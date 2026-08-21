@@ -9,6 +9,7 @@ export interface SourceMetadata {
   source_record_count: number
   source_last_updated_at: string | null
   url: string
+  matched_record_count?: number
 }
 
 export interface Metadata {
@@ -19,6 +20,10 @@ export interface Metadata {
   source_duplicate_registration_rows: number
   source_missing_registration_system_id_rows: number
   invalid_coordinate_system_count: number
+  oath_requested_ticket_count?: number
+  oath_matched_ticket_count?: number
+  oath_unmatched_ticket_count?: number
+  oath_match_basis?: 'SUMMONS_NUMBER_EXACT'
   rules_version: string
   priority_model_version: string
 }
@@ -48,6 +53,7 @@ export interface SystemSummary {
   evidence_confidence: EvidenceConfidence
   priority_score: number
   score_components: ScoreComponent[]
+  oath_case_count?: number
 }
 
 export interface SystemsPayload {
@@ -58,6 +64,7 @@ export interface SystemsPayload {
     active_equipment: number
     potential_sampling_gaps: number
     recent_confirmed_violations: number
+    systems_with_oath_cases?: number
   }
   systems: SystemSummary[]
 }
@@ -92,6 +99,42 @@ export interface Inspection {
   violations: Violation[]
 }
 
+export interface OathCharge {
+  code: string | null
+  code_section: string | null
+  description: string | null
+  infraction_amount: number | null
+}
+
+export interface OathCase {
+  ticket_number: string
+  ticket_number_source_raw: string | null
+  match_basis: 'SUMMONS_NUMBER_EXACT'
+  issuing_agency: string | null
+  violation_date: string | null
+  violation_location: {
+    borough: string | null
+    block: string | null
+    lot: string | null
+    house: string | null
+    street_name: string | null
+    zip: string | null
+  }
+  hearing_status: string | null
+  hearing_result: string | null
+  hearing_date: string | null
+  decision_date: string | null
+  compliance_status: string | null
+  violation_description: string | null
+  penalty_imposed: number | null
+  paid_amount: number | null
+  additional_penalties_or_late_fees: number | null
+  balance_due: number | null
+  total_violation_amount: number | null
+  date_judgment_docketed: string | null
+  charges: OathCharge[]
+}
+
 export interface SystemDetail {
   schema_version: string
   metadata: Metadata
@@ -111,5 +154,6 @@ export interface SystemDetail {
   }
   signals: SignalDetail[]
   inspection_history: Inspection[]
+  oath_case_history?: OathCase[]
   scoring: { score: number; components: ScoreComponent[]; priority_model_version: string }
 }
