@@ -75,8 +75,8 @@ jobs:
           node-version: 22
       - name: Install frontend dependencies
         run: npm install --no-audit --no-fund
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install hosted-test browsers
+        run: npx playwright install --with-deps chromium webkit
       - name: Verify deployed site in desktop and iPhone browser contexts
         env:
           BASE_URL: ${{ needs.deploy.outputs.page_url }}
