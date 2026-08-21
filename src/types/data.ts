@@ -10,6 +10,7 @@ export interface SourceMetadata {
   source_last_updated_at: string | null
   url: string
   matched_record_count?: number
+  source_query_scope?: string
 }
 
 export interface Metadata {
