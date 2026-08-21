@@ -70,7 +70,7 @@ def build(output_dir: Path) -> dict:
         {
             "dataset_id": oath_meta["dataset_id"],
             "name": oath_meta["name"],
-            "retrieved_at": generated_at,
+            "retrieved_at": oath_meta["retrieved_at"],
             "source_record_count": oath_meta["source_record_count"],
             "source_query_scope": oath_meta["source_query_scope"],
             "source_last_updated_at": oath_meta["source_last_updated_at"],
