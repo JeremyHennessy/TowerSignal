@@ -31,7 +31,7 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
-      - name: Independently verify five generated systems against current NYC sources
+      - name: Independently verify generated systems and OATH cases against current NYC sources
         run: python scripts/verify_live_data.py --sample-size 5
       - name: Python fixture tests
         run: python -m unittest discover -s tests/python -p 'test_*.py' -v
