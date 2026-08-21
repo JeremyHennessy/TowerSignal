@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import App from '../../src/App'
@@ -43,7 +43,7 @@ afterEach(() => vi.unstubAllGlobals())
 test('renders the real-data dashboard shell after dataset load', async () => {
   render(<App />)
   expect(await screen.findByText('Find cooling-tower systems worth investigating today.')).toBeInTheDocument()
-  expect(screen.getByText('2 matching systems')).toBeInTheDocument()
+  expect(screen.getByText((_, element) => element?.textContent === '2 matching systems')).toBeInTheDocument()
 })
 
 test('filters records and opens details', async () => {
@@ -56,5 +56,6 @@ test('filters records and opens details', async () => {
   await user.clear(screen.getByPlaceholderText('Address, system ID, BIN…'))
   await user.click(screen.getByText('10 ALPHA ST'))
   await waitFor(() => expect(screen.getByRole('heading', { name:'Identity' })).toBeInTheDocument())
-  expect(screen.getByText('Potential sampling gap')).toBeInTheDocument()
+  const detailPanel = screen.getByRole('complementary', { name: 'Selected cooling tower detail' })
+  expect(within(detailPanel).getByText('Potential sampling gap')).toBeInTheDocument()
 })

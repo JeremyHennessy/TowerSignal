@@ -5,5 +5,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './tests/frontend/setup.ts',
     globals: true,
+    include: ['tests/frontend/**/*.test.tsx'],
   },
 })
