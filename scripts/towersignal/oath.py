@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Iterable
 
 from towersignal.fetch import SourceFetchError, fetch_metadata, fetch_where
@@ -158,9 +158,11 @@ def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 250) -> tu
     metadata = fetch_metadata(OATH_DATASET_ID)
     matched = set(cases)
     validate_match_coverage(len(requested), len(matched))
+    retrieved_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return cases, {
         "dataset_id": OATH_DATASET_ID,
         "name": metadata["name"],
+        "retrieved_at": retrieved_at,
         "source_record_count": query_row_count,
         "source_query_scope": "Exact ticket_number queries for summonses present in NYC Cooling Tower System Inspection Results",
         "source_last_updated_at": metadata.get("source_last_updated_at"),
