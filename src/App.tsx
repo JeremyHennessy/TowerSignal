@@ -22,7 +22,7 @@ export default function App() {
     if (kind === 'Sampling-gap signals') setFilters({ ...initialFilters, signal:'POTENTIAL_SAMPLING_GAP' })
     if (kind === 'No sample date') setFilters({ ...initialFilters, signal:'NO_PUBLIC_SAMPLE_DATE' })
     if (kind === '3+ active units') setFilters({ ...initialFilters, minEquipment:'3' })
-    if (kind === 'Manhattan') setFilters({ ...initialFilters, borough:'MANHATTAN' })
+    if (kind === 'Manhattan') setFilters({ ...initialFilters, borough:'Manhattan' })
     if (kind === 'Highest priority') setFilters({ ...initialFilters, minScore:'70' })
   }
 
