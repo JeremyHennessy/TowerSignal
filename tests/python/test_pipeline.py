@@ -47,6 +47,19 @@ class NormalizationTests(unittest.TestCase):
         duplicate = next(item for item in normalized if item["system_id"] == "SYS-DUPE")
         self.assertEqual(duplicate["sample_count"], 2)
         self.assertEqual(duplicate["active_equipment"], 3)
+        self.assertEqual(duplicate["coordinate_status"], "VALID")
+
+    def test_invalid_source_coordinates_are_quarantined_not_mapped(self):
+        source = dict(self.registrations[0])
+        source.update({"system_id": "SYS-BAD-COORD", "latitude": "0.0", "longitude": "0.0"})
+        normalized, meta = normalize_registrations([source])
+        system = normalized[0]
+        self.assertEqual(system["coordinate_status"], "INVALID_SOURCE")
+        self.assertIsNone(system["latitude"])
+        self.assertIsNone(system["longitude"])
+        self.assertEqual(system["source_latitude_raw"], "0.0")
+        self.assertEqual(system["source_longitude_raw"], "0.0")
+        self.assertEqual(meta["invalid_coordinate_system_count"], 1)
 
     def test_inspection_aggregation_groups_violation_rows(self):
         grouped = aggregate_inspections(self.inspection_rows)

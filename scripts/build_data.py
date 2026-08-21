@@ -71,6 +71,7 @@ def build(output_dir: Path) -> dict:
         "normalized_system_count": len(systems),
         "source_duplicate_registration_rows": dedupe_meta["source_duplicate_rows"],
         "source_missing_registration_system_id_rows": dedupe_meta["source_missing_system_id_rows"],
+        "invalid_coordinate_system_count": dedupe_meta["invalid_coordinate_system_count"],
         "rules_version": rules["rules_version"],
         "priority_model_version": PRIORITY_MODEL_VERSION,
     }
@@ -126,6 +127,7 @@ def build(output_dir: Path) -> dict:
             "active_equipment": system["active_equipment"],
             "latitude": system["latitude"],
             "longitude": system["longitude"],
+            "coordinate_status": system["coordinate_status"],
             "latest_sample_date": system["latest_sample_date"],
             "days_since_latest_sample": signal_state["days_since_latest_sample"],
             "latest_inspection_date": latest_inspection.get("inspection_date") if latest_inspection else None,
@@ -154,6 +156,9 @@ def build(output_dir: Path) -> dict:
                 "active_equipment": system["active_equipment"],
                 "latitude": system["latitude"],
                 "longitude": system["longitude"],
+                "coordinate_status": system["coordinate_status"],
+                "source_latitude_raw": system["source_latitude_raw"],
+                "source_longitude_raw": system["source_longitude_raw"],
             },
             "sample_history": {
                 "source_raw": system["sampledates_raw"],
