@@ -4,6 +4,8 @@ from datetime import date, datetime
 from typing import Any
 
 DATE_FORMATS = ("%m/%d/%Y", "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d")
+NYC_LATITUDE_RANGE = (40.3, 41.1)
+NYC_LONGITUDE_RANGE = (-74.4, -73.5)
 
 
 def _clean(value: Any) -> str | None:
@@ -25,6 +27,37 @@ def _float(value: Any) -> float | None:
         return float(str(value).strip())
     except (TypeError, ValueError):
         return None
+
+
+def normalize_coordinates(latitude_raw: Any, longitude_raw: Any) -> dict[str, Any]:
+    raw_latitude = _clean(latitude_raw)
+    raw_longitude = _clean(longitude_raw)
+    latitude = _float(latitude_raw)
+    longitude = _float(longitude_raw)
+
+    if raw_latitude is None and raw_longitude is None:
+        status = "MISSING"
+        latitude = None
+        longitude = None
+    elif (
+        latitude is not None
+        and longitude is not None
+        and NYC_LATITUDE_RANGE[0] <= latitude <= NYC_LATITUDE_RANGE[1]
+        and NYC_LONGITUDE_RANGE[0] <= longitude <= NYC_LONGITUDE_RANGE[1]
+    ):
+        status = "VALID"
+    else:
+        status = "INVALID_SOURCE"
+        latitude = None
+        longitude = None
+
+    return {
+        "latitude": latitude,
+        "longitude": longitude,
+        "coordinate_status": status,
+        "source_latitude_raw": raw_latitude,
+        "source_longitude_raw": raw_longitude,
+    }
 
 
 def parse_date(value: Any) -> date | None:
@@ -105,8 +138,12 @@ def normalize_registrations(rows: list[dict[str, Any]]) -> tuple[list[dict[str, 
                 best[system_id] = row
 
     normalized: list[dict[str, Any]] = []
+    invalid_coordinate_system_count = 0
     for system_id, row in best.items():
         sample = parse_sample_dates(row.get("sampledates"))
+        coordinates = normalize_coordinates(row.get("latitude"), row.get("longitude"))
+        if coordinates["coordinate_status"] == "INVALID_SOURCE":
+            invalid_coordinate_system_count += 1
         number = _clean(row.get("number"))
         street = _clean(row.get("street"))
         address = " ".join(part for part in (number, street) if part) or None
@@ -122,8 +159,7 @@ def normalize_registrations(rows: list[dict[str, Any]]) -> tuple[list[dict[str, 
                 "borough": _clean(row.get("borough")),
                 "zip": _clean(row.get("zip")),
                 "active_equipment": _int(row.get("activeequipment"), 0),
-                "latitude": _float(row.get("latitude")),
-                "longitude": _float(row.get("longitude")),
+                **coordinates,
                 "community_board": _clean(row.get("community_board")),
                 "council_district": _clean(row.get("council_district")),
                 "census_tract": _clean(row.get("census_tract")),
@@ -143,5 +179,6 @@ def normalize_registrations(rows: list[dict[str, Any]]) -> tuple[list[dict[str, 
     return normalized, {
         "source_duplicate_rows": duplicate_rows,
         "source_missing_system_id_rows": missing_system_id,
+        "invalid_coordinate_system_count": invalid_coordinate_system_count,
         "normalized_system_count": len(normalized),
     }
