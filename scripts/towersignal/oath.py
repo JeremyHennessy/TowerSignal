@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Iterable
 
-from towersignal.fetch import fetch_count, fetch_metadata, fetch_where
+from towersignal.fetch import fetch_metadata, fetch_where
 
 OATH_DATASET_ID = "jz4z-kudi"
 OATH_SOURCE_URL = "https://data.cityofnewyork.us/City-Government/OATH-Hearings-Division-Case-Status/jz4z-kudi"
@@ -51,14 +51,7 @@ def _charges(row: dict[str, Any]) -> list[dict[str, Any]]:
         amount = row.get(f"charge_{index}_infraction_amount")
         if not any(value not in (None, "") for value in (code, section, description, amount)):
             continue
-        charges.append(
-            {
-                "code": code or None,
-                "code_section": section or None,
-                "description": description or None,
-                "infraction_amount": _number(amount),
-            }
-        )
+        charges.append({"code": code or None, "code_section": section or None, "description": description or None, "infraction_amount": _number(amount)})
     return charges
 
 
@@ -113,11 +106,13 @@ def _completeness(case: dict[str, Any]) -> int:
 def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 100) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     requested = sorted({ticket for value in ticket_numbers if (ticket := normalize_ticket_number(value))})
     cases: dict[str, dict[str, Any]] = {}
+    query_row_count = 0
 
     for start in range(0, len(requested), batch_size):
         batch = requested[start : start + batch_size]
         quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
         rows = fetch_where(OATH_DATASET_ID, f"ticket_number in ({quoted})", order_by="ticket_number")
+        query_row_count += len(rows)
         expected = set(batch)
         for row in rows:
             case = normalize_case(row)
@@ -131,12 +126,12 @@ def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 100) -> tu
                 cases[ticket] = case
 
     metadata = fetch_metadata(OATH_DATASET_ID)
-    source_count = fetch_count(OATH_DATASET_ID)
     matched = set(cases)
     return cases, {
         "dataset_id": OATH_DATASET_ID,
         "name": metadata["name"],
-        "source_record_count": source_count,
+        "source_record_count": query_row_count,
+        "source_query_scope": "Exact ticket_number queries for summonses present in NYC Cooling Tower System Inspection Results",
         "source_last_updated_at": metadata.get("source_last_updated_at"),
         "url": OATH_SOURCE_URL,
         "requested_ticket_count": len(requested),
