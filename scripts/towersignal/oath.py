@@ -3,11 +3,12 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Iterable
 
-from towersignal.fetch import fetch_metadata, fetch_where
+from towersignal.fetch import SourceFetchError, fetch_metadata, fetch_where
 
 OATH_DATASET_ID = "jz4z-kudi"
 OATH_SOURCE_URL = "https://data.cityofnewyork.us/City-Government/OATH-Hearings-Division-Case-Status/jz4z-kudi"
 MATCH_BASIS = "SUMMONS_NUMBER_EXACT"
+MIN_EXPECTED_MATCH_RATIO = 0.90
 
 OATH_SELECT = ",".join([
     "ticket_number", "issuing_agency", "violation_date",
@@ -116,6 +117,17 @@ def _completeness(case: dict[str, Any]) -> int:
     return score
 
 
+def validate_match_coverage(requested_count: int, matched_count: int, minimum_ratio: float = MIN_EXPECTED_MATCH_RATIO) -> None:
+    if requested_count < 100:
+        return
+    ratio = matched_count / requested_count if requested_count else 1.0
+    if ratio < minimum_ratio:
+        raise SourceFetchError(
+            f"OATH exact-ticket match coverage collapsed to {matched_count:,}/{requested_count:,} ({ratio:.1%}); "
+            f"expected at least {minimum_ratio:.0%}. Refusing to publish a potentially incomplete lifecycle snapshot."
+        )
+
+
 def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 250) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     requested = sorted({ticket for value in ticket_numbers if (ticket := normalize_ticket_number(value))})
     cases: dict[str, dict[str, Any]] = {}
@@ -138,13 +150,14 @@ def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 250) -> tu
                 continue
             ticket = case["ticket_number"]
             if ticket not in expected:
-                raise RuntimeError(f"OATH query returned unexpected ticket {ticket}")
+                raise SourceFetchError(f"OATH query returned unexpected ticket {ticket}")
             existing = cases.get(ticket)
             if existing is None or _completeness(case) > _completeness(existing):
                 cases[ticket] = case
 
     metadata = fetch_metadata(OATH_DATASET_ID)
     matched = set(cases)
+    validate_match_coverage(len(requested), len(matched))
     return cases, {
         "dataset_id": OATH_DATASET_ID,
         "name": metadata["name"],
