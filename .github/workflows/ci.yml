@@ -33,5 +33,7 @@ jobs:
         run: python -m unittest discover -s tests/python -p 'test_*.py' -v
       - name: Build current NYC + OATH data (Build 002 diagnostic)
         run: python scripts/build_data.py --output /tmp/towersignal-data
+      - name: Independently verify current NYC + OATH data (Build 002 diagnostic)
+        run: python scripts/verify_live_data.py --systems /tmp/towersignal-data/systems.json --details /tmp/towersignal-data/details --output /tmp/towersignal-verification.json --sample-size 5
       - name: Production build
         run: npm run build
