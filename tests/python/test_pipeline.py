@@ -7,9 +7,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from towersignal.fetch import SourceFetchError
 from towersignal.inspections import aggregate_inspections
 from towersignal.normalize import normalize_registrations, parse_sample_dates
-from towersignal.oath import cases_for_system, normalize_case, normalize_ticket_number, summons_numbers_from_inspections
+from towersignal.oath import cases_for_system, normalize_case, normalize_ticket_number, summons_numbers_from_inspections, validate_match_coverage
 from towersignal.scoring import priority_score
 from towersignal.signals import build_signals
 
@@ -74,6 +75,12 @@ class OathLifecycleTests(unittest.TestCase):
         cases = cases_for_system(inspections, {case_a["ticket_number"]: case_a, unrelated["ticket_number"]: unrelated})
         self.assertEqual([case["ticket_number"] for case in cases], ["0880900460"])
         self.assertEqual(summons_numbers_from_inspections({"SYS": inspections}), {"0880900460", "0880900470"})
+
+    def test_match_coverage_gate_rejects_large_anomalous_drop(self):
+        validate_match_coverage(55036, 54746)
+        with self.assertRaises(SourceFetchError):
+            validate_match_coverage(55036, 1000)
+        validate_match_coverage(50, 0)
 
 
 class NormalizationTests(unittest.TestCase):
