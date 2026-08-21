@@ -4,9 +4,9 @@ TowerSignal is a specialized commercial-intelligence product for cooling-tower s
 
 ## Demo
 
-Deployment target: `https://jeremyhennessy.github.io/TowerSignal/`
+Live demo: `https://jeremyhennessy.github.io/TowerSignal/`
 
-**Current status:** Build 001 deployment is configured but this URL is not described here as live until the hosted application has been deployed and verified in a browser.
+**Current status:** Build 001 was deployed and verified against the hosted GitHub Pages application on August 21, 2026. The deployment workflow validates current NYC source data, independently compares five generated systems against NYC Open Data, and runs hosted browser checks before a run is considered green.
 
 ## Current scope
 
@@ -79,7 +79,7 @@ python -m unittest discover -s tests/python -p 'test_*.py' -v
 npm run build
 ```
 
-The Pages workflow also runs an independent five-system source comparison and Playwright browser verification against the deployed GitHub Pages URL in desktop Chromium and iPhone-sized contexts.
+The Pages workflow also runs an independent five-system source comparison and Playwright browser verification against the deployed GitHub Pages URL in desktop Chromium and iPhone/WebKit contexts.
 
 ## Deployment
 
@@ -87,4 +87,4 @@ The Pages workflow also runs an independent five-system source comparison and Pl
 
 ## Current status
 
-Build 001 source implementation is under development on an isolated feature branch. This section will be updated only after CI, Pages deployment, hosted browser verification, and source comparisons are confirmed.
+Build 001 is implemented and hosted for NYC cooling-tower intelligence. The verified workflow includes live-source retrieval and validation, registration deduplication, inspection aggregation, deterministic commercial signals and scoring, dashboard filtering, map interaction, system evidence details, filtered CSV export, five-system source comparison, production build validation, GitHub Pages deployment, and hosted desktop and iPhone/WebKit browser checks.
