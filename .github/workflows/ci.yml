@@ -23,6 +23,10 @@ jobs:
           python-version: '3.12'
       - name: Install frontend dependencies
         run: npm install --no-audit --no-fund
+      - name: Diagnostic live NYC data build
+        run: python scripts/build_data.py --output public/data
+      - name: Diagnostic independent five-system source verification
+        run: python scripts/verify_live_data.py --sample-size 5
       - name: Lint frontend
         run: npm run lint
       - name: Typecheck frontend
