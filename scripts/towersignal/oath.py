@@ -1,0 +1,196 @@
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from typing import Any, Iterable
+
+from towersignal.fetch import SourceFetchError, fetch_metadata, fetch_where
+
+OATH_DATASET_ID = "jz4z-kudi"
+OATH_SOURCE_URL = "https://data.cityofnewyork.us/City-Government/OATH-Hearings-Division-Case-Status/jz4z-kudi"
+MATCH_BASIS = "SUMMONS_NUMBER_EXACT"
+MIN_EXPECTED_MATCH_RATIO = 0.90
+
+OATH_SELECT = ",".join([
+    "ticket_number", "issuing_agency", "violation_date",
+    "violation_location_borough", "violation_location_block_no", "violation_location_lot_no",
+    "violation_location_house", "violation_location_street_name", "violation_location_zip_code",
+    "hearing_status", "hearing_result", "hearing_date", "decision_date", "compliance_status",
+    "violation_description", "violation_details", "penalty_imposed", "paid_amount",
+    "additional_penalties_or_late_fees", "balance_due", "total_violation_amount", "date_judgment_docketed",
+    *[field for index in range(1, 11) for field in (
+        f"charge_{index}_code", f"charge_{index}_code_section",
+        f"charge_{index}_code_description", f"charge_{index}_infraction_amount",
+    )],
+])
+
+
+def normalize_ticket_number(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = "".join(ch for ch in str(value).strip().upper() if ch.isalnum())
+    return text or None
+
+
+def _date_only(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    if len(text) >= 10 and text[4:5] == "-" and text[7:8] == "-":
+        return text[:10]
+    for fmt in ("%m/%d/%Y", "%m/%d/%y"):
+        try:
+            return datetime.strptime(text, fmt).date().isoformat()
+        except ValueError:
+            pass
+    return text
+
+
+def _number(value: Any) -> float | None:
+    if value is None or str(value).strip() == "":
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _charges(row: dict[str, Any]) -> list[dict[str, Any]]:
+    charges: list[dict[str, Any]] = []
+    for index in range(1, 11):
+        code = row.get(f"charge_{index}_code")
+        section = row.get(f"charge_{index}_code_section")
+        description = row.get(f"charge_{index}_code_description")
+        amount = row.get(f"charge_{index}_infraction_amount")
+        if not any(value not in (None, "") for value in (code, section, description, amount)):
+            continue
+        charges.append({"code": code or None, "code_section": section or None, "description": description or None, "infraction_amount": _number(amount)})
+    return charges
+
+
+def normalize_case(row: dict[str, Any]) -> dict[str, Any] | None:
+    ticket_number = normalize_ticket_number(row.get("ticket_number"))
+    if not ticket_number:
+        return None
+    return {
+        "ticket_number": ticket_number,
+        "ticket_number_source_raw": row.get("ticket_number"),
+        "match_basis": MATCH_BASIS,
+        "issuing_agency": row.get("issuing_agency") or None,
+        "violation_date": _date_only(row.get("violation_date")),
+        "violation_location": {
+            "borough": row.get("violation_location_borough") or None,
+            "block": row.get("violation_location_block_no") or None,
+            "lot": row.get("violation_location_lot_no") or None,
+            "house": row.get("violation_location_house") or None,
+            "street_name": row.get("violation_location_street_name") or None,
+            "zip": row.get("violation_location_zip_code") or None,
+        },
+        "hearing_status": row.get("hearing_status") or None,
+        "hearing_result": row.get("hearing_result") or None,
+        "hearing_date": _date_only(row.get("hearing_date")),
+        "decision_date": _date_only(row.get("decision_date")),
+        "compliance_status": row.get("compliance_status") or None,
+        "violation_description": row.get("violation_description") or row.get("violation_details") or None,
+        "penalty_imposed": _number(row.get("penalty_imposed")),
+        "paid_amount": _number(row.get("paid_amount")),
+        "additional_penalties_or_late_fees": _number(row.get("additional_penalties_or_late_fees")),
+        "balance_due": _number(row.get("balance_due")),
+        "total_violation_amount": _number(row.get("total_violation_amount")),
+        "date_judgment_docketed": _date_only(row.get("date_judgment_docketed")),
+        "charges": _charges(row),
+    }
+
+
+def _completeness(case: dict[str, Any]) -> int:
+    score = 0
+    for key, value in case.items():
+        if key in {"ticket_number_source_raw", "match_basis"}:
+            continue
+        if isinstance(value, dict):
+            score += sum(1 for item in value.values() if item not in (None, "", []))
+        elif isinstance(value, list):
+            score += len(value)
+        elif value not in (None, ""):
+            score += 1
+    return score
+
+
+def validate_match_coverage(requested_count: int, matched_count: int, minimum_ratio: float = MIN_EXPECTED_MATCH_RATIO) -> None:
+    if requested_count < 100:
+        return
+    ratio = matched_count / requested_count if requested_count else 1.0
+    if ratio < minimum_ratio:
+        raise SourceFetchError(
+            f"OATH exact-ticket match coverage collapsed to {matched_count:,}/{requested_count:,} ({ratio:.1%}); "
+            f"expected at least {minimum_ratio:.0%}. Refusing to publish a potentially incomplete lifecycle snapshot."
+        )
+
+
+def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 250) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    requested = sorted({ticket for value in ticket_numbers if (ticket := normalize_ticket_number(value))})
+    cases: dict[str, dict[str, Any]] = {}
+    query_row_count = 0
+
+    for start in range(0, len(requested), batch_size):
+        batch = requested[start : start + batch_size]
+        quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
+        rows = fetch_where(
+            OATH_DATASET_ID,
+            f"ticket_number in ({quoted})",
+            order_by="ticket_number",
+            select=OATH_SELECT,
+        )
+        query_row_count += len(rows)
+        expected = set(batch)
+        for row in rows:
+            case = normalize_case(row)
+            if not case:
+                continue
+            ticket = case["ticket_number"]
+            if ticket not in expected:
+                raise SourceFetchError(f"OATH query returned unexpected ticket {ticket}")
+            existing = cases.get(ticket)
+            if existing is None or _completeness(case) > _completeness(existing):
+                cases[ticket] = case
+
+    metadata = fetch_metadata(OATH_DATASET_ID)
+    matched = set(cases)
+    validate_match_coverage(len(requested), len(matched))
+    retrieved_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    return cases, {
+        "dataset_id": OATH_DATASET_ID,
+        "name": metadata["name"],
+        "retrieved_at": retrieved_at,
+        "source_record_count": query_row_count,
+        "source_query_scope": "Exact ticket_number queries for summonses present in NYC Cooling Tower System Inspection Results",
+        "source_last_updated_at": metadata.get("source_last_updated_at"),
+        "url": OATH_SOURCE_URL,
+        "requested_ticket_count": len(requested),
+        "matched_ticket_count": len(matched),
+        "unmatched_ticket_count": len(set(requested) - matched),
+        "matched_case_count": len(cases),
+    }
+
+
+def summons_numbers_from_inspections(inspections_by_system: dict[str, list[dict[str, Any]]]) -> set[str]:
+    values: set[str] = set()
+    for inspections in inspections_by_system.values():
+        for inspection in inspections:
+            for violation in inspection.get("violations", []):
+                ticket = normalize_ticket_number(violation.get("summons_number"))
+                if ticket:
+                    values.add(ticket)
+    return values
+
+
+def cases_for_system(inspections: list[dict[str, Any]], cases_by_ticket: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+    tickets: set[str] = set()
+    for inspection in inspections:
+        for violation in inspection.get("violations", []):
+            ticket = normalize_ticket_number(violation.get("summons_number"))
+            if ticket:
+                tickets.add(ticket)
+    cases = [cases_by_ticket[ticket] for ticket in tickets if ticket in cases_by_ticket]
+    return sorted(cases, key=lambda item: (item.get("violation_date") or "", item["ticket_number"]), reverse=True)

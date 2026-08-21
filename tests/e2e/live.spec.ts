@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('hosted TowerSignal loads data, filters, details and map without app errors', async ({ page }, testInfo) => {
+test('hosted TowerSignal loads data, filters, details, OATH lifecycle and map without app errors', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
@@ -13,6 +13,7 @@ test('hosted TowerSignal loads data, filters, details and map without app errors
   await page.goto('./', { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
   await expect(page.getByText('Registered systems')).toBeVisible()
+  await expect(page.getByText('Systems with OATH cases')).toBeVisible()
   await expect(page.locator('tbody tr').first()).toBeVisible()
   await expect(page.locator('.leaflet-container')).toBeVisible()
   await expect(page.locator('.marker-cluster, .tower-marker').first()).toBeVisible()
@@ -24,8 +25,12 @@ test('hosted TowerSignal loads data, filters, details and map without app errors
   expect(before).toBeGreaterThan(0)
   expect(after).toBeGreaterThan(0)
 
+  await page.getByRole('button', { name: 'OATH cases' }).click()
+  await expect(page.locator('tbody tr').first()).toBeVisible()
   await page.locator('tbody tr').first().click()
   await expect(page.getByRole('heading', { name: 'Identity' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'OATH case lifecycle' })).toBeVisible()
+  await expect(page.getByText(/Matched by exact NYC Health summons number to OATH ticket number/).first()).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Source & provenance' })).toBeVisible()
   await page.reload({ waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()

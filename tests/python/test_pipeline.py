@@ -7,8 +7,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from towersignal.fetch import SourceFetchError
 from towersignal.inspections import aggregate_inspections
 from towersignal.normalize import normalize_registrations, parse_sample_dates
+from towersignal.oath import cases_for_system, normalize_case, normalize_ticket_number, summons_numbers_from_inspections, validate_match_coverage
 from towersignal.scoring import priority_score
 from towersignal.signals import build_signals
 
@@ -31,6 +33,54 @@ class SampleParserTests(unittest.TestCase):
         parsed = parse_sample_dates("bad, 08/01/2026")
         self.assertEqual(parsed["dates"], ["2026-08-01"])
         self.assertEqual(parsed["malformed"], ["bad"])
+
+
+class OathLifecycleTests(unittest.TestCase):
+    def test_ticket_normalization_preserves_leading_zero_identity(self):
+        self.assertEqual(normalize_ticket_number(" 088-090-0460 "), "0880900460")
+        self.assertIsNone(normalize_ticket_number("   "))
+
+    def test_case_normalization_preserves_lifecycle_and_charges(self):
+        case = normalize_case({
+            "ticket_number": "0880900460",
+            "issuing_agency": "DOHMH",
+            "violation_date": "2026-06-10T00:00:00.000",
+            "hearing_status": "HEARING COMPLETED",
+            "hearing_result": "IN VIOLATION",
+            "decision_date": "07/15/2026",
+            "penalty_imposed": "1000",
+            "paid_amount": "250",
+            "balance_due": "750",
+            "charge_1_code": "CT01",
+            "charge_1_code_section": "24 RCNY 8",
+            "charge_1_code_description": "Cooling tower violation",
+            "charge_1_infraction_amount": "1000",
+        })
+        self.assertEqual(case["ticket_number"], "0880900460")
+        self.assertEqual(case["match_basis"], "SUMMONS_NUMBER_EXACT")
+        self.assertEqual(case["violation_date"], "2026-06-10")
+        self.assertEqual(case["decision_date"], "2026-07-15")
+        self.assertEqual(case["balance_due"], 750.0)
+        self.assertEqual(case["charges"][0]["code"], "CT01")
+
+    def test_cases_attach_only_by_exact_summons_number(self):
+        inspections = [{
+            "violations": [
+                {"summons_number": "0880900460"},
+                {"summons_number": "0880900470"},
+            ]
+        }]
+        case_a = normalize_case({"ticket_number": "0880900460", "violation_date": "2026-06-10"})
+        unrelated = normalize_case({"ticket_number": "9999999999", "violation_date": "2026-08-01"})
+        cases = cases_for_system(inspections, {case_a["ticket_number"]: case_a, unrelated["ticket_number"]: unrelated})
+        self.assertEqual([case["ticket_number"] for case in cases], ["0880900460"])
+        self.assertEqual(summons_numbers_from_inspections({"SYS": inspections}), {"0880900460", "0880900470"})
+
+    def test_match_coverage_gate_rejects_large_anomalous_drop(self):
+        validate_match_coverage(55036, 54746)
+        with self.assertRaises(SourceFetchError):
+            validate_match_coverage(55036, 1000)
+        validate_match_coverage(50, 0)
 
 
 class NormalizationTests(unittest.TestCase):
