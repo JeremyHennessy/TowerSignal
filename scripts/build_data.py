@@ -72,6 +72,7 @@ def build(output_dir: Path) -> dict:
             "name": oath_meta["name"],
             "retrieved_at": generated_at,
             "source_record_count": oath_meta["source_record_count"],
+            "source_query_scope": oath_meta["source_query_scope"],
             "source_last_updated_at": oath_meta["source_last_updated_at"],
             "url": oath_meta["url"],
             "matched_record_count": oath_meta["matched_case_count"],
