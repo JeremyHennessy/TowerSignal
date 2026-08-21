@@ -9,6 +9,19 @@ OATH_DATASET_ID = "jz4z-kudi"
 OATH_SOURCE_URL = "https://data.cityofnewyork.us/City-Government/OATH-Hearings-Division-Case-Status/jz4z-kudi"
 MATCH_BASIS = "SUMMONS_NUMBER_EXACT"
 
+OATH_SELECT = ",".join([
+    "ticket_number", "issuing_agency", "violation_date",
+    "violation_location_borough", "violation_location_block_no", "violation_location_lot_no",
+    "violation_location_house", "violation_location_street_name", "violation_location_zip_code",
+    "hearing_status", "hearing_result", "hearing_date", "decision_date", "compliance_status",
+    "violation_description", "violation_details", "penalty_imposed", "paid_amount",
+    "additional_penalties_or_late_fees", "balance_due", "total_violation_amount", "date_judgment_docketed",
+    *[field for index in range(1, 11) for field in (
+        f"charge_{index}_code", f"charge_{index}_code_section",
+        f"charge_{index}_code_description", f"charge_{index}_infraction_amount",
+    )],
+])
+
 
 def normalize_ticket_number(value: Any) -> str | None:
     if value is None:
@@ -103,7 +116,7 @@ def _completeness(case: dict[str, Any]) -> int:
     return score
 
 
-def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 100) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 250) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     requested = sorted({ticket for value in ticket_numbers if (ticket := normalize_ticket_number(value))})
     cases: dict[str, dict[str, Any]] = {}
     query_row_count = 0
@@ -111,7 +124,12 @@ def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 100) -> tu
     for start in range(0, len(requested), batch_size):
         batch = requested[start : start + batch_size]
         quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
-        rows = fetch_where(OATH_DATASET_ID, f"ticket_number in ({quoted})", order_by="ticket_number")
+        rows = fetch_where(
+            OATH_DATASET_ID,
+            f"ticket_number in ({quoted})",
+            order_by="ticket_number",
+            select=OATH_SELECT,
+        )
         query_row_count += len(rows)
         expected = set(batch)
         for row in rows:
