@@ -14,6 +14,7 @@ from towersignal import PRIORITY_MODEL_VERSION, SCHEMA_VERSION  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.inspections import aggregate_inspections  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
+from towersignal.oath import cases_for_system, fetch_oath_cases, summons_numbers_from_inspections  # noqa: E402
 from towersignal.scoring import priority_score  # noqa: E402
 from towersignal.signals import build_signals  # noqa: E402
 from towersignal.validate import validate_generated, validate_normalized, validate_sources  # noqa: E402
@@ -45,6 +46,9 @@ def build(output_dir: Path) -> dict:
     validate_normalized(systems, snapshot_date)
     inspections_by_system = aggregate_inspections(inspection_snapshot.rows)
 
+    oath_ticket_numbers = summons_numbers_from_inspections(inspections_by_system)
+    oath_cases_by_ticket, oath_meta = fetch_oath_cases(oath_ticket_numbers)
+
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [
         {
@@ -63,6 +67,15 @@ def build(output_dir: Path) -> dict:
             "source_last_updated_at": inspection_snapshot.source_last_updated_at,
             "url": "https://data.cityofnewyork.us/Health/NYC-Cooling-Tower-System-Inspection-Results/f9wb-g8mb",
         },
+        {
+            "dataset_id": oath_meta["dataset_id"],
+            "name": oath_meta["name"],
+            "retrieved_at": generated_at,
+            "source_record_count": oath_meta["source_record_count"],
+            "source_last_updated_at": oath_meta["source_last_updated_at"],
+            "url": oath_meta["url"],
+            "matched_record_count": oath_meta["matched_case_count"],
+        },
     ]
     metadata = {
         "generated_at": generated_at,
@@ -72,6 +85,10 @@ def build(output_dir: Path) -> dict:
         "source_duplicate_registration_rows": dedupe_meta["source_duplicate_rows"],
         "source_missing_registration_system_id_rows": dedupe_meta["source_missing_system_id_rows"],
         "invalid_coordinate_system_count": dedupe_meta["invalid_coordinate_system_count"],
+        "oath_requested_ticket_count": oath_meta["requested_ticket_count"],
+        "oath_matched_ticket_count": oath_meta["matched_ticket_count"],
+        "oath_unmatched_ticket_count": oath_meta["unmatched_ticket_count"],
+        "oath_match_basis": "SUMMONS_NUMBER_EXACT",
         "rules_version": rules["rules_version"],
         "priority_model_version": PRIORITY_MODEL_VERSION,
     }
@@ -86,9 +103,13 @@ def build(output_dir: Path) -> dict:
     gap_count = 0
     recent_violation_count = 0
     active_equipment_total = 0
+    systems_with_oath_cases = 0
 
     for system in systems:
         inspections = inspections_by_system.get(system["system_id"], [])
+        oath_cases = cases_for_system(inspections, oath_cases_by_ticket)
+        if oath_cases:
+            systems_with_oath_cases += 1
         signal_state = build_signals(system, inspections, rules, snapshot_date)
         scoring = priority_score(system, signal_state)
         signals = signal_state["signals"]
@@ -140,6 +161,7 @@ def build(output_dir: Path) -> dict:
             "evidence_confidence": evidence_confidence,
             "priority_score": scoring["score"],
             "score_components": scoring["components"],
+            "oath_case_count": len(oath_cases),
         }
         summary_rows.append(row)
 
@@ -172,6 +194,7 @@ def build(output_dir: Path) -> dict:
             },
             "signals": signals,
             "inspection_history": inspections,
+            "oath_case_history": oath_cases,
             "scoring": scoring,
         }
         safe_detail_path(detail_dir, system["system_id"]).write_text(json.dumps(detail, separators=(",", ":")), encoding="utf-8")
@@ -185,6 +208,7 @@ def build(output_dir: Path) -> dict:
             "active_equipment": active_equipment_total,
             "potential_sampling_gaps": gap_count,
             "recent_confirmed_violations": recent_violation_count,
+            "systems_with_oath_cases": systems_with_oath_cases,
         },
         "systems": summary_rows,
     }
@@ -193,6 +217,7 @@ def build(output_dir: Path) -> dict:
     (output_dir / "systems.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     (output_dir / "metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     print(json.dumps(payload["summary"], indent=2))
+    print(f"OATH exact ticket matches: {oath_meta['matched_ticket_count']:,}/{oath_meta['requested_ticket_count']:,}")
     print(f"Generated {len(summary_rows):,} systems at {generated_at}")
     return payload
 
