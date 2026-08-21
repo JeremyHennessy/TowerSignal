@@ -1,5 +1,6 @@
 export type EvidenceConfidence = 'CONFIRMED' | 'STRONG_SIGNAL' | 'VERIFY'
 export type FactClass = 'CONFIRMED_FACT' | 'DERIVED_FACT' | 'COMMERCIAL_SIGNAL'
+export type CoordinateStatus = 'VALID' | 'MISSING' | 'INVALID_SOURCE'
 
 export interface SourceMetadata {
   dataset_id: string
@@ -17,6 +18,7 @@ export interface Metadata {
   normalized_system_count: number
   source_duplicate_registration_rows: number
   source_missing_registration_system_id_rows: number
+  invalid_coordinate_system_count: number
   rules_version: string
   priority_model_version: string
 }
@@ -33,6 +35,7 @@ export interface SystemSummary {
   active_equipment: number
   latitude: number | null
   longitude: number | null
+  coordinate_status: CoordinateStatus
   latest_sample_date: string | null
   days_since_latest_sample: number | null
   latest_inspection_date: string | null
@@ -92,7 +95,10 @@ export interface Inspection {
 export interface SystemDetail {
   schema_version: string
   metadata: Metadata
-  identity: Pick<SystemSummary, 'system_id' | 'bin' | 'bbl' | 'address' | 'borough' | 'zip' | 'active_equipment' | 'latitude' | 'longitude'>
+  identity: Pick<SystemSummary, 'system_id' | 'bin' | 'bbl' | 'address' | 'borough' | 'zip' | 'active_equipment' | 'latitude' | 'longitude' | 'coordinate_status'> & {
+    source_latitude_raw: string | null
+    source_longitude_raw: string | null
+  }
   sample_history: {
     source_raw: string
     dates: string[]
