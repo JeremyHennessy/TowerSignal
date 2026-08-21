@@ -35,7 +35,7 @@ beforeEach(() => {
     const url = String(input)
     return Promise.resolve({ ok:true, json:() => Promise.resolve(url.includes('/details/') ? detail : payload) }) as unknown as Promise<Response>
   }))
-  Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+  Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: vi.fn().mockResolvedValue(undefined) } })
 })
 
 afterEach(() => vi.unstubAllGlobals())
