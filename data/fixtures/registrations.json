@@ -1,0 +1,8 @@
+[
+  {"bin":"1000001","system_id":"SYS-RECENT","date_registered":"2026-01-01","number":"10","street":"ALPHA ST","borough":"MANHATTAN","zip":"10001","sampledates":"08/20/2026, 07/20/2026","activeequipment":"1","bbl":"1000000001","latitude":"40.75","longitude":"-73.99"},
+  {"bin":"1000002","system_id":"SYS-GAP","date_registered":"2026-01-01","number":"20","street":"BETA AVE","borough":"MANHATTAN","zip":"10002","sampledates":"07/20/2026, 06/19/2026","activeequipment":"2","bbl":"1000000002","latitude":"40.72","longitude":"-73.98"},
+  {"bin":"1000003","system_id":"SYS-NONE","date_registered":"2026-01-01","number":"30","street":"GAMMA RD","borough":"QUEENS","zip":"11101","sampledates":"","activeequipment":"1","bbl":"4000000003","latitude":"40.74","longitude":"-73.94"},
+  {"bin":"1000004","system_id":"SYS-BAD","date_registered":"2026-01-01","number":"40","street":"DELTA BLVD","borough":"BROOKLYN","zip":"11201","sampledates":"not-a-date, 08/01/2026","activeequipment":"4","bbl":"3000000004","latitude":"40.69","longitude":"-73.99"},
+  {"bin":"1000005","system_id":"SYS-DUPE","date_registered":"2026-01-01","number":"50","street":"EPSILON ST","borough":"BRONX","zip":"10451","sampledates":"08/05/2026","activeequipment":"3","bbl":"2000000005","latitude":"40.82","longitude":"-73.92"},
+  {"bin":"1000005","system_id":"SYS-DUPE","date_registered":"2026-01-01","number":"50","street":"EPSILON ST","borough":"BRONX","zip":"10451","sampledates":"08/05/2026, 07/05/2026","activeequipment":"3","bbl":"2000000005","latitude":"40.82","longitude":"-73.92","community_board":"1"}
+]
