@@ -1,8 +1,8 @@
 name: Build 002 Pages Diagnostic
 
 on:
-  push:
-    branches: [agent/build-002-pages-diagnostic]
+  pull_request:
+    branches: [main]
 
 permissions:
   actions: read
