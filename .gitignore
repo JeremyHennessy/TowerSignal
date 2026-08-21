@@ -1,0 +1,10 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.DS_Store
+public/data/systems.json
+public/data/metadata.json
+public/data/verification.json
+public/data/details/
