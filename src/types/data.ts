@@ -25,6 +25,8 @@ export interface Metadata {
   oath_matched_ticket_count?: number
   oath_unmatched_ticket_count?: number
   oath_match_basis?: 'SUMMONS_NUMBER_EXACT'
+  pluto_requested_bbl_count?: number
+  pluto_matched_bbl_count?: number
   rules_version: string
   priority_model_version: string
 }
@@ -55,6 +57,7 @@ export interface SystemSummary {
   priority_score: number
   score_components: ScoreComponent[]
   oath_case_count?: number
+  pluto_match?: boolean
 }
 
 export interface SystemsPayload {
@@ -66,6 +69,7 @@ export interface SystemsPayload {
     potential_sampling_gaps: number
     recent_confirmed_violations: number
     systems_with_oath_cases?: number
+    systems_with_pluto_context?: number
   }
   systems: SystemSummary[]
 }
@@ -136,6 +140,22 @@ export interface OathCase {
   charges: OathCharge[]
 }
 
+export interface BuildingContext {
+  bbl: string | null
+  owner_name: string | null
+  land_use: string | null
+  building_class: string | null
+  lot_area_sqft: number | null
+  building_area_sqft: number | null
+  floors: number | null
+  residential_units: number | null
+  total_units: number | null
+  year_built: number | null
+  year_altered_1: number | null
+  year_altered_2: number | null
+  source: 'NYC_DCP_PLUTO'
+}
+
 export interface SystemDetail {
   schema_version: string
   metadata: Metadata
@@ -143,6 +163,7 @@ export interface SystemDetail {
     source_latitude_raw: string | null
     source_longitude_raw: string | null
   }
+  building_context?: BuildingContext | null
   sample_history: {
     source_raw: string
     dates: string[]
