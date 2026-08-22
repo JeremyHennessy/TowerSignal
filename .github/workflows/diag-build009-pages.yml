@@ -6,7 +6,7 @@ on:
     paths-ignore: [diag-build009-result.json]
 
 permissions:
-  actions: write
+  actions: read
   contents: write
 
 jobs:
@@ -14,34 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Cancel unsafe PLUTO-repair run before history persistence
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          RUN_ID: '32566387863'
-        run: |
-          python - <<'PY'
-          import os, urllib.request, urllib.error
-          req = urllib.request.Request(
-              f"https://api.github.com/repos/{os.environ['REPO']}/actions/runs/{os.environ['RUN_ID']}/cancel",
-              data=b'',
-              method='POST',
-              headers={'Authorization': f"Bearer {os.environ['GH_TOKEN']}", 'Accept': 'application/vnd.github+json'},
-          )
-          try:
-              with urllib.request.urlopen(req) as response:
-                  print('cancel status', response.status)
-          except urllib.error.HTTPError as exc:
-              if exc.code == 409:
-                  print('run already completed; cancellation no longer applicable')
-              else:
-                  raise
-          PY
       - name: Capture exact main Pages run state
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          TARGET_SHA: 415005a248626e9f1c1c4515c8e0305a2e46b6db
+          TARGET_SHA: 2824e6b183a215e9bea04abc403b63fa7aec9023
         run: |
           python - <<'PY'
           import json, os, urllib.request
