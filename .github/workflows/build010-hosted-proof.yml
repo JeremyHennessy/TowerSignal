@@ -1,4 +1,4 @@
-name: Build 010 WebKit DOM-locator diagnostic
+name: Build 010 ChangesView render diagnostic
 
 on:
   pull_request:
@@ -8,9 +8,9 @@ permissions:
   contents: read
 
 jobs:
-  test-webkit-dom-locator:
+  test-trivial-changes-view:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
 
@@ -21,10 +21,31 @@ jobs:
       - name: Install frontend dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Copy exact hosted Build 010 summary and Changes data into diagnostic build
+        run: |
+          mkdir -p public/data
+          curl --fail --location --retry 3 --output public/data/systems.json "https://jeremyhennessy.github.io/TowerSignal/data/systems.json?diag=${GITHUB_RUN_ID}"
+          curl --fail --location --retry 3 --output public/data/changes.json "https://jeremyhennessy.github.io/TowerSignal/data/changes.json?diag=${GITHUB_RUN_ID}"
+
+      - name: Build diagnostic app with trivial ChangesView
+        run: npm run build
+
+      - name: Start diagnostic preview
+        run: |
+          npx vite preview --host 127.0.0.1 > /tmp/towersignal-preview.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/TowerSignal/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/towersignal-preview.log
+          exit 1
+
       - name: Install WebKit browser
         run: npx playwright install --with-deps webkit
 
-      - name: Test hosted mode switch with plain DOM selectors
+      - name: Test same mode switch with trivial ChangesView
         env:
-          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          BASE_URL: http://127.0.0.1:4173/TowerSignal/
         run: npx playwright test tests/e2e/build010-webkit-hidden.spec.ts --project=iphone --reporter=list
