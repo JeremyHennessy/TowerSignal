@@ -1,4 +1,5 @@
 import type { SystemDetail, SystemsPayload } from '../types/data'
+import type { ChangesPayload } from '../types/history'
 
 const base = import.meta.env.BASE_URL
 
@@ -7,6 +8,14 @@ export async function loadSystems(): Promise<SystemsPayload> {
   if (!response.ok) throw new Error(`TowerSignal dataset request failed: HTTP ${response.status}`)
   const payload = await response.json() as SystemsPayload
   if (!payload?.metadata || !Array.isArray(payload?.systems)) throw new Error('TowerSignal dataset is malformed')
+  return payload
+}
+
+export async function loadChanges(): Promise<ChangesPayload> {
+  const response = await fetch(`${base}data/changes.json`, { cache: 'no-store' })
+  if (!response.ok) throw new Error(`TowerSignal history request failed: HTTP ${response.status}`)
+  const payload = await response.json() as ChangesPayload
+  if (!payload?.history_started_at || !Array.isArray(payload?.events)) throw new Error('TowerSignal history dataset is malformed')
   return payload
 }
 
