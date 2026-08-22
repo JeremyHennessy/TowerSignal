@@ -124,8 +124,8 @@ jobs:
       - name: Persist verified observation and event history
         run: |
           mkdir -p data/history
-          cp .verified-history/public/data/history/latest.json data/history/latest.json
-          cp .verified-history/public/data/history/events.json data/history/events.json
+          cp .verified-history/latest.json data/history/latest.json
+          cp .verified-history/events.json data/history/events.json
           git config user.name "TowerSignal History Bot"
           git config user.email "actions@users.noreply.github.com"
           git add data/history/latest.json data/history/events.json
