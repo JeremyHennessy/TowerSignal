@@ -27,6 +27,9 @@ export interface Metadata {
   oath_match_basis?: 'SUMMONS_NUMBER_EXACT'
   pluto_requested_bbl_count?: number
   pluto_matched_bbl_count?: number
+  hpd_requested_bbl_count?: number
+  hpd_matched_registration_bbl_count?: number
+  hpd_matched_contact_bbl_count?: number
   rules_version: string
   priority_model_version: string
 }
@@ -58,6 +61,7 @@ export interface SystemSummary {
   score_components: ScoreComponent[]
   oath_case_count?: number
   pluto_match?: boolean
+  hpd_contact_count?: number
 }
 
 export interface SystemsPayload {
@@ -70,6 +74,8 @@ export interface SystemsPayload {
     recent_confirmed_violations: number
     systems_with_oath_cases?: number
     systems_with_pluto_context?: number
+    systems_with_hpd_registration?: number
+    systems_with_hpd_contacts?: number
   }
   systems: SystemSummary[]
 }
@@ -156,6 +162,25 @@ export interface BuildingContext {
   source: 'NYC_DCP_PLUTO'
 }
 
+export interface HpdContact {
+  registration_contact_id: string | null
+  type: string | null
+  description: string | null
+  corporation_name: string | null
+  person_name: string | null
+  title: string | null
+  business_address: string | null
+  source: 'NYC_HPD_REGISTRATION_CONTACTS'
+}
+
+export interface HpdRegistrationContext {
+  registration_id: string | null
+  building_id: string | null
+  last_registration_date: string | null
+  contacts: HpdContact[]
+  source: 'NYC_HPD_MULTIPLE_DWELLING_REGISTRATION'
+}
+
 export interface SystemDetail {
   schema_version: string
   metadata: Metadata
@@ -164,6 +189,7 @@ export interface SystemDetail {
     source_longitude_raw: string | null
   }
   building_context?: BuildingContext | null
+  hpd_registration?: HpdRegistrationContext | null
   sample_history: {
     source_raw: string
     dates: string[]
