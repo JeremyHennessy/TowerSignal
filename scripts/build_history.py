@@ -5,6 +5,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -18,6 +19,15 @@ def safe_detail_path(base: Path, system_id: str) -> Path:
     return base / "details" / prefix / f"{safe}.json"
 
 
+def retain_seen_timestamps(observations: list[dict[str, Any]], previous_snapshot: dict[str, Any] | None, detected_at: str) -> list[dict[str, Any]]:
+    previous_by_id = {item["system_id"]: item for item in (previous_snapshot or {}).get("systems", [])}
+    for observation in observations:
+        previous = previous_by_id.get(observation["system_id"])
+        observation["first_seen_at"] = previous.get("first_seen_at") if previous and previous.get("first_seen_at") else detected_at
+        observation["last_seen_at"] = detected_at
+    return observations
+
+
 def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events_path: Path | None) -> dict:
     systems_path = output_dir / "systems.json"
     if not systems_path.exists():
@@ -25,7 +35,6 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
     payload = json.loads(systems_path.read_text(encoding="utf-8"))
     detected_at = payload.get("metadata", {}).get("generated_at") or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     previous_snapshot = load_json(previous_snapshot_path, None)
-    previous_by_id = {item["system_id"]: item for item in (previous_snapshot or {}).get("systems", [])}
 
     observations = []
     for row in payload.get("systems", []):
@@ -40,19 +49,16 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
             "sample_dates": detail.get("sample_history", {}).get("dates", []),
             "latest_sample_date": detail.get("sample_history", {}).get("latest_sample_date"),
         }
-        observation = build_observation(
+        observations.append(build_observation(
             system,
             row,
             detail.get("inspection_history", []),
             detail.get("oath_case_history", []),
             detail.get("building_context"),
             detail.get("hpd_registration"),
-        )
-        previous = previous_by_id.get(row["system_id"])
-        observation["first_seen_at"] = previous.get("first_seen_at") if previous and previous.get("first_seen_at") else detected_at
-        observation["last_seen_at"] = detected_at
-        observations.append(observation)
+        ))
 
+    retain_seen_timestamps(observations, previous_snapshot, detected_at)
     previous_events_payload = load_json(previous_events_path, {"events": []})
     previous_events = previous_events_payload.get("events", []) if isinstance(previous_events_payload, dict) else []
     snapshot, changes = build_history(observations, detected_at, previous_snapshot, previous_events)
