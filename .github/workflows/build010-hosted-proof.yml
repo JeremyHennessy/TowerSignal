@@ -1,4 +1,4 @@
-name: Build 010 WebKit scale diagnostic
+name: Build 010 WebKit hidden diagnostic
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  test-webkit-scale:
+  test-webkit-hidden:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -24,7 +24,7 @@ jobs:
       - name: Install WebKit browser
         run: npx playwright install --with-deps webkit
 
-      - name: Test Changes switch with reduced hosted systems payload
+      - name: Test Changes switch without display-none hiding
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-        run: npx playwright test tests/e2e/build010-webkit-scale.spec.ts --project=iphone --reporter=list
+        run: npx playwright test tests/e2e/build010-webkit-hidden.spec.ts --project=iphone --reporter=list
