@@ -21,6 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check out durable TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -31,6 +37,8 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
+      - name: Build deterministic historical changes
+        run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
       - name: Independently verify generated systems and OATH cases against current NYC sources
         run: python scripts/verify_live_data.py --sample-size 5
       - name: Python fixture tests
@@ -43,6 +51,14 @@ jobs:
         run: npm test
       - name: Production build
         run: npm run build
+      - name: Stage history state for post-deploy persistence
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-history-state
+          path: |
+            public/data/history/latest.json
+            public/data/history/events.json
+          retention-days: 7
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
@@ -88,3 +104,34 @@ jobs:
           name: live-browser-verification
           path: playwright-report
           retention-days: 14
+
+  persist-history:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out durable history branch
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          fetch-depth: 1
+      - name: Download verified history state
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-history-state
+          path: .verified-history
+      - name: Persist verified observation and event history
+        run: |
+          mkdir -p data/history
+          cp .verified-history/public/data/history/latest.json data/history/latest.json
+          cp .verified-history/public/data/history/events.json data/history/events.json
+          git config user.name "TowerSignal History Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history/latest.json data/history/events.json
+          if git diff --cached --quiet; then
+            echo "History state unchanged"
+          else
+            git commit -m "history: persist verified TowerSignal observation [skip ci]"
+            git push origin HEAD:data/towersignal-history
+          fi
