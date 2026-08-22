@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('hosted TowerSignal loads data, changes, details, OATH lifecycle and map without app errors', async ({ page }, testInfo) => {
+test('hosted TowerSignal loads data, changes, historical profile, OATH lifecycle and map without app errors', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
@@ -35,6 +35,11 @@ test('hosted TowerSignal loads data, changes, details, OATH lifecycle and map wi
   await expect(page.locator('tbody tr').first()).toBeVisible()
   await page.locator('tbody tr').first().click()
   await expect(page.getByRole('heading', { name: 'Identity' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Historical profile' })).toBeVisible()
+  await expect(page.getByText('Reported samples')).toBeVisible()
+  await expect(page.getByText('NYC Health inspections')).toBeVisible()
+  await expect(page.getByText('OATH penalty imposed')).toBeVisible()
+  await expect(page.getByText(/Descriptive history derived from the current authoritative NYC registration/)).toBeVisible()
   await expect(page.getByRole('heading', { name: 'OATH case lifecycle' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'TowerSignal History' })).toBeVisible()
   await expect(page.getByText(/Matched by exact NYC Health summons number to OATH ticket number/).first()).toBeVisible()
