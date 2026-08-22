@@ -25,6 +25,17 @@ const payload = {
   ],
 }
 
+const changes = {
+  history_schema_version:'1.0',
+  history_started_at:'2026-08-20T20:00:00Z',
+  observed_at:'2026-08-21T20:00:00Z',
+  baseline_initialized:false,
+  new_event_count:1,
+  events:[{
+    event_type:'SAMPLE_REPORTED',system_id:'SYS-1',bbl:'1',bin:'1',address:'10 ALPHA ST',borough:'Manhattan',detected_at:'2026-08-21T20:00:00Z',source_observation_date:'2026-08-21',previous_value:null,new_value:'2026-08-21',source:'NYC_COOLING_TOWER_REGISTRATIONS',evidence_basis:'SYSTEM_ID_EXACT',priority_score:88,evidence_confidence:'CONFIRMED',contact_available:true,
+  }],
+}
+
 const detail = {
   schema_version:'1.0', metadata:payload.metadata,
   identity:{ system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',source_latitude_raw:'40.75',source_longitude_raw:'-73.99' },
@@ -38,7 +49,8 @@ const detail = {
 beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
     const url = String(input)
-    return Promise.resolve({ ok:true, json:() => Promise.resolve(url.includes('/details/') ? detail : payload) }) as unknown as Promise<Response>
+    const responsePayload = url.includes('/details/') ? detail : url.includes('/data/changes.json') ? changes : payload
+    return Promise.resolve({ ok:true, json:() => Promise.resolve(responsePayload) }) as unknown as Promise<Response>
   }))
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: vi.fn().mockResolvedValue(undefined) } })
 })
@@ -50,6 +62,7 @@ test('renders the real-data dashboard shell after dataset load', async () => {
   expect(await screen.findByText('Find cooling-tower systems worth investigating today.')).toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '2 matching systems')).toBeInTheDocument()
   expect(screen.getByText('Systems with OATH cases')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name:'Changes' })).toBeInTheDocument()
 })
 
 test('filters records and opens details', async () => {
@@ -65,6 +78,7 @@ test('filters records and opens details', async () => {
   const detailPanel = screen.getByRole('complementary', { name: 'Selected cooling tower detail' })
   expect(within(detailPanel).getByText('Potential sampling gap')).toBeInTheDocument()
   expect(within(detailPanel).getByRole('heading', { name:'OATH case lifecycle' })).toBeInTheDocument()
+  expect(within(detailPanel).getByRole('heading', { name:'TowerSignal History' })).toBeInTheDocument()
   expect(within(detailPanel).getByText(/Ticket 0880900460/)).toBeInTheDocument()
   expect(within(detailPanel).getByText('IN VIOLATION')).toBeInTheDocument()
 })
@@ -87,4 +101,15 @@ test('OATH quick filter returns only exact-matched systems', async () => {
   expect(screen.getByText('10 ALPHA ST')).toBeInTheDocument()
   expect(screen.queryByText('20 BETA AVE')).not.toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '1 matching systems')).toBeInTheDocument()
+})
+
+test('opens the Changes product mode with source-backed change evidence', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await screen.findByText('10 ALPHA ST')
+  await user.click(screen.getByRole('button', { name:'Changes' }))
+  expect(screen.getByRole('heading', { name:'What changed?' })).toBeInTheDocument()
+  expect(screen.getByText('New public sample reported')).toBeInTheDocument()
+  expect(screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')).toBeInTheDocument()
+  expect(screen.getByText('Evidence: SYSTEM_ID_EXACT')).toBeInTheDocument()
 })
