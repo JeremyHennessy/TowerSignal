@@ -142,6 +142,7 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
             detail.get("oath_case_history", []),
             detail.get("building_context"),
             detail.get("hpd_registration"),
+            detail.get("dob_activity_history", []),
         ))
 
     retain_seen_timestamps(observations, previous_snapshot, detected_at)
