@@ -11,13 +11,16 @@ from towersignal.pluto import normalize_bbl, normalize_pluto_record
 class PlutoNormalizationTests(unittest.TestCase):
     def test_normalize_bbl_accepts_numeric_source_identity(self):
         self.assertEqual(normalize_bbl("1001230045"), "1001230045")
+        self.assertEqual(normalize_bbl("1001230045.00000000"), "1001230045")
+        self.assertEqual(normalize_bbl("1.001230045E9"), "1001230045")
         self.assertEqual(normalize_bbl("1-00123-0045"), "1001230045")
+        self.assertIsNone(normalize_bbl("1001230045.5"))
         self.assertIsNone(normalize_bbl(""))
         self.assertIsNone(normalize_bbl(None))
 
     def test_normalize_pluto_record_preserves_commercial_context(self):
         record = normalize_pluto_record({
-            "bbl": "1001230045",
+            "bbl": "1001230045.00000000",
             "ownername": "Example Owner LLC",
             "landuse": "5",
             "bldgclass": "O4",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from towersignal.fetch import fetch_count, fetch_metadata, fetch_where
@@ -26,13 +27,29 @@ PLUTO_SELECT = ",".join((
 def normalize_bbl(value: Any) -> str | None:
     if value is None:
         return None
-    text = "".join(ch for ch in str(value).strip() if ch.isdigit())
-    if not text:
+    raw = str(value).strip()
+    if not raw:
         return None
+
+    # Socrata numeric fields can be serialized as decimal text (for example
+    # "1001230045.00000000"). Parse numeric representations before falling
+    # back to formatted BBL strings such as "1-00123-0045". Stripping all
+    # non-digits from decimal text would append fractional zeroes and break
+    # exact BBL joins.
     try:
-        numeric = int(text)
-    except ValueError:
+        decimal_value = Decimal(raw)
+    except InvalidOperation:
+        decimal_value = None
+    if decimal_value is not None and decimal_value.is_finite() and decimal_value > 0:
+        integral = decimal_value.to_integral_value()
+        if decimal_value == integral:
+            return str(int(integral))
         return None
+
+    digits = "".join(ch for ch in raw if ch.isdigit())
+    if not digits:
+        return None
+    numeric = int(digits)
     if numeric <= 0:
         return None
     return str(numeric)
