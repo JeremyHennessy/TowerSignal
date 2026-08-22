@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -65,6 +66,54 @@ def suppress_unsupported_disappearance_events(
     return changes
 
 
+def suppress_pluto_attachment_recovery_events(
+    changes: dict[str, Any],
+    observations: list[dict[str, Any]],
+    previous_snapshot: dict[str, Any] | None,
+    detected_at: str,
+) -> dict[str, Any]:
+    """Baseline a bulk PLUTO attachment restoration without inventing owner-change events.
+
+    A source/join repair can restore context that was absent from the previous
+    observation. If the previous snapshot had no PLUTO owners at all and the
+    current snapshot suddenly has broad PLUTO coverage, null -> owner is an
+    enrichment restoration, not evidence that ownership changed in the real
+    world. Existing non-null -> different non-null owner transitions remain
+    eligible as genuine deterministic change events.
+    """
+    previous_systems = (previous_snapshot or {}).get("systems", [])
+    if not previous_systems or not observations:
+        changes["suppressed_data_repair_event_count"] = 0
+        return changes
+
+    previous_owner_count = sum(1 for item in previous_systems if item.get("pluto_owner"))
+    current_owner_count = sum(1 for item in observations if item.get("pluto_owner"))
+    broad_recovery_floor = max(3, math.ceil(len(observations) * 0.25))
+    is_attachment_recovery = previous_owner_count == 0 and current_owner_count >= broad_recovery_floor
+    if not is_attachment_recovery:
+        changes["suppressed_data_repair_event_count"] = 0
+        return changes
+
+    previous_by_id = {item["system_id"]: item for item in previous_systems}
+    retained_events = []
+    suppressed_new = 0
+    for event in changes.get("events", []):
+        if event.get("detected_at") != detected_at or event.get("event_type") != "PLUTO_OWNER_CHANGED":
+            retained_events.append(event)
+            continue
+        previous = previous_by_id.get(event.get("system_id"))
+        if previous is not None and not previous.get("pluto_owner"):
+            suppressed_new += 1
+        else:
+            retained_events.append(event)
+
+    changes["events"] = retained_events
+    changes["new_event_count"] = max(0, int(changes.get("new_event_count", 0)) - suppressed_new)
+    changes["suppressed_data_repair_event_count"] = suppressed_new
+    changes["pluto_attachment_recovery_baselined"] = True
+    return changes
+
+
 def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events_path: Path | None) -> dict:
     systems_path = output_dir / "systems.json"
     if not systems_path.exists():
@@ -101,6 +150,7 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
     snapshot, changes = build_history(observations, detected_at, previous_snapshot, previous_events)
     snapshot["source_health"] = payload.get("metadata", {}).get("source_health", [])
     suppress_unsupported_disappearance_events(changes, observations, previous_snapshot, detected_at)
+    suppress_pluto_attachment_recovery_events(changes, observations, previous_snapshot, detected_at)
     write_history_outputs(output_dir, snapshot, changes)
     print(json.dumps({
         "history_started_at": changes["history_started_at"],
@@ -109,6 +159,8 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
         "new_event_count": changes["new_event_count"],
         "retained_event_count": len(changes["events"]),
         "suppressed_unsupported_event_count": changes.get("suppressed_unsupported_event_count", 0),
+        "suppressed_data_repair_event_count": changes.get("suppressed_data_repair_event_count", 0),
+        "pluto_attachment_recovery_baselined": changes.get("pluto_attachment_recovery_baselined", False),
         "source_health_count": len(snapshot.get("source_health", [])),
     }, indent=2))
     return changes
