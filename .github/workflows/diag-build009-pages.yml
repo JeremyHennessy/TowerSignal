@@ -6,7 +6,7 @@ on:
     paths-ignore: [diag-build009-result.json]
 
 permissions:
-  actions: read
+  actions: write
   contents: write
 
 jobs:
@@ -14,7 +14,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Find exact main Pages run
+      - name: Cancel unsafe PLUTO-repair run before history persistence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: '32566387863'
+        run: |
+          python - <<'PY'
+          import os, urllib.request, urllib.error
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['REPO']}/actions/runs/{os.environ['RUN_ID']}/cancel",
+              data=b'',
+              method='POST',
+              headers={'Authorization': f"Bearer {os.environ['GH_TOKEN']}", 'Accept': 'application/vnd.github+json'},
+          )
+          try:
+              with urllib.request.urlopen(req) as response:
+                  print('cancel status', response.status)
+          except urllib.error.HTTPError as exc:
+              if exc.code == 409:
+                  print('run already completed; cancellation no longer applicable')
+              else:
+                  raise
+          PY
+      - name: Capture exact main Pages run state
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -22,24 +45,15 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, urllib.request
-          repo = os.environ['REPO']
-          target = os.environ['TARGET_SHA']
-          token = os.environ['GH_TOKEN']
+          repo = os.environ['REPO']; target = os.environ['TARGET_SHA']; token = os.environ['GH_TOKEN']
           headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json'}
           def get(url):
               req = urllib.request.Request(url, headers=headers)
-              with urllib.request.urlopen(req) as r:
-                  return json.load(r)
+              with urllib.request.urlopen(req) as r: return json.load(r)
           runs = get(f'https://api.github.com/repos/{repo}/actions/runs?branch=main&event=push&per_page=30')['workflow_runs']
-          matches = [r for r in runs if r.get('head_sha') == target and r.get('name') == 'Deploy GitHub Pages']
-          if not matches:
-              raise SystemExit(f'No Deploy GitHub Pages run found for {target}')
-          run = matches[0]
+          run = next(r for r in runs if r.get('head_sha') == target and r.get('name') == 'Deploy GitHub Pages')
           jobs = get(run['jobs_url'])['jobs']
-          result = {
-              'run': {k: run.get(k) for k in ('id','status','conclusion','html_url','head_sha','created_at','updated_at')},
-              'jobs': [{'id':j['id'],'name':j['name'],'status':j['status'],'conclusion':j['conclusion']} for j in jobs],
-          }
+          result = {'run': {k: run.get(k) for k in ('id','status','conclusion','html_url','head_sha','created_at','updated_at')}, 'jobs': [{'id':j['id'],'name':j['name'],'status':j['status'],'conclusion':j['conclusion']} for j in jobs]}
           open('diag-build009-result.json','w').write(json.dumps(result, indent=2, sort_keys=True))
           print(json.dumps(result, indent=2, sort_keys=True))
           PY
