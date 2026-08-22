@@ -18,10 +18,14 @@ export function DetailPanel({ row, metadata, onClose }: { row: SystemSummary | n
     loadSystemDetail(row.system_id).then(setDetail).catch(err => setError(err instanceof Error ? err.message : 'Unable to load system details'))
   }, [row])
   if (!row) return null
-  const copy = async () => { await navigator.clipboard.writeText(leadSummary(row, metadata)); setCopied(true) }
+  const copy = async () => {
+    if (!detail) return
+    await navigator.clipboard.writeText(leadSummary(row, metadata, detail))
+    setCopied(true)
+  }
   return <aside className="detail-panel" aria-label="Selected cooling tower detail">
     <div className="detail-header"><div><span className="eyebrow">Selected system</span><h2>{row.address ?? row.system_id}</h2><p>{row.borough} {row.zip} · System <span className="mono">{row.system_id}</span></p></div><button className="icon-button" onClick={onClose} aria-label="Close details">×</button></div>
-    <div className="detail-actions"><button onClick={copy}>{copied ? 'Copied' : 'Copy lead summary'}</button><span className="score large">{row.priority_score}</span><span>Priority score</span></div>
+    <div className="detail-actions"><button onClick={copy} disabled={!detail}>{copied ? 'Copied' : 'Copy lead brief'}</button><span className="score large">{row.priority_score}</span><span>Priority score</span></div>
     {error && <div className="error-state">{error}</div>}
     {!detail && !error && <div className="loading-state">Loading source-backed details…</div>}
     {detail && <>
