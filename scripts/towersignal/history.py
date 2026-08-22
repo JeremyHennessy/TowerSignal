@@ -9,6 +9,9 @@ from typing import Any
 HISTORY_SCHEMA_VERSION = "1.1"
 EVENT_RETENTION_DAYS = 400
 MAX_EVENT_TEXT_LENGTH = 500
+DOB_SOURCE = "NYC_DOB_NOW_JOB_APPLICATION_FILINGS"
+DOB_MATCH_BASIS = "BBL_EXACT; JOB_FILING_NUMBER_EXACT"
+DOB_COOLING_TOWER_BASIS = "BBL_EXACT; JOB_FILING_NUMBER_EXACT; JOB_DESCRIPTION_EXPLICIT_COOLING_TOWER_TEXT"
 
 
 def _canonical(value: Any) -> str:
@@ -81,9 +84,78 @@ def _compact_contact(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _compact_dob_state(item: dict[str, Any]) -> list[Any]:
+    """Persist only fields needed to detect future DOB lifecycle transitions.
+
+    Boolean lifecycle flags deliberately replace full dates in the durable snapshot;
+    source dates for newly observed transitions come from the current source record.
+    This keeps the exact-filing baseline compact enough for the existing history cap.
+    """
+    return [
+        item.get("filing_status"),
+        bool(item.get("first_permit_date")),
+        bool(item.get("approved_date")),
+        bool(item.get("signoff_date")),
+        bool(item.get("explicit_cooling_tower_mention")),
+    ]
+
+
+def _compact_dob_event(item: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "job_filing_number": item.get("job_filing_number"),
+        "filing_status": item.get("filing_status"),
+        "job_type": item.get("job_type"),
+        "job_description": _bounded(item.get("job_description")),
+        "filing_date": item.get("filing_date"),
+        "current_status_date": item.get("current_status_date"),
+        "first_permit_date": item.get("first_permit_date"),
+        "approved_date": item.get("approved_date"),
+        "signoff_date": item.get("signoff_date"),
+        "explicit_cooling_tower_mention": bool(item.get("explicit_cooling_tower_mention")),
+    }
+
+
+def _dob_state_value(state: Any, index: int) -> Any:
+    if not isinstance(state, list) or len(state) <= index:
+        return None
+    return state[index]
+
+
+def _merge_dob_state(previous: Any, current: Any) -> list[Any]:
+    previous_status = _dob_state_value(previous, 0)
+    current_status = _dob_state_value(current, 0)
+    return [
+        current_status if current_status is not None else previous_status,
+        bool(_dob_state_value(previous, 1)) or bool(_dob_state_value(current, 1)),
+        bool(_dob_state_value(previous, 2)) or bool(_dob_state_value(current, 2)),
+        bool(_dob_state_value(previous, 3)) or bool(_dob_state_value(current, 3)),
+        bool(_dob_state_value(previous, 4)) or bool(_dob_state_value(current, 4)),
+    ]
+
+
+def _carry_forward_dob_state(previous: dict[str, Any], current: dict[str, Any]) -> None:
+    """Do not turn temporary DOB field/record disappearance into a later false re-add.
+
+    DOB lifecycle events are positive transitions only. Once a filing or lifecycle
+    milestone has been observed, preserve that compact fact if a later source refresh
+    temporarily omits it. Current non-null status values can still supersede the
+    previous status and generate a deterministic status-change event.
+    """
+    if not previous.get("dob_history_initialized") or not current.get("dob_history_initialized"):
+        return
+    previous_jobs = previous.get("dob_jobs") or {}
+    current_jobs = current.get("dob_jobs") or {}
+    merged = dict(previous_jobs)
+    for job_number, state in current_jobs.items():
+        old = previous_jobs.get(job_number)
+        merged[job_number] = _merge_dob_state(old, state) if old is not None else state
+    current["dob_jobs"] = merged
+
+
 def build_observation(system: dict[str, Any], summary_row: dict[str, Any], inspections: list[dict[str, Any]],
                       oath_cases: list[dict[str, Any]], building_context: dict[str, Any] | None,
-                      hpd_registration: dict[str, Any] | None) -> dict[str, Any]:
+                      hpd_registration: dict[str, Any] | None,
+                      dob_activity: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     inspection_records: dict[str, dict[str, Any]] = {}
     violation_records: dict[str, dict[str, Any]] = {}
     for inspection in inspections:
@@ -96,6 +168,15 @@ def build_observation(system: dict[str, Any], summary_row: dict[str, Any], inspe
             }
     compact_building = _compact_building_context(building_context)
     contacts = [_compact_contact(item) for item in (hpd_registration or {}).get("contacts", [])]
+    dob_records: dict[str, dict[str, Any]] = {}
+    dob_jobs: dict[str, list[Any]] = {}
+    for item in dob_activity or []:
+        job_number = item.get("job_filing_number")
+        if not job_number:
+            continue
+        key = str(job_number)
+        dob_jobs[key] = _compact_dob_state(item)
+        dob_records[key] = _compact_dob_event(item)
     return {
         "system_id": system["system_id"], "bin": system.get("bin"), "bbl": system.get("bbl"),
         "address": system.get("address"), "borough": system.get("borough"), "zip": system.get("zip"),
@@ -108,7 +189,9 @@ def build_observation(system: dict[str, Any], summary_row: dict[str, Any], inspe
         "pluto_owner": (compact_building or {}).get("owner_name"), "building_context": compact_building,
         "hpd_registration_id": (hpd_registration or {}).get("registration_id"),
         "hpd_last_registration_date": (hpd_registration or {}).get("last_registration_date"),
-        "hpd_contacts": contacts, "_inspection_records": inspection_records, "_violation_records": violation_records,
+        "hpd_contacts": contacts,
+        "dob_history_initialized": True, "dob_jobs": dob_jobs,
+        "_inspection_records": inspection_records, "_violation_records": violation_records, "_dob_records": dob_records,
     }
 
 
@@ -124,6 +207,81 @@ def _oath_map(items: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
 def _managing_contacts(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [item for item in items if "MANAG" in str(item.get("type") or "").upper() or "MANAG" in str(item.get("description") or "").upper()]
+
+
+def _dob_event_record(current: dict[str, Any], job_number: str) -> dict[str, Any]:
+    record = current.get("_dob_records", {}).get(job_number)
+    if record:
+        return record
+    state = (current.get("dob_jobs") or {}).get(job_number)
+    return {
+        "job_filing_number": job_number,
+        "filing_status": _dob_state_value(state, 0),
+        "first_permit_date": None,
+        "approved_date": None,
+        "signoff_date": None,
+        "explicit_cooling_tower_mention": bool(_dob_state_value(state, 4)),
+    }
+
+
+def _detect_dob_changes(previous: dict[str, Any], current: dict[str, Any], detected_at: str) -> list[dict[str, Any]]:
+    if not previous.get("dob_history_initialized") or not current.get("dob_history_initialized"):
+        return []
+
+    events: list[dict[str, Any]] = []
+    previous_jobs = previous.get("dob_jobs") or {}
+    current_jobs = current.get("dob_jobs") or {}
+    for job_number, state in current_jobs.items():
+        old = previous_jobs.get(job_number)
+        record = _dob_event_record(current, job_number)
+        if old is None:
+            events.append(_event(
+                "DOB_JOB_FILED", current, detected_at, DOB_SOURCE, DOB_MATCH_BASIS, None,
+                {key: record.get(key) for key in (
+                    "job_filing_number", "filing_status", "job_type", "filing_date", "explicit_cooling_tower_mention"
+                )},
+                record.get("filing_date"),
+            ))
+            if bool(_dob_state_value(state, 4)):
+                events.append(_event(
+                    "DOB_COOLING_TOWER_MENTION_ADDED", current, detected_at, DOB_SOURCE, DOB_COOLING_TOWER_BASIS,
+                    {"job_filing_number": job_number, "explicit_cooling_tower_mention": False},
+                    {"job_filing_number": job_number, "explicit_cooling_tower_mention": True,
+                     "job_description": record.get("job_description")},
+                ))
+            continue
+
+        old_status = _dob_state_value(old, 0)
+        current_status = _dob_state_value(state, 0)
+        if old_status is not None and current_status is not None and old_status != current_status:
+            events.append(_event(
+                "DOB_STATUS_CHANGED", current, detected_at, DOB_SOURCE, DOB_MATCH_BASIS,
+                {"job_filing_number": job_number, "filing_status": old_status},
+                {"job_filing_number": job_number, "filing_status": current_status},
+                record.get("current_status_date"),
+            ))
+
+        for index, event_type, field in (
+            (1, "DOB_PERMIT_ISSUED", "first_permit_date"),
+            (2, "DOB_JOB_APPROVED", "approved_date"),
+            (3, "DOB_JOB_SIGNED_OFF", "signoff_date"),
+        ):
+            if not bool(_dob_state_value(old, index)) and bool(_dob_state_value(state, index)):
+                events.append(_event(
+                    event_type, current, detected_at, DOB_SOURCE, DOB_MATCH_BASIS,
+                    {"job_filing_number": job_number, field: None},
+                    {"job_filing_number": job_number, field: record.get(field)},
+                    record.get(field),
+                ))
+
+        if not bool(_dob_state_value(old, 4)) and bool(_dob_state_value(state, 4)):
+            events.append(_event(
+                "DOB_COOLING_TOWER_MENTION_ADDED", current, detected_at, DOB_SOURCE, DOB_COOLING_TOWER_BASIS,
+                {"job_filing_number": job_number, "explicit_cooling_tower_mention": False},
+                {"job_filing_number": job_number, "explicit_cooling_tower_mention": True,
+                 "job_description": record.get("job_description")},
+            ))
+    return events
 
 
 def detect_changes(previous: dict[str, Any], current: dict[str, Any], detected_at: str) -> list[dict[str, Any]]:
@@ -182,6 +340,8 @@ def detect_changes(previous: dict[str, Any], current: dict[str, Any], detected_a
         new_managers = [_contact_key(item) for item in _managing_contacts(current.get("hpd_contacts") or [])]
         if old_managers != new_managers:
             events.append(_event("HPD_MANAGING_AGENT_CHANGED", current, detected_at, "NYC_HPD_REGISTRATION_CONTACTS", "REGISTRATION_ID_EXACT", _managing_contacts(previous.get("hpd_contacts") or []), _managing_contacts(current.get("hpd_contacts") or []), current.get("hpd_last_registration_date")))
+
+    events.extend(_detect_dob_changes(previous, current, detected_at))
     return events
 
 
@@ -203,6 +363,7 @@ def build_history(current_observations: list[dict[str, Any]], detected_at: str, 
             if previous is None:
                 new_events.append(_event("SYSTEM_FIRST_SEEN", current, detected_at, "NYC_COOLING_TOWER_REGISTRATIONS", "SYSTEM_ID_EXACT", None, {"present_in_snapshot": True}, current.get("date_registered")))
             else:
+                _carry_forward_dob_state(previous, current)
                 new_events.extend(detect_changes(previous, current, detected_at))
         for system_id, previous in previous_by_id.items():
             if system_id not in current_by_id:
