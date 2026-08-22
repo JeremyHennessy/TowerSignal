@@ -18,7 +18,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          TARGET_SHA: 2824e6b183a215e9bea04abc403b63fa7aec9023
+          TARGET_SHA: a68fa3ba8205cb7d75acb5d76762acc16b2bbc44
         run: |
           python - <<'PY'
           import json, os, urllib.request
