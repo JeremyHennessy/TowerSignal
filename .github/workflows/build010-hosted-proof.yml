@@ -1,4 +1,4 @@
-name: Build 010 changes payload diagnostic
+name: Build 010 WebKit scale diagnostic
 
 on:
   pull_request:
@@ -8,57 +8,23 @@ permissions:
   contents: read
 
 jobs:
-  measure-hosted-changes:
+  test-webkit-scale:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          python-version: '3.12'
+          node-version: 22
 
-      - name: Measure hosted changes payload
-        shell: python
-        run: |
-          import json
-          import time
-          from collections import Counter
-          from urllib.request import Request, urlopen
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
 
-          base = "https://jeremyhennessy.github.io/TowerSignal"
+      - name: Install WebKit browser
+        run: npx playwright install --with-deps webkit
 
-          def get_bytes(path):
-              url = f"{base}{path}?proof={int(time.time())}"
-              request = Request(url, headers={
-                  "Accept": "application/json",
-                  "Cache-Control": "no-cache",
-                  "User-Agent": "TowerSignal-Build010-changes-diagnostic/1.0",
-              })
-              with urlopen(request, timeout=60) as response:
-                  return response.read()
-
-          changes_raw = get_bytes("/data/changes.json")
-          changes = json.loads(changes_raw)
-          events = changes.get("events") or []
-          event_types = Counter(str(event.get("event_type")) for event in events)
-          detected_dates = Counter(str(event.get("detected_at", ""))[:10] for event in events)
-          serialized_sizes = [len(json.dumps(event, separators=(",", ":")).encode("utf-8")) for event in events]
-          systems_raw = get_bytes("/data/systems.json")
-
-          print(json.dumps({
-              "changes_payload_bytes": len(changes_raw),
-              "systems_payload_bytes": len(systems_raw),
-              "history_schema_version": changes.get("history_schema_version"),
-              "history_started_at": changes.get("history_started_at"),
-              "observed_at": changes.get("observed_at"),
-              "baseline_initialized": changes.get("baseline_initialized"),
-              "new_event_count": changes.get("new_event_count"),
-              "retained_event_count": len(events),
-              "unique_system_count": len({event.get("system_id") for event in events}),
-              "event_types": dict(event_types),
-              "events_by_detected_date": dict(detected_dates),
-              "largest_event_bytes": max(serialized_sizes, default=0),
-              "average_event_bytes": round(sum(serialized_sizes) / len(serialized_sizes), 1) if serialized_sizes else 0,
-          }, indent=2))
-
-          if len(changes_raw) > 5_000_000:
-              raise SystemExit("Hosted changes payload exceeds 5 MB diagnostic threshold")
+      - name: Test Changes switch with reduced hosted systems payload
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/build010-webkit-scale.spec.ts --project=iphone --reporter=list
