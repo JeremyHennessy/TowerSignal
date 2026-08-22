@@ -24,6 +24,8 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
         raise RuntimeError(f"Generated systems payload does not exist: {systems_path}")
     payload = json.loads(systems_path.read_text(encoding="utf-8"))
     detected_at = payload.get("metadata", {}).get("generated_at") or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    previous_snapshot = load_json(previous_snapshot_path, None)
+    previous_by_id = {item["system_id"]: item for item in (previous_snapshot or {}).get("systems", [])}
 
     observations = []
     for row in payload.get("systems", []):
@@ -38,16 +40,19 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
             "sample_dates": detail.get("sample_history", {}).get("dates", []),
             "latest_sample_date": detail.get("sample_history", {}).get("latest_sample_date"),
         }
-        observations.append(build_observation(
+        observation = build_observation(
             system,
             row,
             detail.get("inspection_history", []),
             detail.get("oath_case_history", []),
             detail.get("building_context"),
             detail.get("hpd_registration"),
-        ))
+        )
+        previous = previous_by_id.get(row["system_id"])
+        observation["first_seen_at"] = previous.get("first_seen_at") if previous and previous.get("first_seen_at") else detected_at
+        observation["last_seen_at"] = detected_at
+        observations.append(observation)
 
-    previous_snapshot = load_json(previous_snapshot_path, None)
     previous_events_payload = load_json(previous_events_path, {"events": []})
     previous_events = previous_events_payload.get("events", []) if isinstance(previous_events_payload, dict) else []
     snapshot, changes = build_history(observations, detected_at, previous_snapshot, previous_events)
