@@ -5,11 +5,11 @@ import { formatTimestamp } from '../domain/labels'
 export function ChangesView({ payload }: { payload: ChangesPayload; onSelectSystem: (systemId: string) => void }) {
   const [days] = useState('7')
   const [borough, setBorough] = useState('')
-  const [eventType, setEventType] = useState('')
+  const [eventType] = useState('')
   const [minimumPriority] = useState('')
   const [confidence] = useState('')
   const [contactOnly] = useState(false)
-  const [quickTypes, setQuickTypes] = useState<ChangeEventType[] | null>(null)
+  const [quickTypes] = useState<ChangeEventType[] | null>(null)
   const [customStart] = useState('')
   const [customEnd] = useState('')
 
@@ -37,9 +37,8 @@ export function ChangesView({ payload }: { payload: ChangesPayload; onSelectSyst
     {payload.baseline_initialized && <div className="disclaimer"><strong>Historical baseline initialized.</strong> This is TowerSignal's first preserved observation. Existing systems are not being mislabeled as newly registered. Change events will accumulate as later refreshes differ from this baseline.</div>}
     <div className="change-filters">
       <label>Borough<select value={borough} onChange={event => setBorough(event.target.value)}><option value="">All</option>{boroughs.map(value => <option key={value}>{value}</option>)}</select></label>
-      <label>Event type<select value={eventType} onChange={event => { setEventType(event.target.value); setQuickTypes(null) }}><option value="">All</option>{eventTypes.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
     </div>
     <div className="change-count">{filtered.length.toLocaleString()} change{filtered.length === 1 ? '' : 's'} in current view</div>
-    <div className="empty-changes" data-diagnostic-dynamic-selects><strong>Diagnostic: dynamic Borough + Event type selects only.</strong></div>
+    <div className="empty-changes" data-diagnostic-borough-only><strong>Diagnostic: dynamic Borough select only.</strong><span>{eventTypes.length} event types derived but not rendered.</span></div>
   </section>
 }
