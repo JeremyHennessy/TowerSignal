@@ -31,7 +31,7 @@ jobs:
         run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
       - name: Enforce durable history size and growth gates
         run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
-      - name: Prove migration is a silent DOB baseline
+      - name: Prove migration is a silent deduplicated DOB baseline
         shell: bash
         run: |
           python - <<'PY'
@@ -45,9 +45,15 @@ jobs:
           changes = json.loads(changes_path.read_text())
           previous = json.loads(previous_path.read_text())
 
-          previous_markers = sum(1 for row in previous.get('systems', []) if row.get('dob_history_initialized'))
-          current_markers = sum(1 for row in latest.get('systems', []) if row.get('dob_history_initialized'))
-          current_dob_filings = sum(len(row.get('dob_jobs') or {}) for row in latest.get('systems', []))
+          previous_marker = bool(previous.get('dob_history_initialized'))
+          current_marker = bool(latest.get('dob_history_initialized'))
+          dob_by_bbl = latest.get('dob_by_bbl') or {}
+          current_dob_bbls = len(dob_by_bbl)
+          current_dob_filings = sum(len(jobs) for jobs in dob_by_bbl.values())
+          system_embedded_dob_count = sum(
+              1 for row in latest.get('systems', [])
+              if 'dob_jobs' in row or '_dob_jobs' in row or '_dob_records' in row
+          )
           detected_at = changes['observed_at']
           new_dob_events = [
               event for event in changes.get('events', [])
@@ -56,17 +62,21 @@ jobs:
           size_bytes = latest_path.stat().st_size
 
           print(json.dumps({
-              'previous_dob_markers': previous_markers,
-              'current_dob_markers': current_markers,
+              'previous_dob_marker': previous_marker,
+              'current_dob_marker': current_marker,
               'current_system_count': len(latest.get('systems', [])),
-              'durable_per_system_dob_filing_states': current_dob_filings,
+              'durable_dob_bbl_count': current_dob_bbls,
+              'durable_unique_bbl_filing_states': current_dob_filings,
+              'systems_with_embedded_dob_state': system_embedded_dob_count,
               'new_dob_event_count': len(new_dob_events),
               'history_size_bytes': size_bytes,
               'history_size_mib': round(size_bytes / 1024 / 1024, 2),
           }, indent=2))
 
-          assert previous_markers == 0, 'Expected preserved Build 010/010.1 history to predate DOB event baselining'
-          assert current_markers == len(latest.get('systems', [])), 'Every current system must carry the DOB baseline marker'
-          assert current_dob_filings > 0, 'Live DOB filing state was not attached to history'
+          assert not previous_marker, 'Expected preserved Build 010/010.1 history to predate DOB event baselining'
+          assert current_marker, 'Current history must mark the DOB baseline as initialized'
+          assert current_dob_bbls > 0, 'No exact-BBL DOB baseline was persisted'
+          assert current_dob_filings > 0, 'Live DOB filing state was not attached to the BBL history baseline'
+          assert system_embedded_dob_count == 0, 'DOB baseline must not be duplicated inside per-system history observations'
           assert not new_dob_events, f'First DOB-aware refresh emitted synthetic DOB events: {new_dob_events[:3]}'
           PY
