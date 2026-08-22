@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
 
-from scripts.build_history import suppress_unsupported_disappearance_events  # noqa: E402
+from scripts.build_history import suppress_pluto_attachment_recovery_events, suppress_unsupported_disappearance_events  # noqa: E402
 
 
 class EnrichmentSupportTests(unittest.TestCase):
@@ -40,6 +40,43 @@ class EnrichmentSupportTests(unittest.TestCase):
         previous = {"systems": [{"system_id": "CT-1", "hpd_registration_id": "R1"}]}
         suppress_unsupported_disappearance_events(changes, current, previous, detected)
         self.assertEqual(changes["events"], [])
+
+    def test_bulk_pluto_restoration_is_baselined_not_called_owner_change(self):
+        detected = "2026-08-22T02:00:00Z"
+        current = [
+            {"system_id": "CT-1", "pluto_owner": "A LLC"},
+            {"system_id": "CT-2", "pluto_owner": "B LLC"},
+            {"system_id": "CT-3", "pluto_owner": "C LLC"},
+            {"system_id": "CT-4", "pluto_owner": None},
+        ]
+        previous = {"systems": [
+            {"system_id": "CT-1", "pluto_owner": None},
+            {"system_id": "CT-2", "pluto_owner": None},
+            {"system_id": "CT-3", "pluto_owner": None},
+            {"system_id": "CT-4", "pluto_owner": None},
+        ]}
+        events = [
+            {"event_type": "PLUTO_OWNER_CHANGED", "system_id": "CT-1", "detected_at": detected},
+            {"event_type": "PLUTO_OWNER_CHANGED", "system_id": "CT-2", "detected_at": detected},
+            {"event_type": "PLUTO_OWNER_CHANGED", "system_id": "CT-3", "detected_at": detected},
+            {"event_type": "SAMPLE_REPORTED", "system_id": "CT-1", "detected_at": detected},
+        ]
+        changes = {"new_event_count": 4, "events": events}
+        suppress_pluto_attachment_recovery_events(changes, current, previous, detected)
+        self.assertEqual([event["event_type"] for event in changes["events"]], ["SAMPLE_REPORTED"])
+        self.assertEqual(changes["new_event_count"], 1)
+        self.assertEqual(changes["suppressed_data_repair_event_count"], 3)
+        self.assertTrue(changes["pluto_attachment_recovery_baselined"])
+
+    def test_normal_non_null_owner_transition_is_not_suppressed(self):
+        detected = "2026-08-22T02:00:00Z"
+        event = {"event_type": "PLUTO_OWNER_CHANGED", "system_id": "CT-1", "detected_at": detected}
+        current = [{"system_id": "CT-1", "pluto_owner": "NEW LLC"}, {"system_id": "CT-2", "pluto_owner": "B LLC"}, {"system_id": "CT-3", "pluto_owner": "C LLC"}]
+        previous = {"systems": [{"system_id": "CT-1", "pluto_owner": "OLD LLC"}, {"system_id": "CT-2", "pluto_owner": None}, {"system_id": "CT-3", "pluto_owner": None}]}
+        changes = {"new_event_count": 1, "events": [event]}
+        suppress_pluto_attachment_recovery_events(changes, current, previous, detected)
+        self.assertEqual(changes["events"], [event])
+        self.assertEqual(changes["suppressed_data_repair_event_count"], 0)
 
 
 if __name__ == "__main__":
