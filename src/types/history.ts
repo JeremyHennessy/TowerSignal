@@ -21,6 +21,12 @@ export type ChangeEventType =
   | 'HPD_CONTACT_ADDED'
   | 'HPD_CONTACT_REMOVED'
   | 'HPD_MANAGING_AGENT_CHANGED'
+  | 'DOB_JOB_FILED'
+  | 'DOB_STATUS_CHANGED'
+  | 'DOB_PERMIT_ISSUED'
+  | 'DOB_JOB_APPROVED'
+  | 'DOB_JOB_SIGNED_OFF'
+  | 'DOB_COOLING_TOWER_MENTION_ADDED'
 
 export interface ChangeEvent {
   event_type: ChangeEventType
