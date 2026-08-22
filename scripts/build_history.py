@@ -28,6 +28,43 @@ def retain_seen_timestamps(observations: list[dict[str, Any]], previous_snapshot
     return observations
 
 
+def suppress_unsupported_disappearance_events(
+    changes: dict[str, Any],
+    observations: list[dict[str, Any]],
+    previous_snapshot: dict[str, Any] | None,
+    detected_at: str,
+) -> dict[str, Any]:
+    """Do not convert a lost enrichment match into a commercial change signal."""
+    current_by_id = {item["system_id"]: item for item in observations}
+    previous_by_id = {item["system_id"]: item for item in (previous_snapshot or {}).get("systems", [])}
+    retained_events = []
+    suppressed_new = 0
+    for event in changes.get("events", []):
+        if event.get("detected_at") != detected_at:
+            retained_events.append(event)
+            continue
+        current = current_by_id.get(event.get("system_id"))
+        previous = previous_by_id.get(event.get("system_id"))
+        event_type = event.get("event_type")
+        unsupported = False
+        if current is not None and event_type == "PLUTO_OWNER_CHANGED" and not current.get("pluto_owner"):
+            unsupported = True
+        elif current is not None and event_type == "HPD_REGISTRATION_CHANGED" and not current.get("hpd_registration_id"):
+            unsupported = True
+        elif current is not None and event_type == "HPD_CONTACT_REMOVED":
+            unsupported = not current.get("hpd_registration_id") or not previous or current.get("hpd_registration_id") != previous.get("hpd_registration_id")
+        elif current is not None and event_type == "HPD_MANAGING_AGENT_CHANGED" and not current.get("hpd_registration_id"):
+            unsupported = True
+        if unsupported:
+            suppressed_new += 1
+        else:
+            retained_events.append(event)
+    changes["events"] = retained_events
+    changes["new_event_count"] = max(0, int(changes.get("new_event_count", 0)) - suppressed_new)
+    changes["suppressed_unsupported_event_count"] = suppressed_new
+    return changes
+
+
 def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events_path: Path | None) -> dict:
     systems_path = output_dir / "systems.json"
     if not systems_path.exists():
@@ -62,6 +99,7 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
     previous_events_payload = load_json(previous_events_path, {"events": []})
     previous_events = previous_events_payload.get("events", []) if isinstance(previous_events_payload, dict) else []
     snapshot, changes = build_history(observations, detected_at, previous_snapshot, previous_events)
+    suppress_unsupported_disappearance_events(changes, observations, previous_snapshot, detected_at)
     write_history_outputs(output_dir, snapshot, changes)
     print(json.dumps({
         "history_started_at": changes["history_started_at"],
@@ -69,6 +107,7 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
         "current_system_count": len(observations),
         "new_event_count": changes["new_event_count"],
         "retained_event_count": len(changes["events"]),
+        "suppressed_unsupported_event_count": changes.get("suppressed_unsupported_event_count", 0),
     }, indent=2))
     return changes
 
