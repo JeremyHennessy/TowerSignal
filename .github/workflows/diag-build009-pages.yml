@@ -3,15 +3,17 @@ name: Diagnostic Build 009 Pages Run
 on:
   push:
     branches: [agent/diag-build009-pages]
+    paths-ignore: [diag-build009-result.json]
 
 permissions:
   actions: read
-  contents: read
+  contents: write
 
 jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Find exact main Pages run
         env:
           GH_TOKEN: ${{ github.token }}
@@ -33,8 +35,18 @@ jobs:
           if not matches:
               raise SystemExit(f'No Deploy GitHub Pages run found for {target}')
           run = matches[0]
-          print('RUN', json.dumps({k: run.get(k) for k in ('id','status','conclusion','html_url','head_sha','created_at','updated_at')}, sort_keys=True))
           jobs = get(run['jobs_url'])['jobs']
-          for job in jobs:
-              print('JOB', json.dumps({'id':job['id'],'name':job['name'],'status':job['status'],'conclusion':job['conclusion']}, sort_keys=True))
+          result = {
+              'run': {k: run.get(k) for k in ('id','status','conclusion','html_url','head_sha','created_at','updated_at')},
+              'jobs': [{'id':j['id'],'name':j['name'],'status':j['status'],'conclusion':j['conclusion']} for j in jobs],
+          }
+          open('diag-build009-result.json','w').write(json.dumps(result, indent=2, sort_keys=True))
+          print(json.dumps(result, indent=2, sort_keys=True))
           PY
+      - name: Commit diagnostic result to disposable branch
+        run: |
+          git config user.name "TowerSignal Diagnostic Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add diag-build009-result.json
+          git commit -m "diagnostic: capture Build 009 Pages run [skip ci]" || exit 0
+          git push
