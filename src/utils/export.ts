@@ -7,11 +7,11 @@ function csvCell(value: unknown): string {
 }
 
 export function exportCsv(rows: SystemSummary[], metadata: Metadata): void {
-  const headers = ['address','borough','zip','system_id','bin','bbl','active_equipment','latest_public_sample_date','days_since_sample','signal_type','confirmed_violation','latest_inspection_date','oath_exact_match_count','pluto_exact_bbl_match','hpd_registered_contact_count','priority_score','evidence_confidence','source_snapshot_timestamp']
+  const headers = ['address','borough','zip','system_id','bin','bbl','active_equipment','registration_date','reported_sample_count','inspection_count','violation_citation_count','latest_violation_date','oath_balance_due_total','latest_public_sample_date','days_since_sample','signal_type','confirmed_violation','latest_inspection_date','oath_exact_match_count','pluto_exact_bbl_match','hpd_registered_contact_count','priority_score','evidence_confidence','source_snapshot_timestamp']
   const lines = [headers.map(csvCell).join(',')]
   for (const row of rows) {
     lines.push([
-      row.address,row.borough,row.zip,row.system_id,row.bin,row.bbl,row.active_equipment,row.latest_sample_date,row.days_since_latest_sample,
+      row.address,row.borough,row.zip,row.system_id,row.bin,row.bbl,row.active_equipment,row.registration_date,row.sample_count ?? 0,row.inspection_count ?? 0,row.violation_citation_count ?? 0,row.latest_violation_date,row.oath_balance_due_total ?? 0,row.latest_sample_date,row.days_since_latest_sample,
       signalLabel(row.primary_signal),row.confirmed_violation,row.latest_inspection_date,row.oath_case_count ?? 0,row.pluto_match ?? false,row.hpd_contact_count ?? 0,row.priority_score,row.evidence_confidence,metadata.generated_at,
     ].map(csvCell).join(','))
   }
@@ -41,6 +41,15 @@ export function leadSummary(row: SystemSummary, metadata: Metadata, detail?: Sys
     `Confirmed violations: ${violations}`,
     `OATH lifecycle: ${oath}`,
   ]
+
+  if (detail?.historical_profile) {
+    const history = detail.historical_profile
+    lines.push('', 'Historical profile')
+    lines.push(`Registration date: ${history.registration_date ?? 'Not published'}`)
+    lines.push(`Reported sample history: ${history.sample.reported_sample_count} samples${history.sample.first_reported_date ? ` from ${history.sample.first_reported_date} to ${history.sample.latest_reported_date}` : ''}`)
+    lines.push(`NYC Health inspection history: ${history.inspection.inspection_count} inspections; ${history.inspection.inspections_with_violations} with cited violations; ${history.inspection.violation_citation_count} cited violation rows`)
+    lines.push(`OATH totals: $${history.oath.penalty_imposed_total.toFixed(2)} imposed; $${history.oath.paid_amount_total.toFixed(2)} paid; $${history.oath.balance_due_total.toFixed(2)} balance due`)
+  }
 
   if (detail) {
     lines.push('', 'Property / contact context')
