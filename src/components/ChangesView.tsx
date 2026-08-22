@@ -24,12 +24,19 @@ const EVENT_LABELS: Record<string, string> = {
   HPD_CONTACT_ADDED: 'HPD contact added',
   HPD_CONTACT_REMOVED: 'HPD contact removed',
   HPD_MANAGING_AGENT_CHANGED: 'HPD managing-agent record changed',
+  DOB_JOB_FILED: 'New DOB job filing',
+  DOB_STATUS_CHANGED: 'DOB filing status changed',
+  DOB_PERMIT_ISSUED: 'DOB permit issued',
+  DOB_JOB_APPROVED: 'DOB job approved',
+  DOB_JOB_SIGNED_OFF: 'DOB job signed off',
+  DOB_COOLING_TOWER_MENTION_ADDED: 'Cooling tower mentioned in DOB filing',
 }
 
 const QUICK_GROUPS: Record<string, ChangeEventType[]> = {
   'New systems': ['SYSTEM_FIRST_SEEN'],
   'New violations': ['VIOLATION_ADDED'],
   'New OATH activity': ['OATH_CASE_ADDED', 'OATH_STATUS_CHANGED', 'OATH_DECISION_CHANGED', 'OATH_PENALTY_CHANGED', 'OATH_BALANCE_CHANGED'],
+  'DOB project activity': ['DOB_JOB_FILED', 'DOB_STATUS_CHANGED', 'DOB_PERMIT_ISSUED', 'DOB_JOB_APPROVED', 'DOB_JOB_SIGNED_OFF', 'DOB_COOLING_TOWER_MENTION_ADDED'],
   'New samples': ['SAMPLE_REPORTED', 'LATEST_SAMPLE_CHANGED'],
   'Property/contact changes': ['PLUTO_OWNER_CHANGED', 'HPD_REGISTRATION_CHANGED', 'HPD_CONTACT_ADDED', 'HPD_CONTACT_REMOVED', 'HPD_MANAGING_AGENT_CHANGED'],
   'Signals entered': ['SAMPLING_GAP_ENTERED'],
