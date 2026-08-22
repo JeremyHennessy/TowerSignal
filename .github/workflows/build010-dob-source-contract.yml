@@ -1,0 +1,75 @@
+name: Build 010 DOB source contract
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-dob-source-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify DOB NOW job-filings schema and sample
+        shell: python
+        run: |
+          import json
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          dataset_id = "w9ak-ipjd"
+          root = "https://data.cityofnewyork.us"
+          required = {
+              "job_filing_number",
+              "filing_status",
+              "bbl",
+              "filing_date",
+              "current_status_date",
+              "first_permit_date",
+              "approved_date",
+              "signoff_date",
+              "job_type",
+              "job_description",
+              "initial_cost",
+              "mechanical_systems_work_type_",
+              "boiler_equipment_work_type_",
+              "owner_s_business_name",
+              "applicant_business_name",
+          }
+
+          def get_json(url):
+              request = Request(url, headers={"User-Agent": "TowerSignal-Build010-contract-check/1.0", "Accept": "application/json"})
+              with urlopen(request, timeout=60) as response:
+                  return json.load(response)
+
+          metadata = get_json(f"{root}/api/views/{dataset_id}")
+          fields = {column.get("fieldName") for column in metadata.get("columns", [])}
+          missing = sorted(required - fields)
+          if missing:
+              raise SystemExit(f"DOB NOW schema contract failed; missing fields: {missing}")
+
+          selected = ",".join(sorted(required))
+          query = urlencode({
+              "$limit": 1,
+              "$where": "bbl is not null",
+              "$order": "filing_date DESC",
+              "$select": selected,
+          })
+          rows = get_json(f"{root}/resource/{dataset_id}.json?{query}")
+          if not isinstance(rows, list) or not rows:
+              raise SystemExit("DOB NOW source contract failed; no BBL-bearing sample row returned")
+
+          row = rows[0]
+          print(json.dumps({
+              "dataset": metadata.get("name"),
+              "field_count": len(fields),
+              "sample_job_filing_number": row.get("job_filing_number"),
+              "sample_bbl": row.get("bbl"),
+              "sample_filing_date": row.get("filing_date"),
+              "sample_job_type": row.get("job_type"),
+              "sample_mechanical_flag": row.get("mechanical_systems_work_type_"),
+              "sample_description": row.get("job_description"),
+          }, indent=2))
