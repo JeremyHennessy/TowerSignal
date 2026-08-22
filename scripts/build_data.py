@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal import PRIORITY_MODEL_VERSION, SCHEMA_VERSION  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
+from towersignal.historical import build_historical_profile  # noqa: E402
 from towersignal.hpd import fetch_hpd_contacts_by_bbl  # noqa: E402
 from towersignal.inspections import aggregate_inspections  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
@@ -152,6 +153,7 @@ def build(output_dir: Path) -> dict:
     for system in systems:
         inspections = inspections_by_system.get(system["system_id"], [])
         oath_cases = cases_for_system(inspections, oath_cases_by_ticket)
+        historical_profile = build_historical_profile(system, inspections, oath_cases, snapshot_date)
         if oath_cases:
             systems_with_oath_cases += 1
         bbl_key = normalize_bbl(system.get("bbl"))
@@ -203,6 +205,12 @@ def build(output_dir: Path) -> dict:
             "latitude": system["latitude"],
             "longitude": system["longitude"],
             "coordinate_status": system["coordinate_status"],
+            "registration_date": historical_profile["registration_date"],
+            "sample_count": historical_profile["sample"]["reported_sample_count"],
+            "inspection_count": historical_profile["inspection"]["inspection_count"],
+            "violation_citation_count": historical_profile["inspection"]["violation_citation_count"],
+            "latest_violation_date": historical_profile["inspection"]["latest_violation_date"],
+            "oath_balance_due_total": historical_profile["oath"]["balance_due_total"],
             "latest_sample_date": system["latest_sample_date"],
             "days_since_latest_sample": signal_state["days_since_latest_sample"],
             "latest_inspection_date": latest_inspection.get("inspection_date") if latest_inspection else None,
@@ -238,6 +246,7 @@ def build(output_dir: Path) -> dict:
                 "source_latitude_raw": system["source_latitude_raw"],
                 "source_longitude_raw": system["source_longitude_raw"],
             },
+            "historical_profile": historical_profile,
             "building_context": building_context,
             "hpd_registration": hpd_registration,
             "sample_history": {
