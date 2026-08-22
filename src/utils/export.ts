@@ -1,4 +1,4 @@
-import type { Metadata, SystemSummary } from '../types/data'
+import type { Metadata, SystemDetail, SystemSummary } from '../types/data'
 import { signalLabel } from '../domain/labels'
 
 function csvCell(value: unknown): string {
@@ -24,11 +24,49 @@ export function exportCsv(rows: SystemSummary[], metadata: Metadata): void {
   URL.revokeObjectURL(url)
 }
 
-export function leadSummary(row: SystemSummary, metadata: Metadata): string {
+export function leadSummary(row: SystemSummary, metadata: Metadata, detail?: SystemDetail): string {
   const violations = row.confirmed_violation ? 'Official inspection history contains one or more recorded violations.' : 'None identified in the published inspection history.'
   const oath = (row.oath_case_count ?? 0) > 0 ? `${row.oath_case_count} exact summons/ticket match${row.oath_case_count === 1 ? '' : 'es'} in OATH case-status data.` : 'No exact OATH summons/ticket match identified.'
   const signal = row.primary_signal === 'POTENTIAL_SAMPLING_GAP'
     ? `Potential sampling gap — latest publicly reported Legionella sample: ${row.latest_sample_date ?? 'not available'} (${row.days_since_latest_sample ?? 'unknown'} days ago). Operating status must be verified.`
     : signalLabel(row.primary_signal)
-  return `TowerSignal lead\nAddress: ${row.address ?? 'Not available'}\nSystem ID: ${row.system_id}\nActive equipment: ${row.active_equipment}\nSignal: ${signal}\nConfirmed violations: ${violations}\nOATH lifecycle: ${oath}\nEvidence: NYC Cooling Tower Registrations; NYC Cooling Tower System Inspection Results; OATH Hearings Division Case Status (exact ticket matches only)\nGenerated: ${metadata.generated_at}\nTowerSignal signals are derived from public records and are not regulatory compliance determinations.`
+
+  const lines = [
+    'TowerSignal lead',
+    `Address: ${row.address ?? 'Not available'}`,
+    `System ID: ${row.system_id}`,
+    `BBL: ${row.bbl ?? 'Not available'}`,
+    `Active equipment: ${row.active_equipment}`,
+    `Signal: ${signal}`,
+    `Confirmed violations: ${violations}`,
+    `OATH lifecycle: ${oath}`,
+  ]
+
+  if (detail) {
+    lines.push('', 'Property / contact context')
+    lines.push(`PLUTO owner: ${detail.building_context?.owner_name ?? 'No exact PLUTO owner match'}`)
+    if (!detail.hpd_registration) {
+      lines.push('HPD registration: No exact BBL match in Multiple Dwelling Registrations')
+    } else if (detail.hpd_registration.contacts.length === 0) {
+      lines.push(`HPD registration: ${detail.hpd_registration.registration_id ?? 'matched'}; no contact rows returned`)
+    } else {
+      lines.push(`HPD registration: ${detail.hpd_registration.registration_id ?? 'matched'}${detail.hpd_registration.last_registration_date ? `; processed ${detail.hpd_registration.last_registration_date}` : ''}`)
+      detail.hpd_registration.contacts.forEach((contact, index) => {
+        const name = contact.corporation_name ?? contact.person_name ?? contact.description ?? 'Name not published'
+        const parts = [
+          `${index + 1}. ${contact.type ?? 'HPD contact'}: ${name}`,
+          contact.person_name ? `person ${contact.person_name}` : null,
+          contact.title ? `title ${contact.title}` : null,
+          contact.business_address ? `business address ${contact.business_address}` : null,
+        ].filter(Boolean)
+        lines.push(parts.join(' · '))
+      })
+    }
+    lines.push('Contact context is from public NYC PLUTO/HPD records and does not establish who procures or is responsible for cooling-tower service.')
+  }
+
+  lines.push('', 'Evidence: NYC Cooling Tower Registrations; NYC Cooling Tower System Inspection Results; OATH Hearings Division Case Status (exact ticket matches only); NYC DCP PLUTO (exact BBL); NYC HPD Multiple Dwelling Registrations and Registration Contacts (exact BBL / registration ID where available)')
+  lines.push(`Generated: ${metadata.generated_at}`)
+  lines.push('TowerSignal signals are derived from public records and are not regulatory compliance determinations.')
+  return lines.join('\n')
 }
