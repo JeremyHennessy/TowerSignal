@@ -1,16 +1,28 @@
 from __future__ import annotations
 
+import hashlib
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-HISTORY_SCHEMA_VERSION = "1.0"
+HISTORY_SCHEMA_VERSION = "1.1"
 EVENT_RETENTION_DAYS = 400
+MAX_EVENT_TEXT_LENGTH = 500
 
 
 def _canonical(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def _fingerprint(value: Any) -> str:
+    return hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()[:20]
+
+
+def _bounded(value: Any) -> Any:
+    if not isinstance(value, str) or len(value) <= MAX_EVENT_TEXT_LENGTH:
+        return value
+    return value[:MAX_EVENT_TEXT_LENGTH] + "…"
 
 
 def _event(
@@ -42,6 +54,76 @@ def _event(
     }
 
 
+def _compact_inspection_identity(item: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "inspection_date": item.get("inspection_date"),
+        "inspection_type": item.get("inspection_type"),
+        "status": item.get("status"),
+    }
+
+
+def _compact_violation_identity(item: dict[str, Any]) -> dict[str, Any]:
+    identity = {
+        "summons_number": item.get("summons_number"),
+        "violation_code": item.get("violation_code"),
+        "law_section": item.get("law_section"),
+        "violation_type": item.get("violation_type"),
+    }
+    if not any(identity.values()):
+        identity["fallback_text"] = item.get("violation_text") or item.get("citation_text")
+    return identity
+
+
+def _compact_violation_event(item: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "summons_number": item.get("summons_number"),
+        "violation_code": item.get("violation_code"),
+        "law_section": item.get("law_section"),
+        "violation_type": item.get("violation_type"),
+        "description": _bounded(item.get("violation_text") or item.get("citation_text")),
+    }
+
+
+def _compact_oath_case(item: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "ticket_number": item.get("ticket_number"),
+        "hearing_status": item.get("hearing_status"),
+        "hearing_result": item.get("hearing_result"),
+        "hearing_date": item.get("hearing_date"),
+        "decision_date": item.get("decision_date"),
+        "violation_date": item.get("violation_date"),
+        "penalty_imposed": item.get("penalty_imposed"),
+        "paid_amount": item.get("paid_amount"),
+        "balance_due": item.get("balance_due"),
+    }
+
+
+def _compact_building_context(item: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not item:
+        return None
+    return {
+        "owner_name": item.get("owner_name"),
+        "land_use": item.get("land_use"),
+        "building_class": item.get("building_class"),
+        "year_built": item.get("year_built"),
+        "building_area_sqft": item.get("building_area_sqft"),
+        "floors": item.get("floors"),
+        "total_units": item.get("total_units"),
+    }
+
+
+def _compact_contact(item: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "registration_contact_id": item.get("registration_contact_id"),
+        "type": item.get("type"),
+        "description": _bounded(item.get("description")),
+        "corporation_name": item.get("corporation_name"),
+        "person_name": item.get("person_name"),
+        "title": item.get("title"),
+        "business_address": item.get("business_address"),
+    }
+
+
 def build_observation(
     system: dict[str, Any],
     summary_row: dict[str, Any],
@@ -50,6 +132,22 @@ def build_observation(
     building_context: dict[str, Any] | None,
     hpd_registration: dict[str, Any] | None,
 ) -> dict[str, Any]:
+    inspection_records: dict[str, dict[str, Any]] = {}
+    violation_records: dict[str, dict[str, Any]] = {}
+    for inspection in inspections:
+        inspection_identity = _compact_inspection_identity(inspection)
+        inspection_key = _fingerprint(inspection_identity)
+        inspection_records[inspection_key] = inspection_identity
+        for violation in inspection.get("violations") or []:
+            violation_identity = _compact_violation_identity(violation)
+            violation_key = _fingerprint(violation_identity)
+            violation_records[violation_key] = {
+                **_compact_violation_event(violation),
+                "inspection_date": inspection.get("inspection_date"),
+            }
+
+    compact_building = _compact_building_context(building_context)
+    contacts = [_compact_contact(item) for item in (hpd_registration or {}).get("contacts", [])]
     return {
         "system_id": system["system_id"],
         "bin": system.get("bin"),
@@ -65,36 +163,21 @@ def build_observation(
         "signal_types": summary_row.get("signal_types", []),
         "priority_score": summary_row.get("priority_score"),
         "evidence_confidence": summary_row.get("evidence_confidence"),
-        "inspections": inspections,
-        "oath_cases": oath_cases,
-        "pluto_owner": (building_context or {}).get("owner_name"),
-        "building_context": building_context,
+        "inspection_keys": sorted(inspection_records),
+        "violation_keys": sorted(violation_records),
+        "oath_cases": [_compact_oath_case(item) for item in oath_cases if item.get("ticket_number")],
+        "pluto_owner": (compact_building or {}).get("owner_name"),
+        "building_context": compact_building,
         "hpd_registration_id": (hpd_registration or {}).get("registration_id"),
         "hpd_last_registration_date": (hpd_registration or {}).get("last_registration_date"),
-        "hpd_contacts": (hpd_registration or {}).get("contacts", []),
+        "hpd_contacts": contacts,
+        "_inspection_records": inspection_records,
+        "_violation_records": violation_records,
     }
 
 
-def _inspection_key(item: dict[str, Any]) -> str:
-    return _canonical({
-        "inspection_date": item.get("inspection_date"),
-        "inspection_type": item.get("inspection_type"),
-        "status": item.get("status"),
-    })
-
-
-def _violation_key(item: dict[str, Any]) -> str:
-    return _canonical({
-        "summons_number": item.get("summons_number"),
-        "violation_code": item.get("violation_code"),
-        "law_section": item.get("law_section"),
-        "violation_type": item.get("violation_type"),
-        "violation_text": item.get("violation_text"),
-    })
-
-
 def _contact_key(item: dict[str, Any]) -> str:
-    return _canonical({
+    return _fingerprint({
         "registration_contact_id": item.get("registration_contact_id"),
         "type": item.get("type"),
         "corporation_name": item.get("corporation_name"),
@@ -132,21 +215,17 @@ def detect_changes(previous: dict[str, Any], current: dict[str, Any], detected_a
     if "POTENTIAL_SAMPLING_GAP" in previous_signals and "POTENTIAL_SAMPLING_GAP" not in current_signals:
         events.append(_event("SAMPLING_GAP_RESOLVED", current, detected_at, "TOWERSIGNAL_DERIVED", "DETERMINISTIC_RULE_CHANGE", True, False, current.get("latest_sample_date")))
 
-    previous_inspections = {_inspection_key(item): item for item in previous.get("inspections") or []}
-    current_inspections = {_inspection_key(item): item for item in current.get("inspections") or []}
-    for key, inspection in current_inspections.items():
-        if key not in previous_inspections:
-            events.append(_event("INSPECTION_ADDED", current, detected_at, "NYC_COOLING_TOWER_INSPECTIONS", "SYSTEM_ID_EXACT", None, {"inspection_date": inspection.get("inspection_date"), "inspection_type": inspection.get("inspection_type"), "status": inspection.get("status")}, inspection.get("inspection_date")))
+    previous_inspections = set(previous.get("inspection_keys") or [])
+    current_inspections = set(current.get("inspection_keys") or [])
+    for key in sorted(current_inspections - previous_inspections):
+        inspection = current.get("_inspection_records", {}).get(key, {})
+        events.append(_event("INSPECTION_ADDED", current, detected_at, "NYC_COOLING_TOWER_INSPECTIONS", "SYSTEM_ID_EXACT", None, inspection, inspection.get("inspection_date")))
 
-    previous_violations = {}
-    for inspection in previous.get("inspections") or []:
-        for violation in inspection.get("violations") or []:
-            previous_violations[_violation_key(violation)] = (inspection, violation)
-    for inspection in current.get("inspections") or []:
-        for violation in inspection.get("violations") or []:
-            key = _violation_key(violation)
-            if key not in previous_violations:
-                events.append(_event("VIOLATION_ADDED", current, detected_at, "NYC_COOLING_TOWER_INSPECTIONS", "SYSTEM_ID_EXACT", None, violation, inspection.get("inspection_date")))
+    previous_violations = set(previous.get("violation_keys") or [])
+    current_violations = set(current.get("violation_keys") or [])
+    for key in sorted(current_violations - previous_violations):
+        violation = current.get("_violation_records", {}).get(key, {})
+        events.append(_event("VIOLATION_ADDED", current, detected_at, "NYC_COOLING_TOWER_INSPECTIONS", "SYSTEM_ID_EXACT", None, violation, violation.get("inspection_date")))
 
     previous_oath = _oath_map(previous.get("oath_cases") or [])
     current_oath = _oath_map(current.get("oath_cases") or [])
@@ -183,6 +262,10 @@ def detect_changes(previous: dict[str, Any], current: dict[str, Any], detected_a
     return events
 
 
+def _durable_observation(item: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in item.items() if not key.startswith("_")}
+
+
 def build_history(
     current_observations: list[dict[str, Any]],
     detected_at: str,
@@ -192,7 +275,8 @@ def build_history(
     current_by_id = {item["system_id"]: item for item in current_observations}
     previous_by_id = {item["system_id"]: item for item in (previous_snapshot or {}).get("systems", [])}
     history_started_at = (previous_snapshot or {}).get("history_started_at") or detected_at
-    baseline_initialized = not bool(previous_snapshot and previous_by_id)
+    schema_changed = bool(previous_snapshot) and previous_snapshot.get("history_schema_version") != HISTORY_SCHEMA_VERSION
+    baseline_initialized = not bool(previous_snapshot and previous_by_id) or schema_changed
     new_events: list[dict[str, Any]] = []
 
     if not baseline_initialized:
@@ -222,13 +306,14 @@ def build_history(
         "history_schema_version": HISTORY_SCHEMA_VERSION,
         "history_started_at": history_started_at,
         "observed_at": detected_at,
-        "systems": sorted(current_observations, key=lambda item: item["system_id"]),
+        "systems": sorted((_durable_observation(item) for item in current_observations), key=lambda item: item["system_id"]),
     }
     changes = {
         "history_schema_version": HISTORY_SCHEMA_VERSION,
         "history_started_at": history_started_at,
         "observed_at": detected_at,
         "baseline_initialized": baseline_initialized,
+        "schema_migrated": schema_changed,
         "new_event_count": len(new_events),
         "events": retained,
     }
