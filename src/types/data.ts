@@ -47,6 +47,12 @@ export interface SystemSummary {
   latitude: number | null
   longitude: number | null
   coordinate_status: CoordinateStatus
+  registration_date?: string | null
+  sample_count?: number
+  inspection_count?: number
+  violation_citation_count?: number
+  latest_violation_date?: string | null
+  oath_balance_due_total?: number
   latest_sample_date: string | null
   days_since_latest_sample: number | null
   latest_inspection_date: string | null
@@ -181,6 +187,34 @@ export interface HpdRegistrationContext {
   source: 'NYC_HPD_MULTIPLE_DWELLING_REGISTRATION'
 }
 
+export interface HistoricalProfile {
+  registration_date: string | null
+  registration_age_days: number | null
+  first_public_evidence_date: string | null
+  sample: {
+    first_reported_date: string | null
+    latest_reported_date: string | null
+    reported_sample_count: number
+    average_interval_days: number | null
+    longest_interval_days: number | null
+  }
+  inspection: {
+    first_inspection_date: string | null
+    latest_inspection_date: string | null
+    inspection_count: number
+    inspections_with_violations: number
+    violation_citation_count: number
+    first_violation_date: string | null
+    latest_violation_date: string | null
+  }
+  oath: {
+    case_count: number
+    penalty_imposed_total: number
+    paid_amount_total: number
+    balance_due_total: number
+  }
+}
+
 export interface SystemDetail {
   schema_version: string
   metadata: Metadata
@@ -188,6 +222,7 @@ export interface SystemDetail {
     source_latitude_raw: string | null
     source_longitude_raw: string | null
   }
+  historical_profile?: HistoricalProfile
   building_context?: BuildingContext | null
   hpd_registration?: HpdRegistrationContext | null
   sample_history: {
