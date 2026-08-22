@@ -55,6 +55,23 @@ def full_observation(**overrides):
     return build_observation(system, summary, inspections, oath_cases, building_context, hpd_registration, dob_activity)
 
 
+def durable_observation(observation):
+    return {key: value for key, value in observation.items() if not key.startswith("_")}
+
+
+def history_snapshot(observation, *, started_at="2026-08-20T01:00:00Z", include_dob=True):
+    snapshot = {
+        "history_schema_version": HISTORY_SCHEMA_VERSION,
+        "history_started_at": started_at,
+        "systems": [durable_observation(observation)],
+    }
+    if include_dob:
+        snapshot["dob_history_initialized"] = True
+        jobs = observation.get("_dob_jobs") or {}
+        snapshot["dob_by_bbl"] = {str(observation["bbl"]): jobs} if jobs else {}
+    return snapshot
+
+
 class HistoryTests(unittest.TestCase):
     def test_compact_observation_excludes_full_source_payload(self):
         obs = full_observation(
@@ -71,7 +88,7 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual(len(obs["violation_keys"]), 1)
         self.assertNotIn("charges", obs["oath_cases"][0])
         self.assertLessEqual(len(next(iter(obs["_violation_records"].values()))["description"]), 501)
-        self.assertEqual(len(obs["dob_jobs"]["M00123456-I1"]), 5)
+        self.assertEqual(len(obs["_dob_jobs"]["M00123456-I1"]), 2)
         self.assertLessEqual(len(obs["_dob_records"]["M00123456-I1"]["job_description"]), 501)
 
     def test_initial_snapshot_creates_no_false_first_seen_events(self):
@@ -81,8 +98,23 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual(changes["events"], [])
         self.assertEqual(snapshot["history_schema_version"], HISTORY_SCHEMA_VERSION)
         self.assertNotIn("_inspection_records", snapshot["systems"][0])
+        self.assertNotIn("_dob_jobs", snapshot["systems"][0])
         self.assertNotIn("_dob_records", snapshot["systems"][0])
-        self.assertTrue(snapshot["systems"][0]["dob_history_initialized"])
+        self.assertTrue(snapshot["dob_history_initialized"])
+        self.assertIn("M00123456-I1", snapshot["dob_by_bbl"]["1000010001"])
+
+    def test_dob_baseline_is_deduplicated_once_per_exact_bbl(self):
+        first = full_observation(dob_activity=[dob_job()])
+        second = full_observation(
+            system={"system_id": "CT-101", "bin": "1000002", "address": "100 EXAMPLE STREET - SECOND SYSTEM"},
+            dob_activity=[dob_job()],
+        )
+        snapshot, changes = build_history([first, second], "2026-08-22T01:00:00Z", None, [])
+        self.assertEqual(changes["events"], [])
+        self.assertEqual(len(snapshot["dob_by_bbl"]), 1)
+        self.assertEqual(len(snapshot["dob_by_bbl"]["1000010001"]), 1)
+        self.assertIn("M00123456-I1", snapshot["dob_by_bbl"]["1000010001"])
+        self.assertTrue(all("_dob_jobs" not in row and "_dob_records" not in row for row in snapshot["systems"]))
 
     def test_schema_migration_emits_zero_synthetic_events(self):
         previous = {"history_schema_version": "1.0", "history_started_at": "2026-08-20T01:00:00Z",
@@ -94,10 +126,7 @@ class HistoryTests(unittest.TestCase):
 
     def test_existing_history_baselines_dob_without_synthetic_events(self):
         previous_obs = full_observation()
-        previous_obs.pop("dob_history_initialized")
-        previous_obs.pop("dob_jobs")
-        previous = {"history_schema_version": HISTORY_SCHEMA_VERSION, "history_started_at": "2026-08-20T01:00:00Z",
-                    "systems": [previous_obs]}
+        previous = history_snapshot(previous_obs, include_dob=False)
         current = full_observation(dob_activity=[dob_job(explicit_cooling_tower_mention=True,
                                                          job_description="Replace existing cooling tower")])
         snapshot, changes = build_history([current], "2026-08-22T01:00:00Z", previous, [])
@@ -105,7 +134,9 @@ class HistoryTests(unittest.TestCase):
         self.assertFalse(changes["baseline_initialized"])
         self.assertEqual(changes["new_event_count"], 0)
         self.assertEqual(changes["events"], [])
-        self.assertIn("M00123456-I1", snapshot["systems"][0]["dob_jobs"])
+        self.assertTrue(snapshot["dob_history_initialized"])
+        self.assertIn("M00123456-I1", snapshot["dob_by_bbl"]["1000010001"])
+        self.assertNotIn("_dob_jobs", snapshot["systems"][0])
 
     def test_compact_sample_violation_oath_owner_contact_and_dob_changes_are_detected(self):
         previous = full_observation(
@@ -183,12 +214,18 @@ class HistoryTests(unittest.TestCase):
 
     def test_missing_current_dob_records_are_carried_forward_without_false_readd(self):
         previous_obs = full_observation(dob_activity=[dob_job(first_permit_date="2026-08-20")])
-        previous = {"history_schema_version": HISTORY_SCHEMA_VERSION, "history_started_at": "2026-08-20T01:00:00Z",
-                    "systems": [previous_obs]}
+        previous = history_snapshot(previous_obs)
         current = full_observation(dob_activity=[])
         snapshot, changes = build_history([current], "2026-08-22T01:00:00Z", previous, [])
         self.assertFalse(any(event["event_type"].startswith("DOB_") for event in changes["events"]))
-        self.assertIn("M00123456-I1", snapshot["systems"][0]["dob_jobs"])
+        self.assertIn("M00123456-I1", snapshot["dob_by_bbl"]["1000010001"])
+        self.assertNotIn("_dob_jobs", snapshot["systems"][0])
+
+        # A later reappearance of the same already-observed permit remains silent.
+        reappeared = full_observation(dob_activity=[dob_job(first_permit_date="2026-08-20")])
+        next_snapshot, next_changes = build_history([reappeared], "2026-08-23T01:00:00Z", snapshot, changes["events"])
+        self.assertFalse(any(event["event_type"].startswith("DOB_") for event in next_changes["events"]))
+        self.assertIn("M00123456-I1", next_snapshot["dob_by_bbl"]["1000010001"])
 
     def test_missing_current_enrichment_does_not_create_false_change_events(self):
         previous = full_observation(hpd_registration={"registration_id": "R1", "last_registration_date": "2026-08-01",
@@ -203,16 +240,14 @@ class HistoryTests(unittest.TestCase):
 
     def test_removed_system_wording_is_snapshot_presence_not_decommissioning(self):
         previous_obs = full_observation()
-        previous = {"history_schema_version": HISTORY_SCHEMA_VERSION, "history_started_at": "2026-08-20T01:00:00Z",
-                    "systems": [previous_obs]}
+        previous = history_snapshot(previous_obs)
         _, changes = build_history([], "2026-08-22T01:00:00Z", previous, [])
         self.assertEqual(changes["events"][0]["event_type"], "SYSTEM_NO_LONGER_PRESENT")
         self.assertEqual(changes["events"][0]["new_value"], {"present_in_snapshot": False})
 
     def test_new_system_after_baseline_is_first_seen(self):
         previous_obs = full_observation()
-        previous = {"history_schema_version": HISTORY_SCHEMA_VERSION, "history_started_at": "2026-08-20T01:00:00Z",
-                    "systems": [previous_obs]}
+        previous = history_snapshot(previous_obs)
         second = full_observation(system={"system_id": "CT-200", "address": "200 EXAMPLE STREET"})
         _, changes = build_history([previous_obs, second], "2026-08-22T01:00:00Z", previous, [])
         first_seen = [event for event in changes["events"] if event["event_type"] == "SYSTEM_FIRST_SEEN"]
