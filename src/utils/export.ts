@@ -7,12 +7,12 @@ function csvCell(value: unknown): string {
 }
 
 export function exportCsv(rows: SystemSummary[], metadata: Metadata): void {
-  const headers = ['address','borough','zip','system_id','bin','active_equipment','latest_public_sample_date','days_since_sample','signal_type','confirmed_violation','latest_inspection_date','oath_exact_match_count','priority_score','evidence_confidence','source_snapshot_timestamp']
+  const headers = ['address','borough','zip','system_id','bin','bbl','active_equipment','latest_public_sample_date','days_since_sample','signal_type','confirmed_violation','latest_inspection_date','oath_exact_match_count','pluto_exact_bbl_match','hpd_registered_contact_count','priority_score','evidence_confidence','source_snapshot_timestamp']
   const lines = [headers.map(csvCell).join(',')]
   for (const row of rows) {
     lines.push([
-      row.address,row.borough,row.zip,row.system_id,row.bin,row.active_equipment,row.latest_sample_date,row.days_since_latest_sample,
-      signalLabel(row.primary_signal),row.confirmed_violation,row.latest_inspection_date,row.oath_case_count ?? 0,row.priority_score,row.evidence_confidence,metadata.generated_at,
+      row.address,row.borough,row.zip,row.system_id,row.bin,row.bbl,row.active_equipment,row.latest_sample_date,row.days_since_latest_sample,
+      signalLabel(row.primary_signal),row.confirmed_violation,row.latest_inspection_date,row.oath_case_count ?? 0,row.pluto_match ?? false,row.hpd_contact_count ?? 0,row.priority_score,row.evidence_confidence,metadata.generated_at,
     ].map(csvCell).join(','))
   }
   const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' })
