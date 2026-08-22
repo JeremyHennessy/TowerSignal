@@ -3,11 +3,11 @@ import type { ChangeEventType, ChangesPayload } from '../types/history'
 import { formatTimestamp } from '../domain/labels'
 
 export function ChangesView({ payload }: { payload: ChangesPayload; onSelectSystem: (systemId: string) => void }) {
-  const [days, setDays] = useState('7')
-  const [borough] = useState('')
-  const [eventType] = useState('')
+  const [days] = useState('7')
+  const [borough, setBorough] = useState('')
+  const [eventType, setEventType] = useState('')
   const [minimumPriority] = useState('')
-  const [confidence, setConfidence] = useState('')
+  const [confidence] = useState('')
   const [contactOnly] = useState(false)
   const [quickTypes, setQuickTypes] = useState<ChangeEventType[] | null>(null)
   const [customStart] = useState('')
@@ -36,10 +36,10 @@ export function ChangesView({ payload }: { payload: ChangesPayload; onSelectSyst
     <div className="changes-intro"><div><span className="eyebrow">Historical intelligence</span><h2>What changed?</h2><p>TowerSignal compares preserved source-backed observations. Detection time is when TowerSignal first observed a difference; source dates are shown separately when available.</p></div><div className="history-status"><span>History collection began</span><strong>{formatTimestamp(payload.history_started_at)}</strong><small>Latest observation {formatTimestamp(payload.observed_at)}</small></div></div>
     {payload.baseline_initialized && <div className="disclaimer"><strong>Historical baseline initialized.</strong> This is TowerSignal's first preserved observation. Existing systems are not being mislabeled as newly registered. Change events will accumulate as later refreshes differ from this baseline.</div>}
     <div className="change-filters">
-      <label>Period<select value={days} onChange={event => { setDays(event.target.value); setQuickTypes(null) }}><option value="1">Today</option><option value="7">7 days</option><option value="30">30 days</option><option value="custom">Custom</option><option value="0">All retained</option></select></label>
-      <label>Evidence<select value={confidence} onChange={event => setConfidence(event.target.value)}><option value="">All</option><option value="CONFIRMED">Confirmed</option><option value="STRONG_SIGNAL">Strong signal</option><option value="VERIFY">Verify</option></select></label>
+      <label>Borough<select value={borough} onChange={event => setBorough(event.target.value)}><option value="">All</option>{boroughs.map(value => <option key={value}>{value}</option>)}</select></label>
+      <label>Event type<select value={eventType} onChange={event => { setEventType(event.target.value); setQuickTypes(null) }}><option value="">All</option>{eventTypes.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
     </div>
     <div className="change-count">{filtered.length.toLocaleString()} change{filtered.length === 1 ? '' : 's'} in current view</div>
-    <div className="empty-changes" data-diagnostic-static-selects><strong>Diagnostic: static Period + Evidence selects only.</strong><span>{boroughs.length} borough values and {eventTypes.length} event types derived but not rendered.</span></div>
+    <div className="empty-changes" data-diagnostic-dynamic-selects><strong>Diagnostic: dynamic Borough + Event type selects only.</strong></div>
   </section>
 }
