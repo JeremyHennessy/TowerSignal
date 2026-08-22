@@ -22,6 +22,12 @@ test('hosted TowerSignal loads data, changes, historical profile, source health,
   await expect(page.locator('.leaflet-container')).toBeVisible()
   await expect(page.locator('.marker-cluster, .tower-marker').first()).toBeVisible()
 
+  const mapContainment = await page.locator('.map-shell').evaluate(element => {
+    const style = getComputedStyle(element)
+    return { overflow: style.overflow, isolation: style.isolation, position: style.position }
+  })
+  expect(mapContainment).toEqual({ overflow: 'hidden', isolation: 'isolate', position: 'relative' })
+
   await page.getByRole('button', { name: 'Changes' }).click()
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
   await expect(page.getByText('History collection began')).toBeVisible()
