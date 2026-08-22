@@ -32,7 +32,9 @@ test('hosted TowerSignal loads data, changes, historical profile, source health,
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
   await expect(page.getByText('History collection began')).toBeVisible()
   await expect(page.getByText(/change.*in current view/)).toBeVisible()
+  await expect(page.locator('.map-shell')).toBeHidden()
   await page.getByRole('button', { name: 'Leads' }).click()
+  await expect(page.locator('.map-shell')).toBeVisible()
 
   const before = await page.locator('tbody tr').count()
   await page.getByRole('button', { name: 'Manhattan' }).click()
@@ -47,7 +49,7 @@ test('hosted TowerSignal loads data, changes, historical profile, source health,
   await expect(page.getByRole('heading', { name: 'Identity' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Historical profile' })).toBeVisible()
   await expect(page.getByText('Reported samples')).toBeVisible()
-  await expect(page.getByText('NYC Health inspections')).toBeVisible()
+  await expect(page.getByText('NYC Health inspections', { exact: true })).toBeVisible()
   await expect(page.getByText('OATH penalty imposed')).toBeVisible()
   await expect(page.getByText(/Descriptive history derived from the current authoritative NYC registration/)).toBeVisible()
   await expect(page.getByRole('heading', { name: 'OATH case lifecycle' })).toBeVisible()
@@ -71,6 +73,7 @@ test('mobile layout keeps Leads and Changes controls readable and usable', async
   await page.getByRole('button', { name: 'Changes' }).click()
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
   await expect(page.getByText('History collection began')).toBeVisible()
+  await expect(page.locator('.map-shell')).toBeHidden()
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
   const viewportWidth = page.viewportSize()?.width ?? 0
   expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
