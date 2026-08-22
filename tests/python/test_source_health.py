@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import sys
 import unittest
+from pathlib import Path
 
-from scripts.towersignal.source_health import SourceHealthError, health_entry, validate_source_health
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from towersignal.source_health import SourceHealthError, health_entry, validate_source_health
 
 
 class SourceHealthTests(unittest.TestCase):
