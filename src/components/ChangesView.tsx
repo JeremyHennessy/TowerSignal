@@ -4,7 +4,7 @@ import { formatTimestamp } from '../domain/labels'
 
 export function ChangesView({ payload }: { payload: ChangesPayload; onSelectSystem: (systemId: string) => void }) {
   const [days] = useState('7')
-  const [borough] = useState('')
+  const [borough, setBorough] = useState('')
   const [eventType, setEventType] = useState('')
   const [minimumPriority] = useState('')
   const [confidence] = useState('')
@@ -35,10 +35,11 @@ export function ChangesView({ payload }: { payload: ChangesPayload; onSelectSyst
   return <section className="changes-view" aria-label="TowerSignal changes">
     <div className="changes-intro"><div><span className="eyebrow">Historical intelligence</span><h2>What changed?</h2><p>TowerSignal compares preserved source-backed observations. Detection time is when TowerSignal first observed a difference; source dates are shown separately when available.</p></div><div className="history-status"><span>History collection began</span><strong>{formatTimestamp(payload.history_started_at)}</strong><small>Latest observation {formatTimestamp(payload.observed_at)}</small></div></div>
     {payload.baseline_initialized && <div className="disclaimer"><strong>Historical baseline initialized.</strong> This is TowerSignal's first preserved observation. Existing systems are not being mislabeled as newly registered. Change events will accumulate as later refreshes differ from this baseline.</div>}
-    <div className="change-filters">
+    <div className="change-filters" style={{ display: 'block' }}>
+      <label>Borough<select value={borough} onChange={event => setBorough(event.target.value)}><option value="">All</option>{boroughs.map(value => <option key={value}>{value}</option>)}</select></label>
       <label>Event type<select value={eventType} onChange={event => { setEventType(event.target.value); setQuickTypes(null) }}><option value="">All</option>{eventTypes.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
     </div>
     <div className="change-count">{filtered.length.toLocaleString()} change{filtered.length === 1 ? '' : 's'} in current view</div>
-    <div className="empty-changes" data-diagnostic-event-type-only><strong>Diagnostic: dynamic Event type select only.</strong><span>{boroughs.length} borough values derived but not rendered.</span></div>
+    <div className="empty-changes" data-diagnostic-dynamic-selects-no-grid><strong>Diagnostic: both dynamic selects with mobile grid bypassed.</strong></div>
   </section>
 }
