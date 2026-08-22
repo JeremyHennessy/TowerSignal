@@ -38,6 +38,8 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
+      - name: Build and validate source-health coverage
+        run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Build deterministic historical changes
         run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
       - name: Validate durable history size and growth
