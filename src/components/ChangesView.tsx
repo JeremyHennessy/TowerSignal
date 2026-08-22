@@ -6,12 +6,12 @@ export function ChangesView({ payload }: { payload: ChangesPayload; onSelectSyst
   const [days, setDays] = useState('7')
   const [borough, setBorough] = useState('')
   const [eventType, setEventType] = useState('')
-  const [minimumPriority, setMinimumPriority] = useState('')
+  const [minimumPriority] = useState('')
   const [confidence, setConfidence] = useState('')
-  const [contactOnly, setContactOnly] = useState(false)
+  const [contactOnly] = useState(false)
   const [quickTypes, setQuickTypes] = useState<ChangeEventType[] | null>(null)
-  const [customStart, setCustomStart] = useState('')
-  const [customEnd, setCustomEnd] = useState('')
+  const [customStart] = useState('')
+  const [customEnd] = useState('')
 
   const filtered = useMemo(() => payload.events.filter(event => {
     const detected = new Date(event.detected_at).getTime()
@@ -37,14 +37,11 @@ export function ChangesView({ payload }: { payload: ChangesPayload; onSelectSyst
     {payload.baseline_initialized && <div className="disclaimer"><strong>Historical baseline initialized.</strong> This is TowerSignal's first preserved observation. Existing systems are not being mislabeled as newly registered. Change events will accumulate as later refreshes differ from this baseline.</div>}
     <div className="change-filters">
       <label>Period<select value={days} onChange={event => { setDays(event.target.value); setQuickTypes(null) }}><option value="1">Today</option><option value="7">7 days</option><option value="30">30 days</option><option value="custom">Custom</option><option value="0">All retained</option></select></label>
-      {days === 'custom' && <><label>From<input type="date" value={customStart} onChange={event => setCustomStart(event.target.value)} /></label><label>To<input type="date" value={customEnd} onChange={event => setCustomEnd(event.target.value)} /></label></>}
       <label>Borough<select value={borough} onChange={event => setBorough(event.target.value)}><option value="">All</option>{boroughs.map(value => <option key={value}>{value}</option>)}</select></label>
       <label>Event type<select value={eventType} onChange={event => { setEventType(event.target.value); setQuickTypes(null) }}><option value="">All</option>{eventTypes.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
-      <label>Minimum priority<input type="number" min="0" max="100" value={minimumPriority} onChange={event => setMinimumPriority(event.target.value)} placeholder="0" /></label>
       <label>Evidence<select value={confidence} onChange={event => setConfidence(event.target.value)}><option value="">All</option><option value="CONFIRMED">Confirmed</option><option value="STRONG_SIGNAL">Strong signal</option><option value="VERIFY">Verify</option></select></label>
-      <label className="checkbox-label"><input type="checkbox" checked={contactOnly} onChange={event => setContactOnly(event.target.checked)} />Contact available</label>
     </div>
     <div className="change-count">{filtered.length.toLocaleString()} change{filtered.length === 1 ? '' : 's'} in current view</div>
-    <div className="empty-changes" data-diagnostic-quick-cards-omitted><strong>Diagnostic: form controls restored; quick buttons and cards omitted.</strong></div>
+    <div className="empty-changes" data-diagnostic-selects-only><strong>Diagnostic: select controls only; number, checkbox, quick buttons and cards omitted.</strong></div>
   </section>
 }
