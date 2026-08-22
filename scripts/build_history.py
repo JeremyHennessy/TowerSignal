@@ -99,6 +99,7 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
     previous_events_payload = load_json(previous_events_path, {"events": []})
     previous_events = previous_events_payload.get("events", []) if isinstance(previous_events_payload, dict) else []
     snapshot, changes = build_history(observations, detected_at, previous_snapshot, previous_events)
+    snapshot["source_health"] = payload.get("metadata", {}).get("source_health", [])
     suppress_unsupported_disappearance_events(changes, observations, previous_snapshot, detected_at)
     write_history_outputs(output_dir, snapshot, changes)
     print(json.dumps({
@@ -108,6 +109,7 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
         "new_event_count": changes["new_event_count"],
         "retained_event_count": len(changes["events"]),
         "suppressed_unsupported_event_count": changes.get("suppressed_unsupported_event_count", 0),
+        "source_health_count": len(snapshot.get("source_health", [])),
     }, indent=2))
     return changes
 

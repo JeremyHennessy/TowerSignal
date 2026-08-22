@@ -38,6 +38,8 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
+      - name: Build and validate source-health coverage
+        run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Build deterministic historical changes
         run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
       - name: Validate durable history size and growth
@@ -61,6 +63,7 @@ jobs:
           path: |
             public/data/history/latest.json
             public/data/history/events.json
+            public/data/source-health.json
           retention-days: 7
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -124,14 +127,15 @@ jobs:
         with:
           name: towersignal-history-state
           path: .verified-history
-      - name: Persist verified observation and event history
+      - name: Persist verified observation, event and source-health history
         run: |
           mkdir -p data/history
           cp .verified-history/latest.json data/history/latest.json
           cp .verified-history/events.json data/history/events.json
+          cp .verified-history/source-health.json data/history/source-health.json
           git config user.name "TowerSignal History Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/history/latest.json data/history/events.json
+          git add data/history/latest.json data/history/events.json data/history/source-health.json
           if git diff --cached --quiet; then
             echo "History state unchanged"
           else

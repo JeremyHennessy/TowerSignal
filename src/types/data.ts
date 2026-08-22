@@ -1,6 +1,7 @@
 export type EvidenceConfidence = 'CONFIRMED' | 'STRONG_SIGNAL' | 'VERIFY'
 export type FactClass = 'CONFIRMED_FACT' | 'DERIVED_FACT' | 'COMMERCIAL_SIGNAL'
 export type CoordinateStatus = 'VALID' | 'MISSING' | 'INVALID_SOURCE'
+export type SourceHealthStatus = 'HEALTHY' | 'WARNING' | 'FAILED'
 
 export interface SourceMetadata {
   dataset_id: string
@@ -13,10 +14,30 @@ export interface SourceMetadata {
   source_query_scope?: string
 }
 
+export interface SourceHealthEntry {
+  source_key: string
+  dataset_id: string
+  name: string
+  entity_unit: string
+  retrieved_record_count: number
+  requested_entity_count: number
+  normalized_entity_count: number
+  matched_entity_count: number
+  attached_entity_count: number
+  displayed_entity_count: number
+  coverage_percentage: number | null
+  previous_coverage_percentage: number | null
+  coverage_change_percentage_points: number | null
+  coverage_note: string
+  status: SourceHealthStatus
+  status_reasons: string[]
+}
+
 export interface Metadata {
   generated_at: string
   snapshot_date: string
   sources: SourceMetadata[]
+  source_health?: SourceHealthEntry[]
   normalized_system_count: number
   source_duplicate_registration_rows: number
   source_missing_registration_system_id_rows: number
