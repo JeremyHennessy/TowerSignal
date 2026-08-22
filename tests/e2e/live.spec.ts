@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('hosted TowerSignal loads data, changes, historical profile, OATH lifecycle and map without app errors', async ({ page }, testInfo) => {
+test('hosted TowerSignal loads data, changes, historical profile, source health, OATH lifecycle and map without app errors', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
@@ -14,6 +14,10 @@ test('hosted TowerSignal loads data, changes, historical profile, OATH lifecycle
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
   await expect(page.getByText('Registered systems')).toBeVisible()
   await expect(page.getByText('Systems with OATH cases')).toBeVisible()
+  await expect(page.getByText(/Source health \d+\/\d+ healthy/)).toBeVisible()
+  await expect(page.getByText('Source health', { exact: true })).toBeVisible()
+  await expect(page.getByText(/attached · .* represented/).first()).toBeVisible()
+  await expect(page.getByText(/ · FAILED · /)).toHaveCount(0)
   await expect(page.locator('tbody tr').first()).toBeVisible()
   await expect(page.locator('.leaflet-container')).toBeVisible()
   await expect(page.locator('.marker-cluster, .tower-marker').first()).toBeVisible()
@@ -56,6 +60,7 @@ test('mobile layout keeps Leads and Changes controls readable and usable', async
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Export filtered CSV' })).toBeVisible()
   await expect(page.getByLabel('Lead filters')).toBeVisible()
+  await expect(page.getByText(/Source health \d+\/\d+ healthy/)).toBeVisible()
   await expect(page.locator('.leaflet-container')).toBeVisible()
   await page.getByRole('button', { name: 'Changes' }).click()
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
