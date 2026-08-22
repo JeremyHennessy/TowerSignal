@@ -109,7 +109,7 @@ test('opens the Changes product mode with source-backed change evidence', async 
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'Changes' }))
   expect(screen.getByRole('heading', { name:'What changed?' })).toBeInTheDocument()
-  expect(screen.getByText('New public sample reported')).toBeInTheDocument()
+  expect(screen.getAllByText('New public sample reported')).toHaveLength(2)
   expect(screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')).toBeInTheDocument()
   expect(screen.getByText('Evidence: SYSTEM_ID_EXACT')).toBeInTheDocument()
 })
