@@ -1,0 +1,98 @@
+name: Build 010 hosted proof
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-hosted-build010:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify hosted DOB data and exact-BBL detail attachment
+        shell: python
+        run: |
+          import json
+          import time
+          from urllib.request import Request, urlopen
+
+          base = "https://jeremyhennessy.github.io/TowerSignal"
+
+          def get_json(path):
+              separator = "&" if "?" in path else "?"
+              url = f"{base}{path}{separator}proof={int(time.time())}"
+              request = Request(url, headers={
+                  "Accept": "application/json",
+                  "Cache-Control": "no-cache",
+                  "User-Agent": "TowerSignal-Build010-hosted-proof/1.0",
+              })
+              with urlopen(request, timeout=60) as response:
+                  return json.load(response)
+
+          last_state = None
+          for attempt in range(16):
+              payload = get_json("/data/systems.json")
+              metadata = payload.get("metadata") or {}
+              summary = payload.get("summary") or {}
+              last_state = {
+                  "generated_at": metadata.get("generated_at"),
+                  "dob_requested_bbl_count": metadata.get("dob_requested_bbl_count"),
+                  "dob_matched_bbl_count": metadata.get("dob_matched_bbl_count"),
+                  "dob_matched_filing_count": metadata.get("dob_matched_filing_count"),
+                  "systems_with_dob_activity": summary.get("systems_with_dob_activity"),
+              }
+              if (
+                  int(metadata.get("dob_requested_bbl_count") or 0) > 0
+                  and int(metadata.get("dob_matched_bbl_count") or 0) > 0
+                  and int(metadata.get("dob_matched_filing_count") or 0) > 0
+                  and int(summary.get("systems_with_dob_activity") or 0) > 0
+              ):
+                  systems = payload.get("systems") or []
+                  candidate = next((row for row in systems if int(row.get("dob_activity_count") or 0) > 0), None)
+                  if candidate is None:
+                      raise SystemExit("Hosted summary reports DOB activity but no system row carries it")
+                  safe = "".join(ch for ch in candidate["system_id"] if ch.isalnum() or ch in ("-", "_"))
+                  prefix = (safe[:2] or "xx").lower()
+                  detail = get_json(f"/data/details/{prefix}/{safe}.json")
+                  jobs = detail.get("dob_activity_history") or []
+                  if not jobs:
+                      raise SystemExit(f"Hosted DOB summary/detail attachment mismatch for {candidate['system_id']}")
+                  if not all(job.get("match_basis") == "BBL_EXACT" for job in jobs):
+                      raise SystemExit(f"Hosted detail contains non-exact DOB match basis for {candidate['system_id']}")
+                  print(json.dumps({
+                      **last_state,
+                      "registered_systems": summary.get("registered_systems"),
+                      "systems_with_recent_dob_activity": summary.get("systems_with_recent_dob_activity"),
+                      "systems_with_explicit_cooling_tower_dob_activity": summary.get("systems_with_explicit_cooling_tower_dob_activity"),
+                      "sample_system_id": candidate["system_id"],
+                      "sample_system_dob_jobs": len(jobs),
+                  }, indent=2))
+                  break
+              if attempt < 15:
+                  time.sleep(20)
+          else:
+              raise SystemExit(f"Hosted Build 010 DOB data was not observable: {last_state}")
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install hosted-test browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify hosted site in desktop and iPhone browser contexts
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
