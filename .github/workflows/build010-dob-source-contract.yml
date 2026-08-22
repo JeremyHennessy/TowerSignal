@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Verify DOB NOW job-filings schema and sample
+      - name: Verify DOB NOW job-filings schema and exact BBL query
         shell: python
         run: |
           import json
@@ -46,16 +46,16 @@ jobs:
                   return json.load(response)
 
           metadata = get_json(f"{root}/api/views/{dataset_id}")
-          fields = {column.get("fieldName") for column in metadata.get("columns", [])}
-          missing = sorted(required - fields)
+          columns = {column.get("fieldName"): column for column in metadata.get("columns", [])}
+          missing = sorted(required - set(columns))
           if missing:
               raise SystemExit(f"DOB NOW schema contract failed; missing fields: {missing}")
 
           selected = ",".join(sorted(required))
           query = urlencode({
               "$limit": 1,
-              "$where": "bbl is not null",
-              "$order": "filing_date DESC",
+              "$where": "bbl is not null AND current_status_date is not null",
+              "$order": "current_status_date DESC",
               "$select": selected,
           })
           rows = get_json(f"{root}/resource/{dataset_id}.json?{query}")
@@ -63,13 +63,35 @@ jobs:
               raise SystemExit("DOB NOW source contract failed; no BBL-bearing sample row returned")
 
           row = rows[0]
+          sample_bbl = str(row.get("bbl") or "").strip()
+          bbl_type = str((columns.get("bbl") or {}).get("dataTypeName") or "").lower()
+          if not sample_bbl:
+              raise SystemExit("DOB NOW source contract failed; sample BBL was blank")
+          if bbl_type == "number":
+              bbl_literal = sample_bbl
+          else:
+              bbl_literal = "'" + sample_bbl.replace("'", "''") + "'"
+
+          exact_query = urlencode({
+              "$limit": 2,
+              "$where": f"bbl = {bbl_literal}",
+              "$order": "job_filing_number",
+              "$select": selected,
+          })
+          exact_rows = get_json(f"{root}/resource/{dataset_id}.json?{exact_query}")
+          if not isinstance(exact_rows, list) or not exact_rows:
+              raise SystemExit(f"DOB NOW exact-BBL contract failed for {sample_bbl} ({bbl_type})")
+
           print(json.dumps({
               "dataset": metadata.get("name"),
-              "field_count": len(fields),
+              "field_count": len(columns),
+              "bbl_data_type": bbl_type,
               "sample_job_filing_number": row.get("job_filing_number"),
-              "sample_bbl": row.get("bbl"),
+              "sample_bbl": sample_bbl,
               "sample_filing_date": row.get("filing_date"),
+              "sample_current_status_date": row.get("current_status_date"),
               "sample_job_type": row.get("job_type"),
               "sample_mechanical_flag": row.get("mechanical_systems_work_type_"),
               "sample_description": row.get("job_description"),
+              "exact_bbl_rows_returned": len(exact_rows),
           }, indent=2))
