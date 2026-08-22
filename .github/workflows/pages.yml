@@ -27,6 +27,7 @@ jobs:
           ref: data/towersignal-history
           path: .history-store
           fetch-depth: 1
+          sparse-checkout: data/history
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
