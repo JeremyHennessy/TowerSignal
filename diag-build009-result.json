@@ -1,37 +1,19 @@
 {
   "jobs": [
     {
-      "conclusion": "failure",
-      "id": 97014910968,
+      "conclusion": null,
+      "id": 97015504363,
       "name": "build",
-      "status": "completed"
-    },
-    {
-      "conclusion": "skipped",
-      "id": 97015115566,
-      "name": "verify",
-      "status": "completed"
-    },
-    {
-      "conclusion": "skipped",
-      "id": 97015115617,
-      "name": "deploy",
-      "status": "completed"
-    },
-    {
-      "conclusion": "skipped",
-      "id": 97015116108,
-      "name": "persist-history",
-      "status": "completed"
+      "status": "in_progress"
     }
   ],
   "run": {
-    "conclusion": "failure",
-    "created_at": "2026-08-22T09:53:01Z",
-    "head_sha": "b2dce1fb60b628ef29612bbcb7aafb2baa095601",
-    "html_url": "https://github.com/JeremyHennessy/TowerSignal/actions/runs/32566131701",
-    "id": 32566131701,
-    "status": "completed",
-    "updated_at": "2026-08-22T09:55:02Z"
+    "conclusion": null,
+    "created_at": "2026-08-22T09:58:50Z",
+    "head_sha": "415005a248626e9f1c1c4515c8e0305a2e46b6db",
+    "html_url": "https://github.com/JeremyHennessy/TowerSignal/actions/runs/32566387863",
+    "id": 32566387863,
+    "status": "in_progress",
+    "updated_at": "2026-08-22T09:58:54Z"
   }
 }
