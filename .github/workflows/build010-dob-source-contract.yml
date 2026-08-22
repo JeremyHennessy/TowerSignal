@@ -1,4 +1,4 @@
-name: Build 010 DOB source contract
+name: Build 010 live DOB integration
 
 on:
   pull_request:
@@ -9,89 +9,83 @@ permissions:
   contents: read
 
 jobs:
-  verify-dob-source-contract:
+  verify-live-dob-integration:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 20
     steps:
-      - name: Verify DOB NOW job-filings schema and exact BBL query
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build full live TowerSignal data with DOB NOW enrichment
+        run: python scripts/build_data.py --output /tmp/towersignal-data
+
+      - name: Validate source-health attachment on live build
+        run: python scripts/build_source_health.py --output /tmp/towersignal-data
+
+      - name: Verify generated DOB payload integrity
         shell: python
         run: |
           import json
-          from urllib.parse import urlencode
-          from urllib.request import Request, urlopen
+          from pathlib import Path
 
-          dataset_id = "w9ak-ipjd"
-          root = "https://data.cityofnewyork.us"
-          required = {
-              "job_filing_number",
-              "filing_status",
-              "bbl",
-              "filing_date",
-              "current_status_date",
-              "first_permit_date",
-              "approved_date",
-              "signoff_date",
-              "job_type",
-              "job_description",
-              "initial_cost",
-              "mechanical_systems_work_type_",
-              "boiler_equipment_work_type_",
-              "owner_s_business_name",
-              "applicant_business_name",
-          }
+          root = Path('/tmp/towersignal-data')
+          payload = json.loads((root / 'systems.json').read_text())
+          metadata = payload['metadata']
+          summary = payload['summary']
+          systems = payload['systems']
 
-          def get_json(url):
-              request = Request(url, headers={"User-Agent": "TowerSignal-Build010-contract-check/1.0", "Accept": "application/json"})
-              with urlopen(request, timeout=60) as response:
-                  return json.load(response)
-
-          metadata = get_json(f"{root}/api/views/{dataset_id}")
-          columns = {column.get("fieldName"): column for column in metadata.get("columns", [])}
-          missing = sorted(required - set(columns))
+          required_metadata = (
+              'dob_requested_bbl_count',
+              'dob_matched_bbl_count',
+              'dob_matched_filing_count',
+              'dob_explicit_cooling_tower_filing_count',
+              'dob_mechanical_or_boiler_filing_count',
+          )
+          missing = [key for key in required_metadata if key not in metadata]
           if missing:
-              raise SystemExit(f"DOB NOW schema contract failed; missing fields: {missing}")
+              raise SystemExit(f'Missing DOB metadata fields: {missing}')
+          if metadata['dob_requested_bbl_count'] <= 0:
+              raise SystemExit('DOB join requested zero BBLs')
+          if metadata['dob_matched_bbl_count'] <= 0 or metadata['dob_matched_filing_count'] <= 0:
+              raise SystemExit('DOB exact-BBL join produced no live matches')
+          if summary.get('systems_with_dob_activity', 0) <= 0:
+              raise SystemExit('Generated summary has no systems with DOB activity')
 
-          selected = ",".join(sorted(required))
-          query = urlencode({
-              "$limit": 1,
-              "$where": "bbl is not null AND current_status_date is not null",
-              "$order": "current_status_date DESC",
-              "$select": selected,
-          })
-          rows = get_json(f"{root}/resource/{dataset_id}.json?{query}")
-          if not isinstance(rows, list) or not rows:
-              raise SystemExit("DOB NOW source contract failed; no BBL-bearing sample row returned")
+          candidate = next((row for row in systems if row.get('dob_activity_count', 0) > 0), None)
+          if candidate is None:
+              raise SystemExit('No generated system carries DOB activity counts')
+          safe = ''.join(ch for ch in candidate['system_id'] if ch.isalnum() or ch in ('-', '_'))
+          detail_path = root / 'details' / (safe[:2] or 'xx').lower() / f'{safe}.json'
+          detail = json.loads(detail_path.read_text())
+          jobs = detail.get('dob_activity_history') or []
+          if not jobs:
+              raise SystemExit(f"DOB summary/detail attachment mismatch for {candidate['system_id']}")
+          if not all(job.get('match_basis') == 'BBL_EXACT' for job in jobs):
+              raise SystemExit(f"Non-exact DOB match basis found for {candidate['system_id']}")
 
-          row = rows[0]
-          sample_bbl = str(row.get("bbl") or "").strip()
-          bbl_type = str((columns.get("bbl") or {}).get("dataTypeName") or "").lower()
-          if not sample_bbl:
-              raise SystemExit("DOB NOW source contract failed; sample BBL was blank")
-          if bbl_type == "number":
-              bbl_literal = sample_bbl
-          else:
-              bbl_literal = "'" + sample_bbl.replace("'", "''") + "'"
-
-          exact_query = urlencode({
-              "$limit": 2,
-              "$where": f"bbl = {bbl_literal}",
-              "$order": "job_filing_number",
-              "$select": selected,
-          })
-          exact_rows = get_json(f"{root}/resource/{dataset_id}.json?{exact_query}")
-          if not isinstance(exact_rows, list) or not exact_rows:
-              raise SystemExit(f"DOB NOW exact-BBL contract failed for {sample_bbl} ({bbl_type})")
+          source_health = {entry['source_key']: entry for entry in metadata.get('source_health', [])}
+          dob_health = source_health.get('dob_now_jobs')
+          if not dob_health or dob_health.get('status') == 'FAILED':
+              raise SystemExit(f'DOB source-health missing or failed: {dob_health}')
+          if dob_health.get('attached_entity_count', 0) <= 0 or dob_health.get('displayed_entity_count', 0) <= 0:
+              raise SystemExit(f'DOB source-health attachment/display proof failed: {dob_health}')
 
           print(json.dumps({
-              "dataset": metadata.get("name"),
-              "field_count": len(columns),
-              "bbl_data_type": bbl_type,
-              "sample_job_filing_number": row.get("job_filing_number"),
-              "sample_bbl": sample_bbl,
-              "sample_filing_date": row.get("filing_date"),
-              "sample_current_status_date": row.get("current_status_date"),
-              "sample_job_type": row.get("job_type"),
-              "sample_mechanical_flag": row.get("mechanical_systems_work_type_"),
-              "sample_description": row.get("job_description"),
-              "exact_bbl_rows_returned": len(exact_rows),
+              'registered_systems': summary['registered_systems'],
+              'requested_bbls': metadata['dob_requested_bbl_count'],
+              'matched_bbls': metadata['dob_matched_bbl_count'],
+              'matched_filings': metadata['dob_matched_filing_count'],
+              'explicit_cooling_tower_filings': metadata['dob_explicit_cooling_tower_filing_count'],
+              'mechanical_or_boiler_filings': metadata['dob_mechanical_or_boiler_filing_count'],
+              'systems_with_dob_activity': summary.get('systems_with_dob_activity', 0),
+              'systems_with_recent_dob_activity': summary.get('systems_with_recent_dob_activity', 0),
+              'systems_with_explicit_cooling_tower_dob_activity': summary.get('systems_with_explicit_cooling_tower_dob_activity', 0),
+              'sample_system_id': candidate['system_id'],
+              'sample_system_dob_jobs': len(jobs),
+              'dob_source_health': dob_health,
           }, indent=2))
