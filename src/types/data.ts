@@ -2,6 +2,7 @@ export type EvidenceConfidence = 'CONFIRMED' | 'STRONG_SIGNAL' | 'VERIFY'
 export type FactClass = 'CONFIRMED_FACT' | 'DERIVED_FACT' | 'COMMERCIAL_SIGNAL'
 export type CoordinateStatus = 'VALID' | 'MISSING' | 'INVALID_SOURCE'
 export type SourceHealthStatus = 'HEALTHY' | 'WARNING' | 'FAILED'
+export type DobCommercialRelevance = 'COOLING_TOWER_EXPLICIT' | 'MECHANICAL_OR_BOILER' | 'PROPERTY_PROJECT'
 
 export interface SourceMetadata {
   dataset_id: string
@@ -48,6 +49,11 @@ export interface Metadata {
   oath_match_basis?: 'SUMMONS_NUMBER_EXACT'
   pluto_requested_bbl_count?: number
   pluto_matched_bbl_count?: number
+  dob_requested_bbl_count?: number
+  dob_matched_bbl_count?: number
+  dob_matched_filing_count?: number
+  dob_explicit_cooling_tower_filing_count?: number
+  dob_mechanical_or_boiler_filing_count?: number
   hpd_requested_bbl_count?: number
   hpd_matched_registration_bbl_count?: number
   hpd_matched_contact_bbl_count?: number
@@ -88,6 +94,11 @@ export interface SystemSummary {
   score_components: ScoreComponent[]
   oath_case_count?: number
   pluto_match?: boolean
+  dob_activity_count?: number
+  dob_recent_activity_count?: number
+  dob_explicit_cooling_tower_count?: number
+  dob_mechanical_or_boiler_count?: number
+  latest_dob_activity_date?: string | null
   hpd_contact_count?: number
 }
 
@@ -101,6 +112,9 @@ export interface SystemsPayload {
     recent_confirmed_violations: number
     systems_with_oath_cases?: number
     systems_with_pluto_context?: number
+    systems_with_dob_activity?: number
+    systems_with_recent_dob_activity?: number
+    systems_with_explicit_cooling_tower_dob_activity?: number
     systems_with_hpd_registration?: number
     systems_with_hpd_contacts?: number
   }
@@ -189,6 +203,29 @@ export interface BuildingContext {
   source: 'NYC_DCP_PLUTO'
 }
 
+export interface DobActivity {
+  job_filing_number: string | null
+  bbl: string | null
+  filing_status: string | null
+  job_type: string | null
+  job_description: string | null
+  initial_cost: number | null
+  filing_date: string | null
+  current_status_date: string | null
+  first_permit_date: string | null
+  approved_date: string | null
+  signoff_date: string | null
+  activity_date: string | null
+  mechanical_systems: boolean
+  boiler_equipment: boolean
+  explicit_cooling_tower_mention: boolean
+  commercial_relevance: DobCommercialRelevance
+  owner_business_name: string | null
+  applicant_business_name: string | null
+  source: 'NYC_DOB_NOW_JOB_APPLICATION_FILINGS'
+  match_basis: 'BBL_EXACT'
+}
+
 export interface HpdContact {
   registration_contact_id: string | null
   type: string | null
@@ -245,6 +282,7 @@ export interface SystemDetail {
   }
   historical_profile?: HistoricalProfile
   building_context?: BuildingContext | null
+  dob_activity_history?: DobActivity[]
   hpd_registration?: HpdRegistrationContext | null
   sample_history: {
     source_raw: string

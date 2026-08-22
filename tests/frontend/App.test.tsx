@@ -11,17 +11,19 @@ const payload = {
     generated_at: '2026-08-21T20:00:00Z', snapshot_date: '2026-08-21', normalized_system_count: 2,
     source_duplicate_registration_rows: 1, source_missing_registration_system_id_rows: 0, invalid_coordinate_system_count: 0,
     oath_requested_ticket_count: 1, oath_matched_ticket_count: 1, oath_unmatched_ticket_count: 0, oath_match_basis: 'SUMMONS_NUMBER_EXACT',
+    dob_requested_bbl_count: 2, dob_matched_bbl_count: 1, dob_matched_filing_count: 1, dob_explicit_cooling_tower_filing_count: 1, dob_mechanical_or_boiler_filing_count: 1,
     rules_version: 'nyc-2026-05-08', priority_model_version: '1.0',
     sources: [
       { dataset_id:'y4fw-iqfr', name:'NYC Cooling Tower Registrations', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:5900, source_last_updated_at:'2026-08-20T00:00:00Z', url:'https://example.test/a' },
       { dataset_id:'f9wb-g8mb', name:'NYC Cooling Tower System Inspection Results', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:124000, source_last_updated_at:'2026-07-20T00:00:00Z', url:'https://example.test/b' },
       { dataset_id:'jz4z-kudi', name:'OATH Hearings Division Case Status', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:1, matched_record_count:1, source_query_scope:'Exact ticket_number queries', source_last_updated_at:'2026-08-19T00:00:00Z', url:'https://example.test/c' },
+      { dataset_id:'w9ak-ipjd', name:'DOB NOW: Build – Job Application Filings', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:940000, matched_record_count:1, source_query_scope:'Exact BBL subsets', source_last_updated_at:'2026-08-21T00:00:00Z', url:'https://example.test/d' },
     ],
   },
-  summary: { registered_systems:2, active_equipment:4, potential_sampling_gaps:1, recent_confirmed_violations:1, systems_with_oath_cases:1 },
+  summary: { registered_systems:2, active_equipment:4, potential_sampling_gaps:1, recent_confirmed_violations:1, systems_with_oath_cases:1, systems_with_dob_activity:1, systems_with_recent_dob_activity:1, systems_with_explicit_cooling_tower_dob_activity:1 },
   systems: [
-    { system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',latest_sample_date:'2026-07-01',days_since_latest_sample:51,latest_inspection_date:'2026-08-01',latest_inspection_type:'Cycle',confirmed_violation:true,recent_confirmed_violation:true,violation_types:['Critical'],signal_types:['CONFIRMED_RECENT_VIOLATION','POTENTIAL_SAMPLING_GAP'],primary_signal:'CONFIRMED_RECENT_VIOLATION',evidence_confidence:'CONFIRMED',priority_score:88,score_components:[{points:40,reason:'confirmed recent violation'}],oath_case_count:1 },
-    { system_id:'SYS-2',bin:'2',bbl:'2',address:'20 BETA AVE',borough:'Queens',zip:'11101',active_equipment:1,latitude:40.74,longitude:-73.94,coordinate_status:'VALID',latest_sample_date:'2026-08-15',days_since_latest_sample:6,latest_inspection_date:null,latest_inspection_type:null,confirmed_violation:false,recent_confirmed_violation:false,violation_types:[],signal_types:[],primary_signal:'NO_CURRENT_SIGNAL',evidence_confidence:'STRONG_SIGNAL',priority_score:0,score_components:[],oath_case_count:0 },
+    { system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',latest_sample_date:'2026-07-01',days_since_latest_sample:51,latest_inspection_date:'2026-08-01',latest_inspection_type:'Cycle',confirmed_violation:true,recent_confirmed_violation:true,violation_types:['Critical'],signal_types:['CONFIRMED_RECENT_VIOLATION','POTENTIAL_SAMPLING_GAP'],primary_signal:'CONFIRMED_RECENT_VIOLATION',evidence_confidence:'CONFIRMED',priority_score:88,score_components:[{points:40,reason:'confirmed recent violation'}],oath_case_count:1,dob_activity_count:1,dob_recent_activity_count:1,dob_explicit_cooling_tower_count:1,dob_mechanical_or_boiler_count:1,latest_dob_activity_date:'2026-08-20' },
+    { system_id:'SYS-2',bin:'2',bbl:'2',address:'20 BETA AVE',borough:'Queens',zip:'11101',active_equipment:1,latitude:40.74,longitude:-73.94,coordinate_status:'VALID',latest_sample_date:'2026-08-15',days_since_latest_sample:6,latest_inspection_date:null,latest_inspection_type:null,confirmed_violation:false,recent_confirmed_violation:false,violation_types:[],signal_types:[],primary_signal:'NO_CURRENT_SIGNAL',evidence_confidence:'STRONG_SIGNAL',priority_score:0,score_components:[],oath_case_count:0,dob_activity_count:0,dob_recent_activity_count:0,dob_explicit_cooling_tower_count:0,dob_mechanical_or_boiler_count:0,latest_dob_activity_date:null },
   ],
 }
 
@@ -39,6 +41,7 @@ const changes = {
 const detail = {
   schema_version:'1.0', metadata:payload.metadata,
   identity:{ system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',source_latitude_raw:'40.75',source_longitude_raw:'-73.99' },
+  dob_activity_history:[{ job_filing_number:'M0001-I1',bbl:'1',filing_status:'Approved',job_type:'Alteration',job_description:'Replace existing cooling tower and associated piping.',initial_cost:100000,filing_date:'2026-06-01',current_status_date:'2026-08-20',first_permit_date:null,approved_date:'2026-07-01',signoff_date:null,activity_date:'2026-08-20',mechanical_systems:true,boiler_equipment:false,explicit_cooling_tower_mention:true,commercial_relevance:'COOLING_TOWER_EXPLICIT',owner_business_name:'ALPHA OWNER LLC',applicant_business_name:'ALPHA ENGINEERING PC',source:'NYC_DOB_NOW_JOB_APPLICATION_FILINGS',match_basis:'BBL_EXACT' }],
   sample_history:{ source_raw:'07/01/2026',dates:['2026-07-01'],malformed_values:[],latest_sample_date:'2026-07-01',previous_sample_date:null,latest_sample_interval_days:null,intervals_days:[],sample_count:1 },
   signals:[{ type:'POTENTIAL_SAMPLING_GAP',title:'Potential sampling gap',evidence_confidence:'VERIFY',fact_class:'COMMERCIAL_SIGNAL',date:'2026-07-01',reason:'Operating status must be verified.' }],
   inspection_history:[],
@@ -65,7 +68,7 @@ test('renders the real-data dashboard shell after dataset load', async () => {
   expect(screen.getByRole('button', { name:'Changes' })).toBeInTheDocument()
 })
 
-test('filters records and opens details', async () => {
+test('filters records and opens details with DOB project history', async () => {
   const user = userEvent.setup()
   render(<App />)
   await screen.findByText('10 ALPHA ST')
@@ -77,6 +80,9 @@ test('filters records and opens details', async () => {
   await waitFor(() => expect(screen.getByRole('heading', { name:'Identity' })).toBeInTheDocument())
   const detailPanel = screen.getByRole('complementary', { name: 'Selected cooling tower detail' })
   expect(within(detailPanel).getByText('Potential sampling gap')).toBeInTheDocument()
+  expect(within(detailPanel).getByRole('heading', { name:'DOB NOW project activity' })).toBeInTheDocument()
+  expect(within(detailPanel).getByText('Cooling tower mention')).toBeInTheDocument()
+  expect(within(detailPanel).getByText('Replace existing cooling tower and associated piping.')).toBeInTheDocument()
   expect(within(detailPanel).getByRole('heading', { name:'OATH case lifecycle' })).toBeInTheDocument()
   expect(within(detailPanel).getByRole('heading', { name:'TowerSignal History' })).toBeInTheDocument()
   expect(within(detailPanel).getByText(/Ticket 0880900460/)).toBeInTheDocument()

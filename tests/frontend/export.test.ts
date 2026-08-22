@@ -38,3 +38,18 @@ test('lead summary distinguishes an absent HPD registration match', () => {
   const text = leadSummary(row, metadata, { ...detail, hpd_registration:null })
   expect(text).toContain('HPD registration: No exact BBL match in Multiple Dwelling Registrations')
 })
+
+test('lead summary preserves DOB explicit cooling-tower wording versus mechanical context', () => {
+  const text = leadSummary(row, metadata, {
+    ...detail,
+    dob_activity_history:[
+      { job_filing_number:'M0001-I1',bbl:'1000000001',filing_status:'Approved',job_type:'Alteration',job_description:'Replace existing cooling tower and piping.',initial_cost:100000,filing_date:'2026-06-01',current_status_date:'2026-08-20',first_permit_date:null,approved_date:'2026-07-01',signoff_date:null,activity_date:'2026-08-20',mechanical_systems:true,boiler_equipment:false,explicit_cooling_tower_mention:true,commercial_relevance:'COOLING_TOWER_EXPLICIT',owner_business_name:'ALPHA OWNER LLC',applicant_business_name:'ALPHA ENGINEERING PC',source:'NYC_DOB_NOW_JOB_APPLICATION_FILINGS',match_basis:'BBL_EXACT' },
+      { job_filing_number:'M0002-I1',bbl:'1000000001',filing_status:'Filed',job_type:'Alteration',job_description:'Modify HVAC distribution.',initial_cost:25000,filing_date:'2026-05-01',current_status_date:'2026-05-01',first_permit_date:null,approved_date:null,signoff_date:null,activity_date:'2026-05-01',mechanical_systems:true,boiler_equipment:false,explicit_cooling_tower_mention:false,commercial_relevance:'MECHANICAL_OR_BOILER',owner_business_name:null,applicant_business_name:'BETA ENGINEERING PC',source:'NYC_DOB_NOW_JOB_APPLICATION_FILINGS',match_basis:'BBL_EXACT' },
+    ],
+  })
+  expect(text).toContain('2 exact-BBL job filings')
+  expect(text).toContain('1 descriptions explicitly name cooling-tower work')
+  expect(text).toContain('M0001-I1 (explicit cooling-tower description)')
+  expect(text).toContain('M0002-I1 (mechanical/boiler flag)')
+  expect(text).toContain('mechanical/boiler flags are not cooling-tower claims')
+})
