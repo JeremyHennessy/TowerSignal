@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal import PRIORITY_MODEL_VERSION, SCHEMA_VERSION  # noqa: E402
+from towersignal.dob_activity import fetch_dob_activity_by_bbl, summarize_dob_activity  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.historical import build_historical_profile  # noqa: E402
 from towersignal.hpd import fetch_hpd_contacts_by_bbl  # noqa: E402
@@ -53,6 +54,7 @@ def build(output_dir: Path) -> dict:
     oath_ticket_numbers = summons_numbers_from_inspections(inspections_by_system)
     oath_cases_by_ticket, oath_meta = fetch_oath_cases(oath_ticket_numbers)
     pluto_by_bbl, pluto_meta = fetch_pluto_by_bbl(bbl_values)
+    dob_by_bbl, dob_meta = fetch_dob_activity_by_bbl(bbl_values)
     hpd_by_bbl, hpd_meta = fetch_hpd_contacts_by_bbl(bbl_values)
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -94,6 +96,16 @@ def build(output_dir: Path) -> dict:
             "matched_record_count": pluto_meta["matched_bbl_count"],
         },
         {
+            "dataset_id": dob_meta["dataset_id"],
+            "name": dob_meta["name"],
+            "retrieved_at": dob_meta["retrieved_at"],
+            "source_record_count": dob_meta["source_record_count"],
+            "source_query_scope": dob_meta["source_query_scope"],
+            "source_last_updated_at": dob_meta["source_last_updated_at"],
+            "url": dob_meta["url"],
+            "matched_record_count": dob_meta["matched_filing_count"],
+        },
+        {
             "dataset_id": hpd_meta["registration_dataset_id"],
             "name": hpd_meta["registration_name"],
             "retrieved_at": hpd_meta["retrieved_at"],
@@ -128,6 +140,11 @@ def build(output_dir: Path) -> dict:
         "oath_match_basis": "SUMMONS_NUMBER_EXACT",
         "pluto_requested_bbl_count": pluto_meta["requested_bbl_count"],
         "pluto_matched_bbl_count": pluto_meta["matched_bbl_count"],
+        "dob_requested_bbl_count": dob_meta["requested_bbl_count"],
+        "dob_matched_bbl_count": dob_meta["matched_bbl_count"],
+        "dob_matched_filing_count": dob_meta["matched_filing_count"],
+        "dob_explicit_cooling_tower_filing_count": dob_meta["explicit_cooling_tower_filing_count"],
+        "dob_mechanical_or_boiler_filing_count": dob_meta["mechanical_or_boiler_filing_count"],
         "hpd_requested_bbl_count": hpd_meta["requested_bbl_count"],
         "hpd_matched_registration_bbl_count": hpd_meta["matched_registration_bbl_count"],
         "hpd_matched_contact_bbl_count": hpd_meta["matched_contact_bbl_count"],
@@ -147,6 +164,9 @@ def build(output_dir: Path) -> dict:
     active_equipment_total = 0
     systems_with_oath_cases = 0
     systems_with_pluto_context = 0
+    systems_with_dob_activity = 0
+    systems_with_recent_dob_activity = 0
+    systems_with_explicit_cooling_tower_dob_activity = 0
     systems_with_hpd_registration = 0
     systems_with_hpd_contacts = 0
 
@@ -158,9 +178,17 @@ def build(output_dir: Path) -> dict:
             systems_with_oath_cases += 1
         bbl_key = normalize_bbl(system.get("bbl"))
         building_context = pluto_by_bbl.get(bbl_key) if bbl_key else None
+        dob_activity = dob_by_bbl.get(bbl_key, []) if bbl_key else []
+        dob_summary = summarize_dob_activity(dob_activity, snapshot_date)
         hpd_registration = hpd_by_bbl.get(bbl_key) if bbl_key else None
         if building_context:
             systems_with_pluto_context += 1
+        if dob_summary["activity_count"]:
+            systems_with_dob_activity += 1
+        if dob_summary["recent_activity_count"]:
+            systems_with_recent_dob_activity += 1
+        if dob_summary["explicit_cooling_tower_count"]:
+            systems_with_explicit_cooling_tower_dob_activity += 1
         if hpd_registration:
             systems_with_hpd_registration += 1
         hpd_contact_count = len(hpd_registration["contacts"]) if hpd_registration else 0
@@ -225,6 +253,11 @@ def build(output_dir: Path) -> dict:
             "score_components": scoring["components"],
             "oath_case_count": len(oath_cases),
             "pluto_match": building_context is not None,
+            "dob_activity_count": dob_summary["activity_count"],
+            "dob_recent_activity_count": dob_summary["recent_activity_count"],
+            "dob_explicit_cooling_tower_count": dob_summary["explicit_cooling_tower_count"],
+            "dob_mechanical_or_boiler_count": dob_summary["mechanical_or_boiler_count"],
+            "latest_dob_activity_date": dob_summary["latest_activity_date"],
             "hpd_contact_count": hpd_contact_count,
         }
         summary_rows.append(row)
@@ -248,6 +281,7 @@ def build(output_dir: Path) -> dict:
             },
             "historical_profile": historical_profile,
             "building_context": building_context,
+            "dob_activity_history": dob_activity,
             "hpd_registration": hpd_registration,
             "sample_history": {
                 "source_raw": system["sampledates_raw"],
@@ -277,6 +311,9 @@ def build(output_dir: Path) -> dict:
             "recent_confirmed_violations": recent_violation_count,
             "systems_with_oath_cases": systems_with_oath_cases,
             "systems_with_pluto_context": systems_with_pluto_context,
+            "systems_with_dob_activity": systems_with_dob_activity,
+            "systems_with_recent_dob_activity": systems_with_recent_dob_activity,
+            "systems_with_explicit_cooling_tower_dob_activity": systems_with_explicit_cooling_tower_dob_activity,
             "systems_with_hpd_registration": systems_with_hpd_registration,
             "systems_with_hpd_contacts": systems_with_hpd_contacts,
         },
@@ -289,6 +326,7 @@ def build(output_dir: Path) -> dict:
     print(json.dumps(payload["summary"], indent=2))
     print(f"OATH exact ticket matches: {oath_meta['matched_ticket_count']:,}/{oath_meta['requested_ticket_count']:,}")
     print(f"PLUTO exact BBL matches: {pluto_meta['matched_bbl_count']:,}/{pluto_meta['requested_bbl_count']:,}")
+    print(f"DOB NOW exact BBL matches: {dob_meta['matched_bbl_count']:,}/{dob_meta['requested_bbl_count']:,}; {dob_meta['matched_filing_count']:,} job filings")
     print(f"HPD exact BBL registrations: {hpd_meta['matched_registration_bbl_count']:,}/{hpd_meta['requested_bbl_count']:,}; contacts on {hpd_meta['matched_contact_bbl_count']:,} BBLs")
     print(f"Generated {len(summary_rows):,} systems at {generated_at}")
     return payload
