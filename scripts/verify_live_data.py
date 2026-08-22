@@ -10,9 +10,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.fetch import fetch_where  # noqa: E402
+from towersignal.hpd import fetch_hpd_contacts_by_bbl  # noqa: E402
 from towersignal.inspections import aggregate_inspections  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
 from towersignal.oath import fetch_oath_cases  # noqa: E402
+from towersignal.pluto import normalize_bbl  # noqa: E402
 
 REGISTRATION_ID = "y4fw-iqfr"
 INSPECTION_ID = "f9wb-g8mb"
@@ -91,14 +93,43 @@ def verify(systems_path: Path, details_dir: Path, output: Path, sample_size: int
     if payload["metadata"].get("oath_requested_ticket_count", 0) and not oath_candidates:
         raise RuntimeError("OATH summonses were requested but generated output contains zero exact-matched systems")
 
+    hpd_candidates = [system for system in systems if int(system.get("hpd_contact_count") or 0) > 0 and system.get("bbl")]
+    hpd_selected = rng.sample(hpd_candidates, min(sample_size, len(hpd_candidates)))
+    hpd_results = []
+    for displayed in hpd_selected:
+        bbl = normalize_bbl(displayed.get("bbl"))
+        if bbl is None:
+            raise RuntimeError(f"HPD candidate lacks usable BBL for {displayed['system_id']}")
+        detail = json.loads(detail_path(details_dir, displayed["system_id"]).read_text(encoding="utf-8"))
+        generated = detail.get("hpd_registration")
+        if not generated or not generated.get("contacts"):
+            raise RuntimeError(f"Summary reports HPD contacts but detail is empty for {displayed['system_id']}")
+        live_by_bbl, _ = fetch_hpd_contacts_by_bbl([bbl])
+        live = live_by_bbl.get(bbl)
+        checks = {
+            "bbl_exact": live is not None,
+            "registration_id": bool(live) and live["registration_id"] == generated["registration_id"],
+            "last_registration_date": bool(live) and live["last_registration_date"] == generated["last_registration_date"],
+            "contact_count": bool(live) and len(live["contacts"]) == len(generated["contacts"]),
+            "first_contact_type": bool(live) and live["contacts"][0]["type"] == generated["contacts"][0]["type"],
+        }
+        if not all(checks.values()):
+            raise RuntimeError(f"Live HPD comparison failed for BBL {bbl}: {checks}")
+        hpd_results.append({"system_id": displayed["system_id"], "bbl": bbl, "checks": checks, "result": "PASS"})
+
+    if payload["metadata"].get("hpd_matched_contact_bbl_count", 0) and not hpd_candidates:
+        raise RuntimeError("HPD metadata reports contact matches but generated output contains zero contact-bearing systems")
+
     report = {
         "generated_at": payload["metadata"]["generated_at"],
         "method": "Deterministic random sample seeded from snapshot timestamp and independently re-queried from NYC Open Data",
         "sample_size": len(results),
         "oath_sample_size": len(oath_results),
+        "hpd_sample_size": len(hpd_results),
         "result": "PASS",
         "systems": results,
         "oath_cases": oath_results,
+        "hpd_contacts": hpd_results,
     }
     output.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=2))

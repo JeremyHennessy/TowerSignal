@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal import PRIORITY_MODEL_VERSION, SCHEMA_VERSION  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
+from towersignal.hpd import fetch_hpd_contacts_by_bbl  # noqa: E402
 from towersignal.inspections import aggregate_inspections  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
 from towersignal.oath import cases_for_system, fetch_oath_cases, summons_numbers_from_inspections  # noqa: E402
@@ -47,9 +48,11 @@ def build(output_dir: Path) -> dict:
     validate_normalized(systems, snapshot_date)
     inspections_by_system = aggregate_inspections(inspection_snapshot.rows)
 
+    bbl_values = {system["bbl"] for system in systems if system.get("bbl")}
     oath_ticket_numbers = summons_numbers_from_inspections(inspections_by_system)
     oath_cases_by_ticket, oath_meta = fetch_oath_cases(oath_ticket_numbers)
-    pluto_by_bbl, pluto_meta = fetch_pluto_by_bbl({system["bbl"] for system in systems if system.get("bbl")})
+    pluto_by_bbl, pluto_meta = fetch_pluto_by_bbl(bbl_values)
+    hpd_by_bbl, hpd_meta = fetch_hpd_contacts_by_bbl(bbl_values)
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [
@@ -89,6 +92,26 @@ def build(output_dir: Path) -> dict:
             "url": pluto_meta["url"],
             "matched_record_count": pluto_meta["matched_bbl_count"],
         },
+        {
+            "dataset_id": hpd_meta["registration_dataset_id"],
+            "name": hpd_meta["registration_name"],
+            "retrieved_at": hpd_meta["retrieved_at"],
+            "source_record_count": hpd_meta["registration_source_record_count"],
+            "source_query_scope": hpd_meta["source_query_scope"],
+            "source_last_updated_at": hpd_meta["registration_source_last_updated_at"],
+            "url": hpd_meta["registration_url"],
+            "matched_record_count": hpd_meta["matched_registration_bbl_count"],
+        },
+        {
+            "dataset_id": hpd_meta["contacts_dataset_id"],
+            "name": hpd_meta["contacts_name"],
+            "retrieved_at": hpd_meta["retrieved_at"],
+            "source_record_count": hpd_meta["contacts_source_record_count"],
+            "source_query_scope": "Exact registration_id contacts for HPD registrations matched to cooling-tower BBLs",
+            "source_last_updated_at": hpd_meta["contacts_source_last_updated_at"],
+            "url": hpd_meta["contacts_url"],
+            "matched_record_count": hpd_meta["matched_contact_record_count"],
+        },
     ]
     metadata = {
         "generated_at": generated_at,
@@ -104,6 +127,9 @@ def build(output_dir: Path) -> dict:
         "oath_match_basis": "SUMMONS_NUMBER_EXACT",
         "pluto_requested_bbl_count": pluto_meta["requested_bbl_count"],
         "pluto_matched_bbl_count": pluto_meta["matched_bbl_count"],
+        "hpd_requested_bbl_count": hpd_meta["requested_bbl_count"],
+        "hpd_matched_registration_bbl_count": hpd_meta["matched_registration_bbl_count"],
+        "hpd_matched_contact_bbl_count": hpd_meta["matched_contact_bbl_count"],
         "rules_version": rules["rules_version"],
         "priority_model_version": PRIORITY_MODEL_VERSION,
     }
@@ -120,6 +146,8 @@ def build(output_dir: Path) -> dict:
     active_equipment_total = 0
     systems_with_oath_cases = 0
     systems_with_pluto_context = 0
+    systems_with_hpd_registration = 0
+    systems_with_hpd_contacts = 0
 
     for system in systems:
         inspections = inspections_by_system.get(system["system_id"], [])
@@ -128,8 +156,14 @@ def build(output_dir: Path) -> dict:
             systems_with_oath_cases += 1
         bbl_key = normalize_bbl(system.get("bbl"))
         building_context = pluto_by_bbl.get(bbl_key) if bbl_key else None
+        hpd_registration = hpd_by_bbl.get(bbl_key) if bbl_key else None
         if building_context:
             systems_with_pluto_context += 1
+        if hpd_registration:
+            systems_with_hpd_registration += 1
+        hpd_contact_count = len(hpd_registration["contacts"]) if hpd_registration else 0
+        if hpd_contact_count:
+            systems_with_hpd_contacts += 1
         signal_state = build_signals(system, inspections, rules, snapshot_date)
         scoring = priority_score(system, signal_state)
         signals = signal_state["signals"]
@@ -183,6 +217,7 @@ def build(output_dir: Path) -> dict:
             "score_components": scoring["components"],
             "oath_case_count": len(oath_cases),
             "pluto_match": building_context is not None,
+            "hpd_contact_count": hpd_contact_count,
         }
         summary_rows.append(row)
 
@@ -204,6 +239,7 @@ def build(output_dir: Path) -> dict:
                 "source_longitude_raw": system["source_longitude_raw"],
             },
             "building_context": building_context,
+            "hpd_registration": hpd_registration,
             "sample_history": {
                 "source_raw": system["sampledates_raw"],
                 "dates": system["sample_dates"],
@@ -232,6 +268,8 @@ def build(output_dir: Path) -> dict:
             "recent_confirmed_violations": recent_violation_count,
             "systems_with_oath_cases": systems_with_oath_cases,
             "systems_with_pluto_context": systems_with_pluto_context,
+            "systems_with_hpd_registration": systems_with_hpd_registration,
+            "systems_with_hpd_contacts": systems_with_hpd_contacts,
         },
         "systems": summary_rows,
     }
@@ -242,6 +280,7 @@ def build(output_dir: Path) -> dict:
     print(json.dumps(payload["summary"], indent=2))
     print(f"OATH exact ticket matches: {oath_meta['matched_ticket_count']:,}/{oath_meta['requested_ticket_count']:,}")
     print(f"PLUTO exact BBL matches: {pluto_meta['matched_bbl_count']:,}/{pluto_meta['requested_bbl_count']:,}")
+    print(f"HPD exact BBL registrations: {hpd_meta['matched_registration_bbl_count']:,}/{hpd_meta['requested_bbl_count']:,}; contacts on {hpd_meta['matched_contact_bbl_count']:,} BBLs")
     print(f"Generated {len(summary_rows):,} systems at {generated_at}")
     return payload
 
