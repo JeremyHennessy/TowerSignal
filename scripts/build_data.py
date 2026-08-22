@@ -15,6 +15,7 @@ from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.inspections import aggregate_inspections  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
 from towersignal.oath import cases_for_system, fetch_oath_cases, summons_numbers_from_inspections  # noqa: E402
+from towersignal.pluto import fetch_pluto_by_bbl, normalize_bbl  # noqa: E402
 from towersignal.scoring import priority_score  # noqa: E402
 from towersignal.signals import build_signals  # noqa: E402
 from towersignal.validate import validate_generated, validate_normalized, validate_sources  # noqa: E402
@@ -48,6 +49,7 @@ def build(output_dir: Path) -> dict:
 
     oath_ticket_numbers = summons_numbers_from_inspections(inspections_by_system)
     oath_cases_by_ticket, oath_meta = fetch_oath_cases(oath_ticket_numbers)
+    pluto_by_bbl, pluto_meta = fetch_pluto_by_bbl({system["bbl"] for system in systems if system.get("bbl")})
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [
@@ -77,6 +79,16 @@ def build(output_dir: Path) -> dict:
             "url": oath_meta["url"],
             "matched_record_count": oath_meta["matched_case_count"],
         },
+        {
+            "dataset_id": pluto_meta["dataset_id"],
+            "name": pluto_meta["name"],
+            "retrieved_at": pluto_meta["retrieved_at"],
+            "source_record_count": pluto_meta["source_record_count"],
+            "source_query_scope": pluto_meta["source_query_scope"],
+            "source_last_updated_at": pluto_meta["source_last_updated_at"],
+            "url": pluto_meta["url"],
+            "matched_record_count": pluto_meta["matched_bbl_count"],
+        },
     ]
     metadata = {
         "generated_at": generated_at,
@@ -90,6 +102,8 @@ def build(output_dir: Path) -> dict:
         "oath_matched_ticket_count": oath_meta["matched_ticket_count"],
         "oath_unmatched_ticket_count": oath_meta["unmatched_ticket_count"],
         "oath_match_basis": "SUMMONS_NUMBER_EXACT",
+        "pluto_requested_bbl_count": pluto_meta["requested_bbl_count"],
+        "pluto_matched_bbl_count": pluto_meta["matched_bbl_count"],
         "rules_version": rules["rules_version"],
         "priority_model_version": PRIORITY_MODEL_VERSION,
     }
@@ -105,12 +119,17 @@ def build(output_dir: Path) -> dict:
     recent_violation_count = 0
     active_equipment_total = 0
     systems_with_oath_cases = 0
+    systems_with_pluto_context = 0
 
     for system in systems:
         inspections = inspections_by_system.get(system["system_id"], [])
         oath_cases = cases_for_system(inspections, oath_cases_by_ticket)
         if oath_cases:
             systems_with_oath_cases += 1
+        bbl_key = normalize_bbl(system.get("bbl"))
+        building_context = pluto_by_bbl.get(bbl_key) if bbl_key else None
+        if building_context:
+            systems_with_pluto_context += 1
         signal_state = build_signals(system, inspections, rules, snapshot_date)
         scoring = priority_score(system, signal_state)
         signals = signal_state["signals"]
@@ -163,6 +182,7 @@ def build(output_dir: Path) -> dict:
             "priority_score": scoring["score"],
             "score_components": scoring["components"],
             "oath_case_count": len(oath_cases),
+            "pluto_match": building_context is not None,
         }
         summary_rows.append(row)
 
@@ -183,6 +203,7 @@ def build(output_dir: Path) -> dict:
                 "source_latitude_raw": system["source_latitude_raw"],
                 "source_longitude_raw": system["source_longitude_raw"],
             },
+            "building_context": building_context,
             "sample_history": {
                 "source_raw": system["sampledates_raw"],
                 "dates": system["sample_dates"],
@@ -210,6 +231,7 @@ def build(output_dir: Path) -> dict:
             "potential_sampling_gaps": gap_count,
             "recent_confirmed_violations": recent_violation_count,
             "systems_with_oath_cases": systems_with_oath_cases,
+            "systems_with_pluto_context": systems_with_pluto_context,
         },
         "systems": summary_rows,
     }
@@ -219,6 +241,7 @@ def build(output_dir: Path) -> dict:
     (output_dir / "metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     print(json.dumps(payload["summary"], indent=2))
     print(f"OATH exact ticket matches: {oath_meta['matched_ticket_count']:,}/{oath_meta['requested_ticket_count']:,}")
+    print(f"PLUTO exact BBL matches: {pluto_meta['matched_bbl_count']:,}/{pluto_meta['requested_bbl_count']:,}")
     print(f"Generated {len(summary_rows):,} systems at {generated_at}")
     return payload
 
