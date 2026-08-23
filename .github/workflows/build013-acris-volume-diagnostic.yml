@@ -72,7 +72,7 @@ jobs:
                       last = exc
                       if exc.code not in {429, 500, 502, 503, 504}:
                           raise
-                  except URLError as exc:
+                  except (URLError, TimeoutError) as exc:
                       last = exc
                   time.sleep(min(8, 1.5 ** attempt))
               raise last
