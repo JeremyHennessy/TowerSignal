@@ -1,0 +1,168 @@
+name: Build 013 ACRIS source contract
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-acris:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out verified TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history/latest.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inspect exact-BBL ACRIS join contract
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+          import json
+          from collections import Counter
+          from pathlib import Path
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          ROOT = 'https://data.cityofnewyork.us'
+          LEGALS = '8h5j-fqxa'
+          MASTER = 'bnx9-e6tj'
+          PARTIES = '636b-3b5g'
+          UA = 'TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)'
+
+          def get(path, params=None):
+              url = ROOT + path
+              if params:
+                  url += '?' + urlencode(params)
+              req = Request(url, headers={'User-Agent': UA, 'Accept': 'application/json'})
+              with urlopen(req, timeout=90) as response:
+                  return json.load(response)
+
+          def chunks(values, n):
+              values = list(values)
+              for i in range(0, len(values), n):
+                  yield values[i:i+n]
+
+          def quoted(value):
+              return "'" + str(value).replace("'", "''") + "'"
+
+          snapshot = json.loads(Path('.history-store/data/history/latest.json').read_text())
+          bbls = sorted({str(row.get('bbl') or '').strip() for row in snapshot.get('systems', []) if str(row.get('bbl') or '').strip().isdigit() and len(str(row.get('bbl') or '').strip()) == 10})
+          assert len(bbls) > 2500, f'Unexpected usable BBL count: {len(bbls)}'
+
+          # Deterministic spread across the verified cooling-tower BBL universe.
+          sample_size = min(60, len(bbls))
+          sample_indexes = sorted({round(i * (len(bbls)-1) / (sample_size-1)) for i in range(sample_size)})
+          sample_bbls = [bbls[i] for i in sample_indexes]
+
+          metadata = {}
+          for dataset in (LEGALS, MASTER, PARTIES):
+              view = get(f'/api/views/{dataset}')
+              metadata[dataset] = {
+                  'name': view.get('name'),
+                  'rowsUpdatedAt': view.get('rowsUpdatedAt'),
+                  'columns': [
+                      {'name': col.get('name'), 'fieldName': col.get('fieldName'), 'dataTypeName': col.get('dataTypeName')}
+                      for col in view.get('columns', [])
+                  ],
+              }
+
+          legal_rows = []
+          per_bbl_counts = Counter()
+          for bbl in sample_bbls:
+              borough = int(bbl[0]); block = int(bbl[1:6]); lot = int(bbl[6:10])
+              rows = get(f'/resource/{LEGALS}.json', {
+                  '$select': 'document_id,borough,block,lot,easement,partial_lot,air_rights,subterranean_rights,property_type,street_number,street_name,unit,good_through_date',
+                  '$where': f'borough={borough} AND block={block} AND lot={lot}',
+                  '$limit': 50000,
+                  '$order': 'document_id',
+              })
+              legal_rows.extend(rows)
+              per_bbl_counts[bbl] = len(rows)
+
+          document_ids = sorted({str(row.get('document_id') or '').strip() for row in legal_rows if str(row.get('document_id') or '').strip()})
+          master_rows = []
+          party_rows = []
+          for batch in chunks(document_ids, 75):
+              where = 'document_id in (' + ','.join(quoted(value) for value in batch) + ')'
+              master_rows.extend(get(f'/resource/{MASTER}.json', {
+                  '$select': 'document_id,record_type,crfn,recorded_borough,doc_type,document_date,document_amt,recorded_datetime,modified_date,reel_yr,reel_nbr,reel_pg,pct_transferred,good_through_date',
+                  '$where': where,
+                  '$limit': 50000,
+                  '$order': 'document_id',
+              }))
+              party_rows.extend(get(f'/resource/{PARTIES}.json', {
+                  '$select': 'document_id,record_type,party_type,name,address_1,address_2,country,city,state,zip,good_through_date',
+                  '$where': where,
+                  '$limit': 50000,
+                  '$order': 'document_id,party_type,name',
+              }))
+
+          master_by_doc = {str(row.get('document_id') or '').strip(): row for row in master_rows if row.get('document_id')}
+          party_doc_ids = {str(row.get('document_id') or '').strip() for row in party_rows if row.get('document_id')}
+          master_doc_ids = set(master_by_doc)
+          legal_doc_ids = set(document_ids)
+
+          doc_types = Counter(str(row.get('doc_type') or '').strip() or '<blank>' for row in master_rows)
+          party_types = Counter(str(row.get('party_type') or '').strip() or '<blank>' for row in party_rows)
+          recorded_dates = sorted(str(row.get('recorded_datetime') or '')[:10] for row in master_rows if row.get('recorded_datetime'))
+          document_dates = sorted(str(row.get('document_date') or '')[:10] for row in master_rows if row.get('document_date'))
+
+          sample_examples = []
+          for bbl in sample_bbls[:8]:
+              borough = int(bbl[0]); block = int(bbl[1:6]); lot = int(bbl[6:10])
+              docs = sorted({str(row.get('document_id')) for row in legal_rows if int(float(row.get('borough', -1))) == borough and int(float(row.get('block', -1))) == block and int(float(row.get('lot', -1))) == lot})
+              sample_examples.append({
+                  'bbl': bbl,
+                  'legal_rows': per_bbl_counts[bbl],
+                  'document_count': len(docs),
+                  'latest_docs': [
+                      {
+                          'document_id': doc,
+                          'doc_type': master_by_doc.get(doc, {}).get('doc_type'),
+                          'document_date': master_by_doc.get(doc, {}).get('document_date'),
+                          'recorded_datetime': master_by_doc.get(doc, {}).get('recorded_datetime'),
+                          'document_amt': master_by_doc.get(doc, {}).get('document_amt'),
+                          'party_rows': sum(1 for row in party_rows if str(row.get('document_id')) == doc),
+                      }
+                      for doc in sorted(docs, key=lambda value: str(master_by_doc.get(value, {}).get('recorded_datetime') or ''), reverse=True)[:3]
+                  ],
+              })
+
+          result = {
+              'verified_tower_bbl_count': len(bbls),
+              'sample_bbl_count': len(sample_bbls),
+              'sample_bbls_with_any_acris_legal': sum(1 for bbl in sample_bbls if per_bbl_counts[bbl] > 0),
+              'sample_bbl_exact_match_percentage': round(100 * sum(1 for bbl in sample_bbls if per_bbl_counts[bbl] > 0) / len(sample_bbls), 2),
+              'sample_legal_row_count': len(legal_rows),
+              'sample_unique_document_count': len(document_ids),
+              'sample_master_row_count': len(master_rows),
+              'sample_party_row_count': len(party_rows),
+              'legal_documents_with_master': len(legal_doc_ids & master_doc_ids),
+              'legal_documents_with_parties': len(legal_doc_ids & party_doc_ids),
+              'max_legal_rows_per_sample_bbl': max(per_bbl_counts.values(), default=0),
+              'median_legal_rows_per_sample_bbl': sorted(per_bbl_counts.values())[len(per_bbl_counts)//2] if per_bbl_counts else 0,
+              'recorded_date_min': recorded_dates[0] if recorded_dates else None,
+              'recorded_date_max': recorded_dates[-1] if recorded_dates else None,
+              'document_date_min': document_dates[0] if document_dates else None,
+              'document_date_max': document_dates[-1] if document_dates else None,
+              'top_doc_types': doc_types.most_common(30),
+              'party_types': party_types.most_common(),
+              'dataset_metadata': metadata,
+              'examples': sample_examples,
+          }
+          print(json.dumps(result, indent=2, default=str))
+
+          assert len(legal_doc_ids - master_doc_ids) == 0, f'{len(legal_doc_ids - master_doc_ids)} sampled legal document IDs lack Master rows'
+          assert len(legal_doc_ids - party_doc_ids) == 0, f'{len(legal_doc_ids - party_doc_ids)} sampled legal document IDs lack Party rows'
+          assert result['sample_bbls_with_any_acris_legal'] > 0, 'No sampled BBLs matched ACRIS Legals'
+          PY
