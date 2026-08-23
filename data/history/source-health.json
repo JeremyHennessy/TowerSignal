@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T10:48:10.188303Z",
+  "generated_at": "2026-08-23T17:42:22.587864Z",
   "sources": [
     {
       "source_key": "registrations",
@@ -124,6 +124,24 @@
       "previous_coverage_percentage": 99.33,
       "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is the share of exact-matched HPD registration BBLs with public contact rows.",
+      "status": "HEALTHY",
+      "status_reasons": []
+    },
+    {
+      "source_key": "nys_registry",
+      "dataset_id": "24a4-muw7",
+      "name": "New York State Cooling Tower Registry Weekly Extract",
+      "entity_unit": "NYS cooling-tower Equipment_ID records",
+      "retrieved_record_count": 6236,
+      "requested_entity_count": 6236,
+      "normalized_entity_count": 6236,
+      "matched_entity_count": 6236,
+      "attached_entity_count": 6236,
+      "displayed_entity_count": 6236,
+      "coverage_percentage": 100.0,
+      "previous_coverage_percentage": null,
+      "coverage_change_percentage_points": null,
+      "coverage_note": "Coverage is the share of current authoritative NYS extract rows represented by normalized unique Equipment_ID records. Missing coordinates do not remove equipment from the product.",
       "status": "HEALTHY",
       "status_reasons": []
     }
