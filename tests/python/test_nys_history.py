@@ -79,7 +79,7 @@ class NysHistoryTests(unittest.TestCase):
         current = build_observation(row(last_update_days=6, last_sampled_days=23))
         self.assertEqual(detect_changes(previous, current, "2026-08-23T01:00:00Z"), [])
 
-    def test_new_and_missing_equipment_use_presence_wording(self) -> None:
+    def test_new_and_missing_equipment_use_presence_wording_without_invented_source_date(self) -> None:
         previous_obs = build_observation(row())
         previous_obs["first_seen_at"] = "2026-08-22T01:00:00Z"
         previous_obs["last_seen_at"] = "2026-08-22T01:00:00Z"
@@ -94,10 +94,12 @@ class NysHistoryTests(unittest.TestCase):
         first_seen = [event for event in additions["events"] if event["event_type"] == "NYS_EQUIPMENT_FIRST_SEEN"]
         self.assertEqual(len(first_seen), 1)
         self.assertEqual(first_seen[0]["system_id"], "NYS-200")
+        self.assertIsNone(first_seen[0]["source_observation_date"])
 
         _, removals = build_history([], "2026-08-23T01:00:00Z", previous, [])
         self.assertEqual(removals["events"][0]["event_type"], "NYS_EQUIPMENT_NO_LONGER_PRESENT")
         self.assertEqual(removals["events"][0]["new_value"], {"present_in_snapshot": False})
+        self.assertIsNone(removals["events"][0]["source_observation_date"])
 
 
 if __name__ == "__main__":
