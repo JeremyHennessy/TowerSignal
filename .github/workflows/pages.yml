@@ -38,14 +38,22 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
+      - name: Fetch, validate and generate current NYS registry data
+        run: python scripts/build_nys_data.py --output public/data
       - name: Build and validate source-health coverage
         run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
-      - name: Build deterministic historical changes
+      - name: Build deterministic NYC historical changes
         run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
-      - name: Validate durable history size and growth
+      - name: Build deterministic NYS historical changes
+        run: python scripts/build_nys_history.py --output public/data --previous-snapshot .history-store/data/history/nys/latest.json --previous-events .history-store/data/history/nys/events.json
+      - name: Validate durable NYC history size and growth
         run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
+      - name: Validate durable NYS history size and growth
+        run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
       - name: Independently verify generated systems and OATH cases against current NYC sources
         run: python scripts/verify_live_data.py --sample-size 5
+      - name: Independently verify generated NYS equipment against current NYS source
+        run: python scripts/verify_live_nys.py --sample-size 5
       - name: Python fixture tests
         run: python -m unittest discover -s tests/python -p 'test_*.py' -v
       - name: Lint frontend
@@ -63,6 +71,8 @@ jobs:
           path: |
             public/data/history/latest.json
             public/data/history/events.json
+            public/data/history/nys/latest.json
+            public/data/history/nys/events.json
             public/data/source-health.json
           retention-days: 7
       - name: Configure Pages
@@ -129,13 +139,15 @@ jobs:
           path: .verified-history
       - name: Persist verified observation, event and source-health history
         run: |
-          mkdir -p data/history
+          mkdir -p data/history/nys
           cp .verified-history/history/latest.json data/history/latest.json
           cp .verified-history/history/events.json data/history/events.json
+          cp .verified-history/history/nys/latest.json data/history/nys/latest.json
+          cp .verified-history/history/nys/events.json data/history/nys/events.json
           cp .verified-history/source-health.json data/history/source-health.json
           git config user.name "TowerSignal History Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/history/latest.json data/history/events.json data/history/source-health.json
+          git add data/history
           if git diff --cached --quiet; then
             echo "History state unchanged"
           else
