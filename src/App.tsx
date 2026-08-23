@@ -39,7 +39,6 @@ export default function App() {
   }, [])
   const filtered = useMemo(() => payload ? filterSystems(payload.systems, filters) : [], [payload, filters])
   const selectById = useCallback((id: string) => { const row = payload?.systems.find(item => item.system_id === id); if (row) setSelected(row) }, [payload])
-  const selectNysById = useCallback((id: string) => { const row = nysPayload?.systems.find(item => item.system_id === id); if (row) setSelectedNys(row) }, [nysPayload])
   const quick = (kind: string) => {
     if (kind === 'Confirmed violations') setFilters({ ...initialFilters, confirmed:'true' })
     if (kind === 'OATH cases') setFilters({ ...initialFilters, oath:'true' })
