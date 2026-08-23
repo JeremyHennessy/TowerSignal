@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('hosted TowerSignal loads data, changes, historical profile, source health, OATH lifecycle and map without app errors', async ({ page }, testInfo) => {
+test('hosted TowerSignal loads NYC and NYS data, history, source health and maps without app errors', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
@@ -28,12 +28,12 @@ test('hosted TowerSignal loads data, changes, historical profile, source health,
   })
   expect(mapContainment).toEqual({ overflow: 'hidden', isolation: 'isolate', position: 'relative' })
 
-  await page.getByRole('button', { name: 'Changes' }).click()
+  await page.getByRole('button', { name: 'Changes', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
   await expect(page.getByText('History collection began')).toBeVisible()
   await expect(page.getByText(/change.*in current view/)).toBeVisible()
   await expect(page.locator('.map-shell')).toBeHidden()
-  await page.getByRole('button', { name: 'Leads' }).click()
+  await page.getByRole('button', { name: 'Leads', exact: true }).click()
   await expect(page.locator('.map-shell')).toBeVisible()
 
   const before = await page.locator('tbody tr').count()
@@ -59,22 +59,46 @@ test('hosted TowerSignal loads data, changes, historical profile, source health,
   await page.reload({ waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
 
+  await page.getByRole('button', { name: 'NYS Registry', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Statewide cooling-tower registry intelligence without projecting NYC rules.' })).toBeVisible()
+  await expect(page.getByText('Source non-compliant')).toBeVisible()
+  await expect(page.getByLabel('NYS registry filters')).toBeVisible()
+  await expect(page.locator('.nys-table tbody tr').first()).toBeVisible()
+  await expect(page.locator('.leaflet-container')).toBeVisible()
+  await expect(page.getByText(/matching NYS equipment records/)).toBeVisible()
+
+  await page.getByRole('button', { name: 'NYS Changes', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'What changed in the statewide registry?' })).toBeVisible()
+  await expect(page.getByText('NYS history collection began')).toBeVisible()
+
   expect(sameOriginFailures, `Same-origin request failures: ${sameOriginFailures.join('\n')}`).toEqual([])
   expect(consoleErrors, `Console errors: ${consoleErrors.join('\n')}`).toEqual([])
 })
 
-test('mobile layout keeps Leads and Changes controls readable and usable', async ({ page }) => {
+test('mobile layout keeps NYC and NYS controls readable and contained', async ({ page }) => {
   await page.goto('./', { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Export filtered CSV' })).toBeVisible()
   await expect(page.getByLabel('Lead filters')).toBeVisible()
   await expect(page.getByText(/Source health \d+\/\d+ healthy/)).toBeVisible()
   await expect(page.locator('.leaflet-container')).toBeVisible()
-  await page.getByRole('button', { name: 'Changes' }).click()
+
+  await page.getByRole('button', { name: 'Changes', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
   await expect(page.getByText('History collection began')).toBeVisible()
   await expect(page.locator('.map-shell')).toBeHidden()
-  const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
+  let bodyWidth = await page.evaluate(() => document.body.scrollWidth)
   const viewportWidth = page.viewportSize()?.width ?? 0
+  expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
+
+  await page.getByRole('button', { name: 'NYS Registry', exact: true }).click()
+  await expect(page.getByLabel('NYS registry filters')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Statewide cooling-tower registry intelligence without projecting NYC rules.' })).toBeVisible()
+  bodyWidth = await page.evaluate(() => document.body.scrollWidth)
+  expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
+
+  await page.getByRole('button', { name: 'NYS Changes', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'What changed in the statewide registry?' })).toBeVisible()
+  bodyWidth = await page.evaluate(() => document.body.scrollWidth)
   expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
 })
