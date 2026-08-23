@@ -1,0 +1,168 @@
+name: Refresh verified ACRIS cache
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 8 * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/acris-cache.yml'
+      - 'scripts/towersignal/acris.py'
+      - 'scripts/build_acris_cache.py'
+      - 'scripts/validate_acris_cache.py'
+      - 'scripts/verify_live_acris.py'
+      - 'scripts/attach_acris.py'
+      - 'scripts/attach_acris_health.py'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/acris-cache.yml'
+      - '.github/workflows/pages.yml'
+      - 'scripts/towersignal/acris.py'
+      - 'scripts/build_acris_cache.py'
+      - 'scripts/validate_acris_cache.py'
+      - 'scripts/verify_live_acris.py'
+      - 'scripts/attach_acris.py'
+      - 'scripts/attach_acris_health.py'
+      - 'src/components/AcrisActivitySection.tsx'
+      - 'src/components/DetailPanel.tsx'
+      - 'src/types/acris.ts'
+      - 'src/utils/export.ts'
+      - 'tests/python/test_acris.py'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: towersignal-acris-cache-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out last verified NYC tower snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history/latest.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build bounded ACRIS cache
+        run: python scripts/build_acris_cache.py --tower-snapshot .history-store/data/history/latest.json --output acris-cache/cache.json
+      - name: Validate cache size, structure and production volume
+        run: python scripts/validate_acris_cache.py --cache acris-cache/cache.json --max-age-days 1 --require-production-volume
+      - name: Independently verify sampled cache rows against live ACRIS
+        run: python scripts/verify_live_acris.py --cache acris-cache/cache.json --sample-size 5
+      - name: Upload verified ACRIS cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-acris-cache
+          path: acris-cache/cache.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out durable TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified ACRIS cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-acris-cache
+          path: .verified-acris
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Generate current NYC data
+        run: python scripts/build_data.py --output public/data
+      - name: Attach verified ACRIS cache
+        run: python scripts/attach_acris.py --output public/data --cache .verified-acris/cache.json
+      - name: Generate current NYS data
+        run: python scripts/build_nys_data.py --output public/data
+      - name: Build source health
+        run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
+      - name: Attach ACRIS source health
+        run: python scripts/attach_acris_health.py --output public/data
+      - name: Build NYC history
+        run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
+      - name: Build NYS history
+        run: python scripts/build_nys_history.py --output public/data --previous-snapshot .history-store/data/history/nys/latest.json --previous-events .history-store/data/history/nys/events.json
+      - name: Validate NYC history size
+        run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
+      - name: Validate NYS history size
+        run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
+      - name: Independently verify NYC sources
+        run: python scripts/verify_live_data.py --sample-size 5
+      - name: Independently verify NYS source
+        run: python scripts/verify_live_nys.py --sample-size 5
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+
+  persist-cache:
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out durable ACRIS cache branch
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-acris
+          fetch-depth: 1
+      - name: Download verified ACRIS cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-acris-cache
+          path: .verified-acris
+      - name: Persist verified cache
+        run: |
+          mkdir -p data/acris
+          cp .verified-acris/cache.json data/acris/cache.json
+          git config user.name "TowerSignal ACRIS Cache Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/acris/cache.json
+          if git diff --cached --quiet; then
+            echo "ACRIS cache unchanged"
+          else
+            git commit -m "data: persist verified bounded ACRIS cache [skip ci]"
+            git push origin HEAD:data/towersignal-acris
+          fi
+
+  deploy-refreshed-cache:
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: persist-cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy product with last verified ACRIS cache
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

@@ -28,6 +28,13 @@ jobs:
           path: .history-store
           fetch-depth: 1
           sparse-checkout: data/history
+      - name: Check out last verified ACRIS cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-acris
+          path: .acris-store
+          fetch-depth: 1
+          sparse-checkout: data/acris
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -38,10 +45,17 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
+      - name: Attach last verified ACRIS timing cache
+        run: python scripts/attach_acris.py --output public/data --cache .acris-store/data/acris/cache.json
+      - name: Validate verified ACRIS cache when present
+        if: ${{ hashFiles('.acris-store/data/acris/cache.json') != '' }}
+        run: python scripts/validate_acris_cache.py --cache .acris-store/data/acris/cache.json --max-age-days 30 --require-production-volume
       - name: Fetch, validate and generate current NYS registry data
         run: python scripts/build_nys_data.py --output public/data
       - name: Build and validate source-health coverage
         run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
+      - name: Attach ACRIS cache health and freshness
+        run: python scripts/attach_acris_health.py --output public/data
       - name: Build deterministic NYC historical changes
         run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
       - name: Build deterministic NYS historical changes
