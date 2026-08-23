@@ -1,0 +1,243 @@
+name: Build 013 ACRIS volume diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  measure-acris-volume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out verified TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history/latest.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Measure all-BBL ACRIS batch strategy
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+          import json
+          import time
+          from collections import Counter, defaultdict
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+          from pathlib import Path
+          from urllib.error import HTTPError, URLError
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          ROOT = 'https://data.cityofnewyork.us'
+          LEGALS = '8h5j-fqxa'
+          MASTER = 'bnx9-e6tj'
+          PARTIES = '636b-3b5g'
+          UA = 'TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)'
+          MAX_WORKERS = 6
+          LEGAL_BBL_BATCH = 20
+          DOCUMENT_BATCH = 150
+          PARTY_DOCS_PER_BBL = 12
+          RELEVANT_DOC_TYPES = {
+              'DEED','DEED COR','MTGE','AGMT','ASST','ASSTO','AALR','AL&R','SAT','SAGE',
+              'LEAS','MLEA','REL','RPTT','RPTT&RET','M&CON','DECL','EASE'
+          }
+
+          def chunks(values, n):
+              values = list(values)
+              for i in range(0, len(values), n):
+                  yield values[i:i+n]
+
+          def quoted(value):
+              return "'" + str(value).replace("'", "''") + "'"
+
+          def get(path, params=None, attempts=5):
+              url = ROOT + path
+              if params:
+                  url += '?' + urlencode(params)
+              last = None
+              for attempt in range(attempts):
+                  try:
+                      req = Request(url, headers={'User-Agent': UA, 'Accept': 'application/json'})
+                      with urlopen(req, timeout=90) as response:
+                          return json.load(response)
+                  except HTTPError as exc:
+                      last = exc
+                      if exc.code not in {429, 500, 502, 503, 504}:
+                          raise
+                  except URLError as exc:
+                      last = exc
+                  time.sleep(min(8, 1.5 ** attempt))
+              raise last
+
+          def parallel_map(fn, items):
+              results = []
+              with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+                  futures = [pool.submit(fn, item) for item in items]
+                  for future in as_completed(futures):
+                      results.extend(future.result())
+              return results
+
+          started = time.monotonic()
+          snapshot = json.loads(Path('.history-store/data/history/latest.json').read_text())
+          bbls = sorted({str(row.get('bbl') or '').strip() for row in snapshot.get('systems', []) if str(row.get('bbl') or '').strip().isdigit() and len(str(row.get('bbl') or '').strip()) == 10})
+          assert len(bbls) == 2991, f'Expected verified 2,991 BBLs, got {len(bbls)}'
+
+          by_borough = defaultdict(list)
+          for bbl in bbls:
+              by_borough[bbl[0]].append(bbl)
+
+          legal_batches = []
+          for borough, borough_bbls in sorted(by_borough.items()):
+              for batch in chunks(borough_bbls, LEGAL_BBL_BATCH):
+                  clauses = [f'(block={int(bbl[1:6])} AND lot={int(bbl[6:10])})' for bbl in batch]
+                  legal_batches.append((borough, batch, f"borough={int(borough)} AND ({' OR '.join(clauses)})"))
+
+          def fetch_legal_batch(item):
+              borough, batch, where = item
+              rows = get(f'/resource/{LEGALS}.json', {
+                  '$select': 'document_id,borough,block,lot,easement,partial_lot,air_rights,subterranean_rights,property_type,street_number,street_name,unit,good_through_date',
+                  '$where': where,
+                  '$limit': 50000,
+                  '$order': 'document_id',
+              })
+              return rows
+
+          legal_rows = parallel_map(fetch_legal_batch, legal_batches)
+          legal_elapsed = time.monotonic() - started
+
+          docs_by_bbl = defaultdict(set)
+          bbls_by_doc = defaultdict(set)
+          for row in legal_rows:
+              try:
+                  borough = int(float(row.get('borough')))
+                  block = int(float(row.get('block')))
+                  lot = int(float(row.get('lot')))
+              except (TypeError, ValueError):
+                  continue
+              bbl = f'{borough}{block:05d}{lot:04d}'
+              doc = str(row.get('document_id') or '').strip()
+              if bbl in set(bbls) and doc:
+                  docs_by_bbl[bbl].add(doc)
+                  bbls_by_doc[doc].add(bbl)
+
+          document_ids = sorted(bbls_by_doc)
+          master_batches = list(chunks(document_ids, DOCUMENT_BATCH))
+
+          def fetch_master_batch(batch):
+              where = 'document_id in (' + ','.join(quoted(value) for value in batch) + ')'
+              return get(f'/resource/{MASTER}.json', {
+                  '$select': 'document_id,record_type,crfn,recorded_borough,doc_type,document_date,document_amt,recorded_datetime,modified_date,reel_yr,reel_nbr,reel_pg,percent_trans,good_through_date',
+                  '$where': where,
+                  '$limit': 50000,
+                  '$order': 'document_id,recorded_datetime,modified_date',
+              })
+
+          master_rows = parallel_map(fetch_master_batch, master_batches)
+          master_elapsed = time.monotonic() - started
+          master_by_doc = defaultdict(list)
+          for row in master_rows:
+              doc = str(row.get('document_id') or '').strip()
+              if doc:
+                  master_by_doc[doc].append(row)
+
+          missing_master = sorted(set(document_ids) - set(master_by_doc))
+          duplicate_master_docs = {doc: rows for doc, rows in master_by_doc.items() if len(rows) > 1}
+
+          def canonical_master(rows):
+              return sorted(rows, key=lambda row: (
+                  str(row.get('recorded_datetime') or ''),
+                  str(row.get('modified_date') or ''),
+                  str(row.get('record_type') or ''),
+                  json.dumps(row, sort_keys=True),
+              ), reverse=True)[0]
+
+          canonical = {doc: canonical_master(rows) for doc, rows in master_by_doc.items()}
+          selected_party_docs = set()
+          recent_doc_counts = Counter()
+          relevant_doc_counts = Counter()
+          for bbl, docs in docs_by_bbl.items():
+              candidates = []
+              for doc in docs:
+                  row = canonical.get(doc)
+                  if not row:
+                      continue
+                  doc_type = str(row.get('doc_type') or '').strip().upper()
+                  recorded = str(row.get('recorded_datetime') or '')[:10]
+                  if recorded >= '2025-01-01':
+                      recent_doc_counts[bbl] += 1
+                  if doc_type in RELEVANT_DOC_TYPES:
+                      relevant_doc_counts[bbl] += 1
+                      candidates.append((recorded, doc, doc_type))
+              candidates.sort(reverse=True)
+              selected_party_docs.update(doc for _, doc, _ in candidates[:PARTY_DOCS_PER_BBL])
+
+          party_batches = list(chunks(sorted(selected_party_docs), DOCUMENT_BATCH))
+
+          def fetch_party_batch(batch):
+              where = 'document_id in (' + ','.join(quoted(value) for value in batch) + ')'
+              return get(f'/resource/{PARTIES}.json', {
+                  '$select': 'document_id,record_type,party_type,name,address_1,address_2,country,city,state,zip,good_through_date',
+                  '$where': where,
+                  '$limit': 50000,
+                  '$order': 'document_id,party_type,name',
+              })
+
+          party_rows = parallel_map(fetch_party_batch, party_batches) if party_batches else []
+          total_elapsed = time.monotonic() - started
+          party_doc_ids = {str(row.get('document_id') or '').strip() for row in party_rows if row.get('document_id')}
+          missing_parties = sorted(selected_party_docs - party_doc_ids)
+
+          legal_counts = [len(docs_by_bbl.get(bbl, set())) for bbl in bbls]
+          matched_bbls = [bbl for bbl in bbls if docs_by_bbl.get(bbl)]
+          matched_counts = [len(docs_by_bbl[bbl]) for bbl in matched_bbls]
+          doc_types = Counter(str(row.get('doc_type') or '').strip() or '<blank>' for row in canonical.values())
+          recorded_dates = sorted(str(row.get('recorded_datetime') or '')[:10] for row in canonical.values() if row.get('recorded_datetime'))
+
+          result = {
+              'requested_bbl_count': len(bbls),
+              'legal_batch_count': len(legal_batches),
+              'matched_bbl_count': len(matched_bbls),
+              'exact_bbl_match_percentage': round(100 * len(matched_bbls) / len(bbls), 2),
+              'legal_row_count': len(legal_rows),
+              'unique_document_count': len(document_ids),
+              'median_documents_all_bbls': sorted(legal_counts)[len(legal_counts)//2],
+              'median_documents_matched_bbls': sorted(matched_counts)[len(matched_counts)//2] if matched_counts else 0,
+              'max_documents_per_bbl': max(legal_counts, default=0),
+              'master_batch_count': len(master_batches),
+              'master_row_count': len(master_rows),
+              'master_resolved_document_count': len(master_by_doc),
+              'master_missing_document_count': len(missing_master),
+              'master_documents_with_multiple_rows': len(duplicate_master_docs),
+              'max_master_rows_per_document': max((len(rows) for rows in master_by_doc.values()), default=0),
+              'selected_party_document_count': len(selected_party_docs),
+              'party_batch_count': len(party_batches),
+              'party_row_count': len(party_rows),
+              'party_resolved_document_count': len(party_doc_ids),
+              'party_missing_selected_document_count': len(missing_parties),
+              'properties_with_recent_documents_since_2025': sum(1 for bbl in bbls if recent_doc_counts[bbl] > 0),
+              'properties_with_relevant_document_types': sum(1 for bbl in bbls if relevant_doc_counts[bbl] > 0),
+              'recorded_date_min': recorded_dates[0] if recorded_dates else None,
+              'recorded_date_max': recorded_dates[-1] if recorded_dates else None,
+              'top_doc_types': doc_types.most_common(30),
+              'legal_fetch_seconds': round(legal_elapsed, 2),
+              'master_fetch_cumulative_seconds': round(master_elapsed, 2),
+              'total_seconds': round(total_elapsed, 2),
+              'missing_master_examples': missing_master[:20],
+              'missing_party_examples': missing_parties[:20],
+          }
+          print(json.dumps(result, indent=2))
+
+          assert len(legal_batches) < 200, 'BBL batching did not reduce Legals requests sufficiently'
+          assert len(missing_master) == 0, f'{len(missing_master)} exact Legal document IDs lack Master rows'
+          assert len(missing_parties) == 0, f'{len(missing_parties)} selected transaction documents lack Party rows'
+          assert result['matched_bbl_count'] > 1000, 'Unexpectedly low full-universe ACRIS exact-BBL coverage'
+          assert total_elapsed < 15 * 60, f'ACRIS diagnostic took too long for production design: {total_elapsed:.1f}s'
+          PY
