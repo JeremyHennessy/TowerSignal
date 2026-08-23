@@ -165,6 +165,6 @@ test('opens NYS Changes and shows Equipment_ID-exact evidence', async () => {
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'NYS Changes' }))
   expect(screen.getByRole('heading', { name:'What changed in the statewide registry?' })).toBeInTheDocument()
-  expect(screen.getByText('NYS cooling-tower status changed')).toBeInTheDocument()
+  expect(screen.getAllByText('NYS cooling-tower status changed')).toHaveLength(2)
   expect(screen.getByText('Evidence: EQUIPMENT_ID_EXACT')).toBeInTheDocument()
 })
