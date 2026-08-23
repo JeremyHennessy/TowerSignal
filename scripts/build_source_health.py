@@ -26,13 +26,21 @@ def safe_detail_path(base: Path, system_id: str) -> Path:
 def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[dict[str, Any]]:
     systems_path = output_dir / "systems.json"
     metadata_path = output_dir / "metadata.json"
+    nys_systems_path = output_dir / "nys-systems.json"
+    nys_metadata_path = output_dir / "nys-metadata.json"
     payload = load_json(systems_path, None)
+    nys_payload = load_json(nys_systems_path, None)
     if not isinstance(payload, dict):
         raise RuntimeError(f"Missing or malformed generated systems payload: {systems_path}")
+    if not isinstance(nys_payload, dict):
+        raise RuntimeError(f"Missing or malformed generated NYS systems payload: {nys_systems_path}")
     metadata = payload.get("metadata") or {}
     summary = payload.get("summary") or {}
     systems = payload.get("systems") or []
     sources = {source.get("dataset_id"): source for source in metadata.get("sources", [])}
+    nys_metadata = nys_payload.get("metadata") or {}
+    nys_systems = nys_payload.get("systems") or []
+    nys_source = nys_metadata.get("source") or {}
 
     previous = load_json(previous_snapshot_path, {})
     previous_health = {entry.get("source_key"): entry for entry in previous.get("source_health", []) if isinstance(entry, dict)}
@@ -63,6 +71,23 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
         health_entry(source_key="dob_now_jobs", dataset_id=str(dob.get("dataset_id") or "w9ak-ipjd"), name=str(dob.get("name") or "DOB NOW: Build – Job Application Filings"), entity_unit="BBLs with DOB NOW job filings", retrieved_record_count=int(dob.get("source_record_count") or 0), requested_entity_count=int(metadata.get("dob_requested_bbl_count") or 0), normalized_entity_count=int(metadata.get("dob_matched_bbl_count") or 0), matched_entity_count=int(metadata.get("dob_matched_bbl_count") or 0), attached_entity_count=dob_systems, displayed_entity_count=dob_systems, previous_coverage_percentage=previous_coverage("dob_now_jobs"), coverage_note="Coverage is exact BBL job-filing coverage. A missing DOB NOW match means no matching DOB NOW job filing was returned; it is not evidence that no construction or mechanical work ever occurred."),
         health_entry(source_key="hpd_registrations", dataset_id=str(hpd_reg.get("dataset_id") or "tesw-yqqr"), name=str(hpd_reg.get("name") or "NYC HPD Multiple Dwelling Registrations"), entity_unit="BBLs", retrieved_record_count=int(hpd_reg.get("source_record_count") or 0), requested_entity_count=int(metadata.get("hpd_requested_bbl_count") or 0), normalized_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), matched_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), attached_entity_count=hpd_registration_systems, displayed_entity_count=hpd_registration_systems, previous_coverage_percentage=previous_coverage("hpd_registrations"), coverage_note="Coverage is exact BBL registration match coverage. HPD registration applies only to qualifying properties, so low absolute coverage is not itself a failure."),
         health_entry(source_key="hpd_contacts", dataset_id=str(hpd_contacts.get("dataset_id") or "feu5-w2e2"), name=str(hpd_contacts.get("name") or "NYC HPD Registration Contacts"), entity_unit="matched HPD registration BBLs", retrieved_record_count=int(hpd_contacts.get("source_record_count") or 0), requested_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), normalized_entity_count=int(metadata.get("hpd_matched_contact_bbl_count") or 0), matched_entity_count=int(metadata.get("hpd_matched_contact_bbl_count") or 0), attached_entity_count=hpd_contact_systems, displayed_entity_count=hpd_contact_systems, previous_coverage_percentage=previous_coverage("hpd_contacts"), coverage_note="Coverage is the share of exact-matched HPD registration BBLs with public contact rows."),
+        health_entry(
+            source_key="nys_registry",
+            dataset_id=str(nys_source.get("dataset_id") or "24a4-muw7"),
+            name=str(nys_source.get("name") or "New York State Cooling Tower Registry Weekly Extract"),
+            entity_unit="NYS cooling-tower Equipment_ID records",
+            retrieved_record_count=int(nys_source.get("source_record_count") or 0),
+            requested_entity_count=int(nys_source.get("source_record_count") or 0),
+            normalized_entity_count=int(nys_metadata.get("normalized_equipment_count") or len(nys_systems)),
+            matched_entity_count=int(nys_metadata.get("normalized_equipment_count") or len(nys_systems)),
+            attached_entity_count=len(nys_systems),
+            displayed_entity_count=len(nys_systems),
+            previous_coverage_percentage=previous_coverage("nys_registry"),
+            coverage_note=(
+                "Coverage is the share of current authoritative NYS extract rows represented by normalized unique Equipment_ID records. "
+                "Missing coordinates do not remove equipment from the product."
+            ),
+        ),
     ]
 
     validate_source_health(entries)
@@ -71,6 +96,12 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
     systems_path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     (output_dir / "source-health.json").write_text(json.dumps({"generated_at": metadata.get("generated_at"), "sources": entries}, indent=2), encoding="utf-8")
+
+    nys_health = [entry for entry in entries if entry["source_key"] == "nys_registry"]
+    nys_metadata["source_health"] = nys_health
+    nys_payload["metadata"] = nys_metadata
+    nys_systems_path.write_text(json.dumps(nys_payload, separators=(",", ":")), encoding="utf-8")
+    nys_metadata_path.write_text(json.dumps(nys_metadata, indent=2), encoding="utf-8")
 
     for row in systems:
         detail_path = safe_detail_path(output_dir, row["system_id"])

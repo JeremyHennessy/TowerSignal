@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import App from '../../src/App'
 
 vi.mock('../../src/components/TowerMap', () => ({ TowerMap: () => <div data-testid="map">Map</div> }))
+vi.mock('../../src/components/NysTowerMap', () => ({ NysTowerMap: () => <div data-testid="nys-map">NYS Map</div> }))
 
 const payload = {
   schema_version: '1.0',
@@ -28,7 +29,7 @@ const payload = {
 }
 
 const changes = {
-  history_schema_version:'1.0',
+  history_schema_version:'1.1',
   history_started_at:'2026-08-20T20:00:00Z',
   observed_at:'2026-08-21T20:00:00Z',
   baseline_initialized:false,
@@ -36,6 +37,26 @@ const changes = {
   events:[{
     event_type:'SAMPLE_REPORTED',system_id:'SYS-1',bbl:'1',bin:'1',address:'10 ALPHA ST',borough:'Manhattan',detected_at:'2026-08-21T20:00:00Z',source_observation_date:'2026-08-21',previous_value:null,new_value:'2026-08-21',source:'NYC_COOLING_TOWER_REGISTRATIONS',evidence_basis:'SYSTEM_ID_EXACT',priority_score:88,evidence_confidence:'CONFIRMED',contact_available:true,
   }],
+}
+
+const nysPayload = {
+  schema_version:'1.0',
+  metadata:{
+    schema_version:'1.0', generated_at:'2026-08-21T20:05:00Z', jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC', source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',
+    source:{ dataset_id:'24a4-muw7',name:'New York State Cooling Tower Registry Weekly Extract',retrieved_at:'2026-08-21T20:05:00Z',source_record_count:2,source_last_updated_at:'2026-08-18T00:00:00Z',url:'https://example.test/nys',scope_note:'Official NYS weekly extract; county is source provenance.' },
+    normalized_equipment_count:2,source_duplicate_equipment_rows:0,source_missing_equipment_id_rows:0,invalid_coordinate_equipment_count:0,missing_coordinate_equipment_count:0,unique_property_count:1,multi_equipment_property_count:1,equipment_at_multi_equipment_properties:2,max_equipment_per_property:2,
+    source_health:[{source_key:'nys_registry',dataset_id:'24a4-muw7',name:'New York State Cooling Tower Registry Weekly Extract',entity_unit:'NYS cooling-tower Equipment_ID records',retrieved_record_count:2,requested_entity_count:2,normalized_entity_count:2,matched_entity_count:2,attached_entity_count:2,displayed_entity_count:2,coverage_percentage:100,previous_coverage_percentage:null,coverage_change_percentage_points:null,coverage_note:'Current source represented.',status:'HEALTHY',status_reasons:[]}],
+  },
+  summary:{registered_equipment:2,mapped_equipment:2,non_compliant:1,compliant:1,sample_required:1,update_required:0,missing_legionella_result:0,disinfection_required:0,decommissioned:0,out_of_service:0,multi_equipment_properties:1,equipment_at_multi_equipment_properties:2,max_equipment_per_property:2,published_county_counts:{Madison:2},status_counts:{Sample_Required:1,'Legionella Sampled':1},compliance_counts:{'Non-compliant':1,Compliant:1},sample_result_counts:{lt20:2},operation_duration_counts:{'Year-round':2}},
+  systems:[
+    {system_id:'NYS-100',source_equipment_id:'100',jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC',source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',property_key:'252 genesee st|oneida|13421',property_equipment_count:2,regulation_compliance:'Non-compliant',ct_status:'Sample_Required',last_update_days:8,last_sampled_days:99,latest_sample_date:'2026-05-11',latest_sample_result:'lt20',operation_duration:'Year-round',latitude:43.078739,longitude:-75.6493,coordinate_status:'VALID',source_latitude_raw:'43.078739',source_longitude_raw:'-75.6493'},
+    {system_id:'NYS-101',source_equipment_id:'101',jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC',source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',property_key:'252 genesee st|oneida|13421',property_equipment_count:2,regulation_compliance:'Compliant',ct_status:'Legionella Sampled',last_update_days:2,last_sampled_days:29,latest_sample_date:'2026-07-20',latest_sample_result:'lt20',operation_duration:'Year-round',latitude:43.078739,longitude:-75.6493,coordinate_status:'VALID',source_latitude_raw:'43.078739',source_longitude_raw:'-75.6493'},
+  ],
+}
+
+const nysChanges = {
+  history_schema_version:'1.0',history_started_at:'2026-08-20T20:05:00Z',observed_at:'2026-08-21T20:05:00Z',baseline_initialized:false,new_event_count:1,
+  events:[{event_type:'NYS_CT_STATUS_CHANGED',system_id:'NYS-100',source_equipment_id:'100',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',detected_at:'2026-08-21T20:05:00Z',source_observation_date:null,previous_value:'Legionella Sampled',new_value:'Sample_Required',source:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',evidence_basis:'EQUIPMENT_ID_EXACT'}],
 }
 
 const detail = {
@@ -52,7 +73,11 @@ const detail = {
 beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
     const url = String(input)
-    const responsePayload = url.includes('/details/') ? detail : url.includes('/data/changes.json') ? changes : payload
+    const responsePayload = url.includes('/details/') ? detail
+      : url.includes('/data/nys-changes.json') ? nysChanges
+      : url.includes('/data/nys-systems.json') ? nysPayload
+      : url.includes('/data/changes.json') ? changes
+      : payload
     return Promise.resolve({ ok:true, json:() => Promise.resolve(responsePayload) }) as unknown as Promise<Response>
   }))
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: vi.fn().mockResolvedValue(undefined) } })
@@ -66,6 +91,7 @@ test('renders the real-data dashboard shell after dataset load', async () => {
   expect(screen.getByText((_, element) => element?.textContent === '2 matching systems')).toBeInTheDocument()
   expect(screen.getByText('Systems with OATH cases')).toBeInTheDocument()
   expect(screen.getByRole('button', { name:'Changes' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name:'NYS Registry' })).toBeInTheDocument()
 })
 
 test('filters records and opens details with DOB project history', async () => {
@@ -118,4 +144,27 @@ test('opens the Changes product mode with source-backed change evidence', async 
   expect(screen.getAllByText('New public sample reported')).toHaveLength(2)
   expect(screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')).toBeInTheDocument()
   expect(screen.getByText('Evidence: SYSTEM_ID_EXACT')).toBeInTheDocument()
+})
+
+test('opens the NYS Registry mode without NYC score semantics', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await screen.findByText('10 ALPHA ST')
+  await user.click(screen.getByRole('button', { name:'NYS Registry' }))
+  expect(screen.getByRole('heading', { name:'Statewide cooling-tower registry intelligence without projecting NYC rules.' })).toBeInTheDocument()
+  expect(screen.getByText('Source non-compliant')).toBeInTheDocument()
+  expect(screen.getByText((_, element) => element?.textContent === '2 matching NYS equipment records')).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name:'Non-compliant' }))
+  expect(screen.getByText((_, element) => element?.textContent === '1 matching NYS equipment records')).toBeInTheDocument()
+  expect(screen.queryByText('Priority score')).not.toBeInTheDocument()
+})
+
+test('opens NYS Changes and shows Equipment_ID-exact evidence', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await screen.findByText('10 ALPHA ST')
+  await user.click(screen.getByRole('button', { name:'NYS Changes' }))
+  expect(screen.getByRole('heading', { name:'What changed in the statewide registry?' })).toBeInTheDocument()
+  expect(screen.getAllByText('NYS cooling-tower status changed')).toHaveLength(2)
+  expect(screen.getByText('Evidence: EQUIPMENT_ID_EXACT')).toBeInTheDocument()
 })
