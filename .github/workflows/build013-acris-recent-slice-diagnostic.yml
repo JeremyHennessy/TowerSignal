@@ -32,6 +32,7 @@ jobs:
           from collections import Counter, defaultdict
           from concurrent.futures import ThreadPoolExecutor, as_completed
           from datetime import datetime, timedelta, timezone
+          from http.client import IncompleteRead
           from pathlib import Path
           from urllib.error import HTTPError, URLError
           from urllib.parse import urlencode
@@ -73,7 +74,7 @@ jobs:
                       last = exc
                       if exc.code not in {429, 500, 502, 503, 504}:
                           raise
-                  except (URLError, TimeoutError) as exc:
+                  except (URLError, TimeoutError, IncompleteRead) as exc:
                       last = exc
                   time.sleep(min(8, 1.5 ** attempt))
               raise last
