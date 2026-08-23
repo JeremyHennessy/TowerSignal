@@ -1,0 +1,215 @@
+name: Build 013 ACRIS recent slice diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  measure-recent-acris:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out verified TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history/latest.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Measure bounded recent ACRIS path
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+          import json
+          import time
+          from collections import Counter, defaultdict
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+          from urllib.error import HTTPError, URLError
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          ROOT = 'https://data.cityofnewyork.us'
+          MASTER = 'bnx9-e6tj'
+          LEGALS = '8h5j-fqxa'
+          PARTIES = '636b-3b5g'
+          UA = 'TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)'
+          PAGE_SIZE = 50000
+          DOC_BATCH = 300
+          MAX_WORKERS = 8
+          LOOKBACK_DAYS = 365
+          DOC_TYPES = (
+              'DEED','DEED COR','MTGE','ASST','ASSTO','SAT','SAGE','AALR','AL&R',
+              'LEAS','MLEA','REL'
+          )
+
+          def quoted(value):
+              return "'" + str(value).replace("'", "''") + "'"
+
+          def chunks(values, n):
+              values = list(values)
+              for i in range(0, len(values), n):
+                  yield values[i:i+n]
+
+          def get(path, params=None, attempts=5):
+              url = ROOT + path
+              if params:
+                  url += '?' + urlencode(params)
+              last = None
+              for attempt in range(attempts):
+                  try:
+                      req = Request(url, headers={'User-Agent': UA, 'Accept': 'application/json'})
+                      with urlopen(req, timeout=90) as response:
+                          return json.load(response)
+                  except HTTPError as exc:
+                      last = exc
+                      if exc.code not in {429, 500, 502, 503, 504}:
+                          raise
+                  except (URLError, TimeoutError) as exc:
+                      last = exc
+                  time.sleep(min(8, 1.5 ** attempt))
+              raise last
+
+          def parallel_map(fn, items):
+              out = []
+              with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+                  futures = [pool.submit(fn, item) for item in items]
+                  for future in as_completed(futures):
+                      out.extend(future.result())
+              return out
+
+          started = time.monotonic()
+          snapshot = json.loads(Path('.history-store/data/history/latest.json').read_text())
+          tower_bbls = sorted({str(row.get('bbl') or '').strip() for row in snapshot.get('systems', []) if str(row.get('bbl') or '').strip().isdigit() and len(str(row.get('bbl') or '').strip()) == 10})
+          tower_bbl_set = set(tower_bbls)
+          assert len(tower_bbls) == 2991, f'Expected verified 2,991 BBLs, got {len(tower_bbls)}'
+
+          cutoff = (datetime.now(timezone.utc).date() - timedelta(days=LOOKBACK_DAYS)).isoformat()
+          type_clause = ','.join(quoted(value) for value in DOC_TYPES)
+          master_where = f"recorded_datetime >= '{cutoff}T00:00:00.000' AND doc_type in ({type_clause})"
+
+          count_rows = get(f'/resource/{MASTER}.json', {'$select': 'count(*) as count', '$where': master_where})
+          expected_master_count = int(count_rows[0]['count']) if count_rows else 0
+          assert expected_master_count > 1000, f'Unexpectedly small recent ACRIS Master slice: {expected_master_count}'
+
+          master_rows = []
+          offset = 0
+          while True:
+              rows = get(f'/resource/{MASTER}.json', {
+                  '$select': 'document_id,record_type,crfn,recorded_borough,doc_type,document_date,document_amt,recorded_datetime,modified_date,percent_trans,good_through_date',
+                  '$where': master_where,
+                  '$limit': PAGE_SIZE,
+                  '$offset': offset,
+                  '$order': 'document_id,recorded_datetime,modified_date',
+              })
+              master_rows.extend(rows)
+              if len(rows) < PAGE_SIZE:
+                  break
+              offset += PAGE_SIZE
+
+          master_by_doc = defaultdict(list)
+          for row in master_rows:
+              doc = str(row.get('document_id') or '').strip()
+              if doc:
+                  master_by_doc[doc].append(row)
+          document_ids = sorted(master_by_doc)
+
+          def canonical_master(rows):
+              return sorted(rows, key=lambda row: (
+                  str(row.get('recorded_datetime') or ''),
+                  str(row.get('modified_date') or ''),
+                  str(row.get('record_type') or ''),
+                  json.dumps(row, sort_keys=True),
+              ), reverse=True)[0]
+
+          canonical_master_by_doc = {doc: canonical_master(rows) for doc, rows in master_by_doc.items()}
+          master_elapsed = time.monotonic() - started
+
+          legal_batches = list(chunks(document_ids, DOC_BATCH))
+          def fetch_legal_batch(batch):
+              where = 'document_id in (' + ','.join(quoted(value) for value in batch) + ')'
+              return get(f'/resource/{LEGALS}.json', {
+                  '$select': 'document_id,borough,block,lot,property_type,street_number,street_name,unit,good_through_date',
+                  '$where': where,
+                  '$limit': 50000,
+                  '$order': 'document_id,borough,block,lot',
+              })
+
+          legal_rows = parallel_map(fetch_legal_batch, legal_batches)
+          matched_docs_by_bbl = defaultdict(set)
+          legal_rows_on_tower_bbls = []
+          for row in legal_rows:
+              try:
+                  borough = int(float(row.get('borough')))
+                  block = int(float(row.get('block')))
+                  lot = int(float(row.get('lot')))
+              except (TypeError, ValueError):
+                  continue
+              bbl = f'{borough}{block:05d}{lot:04d}'
+              doc = str(row.get('document_id') or '').strip()
+              if bbl in tower_bbl_set and doc in canonical_master_by_doc:
+                  matched_docs_by_bbl[bbl].add(doc)
+                  legal_rows_on_tower_bbls.append(row)
+
+          matched_doc_ids = sorted({doc for docs in matched_docs_by_bbl.values() for doc in docs})
+          legal_elapsed = time.monotonic() - started
+
+          party_batches = list(chunks(matched_doc_ids, DOC_BATCH))
+          def fetch_party_batch(batch):
+              where = 'document_id in (' + ','.join(quoted(value) for value in batch) + ')'
+              return get(f'/resource/{PARTIES}.json', {
+                  '$select': 'document_id,record_type,party_type,name,address_1,address_2,country,city,state,zip,good_through_date',
+                  '$where': where,
+                  '$limit': 50000,
+                  '$order': 'document_id,party_type,name',
+              })
+
+          party_rows = parallel_map(fetch_party_batch, party_batches) if party_batches else []
+          party_doc_ids = {str(row.get('document_id') or '').strip() for row in party_rows if row.get('document_id')}
+          total_elapsed = time.monotonic() - started
+
+          doc_types = Counter(str(canonical_master_by_doc[doc].get('doc_type') or '').strip() or '<blank>' for doc in matched_doc_ids)
+          matched_counts = [len(docs) for docs in matched_docs_by_bbl.values()]
+          recent_amounts = [float(canonical_master_by_doc[doc].get('document_amt') or 0) for doc in matched_doc_ids]
+
+          result = {
+              'lookback_days': LOOKBACK_DAYS,
+              'cutoff': cutoff,
+              'requested_tower_bbl_count': len(tower_bbls),
+              'master_source_row_count_for_slice': expected_master_count,
+              'master_rows_retrieved': len(master_rows),
+              'master_unique_document_count': len(document_ids),
+              'master_documents_with_multiple_rows': sum(1 for rows in master_by_doc.values() if len(rows) > 1),
+              'legal_batch_count': len(legal_batches),
+              'legal_rows_retrieved_for_recent_documents': len(legal_rows),
+              'tower_bbls_with_recent_relevant_acris': len(matched_docs_by_bbl),
+              'tower_bbl_match_percentage': round(100 * len(matched_docs_by_bbl) / len(tower_bbls), 2),
+              'matched_recent_document_count': len(matched_doc_ids),
+              'matched_legal_row_count': len(legal_rows_on_tower_bbls),
+              'median_matched_documents_per_matched_bbl': sorted(matched_counts)[len(matched_counts)//2] if matched_counts else 0,
+              'max_matched_documents_per_bbl': max(matched_counts, default=0),
+              'party_batch_count': len(party_batches),
+              'party_row_count': len(party_rows),
+              'matched_documents_with_parties': len(set(matched_doc_ids) & party_doc_ids),
+              'matched_documents_without_parties': len(set(matched_doc_ids) - party_doc_ids),
+              'top_matched_doc_types': doc_types.most_common(),
+              'max_document_amount': max(recent_amounts, default=0),
+              'master_fetch_seconds': round(master_elapsed, 2),
+              'legal_fetch_cumulative_seconds': round(legal_elapsed, 2),
+              'total_seconds': round(total_elapsed, 2),
+          }
+          print(json.dumps(result, indent=2))
+
+          assert len(master_rows) >= expected_master_count, 'Paginated Master retrieval returned fewer rows than the source count'
+          assert len(matched_docs_by_bbl) >= 100, f'Unexpectedly low recent ACRIS tower-property coverage: {len(matched_docs_by_bbl)} BBLs'
+          assert len(matched_doc_ids) >= 100, f'Unexpectedly low recent ACRIS matched document count: {len(matched_doc_ids)}'
+          assert total_elapsed < 12 * 60, f'Recent ACRIS path exceeded 12-minute production target: {total_elapsed:.1f}s'
+          PY
