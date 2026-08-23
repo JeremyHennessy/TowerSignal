@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T04:14:14.111275Z",
+  "generated_at": "2026-08-23T10:48:10.188303Z",
   "sources": [
     {
       "source_key": "registrations",
@@ -13,8 +13,8 @@
       "attached_entity_count": 4894,
       "displayed_entity_count": 4894,
       "coverage_percentage": 100.0,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 100.0,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is normalized current systems represented in the generated product.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -31,8 +31,8 @@
       "attached_entity_count": 4835,
       "displayed_entity_count": 4835,
       "coverage_percentage": 98.79,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 98.79,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is the share of current systems with at least one exact system_id inspection history; it is not an expected-completeness percentage.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -49,8 +49,8 @@
       "attached_entity_count": 3977,
       "displayed_entity_count": 3977,
       "coverage_percentage": 99.47,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 99.47,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact NYC Health summons_number to OATH ticket_number match coverage.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -67,8 +67,8 @@
       "attached_entity_count": 3690,
       "displayed_entity_count": 3690,
       "coverage_percentage": 96.29,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 96.29,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact BBL match coverage; one BBL can attach to more than one cooling-tower system.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -85,8 +85,8 @@
       "attached_entity_count": 3535,
       "displayed_entity_count": 3535,
       "coverage_percentage": 91.68,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 91.68,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact BBL job-filing coverage. A missing DOB NOW match means no matching DOB NOW job filing was returned; it is not evidence that no construction or mechanical work ever occurred.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -103,8 +103,8 @@
       "attached_entity_count": 1748,
       "displayed_entity_count": 1748,
       "coverage_percentage": 49.88,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 49.88,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact BBL registration match coverage. HPD registration applies only to qualifying properties, so low absolute coverage is not itself a failure.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -121,8 +121,8 @@
       "attached_entity_count": 1736,
       "displayed_entity_count": 1736,
       "coverage_percentage": 99.33,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 99.33,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is the share of exact-matched HPD registration BBLs with public contact rows.",
       "status": "HEALTHY",
       "status_reasons": []
