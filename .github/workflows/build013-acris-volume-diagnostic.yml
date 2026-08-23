@@ -42,7 +42,7 @@ jobs:
           PARTIES = '636b-3b5g'
           UA = 'TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)'
           MAX_WORKERS = 6
-          LEGAL_BBL_BATCH = 20
+          LEGAL_BBL_BATCH = 10
           DOCUMENT_BATCH = 150
           PARTY_DOCS_PER_BBL = 12
           RELEVANT_DOC_TYPES = {
@@ -235,7 +235,7 @@ jobs:
           }
           print(json.dumps(result, indent=2))
 
-          assert len(legal_batches) < 200, 'BBL batching did not reduce Legals requests sufficiently'
+          assert len(legal_batches) < 400, 'BBL batching did not reduce Legals requests sufficiently'
           assert len(missing_master) == 0, f'{len(missing_master)} exact Legal document IDs lack Master rows'
           assert len(missing_parties) == 0, f'{len(missing_parties)} selected transaction documents lack Party rows'
           assert result['matched_bbl_count'] > 1000, 'Unexpectedly low full-universe ACRIS exact-BBL coverage'
