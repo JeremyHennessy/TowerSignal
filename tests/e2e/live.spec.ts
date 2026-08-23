@@ -64,7 +64,7 @@ test('hosted TowerSignal loads NYC and NYS data, history, source health and maps
   await expect(page.getByText('Source non-compliant')).toBeVisible()
   await expect(page.getByLabel('NYS registry filters')).toBeVisible()
   await expect(page.locator('.nys-table tbody tr').first()).toBeVisible()
-  await expect(page.locator('.leaflet-container')).toBeVisible()
+  await expect(page.getByLabel('Filtered New York State cooling tower registry map')).toBeVisible()
   await expect(page.getByText(/matching NYS equipment records/)).toBeVisible()
 
   await page.getByRole('button', { name: 'NYS Changes', exact: true }).click()
