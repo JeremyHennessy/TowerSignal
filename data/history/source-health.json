@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T17:42:22.587864Z",
+  "generated_at": "2026-08-23T21:19:12.530914Z",
   "sources": [
     {
       "source_key": "registrations",
@@ -139,8 +139,8 @@
       "attached_entity_count": 6236,
       "displayed_entity_count": 6236,
       "coverage_percentage": 100.0,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 100.0,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is the share of current authoritative NYS extract rows represented by normalized unique Equipment_ID records. Missing coordinates do not remove equipment from the product.",
       "status": "HEALTHY",
       "status_reasons": []
