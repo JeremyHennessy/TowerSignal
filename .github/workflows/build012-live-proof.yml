@@ -1,0 +1,134 @@
+name: Build 012 full live proof
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  prove-build012:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out durable TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build current NYC data
+        run: python scripts/build_data.py --output public/data
+      - name: Build current NYS data
+        run: python scripts/build_nys_data.py --output public/data
+      - name: Build combined source health
+        run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
+      - name: Build current NYC history
+        run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
+      - name: Build first NYS history baseline
+        run: python scripts/build_nys_history.py --output public/data --previous-snapshot .history-store/data/history/nys/latest.json --previous-events .history-store/data/history/nys/events.json
+      - name: Enforce NYC history guard
+        run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
+      - name: Enforce NYS history guard
+        run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
+      - name: Independently verify NYC source sample
+        run: python scripts/verify_live_data.py --sample-size 5
+      - name: Independently verify NYS source sample
+        run: python scripts/verify_live_nys.py --sample-size 7
+      - name: Prove source coverage and silent NYS baseline
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          nys = json.loads(Path('public/data/nys-systems.json').read_text())
+          nys_changes = json.loads(Path('public/data/nys-changes.json').read_text())
+          nys_history = json.loads(Path('public/data/history/nys/latest.json').read_text())
+          nyc_history = json.loads(Path('public/data/history/latest.json').read_text())
+          health = json.loads(Path('public/data/source-health.json').read_text())
+
+          source_rows = int(nys['metadata']['source']['source_record_count'])
+          normalized = int(nys['metadata']['normalized_equipment_count'])
+          represented = len(nys['systems'])
+          nys_health = next(entry for entry in health['sources'] if entry['source_key'] == 'nys_registry')
+          failed = [entry['source_key'] for entry in health['sources'] if entry['status'] == 'FAILED']
+          previous_nys_exists = Path('.history-store/data/history/nys/latest.json').exists()
+          current_nys_events = [
+              event for event in nys_changes.get('events', [])
+              if event.get('detected_at') == nys_changes.get('observed_at')
+          ]
+          summary = {
+              'nys_source_rows': source_rows,
+              'nys_normalized_equipment': normalized,
+              'nys_represented_equipment': represented,
+              'nys_mapped_equipment': nys['summary']['mapped_equipment'],
+              'nys_non_compliant': nys['summary']['non_compliant'],
+              'nys_sample_required': nys['summary']['sample_required'],
+              'nys_disinfection_required': nys['summary']['disinfection_required'],
+              'nys_multi_equipment_properties': nys['summary']['multi_equipment_properties'],
+              'nys_source_health_status': nys_health['status'],
+              'nys_source_health_coverage': nys_health['coverage_percentage'],
+              'previous_nys_history_exists': previous_nys_exists,
+              'nys_baseline_initialized': nys_changes['baseline_initialized'],
+              'nys_new_event_count': nys_changes['new_event_count'],
+              'nys_current_detected_event_count': len(current_nys_events),
+              'nys_history_system_count': len(nys_history['systems']),
+              'nys_history_bytes': Path('public/data/history/nys/latest.json').stat().st_size,
+              'nyc_history_bytes': Path('public/data/history/latest.json').stat().st_size,
+              'failed_source_health_entries': failed,
+          }
+          print(json.dumps(summary, indent=2))
+
+          assert source_rows == normalized == represented, 'Every current NYS source row must be represented by one unique Equipment_ID record'
+          assert source_rows > 5000, 'NYS source unexpectedly small'
+          assert nys['summary']['mapped_equipment'] >= represented - 25, 'Unexpected NYS coordinate coverage collapse'
+          assert nys_health['status'] == 'HEALTHY', f'NYS source health is not healthy: {nys_health}'
+          assert nys_health['coverage_percentage'] == 100.0, 'NYS current source representation is not complete'
+          assert not failed, f'One or more source-health entries failed: {failed}'
+          assert not previous_nys_exists, 'Expected this to be the first persisted NYS history baseline'
+          assert nys_changes['baseline_initialized'] is True, 'First NYS refresh must initialize the baseline'
+          assert nys_changes['new_event_count'] == 0, 'First NYS baseline must emit zero synthetic events'
+          assert not current_nys_events, 'First NYS baseline emitted current change events'
+          assert len(nys_history['systems']) == represented, 'NYS history baseline does not represent the current inventory'
+          assert Path('public/data/history/nys/latest.json').stat().st_size < 8 * 1024 * 1024, 'NYS history exceeds its hard ceiling'
+          assert Path('public/data/history/latest.json').stat().st_size < 25 * 1024 * 1024, 'NYC history exceeds its hard ceiling'
+          PY
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build with full generated data
+        run: npm run build
+      - name: Start production preview
+        run: |
+          npx vite preview --host 127.0.0.1 > /tmp/towersignal-build012-preview.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/TowerSignal/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/towersignal-build012-preview.log
+          exit 1
+      - name: Install hosted-test browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Verify full generated product in Chromium and iPhone WebKit
+        env:
+          BASE_URL: http://127.0.0.1:4173/TowerSignal/
+        run: npx playwright test tests/e2e/live.spec.ts --reporter=list
