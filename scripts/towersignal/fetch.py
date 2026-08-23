@@ -49,31 +49,31 @@ def _iso_from_epoch(value: Any) -> str | None:
     return datetime.fromtimestamp(epoch, tz=timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def fetch_metadata(dataset_id: str) -> dict[str, Any]:
-    metadata = _request_json(f"{API_ROOT}/api/views/{dataset_id}")
+def fetch_metadata(dataset_id: str, api_root: str = API_ROOT) -> dict[str, Any]:
+    metadata = _request_json(f"{api_root}/api/views/{dataset_id}")
     return {
         "name": metadata.get("name") or dataset_id,
         "source_last_updated_at": _iso_from_epoch(metadata.get("rowsUpdatedAt") or metadata.get("dataUpdatedAt")),
     }
 
 
-def fetch_count(dataset_id: str) -> int:
+def fetch_count(dataset_id: str, api_root: str = API_ROOT) -> int:
     query = urlencode({"$select": "count(*) as count"})
-    payload = _request_json(f"{API_ROOT}/resource/{dataset_id}.json?{query}")
+    payload = _request_json(f"{api_root}/resource/{dataset_id}.json?{query}")
     if not payload or "count" not in payload[0]:
         raise SourceFetchError(f"Count query for {dataset_id} returned an unexpected payload")
     return int(payload[0]["count"])
 
 
-def fetch_dataset(dataset_id: str, order_by: str, page_size: int = 50000) -> DatasetSnapshot:
-    expected_count = fetch_count(dataset_id)
-    metadata = fetch_metadata(dataset_id)
+def fetch_dataset(dataset_id: str, order_by: str, page_size: int = 50000, api_root: str = API_ROOT) -> DatasetSnapshot:
+    expected_count = fetch_count(dataset_id, api_root=api_root)
+    metadata = fetch_metadata(dataset_id, api_root=api_root)
     rows: list[dict[str, Any]] = []
     offset = 0
 
     while offset < expected_count:
         query = urlencode({"$limit": page_size, "$offset": offset, "$order": order_by})
-        page = _request_json(f"{API_ROOT}/resource/{dataset_id}.json?{query}")
+        page = _request_json(f"{api_root}/resource/{dataset_id}.json?{query}")
         if not isinstance(page, list):
             raise SourceFetchError(f"Dataset {dataset_id} returned a non-list page at offset {offset}")
         rows.extend(page)
@@ -98,13 +98,14 @@ def fetch_dataset(dataset_id: str, order_by: str, page_size: int = 50000) -> Dat
     )
 
 
-def fetch_where(dataset_id: str, where: str, order_by: str | None = None, select: str | None = None) -> list[dict[str, Any]]:
+def fetch_where(dataset_id: str, where: str, order_by: str | None = None, select: str | None = None,
+                api_root: str = API_ROOT) -> list[dict[str, Any]]:
     params: dict[str, Any] = {"$limit": 50000, "$where": where}
     if order_by:
         params["$order"] = order_by
     if select:
         params["$select"] = select
-    payload = _request_json(f"{API_ROOT}/resource/{dataset_id}.json?{urlencode(params)}")
+    payload = _request_json(f"{api_root}/resource/{dataset_id}.json?{urlencode(params)}")
     if not isinstance(payload, list):
         raise SourceFetchError(f"Filtered query for {dataset_id} returned a non-list payload")
     return payload
