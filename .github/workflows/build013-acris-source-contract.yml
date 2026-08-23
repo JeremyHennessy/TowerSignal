@@ -59,7 +59,6 @@ jobs:
           bbls = sorted({str(row.get('bbl') or '').strip() for row in snapshot.get('systems', []) if str(row.get('bbl') or '').strip().isdigit() and len(str(row.get('bbl') or '').strip()) == 10})
           assert len(bbls) > 2500, f'Unexpected usable BBL count: {len(bbls)}'
 
-          # Deterministic spread across the verified cooling-tower BBL universe.
           sample_size = min(60, len(bbls))
           sample_indexes = sorted({round(i * (len(bbls)-1) / (sample_size-1)) for i in range(sample_size)})
           sample_bbls = [bbls[i] for i in sample_indexes]
@@ -95,7 +94,7 @@ jobs:
           for batch in chunks(document_ids, 75):
               where = 'document_id in (' + ','.join(quoted(value) for value in batch) + ')'
               master_rows.extend(get(f'/resource/{MASTER}.json', {
-                  '$select': 'document_id,record_type,crfn,recorded_borough,doc_type,document_date,document_amt,recorded_datetime,modified_date,reel_yr,reel_nbr,reel_pg,pct_transferred,good_through_date',
+                  '$select': 'document_id,record_type,crfn,recorded_borough,doc_type,document_date,document_amt,recorded_datetime,modified_date,reel_yr,reel_nbr,reel_pg,percent_trans,good_through_date',
                   '$where': where,
                   '$limit': 50000,
                   '$order': 'document_id',
