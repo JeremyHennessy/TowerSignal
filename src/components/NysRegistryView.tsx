@@ -3,7 +3,6 @@ import type { NysSystem, NysSystemsPayload } from '../types/nys'
 import { formatTimestamp } from '../domain/labels'
 import { NysTowerMap } from './NysTowerMap'
 import { NysSystemTable } from './NysSystemTable'
-import { NysDetailPanel } from './NysDetailPanel'
 
 export interface NysFilterState {
   search: string
@@ -74,6 +73,5 @@ export function NysRegistryView({ payload, selected, onSelect }: { payload: NysS
     </section>
 
     <main className="workspace"><NysTowerMap systems={filtered} selectedId={selected?.system_id ?? null} onSelect={id => onSelect(payload.systems.find(row => row.system_id === id) ?? null)} /><NysSystemTable rows={filtered} onSelect={onSelect} /></main>
-    <NysDetailPanel row={selected} metadata={payload.metadata} onClose={() => onSelect(null)} />
   </>
 }
