@@ -1,0 +1,95 @@
+name: Build 012 NYS source contract
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-nys-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inspect authoritative NYS cooling-tower dataset
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+          import json
+          from collections import Counter
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          ROOT = 'https://health.data.ny.gov'
+          DATASET = '24a4-muw7'
+          UA = 'TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)'
+
+          def get(path, params=None):
+              url = ROOT + path
+              if params:
+                  url += '?' + urlencode(params)
+              req = Request(url, headers={'User-Agent': UA, 'Accept': 'application/json'})
+              with urlopen(req, timeout=90) as response:
+                  return json.load(response)
+
+          metadata = get(f'/api/views/{DATASET}')
+          count_payload = get(f'/resource/{DATASET}.json', {'$select': 'count(*) as count'})
+          unique_payload = get(f'/resource/{DATASET}.json', {'$select': 'count(distinct equipment_id) as count'})
+          missing_id = get(f'/resource/{DATASET}.json', {'$select': 'count(*) as count', '$where': "equipment_id is null or equipment_id = ''"})
+          rows = get(f'/resource/{DATASET}.json', {'$limit': 50000, '$order': 'equipment_id'})
+
+          def clean(value):
+              text = str(value or '').strip()
+              return text or None
+
+          ids = [clean(row.get('equipment_id')) for row in rows]
+          id_counts = Counter(value for value in ids if value)
+          duplicate_equipment_ids = {key: value for key, value in id_counts.items() if value > 1}
+
+          fields = [
+              'reg_comp', 'ct_status', 'equipment_last_legionella_test_result',
+              'equipment_tower_operation_duration', 'county'
+          ]
+          distinct = {field: Counter(clean(row.get(field)) for row in rows) for field in fields}
+          missing_coords = sum(1 for row in rows if not clean(row.get('latitude')) or not clean(row.get('longitude')))
+          invalid_coords = 0
+          valid_coords = 0
+          for row in rows:
+              try:
+                  lat = float(str(row.get('latitude')).strip())
+                  lon = float(str(row.get('longitude')).strip())
+              except (TypeError, ValueError, AttributeError):
+                  continue
+              if 40.3 <= lat <= 45.2 and -80.0 <= lon <= -71.5:
+                  valid_coords += 1
+              else:
+                  invalid_coords += 1
+
+          print(json.dumps({
+              'name': metadata.get('name'),
+              'rowsUpdatedAt': metadata.get('rowsUpdatedAt'),
+              'source_row_count': int(count_payload[0]['count']),
+              'fetched_row_count': len(rows),
+              'unique_equipment_id_count': int(unique_payload[0]['count']),
+              'missing_equipment_id_rows': int(missing_id[0]['count']),
+              'equipment_ids_with_multiple_rows': len(duplicate_equipment_ids),
+              'max_rows_per_equipment_id': max(id_counts.values(), default=0),
+              'duplicate_row_excess': sum(value - 1 for value in duplicate_equipment_ids.values()),
+              'missing_coordinate_rows': missing_coords,
+              'valid_nys_coordinate_rows': valid_coords,
+              'out_of_nys_coordinate_rows': invalid_coords,
+              'distinct_values': {
+                  field: [{'value': value, 'count': count} for value, count in counter.most_common()]
+                  for field, counter in distinct.items()
+              },
+              'sample_rows': rows[:5],
+          }, indent=2, default=str))
+
+          assert len(rows) == int(count_payload[0]['count']), 'NYS source pagination/fetch count mismatch'
+          assert int(unique_payload[0]['count']) > 0, 'No NYS equipment identifiers returned'
+          PY
