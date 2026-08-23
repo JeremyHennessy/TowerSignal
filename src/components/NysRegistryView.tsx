@@ -72,6 +72,6 @@ export function NysRegistryView({ payload, selected, onSelect }: { payload: NysS
       </div>
     </section>
 
-    <main className="workspace"><NysTowerMap systems={filtered} selectedId={selected?.system_id ?? null} onSelect={id => onSelect(payload.systems.find(row => row.system_id === id) ?? null)} /><NysSystemTable rows={filtered} onSelect={onSelect} /></main>
+    <section className="workspace"><NysTowerMap systems={filtered} selectedId={selected?.system_id ?? null} onSelect={id => onSelect(payload.systems.find(row => row.system_id === id) ?? null)} /><NysSystemTable rows={filtered} onSelect={onSelect} /></section>
   </>
 }
