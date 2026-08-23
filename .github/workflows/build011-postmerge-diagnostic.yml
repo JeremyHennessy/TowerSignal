@@ -1,0 +1,115 @@
+name: Build 011 post-merge diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce-pages-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out durable TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Fetch, validate and generate current NYC data
+        run: python scripts/build_data.py --output public/data
+      - name: Build and validate source-health coverage
+        run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
+      - name: Build deterministic historical changes
+        run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
+      - name: Validate durable history size and growth
+        run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
+      - name: Independently verify generated systems and OATH cases against current NYC sources
+        run: python scripts/verify_live_data.py --sample-size 5
+      - name: Python fixture tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Summarize generated Build 011 history
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          latest = json.loads(Path('public/data/history/latest.json').read_text())
+          changes = json.loads(Path('public/data/changes.json').read_text())
+          print(json.dumps({
+              'dob_history_initialized': latest.get('dob_history_initialized'),
+              'dob_bbl_count': len(latest.get('dob_by_bbl') or {}),
+              'dob_filing_state_count': sum(len(v) for v in (latest.get('dob_by_bbl') or {}).values()),
+              'history_bytes': Path('public/data/history/latest.json').stat().st_size,
+              'new_dob_events': sum(1 for e in changes.get('events', []) if e.get('detected_at') == changes.get('observed_at') and str(e.get('event_type','')).startswith('DOB_')),
+          }, indent=2))
+          PY
+
+  inspect-live-pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Inspect deployed Build 011 assets and history
+        run: |
+          set -euo pipefail
+          live='https://jeremyhennessy.github.io/TowerSignal/'
+          curl --fail --location --retry 3 -o /tmp/live.html "${live}?diag=${GITHUB_RUN_ID}"
+          js_path="$(grep -oE 'src="[^"]+\.js"' /tmp/live.html | head -1 | sed -E 's/^src="//;s/"$//')"
+          if [[ "$js_path" == /* ]]; then js_url="https://jeremyhennessy.github.io${js_path}"; else js_url="${live}${js_path#./}"; fi
+          curl --fail --location --retry 3 -o /tmp/live.js "${js_url}?diag=${GITHUB_RUN_ID}"
+          if grep -Fq 'DOB project activity' /tmp/live.js; then
+            echo 'Live client contains Build 011 DOB Changes quick-filter text.'
+          else
+            echo 'Live client does NOT contain Build 011 DOB Changes quick-filter text.'
+            exit 21
+          fi
+          curl --fail --location --retry 3 -o /tmp/live-history.json "${live}data/history/latest.json?diag=${GITHUB_RUN_ID}"
+          curl --fail --location --retry 3 -o /tmp/live-changes.json "${live}data/changes.json?diag=${GITHUB_RUN_ID}"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          latest = json.loads(Path('/tmp/live-history.json').read_text())
+          changes = json.loads(Path('/tmp/live-changes.json').read_text())
+          summary = {
+              'dob_history_initialized': latest.get('dob_history_initialized'),
+              'dob_bbl_count': len(latest.get('dob_by_bbl') or {}),
+              'dob_filing_state_count': sum(len(v) for v in (latest.get('dob_by_bbl') or {}).values()),
+              'history_bytes': Path('/tmp/live-history.json').stat().st_size,
+              'observed_at': latest.get('observed_at'),
+              'changes_observed_at': changes.get('observed_at'),
+          }
+          print(json.dumps(summary, indent=2))
+          assert latest.get('dob_history_initialized') is True, 'Live history is not Build 011 DOB-aware'
+          assert len(latest.get('dob_by_bbl') or {}) > 0, 'Live Build 011 DOB baseline is empty'
+          PY
+      - name: Install hosted-test browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Verify deployed site in desktop and iPhone browser contexts
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
