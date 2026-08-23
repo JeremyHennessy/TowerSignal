@@ -1,0 +1,64 @@
+name: Build 012 persistence artifact diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create production-shaped synthetic history state
+        run: |
+          mkdir -p public/data/history/nys
+          printf 'nyc-latest\n' > public/data/history/latest.json
+          printf 'nyc-events\n' > public/data/history/events.json
+          printf 'nys-latest\n' > public/data/history/nys/latest.json
+          printf 'nys-events\n' > public/data/history/nys/events.json
+          printf 'source-health\n' > public/data/source-health.json
+      - name: Upload exact production history path set
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-history-state-diagnostic
+          path: |
+            public/data/history/latest.json
+            public/data/history/events.json
+            public/data/history/nys/latest.json
+            public/data/history/nys/events.json
+            public/data/source-health.json
+          retention-days: 1
+
+  verify-download-layout:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download exact production-shaped artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-history-state-diagnostic
+          path: .verified-history
+      - name: Print and verify extracted tree
+        run: |
+          find .verified-history -type f -print | sort
+          test -f .verified-history/history/latest.json
+          test -f .verified-history/history/events.json
+          test -f .verified-history/history/nys/latest.json
+          test -f .verified-history/history/nys/events.json
+          test -f .verified-history/source-health.json
+      - name: Reproduce production persistence copies
+        run: |
+          mkdir -p data/history/nys
+          cp .verified-history/history/latest.json data/history/latest.json
+          cp .verified-history/history/events.json data/history/events.json
+          cp .verified-history/history/nys/latest.json data/history/nys/latest.json
+          cp .verified-history/history/nys/events.json data/history/nys/events.json
+          cp .verified-history/source-health.json data/history/source-health.json
+          test "$(cat data/history/latest.json)" = 'nyc-latest'
+          test "$(cat data/history/events.json)" = 'nyc-events'
+          test "$(cat data/history/nys/latest.json)" = 'nys-latest'
+          test "$(cat data/history/nys/events.json)" = 'nys-events'
+          test "$(cat data/history/source-health.json)" = 'source-health'
