@@ -1,5 +1,6 @@
 import type { SystemDetail, SystemsPayload } from '../types/data'
 import type { ChangesPayload } from '../types/history'
+import type { NysChangesPayload, NysSystemsPayload } from '../types/nys'
 
 const base = import.meta.env.BASE_URL
 
@@ -16,6 +17,22 @@ export async function loadChanges(): Promise<ChangesPayload> {
   if (!response.ok) throw new Error(`TowerSignal history request failed: HTTP ${response.status}`)
   const payload = await response.json() as ChangesPayload
   if (!payload?.history_started_at || !Array.isArray(payload?.events)) throw new Error('TowerSignal history dataset is malformed')
+  return payload
+}
+
+export async function loadNysSystems(): Promise<NysSystemsPayload> {
+  const response = await fetch(`${base}data/nys-systems.json`, { cache: 'no-store' })
+  if (!response.ok) throw new Error(`TowerSignal NYS registry request failed: HTTP ${response.status}`)
+  const payload = await response.json() as NysSystemsPayload
+  if (!payload?.metadata || !Array.isArray(payload?.systems)) throw new Error('TowerSignal NYS registry dataset is malformed')
+  return payload
+}
+
+export async function loadNysChanges(): Promise<NysChangesPayload> {
+  const response = await fetch(`${base}data/nys-changes.json`, { cache: 'no-store' })
+  if (!response.ok) throw new Error(`TowerSignal NYS history request failed: HTTP ${response.status}`)
+  const payload = await response.json() as NysChangesPayload
+  if (!payload?.history_started_at || !Array.isArray(payload?.events)) throw new Error('TowerSignal NYS history dataset is malformed')
   return payload
 }
 
