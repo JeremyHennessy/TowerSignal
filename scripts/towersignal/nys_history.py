@@ -99,7 +99,7 @@ def build_history(current_observations: list[dict[str, Any]], detected_at: str,
             if previous is None:
                 new_events.append(_event(
                     "NYS_EQUIPMENT_FIRST_SEEN", current, detected_at, None,
-                    {"present_in_snapshot": True}, current.get("latest_sample_date"),
+                    {"present_in_snapshot": True}, None,
                 ))
             else:
                 new_events.extend(detect_changes(previous, current, detected_at))
