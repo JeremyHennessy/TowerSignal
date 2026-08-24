@@ -23,7 +23,7 @@ class AcrisVerifierTests(unittest.TestCase):
             },
             {
                 "document_id": "D2",
-                "bbl": "2000020002",
+                "bbl": "2000200002",
                 "doc_type": "MTGE",
                 "recorded_date": "2026-08-02",
                 "parties": [{"party_type": "2", "name": "LENDER LLC"}],
@@ -32,7 +32,7 @@ class AcrisVerifierTests(unittest.TestCase):
         cache = {
             "properties": {
                 "1000010001": {"documents": [documents[0]]},
-                "2000020002": {"documents": [documents[1]]},
+                "2000200002": {"documents": [documents[1]]},
             }
         }
         calls = []
