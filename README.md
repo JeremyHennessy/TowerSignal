@@ -22,9 +22,11 @@ See [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) for the canonical current s
 
 - Commercial redesign merge: `8d7911aab60b6521891398efc5a2957247218ceb` (PR #44).
 - Responsive production correction: `a773dcbca9a7c038408f7f990a9c567db65be813` (PR #52).
-- Hosted-test-only correction currently on `main`: `dfec21e063c75f077b33879044113515d89e11ff` (PR #54).
-- The product/UI code in `dfec21e...` is the same as `a773dcb...`; PR #54 changes hosted-test expectations only.
-- **Approval status:** the corrected commercial UI code is still treated as a candidate baseline until the exact post-correction GitHub Pages workflow completes build, deployment, desktop Chromium verification, iPhone/WebKit verification and history persistence.
+- Hosted-test-only correction on verified `main`: `dfec21e063c75f077b33879044113515d89e11ff` (PR #54).
+- **Approved UI code baseline:** `a773dcbca9a7c038408f7f990a9c567db65be813`.
+- **Verified production descendant:** `dfec21e063c75f077b33879044113515d89e11ff`.
+- **Approval checkpoint:** 2026-08-24 16:17 America/Moncton, after Pages run `32766611745` passed current NYC/NYS generation, source health, both history guards, independent NYC/NYS source verification, Python/frontend/build gates, Pages deployment, desktop Chromium, iPhone/WebKit and post-verification history persistence.
+- **Approved visual/product state:** Prospect / Monitor / Map / NYS Market / NYS Changes commercial workspace, including the responsive corrections from PR #52. PR #54 changes hosted-test expectations only, so the approved UI code itself remains `a773dcb...`.
 - Known deployment-infrastructure issue: repository Pages configuration is still legacy branch publishing (`main` `/`) even though TowerSignal uses a custom Actions Pages artifact workflow. See issue #53. This can temporarily expose raw repository source between a push and the custom artifact deployment.
 
 Do not describe a merge, a CI pass or a successful deploy step alone as a verified production baseline. TowerSignal considers a release verified only after the hosted browser gate passes.
