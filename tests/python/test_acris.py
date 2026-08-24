@@ -4,12 +4,16 @@ import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.acris import (
     ACRIS_CACHE_SCHEMA_VERSION,
+    MASTER_DATASET_ID,
+    AcrisError,
+    _metadata,
     browser_property_context,
     canonical_master,
     normalize_document,
@@ -21,6 +25,18 @@ from towersignal.acris import (
 
 
 class AcrisTests(unittest.TestCase):
+    def test_metadata_enrichment_is_nonfatal_when_legacy_view_endpoint_times_out(self):
+        with patch("towersignal.acris._request_json", side_effect=AcrisError("timed out")) as request:
+            metadata = _metadata(MASTER_DATASET_ID)
+
+        request.assert_called_once()
+        _, kwargs = request.call_args
+        self.assertEqual(kwargs, {"attempts": 2, "timeout": 15})
+        self.assertEqual(metadata["name"], MASTER_DATASET_ID)
+        self.assertIsNone(metadata["source_last_updated_at"])
+        self.assertEqual(metadata["metadata_status"], "UNAVAILABLE")
+        self.assertIn("timed out", metadata["metadata_error"])
+
     def test_canonical_master_prefers_latest_recorded_then_modified_row(self):
         rows = [
             {"document_id": "D1", "recorded_datetime": "2026-01-01T00:00:00", "modified_date": "2026-01-02T00:00:00", "record_type": "A"},
