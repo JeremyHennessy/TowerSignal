@@ -1,0 +1,39 @@
+name: Diagnostic UI redesign live closeout
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ui-redesign-live-closeout.yml'
+      - 'tests/e2e/redesign-live.spec.ts'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-redesign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium and WebKit
+        run: npx playwright install --with-deps chromium webkit
+      - name: Verify live commercial workspace
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/redesign-live.spec.ts --project=desktop-chromium --project=iphone
+      - name: Upload live verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-redesign-live-closeout
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: warn
+          retention-days: 14
