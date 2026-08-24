@@ -7,6 +7,12 @@ const PAGE_SIZE = 50
 
 type SortKey = 'priority_score' | 'address' | 'active_equipment' | 'days_since_latest_sample' | 'latest_inspection_date' | 'oath_case_count'
 
+function priorityBand(score: number): string {
+  if (score >= 70) return 'high'
+  if (score >= 40) return 'medium'
+  return 'low'
+}
+
 export function SystemTable({ rows, onSelect }: { rows: SystemSummary[]; onSelect: (row: SystemSummary) => void }) {
   const [page, setPage] = useState(0)
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'priority_score', dir: 'desc' })
@@ -20,12 +26,18 @@ export function SystemTable({ rows, onSelect }: { rows: SystemSummary[]; onSelec
   const visible = sorted.slice(activePage * PAGE_SIZE, activePage * PAGE_SIZE + PAGE_SIZE)
   const changeSort = (key: SortKey) => setSort(current => current.key === key ? { key, dir: current.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: key === 'priority_score' ? 'desc' : 'asc' })
 
-  return <div className="table-card">
+  return <div className="table-card account-table-card">
     <div className="table-heading"><div><strong>{rows.length.toLocaleString()}</strong> matching systems</div><div>Showing {visible.length ? activePage * PAGE_SIZE + 1 : 0}–{Math.min((activePage + 1) * PAGE_SIZE, rows.length)}</div></div>
-    {rows.length === 0 ? <div className="empty-state">No systems match the active filters.</div> : <div className="table-scroll"><table><thead><tr>
-      <th><button onClick={() => changeSort('priority_score')}>Priority</button></th><th>Signal</th><th><button onClick={() => changeSort('address')}>Address</button></th><th>Borough / ZIP</th><th>System ID</th><th><button onClick={() => changeSort('active_equipment')}>Equipment</button></th><th><button onClick={() => changeSort('days_since_latest_sample')}>Latest sample</button></th><th><button onClick={() => changeSort('latest_inspection_date')}>NYC Health inspection</button></th><th>Violation</th><th><button onClick={() => changeSort('oath_case_count')}>OATH</button></th><th>Evidence</th>
+    {rows.length === 0 ? <div className="empty-state"><strong>No accounts match these filters.</strong><span>Try widening the territory, timing signal or priority criteria.</span></div> : <div className="table-scroll"><table className="account-table"><thead><tr>
+      <th><button onClick={() => changeSort('address')}>Account</button></th><th><button onClick={() => changeSort('priority_score')}>Priority</button></th><th>Timing signal</th><th>Contact</th><th><button onClick={() => changeSort('days_since_latest_sample')}>Sampling</button></th><th><button onClick={() => changeSort('oath_case_count')}>Activity</button></th><th>Evidence</th><th aria-label="Open account" />
     </tr></thead><tbody>{visible.map(row => <tr key={row.system_id} onClick={() => onSelect(row)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') onSelect(row) }}>
-      <td><span className="score">{row.priority_score}</span></td><td><span className={`signal signal-${row.primary_signal.toLowerCase()}`}>{signalLabel(row.primary_signal)}</span></td><td>{row.address ?? 'Address unavailable'}</td><td>{row.borough ?? '—'}<small>{row.zip ?? '—'}</small></td><td className="mono">{row.system_id}</td><td>{row.active_equipment}</td><td>{formatDate(row.latest_sample_date)}<small>{row.days_since_latest_sample == null ? 'No usable date' : `${row.days_since_latest_sample} days ago`}</small></td><td>{formatDate(row.latest_inspection_date)}<small>{row.latest_inspection_type ?? '—'}</small></td><td>{row.confirmed_violation ? 'Confirmed record' : 'None recorded'}</td><td>{(row.oath_case_count ?? 0) > 0 ? `${row.oath_case_count} exact match${row.oath_case_count === 1 ? '' : 'es'}` : '—'}</td><td><StatusBadge value={row.evidence_confidence} /></td>
+      <td className="account-cell"><strong>{row.address ?? 'Address unavailable'}</strong><span>{row.borough ?? '—'} · {row.zip ?? '—'}</span><small className="mono">{row.system_id} · {row.active_equipment} active unit{row.active_equipment === 1 ? '' : 's'}</small></td>
+      <td><div className={`priority-indicator priority-${priorityBand(row.priority_score)}`}><strong>{row.priority_score}</strong><span><i style={{ width:`${Math.max(4, row.priority_score)}%` }} /></span></div></td>
+      <td><span className={`signal signal-${row.primary_signal.toLowerCase()}`}>{signalLabel(row.primary_signal)}</span>{row.confirmed_violation && <small className="urgent-copy">Confirmed record</small>}</td>
+      <td>{(row.hpd_contact_count ?? 0) > 0 ? <span className="contact-ready">✓ {row.hpd_contact_count} HPD contact{row.hpd_contact_count === 1 ? '' : 's'}</span> : <span className="muted-copy">No matched contact</span>}</td>
+      <td>{formatDate(row.latest_sample_date)}<small>{row.days_since_latest_sample == null ? 'No usable date' : `${row.days_since_latest_sample} days ago`}</small></td>
+      <td><div className="activity-stack">{(row.oath_case_count ?? 0) > 0 && <span>OATH · {row.oath_case_count}</span>}{(row.dob_recent_activity_count ?? 0) > 0 && <span>DOB · {row.dob_recent_activity_count}</span>}{(row.oath_case_count ?? 0) === 0 && (row.dob_recent_activity_count ?? 0) === 0 && <span className="muted-copy">No recent match</span>}</div></td>
+      <td><StatusBadge value={row.evidence_confidence} /></td><td className="row-arrow">›</td>
     </tr>)}</tbody></table></div>}
     <div className="pagination"><button disabled={activePage === 0} onClick={() => setPage(p => Math.max(0,p-1))}>Previous</button><span>Page {activePage + 1} of {maxPage + 1}</span><button disabled={activePage === maxPage} onClick={() => setPage(p => Math.min(maxPage,p+1))}>Next</button></div>
   </div>

@@ -85,13 +85,13 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals())
 
-test('renders the real-data dashboard shell after dataset load', async () => {
+test('renders the commercial account-intelligence dashboard after dataset load', async () => {
   render(<App />)
-  expect(await screen.findByText('Find cooling-tower systems worth investigating today.')).toBeInTheDocument()
+  expect(await screen.findByText('Know which cooling-tower accounts deserve attention now.')).toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '2 matching systems')).toBeInTheDocument()
-  expect(screen.getByText('Systems with OATH cases')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name:'Changes' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name:'NYS Registry' })).toBeInTheDocument()
+  expect(screen.getByText('New OATH activity')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name:'Monitor' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name:'NYS Market' })).toBeInTheDocument()
 })
 
 test('filters records and opens details with DOB project history', async () => {
@@ -135,23 +135,23 @@ test('OATH quick filter returns only exact-matched systems', async () => {
   expect(screen.getByText((_, element) => element?.textContent === '1 matching systems')).toBeInTheDocument()
 })
 
-test('opens the Changes product mode with source-backed change evidence', async () => {
+test('opens the Monitor product mode with source-backed change evidence', async () => {
   const user = userEvent.setup()
   render(<App />)
   await screen.findByText('10 ALPHA ST')
-  await user.click(screen.getByRole('button', { name:'Changes' }))
-  expect(screen.getByRole('heading', { name:'What changed?' })).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name:'Monitor' }))
+  expect(screen.getByRole('heading', { name:'What changed since the last observation?' })).toBeInTheDocument()
   expect(screen.getAllByText('New public sample reported')).toHaveLength(2)
   expect(screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')).toBeInTheDocument()
   expect(screen.getByText('Evidence: SYSTEM_ID_EXACT')).toBeInTheDocument()
 })
 
-test('opens the NYS Registry mode without NYC score semantics', async () => {
+test('opens the NYS Market mode without NYC score semantics', async () => {
   const user = userEvent.setup()
   render(<App />)
   await screen.findByText('10 ALPHA ST')
-  await user.click(screen.getByRole('button', { name:'NYS Registry' }))
-  expect(screen.getByRole('heading', { name:'Statewide cooling-tower registry intelligence without projecting NYC rules.' })).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name:'NYS Market' }))
+  expect(screen.getByRole('heading', { name:'New York State registry intelligence' })).toBeInTheDocument()
   expect(screen.getByText('Source non-compliant')).toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '2 matching NYS equipment records')).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name:'Non-compliant' }))
@@ -164,7 +164,7 @@ test('opens NYS Changes and shows Equipment_ID-exact evidence', async () => {
   render(<App />)
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'NYS Changes' }))
-  expect(screen.getByRole('heading', { name:'What changed in the statewide registry?' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name:'New York State registry changes' })).toBeInTheDocument()
   expect(screen.getAllByText('NYS cooling-tower status changed')).toHaveLength(2)
   expect(screen.getByText('Evidence: EQUIPMENT_ID_EXACT')).toBeInTheDocument()
 })
