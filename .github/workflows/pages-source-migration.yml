@@ -1,0 +1,35 @@
+name: Diagnostic migrate Pages source to workflow
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/pages-source-migration.yml'
+
+permissions:
+  contents: read
+  pages: write
+
+jobs:
+  migrate-pages-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify legacy source and switch to workflow publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          before="$(gh api "repos/${GITHUB_REPOSITORY}/pages")"
+          echo "$before" | jq '{build_type,source,status,html_url,https_enforced}'
+          build_type="$(echo "$before" | jq -r '.build_type')"
+          if [ "$build_type" = "workflow" ]; then
+            echo 'Pages is already configured for workflow publishing.'
+            exit 0
+          fi
+          [ "$build_type" = "legacy" ] || { echo "Unexpected Pages build_type: $build_type" >&2; exit 1; }
+          [ "$(echo "$before" | jq -r '.source.branch')" = "main" ] || { echo 'Unexpected legacy source branch' >&2; exit 1; }
+          [ "$(echo "$before" | jq -r '.source.path')" = "/" ] || { echo 'Unexpected legacy source path' >&2; exit 1; }
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow
+          after="$(gh api "repos/${GITHUB_REPOSITORY}/pages")"
+          echo "$after" | jq '{build_type,source,status,html_url,https_enforced}'
+          [ "$(echo "$after" | jq -r '.build_type')" = "workflow" ] || { echo 'Pages did not switch to workflow publishing' >&2; exit 1; }
