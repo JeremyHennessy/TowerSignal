@@ -1,0 +1,86 @@
+name: Diagnostic ACRIS metadata endpoint
+
+on:
+  pull_request:
+    branches: [agent/build013-commercial-reconcile]
+    paths:
+      - '.github/workflows/acris-metadata-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compare ACRIS metadata and resource endpoint responsiveness
+        run: |
+          python - <<'PY'
+          import json
+          import time
+          from urllib.request import Request, urlopen
+
+          ROOT = 'https://data.cityofnewyork.us'
+          UA = 'TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)'
+          DATASETS = [
+              ('master', 'bnx9-e6tj', 3),
+              ('legals', '8h5j-fqxa', 1),
+              ('parties', '636b-3b5g', 1),
+          ]
+
+          def probe(label, url, repetitions, timeout=30):
+              results = []
+              for index in range(repetitions):
+                  started = time.monotonic()
+                  try:
+                      req = Request(url, headers={'User-Agent': UA, 'Accept': 'application/json'})
+                      with urlopen(req, timeout=timeout) as response:
+                          payload = response.read()
+                          results.append({
+                              'attempt': index + 1,
+                              'ok': True,
+                              'status': getattr(response, 'status', None),
+                              'seconds': round(time.monotonic() - started, 2),
+                              'bytes': len(payload),
+                          })
+                  except Exception as exc:
+                      results.append({
+                          'attempt': index + 1,
+                          'ok': False,
+                          'seconds': round(time.monotonic() - started, 2),
+                          'error_type': type(exc).__name__,
+                          'error': str(exc),
+                      })
+              print(json.dumps({'probe': label, 'url': url, 'results': results}, indent=2))
+              return results
+
+          report = {}
+          for name, dataset_id, repetitions in DATASETS:
+              report[f'{name}_metadata'] = probe(
+                  f'{name}_metadata',
+                  f'{ROOT}/api/views/{dataset_id}',
+                  repetitions,
+              )
+              report[f'{name}_resource'] = probe(
+                  f'{name}_resource',
+                  f'{ROOT}/resource/{dataset_id}.json?$limit=1',
+                  repetitions,
+              )
+
+          master_meta_ok = sum(1 for item in report['master_metadata'] if item['ok'])
+          master_resource_ok = sum(1 for item in report['master_resource'] if item['ok'])
+          classification = (
+              'METADATA_ENDPOINT_SPECIFIC' if master_meta_ok < master_resource_ok
+              else 'NOT_METADATA_SPECIFIC'
+          )
+          print(json.dumps({
+              'classification': classification,
+              'master_metadata_successes': master_meta_ok,
+              'master_resource_successes': master_resource_ok,
+          }, indent=2))
+          PY
