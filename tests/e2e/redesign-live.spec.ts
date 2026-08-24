@@ -26,7 +26,7 @@ const expectContained = async (page: import('@playwright/test').Page) => {
   expect(diagnostic.bodyScrollWidth, `Horizontal overflow diagnostic:\n${JSON.stringify(diagnostic, null, 2)}`).toBeLessThanOrEqual(viewportWidth + 2)
 }
 
-test('commercial workspace is live and functional with isolated responsive candidates', async ({ page }, testInfo) => {
+test('commercial workspace is live and functional natively', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
@@ -40,17 +40,6 @@ test('commercial workspace is live and functional with isolated responsive candi
 
   await page.goto('./', { waitUntil: 'networkidle' })
 
-  // Diagnostic-only overrides. These are injected into the live DOM so the two smallest
-  // CSS corrections can be proven before any production stylesheet is changed.
-  await page.addStyleTag({ content: `
-    @media (min-width:1201px) {
-      .page-section .workspace { grid-template-columns:minmax(0,.78fr) minmax(0,1.4fr); }
-    }
-    @media (max-width:430px) {
-      .side-nav nav button:nth-of-type(4), .side-nav nav button:nth-of-type(5) { display:flex; }
-    }
-  ` })
-
   await expect(page.getByRole('button', { name: 'Prospect', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Monitor', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Map', exact: true })).toBeVisible()
@@ -60,8 +49,9 @@ test('commercial workspace is live and functional with isolated responsive candi
   await expect(page.getByLabel('Lead filters')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Sales-ready accounts' })).toBeVisible()
   await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
-  await expect(page.getByText(/sources healthy/)).toBeVisible()
+  await expect(page.getByText(/NYC Cooling Tower Registrations · HEALTHY/)).toBeVisible()
   await expect(page.getByText(/ · FAILED · /)).toHaveCount(0)
+  await expectContained(page)
   await page.screenshot({ path: testInfo.outputPath(`prospect-${testInfo.project.name}.png`), fullPage: true })
 
   const before = await page.locator('.account-table tbody tr').count()
