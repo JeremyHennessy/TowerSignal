@@ -14,7 +14,7 @@ test('hosted TowerSignal loads NYC and NYS data, history, source health, ACRIS t
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
   await expect(page.getByText('Registered systems')).toBeVisible()
   await expect(page.getByText('Systems with OATH cases')).toBeVisible()
-  await expect(page.getByText('Recent ACRIS activity', { exact: true })).toBeVisible()
+  await expect(page.locator('.kpis').getByText('Recent ACRIS activity', { exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Recent ACRIS activity' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'ACRIS activity' })).toBeVisible()
   await expect(page.getByText(/Source health \d+\/\d+ healthy/)).toBeVisible()
