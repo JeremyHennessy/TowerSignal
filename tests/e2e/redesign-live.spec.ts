@@ -84,7 +84,12 @@ test('commercial workspace is live and functional natively', async ({ page }, te
   await page.getByRole('button', { name: 'Map', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Explore the current opportunity set geographically.' })).toBeVisible()
   await expect(page.locator('.leaflet-container')).toBeVisible()
-  await expect(page.getByText('matching accounts', { exact: true })).toBeVisible()
+  const mapSummary = page.getByText('matching accounts', { exact: true })
+  if ((page.viewportSize()?.width ?? 0) > 1200) {
+    await expect(mapSummary).toBeVisible()
+  } else {
+    await expect(mapSummary).toBeHidden()
+  }
   await expectContained(page)
 
   await page.getByRole('button', { name: 'NYS Market', exact: true }).click()
