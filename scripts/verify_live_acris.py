@@ -5,6 +5,7 @@ import hashlib
 import json
 import sys
 import time
+from collections import defaultdict
 from http.client import IncompleteRead
 from pathlib import Path
 from typing import Any
@@ -65,39 +66,68 @@ def verify(cache_path: Path, sample_size: int) -> None:
     if len(selected) < sample_size:
         raise RuntimeError(f"ACRIS verifier could only select {len(selected)} documents")
 
+    document_ids = [str(cached["document_id"]) for _, _, cached in selected]
+    where = "document_id in (" + ",".join(quote(document_id) for document_id in document_ids) + ")"
+
+    master_rows = request_rows(
+        MASTER_DATASET_ID,
+        where,
+        "document_id,doc_type,recorded_datetime,document_amt,percent_trans",
+    )
+    legal_rows = request_rows(
+        LEGALS_DATASET_ID,
+        where,
+        "document_id,borough,block,lot",
+    )
+    party_rows = request_rows(
+        PARTIES_DATASET_ID,
+        where,
+        "document_id,party_type,name",
+    )
+
+    master_by_document: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in master_rows:
+        master_by_document[str(row.get("document_id") or "")].append(row)
+
+    legal_bbls_by_document: dict[str, set[str]] = defaultdict(set)
+    for row in legal_rows:
+        document_id = str(row.get("document_id") or "")
+        if bbl := bbl_from_legal(row):
+            legal_bbls_by_document[document_id].add(bbl)
+
+    party_pairs_by_document: dict[str, set[tuple[str, str]]] = defaultdict(set)
+    for row in party_rows:
+        document_id = str(row.get("document_id") or "")
+        party_pairs_by_document[document_id].add(
+            (str(row.get("party_type") or ""), str(row.get("name") or "").strip())
+        )
+
     verified = []
     for _, bbl, cached in selected:
         document_id = str(cached["document_id"])
-        master_rows = request_rows(
-            MASTER_DATASET_ID,
-            f"document_id = {quote(document_id)}",
-            "document_id,doc_type,recorded_datetime,document_amt,percent_trans",
-        )
-        if not master_rows:
+        document_master_rows = master_by_document.get(document_id, [])
+        if not document_master_rows:
             raise RuntimeError(f"ACRIS Master no longer returns cached document {document_id}")
         cached_type = str(cached.get("doc_type") or "")
         cached_recorded = cached.get("recorded_date")
-        if not any(str(row.get("doc_type") or "") == cached_type and normalize_date(row.get("recorded_datetime")) == cached_recorded for row in master_rows):
+        if not any(
+            str(row.get("doc_type") or "") == cached_type
+            and normalize_date(row.get("recorded_datetime")) == cached_recorded
+            for row in document_master_rows
+        ):
             raise RuntimeError(f"ACRIS Master values no longer reproduce cached document {document_id}")
 
-        legal_rows = request_rows(
-            LEGALS_DATASET_ID,
-            f"document_id = {quote(document_id)}",
-            "document_id,borough,block,lot",
-        )
-        if bbl not in {value for row in legal_rows if (value := bbl_from_legal(row)) is not None}:
+        if bbl not in legal_bbls_by_document.get(document_id, set()):
             raise RuntimeError(f"ACRIS Legals no longer reproduces exact BBL {bbl} for document {document_id}")
 
         cached_parties = cached.get("parties") or []
-        party_rows = request_rows(
-            PARTIES_DATASET_ID,
-            f"document_id = {quote(document_id)}",
-            "document_id,party_type,name",
-        )
-        if cached_parties and not party_rows:
+        cached_party_pairs = {
+            (str(row.get("party_type") or ""), str(row.get("name") or "").strip())
+            for row in cached_parties
+        }
+        live_party_pairs = party_pairs_by_document.get(document_id, set())
+        if cached_party_pairs and not live_party_pairs:
             raise RuntimeError(f"ACRIS Parties no longer returns cached party evidence for document {document_id}")
-        cached_party_pairs = {(str(row.get("party_type") or ""), str(row.get("name") or "").strip()) for row in cached_parties}
-        live_party_pairs = {(str(row.get("party_type") or ""), str(row.get("name") or "").strip()) for row in party_rows}
         if cached_party_pairs and not (cached_party_pairs & live_party_pairs):
             raise RuntimeError(f"ACRIS Parties no longer reproduces cached party evidence for document {document_id}")
         verified.append({"bbl": bbl, "document_id": document_id, "doc_type": cached_type, "recorded_date": cached_recorded})
