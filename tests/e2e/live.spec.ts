@@ -54,7 +54,12 @@ test('hosted TowerSignal commercial workspace is functional across NYC and NYS m
     await page.getByRole('button', { name: 'Close details' }).click()
   } else {
     await expect(acrisSelect).toBeDisabled()
-    await expect(page.getByText('ACRIS timing unavailable', { exact: true })).toBeVisible()
+    const unavailableChip = page.getByText('ACRIS timing unavailable', { exact: true })
+    if (testInfo.project.name === 'desktop-chromium') {
+      await expect(unavailableChip).toBeVisible()
+    } else {
+      await expect(unavailableChip).toBeHidden()
+    }
   }
 
   const before = await page.locator('.account-table tbody tr').count()
