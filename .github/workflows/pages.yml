@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      require_acris:
+        description: Require a verified ACRIS cache in the deployed product
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: '17 10 * * *'
 
@@ -28,6 +34,13 @@ jobs:
           path: .history-store
           fetch-depth: 1
           sparse-checkout: data/history
+      - name: Check out last verified ACRIS cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-acris
+          path: .acris-store
+          fetch-depth: 1
+          sparse-checkout: data/acris
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -38,10 +51,38 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
+      - name: Attach last verified ACRIS timing cache
+        run: python scripts/attach_acris.py --output public/data --cache .acris-store/data/acris/cache.json
+      - name: Validate verified ACRIS cache when present
+        if: ${{ hashFiles('.acris-store/data/acris/cache.json') != '' }}
+        run: python scripts/validate_acris_cache.py --cache .acris-store/data/acris/cache.json --max-age-days 30 --require-production-volume
+      - name: Require attached verified ACRIS cache when requested
+        if: ${{ inputs.require_acris }}
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          cache_path = Path('.acris-store/data/acris/cache.json')
+          if not cache_path.exists():
+              raise SystemExit('Required verified ACRIS cache is missing from data/towersignal-acris')
+          payload = json.loads(Path('public/data/systems.json').read_text(encoding='utf-8'))
+          metadata = payload.get('metadata') or {}
+          if metadata.get('acris_cache_available') is not True:
+              raise SystemExit('Required ACRIS cache did not attach to the generated product')
+          if metadata.get('acris_cache_universe_aligned') is not True:
+              raise SystemExit('Required ACRIS cache is not aligned to the current TowerSignal BBL universe')
+          print(json.dumps({
+              'acris_cache_generated_at': metadata.get('acris_cache_generated_at'),
+              'acris_matched_bbl_count': metadata.get('acris_matched_bbl_count'),
+              'acris_matched_document_count': metadata.get('acris_matched_document_count'),
+          }, indent=2))
+          PY
       - name: Fetch, validate and generate current NYS registry data
         run: python scripts/build_nys_data.py --output public/data
       - name: Build and validate source-health coverage
         run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
+      - name: Attach ACRIS cache health and freshness
+        run: python scripts/attach_acris_health.py --output public/data
       - name: Build deterministic NYC historical changes
         run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
       - name: Build deterministic NYS historical changes
@@ -112,6 +153,7 @@ jobs:
       - name: Verify deployed site in desktop and iPhone browser contexts
         env:
           BASE_URL: ${{ needs.deploy.outputs.page_url }}
+          REQUIRE_ACRIS: ${{ inputs.require_acris }}
         run: npm run test:e2e
       - name: Upload browser verification report
         if: always()

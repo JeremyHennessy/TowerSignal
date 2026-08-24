@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+const requireAcris = process.env.REQUIRE_ACRIS === 'true'
+
 const expectContained = async (page: import('@playwright/test').Page) => {
   const viewportWidth = page.viewportSize()?.width ?? 0
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
@@ -31,7 +33,29 @@ test('hosted TowerSignal commercial workspace is functional across NYC and NYS m
   await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
   await expect(page.getByText(/NYC Cooling Tower Registrations · HEALTHY/)).toBeVisible()
   await expect(page.getByText(/ · FAILED · /)).toHaveCount(0)
+  await expect(page.getByText('Recent ACRIS activity', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('ACRIS recorded activity')).toBeVisible()
   await expectContained(page)
+
+  const acrisQuick = page.getByRole('button', { name: 'Recent ACRIS activity', exact: true })
+  const acrisSelect = page.getByLabel('ACRIS recorded activity')
+  const acrisAvailable = await acrisQuick.count() > 0
+  if (requireAcris) expect(acrisAvailable, 'Required ACRIS deployment did not expose the verified cache').toBe(true)
+  if (acrisAvailable) {
+    await expect(acrisSelect).toBeEnabled()
+    await acrisQuick.click()
+    await expect(page.getByLabel('Active filters')).toContainText('ACRIS activity: Yes')
+    await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
+    await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
+    await page.locator('.account-table tbody tr').first().click()
+    await expect(page.getByRole('heading', { name: 'ACRIS property activity', exact: true })).toBeVisible()
+    await expect(page.getByText(/relevant recorded document/)).toBeVisible()
+    await expect(page.getByText(/ACRIS is joined by exact borough\/block\/lot BBL and exact document ID only/)).toBeVisible()
+    await page.getByRole('button', { name: 'Close details' }).click()
+  } else {
+    await expect(acrisSelect).toBeDisabled()
+    await expect(page.getByText('ACRIS timing unavailable', { exact: true })).toBeVisible()
+  }
 
   const before = await page.locator('.account-table tbody tr').count()
   await page.getByRole('button', { name: 'Manhattan', exact: true }).click()
@@ -51,6 +75,7 @@ test('hosted TowerSignal commercial workspace is functional across NYC and NYS m
   await expect(page.getByText('OATH penalty imposed')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'OATH case lifecycle', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'ACRIS property activity', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'TowerSignal History', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
