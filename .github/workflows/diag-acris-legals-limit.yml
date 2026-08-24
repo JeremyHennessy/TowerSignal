@@ -1,0 +1,97 @@
+name: Diagnostic ACRIS Legals verifier query limit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/diag-acris-legals-limit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  compare-legals-query-limits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compare exact-document Legals queries
+        run: |
+          python - <<'PY'
+          import json
+          import time
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          dataset_id = '8h5j-fqxa'
+          document_ids = [
+              '2026030300971006',
+              '2025122900744008',
+              '2026031800422001',
+              '2026021000100007',
+              '2026071300974003',
+          ]
+          results = []
+
+          def quote(value):
+              return "'" + value.replace("'", "''") + "'"
+
+          for round_number in (1, 2):
+              for document_id in document_ids:
+                  limits = (50000, 100) if round_number == 1 else (100, 50000)
+                  for limit in limits:
+                      params = {
+                          '$limit': limit,
+                          '$where': f'document_id = {quote(document_id)}',
+                          '$select': 'document_id,borough,block,lot',
+                      }
+                      url = f'https://data.cityofnewyork.us/resource/{dataset_id}.json?{urlencode(params)}'
+                      started = time.monotonic()
+                      item = {'round': round_number, 'document_id': document_id, 'limit': limit}
+                      try:
+                          request = Request(url, headers={'User-Agent': 'TowerSignal-ACRIS-Legals-Diagnostic/1.0', 'Accept': 'application/json'})
+                          with urlopen(request, timeout=45) as response:
+                              payload = json.load(response)
+                          item.update({
+                              'ok': True,
+                              'seconds': round(time.monotonic() - started, 3),
+                              'rows': len(payload) if isinstance(payload, list) else None,
+                              'status': response.status,
+                          })
+                      except Exception as exc:
+                          item.update({
+                              'ok': False,
+                              'seconds': round(time.monotonic() - started, 3),
+                              'error_type': type(exc).__name__,
+                              'error': str(exc),
+                          })
+                      results.append(item)
+                      print(json.dumps(item, sort_keys=True), flush=True)
+
+          with open('acris-legals-limit-diagnostic.json', 'w', encoding='utf-8') as handle:
+              json.dump(results, handle, indent=2)
+
+          summary = {}
+          for limit in (50000, 100):
+              items = [item for item in results if item['limit'] == limit]
+              successes = [item for item in items if item.get('ok')]
+              summary[str(limit)] = {
+                  'attempts': len(items),
+                  'successes': len(successes),
+                  'failures': len(items) - len(successes),
+                  'median_seconds': sorted(item['seconds'] for item in successes)[len(successes)//2] if successes else None,
+                  'max_seconds': max((item['seconds'] for item in successes), default=None),
+              }
+          print('SUMMARY=' + json.dumps(summary, sort_keys=True))
+          if not any(item.get('ok') for item in results):
+              raise SystemExit('No Legals diagnostic query succeeded; limit hypothesis cannot be evaluated')
+          PY
+      - name: Upload diagnostic results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acris-legals-limit-diagnostic
+          path: acris-legals-limit-diagnostic.json
+          retention-days: 7
