@@ -16,7 +16,7 @@ class AcrisVerifierTests(unittest.TestCase):
         documents = [
             {
                 "document_id": "D1",
-                "bbl": "1000010001",
+                "bbl": "1000100001",
                 "doc_type": "DEED",
                 "recorded_date": "2026-08-01",
                 "parties": [{"party_type": "1", "name": "SELLER LLC"}],
@@ -31,7 +31,7 @@ class AcrisVerifierTests(unittest.TestCase):
         ]
         cache = {
             "properties": {
-                "1000010001": {"documents": [documents[0]]},
+                "1000100001": {"documents": [documents[0]]},
                 "2000200002": {"documents": [documents[1]]},
             }
         }
