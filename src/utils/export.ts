@@ -1,4 +1,5 @@
 import type { Metadata, SystemDetail, SystemSummary } from '../types/data'
+import type { AcrisMetadataFields, AcrisPropertyActivity, AcrisSummaryFields } from '../types/acris'
 import { signalLabel } from '../domain/labels'
 
 function csvCell(value: unknown): string {
@@ -7,12 +8,15 @@ function csvCell(value: unknown): string {
 }
 
 export function exportCsv(rows: SystemSummary[], metadata: Metadata): void {
-  const headers = ['address','borough','zip','system_id','bin','bbl','active_equipment','registration_date','reported_sample_count','inspection_count','violation_citation_count','latest_violation_date','oath_balance_due_total','latest_public_sample_date','days_since_sample','signal_type','confirmed_violation','latest_inspection_date','oath_exact_match_count','pluto_exact_bbl_match','dob_job_filing_count','dob_recent_activity_count_365d','dob_explicit_cooling_tower_count','dob_mechanical_or_boiler_count','latest_dob_activity_date','hpd_registered_contact_count','priority_score','evidence_confidence','source_snapshot_timestamp']
+  const headers = ['address','borough','zip','system_id','bin','bbl','active_equipment','registration_date','reported_sample_count','inspection_count','violation_citation_count','latest_violation_date','oath_balance_due_total','latest_public_sample_date','days_since_sample','signal_type','confirmed_violation','latest_inspection_date','oath_exact_match_count','pluto_exact_bbl_match','dob_job_filing_count','dob_recent_activity_count_365d','dob_explicit_cooling_tower_count','dob_mechanical_or_boiler_count','latest_dob_activity_date','hpd_registered_contact_count','acris_recent_document_count_365d','latest_acris_recorded_date','acris_deed_count','acris_mortgage_count','acris_lease_count','acris_recorded_party_count','priority_score','evidence_confidence','source_snapshot_timestamp']
   const lines = [headers.map(csvCell).join(',')]
   for (const row of rows) {
+    const acris = row as SystemSummary & AcrisSummaryFields
     lines.push([
       row.address,row.borough,row.zip,row.system_id,row.bin,row.bbl,row.active_equipment,row.registration_date,row.sample_count ?? 0,row.inspection_count ?? 0,row.violation_citation_count ?? 0,row.latest_violation_date,row.oath_balance_due_total ?? 0,row.latest_sample_date,row.days_since_latest_sample,
-      signalLabel(row.primary_signal),row.confirmed_violation,row.latest_inspection_date,row.oath_case_count ?? 0,row.pluto_match ?? false,row.dob_activity_count ?? 0,row.dob_recent_activity_count ?? 0,row.dob_explicit_cooling_tower_count ?? 0,row.dob_mechanical_or_boiler_count ?? 0,row.latest_dob_activity_date,row.hpd_contact_count ?? 0,row.priority_score,row.evidence_confidence,metadata.generated_at,
+      signalLabel(row.primary_signal),row.confirmed_violation,row.latest_inspection_date,row.oath_case_count ?? 0,row.pluto_match ?? false,row.dob_activity_count ?? 0,row.dob_recent_activity_count ?? 0,row.dob_explicit_cooling_tower_count ?? 0,row.dob_mechanical_or_boiler_count ?? 0,row.latest_dob_activity_date,row.hpd_contact_count ?? 0,
+      acris.acris_recent_document_count ?? '',acris.latest_acris_recorded_date,acris.acris_deed_count ?? '',acris.acris_mortgage_count ?? '',acris.acris_lease_count ?? '',acris.acris_recorded_party_count ?? '',
+      row.priority_score,row.evidence_confidence,metadata.generated_at,
     ].map(csvCell).join(','))
   }
   const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' })
@@ -97,9 +101,33 @@ export function leadSummary(row: SystemSummary, metadata: Metadata, detail?: Sys
       })
     }
     lines.push('DOB NOW activity is exact-BBL property context only; mechanical/boiler flags are not cooling-tower claims, and this source does not affect TowerSignal priority scoring.')
+
+    lines.push('', 'ACRIS property activity')
+    const acrisMeta = metadata as Metadata & AcrisMetadataFields
+    const enrichedDetail = detail as SystemDetail & { acris_activity?: AcrisPropertyActivity | null }
+    if (!acrisMeta.acris_cache_available) {
+      lines.push('Verified ACRIS cache unavailable for this snapshot; ACRIS timing context was omitted rather than inferred.')
+    } else if (!enrichedDetail.acris_activity) {
+      lines.push(`No commercially relevant ACRIS document matched this exact BBL in the current ${acrisMeta.acris_cache_lookback_days ?? 365}-day verified cache.`)
+    } else {
+      const activity = enrichedDetail.acris_activity
+      lines.push(`${activity.recent_document_count} relevant recorded documents; latest recorded date ${activity.latest_recorded_date ?? 'not published'}; ${activity.deed_count} deeds; ${activity.mortgage_count} mortgages; ${activity.lease_count} leases; ${activity.recorded_party_count} recorded party rows.`)
+      activity.documents.slice(0, 3).forEach((document, index) => {
+        const parties = document.parties.slice(0, 4).map(party => `${party.name ?? 'name not published'} [party type ${party.party_type ?? 'not published'}]`).join('; ')
+        const parts = [
+          `${index + 1}. ${document.doc_type ?? 'ACRIS document'} ${document.document_id}`,
+          document.recorded_date ?? null,
+          document.document_amount != null ? `amount $${document.document_amount.toLocaleString('en-US')}` : null,
+          parties ? `recorded parties: ${parties}` : null,
+        ].filter(Boolean)
+        lines.push(parts.join(' · '))
+      })
+    }
+    lines.push('ACRIS is exact BBL + exact document-ID timing context only. Recorded document parties are not asserted to be current owners, procurement contacts, service providers or vendors, and ACRIS does not affect TowerSignal priority scoring.')
   }
 
-  lines.push('', 'Evidence: NYC Cooling Tower Registrations; NYC Cooling Tower System Inspection Results; OATH Hearings Division Case Status (exact ticket matches only); NYC DCP PLUTO (exact BBL); DOB NOW Job Application Filings (exact BBL); NYC HPD Multiple Dwelling Registrations and Registration Contacts (exact BBL / registration ID where available)')
+  const acrisMeta = metadata as Metadata & AcrisMetadataFields
+  lines.push('', `Evidence: NYC Cooling Tower Registrations; NYC Cooling Tower System Inspection Results; OATH Hearings Division Case Status (exact ticket matches only); NYC DCP PLUTO (exact BBL); DOB NOW Job Application Filings (exact BBL); NYC HPD Multiple Dwelling Registrations and Registration Contacts (exact BBL / registration ID where available)${acrisMeta.acris_cache_available ? '; NYC ACRIS Real Property Master, Legals and Parties (exact BBL / document ID from independently verified bounded cache)' : ''}`)
   lines.push(`Generated: ${metadata.generated_at}`)
   lines.push('TowerSignal signals are derived from public records and are not regulatory compliance determinations.')
   return lines.join('\n')
