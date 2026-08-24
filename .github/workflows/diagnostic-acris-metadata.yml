@@ -1,0 +1,72 @@
+name: Diagnostic ACRIS metadata endpoint
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnostic-acris-metadata.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  compare-endpoints:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compare legacy metadata and resource endpoints
+        run: |
+          python - <<'PY'
+          import json
+          import time
+          from urllib.request import Request, urlopen
+
+          endpoints = {
+              'legacy_metadata': 'https://data.cityofnewyork.us/api/views/bnx9-e6tj',
+              'resource_probe': 'https://data.cityofnewyork.us/resource/bnx9-e6tj.json?$select=document_id&$limit=1',
+          }
+          results = []
+          for round_number in range(1, 4):
+              order = list(endpoints.items()) if round_number % 2 else list(reversed(list(endpoints.items())))
+              for name, url in order:
+                  started = time.monotonic()
+                  item = {'round': round_number, 'endpoint': name, 'url': url}
+                  try:
+                      request = Request(url, headers={'User-Agent': 'TowerSignal-ACRIS-Diagnostic/1.0', 'Accept': 'application/json'})
+                      with urlopen(request, timeout=45) as response:
+                          body = response.read()
+                          item.update({
+                              'ok': True,
+                              'status': response.status,
+                              'seconds': round(time.monotonic() - started, 3),
+                              'bytes': len(body),
+                              'content_type': response.headers.get('content-type'),
+                          })
+                  except Exception as exc:
+                      item.update({
+                          'ok': False,
+                          'seconds': round(time.monotonic() - started, 3),
+                          'error_type': type(exc).__name__,
+                          'error': str(exc),
+                      })
+                  results.append(item)
+                  print(json.dumps(item, sort_keys=True), flush=True)
+
+          with open('acris-metadata-diagnostic.json', 'w', encoding='utf-8') as handle:
+              json.dump(results, handle, indent=2)
+
+          resource_successes = sum(1 for item in results if item['endpoint'] == 'resource_probe' and item.get('ok'))
+          if resource_successes == 0:
+              raise SystemExit('Resource endpoint never succeeded; endpoint-specific metadata hypothesis cannot be isolated on this run')
+          PY
+      - name: Upload diagnostic results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acris-metadata-endpoint-diagnostic
+          path: acris-metadata-diagnostic.json
+          if-no-files-found: warn
+          retention-days: 7
