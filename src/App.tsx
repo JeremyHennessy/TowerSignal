@@ -110,12 +110,12 @@ export default function App() {
       <div className="brand-lockup"><span className="brand-mark">TS</span><div><strong>TowerSignal</strong><small>Account intelligence</small></div></div>
       <nav aria-label="TowerSignal workspace">
         <span className="nav-label">Workspace</span>
-        <button className={mode === 'prospect' ? 'active' : ''} onClick={() => setMode('prospect')}><span>◎</span> Prospect</button>
-        <button className={mode === 'monitor' ? 'active' : ''} onClick={() => setMode('monitor')}><span>◫</span> Monitor</button>
-        <button className={mode === 'map' ? 'active' : ''} onClick={() => setMode('map')}><span>◇</span> Map</button>
+        <button className={mode === 'prospect' ? 'active' : ''} onClick={() => setMode('prospect')}><span aria-hidden="true">◎</span> Prospect</button>
+        <button className={mode === 'monitor' ? 'active' : ''} onClick={() => setMode('monitor')}><span aria-hidden="true">◫</span> Monitor</button>
+        <button className={mode === 'map' ? 'active' : ''} onClick={() => setMode('map')}><span aria-hidden="true">◇</span> Map</button>
         <span className="nav-label">Market intelligence</span>
-        <button className={mode === 'nys' ? 'active' : ''} onClick={() => setMode('nys')}><span>↗</span> NYS Market</button>
-        <button className={mode === 'nys-changes' ? 'active' : ''} onClick={() => setMode('nys-changes')}><span>↻</span> NYS Changes</button>
+        <button className={mode === 'nys' ? 'active' : ''} onClick={() => setMode('nys')}><span aria-hidden="true">↗</span> NYS Market</button>
+        <button className={mode === 'nys-changes' ? 'active' : ''} onClick={() => setMode('nys-changes')}><span aria-hidden="true">↻</span> NYS Changes</button>
       </nav>
       <div className="side-trust"><span className="status-dot" />{healthyHealth.length}/{sourceHealth.length || '—'} sources healthy<small>Updated {formatTimestamp(payload.metadata.generated_at)}</small></div>
     </aside>
