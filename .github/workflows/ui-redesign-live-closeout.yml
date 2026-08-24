@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  pages: read
 
 jobs:
   verify-live-redesign:
@@ -16,6 +18,14 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Report current Pages configuration and recent main deployment runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo '--- Pages configuration ---'
+          gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '{status,build_type,source,html_url,https_enforced}' || true
+          echo '--- Recent pages.yml runs on main ---'
+          gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/pages.yml/runs?branch=main&per_page=5" --jq '.workflow_runs[] | {id,event,status,conclusion,head_sha,run_started_at,updated_at}' || true
       - uses: actions/setup-node@v4
         with:
           node-version: 22
