@@ -1,0 +1,10 @@
+/* Narrow hosted-regression fixes for the commercial UI redesign. */
+@media (min-width:1201px){
+  .page-section .workspace{grid-template-columns:minmax(0,.78fr) minmax(0,1.4fr)}
+  .page-section .workspace>*{min-width:0}
+}
+
+@media (max-width:430px){
+  .side-nav nav button:nth-of-type(4),
+  .side-nav nav button:nth-of-type(5){display:flex}
+}
