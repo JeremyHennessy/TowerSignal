@@ -17,7 +17,7 @@ jobs:
       - name: Require successful production Pages run for target main SHA
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: a773dcbca9a7c038408f7f990a9c567db65be813
+          TARGET_SHA: dfec21e063c75f077b33879044113515d89e11ff
         run: |
           python - <<'PY'
           import json, os, subprocess
