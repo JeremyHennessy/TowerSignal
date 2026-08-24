@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-24T19:27:05.898527Z",
+  "generated_at": "2026-08-24T22:39:40.971964Z",
   "sources": [
     {
       "source_key": "registrations",
@@ -60,15 +60,15 @@
       "dataset_id": "64uk-42ks",
       "name": "Primary Land Use Tax Lot Output (PLUTO)",
       "entity_unit": "BBLs",
-      "retrieved_record_count": 858602,
+      "retrieved_record_count": 858284,
       "requested_entity_count": 2991,
-      "normalized_entity_count": 2880,
-      "matched_entity_count": 2880,
-      "attached_entity_count": 3690,
-      "displayed_entity_count": 3690,
-      "coverage_percentage": 96.29,
+      "normalized_entity_count": 2866,
+      "matched_entity_count": 2866,
+      "attached_entity_count": 3669,
+      "displayed_entity_count": 3669,
+      "coverage_percentage": 95.82,
       "previous_coverage_percentage": 96.29,
-      "coverage_change_percentage_points": 0.0,
+      "coverage_change_percentage_points": -0.47,
       "coverage_note": "Coverage is exact BBL match coverage; one BBL can attach to more than one cooling-tower system.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -78,7 +78,7 @@
       "dataset_id": "w9ak-ipjd",
       "name": "DOB NOW: Build \u2013 Job Application Filings",
       "entity_unit": "BBLs with DOB NOW job filings",
-      "retrieved_record_count": 947229,
+      "retrieved_record_count": 947317,
       "requested_entity_count": 2991,
       "normalized_entity_count": 2742,
       "matched_entity_count": 2742,
@@ -144,6 +144,26 @@
       "coverage_note": "Coverage is the share of current authoritative NYS extract rows represented by normalized unique Equipment_ID records. Missing coordinates do not remove equipment from the product.",
       "status": "HEALTHY",
       "status_reasons": []
+    },
+    {
+      "source_key": "acris_recent",
+      "dataset_id": "ACRIS-VERIFIED-CACHE",
+      "name": "NYC ACRIS recent property activity cache",
+      "entity_unit": "cooling-tower BBLs with relevant ACRIS activity in the bounded window",
+      "retrieved_record_count": 0,
+      "requested_entity_count": 2991,
+      "normalized_entity_count": 0,
+      "matched_entity_count": 0,
+      "attached_entity_count": 0,
+      "displayed_entity_count": 0,
+      "coverage_percentage": null,
+      "previous_coverage_percentage": null,
+      "coverage_change_percentage_points": null,
+      "coverage_note": "Verified ACRIS cache is temporarily unavailable. TowerSignal remains published from its other verified sources; ACRIS timing context is omitted rather than inferred.",
+      "status": "WARNING",
+      "status_reasons": [
+        "verified ACRIS cache unavailable for this snapshot"
+      ]
     }
   ]
 }
