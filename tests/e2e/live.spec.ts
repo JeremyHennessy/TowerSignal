@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('hosted TowerSignal loads NYC and NYS data, history, source health and maps without app errors', async ({ page }, testInfo) => {
+test('hosted TowerSignal loads NYC and NYS data, history, source health, ACRIS timing and maps without app errors', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
@@ -14,6 +14,9 @@ test('hosted TowerSignal loads NYC and NYS data, history, source health and maps
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
   await expect(page.getByText('Registered systems')).toBeVisible()
   await expect(page.getByText('Systems with OATH cases')).toBeVisible()
+  await expect(page.getByText('Recent ACRIS activity', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Recent ACRIS activity' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'ACRIS activity' })).toBeVisible()
   await expect(page.getByText(/Source health \d+\/\d+ healthy/)).toBeVisible()
   await expect(page.getByText('Source health', { exact: true })).toBeVisible()
   await expect(page.getByText(/attached · .* represented/).first()).toBeVisible()
@@ -27,6 +30,15 @@ test('hosted TowerSignal loads NYC and NYS data, history, source health and maps
     return { overflow: style.overflow, isolation: style.isolation, position: style.position }
   })
   expect(mapContainment).toEqual({ overflow: 'hidden', isolation: 'isolate', position: 'relative' })
+
+  await page.getByRole('button', { name: 'Recent ACRIS activity' }).click()
+  await expect(page.locator('tbody tr').first()).toBeVisible()
+  await expect(page.locator('tbody tr').first().getByText(/recent document/)).toBeVisible()
+  await page.locator('tbody tr').first().click()
+  await expect(page.getByRole('heading', { name: 'ACRIS property activity' })).toBeVisible()
+  await expect(page.getByText(/relevant recorded document/)).toBeVisible()
+  await expect(page.getByText(/ACRIS is joined by exact borough\/block\/lot BBL and exact document ID only/)).toBeVisible()
+  await page.getByRole('button', { name: 'Close details' }).click()
 
   await page.getByRole('button', { name: 'Changes', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
@@ -75,20 +87,25 @@ test('hosted TowerSignal loads NYC and NYS data, history, source health and maps
   expect(consoleErrors, `Console errors: ${consoleErrors.join('\n')}`).toEqual([])
 })
 
-test('mobile layout keeps NYC and NYS controls readable and contained', async ({ page }) => {
+test('mobile layout keeps NYC, ACRIS and NYS controls readable and contained', async ({ page }) => {
   await page.goto('./', { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Export filtered CSV' })).toBeVisible()
   await expect(page.getByLabel('Lead filters')).toBeVisible()
+  await expect(page.getByLabel('ACRIS recorded activity')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Recent ACRIS activity' })).toBeVisible()
   await expect(page.getByText(/Source health \d+\/\d+ healthy/)).toBeVisible()
   await expect(page.locator('.leaflet-container')).toBeVisible()
+
+  let bodyWidth = await page.evaluate(() => document.body.scrollWidth)
+  const viewportWidth = page.viewportSize()?.width ?? 0
+  expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
 
   await page.getByRole('button', { name: 'Changes', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
   await expect(page.getByText('History collection began')).toBeVisible()
   await expect(page.locator('.map-shell')).toBeHidden()
-  let bodyWidth = await page.evaluate(() => document.body.scrollWidth)
-  const viewportWidth = page.viewportSize()?.width ?? 0
+  bodyWidth = await page.evaluate(() => document.body.scrollWidth)
   expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
 
   await page.getByRole('button', { name: 'NYS Registry', exact: true }).click()
