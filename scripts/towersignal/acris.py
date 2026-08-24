@@ -197,9 +197,23 @@ def _resource(dataset_id: str, params: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _metadata(dataset_id: str) -> dict[str, Any]:
-    payload = _request_json(f"{API_ROOT}/api/views/{dataset_id}")
+    url = f"{API_ROOT}/api/views/{dataset_id}"
+    try:
+        payload = _request_json(url, attempts=2, timeout=15)
+    except AcrisError as exc:
+        return {
+            "name": dataset_id,
+            "source_last_updated_at": None,
+            "metadata_status": "UNAVAILABLE",
+            "metadata_error": str(exc),
+        }
     if not isinstance(payload, dict):
-        raise AcrisError(f"ACRIS metadata {dataset_id} returned malformed payload")
+        return {
+            "name": dataset_id,
+            "source_last_updated_at": None,
+            "metadata_status": "UNAVAILABLE",
+            "metadata_error": f"ACRIS metadata {dataset_id} returned malformed payload",
+        }
     updated = payload.get("rowsUpdatedAt") or payload.get("dataUpdatedAt")
     source_last_updated_at = None
     try:
@@ -210,6 +224,8 @@ def _metadata(dataset_id: str) -> dict[str, Any]:
     return {
         "name": str(payload.get("name") or dataset_id),
         "source_last_updated_at": source_last_updated_at,
+        "metadata_status": "AVAILABLE",
+        "metadata_error": None,
     }
 
 
@@ -461,28 +477,25 @@ def build_recent_cache(
     sources = [
         {
             "dataset_id": MASTER_DATASET_ID,
-            "name": master_meta["name"],
+            **master_meta,
             "retrieved_at": generated_at,
             "source_record_count": len(master_rows),
-            "source_last_updated_at": master_meta.get("source_last_updated_at"),
             "url": MASTER_URL,
             "source_query_scope": f"{lookback_days}-day bounded Master slice for commercially relevant ACRIS document types",
         },
         {
             "dataset_id": LEGALS_DATASET_ID,
-            "name": legal_meta["name"],
+            **legal_meta,
             "retrieved_at": generated_at,
             "source_record_count": len(legal_rows),
-            "source_last_updated_at": legal_meta.get("source_last_updated_at"),
             "url": LEGALS_URL,
             "source_query_scope": f"Exact document_id Legals rows for {len(document_ids):,} bounded recent Master documents; intersected to exact cooling-tower BBLs",
         },
         {
             "dataset_id": PARTIES_DATASET_ID,
-            "name": party_meta["name"],
+            **party_meta,
             "retrieved_at": generated_at,
             "source_record_count": len(party_rows),
-            "source_last_updated_at": party_meta.get("source_last_updated_at"),
             "url": PARTIES_URL,
             "source_query_scope": f"Exact document_id Party rows for {len(matched_document_ids):,} ACRIS documents matched to cooling-tower BBLs",
         },
