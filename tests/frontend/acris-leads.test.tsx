@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, test, vi } from 'vitest'
 import { Filters, filterSystems, initialFilters } from '../../src/components/Filters'
@@ -20,6 +20,12 @@ function row(systemId: string, address: string, priority: number, acrisCount: nu
     latitude: 40.75,
     longitude: -73.99,
     coordinate_status: 'VALID',
+    registration_date: '2020-01-01',
+    sample_count: 1,
+    inspection_count: 0,
+    violation_citation_count: 0,
+    latest_violation_date: null,
+    oath_balance_due_total: 0,
     latest_sample_date: '2026-08-01',
     days_since_latest_sample: 23,
     latest_inspection_date: null,
@@ -33,6 +39,12 @@ function row(systemId: string, address: string, priority: number, acrisCount: nu
     priority_score: priority,
     score_components: [],
     oath_case_count: 0,
+    pluto_match: false,
+    dob_activity_count: 0,
+    dob_recent_activity_count: 0,
+    dob_explicit_cooling_tower_count: 0,
+    dob_mechanical_or_boiler_count: 0,
+    latest_dob_activity_date: null,
     hpd_contact_count: 0,
     acris_recent_document_count: acrisCount,
     latest_acris_recorded_date: acrisDate,
@@ -51,7 +63,7 @@ test('recent ACRIS filter selects only systems with exact-BBL cached activity', 
   expect(result.map(item => item.system_id)).toEqual([recent.system_id])
 })
 
-test('ACRIS quick filter is available only when the verified cache is available', async () => {
+test('commercial filter rail exposes ACRIS only when verified cache is available', async () => {
   const user = userEvent.setup()
   const onQuick = vi.fn()
   const { rerender } = render(<Filters rows={[recent, quiet]} value={initialFilters} onChange={vi.fn()} onQuick={onQuick} acrisAvailable={true} />)
@@ -64,11 +76,9 @@ test('ACRIS quick filter is available only when the verified cache is available'
   expect(screen.getByLabelText('ACRIS recorded activity')).toBeDisabled()
 })
 
-test('lead table surfaces and sorts by latest ACRIS timing', async () => {
-  const user = userEvent.setup()
+test('commercial account table surfaces ACRIS inside the existing Activity column', () => {
   render(<SystemTable rows={[quiet, recent]} onSelect={vi.fn()} />)
-  expect(screen.getByText('3 recent documents')).toBeInTheDocument()
-  await user.click(screen.getByRole('button', { name: 'ACRIS activity' }))
-  const dataRows = screen.getAllByRole('row').slice(1)
-  expect(within(dataRows[0]).getByText('10 ALPHA ST')).toBeInTheDocument()
+  expect(screen.getByText('ACRIS · 3')).toBeInTheDocument()
+  expect(screen.getByText('10 ALPHA ST')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Activity' })).toBeInTheDocument()
 })
