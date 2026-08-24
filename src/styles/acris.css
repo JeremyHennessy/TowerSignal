@@ -1,0 +1,2 @@
+@media (min-width:1201px){.kpis{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media (max-width:700px){.kpis article:last-child{grid-column:auto}}
