@@ -18,6 +18,10 @@ export interface AcrisMetadataFields {
   acris_cache_universe_aligned?: boolean
 }
 
+export interface AcrisPayloadSummaryFields {
+  systems_with_recent_acris_activity?: number
+}
+
 export interface AcrisParty {
   party_type: string | null
   name: string | null
