@@ -1,0 +1,53 @@
+name: Diagnostic current Pages status
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnostic-pages-status.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  inspect-pages-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful production Pages run for target main SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: a773dcbca9a7c038408f7f990a9c567db65be813
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          repo = os.environ['GITHUB_REPOSITORY']
+          target = os.environ['TARGET_SHA']
+          raw = subprocess.check_output([
+              'gh','api',f'repos/{repo}/actions/workflows/pages.yml/runs',
+              '-f','branch=main','-f','per_page=20','--method','GET'
+          ], text=True)
+          payload = json.loads(raw)
+          matches = [r for r in payload.get('workflow_runs', []) if r.get('head_sha') == target]
+          if not matches:
+              raise SystemExit(f'No pages.yml run found yet for {target}')
+          run = matches[0]
+          summary = {k: run.get(k) for k in ('id','run_number','event','head_sha','status','conclusion','created_at','updated_at','html_url')}
+          print(json.dumps(summary, indent=2))
+          if run.get('status') != 'completed':
+              raise SystemExit(f"Pages run {run.get('id')} is still {run.get('status')}")
+          if run.get('conclusion') != 'success':
+              raise SystemExit(f"Pages run {run.get('id')} concluded {run.get('conclusion')}")
+          jobs_raw = subprocess.check_output(['gh','api',f"repos/{repo}/actions/runs/{run['id']}/jobs",'-f','per_page=100','--method','GET'], text=True)
+          jobs = json.loads(jobs_raw).get('jobs', [])
+          print(json.dumps([{'id':j.get('id'),'name':j.get('name'),'status':j.get('status'),'conclusion':j.get('conclusion')} for j in jobs], indent=2))
+          required = {'build','deploy','verify','persist-history'}
+          by_name = {j.get('name'):j for j in jobs}
+          missing = required - set(by_name)
+          if missing:
+              raise SystemExit(f'Missing expected Pages jobs: {sorted(missing)}')
+          failed = {name: by_name[name].get('conclusion') for name in required if by_name[name].get('conclusion') != 'success'}
+          if failed:
+              raise SystemExit(f'Pages job failure: {failed}')
+          print('PRODUCTION_PAGES_VERIFIED')
+          PY
