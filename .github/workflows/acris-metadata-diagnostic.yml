@@ -1,10 +1,9 @@
 name: Diagnostic ACRIS metadata endpoint
 
 on:
-  pull_request:
-    branches: [agent/build013-commercial-reconcile]
-    paths:
-      - '.github/workflows/acris-metadata-diagnostic.yml'
+  push:
+    branches: [agent/build013-acris-metadata-diagnostic]
+  workflow_dispatch:
 
 permissions:
   contents: read
