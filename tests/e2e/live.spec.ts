@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+const requireAcris = process.env.REQUIRE_ACRIS === 'true'
+
 test('hosted TowerSignal loads NYC and NYS data, history, source health, ACRIS timing and maps without app errors', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
@@ -15,7 +17,6 @@ test('hosted TowerSignal loads NYC and NYS data, history, source health, ACRIS t
   await expect(page.getByText('Registered systems')).toBeVisible()
   await expect(page.getByText('Systems with OATH cases')).toBeVisible()
   await expect(page.locator('.kpis').getByText('Recent ACRIS activity', { exact: true })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Recent ACRIS activity' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'ACRIS activity' })).toBeVisible()
   await expect(page.getByText(/Source health \d+\/\d+ healthy/)).toBeVisible()
   await expect(page.getByText('Source health', { exact: true })).toBeVisible()
@@ -31,14 +32,25 @@ test('hosted TowerSignal loads NYC and NYS data, history, source health, ACRIS t
   })
   expect(mapContainment).toEqual({ overflow: 'hidden', isolation: 'isolate', position: 'relative' })
 
-  await page.getByRole('button', { name: 'Recent ACRIS activity' }).click()
-  await expect(page.locator('tbody tr').first()).toBeVisible()
-  await expect(page.locator('tbody tr').first().getByText(/recent document/)).toBeVisible()
-  await page.locator('tbody tr').first().click()
-  await expect(page.getByRole('heading', { name: 'ACRIS property activity' })).toBeVisible()
-  await expect(page.getByText(/relevant recorded document/)).toBeVisible()
-  await expect(page.getByText(/ACRIS is joined by exact borough\/block\/lot BBL and exact document ID only/)).toBeVisible()
-  await page.getByRole('button', { name: 'Close details' }).click()
+  const acrisQuick = page.getByRole('button', { name: 'Recent ACRIS activity' })
+  const acrisSelect = page.getByLabel('ACRIS recorded activity')
+  const acrisAvailable = await acrisQuick.count() > 0
+  if (requireAcris) expect(acrisAvailable, 'Required ACRIS deployment did not expose the verified cache').toBe(true)
+  if (acrisAvailable) {
+    await expect(acrisQuick).toBeVisible()
+    await expect(acrisSelect).toBeEnabled()
+    await acrisQuick.click()
+    await expect(page.locator('tbody tr').first()).toBeVisible()
+    await expect(page.locator('tbody tr').first().getByText(/recent document/)).toBeVisible()
+    await page.locator('tbody tr').first().click()
+    await expect(page.getByRole('heading', { name: 'ACRIS property activity' })).toBeVisible()
+    await expect(page.getByText(/relevant recorded document/)).toBeVisible()
+    await expect(page.getByText(/ACRIS is joined by exact borough\/block\/lot BBL and exact document ID only/)).toBeVisible()
+    await page.getByRole('button', { name: 'Close details' }).click()
+  } else {
+    await expect(acrisSelect).toBeDisabled()
+    await expect(page.getByText('ACRIS timing cache unavailable', { exact: true })).toBeVisible()
+  }
 
   await page.getByRole('button', { name: 'Changes', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'What changed?' })).toBeVisible()
@@ -92,8 +104,18 @@ test('mobile layout keeps NYC, ACRIS and NYS controls readable and contained', a
   await expect(page.getByRole('heading', { name: 'TowerSignal' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Export filtered CSV' })).toBeVisible()
   await expect(page.getByLabel('Lead filters')).toBeVisible()
-  await expect(page.getByLabel('ACRIS recorded activity')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Recent ACRIS activity' })).toBeVisible()
+  const acrisSelect = page.getByLabel('ACRIS recorded activity')
+  const acrisQuick = page.getByRole('button', { name: 'Recent ACRIS activity' })
+  await expect(acrisSelect).toBeVisible()
+  const acrisAvailable = await acrisQuick.count() > 0
+  if (requireAcris) expect(acrisAvailable, 'Required mobile ACRIS deployment did not expose the verified cache').toBe(true)
+  if (acrisAvailable) {
+    await expect(acrisQuick).toBeVisible()
+    await expect(acrisSelect).toBeEnabled()
+  } else {
+    await expect(acrisSelect).toBeDisabled()
+    await expect(page.getByText('ACRIS timing cache unavailable', { exact: true })).toBeVisible()
+  }
   await expect(page.getByText(/Source health \d+\/\d+ healthy/)).toBeVisible()
   await expect(page.locator('.leaflet-container')).toBeVisible()
 
