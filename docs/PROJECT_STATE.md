@@ -29,24 +29,38 @@ The product must preserve the distinction between **commercial priority**, **sou
 - PR #52 applied the proven responsive corrections and merged at `a773dcbca9a7c038408f7f990a9c567db65be813`.
 - PR #54 is hosted-test-only and merged at `dfec21e063c75f077b33879044113515d89e11ff`; it does not change application/UI code.
 
-### Approval state
+### APPROVED BASELINE — 2026-08-24 16:17 America/Moncton
 
-**Candidate UI code baseline:** `a773dcbca9a7c038408f7f990a9c567db65be813`.
+**Approved UI code SHA:** `a773dcbca9a7c038408f7f990a9c567db65be813`.
 
-Do not mark this as the approved production baseline until the post-correction `pages.yml` run proves:
+**Verified production descendant:** `dfec21e063c75f077b33879044113515d89e11ff`.
 
-- production build green;
-- Pages artifact deployment green;
-- hosted desktop Chromium green;
-- hosted iPhone/WebKit green;
-- verified history persistence green.
+**Verification evidence:** exact `pages.yml` run `32766611745` completed successfully through:
 
-When that proof exists, record:
+- current NYC source generation;
+- current NYS source generation;
+- source-health validation;
+- deterministic NYC history generation;
+- deterministic NYS history generation;
+- NYC 25 MiB history guard;
+- NYS 8 MiB history guard;
+- independent NYC source verification;
+- independent NYS source verification;
+- Python tests;
+- ESLint;
+- TypeScript;
+- frontend regression tests;
+- production Vite build;
+- Pages artifact deployment;
+- hosted desktop Chromium verification;
+- hosted iPhone/WebKit verification;
+- post-verification durable history persistence.
 
-- Approved UI code SHA: `a773dcbca9a7c038408f7f990a9c567db65be813`.
-- QA-only main SHA at approval: `dfec21e063c75f077b33879044113515d89e11ff` or later test/documentation-only descendant.
-- What is approved: Prospect / Monitor / Map / NYS Market / NYS Changes commercial workspace and the responsive corrections from PR #52.
-- What is not implied by approval: Build 013 ACRIS, persistent multi-device workflow, Opportunity Score, SaaS infrastructure.
+**What is approved:** Prospect / Monitor / Map / NYS Market / NYS Changes commercial workspace and the responsive corrections from PR #52. This includes the task-first navigation, commercial summary surfaces, Prospect filter rail/table, Monitor history view, territory map, NYS registry/change workflows, existing source-backed detail panel, CSV export and responsive behavior proven by the hosted gate.
+
+**What is not implied by this approval:** Build 013 ACRIS, persistent multi-device workflow, Opportunity Score, portfolio intelligence, LL84 enrichment or SaaS infrastructure.
+
+**Immutability rule:** unrelated backend/data/ACRIS fixes must preserve this approved UI code/state. If future work must alter it, the change must be explicit and separately re-verified.
 
 ## 3. Current product modes
 
