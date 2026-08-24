@@ -1,0 +1,21 @@
+name: Diagnostic Pages queue
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnostic-pages-queue.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  inspect-queue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print recent Pages runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${GITHUB_REPOSITORY}/actions/workflows/pages.yml/runs -f branch=main -f per_page=10 --method GET --jq '.workflow_runs[] | {id,run_number,head_sha,status,conclusion,created_at,updated_at,display_title}'
