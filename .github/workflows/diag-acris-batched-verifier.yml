@@ -1,0 +1,81 @@
+name: Diagnostic ACRIS batched verifier
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/diag-acris-batched-verifier.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-batched-sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify exact five-document sample with three batched requests
+        run: |
+          python - <<'PY'
+          import json
+          import time
+          from collections import defaultdict
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          samples = [
+              {'bbl':'1010090037','document_id':'2026030300971006','doc_type':'MTGE','recorded_date':'2026-03-04'},
+              {'bbl':'1010090037','document_id':'2025122900744008','doc_type':'SAT','recorded_date':'2025-12-29'},
+              {'bbl':'1013940013','document_id':'2026031800422001','doc_type':'DEED','recorded_date':'2026-03-19'},
+              {'bbl':'1010090037','document_id':'2026021000100007','doc_type':'SAT','recorded_date':'2026-02-10'},
+              {'bbl':'1010090037','document_id':'2026071300974003','doc_type':'MTGE','recorded_date':'2026-07-14'},
+          ]
+          document_ids = [item['document_id'] for item in samples]
+          quoted = ','.join("'" + value.replace("'", "''") + "'" for value in document_ids)
+
+          def request_rows(dataset_id, select):
+              params = {'$limit':50000, '$where':f'document_id in ({quoted})', '$select':select}
+              url = f'https://data.cityofnewyork.us/resource/{dataset_id}.json?{urlencode(params)}'
+              started = time.monotonic()
+              request = Request(url, headers={'User-Agent':'TowerSignal-ACRIS-Batched-Diagnostic/1.0','Accept':'application/json'})
+              with urlopen(request, timeout=90) as response:
+                  payload = json.load(response)
+              if not isinstance(payload, list):
+                  raise SystemExit(f'{dataset_id} returned non-list payload')
+              print(json.dumps({'dataset_id':dataset_id,'rows':len(payload),'seconds':round(time.monotonic()-started,3)}, sort_keys=True), flush=True)
+              return payload
+
+          started = time.monotonic()
+          master = request_rows('bnx9-e6tj', 'document_id,doc_type,recorded_datetime,document_amt,percent_trans')
+          legals = request_rows('8h5j-fqxa', 'document_id,borough,block,lot')
+          parties = request_rows('636b-3b5g', 'document_id,party_type,name')
+
+          master_by_doc = defaultdict(list)
+          for row in master:
+              master_by_doc[str(row.get('document_id') or '')].append(row)
+          legal_bbls_by_doc = defaultdict(set)
+          for row in legals:
+              try:
+                  bbl = f"{int(float(str(row.get('borough'))))}{int(float(str(row.get('block')))):05d}{int(float(str(row.get('lot')))):04d}"
+              except (TypeError, ValueError):
+                  continue
+              legal_bbls_by_doc[str(row.get('document_id') or '')].add(bbl)
+          party_count_by_doc = defaultdict(int)
+          for row in parties:
+              party_count_by_doc[str(row.get('document_id') or '')] += 1
+
+          verified = []
+          for sample in samples:
+              document_id = sample['document_id']
+              rows = master_by_doc.get(document_id, [])
+              if not any(str(row.get('doc_type') or '') == sample['doc_type'] and str(row.get('recorded_datetime') or '')[:10] == sample['recorded_date'] for row in rows):
+                  raise SystemExit(f'Master mismatch for {document_id}')
+              if sample['bbl'] not in legal_bbls_by_doc.get(document_id, set()):
+                  raise SystemExit(f'Legals BBL mismatch for {document_id}')
+              verified.append({'document_id':document_id,'bbl':sample['bbl'],'party_rows':party_count_by_doc.get(document_id,0)})
+
+          print(json.dumps({'status':'PASS','sample_size':len(verified),'total_seconds':round(time.monotonic()-started,3),'verified':verified}, indent=2), flush=True)
+          PY
