@@ -1,6 +1,6 @@
 # TowerSignal — Canonical Project State
 
-Last reconstructed and verified: **2026-08-24**
+Last reconstructed and verified: **2026-08-25**
 
 This file is the engineering custody record for TowerSignal. Before a consequential production change, compare the intended change against this state and the current repository rather than reconstructing project history from memory or the nearest commit.
 
@@ -10,41 +10,58 @@ This file is the engineering custody record for TowerSignal. Before a consequent
 | --- | --- |
 | Repository | `JeremyHennessy/TowerSignal` |
 | Default branch | `main` |
-| Verified commercial UI / production baseline | `dfec21e063c75f077b33879044113515d89e11ff` |
-| Verification date | 2026-08-24 |
-| Production Pages workflow | run #33 / `32766611745` |
-| Build | SUCCESS |
+| Verified production baseline | `56fd31300d4d5f128c751e75f3607438073da0ab` |
+| Verification date | 2026-08-25 |
+| Build 013 ACRIS workflow | run #25 / `32845745013` — SUCCESS |
+| Required-cache production Pages workflow | run #40 / `32848763862` — SUCCESS |
+| Required verified ACRIS attachment | SUCCESS |
+| NYC + NYS source/data/history gates | SUCCESS |
 | GitHub Pages deployment | SUCCESS |
 | Hosted desktop Chromium | SUCCESS |
 | Hosted iPhone/WebKit | SUCCESS |
 | Verified history persistence | SUCCESS |
 | Live URL | `https://jeremyhennessy.github.io/TowerSignal/` |
 
-`dfec21e063c75f077b33879044113515d89e11ff` is the **current engineering regression baseline** for the commercial interface. It contains the task-first commercial redesign plus the two proven responsive fixes and the final hosted-test correction. Treat the existing Prospect / Monitor / Map / NYS Market / NYS Changes architecture and visual system as the reference state during unrelated fixes.
+`56fd31300d4d5f128c751e75f3607438073da0ab` is the current **verified product/production baseline**. The mandatory `require_acris=true` Pages run #40 proved that a verified ACRIS cache actually attached to the current TowerSignal BBL universe and then passed the full production chain through hosted desktop/iPhone verification and post-verification history persistence.
 
-This engineering verification does not substitute for a separate explicit user design-approval statement if one is later given. A later explicit user approval must be recorded as a harder checkpoint.
+The commercial visual/layout regression lineage still originates from the verified redesign closeout at `dfec21e063c75f077b33879044113515d89e11ff`; subsequent Build 013 product work adds ACRIS timing intelligence inside the existing Prospect/account workflow and does not authorize an unrelated redesign.
+
+This engineering verification does not substitute for a later explicit user visual approval. Any explicit user statement such as “approved”, “perfect”, “keep this”, or “don’t change this” must be recorded as a harder checkpoint for the behavior it approves.
 
 ### Baseline lineage
 
-- `3f6e44e0a191e3f5d2aadd7deb7f3869a119ca58` — merged Build 012 NYS expansion baseline.
-- `8d7911aab60b6521891398efc5a2957247218ceb` — PR #44 commercial account-intelligence UI redesign merge.
-- `a773dcbca9a7c038408f7f990a9c567db65be813` — PR #52 narrow responsive closeout fixes: mobile NYS navigation and desktop NYS workspace shrink behavior; production code otherwise unchanged.
-- `dfec21e063c75f077b33879044113515d89e11ff` — PR #54 test-only mobile Map hosted-verification correction; **current verified baseline**.
+- `3f6e44e0a191e3f5d2aadd7deb7f3869a119ca58` — Build 012 NYS expansion baseline.
+- `8d7911aab60b6521891398efc5a2957247218ceb` — PR #44 commercial account-intelligence redesign.
+- `a773dcbca9a7c038408f7f990a9c567db65be813` — PR #52 narrow responsive closeout fixes.
+- `dfec21e063c75f077b33879044113515d89e11ff` — PR #54 hosted Map-test alignment; commercial UI closeout baseline.
+- `78650ad3a3c6b6752e99cdd03f4c8d869a4b9c02` — PR #59 Build 013 ACRIS implementation merge from exact green head `24938072fb17b0a121b80ef074868a20f4e8e9ec`.
+- `a8cdc7b582de34c84641f2cdb208eb1fe1bf388b` — PR #63 test-only mobile fallback hosted-assertion correction.
+- `bdb22a48a095e876766aa5a8bf94612cfb430721` — PR #67 test-only enriched ACRIS hosted-selector correction.
+- `56fd31300d4d5f128c751e75f3607438073da0ab` — PR #64 Build 013.1 required-cache Pages dispatch fix; **current verified production baseline**.
 
-### Closeout evidence
+### Build 013 production closeout evidence
 
-The first independent redesign live proof correctly failed and exposed two real regressions:
+The final acceptance chain is deliberately stronger than “merged”:
 
-1. mobile CSS explicitly hid NYS Market / NYS Changes;
-2. the legacy NYS workspace minimum grid tracks exceeded the redesigned desktop content shell at 1280px.
+1. bounded ACRIS cache construction passed;
+2. production-volume validation passed;
+3. five deterministic cached documents were independently reproduced from live ACRIS Master, Legals and Parties;
+4. verified cache artifact was persisted to `data/towersignal-acris`;
+5. ACRIS workflow #25 successfully dispatched `pages.yml` with `require_acris=true`;
+6. required-cache Pages #40 on exact `main@56fd3130…` passed cache attachment and cache-required assertion;
+7. current NYC and NYS generation, source health, histories, history-size guards and independent source verification passed;
+8. Python/frontend tests, lint, typecheck and production build passed;
+9. Pages deployment passed;
+10. hosted Chromium and iPhone/WebKit passed;
+11. only after hosted verification did verified history persistence pass.
 
-PR #52 corrected only those boundaries. Production run #32 then passed desktop but exposed a test defect on iPhone: the test required the Map summary to be visible even though responsive CSS intentionally hides `.map-summary` at `max-width:1200px`. PR #54 changed only that test expectation. Production run #33 subsequently passed the complete build/deploy/hosted-verification/persistence chain.
+Build 013 issue #46 and Pages-source issue #53 are closed as completed.
 
-Diagnostic PR #45 was closed **unmerged** after closeout.
+### Historical closeout notes
 
-### Custody note: reverted temporary file
+During the earlier UI closeout, an unintended `docs/DO-NOT-COMMIT.txt` was briefly created on `main` in `ddbf1bfe1cd0942737f2ec451d093d270492e20e` and immediately deleted in `ea2083da53f07ccaaf7b189cfa00f1da3082ce8c`. No product file difference survived.
 
-During closeout, an unintended `docs/DO-NOT-COMMIT.txt` file was briefly created on `main` in commit `ddbf1bfe1cd0942737f2ec451d093d270492e20e` and immediately deleted in `ea2083da53f07ccaaf7b189cfa00f1da3082ce8c`. A compare against the pre-incident product tree confirmed no surviving file-content difference before the production responsive-fix merge. These commits remain in history as transparent no-op/revert lineage; do not treat them as product baselines.
+Stale pre-redesign ACRIS PR #43 was closed **unmerged**. Duplicate closeout PR #66 was also closed **unmerged** after the already-existing authoritative PR #64 was recovered. Do not use either as a restoration source.
 
 ## 2. Product purpose and target users
 
@@ -80,34 +97,35 @@ The product is **not** an owner compliance-management system, health-risk model,
 | Build 011 | #34 | DOB NOW lifecycle change events in durable NYC history | Complete |
 | Build 011.1 | #36 | verified-history artifact persistence path repair | Complete |
 | Build 012 | #38 | separate NYS Cooling Tower Registry product/history/source-health regime | Complete |
-| Commercial UI redesign | #44 | Prospect / Monitor / Map / NYS Market / NYS Changes commercial workspace; saved local views; task-first hierarchy | Complete |
-| UI live closeout | #52, #54 | proven responsive boundary fixes + production hosted-test alignment | Complete / verified at `dfec21e…` |
-| Build 013 | #43 | bounded recent ACRIS property transaction timing intelligence | **Open / not merged** |
+| Commercial UI redesign | #44 | Prospect / Monitor / Map / NYS Market / NYS Changes commercial workspace; browser-local saved views; task-first hierarchy | Complete |
+| UI live closeout | #52, #54 | responsive boundary fixes + production hosted-test alignment | Complete |
+| Build 013 | #59, #63, #67, #64 | bounded verified ACRIS recent property-activity timing intelligence, commercial workspace integration, durable verified cache, required-cache production gate | **Complete / production verified** |
 
-Disposable diagnostic PRs are intentionally excluded from the product build sequence unless they established an architectural decision documented below.
+Disposable diagnostics are excluded from the product build sequence unless they established an architectural decision documented here.
 
 ## 4. Current source inventory and health
 
-Latest persisted source-health snapshot: **2026-08-24T19:14:30.555406Z**.
+Latest persisted source-health snapshot: **2026-08-25T12:43:18.295145Z**.
 
-All eight current source models are `HEALTHY`.
+All **nine** current source models are `HEALTHY`.
 
 | Source key | Authoritative dataset | Current requested / represented context | Coverage | Health |
 | --- | --- | --- | ---: | --- |
 | registrations | NYC Cooling Tower Registrations `y4fw-iqfr` | 4,894 normalized NYC systems / 4,894 represented | 100.00% | HEALTHY |
 | inspections | NYC Cooling Tower System Inspection Results `f9wb-g8mb` | 4,835 current systems with exact inspection history / 4,894 systems | 98.79% | HEALTHY |
-| OATH | OATH Hearings Division Case Status `jz4z-kudi` | 54,746 exact matched summons/tickets / 55,036 requested | 99.47% | HEALTHY |
-| PLUTO | PLUTO `64uk-42ks` | 2,880 exact BBL matches / 2,991 requested | 96.29% | HEALTHY |
-| DOB NOW | Job Application Filings `w9ak-ipjd` | 2,742 exact BBL matches / 2,991 requested | 91.68% | HEALTHY |
+| OATH | OATH Hearings Division Case Status `jz4z-kudi` | 54,746 exact summons/ticket matches / 55,036 requested | 99.47% | HEALTHY |
+| PLUTO | PLUTO `64uk-42ks` | 2,866 exact BBL matches / 2,991 requested; 3,669 displayed systems | 95.82% | HEALTHY |
+| DOB NOW | Job Application Filings `w9ak-ipjd` | 2,742 exact BBL matches / 2,991 requested; 3,535 displayed systems | 91.68% | HEALTHY |
 | HPD registrations | Multiple Dwelling Registrations `tesw-yqqr` | 1,492 exact BBL matches / 2,991 requested | 49.88% | HEALTHY / scope-limited |
-| HPD contacts | Registration Contacts `feu5-w2e2` | 1,482 matched HPD-registration BBLs with contact rows / 1,492 matched registrations | 99.33% | HEALTHY |
-| NYS registry | Weekly Extract `24a4-muw7` | 6,236 unique Equipment_ID rows / 6,236 represented | 100.00% | HEALTHY |
+| HPD contacts | Registration Contacts `feu5-w2e2` | 1,482 matched registration BBLs with contact rows / 1,492 matched registrations | 99.33% | HEALTHY |
+| NYS registry | Weekly Extract `24a4-muw7` | 6,236 unique `Equipment_ID` rows / 6,236 represented | 100.00% | HEALTHY |
+| ACRIS recent | Master `bnx9-e6tj` + Legals `8h5j-fqxa` + Parties `636b-3b5g` | 296 exact tower BBLs with relevant 365-day activity / 2,991 requested; 386 displayed systems | 9.90% observed prevalence | HEALTHY |
 
-Coverage percentage is source-contract specific. Low HPD registration coverage is not itself a failure because HPD registration applies only to qualifying properties.
+Coverage percentage is source-contract specific. HPD registration coverage is scope-limited. ACRIS 9.9% is observed recent-activity prevalence, **not** a completeness target; no cached recent match is not evidence that no historical property transaction exists.
 
 ## 5. Exact identity / join contracts
 
-These contracts are part of the current evidence model. Do not replace them with fuzzy matching merely to increase coverage.
+These contracts are part of the evidence model. Do not replace them with fuzzy matching merely to increase coverage.
 
 ### NYC cooling-tower core
 
@@ -121,14 +139,14 @@ These contracts are part of the current evidence model. Do not replace them with
 
 - exact identifier equality only;
 - no respondent/address/BBL fuzzy fallback;
-- OATH outcome/monetary context is separate from Priority Score 1.0.
+- OATH outcome/monetary context remains separate from Priority Score 1.0.
 
 ### PLUTO
 
 `cooling-tower BBL → PLUTO BBL`
 
 - exact normalized BBL only;
-- integral Socrata numeric representations are normalized without altering the identifier;
+- integral Socrata numeric representations may be normalized without altering the identifier;
 - owner text is public property context, not cooling-tower procurement identity.
 
 ### HPD
@@ -156,25 +174,32 @@ These contracts are part of the current evidence model. Do not replace them with
 - published county is provenance, not a safe NYC classifier by itself;
 - no NYC Priority Score is projected onto NYS equipment.
 
-### Pending ACRIS contract
+### ACRIS recent property activity
 
-Planned Build 013 exact chain:
+Exact chain:
 
 `cooling-tower exact BBL → ACRIS Legals exact borough/block/lot BBL → exact document_id → ACRIS Master + Parties exact document_id`
 
 Datasets:
 
-- Legals `8h5j-fqxa`
-- Master `bnx9-e6tj`
-- Parties `636b-3b5g`
+- Legals `8h5j-fqxa`;
+- Master `bnx9-e6tj`;
+- Parties `636b-3b5g`.
 
-No ACRIS party may be inferred to be the current owner, cooling-tower operator, procurement contact, service provider or vendor solely from the recorded document.
+Architecture and evidence boundaries:
+
+- bounded 365-day commercially relevant Master slice;
+- separately refreshed verified cache on `data/towersignal-acris`;
+- current cache branch head at this reconstruction: `82d57a7b01fb9e6f3202f6a046c002414250b934`;
+- Pages consumes the last verified cache rather than querying ACRIS live during ordinary deployment;
+- ACRIS cache refresh independently re-verifies five deterministic cached documents against live Master, Legals and Parties before persistence;
+- source metadata enrichment may record unavailable metadata explicitly, but hard resource data retrieval, exact joins and independent evidence verification remain fail-closed;
+- no ACRIS party may be inferred to be the current owner, cooling-tower operator, procurement contact, service provider or vendor solely from a recorded document;
+- ACRIS remains outside NYC durable history and outside Priority Score 1.0.
 
 ## 6. NYC Priority Score 1.0 — immutable current contract
 
 Model constant: `PRIORITY_MODEL_VERSION = "1.0"`.
-
-The current implementation in `scripts/towersignal/scoring.py` is:
 
 | Component | Points |
 | --- | ---: |
@@ -188,16 +213,15 @@ The current implementation in `scripts/towersignal/scoring.py` is:
 | recent NYC Health regulatory activity | +10 |
 | total | capped at 100 |
 
-Rules version at this baseline: `nyc-2026-05-08`.
+Rules version: `nyc-2026-05-08`.
 
 Interpretation contract:
 
 - Priority Score is a commercial research-priority score.
 - It is not a health-risk score, regulatory-risk score, safety rating, compliance probability or legal conclusion.
 - Evidence confidence is separate from score.
-- DOB, PLUTO, HPD and OATH outcome fields do not silently alter model 1.0.
-- Pending ACRIS must not alter model 1.0.
-- A future Opportunity Score must be a separate, explicitly versioned model rather than a silent rewrite of Priority Score.
+- DOB, PLUTO, HPD, OATH outcomes and ACRIS do not silently alter model 1.0.
+- A future Opportunity Score must be a separate, explicitly versioned model.
 
 ## 7. Historical-state architecture and storage guardrails
 
@@ -205,32 +229,31 @@ Durable history branch: `data/towersignal-history`.
 
 ### NYC history
 
-- schema: compact durable observation representation introduced in Build 007;
+- compact durable observation representation introduced in Build 007;
 - hard snapshot ceiling: **25 MiB / 26,214,400 bytes**;
-- current `latest.json`: **22,323,020 bytes / 21.29 MiB**;
-- current ceiling utilization: **85.16%**;
-- current retained `events.json`: **436,161 bytes**;
+- current `latest.json`: **22,321,255 bytes / ~21.29 MiB**;
+- current ceiling utilization: **~85.15%**;
+- current retained `events.json`: **498,803 bytes**;
 - relative-growth anomaly guard remains active;
-- DOB baseline is deduplicated by exact BBL at top level rather than duplicated per system.
-
-Because the NYC snapshot is already at ~85% of its hard ceiling, new high-volume source state must not be added casually. ACRIS is intentionally excluded from this history store.
+- DOB baseline is deduplicated by exact BBL at top level rather than duplicated per system;
+- ACRIS is intentionally excluded from this near-limit history store.
 
 ### NYS history
 
 - physically separate under `data/history/nys/`;
 - hard snapshot ceiling: **8 MiB / 8,388,608 bytes**;
-- current `latest.json`: **3,451,744 bytes / 3.29 MiB**;
-- current ceiling utilization: **41.15%**;
-- current `events.json`: 13 bytes at this observed snapshot (no retained NYS events in the current file);
-- ignores routine movement in source-relative counters such as `lastupdate` / `last_sampled_days` when those would manufacture daily changes.
+- current `latest.json`: **3,451,744 bytes / ~3.29 MiB**;
+- current ceiling utilization: **~41.15%**;
+- current `events.json`: **13 bytes** at this snapshot;
+- routine source-relative counters such as `lastupdate` / `last_sampled_days` do not manufacture daily changes.
 
 ### Persistence invariant
 
-The normal Pages pipeline stages generated history during build but persists it to `data/towersignal-history` **only after the deployed Pages application passes hosted verification**. A failed hosted build must not advance the durable observation baseline.
+The Pages pipeline stages history during build but persists it to `data/towersignal-history` **only after the deployed application passes hosted verification**. A failed hosted build must not advance the durable observation baseline.
 
 ## 8. Source-health invariant
 
-Source health measures the path:
+Source health measures the full path:
 
 `requested → retrieved → normalized → matched → attached → displayed/represented`
 
@@ -240,9 +263,10 @@ Key safeguards include:
 - attached-but-not-represented regression detection;
 - material relative coverage-collapse guards;
 - persisted previous verified coverage for comparison;
-- explicit scope notes where low absolute coverage is expected rather than anomalous.
+- explicit scope notes where low absolute coverage is expected rather than anomalous;
+- ACRIS cache freshness/availability represented explicitly.
 
-A pipeline run is not considered successful merely because an upstream query returned rows.
+A pipeline run is not successful merely because an upstream query returned rows.
 
 ## 9. Current UI / workflow contract
 
@@ -257,86 +281,88 @@ Current navigation:
 Current commercial behaviors include:
 
 - NYC prospect filtering by search, timing/evidence/contact/OATH/violation/geography/equipment/priority criteria;
-- commercial signal summary metrics;
+- ACRIS recent-activity quick filter and explicit filter when a verified cache is available;
+- commercial signal summary including recent ACRIS timing;
 - account-priority table emphasizing timing/evidence/contact/activity context;
-- detail slide-over retaining source-backed evidence and historical context;
-- CSV export;
-- copied source-backed lead brief;
+- detail slide-over retaining source-backed evidence, including ACRIS recorded property activity where exact matches exist;
+- CSV export and copied source-backed lead brief;
 - browser-local saved filter views under `towersignal.savedViews.v1`;
 - same filtered NYC set shared between Prospect and Map;
 - separate NYS source regime and NYS change view;
 - compact source-health/provenance trust surfaces.
 
+ACRIS is commercial timing/property-record context, not another raw-data workspace and not a new regulatory score.
+
 ### Known workflow limitation
 
-Saved views are currently `localStorage` only. There is no durable cross-device watchlist, account disposition, note, next-action or alert/digest system. This is the highest-priority product-depth gap after Build 013.
+Saved views are currently `localStorage` only. There is no durable cross-device watchlist, account disposition, note, next-action or alert/digest system. This is the next product-depth frontier, but it must not start before repository governance issue #65 is complete.
 
-## 10. Build 013 — current state and blocker
+## 10. Build 013 — CLOSED
 
-PR: **#43 — Build 013: verified ACRIS property timing intelligence**
+GitHub issue: **#46 — completed**.
 
-Current old branch head: `c7b063f91b0c52c72604118f709b967bece38a55`.
+Implementation/closeout lineage:
 
-Status: **open, unmerged; do not merge as-is**.
+- PR #59 — reconciled bounded ACRIS implementation into the commercial Prospect/Monitor/Map architecture; merged exact green head `24938072fb17b0a121b80ef074868a20f4e8e9ec`;
+- PR #63 — test-only mobile fallback hosted assertion alignment;
+- PR #67 — test-only enriched ACRIS hosted selector scoping;
+- PR #64 — explicit repository context for post-cache `require_acris=true` Pages dispatch;
+- PR #43 — stale pre-redesign implementation branch, closed unmerged;
+- PR #66 — duplicate dispatch closeout branch, closed unmerged.
 
-### Proven architecture
+Production envelope repeatedly reproduced:
 
-A full decades-long ACRIS-per-BBL crawl was rejected after scale diagnostics because it exceeded acceptable production latency and was sensitive to Socrata query planning/timeouts.
-
-The replacement bounded strategy was proven at production scale:
-
-- 365-day commercially relevant Master slice;
-- exact document resolution into Legals;
-- exact intersection with the 2,991 TowerSignal NYC BBL universe;
-- Parties fetched only for matched tower-property documents;
-- 296 BBLs with recent relevant ACRIS activity;
+- 2,991 TowerSignal cooling-tower BBLs requested;
+- 296 BBLs with relevant recent ACRIS activity;
 - 1,802 matched recent documents;
 - 4,654 Party rows;
-- 1,747,658-byte verified cache;
-- 386 cooling-tower systems enriched across 296 matched BBLs;
+- approximately 1.75 MB verified cache;
+- 386 cooling-tower systems displaying exact-BBL recent ACRIS context;
 - observed recent-activity prevalence 9.9%;
-- deterministic sampled records independently reproduced from live Master, Legals and Parties.
+- five deterministic sampled documents independently reproduced against all three authoritative ACRIS datasets.
 
-### Current blocker
+The bounded strategy replaced an impractical decades-long per-BBL crawl after diagnostics showed unacceptable latency/query-planning sensitivity. Do not revert to the rejected full-history architecture without new evidence.
 
-The latest required ACRIS cache workflow on PR #43 failed during `build-cache` because the Master metadata endpoint `https://data.cityofnewyork.us/api/views/bnx9-e6tj` timed out after five attempts. Normal repository CI passed; the required cache/integration gate did not.
+## 11. Current roadmap and hard start gates
 
-Evidence therefore supports **upstream metadata-endpoint latency as the observed failure**, not rejection of the already-proven bounded-cache architecture.
+Completed closeout/governance prerequisites:
 
-### Reconciliation requirement
+- **#46 — Build 013 ACRIS production closeout — COMPLETE**;
+- **#53 — GitHub Pages publishing source switched to GitHub Actions — COMPLETE**.
 
-PR #43 was based on pre-commercial-redesign `main` and overlaps current commercial UI files including `App.tsx`, `Filters.tsx`, `SystemTable.tsx` and `main.tsx`. Do not resolve this by taking the old PR versions wholesale.
+Next hard prerequisite:
 
-Required continuation:
+- **#65 — Harden `main` branch protection after Build 013 closeout — OPEN**.
 
-1. branch from the current verified `dfec21e…` baseline;
-2. selectively port the proven ACRIS backend/workflow/cache/types/detail components;
-3. manually integrate ACRIS into the current Prospect/account workflow;
-4. preserve Prospect / Monitor / Map / NYS Market / NYS Changes and current visual hierarchy;
-5. diagnose the metadata endpoint separately, one hypothesis at a time;
-6. merge only from an exact head with both normal CI and full ACRIS cache/integration green;
-7. require normal Pages build/deploy/desktop+iPhone verification after merge.
+Current GitHub branch metadata at this reconstruction reports `main` as **not protected**. Build 014 must not start until #65 is enabled and verified.
 
-ACRIS must remain outside Priority Score 1.0 and the NYC durable history store.
+After #65:
 
-## 11. Current roadmap issues
+1. **#47 — Build 014: persistent prospect workflow** — durable watchlists/saved accounts, saved views, disposition, notes, next-action dates, source-backed watched-account activity feed, then digest/handoff;
+2. **#48 — Opportunity Score 2.0** — a separate commercial-ranking model, never a silent Priority Score rewrite;
+3. **#49 — owner portfolio intelligence** from exact PLUTO property context;
+4. **#50 — evaluate LL84/additional triggers** by commercial lift rather than source count;
+5. **#51 — broader SaaS productization** only after repeatable workflow value is proven.
 
-The roadmap is now represented in GitHub issues rather than existing only in conversation history:
+Target sequencing:
 
-1. **#46 — Build 013: reconcile ACRIS with commercial UI and close production gate**
-2. **#47 — Persistent prospect workflow: watchlists, account state, notes and digests**
-3. **#48 — Opportunity Score 2.0: separate commercial ranking from regulatory evidence**
-4. **#49 — Owner portfolio intelligence from exact PLUTO property context**
-5. **#50 — Evaluate LL84 and additional data triggers by commercial lift**
-6. **#51 — SaaS productization after workflow validation**
+`branch protection → persistent workflow → separate Opportunity Score → portfolio intelligence → evidence-gated sources → SaaS infrastructure`
 
-Target sequencing after Build 013:
+Additional data sources should pass a commercial-lift test: does the source materially improve **who** to investigate/contact, **when** to act, or **why** the account is commercially valuable/timely?
 
-`persistent workflow → separate Opportunity Score → portfolio intelligence → evidence-gated additional sources → SaaS infrastructure`
+## 12. Branch-protection contract for #65
 
-Additional sources should pass a commercial-lift test before implementation: does the source materially improve **who** to investigate/contact, **when** to act, or **why** the account is commercially valuable/timely?
+Required before Build 014:
 
-## 12. Change-control rules for future work
+1. changes to `main` go through pull requests;
+2. standard repository CI is a required merge check;
+3. accidental direct pushes to production are blocked while preserving a deliberate owner/admin recovery path;
+4. require branches to be up to date only if it does not create unnecessary merge churn;
+5. verify the rule is actually active after configuration.
+
+Do **not** blindly require the current path-filtered ACRIS workflow as a branch-protection check. Unrelated PRs may not emit it. If ACRIS later becomes repository-required, first create an always-reporting gate that returns `PASS` or `NOT_REQUIRED` deterministically.
+
+## 13. Change-control rules for future work
 
 Before changing production:
 
@@ -345,15 +371,15 @@ Before changing production:
 3. trace incorrect data through source → collection → processing → stored payload → client mapping → rendering → display before changing presentation;
 4. test one hypothesis at a time on an isolated branch where practical;
 5. keep experiments reversible and do not build on failed experiments;
-6. do not relax source-health/history gates to make a build pass without evidence;
+6. do not relax source-health/history gates merely to make a build pass;
 7. do not refactor unrelated working code during a targeted fix;
 8. do not change approved/verified UI while fixing unrelated data or backend behavior;
 9. merge only from an exact green head;
 10. treat merge as distinct from deployment proof; require hosted verification for production claims.
 
-## 13. What is not yet a finished commercial SaaS
+## 14. What is not yet a finished commercial SaaS
 
-TowerSignal currently has a strong technical/public-data intelligence foundation, but conventional SaaS infrastructure is intentionally deferred until the core workflow is proven useful. Not yet implemented as durable multi-user product capabilities:
+TowerSignal has a strong public-data intelligence foundation but intentionally defers conventional SaaS infrastructure until the core workflow is proven useful. Not yet implemented as durable multi-user product capabilities:
 
 - authentication;
 - organizations/workspaces/users;
@@ -366,4 +392,4 @@ TowerSignal currently has a strong technical/public-data intelligence foundation
 - tenant authorization/isolation;
 - customer support/admin tooling.
 
-The next commercial-product challenge is therefore not simply adding more datasets. It is converting existing evidence and deterministic change intelligence into a repeatable prospecting/monitoring workflow.
+The next commercial-product challenge is not simply adding more datasets. It is converting the existing source-backed evidence, ACRIS timing context and deterministic change intelligence into a repeatable prospecting/monitoring workflow.
