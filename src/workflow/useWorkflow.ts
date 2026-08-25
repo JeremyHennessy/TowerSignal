@@ -205,7 +205,6 @@ export function useWorkflow() {
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save account workflow state')
-      throw err
     } finally { setBusy(false) }
   }, [user])
 
@@ -222,7 +221,6 @@ export function useWorkflow() {
       if (enabled) setAccounts(current => current.some(item => item.system_id === systemId) ? current : [...current, { system_id: systemId, status: 'new', note: '', next_action_date: null }])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to update watchlist')
-      throw err
     } finally { setBusy(false) }
   }, [user])
 
