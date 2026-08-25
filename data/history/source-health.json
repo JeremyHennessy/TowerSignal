@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-24T22:39:40.971964Z",
+  "generated_at": "2026-08-25T11:45:53.056589Z",
   "sources": [
     {
       "source_key": "registrations",
@@ -67,8 +67,8 @@
       "attached_entity_count": 3669,
       "displayed_entity_count": 3669,
       "coverage_percentage": 95.82,
-      "previous_coverage_percentage": 96.29,
-      "coverage_change_percentage_points": -0.47,
+      "previous_coverage_percentage": 95.82,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact BBL match coverage; one BBL can attach to more than one cooling-tower system.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -147,23 +147,21 @@
     },
     {
       "source_key": "acris_recent",
-      "dataset_id": "ACRIS-VERIFIED-CACHE",
+      "dataset_id": "bnx9-e6tj+8h5j-fqxa+636b-3b5g",
       "name": "NYC ACRIS recent property activity cache",
       "entity_unit": "cooling-tower BBLs with relevant ACRIS activity in the bounded window",
-      "retrieved_record_count": 0,
+      "retrieved_record_count": 1802,
       "requested_entity_count": 2991,
-      "normalized_entity_count": 0,
-      "matched_entity_count": 0,
-      "attached_entity_count": 0,
-      "displayed_entity_count": 0,
-      "coverage_percentage": null,
+      "normalized_entity_count": 296,
+      "matched_entity_count": 296,
+      "attached_entity_count": 386,
+      "displayed_entity_count": 386,
+      "coverage_percentage": 9.9,
       "previous_coverage_percentage": null,
       "coverage_change_percentage_points": null,
-      "coverage_note": "Verified ACRIS cache is temporarily unavailable. TowerSignal remains published from its other verified sources; ACRIS timing context is omitted rather than inferred.",
-      "status": "WARNING",
-      "status_reasons": [
-        "verified ACRIS cache unavailable for this snapshot"
-      ]
+      "coverage_note": "Coverage is observed 365-day relevant-document activity prevalence across exact cooling-tower BBLs, not a source-completeness target. A BBL without a cached match is not evidence that no property transaction or filing ever occurred.",
+      "status": "HEALTHY",
+      "status_reasons": []
     }
   ]
 }
