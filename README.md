@@ -1,19 +1,23 @@
 # TowerSignal
 
-TowerSignal is a source-backed commercial timing and account-intelligence product for cooling-tower service providers. It turns public cooling-tower, regulatory, property, construction and contact records into an explainable workspace for finding, prioritizing, monitoring and investigating accounts.
+TowerSignal is a source-backed commercial timing and account-intelligence product for cooling-tower service providers. It turns public cooling-tower, regulatory, property, construction, contact and recent property-transaction records into an explainable workspace for finding, prioritizing, monitoring and investigating accounts.
 
 ## Live product
 
 Live demo: `https://jeremyhennessy.github.io/TowerSignal/`
 
-**Verified production baseline:** `dfec21e063c75f077b33879044113515d89e11ff` — August 24, 2026.
+**Verified production baseline:** `56fd31300d4d5f128c751e75f3607438073da0ab` — August 25, 2026.
 
-Production GitHub Pages run #33 (`32766611745`) passed the complete gated chain on this exact baseline:
+Build 013 ACRIS workflow #25 (`32845745013`) and the mandatory required-cache GitHub Pages run #40 (`32848763862`) passed the complete production chain on this exact application baseline:
 
+- bounded ACRIS cache construction and production-volume validation
+- independent five-document live ACRIS verification
+- durable verified-cache persistence
+- explicit `require_acris=true` cache attachment assertion
 - current NYC and NYS authoritative-source generation
-- source-health and join-coverage validation
-- deterministic NYC and NYS history generation
-- independent source verification
+- source-health and join/attachment/display validation, including ACRIS freshness/health
+- deterministic NYC and NYS history generation and size guards
+- independent NYC and NYS source verification
 - Python and frontend tests, lint, TypeScript and production build
 - GitHub Pages deployment
 - hosted desktop Chromium verification
@@ -26,13 +30,13 @@ The canonical engineering/project state, build history, source contracts and roa
 
 The commercial interface is organized around user tasks rather than datasets:
 
-- **Prospect** — search, filter and prioritize NYC cooling-tower accounts; save browser-local filter views; inspect source-backed account evidence; export the current account set.
+- **Prospect** — search, filter and prioritize NYC cooling-tower accounts; filter on recent verified ACRIS property activity; save browser-local filter views; inspect source-backed account evidence; export the current account set.
 - **Monitor** — review deterministic changes observed across preserved NYC public-record history.
 - **Map** — explore the same filtered NYC opportunity set geographically.
 - **NYS Market** — explore the separate New York State Cooling Tower Registry evidence regime without projecting NYC rules or Priority Score semantics onto NYS records.
-- **NYS Changes** — review deterministic changes in the preserved NYS Equipment_ID history.
+- **NYS Changes** — review deterministic changes in the preserved NYS `Equipment_ID` history.
 
-Account detail can include registration identity, sampling, NYC Health inspections, exact-matched OATH cases, PLUTO building/owner context, HPD registration contacts, DOB NOW project activity, historical profile and TowerSignal change history.
+Account detail can include registration identity, sampling, NYC Health inspections, exact-matched OATH cases, PLUTO building/owner context, HPD registration contacts, DOB NOW project activity, recent exact-BBL ACRIS property activity, historical profile and TowerSignal change history.
 
 ## Current authoritative sources
 
@@ -45,11 +49,14 @@ Account detail can include registration identity, sampling, NYC Health inspectio
 | DOB NOW: Build – Job Application Filings | `w9ak-ipjd` | construction/mechanical/cooling-tower timing context | exact quoted BBL |
 | HPD Multiple Dwelling Registrations | `tesw-yqqr` | qualifying-property registration context | exact BBL |
 | HPD Registration Contacts | `feu5-w2e2` | public registered-contact context | exact HPD `registration_id` after exact-BBL registration match |
-| NYS Cooling Tower Registry Weekly Extract | `24a4-muw7` | statewide equipment/status/compliance market intelligence | exact source `Equipment_ID`; conservative exact normalized address + city + ZIP property grouping |
+| NYS Cooling Tower Registry Weekly Extract | `24a4-muw7` | statewide equipment/status/compliance market intelligence | exact source `Equipment_ID`; conservative exact normalized address + city + ZIP grouping |
+| NYC ACRIS Real Property | Master `bnx9-e6tj`, Legals `8h5j-fqxa`, Parties `636b-3b5g` | bounded recent property-transaction/recording timing context | exact cooling-tower BBL → exact Legals BBL → exact `document_id` into Master + Parties |
 
-No fuzzy address, owner, respondent, property or contact matching is used merely to increase coverage.
+No fuzzy address, owner, respondent, property, document or contact matching is used merely to increase coverage.
 
-The most recently persisted source-health snapshot (2026-08-24T19:14:30Z) reports all eight current source models **HEALTHY**. Current coverage includes 4,894 NYC systems, 98.79% inspection-history coverage, 99.47% exact OATH ticket coverage, 96.29% exact PLUTO BBL coverage, 91.68% exact DOB NOW BBL coverage, 99.33% HPD-contact coverage among matched HPD registrations, and 6,236/6,236 NYS Equipment_ID records represented.
+The most recently persisted source-health snapshot (2026-08-25T12:43:18Z) reports all **nine** current source models **HEALTHY**. Current coverage includes 4,894 NYC systems, 98.79% inspection-history coverage, 99.47% exact OATH ticket coverage, 95.82% exact PLUTO BBL coverage, 91.68% exact DOB NOW BBL coverage, 99.33% HPD-contact coverage among matched HPD registrations, 6,236/6,236 NYS `Equipment_ID` records represented, and 296 of 2,991 cooling-tower BBLs with relevant recent ACRIS activity (386 displayed systems; 9.9% observed recent-activity prevalence).
+
+ACRIS 9.9% is an observed 365-day activity prevalence, not a completeness target. A missing bounded-cache match is not evidence that no historical property transaction exists.
 
 ## Priority Score 1.0 — locked semantics
 
@@ -65,7 +72,7 @@ Model `1.0` currently assigns:
 - **+10** recent NYC Health regulatory activity
 - total capped at **100**
 
-The model version is defined in `scripts/towersignal/__init__.py`; implementation is in `scripts/towersignal/scoring.py`. New commercial opportunity-ranking work must be a separate, explicitly versioned model and must not silently modify Priority Score 1.0.
+The model version is defined in `scripts/towersignal/__init__.py`; implementation is in `scripts/towersignal/scoring.py`. DOB, PLUTO, HPD, OATH outcome fields and ACRIS do **not** silently alter Priority Score 1.0. New commercial opportunity-ranking work must be a separate, explicitly versioned model.
 
 ## Signal and evidence semantics
 
@@ -74,9 +81,32 @@ The model version is defined in `scripts/towersignal/__init__.py`; implementatio
 - **No public sample date** — no usable reported sample date is present in the current public registration record. Evidence confidence: `VERIFY`.
 - **DOB activity** — exact-BBL construction/project context. A `Cooling tower mention` is used only when the published DOB job description explicitly names cooling-tower work. Mechanical/boiler flags remain broader property context.
 - **PLUTO / HPD context** — public property or registration context only. It does not establish cooling-tower procurement responsibility or a service-provider relationship.
+- **ACRIS activity** — recent recorded property-document timing context from an exact-BBL/document chain. Recorded parties are document parties only; TowerSignal does not infer that they are current owners, operators, procurement contacts, service providers or vendors.
 - **NYS status/compliance** — represented using the NYS source-native evidence regime. NYC Priority Score and NYC regulatory inference are not projected onto NYS equipment.
 
 NYC Health rules are versioned in [`config/rules/nyc.json`](config/rules/nyc.json). Current rules version: `nyc-2026-05-08`.
+
+## ACRIS verified-cache architecture
+
+A full decades-long ACRIS-per-BBL crawl was rejected after scale diagnostics showed unacceptable latency/query-planning sensitivity. Production uses a bounded, separately refreshed cache instead:
+
+```text
+current TowerSignal NYC BBL universe
+        ↓ exact BBL
+365-day relevant ACRIS Master slice + Legals
+        ↓ exact document_id
+ACRIS Parties
+        ↓
+production-volume validation
+        ↓
+independent live five-document verification
+        ↓
+verified cache persisted to data/towersignal-acris
+        ↓
+normal Pages builds attach last verified cache
+```
+
+The current durable cache branch is `data/towersignal-acris`. ACRIS is deliberately excluded from the near-limit NYC durable observation history and from Priority Score 1.0.
 
 ## Historical intelligence
 
@@ -84,13 +114,14 @@ TowerSignal maintains deterministic durable observation history separately from 
 
 - NYC durable history branch: `data/towersignal-history`
 - NYC history hard ceiling: **25 MiB**
-- current NYC snapshot: **22,323,020 bytes / 21.29 MiB**
+- current NYC snapshot: **22,321,255 bytes / ~21.29 MiB**
+- current NYC retained events: **498,803 bytes**
 - NYS history hard ceiling: **8 MiB**
-- current NYS snapshot: **3,451,744 bytes / 3.29 MiB**
+- current NYS snapshot: **3,451,744 bytes / ~3.29 MiB**
 - first baselines and schema/enrichment recoveries are guarded against synthetic change events
 - history is persisted only after the deployed site passes hosted verification
 
-Current change intelligence includes core system/source transitions, OATH case lifecycle evidence, PLUTO/HPD context changes where supported, DOB NOW lifecycle events, and separate NYS Equipment_ID status/compliance/sample/operation changes.
+Current change intelligence includes core system/source transitions, OATH case lifecycle evidence, PLUTO/HPD context changes where supported, DOB NOW lifecycle events, and separate NYS `Equipment_ID` status/compliance/sample/operation changes. ACRIS remains a separately refreshed current timing cache rather than durable NYC change-state payload.
 
 ## Architecture
 
@@ -109,24 +140,27 @@ Optimized static summary/detail JSON
         ↓
 React + TypeScript + Vite
         ↓
-GitHub Pages
+GitHub Pages via Actions workflow
         ↓
 Hosted Chromium + iPhone/WebKit verification
         ↓
 Persist verified history state
+
+Separately:
+ACRIS bounded retrieval → exact joins → live verification → durable verified cache → Pages attachment
 ```
 
-A failed authoritative-source retrieval, incomplete pagination, schema anomaly, join/attachment/display regression, history-size anomaly, test, build, deployment or hosted-browser verification prevents the new run from becoming the verified state. The application does not intentionally substitute fixture/mock production records after a source failure.
+A failed authoritative-source retrieval, incomplete pagination, schema anomaly, join/attachment/display regression, history-size anomaly, test, build, deployment or hosted-browser verification prevents the new run from becoming verified state. The application does not intentionally substitute fixture/mock production records after a source failure.
 
 ## Current development frontier
 
-**Build 013 — ACRIS recent property transaction timing intelligence** is not merged. The intended architecture is a bounded 365-day, separately refreshed verified cache using exact joins:
+**Build 013 is complete and production verified.** GitHub Pages publishing is workflow-only and issue #53 is complete.
 
-`cooling-tower BBL → ACRIS Legals borough/block/lot → document_id → Master + Parties`
+The next hard prerequisite is **#65 — protect `main`**. Current branch metadata still reports `main` as unprotected. Build 014 must not start until branch protection is enabled and verified.
 
-A full decades-long ACRIS crawl was rejected after scale diagnostics. The bounded architecture has passed production-volume proof, but the current Build 013 branch must be reconciled manually with the verified commercial UI and its final ACRIS cache/integration gate must be green before merge. ACRIS must remain outside Priority Score 1.0 and outside the near-limit NYC durable history snapshot.
+After #65, **Build 014 / issue #47** is the next product build: persistent cross-device prospect workflow (saved accounts/watchlists, persistent saved views, disposition, notes, next-action dates, Changes-driven watched-account activity and later digest/CRM handoff). The goal is the minimum durable synchronization/service layer that proves workflow value—not a full multi-tenant SaaS rewrite.
 
-Roadmap issues are tracked in GitHub, beginning with Build 013 reconciliation and persistent prospect/watchlist workflow. See [`docs/project-state.md`](docs/project-state.md).
+Opportunity Score 2.0, owner portfolio intelligence, LL84/additional-source evaluation and broader SaaS productization remain later, separate workstreams. See [`docs/project-state.md`](docs/project-state.md).
 
 ## Local development and tests
 
@@ -151,6 +185,8 @@ python scripts/verify_live_data.py --sample-size 5
 python scripts/verify_live_nys.py --sample-size 5
 npm run build
 ```
+
+ACRIS cache maintenance/verification is handled by the dedicated Actions workflow and related `scripts/*acris*` utilities rather than the normal live Pages source path.
 
 ## Responsible use
 
