@@ -53,26 +53,21 @@ ALTER TABLE public.workflow_watchlists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workflow_accounts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workflow_watchlist_members ENABLE ROW LEVEL SECURITY;
 
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='workflow_saved_views' AND policyname='workflow_saved_views_own_rows') THEN
-    CREATE POLICY workflow_saved_views_own_rows ON public.workflow_saved_views
-      TO authenticated USING (auth.user_id() = user_id) WITH CHECK (auth.user_id() = user_id);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='workflow_watchlists' AND policyname='workflow_watchlists_own_rows') THEN
-    CREATE POLICY workflow_watchlists_own_rows ON public.workflow_watchlists
-      TO authenticated USING (auth.user_id() = user_id) WITH CHECK (auth.user_id() = user_id);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='workflow_accounts' AND policyname='workflow_accounts_own_rows') THEN
-    CREATE POLICY workflow_accounts_own_rows ON public.workflow_accounts
-      TO authenticated USING (auth.user_id() = user_id) WITH CHECK (auth.user_id() = user_id);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='workflow_watchlist_members' AND policyname='workflow_watchlist_members_own_rows') THEN
-    CREATE POLICY workflow_watchlist_members_own_rows ON public.workflow_watchlist_members
-      TO authenticated USING (auth.user_id() = user_id) WITH CHECK (auth.user_id() = user_id);
-  END IF;
-END
-$$;
+DROP POLICY IF EXISTS workflow_saved_views_own_rows ON public.workflow_saved_views;
+CREATE POLICY workflow_saved_views_own_rows ON public.workflow_saved_views
+  TO authenticated USING (auth.user_id() = user_id) WITH CHECK (auth.user_id() = user_id);
+
+DROP POLICY IF EXISTS workflow_watchlists_own_rows ON public.workflow_watchlists;
+CREATE POLICY workflow_watchlists_own_rows ON public.workflow_watchlists
+  TO authenticated USING (auth.user_id() = user_id) WITH CHECK (auth.user_id() = user_id);
+
+DROP POLICY IF EXISTS workflow_accounts_own_rows ON public.workflow_accounts;
+CREATE POLICY workflow_accounts_own_rows ON public.workflow_accounts
+  TO authenticated USING (auth.user_id() = user_id) WITH CHECK (auth.user_id() = user_id);
+
+DROP POLICY IF EXISTS workflow_watchlist_members_own_rows ON public.workflow_watchlist_members;
+CREATE POLICY workflow_watchlist_members_own_rows ON public.workflow_watchlist_members
+  TO authenticated USING (auth.user_id() = user_id) WITH CHECK (auth.user_id() = user_id);
 
 GRANT USAGE ON SCHEMA public TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.workflow_saved_views TO authenticated;
