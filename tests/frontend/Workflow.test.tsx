@@ -63,6 +63,7 @@ test('migrates existing browser-local saved views when first signing into an emp
   window.localStorage.setItem('towersignal.savedViews.v1', JSON.stringify([localView]))
   remote.loadWorkflowSnapshot
     .mockResolvedValueOnce({ savedViews: [], watchlists: [], accounts: [], memberships: [] })
+    .mockResolvedValueOnce({ savedViews: [localView], watchlists: [], accounts: [], memberships: [] })
     .mockResolvedValueOnce({ savedViews: [localView], watchlists: [{ id: 'default', name: 'My watchlist' }], accounts: [], memberships: [] })
 
   const { result } = renderHook(() => useWorkflow())
@@ -70,6 +71,21 @@ test('migrates existing browser-local saved views when first signing into an emp
   expect(remote.saveRemoteView).toHaveBeenCalledWith(localView)
   expect(remote.createRemoteWatchlist).toHaveBeenCalledWith({ id: 'default', name: 'My watchlist' })
   expect(result.current.savedViews.map(view => view.name)).toContain('Queens follow-up')
+})
+
+test('adds a local-only saved view to an existing remote workspace without overwriting either side', async () => {
+  const localView = { id: 'local-2', name: 'Queens local', filters: { ...initialFilters, borough: 'Queens' } }
+  window.localStorage.setItem('towersignal.savedViews.v1', JSON.stringify([localView]))
+  remote.loadWorkflowSnapshot
+    .mockResolvedValueOnce(remoteSnapshot)
+    .mockResolvedValueOnce({ ...remoteSnapshot, savedViews: [...remoteSnapshot.savedViews, localView] })
+
+  const { result } = renderHook(() => useWorkflow())
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(remote.saveRemoteView).toHaveBeenCalledWith(localView)
+  expect(result.current.savedViews.map(view => view.name)).toEqual(expect.arrayContaining(['Manhattan', 'Queens local']))
+  const persisted = JSON.parse(window.localStorage.getItem('towersignal.savedViews.v1') ?? '[]') as Array<{ name: string }>
+  expect(persisted.map(view => view.name)).toEqual(['Queens local'])
 })
 
 test('does not overwrite signed-out local saved views with signed-in private views', async () => {
