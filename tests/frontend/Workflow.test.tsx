@@ -2,6 +2,7 @@ import { act, render, renderHook, screen, waitFor } from '@testing-library/react
 import { beforeEach, expect, test, vi } from 'vitest'
 import { WorkflowAccountSection } from '../../src/components/WorkflowAccountSection'
 import { initialFilters } from '../../src/components/Filters'
+import { workflowCsvText } from '../../src/utils/workflowExport'
 
 const remote = vi.hoisted(() => ({
   getWorkflowSession: vi.fn(),
@@ -128,6 +129,15 @@ test('saves private account disposition without treating it as source evidence',
   })
   expect(remote.saveRemoteAccount).toHaveBeenCalledWith('SYS-2', { status: 'follow-up', note: 'Asked for proposal timing', next_action_date: '2026-09-15' })
   expect(result.current.accountBySystemId.get('SYS-2')?.status).toBe('follow-up')
+})
+
+test('includes an annotated non-watchlisted account in CRM workflow export', () => {
+  const metadata = { generated_at: '2026-08-25T00:00:00Z', snapshot_date: '2026-08-25' } as Parameters<typeof workflowCsvText>[1]
+  const text = workflowCsvText([], metadata, [{ system_id: 'SYS-2', status: 'follow-up', note: 'Proposal timing', next_action_date: '2026-09-15' }], [], [])
+  expect(text).toContain('"SYS-2"')
+  expect(text).toContain('"follow-up"')
+  expect(text).toContain('"Proposal timing"')
+  expect(text).toContain('"2026-09-15"')
 })
 
 test('labels account workflow as user-entered private context', () => {
