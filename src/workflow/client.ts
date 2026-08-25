@@ -2,7 +2,6 @@ import { createClient } from '@neondatabase/neon-js'
 import type {
   WorkflowAccountPatch,
   WorkflowAccountState,
-  WorkflowMembership,
   WorkflowSavedView,
   WorkflowSnapshot,
   WorkflowUser,
