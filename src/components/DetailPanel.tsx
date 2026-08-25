@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { loadSystemDetail } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { leadSummary } from '../utils/export'
@@ -14,7 +14,7 @@ const compactHistoryValue = (value: unknown) => value == null ? '—' : typeof v
 const daysAsYears = (value: number | null) => value == null ? '—' : `${(value / 365.2425).toFixed(1)} years`
 const dobRelevanceLabel = (value: string) => value === 'COOLING_TOWER_EXPLICIT' ? 'Cooling tower mention' : value === 'MECHANICAL_OR_BOILER' ? 'Mechanical / boiler' : 'Property project'
 
-export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, onClose }: { row: SystemSummary | null; metadata: Metadata; historyEvents: ChangeEvent[]; historyStartedAt: string; onClose: () => void }) {
+export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, workflowSection, onClose }: { row: SystemSummary | null; metadata: Metadata; historyEvents: ChangeEvent[]; historyStartedAt: string; workflowSection?: ReactNode; onClose: () => void }) {
   const [detail, setDetail] = useState<SystemDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -32,6 +32,7 @@ export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, on
   return <aside className="detail-panel" aria-label="Selected cooling tower detail">
     <div className="detail-header"><div><span className="eyebrow">Selected system</span><h2>{row.address ?? row.system_id}</h2><p>{row.borough} {row.zip} · System <span className="mono">{row.system_id}</span></p></div><button className="icon-button" onClick={onClose} aria-label="Close details">×</button></div>
     <div className="detail-actions"><button onClick={copy} disabled={!detail}>{copied ? 'Copied' : 'Copy lead brief'}</button><span className="score large">{row.priority_score}</span><span>Priority score</span></div>
+    {workflowSection}
     {error && <div className="error-state">{error}</div>}
     {!detail && !error && <div className="loading-state">Loading source-backed details…</div>}
     {detail && <>
