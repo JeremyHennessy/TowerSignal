@@ -72,6 +72,38 @@ test('migrates existing browser-local saved views when first signing into an emp
   expect(result.current.savedViews.map(view => view.name)).toContain('Queens follow-up')
 })
 
+test('does not overwrite signed-out local saved views with signed-in private views', async () => {
+  const localView = { id: 'local-1', name: 'Local fallback', filters: { ...initialFilters, borough: 'Queens' } }
+  window.localStorage.setItem('towersignal.savedViews.v1', JSON.stringify([localView]))
+
+  const { result } = renderHook(() => useWorkflow())
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(result.current.savedViews[0].name).toBe('Manhattan')
+
+  const persisted = JSON.parse(window.localStorage.getItem('towersignal.savedViews.v1') ?? '[]') as Array<{ name: string }>
+  expect(persisted.map(view => view.name)).toEqual(['Local fallback'])
+})
+
+test('keeps signed-in saved-view changes private from the signed-out local fallback', async () => {
+  const localView = { id: 'local-1', name: 'Local fallback', filters: { ...initialFilters, borough: 'Queens' } }
+  window.localStorage.setItem('towersignal.savedViews.v1', JSON.stringify([localView]))
+
+  const { result } = renderHook(() => useWorkflow())
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  await act(async () => {
+    await result.current.saveView('Private follow-up', { ...initialFilters, borough: 'Brooklyn' })
+  })
+
+  expect(remote.saveRemoteView).toHaveBeenCalledWith(expect.objectContaining({ name: 'Private follow-up' }))
+  const persisted = JSON.parse(window.localStorage.getItem('towersignal.savedViews.v1') ?? '[]') as Array<{ name: string }>
+  expect(persisted.map(view => view.name)).toEqual(['Local fallback'])
+
+  await act(async () => {
+    await result.current.signOut()
+  })
+  expect(result.current.savedViews.map(view => view.name)).toEqual(['Local fallback'])
+})
+
 test('saves private account disposition without treating it as source evidence', async () => {
   const { result } = renderHook(() => useWorkflow())
   await waitFor(() => expect(result.current.loading).toBe(false))
