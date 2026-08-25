@@ -76,7 +76,6 @@ export function useWorkflow() {
     const normalizedViews = snapshot.savedViews.map(view => ({ ...view, filters: { ...initialFilters, ...view.filters } }))
     setUser(sessionUser)
     setSavedViews(normalizedViews)
-    writeLocalViews(normalizedViews)
     setWatchlists(snapshot.watchlists)
     setAccounts(snapshot.accounts)
     setMemberships(snapshot.memberships)
@@ -143,8 +142,11 @@ export function useWorkflow() {
     const existing = savedViews.find(view => view.name.toLowerCase() === name.toLowerCase())
     const view: WorkflowSavedView = { id: existing?.id ?? id('view'), name, filters: { ...filters } }
     const next = [...savedViews.filter(item => item.id !== view.id && item.name.toLowerCase() !== name.toLowerCase()), view]
-    setSavedViews(next); writeLocalViews(next)
-    if (!user) return
+    setSavedViews(next)
+    if (!user) {
+      writeLocalViews(next)
+      return
+    }
     setBusy(true); setError(null)
     try { await saveRemoteView(view) }
     catch (err) { setError(err instanceof Error ? err.message : 'Unable to sync saved view') }
@@ -153,8 +155,11 @@ export function useWorkflow() {
 
   const deleteView = useCallback(async (viewId: string) => {
     const next = savedViews.filter(view => view.id !== viewId)
-    setSavedViews(next); writeLocalViews(next)
-    if (!user) return
+    setSavedViews(next)
+    if (!user) {
+      writeLocalViews(next)
+      return
+    }
     setBusy(true); setError(null)
     try { await deleteRemoteView(viewId) }
     catch (err) { setError(err instanceof Error ? err.message : 'Unable to delete saved view') }
