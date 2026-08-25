@@ -65,9 +65,12 @@ export function useWorkflow() {
   const hydrateRemote = useCallback(async (sessionUser: WorkflowUser) => {
     let snapshot = await loadWorkflowSnapshot()
     const localViews = readLocalViews()
-    if (snapshot.savedViews.length === 0 && localViews.length > 0) {
-      for (const view of localViews) await saveRemoteView(view)
-      snapshot = { ...snapshot, savedViews: localViews }
+    const remoteIds = new Set(snapshot.savedViews.map(view => view.id))
+    const remoteNames = new Set(snapshot.savedViews.map(view => view.name.trim().toLowerCase()))
+    const localOnlyViews = localViews.filter(view => !remoteIds.has(view.id) && !remoteNames.has(view.name.trim().toLowerCase()))
+    if (localOnlyViews.length > 0) {
+      for (const view of localOnlyViews) await saveRemoteView(view)
+      snapshot = await loadWorkflowSnapshot()
     }
     if (snapshot.watchlists.length === 0) {
       await createRemoteWatchlist({ id: 'default', name: 'My watchlist' })
