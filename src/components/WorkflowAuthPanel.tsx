@@ -24,7 +24,7 @@ export function WorkflowAuthPanel({
   const [createAccount, setCreateAccount] = useState(false)
 
   if (loading) return <span className="workflow-sync-chip">Checking workflow sync…</span>
-  if (user) return <div className="workflow-auth signed-in"><span><strong>Workflow synced</strong><small>{user.email}</small></span><button onClick={() => void onSignOut()} disabled={busy}>Sign out</button></div>
+  if (user) return <div className="workflow-auth signed-in"><span><strong>Workflow synced</strong><small>{user.email}</small></span>{error && <div className="workflow-error workflow-auth-error" role="alert" title={error}>{error}</div>}<button onClick={() => void onSignOut()} disabled={busy}>Sign out</button></div>
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
