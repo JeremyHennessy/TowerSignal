@@ -33,7 +33,7 @@ test('hosted TowerSignal commercial workspace is functional across NYC and NYS m
   await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
   await expect(page.getByText(/NYC Cooling Tower Registrations · HEALTHY/)).toBeVisible()
   await expect(page.getByText(/ · FAILED · /)).toHaveCount(0)
-  await expect(page.getByText('Recent ACRIS activity', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Commercial signal summary').getByText('Recent ACRIS activity', { exact: true })).toBeVisible()
   await expect(page.getByLabel('ACRIS recorded activity')).toBeVisible()
   await expectContained(page)
 
