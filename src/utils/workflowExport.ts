@@ -6,13 +6,14 @@ function cell(value: unknown): string {
   return `"${text.replaceAll('"', '""')}"`
 }
 
-export function exportWorkflowCsv(
+export function workflowCsvText(
   rows: SystemSummary[],
   metadata: Metadata,
   accounts: WorkflowAccountState[],
   memberships: WorkflowMembership[],
   watchlists: WorkflowWatchlist[],
-): void {
+): string {
+  const rowMap = new Map(rows.map(row => [row.system_id, row]))
   const accountMap = new Map(accounts.map(account => [account.system_id, account]))
   const watchlistMap = new Map(watchlists.map(watchlist => [watchlist.id, watchlist.name]))
   const watchlistsBySystem = new Map<string, string[]>()
@@ -23,20 +24,31 @@ export function exportWorkflowCsv(
     watchlistsBySystem.set(item.system_id, names)
   })
 
+  const systemIds = [...new Set([...rowMap.keys(), ...accountMap.keys()])]
   const headers = [
     'address','borough','zip','system_id','bin','bbl','priority_score','primary_signal','evidence_confidence',
     'workflow_status','workflow_note','workflow_next_action_date','workflow_watchlists','source_snapshot_timestamp',
   ]
   const lines = [headers.map(cell).join(',')]
-  rows.forEach(row => {
-    const workflow = accountMap.get(row.system_id)
+  systemIds.forEach(systemId => {
+    const row = rowMap.get(systemId)
+    const workflow = accountMap.get(systemId)
     lines.push([
-      row.address,row.borough,row.zip,row.system_id,row.bin,row.bbl,row.priority_score,row.primary_signal,row.evidence_confidence,
-      workflow?.status ?? 'new',workflow?.note ?? '',workflow?.next_action_date ?? '',(watchlistsBySystem.get(row.system_id) ?? []).join(' | '),metadata.generated_at,
+      row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,
+      workflow?.status ?? 'new',workflow?.note ?? '',workflow?.next_action_date ?? '',(watchlistsBySystem.get(systemId) ?? []).join(' | '),metadata.generated_at,
     ].map(cell).join(','))
   })
+  return lines.join('\n')
+}
 
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' })
+export function exportWorkflowCsv(
+  rows: SystemSummary[],
+  metadata: Metadata,
+  accounts: WorkflowAccountState[],
+  memberships: WorkflowMembership[],
+  watchlists: WorkflowWatchlist[],
+): void {
+  const blob = new Blob([workflowCsvText(rows, metadata, accounts, memberships, watchlists)], { type: 'text/csv;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
