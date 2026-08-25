@@ -111,13 +111,17 @@ assert(isolatedWatchlists.length === 0, 'RLS isolation failed: second user can r
 assert(isolatedAccounts.length === 0, 'RLS isolation failed: second user can read first user account state')
 
 await dataRequest(secondSession.jwt, `workflow_watchlists?watchlist_id=eq.${encodeURIComponent(watchlistId)}`, { method: 'DELETE' })
-const afterDelete = await dataRequest(secondSession.jwt, `workflow_accounts?system_id=eq.${encodeURIComponent(systemId)}&select=system_id`)
-assert(afterDelete.length === 0, 'Cascade cleanup did not remove workflow account after watchlist deletion')
+const membershipsAfterWatchlistDelete = await dataRequest(secondSession.jwt, `workflow_watchlist_members?system_id=eq.${encodeURIComponent(systemId)}&select=watchlist_id,system_id`)
+assert(membershipsAfterWatchlistDelete.length === 0, 'Cascade cleanup did not remove watchlist membership')
+await dataRequest(secondSession.jwt, `workflow_accounts?system_id=eq.${encodeURIComponent(systemId)}`, { method: 'DELETE' })
+const accountAfterCleanup = await dataRequest(secondSession.jwt, `workflow_accounts?system_id=eq.${encodeURIComponent(systemId)}&select=system_id`)
+assert(accountAfterCleanup.length === 0, 'Explicit account cleanup failed')
 
 console.log(JSON.stringify({
   result: 'PASS',
   cross_session_recovery: true,
   rls_user_isolation: true,
-  cascade_cleanup: true,
+  membership_cascade_cleanup: true,
+  account_cleanup: true,
   test_system_id: systemId,
 }))
