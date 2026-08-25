@@ -19,7 +19,7 @@ export function WorkflowPanel({
   watchedSystemIds: Set<string>
   memberships: Array<{ watchlist_id: string; system_id: string }>
   watchedOnly: boolean
-  exportableCount: number
+  exportableCount?: number
   busy: boolean
   onToggleWatchedOnly: () => void
   onCreateWatchlist: (name: string) => Promise<void>
@@ -45,7 +45,7 @@ export function WorkflowPanel({
       const count = memberships.filter(item => item.watchlist_id === watchlist.id).length
       return <div key={watchlist.id}><span><strong>{watchlist.name}</strong><small>{count} account{count === 1 ? '' : 's'}</small></span>{watchlists.length > 1 && <button aria-label={`Delete ${watchlist.name}`} disabled={busy} onClick={() => void onDeleteWatchlist(watchlist.id)}>×</button>}</div>
     })}</div>
-    <button className="workflow-export" disabled={exportableCount === 0} onClick={onExport}>Export workflow for CRM{exportableCount > 0 ? ` (${exportableCount})` : ''}</button>
+    <button className="workflow-export" disabled={exportableCount === 0} onClick={onExport}>Export workflow for CRM{exportableCount && exportableCount > 0 ? ` (${exportableCount})` : ''}</button>
     <p className="microcopy">Watchlists and account state are private workflow records. Public evidence and scoring remain unchanged.</p>
   </section>
 }
