@@ -1,0 +1,39 @@
+/* Final reference-alignment details discovered in source-backed visual QA. */
+.reference-brand-mark{
+  width:28px!important;
+  height:30px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+.reference-brand-antenna{
+  width:25px;
+  height:29px;
+  overflow:visible;
+  fill:none;
+  stroke:#35d7aa;
+  stroke-width:1.55;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.reference-brand-antenna circle{
+  fill:#35d7aa;
+  stroke:none;
+}
+.reference-top-nav .global-share-button{
+  height:34px;
+  border:1px solid #29404b;
+  background:#0a1e28;
+  color:#dbe8e8;
+  padding:0 10px;
+  border-radius:7px;
+  font-size:9px;
+}
+.reference-top-nav .global-share-button:hover{
+  border-color:#48616d;
+  background:#112b36;
+  color:#fff;
+}
+@media(max-width:1180px){
+  .reference-top-nav .global-share-button{display:none}
+}
