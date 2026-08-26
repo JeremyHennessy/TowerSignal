@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import type { NysChangeEvent, NysChangeEventType, NysChangesPayload, NysSystem } from '../types/nys'
 import { formatDate, formatTimestamp } from '../domain/labels'
 
-const INITIAL_VISIBLE_EVENTS = 60
+const INITIAL_VISIBLE_EVENTS = 1
 
 const EVENT_LABELS: Record<NysChangeEventType, string> = {
   NYS_EQUIPMENT_FIRST_SEEN: 'New NYS equipment observed',
