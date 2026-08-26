@@ -13,129 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
-      - name: Create deterministic preview data
+      - name: Install dependencies for disposable preview
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Recover deterministic preview fixture from parent preview commit
         shell: bash
         run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          from datetime import datetime, timedelta
-
-          root = Path('public/data')
-          (root / 'details' / 'sy').mkdir(parents=True, exist_ok=True)
-          generated = '2026-08-26T19:00:00Z'
-          boroughs = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']
-          owners = ['METROPOLITAN HEALTH SYSTEM', 'NORTHSTAR PROPERTY GROUP LLC', 'CIVIC FACILITIES CORP', 'MIDTOWN HOSPITALITY LLC', 'EAST RIVER HOLDINGS']
-          systems = []
-          for i in range(1, 61):
-              high = i <= 18
-              gap = i % 3 == 0
-              missing = i % 7 == 0
-              violation = i % 5 == 0
-              priority = 88 if violation and gap else 76 if high else 58 if gap else 34 if i % 4 == 0 else 12
-              signals = []
-              if violation: signals.append('CONFIRMED_RECENT_VIOLATION')
-              if gap: signals.append('POTENTIAL_SAMPLING_GAP')
-              if missing: signals.append('NO_PUBLIC_SAMPLE_DATE')
-              if i % 4 == 0: signals.append('MULTIPLE_ACTIVE_EQUIPMENT')
-              primary = signals[0] if signals else 'NO_CURRENT_SIGNAL'
-              owner = owners[(i - 1) % len(owners)]
-              systems.append({
-                  'system_id': f'SYS-{i:03d}', 'bin': f'10{i:05d}', 'bbl': f'1{i:09d}',
-                  'address': f'{100 + i * 7} {['LEXINGTON AVE','BROADWAY','ATLANTIC AVE','QUEENS BLVD','GRAND CONCOURSE'][i % 5]}',
-                  'borough': boroughs[(i - 1) % len(boroughs)], 'zip': f'{10000 + i:05d}',
-                  'active_equipment': 1 + (i % 4), 'latitude': 40.66 + (i % 12) * .009, 'longitude': -74.02 + (i % 15) * .008,
-                  'coordinate_status': 'VALID', 'registration_date': '2017-06-15', 'sample_count': 24 + i,
-                  'inspection_count': 4 + (i % 8), 'violation_citation_count': 1 if violation else 0,
-                  'latest_violation_date': '2026-08-08' if violation else None, 'oath_balance_due_total': 2500 if violation else 0,
-                  'latest_sample_date': None if missing else ('2026-06-18' if gap else '2026-08-12'),
-                  'days_since_latest_sample': None if missing else (69 if gap else 14),
-                  'latest_inspection_date': '2026-08-15' if i % 2 == 0 else '2026-05-14', 'latest_inspection_type': 'Routine',
-                  'confirmed_violation': violation, 'recent_confirmed_violation': violation,
-                  'violation_types': ['Critical'] if violation else [], 'signal_types': signals, 'primary_signal': primary,
-                  'evidence_confidence': 'CONFIRMED' if violation else ('VERIFY' if gap or missing else 'STRONG_SIGNAL'),
-                  'priority_score': priority, 'score_components': [{'points': 40, 'reason': 'confirmed recent violation'}] if violation else [],
-                  'oath_case_count': 1 if violation else 0, 'pluto_match': True, 'pluto_owner_name': owner,
-                  'pluto_building_area_sqft': 180000 + i * 13500, 'hpd_contact_count': 2 if i % 3 != 1 else 0,
-                  'dob_activity_count': 2 if i % 4 == 0 else 0, 'dob_recent_activity_count': 1 if i % 4 == 0 else 0,
-                  'dob_explicit_cooling_tower_count': 1 if i % 9 == 0 else 0, 'dob_mechanical_or_boiler_count': 1 if i % 4 == 0 else 0,
-                  'latest_dob_activity_date': '2026-08-20' if i % 4 == 0 else None,
-                  'acris_recent_document_count': 2 if i % 6 == 0 else 0, 'acris_document_count': 5 if i % 6 == 0 else 0,
-              })
-
-          health = []
-          for key, dataset, name, retrieved, matched, coverage in [
-              ('registration','y4fw-iqfr','NYC Cooling Tower Registrations',5900,5900,100),
-              ('inspection','f9wb-g8mb','NYC Cooling Tower Inspection Results',124000,5520,94.2),
-              ('oath','jz4z-kudi','OATH Hearings / Cases',840,790,94.0),
-              ('pluto','64uk-42ks','PLUTO',5860,5790,98.8),
-              ('dob','w9ak-ipjd','DOB NOW Job Application Filings',7400,2050,34.9),
-              ('hpd','tesw-yqqr','HPD Multiple Dwelling Registrations',4100,3210,54.6),
-              ('acris','bnx9-e6tj','ACRIS Property Documents',16000,4490,76.4),
-          ]:
-              health.append({'source_key':key,'dataset_id':dataset,'name':name,'entity_unit':'source-backed records','retrieved_record_count':retrieved,'requested_entity_count':5900,'normalized_entity_count':retrieved,'matched_entity_count':matched,'attached_entity_count':matched,'displayed_entity_count':matched,'coverage_percentage':coverage,'previous_coverage_percentage':max(0,coverage-.4),'coverage_change_percentage_points':.4,'coverage_note':'Deterministic preview of production health-card shape.','status':'HEALTHY','status_reasons':[]})
-
-          metadata = {
-              'generated_at': generated, 'snapshot_date': '2026-08-26', 'sources': [], 'source_health': health,
-              'normalized_system_count': len(systems), 'source_duplicate_registration_rows': 0, 'source_missing_registration_system_id_rows': 0,
-              'invalid_coordinate_system_count': 0, 'oath_requested_ticket_count': 12, 'oath_matched_ticket_count': 12, 'oath_unmatched_ticket_count': 0,
-              'oath_match_basis': 'SUMMONS_NUMBER_EXACT', 'pluto_requested_bbl_count': 60, 'pluto_matched_bbl_count': 60,
-              'dob_requested_bbl_count': 60, 'dob_matched_bbl_count': 15, 'dob_matched_filing_count': 30,
-              'dob_explicit_cooling_tower_filing_count': 6, 'dob_mechanical_or_boiler_filing_count': 15,
-              'hpd_requested_bbl_count': 60, 'hpd_matched_registration_bbl_count': 48, 'hpd_matched_contact_bbl_count': 40,
-              'rules_version': 'nyc-2026-05-08', 'priority_model_version': '1.0',
-              'acris_cache_available': True, 'acris_cache_generated_at': generated,
-          }
-          payload = {'schema_version':'1.0','metadata':metadata,'summary':{
-              'registered_systems':60,'active_equipment':sum(x['active_equipment'] for x in systems),
-              'potential_sampling_gaps':sum('POTENTIAL_SAMPLING_GAP' in x['signal_types'] for x in systems),
-              'recent_confirmed_violations':sum(x['recent_confirmed_violation'] for x in systems),
-              'systems_with_oath_cases':sum(x['oath_case_count']>0 for x in systems),'systems_with_pluto_context':60,
-              'systems_with_dob_activity':15,'systems_with_recent_dob_activity':15,'systems_with_explicit_cooling_tower_dob_activity':6,
-              'systems_with_hpd_registration':48,'systems_with_hpd_contacts':40,'systems_with_recent_acris_activity':10,
-          },'systems':systems}
-          (root/'systems.json').write_text(json.dumps(payload), encoding='utf-8')
-
-          events = []
-          event_types = ['SAMPLE_REPORTED','OATH_CASE_ADDED','DOB_ACTIVITY_ADDED','HPD_CONTACT_CHANGED','PLUTO_OWNER_CHANGED']
-          for i in range(1, 26):
-              row = systems[(i*2) % len(systems)]
-              events.append({'event_type':event_types[i % len(event_types)],'system_id':row['system_id'],'bbl':row['bbl'],'bin':row['bin'],'address':row['address'],'borough':row['borough'],'detected_at':generated,'source_observation_date':'2026-08-26','previous_value':'prior public value','new_value':'new public value','source':'PREVIEW_SOURCE','evidence_basis':'SYSTEM_ID_EXACT','priority_score':row['priority_score'],'evidence_confidence':row['evidence_confidence'],'contact_available':row['hpd_contact_count']>0})
-          (root/'changes.json').write_text(json.dumps({'history_schema_version':'1.1','history_started_at':'2026-01-01T00:00:00Z','observed_at':generated,'baseline_initialized':False,'new_event_count':len(events),'events':events}),encoding='utf-8')
-
-          nys = []
-          for i in range(1, 31):
-              nys.append({'system_id':f'NYS-{i:03d}','source_equipment_id':str(9000+i),'jurisdiction':'NEW_YORK_STATE_EXCLUDING_NYC','source_regime':'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT','address':f'{40+i} STATE ST','city':['Albany','Buffalo','Rochester','Syracuse'][i%4],'zip':f'{12000+i:05d}','source_county':['Albany','Erie','Monroe','Onondaga'][i%4],'property_key':f'property-{(i-1)//2}','property_equipment_count':2,'regulation_compliance':'Non-compliant' if i%5==0 else 'Compliant','ct_status':'Sample_Required' if i%4==0 else 'Legionella Sampled','last_update_days':i%14,'last_sampled_days':70 if i%4==0 else 18,'latest_sample_date':'2026-06-17' if i%4==0 else '2026-08-08','latest_sample_result':'lt20','operation_duration':'Year-round','latitude':42.65+(i%8)*.08,'longitude':-76.8+(i%10)*.25,'coordinate_status':'VALID','source_latitude_raw':'42.7','source_longitude_raw':'-75.7'})
-          nys_health = [{'source_key':'nys_registry','dataset_id':'24a4-muw7','name':'New York State Cooling Tower Registry Weekly Extract','entity_unit':'NYS cooling-tower Equipment_ID records','retrieved_record_count':30,'requested_entity_count':30,'normalized_entity_count':30,'matched_entity_count':30,'attached_entity_count':30,'displayed_entity_count':30,'coverage_percentage':100,'previous_coverage_percentage':100,'coverage_change_percentage_points':0,'coverage_note':'Preview source represented.','status':'HEALTHY','status_reasons':[]}]
-          nys_payload={'schema_version':'1.0','metadata':{'schema_version':'1.0','generated_at':generated,'jurisdiction':'NEW_YORK_STATE_EXCLUDING_NYC','source_regime':'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT','source':{'dataset_id':'24a4-muw7','name':'New York State Cooling Tower Registry Weekly Extract','retrieved_at':generated,'source_record_count':30,'source_last_updated_at':'2026-08-24T00:00:00Z','url':'https://data.ny.gov','scope_note':'Preview source shape.'},'normalized_equipment_count':30,'source_duplicate_equipment_rows':0,'source_missing_equipment_id_rows':0,'invalid_coordinate_equipment_count':0,'missing_coordinate_equipment_count':0,'unique_property_count':15,'multi_equipment_property_count':15,'equipment_at_multi_equipment_properties':30,'max_equipment_per_property':2,'source_health':nys_health},'summary':{'registered_equipment':30,'mapped_equipment':30,'non_compliant':6,'compliant':24,'sample_required':7,'update_required':0,'missing_legionella_result':0,'disinfection_required':0,'decommissioned':0,'out_of_service':0,'multi_equipment_properties':15,'equipment_at_multi_equipment_properties':30,'max_equipment_per_property':2,'published_county_counts':{'Albany':8,'Erie':8,'Monroe':7,'Onondaga':7},'status_counts':{'Sample_Required':7,'Legionella Sampled':23},'compliance_counts':{'Non-compliant':6,'Compliant':24},'sample_result_counts':{'lt20':30},'operation_duration_counts':{'Year-round':30}},'systems':nys}
-          (root/'nys-systems.json').write_text(json.dumps(nys_payload),encoding='utf-8')
-          nys_events=[{'event_type':'NYS_CT_STATUS_CHANGED','system_id':x['system_id'],'source_equipment_id':x['source_equipment_id'],'address':x['address'],'city':x['city'],'zip':x['zip'],'source_county':x['source_county'],'detected_at':generated,'source_observation_date':'2026-08-26','previous_value':'Legionella Sampled','new_value':'Sample_Required','source':'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT','evidence_basis':'EQUIPMENT_ID_EXACT'} for x in nys[:12]]
-          (root/'nys-changes.json').write_text(json.dumps({'history_schema_version':'1.0','history_started_at':'2026-01-01T00:00:00Z','observed_at':generated,'baseline_initialized':False,'new_event_count':len(nys_events),'events':nys_events}),encoding='utf-8')
-
-          first = systems[0]
-          detail = {
-              'schema_version':'1.0','metadata':metadata,
-              'identity':{'system_id':first['system_id'],'bin':first['bin'],'bbl':first['bbl'],'address':first['address'],'borough':first['borough'],'zip':first['zip'],'active_equipment':first['active_equipment'],'latitude':first['latitude'],'longitude':first['longitude'],'coordinate_status':'VALID','source_latitude_raw':str(first['latitude']),'source_longitude_raw':str(first['longitude'])},
-              'historical_profile':{'registration_date':'2017-06-15','registration_age_days':3360,'first_public_evidence_date':'2017-06-15','sample':{'first_reported_date':'2017-07-15','latest_reported_date':'2026-08-12','reported_sample_count':54,'average_interval_days':31,'longest_interval_days':69},'inspection':{'first_inspection_date':'2018-01-10','latest_inspection_date':'2026-08-15','inspection_count':9,'inspections_with_violations':2,'violation_citation_count':2,'first_violation_date':'2024-04-04','latest_violation_date':'2026-08-08'},'oath':{'case_count':2,'penalty_imposed_total':3500,'paid_amount_total':1000,'balance_due_total':2500}},
-              'building_context':{'bbl':first['bbl'],'owner_name':first['pluto_owner_name'],'land_use':'05','building_class':'H6','lot_area_sqft':52000,'building_area_sqft':first['pluto_building_area_sqft'],'floors':18,'residential_units':0,'total_units':1,'year_built':1987,'year_altered_1':2016,'year_altered_2':2025,'source':'NYC_DCP_PLUTO'},
-              'dob_activity_history':[{'job_filing_number':'M00987654-I1','bbl':first['bbl'],'filing_status':'Approved','job_type':'Alteration','job_description':'Mechanical plant upgrade including cooling tower, chiller and condenser water piping.','initial_cost':1850000,'filing_date':'2026-05-12','current_status_date':'2026-08-20','first_permit_date':'2026-07-02','approved_date':'2026-06-28','signoff_date':None,'activity_date':'2026-08-20','mechanical_systems':True,'boiler_equipment':False,'explicit_cooling_tower_mention':True,'commercial_relevance':'COOLING_TOWER_EXPLICIT','owner_business_name':first['pluto_owner_name'],'applicant_business_name':'METRO MECHANICAL ENGINEERING PC','source':'NYC_DOB_NOW_JOB_APPLICATION_FILINGS','match_basis':'BBL_EXACT'}],
-              'hpd_registration':{'registration_id':'REG-1001','building_id':'BLDG-1001','last_registration_date':'2026-02-01','contacts':[{'registration_contact_id':'C-1','type':'Agent','description':'Managing Agent','corporation_name':'METRO FACILITY MANAGEMENT','person_name':'Jordan Lee','title':'Property Manager','business_address':'200 MADISON AVE NEW YORK NY 10016','source':'NYC_HPD_REGISTRATION_CONTACTS'}],'source':'NYC_HPD_MULTIPLE_DWELLING_REGISTRATION'},
-              'sample_history':{'source_raw':'08/12/2026,07/12/2026,06/12/2026','dates':['2026-06-12','2026-07-12','2026-08-12'],'malformed_values':[],'latest_sample_date':'2026-08-12','previous_sample_date':'2026-07-12','latest_sample_interval_days':31,'intervals_days':[30,31],'sample_count':54},
-              'signals':[{'type':'MULTIPLE_ACTIVE_EQUIPMENT','title':'Multiple active equipment','evidence_confidence':'STRONG_SIGNAL','fact_class':'DERIVED_FACT','date':None,'reason':'Multiple active cooling-tower equipment records create a larger service account.'}],
-              'inspection_history':[{'system_id':first['system_id'],'inspection_date':'2026-08-15','inspection_type':'Routine','status':'Closed','active_equipment_at_publication':first['active_equipment'],'violation_count':1,'violations':[{'violation_code':'CT-01','law_section':'24 RCNY 8','violation_text':'Cooling tower maintenance record finding','violation_type':'Critical','citation_text':'Public source citation','summons_number':'0880900460'}]}],
-              'oath_case_history':[{'ticket_number':'0880900460','ticket_number_source_raw':'0880900460','match_basis':'SUMMONS_NUMBER_EXACT','issuing_agency':'DOHMH','violation_date':'2026-08-08','violation_location':{'borough':first['borough'],'block':'100','lot':'10','house':'107','street_name':'BROADWAY','zip':first['zip']},'hearing_status':'HEARING COMPLETED','hearing_result':'IN VIOLATION','hearing_date':'2026-08-18','decision_date':'2026-08-22','compliance_status':None,'violation_description':'Cooling tower public-record case','penalty_imposed':2500,'paid_amount':0,'additional_penalties_or_late_fees':0,'balance_due':2500,'total_violation_amount':2500,'date_judgment_docketed':None,'charges':[{'code':'CT01','code_section':'24 RCNY 8','description':'Cooling tower violation','infraction_amount':2500}]}],
-              'scoring':{'score':first['priority_score'],'components':first['score_components'],'priority_model_version':'1.0'},
-          }
-          (root/'details'/'sy'/f"{first['system_id']}.json").write_text(json.dumps(detail),encoding='utf-8')
-          PY
+          git show HEAD^:.github/workflows/redesign-preview-artifact.yml > /tmp/parent-preview.yml
+          sed -n "/python - <<'PY'/,/^          PY$/p" /tmp/parent-preview.yml | sed '1d;$d;s/^          //' > /tmp/preview_data.py
+          python /tmp/preview_data.py
       - name: Build preview
         run: npm run build
       - uses: actions/upload-artifact@v4
