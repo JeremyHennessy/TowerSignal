@@ -7,6 +7,8 @@ export const signalLabels: Record<string, string> = {
   NO_CURRENT_SIGNAL: 'No current priority signal',
 }
 
+const timestampFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+
 export function signalLabel(value: string): string { return signalLabels[value] ?? value.replaceAll('_', ' ') }
 export function formatDate(value: string | null): string { return value ? new Date(`${value}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available' }
-export function formatTimestamp(value: string): string { return new Date(value).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) }
+export function formatTimestamp(value: string): string { return timestampFormatter.format(new Date(value)) }
