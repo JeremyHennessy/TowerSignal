@@ -51,6 +51,8 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
+      - name: Fetch, validate and normalize NYC City Record procurement
+        run: python scripts/build_city_record_procurement.py --output public/data/procurement-city-record.json
       - name: Attach last verified ACRIS timing cache
         run: python scripts/attach_acris.py --output public/data --cache .acris-store/data/acris/cache.json
       - name: Validate verified ACRIS cache when present
