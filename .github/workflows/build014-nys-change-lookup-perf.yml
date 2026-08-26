@@ -1,0 +1,52 @@
+name: Build 014 NYS change lookup performance diagnostic
+
+on:
+  push:
+    branches: [agent/build014-nys-change-lookup-perf]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  iphone-nys-changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download exact deployed Build 014 Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: .production-artifact
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32976164236
+      - name: Reuse exact production data for candidate build
+        run: |
+          mkdir -p .production-dist public/data .candidate-root/TowerSignal
+          tar -xf .production-artifact/artifact.tar -C .production-dist
+          cp -R .production-dist/data/. public/data/
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build candidate with exact production data
+        run: |
+          npm run build
+          cp -R dist/. .candidate-root/TowerSignal/
+      - name: Install WebKit
+        run: npx playwright install --with-deps webkit
+      - name: Serve candidate artifact
+        run: |
+          python3 -m http.server 4173 --directory .candidate-root > /tmp/towersignal-candidate.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:4173/TowerSignal/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://localhost:4173/TowerSignal/ >/dev/null
+      - name: Repeat exact iPhone suite under normal 60-second gate
+        env:
+          BASE_URL: http://localhost:4173/TowerSignal/
+        run: npx playwright test tests/e2e/live.spec.ts --project=iphone --timeout=60000 --repeat-each=3 --workers=1 --reporter=list
