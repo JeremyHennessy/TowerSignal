@@ -1,0 +1,78 @@
+name: Build 014 mobile auth A-B diagnostic
+
+on:
+  push:
+    branches: [agent/build014-lightweight-session-probe]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  mobile-ab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download exact deployed Build 014 Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: .baseline-artifact
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32976164236
+      - name: Prepare baseline artifact and candidate data
+        run: |
+          mkdir -p .baseline-dist .baseline-root/TowerSignal .candidate-root/TowerSignal public/data
+          tar -xf .baseline-artifact/artifact.tar -C .baseline-dist
+          cp -R .baseline-dist/. .baseline-root/TowerSignal/
+          cp -R .baseline-dist/data/. public/data/
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build lightweight-session candidate with identical production data
+        run: |
+          npm run build
+          cp -R dist/. .candidate-root/TowerSignal/
+      - name: Install WebKit
+        run: npx playwright install --with-deps webkit
+      - name: Start identical local artifact servers
+        run: |
+          python3 -m http.server 4173 --directory .baseline-root > /tmp/towersignal-baseline.log 2>&1 &
+          echo $! > /tmp/towersignal-baseline.pid
+          python3 -m http.server 4174 --directory .candidate-root > /tmp/towersignal-candidate.log 2>&1 &
+          echo $! > /tmp/towersignal-candidate.pid
+          for url in http://localhost:4173/TowerSignal/ http://localhost:4174/TowerSignal/; do
+            for i in $(seq 1 30); do
+              if curl -fsS "$url" >/dev/null; then break; fi
+              sleep 1
+            done
+            curl -fsS "$url" >/dev/null
+          done
+      - name: Reproduce deployed baseline on same WebKit runner
+        env:
+          BASE_URL: http://localhost:4173/TowerSignal/
+        run: |
+          set +e
+          npx playwright test tests/e2e/live.spec.ts --project=iphone --timeout=120000 --workers=1 --reporter=list > /tmp/baseline-playwright.log 2>&1
+          baseline_status=$?
+          set -e
+          cat /tmp/baseline-playwright.log
+          echo "BASELINE_STATUS=$baseline_status"
+          echo "BASELINE_REMOTE_CLIENT_REQUESTS=$(grep -c 'remoteClient-' /tmp/towersignal-baseline.log || true)"
+          if [ "$baseline_status" -eq 0 ]; then
+            echo "Baseline passed on this runner; candidate comparison remains valid but regression reproduction was not observed locally."
+          fi
+      - name: Test lightweight-session candidate on same WebKit runner
+        env:
+          BASE_URL: http://localhost:4174/TowerSignal/
+        run: |
+          npx playwright test tests/e2e/live.spec.ts --project=iphone --timeout=120000 --workers=1 --reporter=list
+          echo "CANDIDATE_REMOTE_CLIENT_REQUESTS=$(grep -c 'remoteClient-' /tmp/towersignal-candidate.log || true)"
+          if grep -q 'remoteClient-' /tmp/towersignal-candidate.log; then
+            echo "Signed-out candidate unexpectedly loaded remoteClient chunk" >&2
+            exit 1
+          fi
