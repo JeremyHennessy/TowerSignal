@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import type { NysChangeEvent, NysChangeEventType, NysChangesPayload, NysSystem } from '../types/nys'
 import { formatDate, formatTimestamp } from '../domain/labels'
 
+const INITIAL_VISIBLE_EVENTS = 60
+
 const EVENT_LABELS: Record<NysChangeEventType, string> = {
   NYS_EQUIPMENT_FIRST_SEEN: 'New NYS equipment observed',
   NYS_EQUIPMENT_NO_LONGER_PRESENT: 'No longer present in current NYS snapshot',
@@ -41,6 +43,7 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
   const [quickTypes, setQuickTypes] = useState<NysChangeEventType[] | null>(null)
   const [customStart, setCustomStart] = useState('')
   const [customEnd, setCustomEnd] = useState('')
+  const [visibleLimit, setVisibleLimit] = useState(INITIAL_VISIBLE_EVENTS)
 
   const filtered = useMemo(() => payload.events.filter(event => {
     const detected = new Date(event.detected_at).getTime()
@@ -58,23 +61,28 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
   const eventTypes = [...new Set(payload.events.map(event => event.event_type))]
   const counties = [...new Set(payload.events.map(event => event.source_county).filter(Boolean))].sort() as string[]
   const systemById = useMemo(() => new Map(systems.map(row => [row.system_id, row])), [systems])
+  const visibleEvents = filtered.slice(0, visibleLimit)
+  const resetVisible = () => setVisibleLimit(INITIAL_VISIBLE_EVENTS)
 
   return <section className="changes-view" aria-label="TowerSignal NYS changes">
     <div className="changes-intro"><div><span className="eyebrow">NYS historical intelligence</span><h2>What changed in the statewide registry?</h2><p>TowerSignal preserves the official weekly NYS snapshot separately from NYC history. Detection time is when TowerSignal first observed a difference; a source sample date is shown only when the source publishes one for that field.</p></div><div className="history-status"><span>NYS history collection began</span><strong>{formatTimestamp(payload.history_started_at)}</strong><small>Latest observation {formatTimestamp(payload.observed_at)}</small></div></div>
 
     {payload.baseline_initialized && <div className="disclaimer"><strong>NYS historical baseline initialized.</strong> Existing Equipment_ID records are not being mislabeled as new. Future weekly snapshots can now produce deterministic source-status changes.</div>}
 
-    <div className="quick-change-filters"><strong>New this week</strong>{Object.entries(QUICK_GROUPS).map(([label, types]) => <button key={label} onClick={() => { setDays('7'); setEventType(''); setQuickTypes(types) }}>{label}</button>)}<button onClick={() => setQuickTypes(null)}>All changes</button></div>
+    <div className="quick-change-filters"><strong>New this week</strong>{Object.entries(QUICK_GROUPS).map(([label, types]) => <button key={label} onClick={() => { setDays('7'); setEventType(''); setQuickTypes(types); resetVisible() }}>{label}</button>)}<button onClick={() => { setQuickTypes(null); resetVisible() }}>All changes</button></div>
 
     <div className="change-filters nys-change-filters">
-      <label>Period<select value={days} onChange={event => { setDays(event.target.value); setQuickTypes(null) }}><option value="1">Today</option><option value="7">7 days</option><option value="30">30 days</option><option value="custom">Custom</option><option value="0">All retained</option></select></label>
-      {days === 'custom' && <><label>From<input type="date" value={customStart} onChange={event => setCustomStart(event.target.value)} /></label><label>To<input type="date" value={customEnd} onChange={event => setCustomEnd(event.target.value)} /></label></>}
-      <label>Event type<select value={eventType} onChange={event => { setEventType(event.target.value); setQuickTypes(null) }}><option value="">All</option>{eventTypes.map(value => <option key={value} value={value}>{EVENT_LABELS[value]}</option>)}</select></label>
-      <label>Published county<select value={sourceCounty} onChange={event => setSourceCounty(event.target.value)}><option value="">All</option>{counties.map(value => <option key={value}>{value}</option>)}</select></label>
+      <label>Period<select value={days} onChange={event => { setDays(event.target.value); setQuickTypes(null); resetVisible() }}><option value="1">Today</option><option value="7">7 days</option><option value="30">30 days</option><option value="custom">Custom</option><option value="0">All retained</option></select></label>
+      {days === 'custom' && <><label>From<input type="date" value={customStart} onChange={event => { setCustomStart(event.target.value); resetVisible() }} /></label><label>To<input type="date" value={customEnd} onChange={event => { setCustomEnd(event.target.value); resetVisible() }} /></label></>}
+      <label>Event type<select value={eventType} onChange={event => { setEventType(event.target.value); setQuickTypes(null); resetVisible() }}><option value="">All</option>{eventTypes.map(value => <option key={value} value={value}>{EVENT_LABELS[value]}</option>)}</select></label>
+      <label>Published county<select value={sourceCounty} onChange={event => { setSourceCounty(event.target.value); resetVisible() }}><option value="">All</option>{counties.map(value => <option key={value}>{value}</option>)}</select></label>
     </div>
 
     <div className="change-count">{filtered.length.toLocaleString()} NYS change{filtered.length === 1 ? '' : 's'} in current view</div>
-    {filtered.length === 0 ? <div className="empty-changes"><strong>No observed NYS changes match these filters.</strong><span>{payload.baseline_initialized ? 'TowerSignal has established the first statewide baseline; later weekly snapshots will be compared against it.' : 'Adjust the period or filters to inspect retained NYS history.'}</span></div> : <div className="change-list">{filtered.map((event, index) => <NysChangeCard key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} current={systemById.get(event.system_id) ?? null} onSelect={onSelect} />)}</div>}
+    {filtered.length === 0 ? <div className="empty-changes"><strong>No observed NYS changes match these filters.</strong><span>{payload.baseline_initialized ? 'TowerSignal has established the first statewide baseline; later weekly snapshots will be compared against it.' : 'Adjust the period or filters to inspect retained NYS history.'}</span></div> : <>
+      <div className="change-list">{visibleEvents.map((event, index) => <NysChangeCard key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} current={systemById.get(event.system_id) ?? null} onSelect={onSelect} />)}</div>
+      {visibleEvents.length < filtered.length && <div className="change-count"><span>Showing {visibleEvents.length.toLocaleString()} of {filtered.length.toLocaleString()} changes</span><button className="link-button" onClick={() => setVisibleLimit(limit => Math.min(limit + INITIAL_VISIBLE_EVENTS, filtered.length))}>Show {Math.min(INITIAL_VISIBLE_EVENTS, filtered.length - visibleEvents.length).toLocaleString()} more</button></div>}
+    </>}
   </section>
 }
 
