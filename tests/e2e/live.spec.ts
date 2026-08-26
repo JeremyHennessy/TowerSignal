@@ -25,7 +25,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   for (const name of ['Prospect','Monitor','Map','NYS Market','NYS Changes','Opportunities','Portfolios','Workflow']) {
     await expect(page.getByRole('button', { name, exact: true })).toBeVisible()
   }
-  await expect(page.getByRole('button', { name: 'Source Health & Coverage' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Source Health & Coverage', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
   await expect(page.getByLabel('Lead filters')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Sales-ready accounts', exact: true })).toBeVisible()
@@ -143,7 +143,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.getByText(/private workflow/i).first()).toBeVisible()
   await expectContained(page)
 
-  await page.getByRole('button', { name: 'Source Health & Coverage' }).click()
+  await page.getByRole('button', { name: 'Source Health & Coverage', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Source Health & Coverage', exact: true })).toBeVisible()
   await expect(page.locator('.source-health-table tbody tr').first()).toBeVisible()
   await expect(page.locator('.health-failed')).toHaveCount(0)
