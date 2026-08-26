@@ -40,7 +40,7 @@ export function PortfoliosPage({ payload, watchedSystemIds, onOpenAccount }: { p
   const groups = ownerGroups(rows)
   const plutoContext = rows.filter(row => row.pluto_match).length
   const contactReady = rows.filter(row => (row.hpd_contact_count ?? 0) > 0).length
-  const acrisContext = rows.filter(row => ((row as SystemSummary & AcrisSummaryFields).acris_document_count ?? 0) > 0).length
+  const acrisContext = rows.filter(row => ((row as SystemSummary & AcrisSummaryFields).acris_recent_document_count ?? 0) > 0).length
   const candidates = [...rows].filter(row => row.pluto_match).sort((a, b) => b.active_equipment - a.active_equipment || b.priority_score - a.priority_score).slice(0, 12)
   const selectedGroup = groups[0]
 
@@ -54,7 +54,7 @@ export function PortfoliosPage({ payload, watchedSystemIds, onOpenAccount }: { p
       <article><span className="reference-metric-icon success">⌂</span><div><small>PLUTO context</small><strong>{number.format(plutoContext)}</strong><span>Exact-BBL property matches</span></div></article>
       <article><span className="reference-metric-icon">◎</span><div><small>Owner groups indexed</small><strong>{number.format(groups.length)}</strong><span>{groups.length > 0 ? 'Exact normalized owner-name groups' : 'Not emitted in current summary payload'}</span></div></article>
       <article><span className="reference-metric-icon success">◉</span><div><small>Contact-ready</small><strong>{number.format(contactReady)}</strong><span>HPD contact context</span></div></article>
-      <article><span className="reference-metric-icon">⌁</span><div><small>ACRIS context</small><strong>{number.format(acrisContext)}</strong><span>Exact-BBL recorded documents</span></div></article>
+      <article><span className="reference-metric-icon">⌁</span><div><small>ACRIS context</small><strong>{number.format(acrisContext)}</strong><span>Exact-BBL recent recorded activity</span></div></article>
       <article><span className="reference-metric-icon warning">★</span><div><small>Watched accounts</small><strong>{number.format(watchedSystemIds.size)}</strong><span>Private workflow membership</span></div></article>
     </div>
 
