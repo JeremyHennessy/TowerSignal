@@ -54,3 +54,19 @@
   font-size:10px;
   font-weight:750;
 }
+.portfolio-group-button{
+  display:block;
+  width:100%;
+  border:0;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  padding:0;
+}
+.portfolio-group-button>div{display:grid}
+.portfolio-group-button>div strong{font-size:10px}
+.portfolio-group-button>div span{font-size:8px;color:var(--ref-muted)}
+.portfolio-group-button dl{display:flex;gap:13px;margin:8px 0 0}
+.portfolio-group-button dl div{display:grid}
+.portfolio-group-button dt{font-size:7px;color:#7a868e;text-transform:uppercase}
+.portfolio-group-button dd{font-size:10px;font-weight:800;margin:2px 0 0}
