@@ -51,7 +51,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.getByText(/ACRIS is joined by exact borough\/block\/lot BBL and exact document ID only/)).toBeVisible()
     await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
     await expect(page).toHaveURL(/#\/account\//)
-    await page.getByRole('button', { name: 'Close details' }).click()
+    await page.getByRole('button', { name: '← Back', exact: true }).click()
   } else {
     await expect(acrisSelect).toBeDisabled()
     const unavailableChip = page.getByText('ACRIS timing unavailable', { exact: true })
@@ -88,7 +88,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page).toHaveURL(accountUrl)
   await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
-  await page.getByRole('button', { name: 'Close details' }).click()
+  await page.getByRole('button', { name: '← Back', exact: true }).click()
 
   const exportButton = page.getByRole('button', { name: /^Export .* accounts$/ })
   await expect(exportButton).toBeVisible()
