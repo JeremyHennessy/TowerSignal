@@ -218,7 +218,6 @@ export function useWorkflow() {
           ? current
           : [...current, { system_id: systemId, watchlist_id: watchlistId, added_at: new Date().toISOString() }]
         : current.filter(item => !(item.system_id === systemId && item.watchlist_id === watchlistId)))
-      if (enabled) setAccounts(current => current.some(item => item.system_id === systemId) ? current : [...current, { system_id: systemId, status: 'new', note: '', next_action_date: null }])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to update watchlist')
     } finally { setBusy(false) }
