@@ -171,6 +171,12 @@ def source_text(row: Mapping[str, Any]) -> str:
     return normalize_space(" ".join(str(row.get(field) or "") for field in TEXT_FIELDS))
 
 
+def source_document_url(value: Any) -> str | None:
+    if isinstance(value, Mapping):
+        return normalize_space(str(value.get("url") or value.get("href") or "")) or None
+    return normalize_space(str(value or "")) or None
+
+
 def normalize_city_record_row(row: Mapping[str, Any], *, retrieved_at: str, scope: str) -> dict[str, Any]:
     request_id = normalize_space(str(row.get("request_id") or ""))
     if not request_id:
@@ -197,7 +203,7 @@ def normalize_city_record_row(row: Mapping[str, Any], *, retrieved_at: str, scop
         contact_phone=normalize_space(str(row.get("contact_phone") or "")) or None,
         amount=row.get("contract_amount"),
         status="OPEN" if scope == "OPEN_SOLICITATIONS" else "AWARDED" if scope == "RECENT_AWARDS" else None,
-        source_url=normalize_space(str(row.get("document_links") or "")) or DATASET_PAGE,
+        source_url=source_document_url(row.get("document_links")) or DATASET_PAGE,
     )
     notice.update(
         {
