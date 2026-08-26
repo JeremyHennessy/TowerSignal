@@ -1,0 +1,32 @@
+name: Verify workflow persistence
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/workflow-persistence.yml'
+      - 'database/migrations/001_build014_workflow.sql'
+      - 'scripts/verify_workflow_persistence.mjs'
+      - 'src/workflow/**'
+      - 'src/types/workflow.ts'
+      - 'src/components/Workflow*.tsx'
+      - 'src/App.tsx'
+      - 'package.json'
+
+permissions:
+  contents: read
+
+jobs:
+  persistence-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify cross-session persistence and RLS isolation on Neon development branch
+        env:
+          TOWERSIGNAL_WORKFLOW_AUTH_URL: https://ep-frosty-lab-aub4h99n.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth
+          TOWERSIGNAL_WORKFLOW_DATA_API_URL: https://ep-frosty-lab-aub4h99n.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1
+        run: node scripts/verify_workflow_persistence.mjs

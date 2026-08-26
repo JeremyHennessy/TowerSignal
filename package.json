@@ -13,6 +13,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@neondatabase/neon-js": "0.7.0-beta",
     "leaflet": "1.9.4",
     "leaflet.markercluster": "1.5.3",
     "react": "18.3.1",
