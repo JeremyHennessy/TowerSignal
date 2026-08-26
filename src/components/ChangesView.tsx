@@ -139,8 +139,8 @@ function ChangeRow({ event, onSelectSystem }: { event: ChangeEvent; onSelectSyst
     <td><span className={`change-kind change-kind-${eventTone(event)}`}>{EVENT_LABELS[event.event_type] ?? event.event_type}</span></td>
     <td><div className="change-inline-values"><span>{compactValue(event.previous_value)}</span><b>→</b><strong>{compactValue(event.new_value)}</strong></div></td>
     <td>{event.priority_score == null ? '—' : <strong className={event.priority_score >= 70 ? 'priority-text-high' : ''}>{event.priority_score}</strong>}</td>
-    <td><strong>{event.source}</strong>{event.contact_available && <small>contact-ready</small>}</td>
-    <td>{event.evidence_confidence ? <StatusBadge value={event.evidence_confidence} /> : <span className="muted-label">—</span>}<small>{event.evidence_basis}</small></td>
+    <td><strong>Source: {event.source}</strong>{event.contact_available && <small>contact-ready</small>}</td>
+    <td>{event.evidence_confidence ? <StatusBadge value={event.evidence_confidence} /> : <span className="muted-label">—</span>}<small>Evidence: {event.evidence_basis}</small></td>
     <td><button className="table-link" onClick={click => { click.stopPropagation(); onSelectSystem(event.system_id) }}>Open →</button></td>
   </tr>
 }
