@@ -1,0 +1,48 @@
+name: Build 014 mobile transition timing diagnostic
+
+on:
+  push:
+    branches: [agent/build014-mobile-transition-timing]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  iphone-timings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download exact current deployed Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: .production-artifact
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32979767411
+      - name: Prepare exact deployed artifact
+        run: |
+          mkdir -p .production-dist .root/TowerSignal
+          tar -xf .production-artifact/artifact.tar -C .production-dist
+          cp -R .production-dist/. .root/TowerSignal/
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install WebKit
+        run: npx playwright install --with-deps webkit
+      - name: Serve exact deployed artifact
+        run: |
+          python3 -m http.server 4173 --directory .root > /tmp/towersignal.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:4173/TowerSignal/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://localhost:4173/TowerSignal/ >/dev/null
+      - name: Measure isolated iPhone transitions
+        env:
+          BASE_URL: http://localhost:4173/TowerSignal/
+        run: npx playwright test tests/e2e/mobile-transition-timing.spec.ts --project=iphone --workers=1 --reporter=list
