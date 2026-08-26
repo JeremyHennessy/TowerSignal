@@ -61,7 +61,7 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
   const eventTypes = [...new Set(payload.events.map(event => event.event_type))]
   const counties = [...new Set(payload.events.map(event => event.source_county).filter(Boolean))].sort() as string[]
   const systemById = useMemo(() => new Map(systems.map(row => [row.system_id, row])), [systems])
-  const visibleEvents = filtered.slice(0, visibleLimit)
+  const visibleEvents = filtered.slice(0, 0)
   const resetVisible = () => setVisibleLimit(INITIAL_VISIBLE_EVENTS)
 
   return <section className="changes-view" aria-label="TowerSignal NYS changes">
