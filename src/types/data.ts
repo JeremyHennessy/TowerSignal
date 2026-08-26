@@ -94,6 +94,8 @@ export interface SystemSummary {
   score_components: ScoreComponent[]
   oath_case_count?: number
   pluto_match?: boolean
+  pluto_owner_name?: string | null
+  pluto_building_area_sqft?: number | null
   dob_activity_count?: number
   dob_recent_activity_count?: number
   dob_explicit_cooling_tower_count?: number
