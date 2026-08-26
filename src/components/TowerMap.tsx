@@ -6,7 +6,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import type { SystemSummary } from '../types/data'
 
-export function TowerMap({ systems, selectedId, onSelect }: { systems: SystemSummary[]; selectedId: string | null; onSelect: (id: string) => void }) {
+export function TowerMap({ systems, selectedId, onSelect }: { systems: SystemSummary[]; selectedId: string | null; onSelect: (row: SystemSummary) => void }) {
   const container = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<L.Map | null>(null)
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
@@ -33,7 +33,7 @@ export function TowerMap({ systems, selectedId, onSelect }: { systems: SystemSum
         icon: L.divIcon({ className: 'tower-marker-wrap', html: `<span class="tower-marker${system.recent_confirmed_violation ? ' violation' : system.signal_types.includes('POTENTIAL_SAMPLING_GAP') ? ' caution' : ''}"></span>`, iconSize: [16,16], iconAnchor: [8,8] }),
         title: system.address ?? system.system_id,
       })
-      marker.on('click', () => onSelect(system.system_id))
+      marker.on('click', () => onSelect(system))
       marker.bindTooltip(`${system.address ?? system.system_id} · score ${system.priority_score}`)
       cluster.addLayer(marker); markerRef.current.set(system.system_id, marker)
     }
