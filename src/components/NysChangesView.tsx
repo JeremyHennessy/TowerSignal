@@ -6,7 +6,7 @@ const EVENT_LABELS: Record<NysChangeEventType, string> = {
   NYS_EQUIPMENT_FIRST_SEEN: 'New equipment observed',
   NYS_EQUIPMENT_NO_LONGER_PRESENT: 'Equipment no longer present',
   NYS_REG_COMPLIANCE_CHANGED: 'Compliance status changed',
-  NYS_CT_STATUS_CHANGED: 'Tower status changed',
+  NYS_CT_STATUS_CHANGED: 'NYS cooling-tower status changed',
   NYS_SAMPLE_DATE_CHANGED: 'Sample date changed',
   NYS_SAMPLE_RESULT_CHANGED: 'Sample result changed',
   NYS_OPERATION_DURATION_CHANGED: 'Operating status changed',
@@ -97,7 +97,7 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
       </aside>
 
       <div className="change-table-workspace">
-        <div className="change-table-topline"><div><span className="page-kicker">NYS historical intelligence</span><h2>What changed in the statewide registry?</h2><p>Official weekly NYS snapshots remain separate from NYC scoring and regulatory history. Changes are keyed to source Equipment_ID records.</p></div><div className="history-status compact"><span>NYS history began</span><strong>{formatTimestamp(payload.history_started_at)}</strong><small>Latest observation {formatTimestamp(payload.observed_at)}</small></div></div>
+        <div className="change-table-topline"><div><span className="page-kicker">NYS historical intelligence</span><h2>What changed in the statewide registry?</h2><p>Official weekly NYS snapshots remain separate from NYC scoring and regulatory history. Changes are keyed to source Equipment_ID records.</p></div><div className="history-status compact"><span>NYS history collection began</span><strong>{formatTimestamp(payload.history_started_at)}</strong><small>Latest observation {formatTimestamp(payload.observed_at)}</small></div></div>
 
         <div className="change-tabs" role="tablist" aria-label="NYS change categories">{QUICK_GROUPS.map(group => <button key={group.label} className={quickLabel === group.label ? 'active' : ''} onClick={() => { setQuickLabel(group.label); setQuickTypes(group.types); setEventType(''); setPage(0) }}>{group.label}<span>{group.label === 'All changes' ? payload.events.length : ''}</span></button>)}</div>
 
@@ -122,7 +122,7 @@ function NysChangeRow({ event, current, onSelect }: { event: NysChangeEvent; cur
     <td><strong>{formatTimestamp(event.detected_at)}</strong>{event.source_observation_date && <small>source {formatDate(event.source_observation_date)}</small>}</td>
     <td>{current?.ct_status ?? '—'}</td>
     <td>{current?.regulation_compliance ? <span className={`nys-current-status ${current.regulation_compliance.toLowerCase().includes('non') ? 'noncompliant' : 'compliant'}`}>{current.regulation_compliance}</span> : '—'}</td>
-    <td><strong>{event.evidence_basis}</strong><small>NYS weekly registry</small></td>
+    <td><strong>Evidence: {event.evidence_basis}</strong><small>NYS weekly registry</small></td>
     <td>{current ? <button className="table-link" onClick={click => { click.stopPropagation(); onSelect(current) }}>Open →</button> : <span className="muted-label">Not current</span>}</td>
   </tr>
 }
