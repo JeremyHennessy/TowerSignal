@@ -8,5 +8,8 @@ import './styles/redesign.css'
 import './styles/redesign-fixes.css'
 import './styles/acris.css'
 import './styles/workflow.css'
+import './styles/product-redesign.css'
+import './styles/product-redesign-fixes.css'
+import './styles/product-redesign-final.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>)

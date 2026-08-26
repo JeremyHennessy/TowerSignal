@@ -21,10 +21,10 @@ const payload = {
       { dataset_id:'w9ak-ipjd', name:'DOB NOW: Build – Job Application Filings', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:940000, matched_record_count:1, source_query_scope:'Exact BBL subsets', source_last_updated_at:'2026-08-21T00:00:00Z', url:'https://example.test/d' },
     ],
   },
-  summary: { registered_systems:2, active_equipment:4, potential_sampling_gaps:1, recent_confirmed_violations:1, systems_with_oath_cases:1, systems_with_dob_activity:1, systems_with_recent_dob_activity:1, systems_with_explicit_cooling_tower_dob_activity:1 },
+  summary: { registered_systems:2, active_equipment:4, potential_sampling_gaps:1, recent_confirmed_violations:1, systems_with_oath_cases:1, systems_with_pluto_context:2, systems_with_dob_activity:1, systems_with_recent_dob_activity:1, systems_with_explicit_cooling_tower_dob_activity:1 },
   systems: [
-    { system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',latest_sample_date:'2026-07-01',days_since_latest_sample:51,latest_inspection_date:'2026-08-01',latest_inspection_type:'Cycle',confirmed_violation:true,recent_confirmed_violation:true,violation_types:['Critical'],signal_types:['CONFIRMED_RECENT_VIOLATION','POTENTIAL_SAMPLING_GAP'],primary_signal:'CONFIRMED_RECENT_VIOLATION',evidence_confidence:'CONFIRMED',priority_score:88,score_components:[{points:40,reason:'confirmed recent violation'}],oath_case_count:1,dob_activity_count:1,dob_recent_activity_count:1,dob_explicit_cooling_tower_count:1,dob_mechanical_or_boiler_count:1,latest_dob_activity_date:'2026-08-20' },
-    { system_id:'SYS-2',bin:'2',bbl:'2',address:'20 BETA AVE',borough:'Queens',zip:'11101',active_equipment:1,latitude:40.74,longitude:-73.94,coordinate_status:'VALID',latest_sample_date:'2026-08-15',days_since_latest_sample:6,latest_inspection_date:null,latest_inspection_type:null,confirmed_violation:false,recent_confirmed_violation:false,violation_types:[],signal_types:[],primary_signal:'NO_CURRENT_SIGNAL',evidence_confidence:'STRONG_SIGNAL',priority_score:0,score_components:[],oath_case_count:0,dob_activity_count:0,dob_recent_activity_count:0,dob_explicit_cooling_tower_count:0,dob_mechanical_or_boiler_count:0,latest_dob_activity_date:null },
+    { system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',latest_sample_date:'2026-07-01',days_since_latest_sample:51,latest_inspection_date:'2026-08-01',latest_inspection_type:'Cycle',confirmed_violation:true,recent_confirmed_violation:true,violation_types:['Critical'],signal_types:['CONFIRMED_RECENT_VIOLATION','POTENTIAL_SAMPLING_GAP'],primary_signal:'CONFIRMED_RECENT_VIOLATION',evidence_confidence:'CONFIRMED',priority_score:88,score_components:[{points:40,reason:'confirmed recent violation'}],oath_case_count:1,pluto_match:true,pluto_owner_name:'ALPHA OWNER LLC',pluto_building_area_sqft:500000,hpd_contact_count:2,dob_activity_count:1,dob_recent_activity_count:1,dob_explicit_cooling_tower_count:1,dob_mechanical_or_boiler_count:1,latest_dob_activity_date:'2026-08-20' },
+    { system_id:'SYS-2',bin:'2',bbl:'2',address:'20 BETA AVE',borough:'Queens',zip:'11101',active_equipment:1,latitude:40.74,longitude:-73.94,coordinate_status:'VALID',latest_sample_date:'2026-08-15',days_since_latest_sample:6,latest_inspection_date:null,latest_inspection_type:null,confirmed_violation:false,recent_confirmed_violation:false,violation_types:[],signal_types:[],primary_signal:'NO_CURRENT_SIGNAL',evidence_confidence:'STRONG_SIGNAL',priority_score:0,score_components:[],oath_case_count:0,pluto_match:true,pluto_owner_name:'ALPHA OWNER LLC',pluto_building_area_sqft:250000,hpd_contact_count:0,dob_activity_count:0,dob_recent_activity_count:0,dob_explicit_cooling_tower_count:0,dob_mechanical_or_boiler_count:0,latest_dob_activity_date:null },
   ],
 }
 
@@ -71,6 +71,7 @@ const detail = {
 }
 
 beforeEach(() => {
+  window.location.hash = ''
   vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
     const url = String(input)
     const responsePayload = url.includes('/details/') ? detail
@@ -85,16 +86,19 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals())
 
-test('renders the commercial account-intelligence dashboard after dataset load', async () => {
+test('renders the redesigned commercial account-intelligence workspace after dataset load', async () => {
   render(<App />)
-  expect(await screen.findByText('Know which cooling-tower accounts deserve attention now.')).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name:'Prospect workspace', level:1 })).toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '2 matching systems')).toBeInTheDocument()
-  expect(screen.getByText('New OATH activity')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name:'Monitor' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name:'NYS Market' })).toBeInTheDocument()
+  expect(screen.getByText('High priority accounts')).toBeInTheDocument()
+  expect(screen.getByText('Sampling follow-up')).toBeInTheDocument()
+  for (const name of ['Monitor','Map','NYS Market','NYS Changes','Opportunities','Portfolios','Workflow']) {
+    expect(screen.getByRole('button', { name })).toBeInTheDocument()
+  }
+  expect(screen.getByRole('button', { name:'Source Health & Coverage' })).toBeInTheDocument()
 })
 
-test('filters records and opens details with DOB project history', async () => {
+test('filters records and opens a shareable full account profile with DOB project history', async () => {
   const user = userEvent.setup()
   render(<App />)
   await screen.findByText('10 ALPHA ST')
@@ -104,6 +108,8 @@ test('filters records and opens details with DOB project history', async () => {
   await user.clear(screen.getByPlaceholderText('Address, system ID, BIN…'))
   await user.click(screen.getByText('10 ALPHA ST'))
   await waitFor(() => expect(screen.getByRole('heading', { name:'Identity' })).toBeInTheDocument())
+  expect(window.location.hash).toBe('#/account/SYS-1')
+  expect(screen.getByRole('button', { name:'Copy account link' })).toBeInTheDocument()
   const detailPanel = screen.getByRole('complementary', { name: 'Selected cooling tower detail' })
   expect(within(detailPanel).getByText('Potential sampling gap')).toBeInTheDocument()
   expect(within(detailPanel).getByRole('heading', { name:'DOB NOW project activity' })).toBeInTheDocument()
@@ -140,7 +146,7 @@ test('opens the Monitor product mode with source-backed change evidence', async 
   render(<App />)
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'Monitor' }))
-  expect(screen.getByRole('heading', { name:'What changed since the last observation?' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name:'Monitor workspace', level:1 })).toBeInTheDocument()
   expect(screen.getAllByText('New public sample reported')).toHaveLength(2)
   expect(screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')).toBeInTheDocument()
   expect(screen.getByText('Evidence: SYSTEM_ID_EXACT')).toBeInTheDocument()
@@ -151,7 +157,7 @@ test('opens the NYS Market mode without NYC score semantics', async () => {
   render(<App />)
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'NYS Market' }))
-  expect(screen.getByRole('heading', { name:'New York State registry intelligence' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name:'NYS Market', level:1 })).toBeInTheDocument()
   expect(screen.getByText('Source non-compliant')).toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '2 matching NYS equipment records')).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name:'Non-compliant' }))
@@ -164,7 +170,31 @@ test('opens NYS Changes and shows Equipment_ID-exact evidence', async () => {
   render(<App />)
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'NYS Changes' }))
-  expect(screen.getByRole('heading', { name:'New York State registry changes' })).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name:'NYS Changes', level:1 })).toBeInTheDocument()
   expect(screen.getAllByText('NYS cooling-tower status changed')).toHaveLength(2)
   expect(screen.getByText('Evidence: EQUIPMENT_ID_EXACT')).toBeInTheDocument()
+})
+
+test('opens the new commercial, portfolio, workflow and source-health workspaces without fabricating unsupported data', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await screen.findByText('10 ALPHA ST')
+
+  await user.click(screen.getByRole('button', { name:'Opportunities' }))
+  expect(screen.getByRole('heading', { name:'Opportunities workspace', level:1 })).toBeInTheDocument()
+  expect(screen.getByText('Procurement intelligence is not in the current production account payload.')).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name:'Portfolios' }))
+  expect(screen.getByRole('heading', { name:'Portfolios', level:1 })).toBeInTheDocument()
+  expect(screen.getAllByText('ALPHA OWNER LLC').length).toBeGreaterThanOrEqual(2)
+  expect(screen.getByText('1 multi-property group')).toBeInTheDocument()
+  expect(screen.getByText('2 cooling-tower accounts · 4 active equipment · 1 contact-ready · 750,000 sq ft PLUTO building area')).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name:'Workflow' }))
+  expect(screen.getByRole('heading', { name:/Workflow workspace/, level:1 })).toBeInTheDocument()
+  expect(screen.getByText('Sign in from the profile control to sync workflow state across sessions and devices.')).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name:'Source Health & Coverage' }))
+  expect(screen.getByRole('heading', { name:'Source Health & Coverage', level:1 })).toBeInTheDocument()
+  expect(screen.getByText('Source-health metrics are not available in this payload.')).toBeInTheDocument()
 })

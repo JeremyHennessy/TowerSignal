@@ -1,0 +1,171 @@
+/* Narrow fixes discovered while reviewing Build 015 before merge. */
+.reference-top-nav .workflow-sync-state-label{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  padding:0!important;
+  margin:-1px!important;
+  overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;
+  border:0!important;
+}
+.reference-top-nav .workflow-auth.signed-in>.workflow-profile-trigger{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid #d9e8e3;
+  background:#f5fbf9;
+  color:#0d5648;
+  font-size:10px;
+  font-weight:900;
+  padding:0;
+  display:grid;
+  place-items:center;
+}
+.reference-top-nav .workflow-auth.signed-in>.workflow-profile-trigger::before{content:none}
+.reference-top-nav .workflow-profile-trigger>span{display:block!important;color:inherit;font-size:10px;font-weight:900}
+.reference-top-nav .workflow-profile-popover{
+  position:absolute;
+  right:0;
+  top:42px;
+  width:280px;
+  z-index:120;
+  background:#fff;
+  color:var(--ref-ink);
+  border:1px solid var(--ref-border);
+  border-radius:12px;
+  box-shadow:0 18px 50px rgba(5,19,26,.2);
+  padding:16px;
+}
+.reference-top-nav .workflow-profile-popover>strong,
+.reference-top-nav .workflow-profile-popover>small{display:block}
+.reference-top-nav .workflow-profile-popover>strong{font-size:12px;margin-top:5px}
+.reference-top-nav .workflow-profile-popover>small{font-size:9px;color:var(--ref-muted);margin-top:2px}
+.reference-top-nav .workflow-profile-popover p{font-size:10px;line-height:1.5;color:var(--ref-muted);margin:10px 0}
+.reference-top-nav .workflow-profile-popover>button{
+  width:100%;
+  min-height:34px;
+  border:1px solid var(--ref-border);
+  background:#fff;
+  color:#30414b;
+  border-radius:8px;
+  padding:7px 9px;
+  font-size:10px;
+  font-weight:750;
+}
+.portfolio-group-button{
+  display:block;
+  width:100%;
+  border:0;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  padding:0;
+}
+.portfolio-group-button>div{display:grid}
+.portfolio-group-button>div strong{font-size:10px}
+.portfolio-group-button>div span{font-size:8px;color:var(--ref-muted)}
+.portfolio-group-button dl{display:flex;gap:13px;margin:8px 0 0}
+.portfolio-group-button dl div{display:grid}
+.portfolio-group-button dt{font-size:7px;color:#7a868e;text-transform:uppercase}
+.portfolio-group-button dd{font-size:10px;font-weight:800;margin:2px 0 0}
+
+/* Visual QA: remove the duplicate workspace-title band from the reference shell.
+   Prospect keeps its refresh/export controls as a non-flowing utility cluster. */
+.reference-shell .main-stage{position:relative}
+.reference-utility-bar{
+  position:absolute!important;
+  top:14px!important;
+  right:20px!important;
+  left:auto!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  z-index:25!important;
+}
+.reference-utility-bar>div:first-child,.reference-utility-bar .share-button{display:none!important}
+.reference-utility-bar .utility-actions{gap:6px!important}
+.mode-monitor .reference-utility-bar,.mode-map .reference-utility-bar,.mode-nys .reference-utility-bar,.mode-nys-changes .reference-utility-bar{display:none!important}
+.reference-prospect-layout .filter-rail{top:70px!important}
+
+/* Monitor and NYS Changes are dense investigation tables, not stacked event cards. */
+.changes-table-view{margin-top:2px}
+.change-workspace-grid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;align-items:start}
+.change-filter-rail{background:#fff;border:1px solid var(--ref-border);border-radius:10px;padding:13px;display:grid;gap:10px;position:sticky;top:70px}
+.change-filter-heading{display:flex;align-items:center;justify-content:space-between;padding-bottom:3px}
+.change-filter-heading button{border:0;background:transparent;color:var(--ref-green);font-size:8px;text-decoration:underline;padding:0}
+.change-filter-rail>label{display:grid;gap:5px;font-size:8px;font-weight:800;color:#3f505b;text-transform:uppercase;letter-spacing:.035em}
+.change-filter-rail select,.change-filter-rail input[type="number"],.change-filter-rail input[type="date"]{width:100%;height:35px;border:1px solid #d8e1e4;border-radius:7px;background:#fff;color:#25343d;padding:0 8px;font-size:9px;font-weight:560;text-transform:none;letter-spacing:0}
+.change-filter-rail .change-check{display:flex;grid-template-columns:auto 1fr;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-size:9px;padding-top:4px}
+.change-filter-rail .change-check input{width:14px;height:14px;margin:0;accent-color:var(--ref-green)}
+.change-table-workspace{min-width:0}
+.change-table-topline{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:0 0 8px}
+.change-table-topline h2{font-size:16px;line-height:1.15;margin:4px 0 2px;letter-spacing:-.025em}
+.change-table-topline p{margin:0;color:var(--ref-muted);font-size:9px;line-height:1.45;max-width:670px}
+.history-status.compact{min-width:180px;text-align:right;display:grid;gap:1px;padding:0!important;background:transparent!important;border:0!important}
+.history-status.compact span,.history-status.compact small{font-size:7px;color:#7b8790}.history-status.compact strong{font-size:9px;color:#34444e}
+.change-tabs{display:flex;align-items:center;gap:2px;overflow:auto;border:1px solid var(--ref-border);border-bottom:0;background:#fff;border-radius:10px 10px 0 0;padding:0 8px}
+.change-tabs button{display:flex;align-items:center;gap:5px;min-height:40px;border:0;border-bottom:2px solid transparent;background:transparent;color:#33454f;padding:0 10px;font-size:9px;font-weight:760;white-space:nowrap}
+.change-tabs button span{display:inline-flex;min-width:17px;height:17px;align-items:center;justify-content:center;border-radius:10px;background:#eef2f3;color:#6c7880;font-size:7px}
+.change-tabs button.active{color:#0b6755;border-bottom-color:var(--ref-green)}
+.monitor-change-table-card{border-radius:0 0 10px 10px;border-top-color:#edf1f2}
+.change-reference-table{min-width:1180px}
+.nys-change-reference-table{min-width:1450px}
+.change-reference-table td,.nys-change-reference-table td{vertical-align:middle;padding-top:9px;padding-bottom:9px}
+.change-reference-table tbody tr,.nys-change-reference-table tbody tr{cursor:pointer}
+.change-kind{display:inline-flex;align-items:center;max-width:190px;border-radius:6px;padding:5px 7px;font-size:8px;font-weight:800;line-height:1.25;background:#eef2f3;color:#465963}
+.change-kind-urgent{background:var(--ref-red-soft);color:#b93939}.change-kind-warning{background:var(--ref-amber-soft);color:#9e630b}.change-kind-blue{background:var(--ref-blue-soft);color:#286aad}.change-kind-success{background:var(--ref-green-soft);color:#0b6c58}
+.change-inline-values{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:5px;max-width:260px}.change-inline-values span,.change-inline-values strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8px!important}.change-inline-values span{color:#727f87}.change-inline-values b{color:#9ba5ab;font-size:8px}
+.change-old-value{color:#6f7d85;font-size:8px}
+.nys-current-status{display:inline-flex;border-radius:6px;padding:4px 6px;font-size:8px;font-weight:800}.nys-current-status.compliant{background:var(--ref-green-soft);color:#0b6b58}.nys-current-status.noncompliant{background:var(--ref-red-soft);color:#b83939}
+.reference-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px;border-top:1px solid #edf1f2;font-size:8px;color:#6f7c85}.reference-pagination>div{display:flex;gap:5px}.reference-pagination button{border:1px solid #d8e1e4;background:#fff;border-radius:6px;padding:5px 8px;font-size:8px}.reference-pagination button:disabled{opacity:.45}
+
+/* Full account profile: retain the source-backed detail component, but compose it as a 360° dashboard. */
+.account-profile-page .detail-panel{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr))!important;gap:10px!important;align-items:start!important}
+.account-profile-page .detail-header{grid-column:span 9!important;margin:0!important;min-height:108px!important;display:flex!important;align-items:center!important;background:linear-gradient(135deg,#fff,#fbfdfc)!important}
+.account-profile-page .detail-header h2{font-size:29px!important;letter-spacing:-.045em!important}
+.account-profile-page .detail-header .icon-button{display:none!important}
+.account-profile-page .detail-actions{grid-column:span 3!important;margin:0!important;min-height:108px!important;display:grid!important;grid-template-columns:auto 1fr!important;align-content:center!important;gap:4px 9px!important;padding:16px!important}
+.account-profile-page .detail-actions>button{grid-row:1/3;align-self:center;min-height:48px!important}
+.account-profile-page .detail-actions .score.large{font-size:34px!important;line-height:1!important;color:#0d6755!important}
+.account-profile-page .detail-actions>span:last-child{font-size:8px!important;text-transform:uppercase!important;letter-spacing:.06em!important;color:#6c7981!important}
+.account-profile-page .workflow-account-section{grid-column:1/-1!important;margin:0!important}
+.account-profile-page .detail-panel>.error-state,.account-profile-page .detail-panel>.loading-state{grid-column:1/-1}
+.account-profile-page .detail-panel>section{margin:0!important;min-width:0!important}
+.account-profile-page .detail-panel>section:nth-of-type(2){grid-column:span 4}.account-profile-page .detail-panel>section:nth-of-type(3){grid-column:span 8}
+.account-profile-page .detail-panel>section:nth-of-type(4){grid-column:span 4}.account-profile-page .detail-panel>section:nth-of-type(5){grid-column:span 8}
+.account-profile-page .detail-panel>section:nth-of-type(6){grid-column:span 7}.account-profile-page .detail-panel>section:nth-of-type(7){grid-column:span 5}
+.account-profile-page .detail-panel>section:nth-of-type(8){grid-column:1/-1}
+.account-profile-page .detail-panel>section:nth-of-type(9){grid-column:span 4}.account-profile-page .detail-panel>section:nth-of-type(10){grid-column:span 8}
+.account-profile-page .detail-panel>section:nth-of-type(11){grid-column:span 8}.account-profile-page .detail-panel>section:nth-of-type(12){grid-column:span 4}
+.account-profile-page .detail-panel>section:nth-of-type(13){grid-column:span 4}.account-profile-page .detail-panel>section:nth-of-type(14){grid-column:span 8}
+.account-profile-page .detail-panel>section .identity-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.account-profile-page .detail-panel>section:nth-of-type(3) .identity-grid,.account-profile-page .detail-panel>section:nth-of-type(8) .identity-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.account-profile-page .detail-panel>section h3{display:flex;align-items:center;min-height:24px;margin-bottom:9px!important}
+.account-profile-page .detail-panel details{border-radius:8px!important}
+.account-profile-page .detail-panel .signal-card{border-radius:8px!important}
+
+@media(max-width:1050px){
+  .change-workspace-grid{grid-template-columns:190px minmax(0,1fr)}
+  .account-profile-page .detail-header,.account-profile-page .detail-actions{grid-column:1/-1!important;min-height:auto!important}
+  .account-profile-page .detail-panel>section:nth-of-type(n){grid-column:span 6}
+  .account-profile-page .detail-panel>section:nth-of-type(8),.account-profile-page .detail-panel>section:nth-of-type(14){grid-column:1/-1}
+}
+@media(max-width:780px){
+  .reference-utility-bar{display:none!important}
+  .change-workspace-grid{grid-template-columns:1fr}
+  .change-filter-rail{position:static;grid-template-columns:repeat(2,minmax(0,1fr));align-items:end}
+  .change-filter-heading{grid-column:1/-1}
+  .change-table-topline{align-items:flex-start;flex-direction:column}.history-status.compact{text-align:left}
+  .account-profile-page .detail-panel{display:block!important}
+  .account-profile-page .detail-header,.account-profile-page .detail-actions,.account-profile-page .workflow-account-section,.account-profile-page .detail-panel>section{margin:0 0 9px!important}
+}
+@media(max-width:520px){
+  .change-filter-rail{grid-template-columns:1fr}
+  .change-filter-heading{grid-column:auto}
+}

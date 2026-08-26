@@ -14,30 +14,73 @@ import { NysRegistryView } from './components/NysRegistryView'
 import { SystemTable } from './components/SystemTable'
 import { TowerMap } from './components/TowerMap'
 import { WorkflowAccountSection } from './components/WorkflowAccountSection'
-import { WorkflowAuthPanel } from './components/WorkflowAuthPanel'
 import { WorkflowPanel } from './components/WorkflowPanel'
+import { OpportunitiesPage } from './components/OpportunitiesPage'
+import { PortfoliosPage } from './components/PortfoliosPage'
+import { SourceHealthPage } from './components/SourceHealthPage'
+import { WorkflowWorkspacePage } from './components/WorkflowWorkspacePage'
+import { ShareButton } from './components/ShareButton'
+import { TopNavigation, type WorkspaceMode } from './components/TopNavigation'
 import { exportCsv } from './utils/export'
 import { exportWorkflowCsv } from './utils/workflowExport'
 import { useWorkflow } from './workflow/useWorkflow'
 
-type ProductMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes'
+type ProductMode = WorkspaceMode | 'nys-account'
+
+const validModes = new Set<ProductMode>(['prospect','monitor','map','nys','nys-changes','opportunities','portfolios','workflow','source-health','account','nys-account'])
+const filterKeys = Object.keys(initialFilters) as Array<keyof FilterState>
 
 function pct(value: number, total: number): string {
   return total > 0 ? `${Math.round((value / total) * 100)}%` : '—'
 }
 
+function parseRoute(): { mode: ProductMode; id: string | null; filters: Partial<FilterState> } {
+  const raw = window.location.hash.replace(/^#\/?/, '')
+  if (!raw) return { mode:'prospect', id:null, filters:{} }
+  const [path, query = ''] = raw.split('?')
+  const parts = path.split('/').filter(Boolean)
+  const mode = validModes.has(parts[0] as ProductMode) ? parts[0] as ProductMode : 'prospect'
+  const params = new URLSearchParams(query)
+  const filters: Partial<FilterState> = {}
+  filterKeys.forEach(key => {
+    const value = params.get(key)
+    if (value != null) filters[key] = value
+  })
+  return { mode, id: parts[1] ? decodeURIComponent(parts[1]) : null, filters }
+}
+
+function routeHash(mode: ProductMode, id?: string | null, filters?: FilterState): string {
+  const path = id ? `#/${mode}/${encodeURIComponent(id)}` : `#/${mode}`
+  if (!filters || !['prospect','map'].includes(mode)) return path
+  const params = new URLSearchParams()
+  filterKeys.forEach(key => {
+    const value = filters[key]
+    if (value) params.set(key, value)
+  })
+  const query = params.toString()
+  return query ? `${path}?${query}` : path
+}
+
+function shareUrl(mode: ProductMode, filters: FilterState, id?: string | null): string {
+  const base = `${window.location.origin}${window.location.pathname}${window.location.search}`
+  return `${base}${routeHash(mode, id, filters)}`
+}
+
 export default function App() {
+  const initialRoute = parseRoute()
   const [payload, setPayload] = useState<SystemsPayload | null>(null)
   const [changes, setChanges] = useState<ChangesPayload | null>(null)
   const [nysPayload, setNysPayload] = useState<NysSystemsPayload | null>(null)
   const [nysChanges, setNysChanges] = useState<NysChangesPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [filters, setFilters] = useState<FilterState>(initialFilters)
+  const [filters, setFilters] = useState<FilterState>({ ...initialFilters, ...initialRoute.filters })
   const [selected, setSelected] = useState<SystemSummary | null>(null)
   const [selectedNys, setSelectedNys] = useState<NysSystem | null>(null)
-  const [mode, setMode] = useState<ProductMode>('prospect')
+  const [mode, setMode] = useState<ProductMode>(initialRoute.mode)
+  const [returnMode, setReturnMode] = useState<ProductMode>('prospect')
   const [viewName, setViewName] = useState('')
   const [watchedOnly, setWatchedOnly] = useState(false)
+  const [globalSearch, setGlobalSearch] = useState(initialRoute.filters.search ?? '')
   const workflow = useWorkflow()
 
   useEffect(() => {
@@ -51,6 +94,27 @@ export default function App() {
       .catch(err => setError(err instanceof Error ? err.message : 'Unable to load TowerSignal data'))
   }, [])
 
+  useEffect(() => {
+    const apply = () => {
+      const route = parseRoute()
+      setMode(route.mode)
+      if (Object.keys(route.filters).length > 0) setFilters(current => ({ ...current, ...route.filters }))
+      if (route.mode === 'account' && route.id && payload) {
+        setSelected(payload.systems.find(row => row.system_id === route.id) ?? null)
+      } else if (route.mode !== 'account') {
+        setSelected(null)
+      }
+      if (route.mode === 'nys-account' && route.id && nysPayload) {
+        setSelectedNys(nysPayload.systems.find(row => row.system_id === route.id || row.source_equipment_id === route.id) ?? null)
+      } else if (route.mode !== 'nys-account') {
+        setSelectedNys(null)
+      }
+    }
+    apply()
+    window.addEventListener('hashchange', apply)
+    return () => window.removeEventListener('hashchange', apply)
+  }, [payload, nysPayload])
+
   const sourceFiltered = useMemo(() => payload ? filterSystems(payload.systems, filters) : [], [payload, filters])
   const filtered = useMemo(() => watchedOnly && workflow.user
     ? sourceFiltered.filter(row => workflow.watchedSystemIds.has(row.system_id))
@@ -61,10 +125,32 @@ export default function App() {
     return { ...changes, events, new_event_count: events.length }
   }, [changes, watchedOnly, workflow.user, workflow.watchedSystemIds])
 
+  const navigate = useCallback((next: ProductMode) => {
+    if (next === 'account' || next === 'nys-account') return
+    setMode(next)
+    setSelected(null)
+    setSelectedNys(null)
+    window.location.hash = routeHash(next)
+  }, [])
+
+  const openAccount = useCallback((row: SystemSummary) => {
+    setReturnMode(mode === 'account' || mode === 'nys-account' ? 'prospect' : mode)
+    setSelected(row)
+    setMode('account')
+    window.location.hash = routeHash('account', row.system_id)
+  }, [mode])
+
+  const openNysAccount = useCallback((row: NysSystem) => {
+    setReturnMode(mode === 'account' || mode === 'nys-account' ? 'nys' : mode)
+    setSelectedNys(row)
+    setMode('nys-account')
+    window.location.hash = routeHash('nys-account', row.system_id)
+  }, [mode])
+
   const selectById = useCallback((id: string) => {
     const row = payload?.systems.find(item => item.system_id === id)
-    if (row) setSelected(row)
-  }, [payload])
+    if (row) openAccount(row)
+  }, [payload, openAccount])
 
   const quick = (kind: string) => {
     if (kind === 'Confirmed violations') setFilters({ ...initialFilters, confirmed:'true' })
@@ -84,12 +170,19 @@ export default function App() {
     setViewName('')
   }
 
+  const submitGlobalSearch = () => {
+    const search = globalSearch.trim()
+    setFilters({ ...initialFilters, search })
+    setMode('prospect')
+    window.location.hash = routeHash('prospect', null, { ...initialFilters, search })
+  }
+
   if (error) return <main className="app-shell"><div className="fatal-state"><div className="brand-lockup"><span className="brand-mark">TS</span><strong>TowerSignal</strong></div><h2>Intelligence workspace unavailable</h2><p>{error}</p><p>The application will not substitute fixture or mock records for a failed production dataset.</p></div></main>
   if (!payload || !changes || !nysPayload || !nysChanges || !monitorChanges) return <main className="app-shell"><div className="loading-page"><div className="brand-mark">TS</div><h1>TowerSignal</h1><p>Building the latest account-intelligence workspace…</p></div></main>
 
   const sourceHealth = payload.metadata.source_health ?? []
   const healthyHealth = sourceHealth.filter(source => source.status === 'HEALTHY')
-  const nysMode = mode === 'nys' || mode === 'nys-changes'
+  const nysMode = mode === 'nys' || mode === 'nys-changes' || mode === 'nys-account'
   const acrisMetadata = payload.metadata as SystemsPayload['metadata'] & AcrisMetadataFields
   const acrisSummary = payload.summary as SystemsPayload['summary'] & AcrisPayloadSummaryFields
   const acrisAvailable = acrisMetadata.acris_cache_available === true
@@ -100,74 +193,81 @@ export default function App() {
   const newOathCases = changes.events.filter(event => event.event_type === 'OATH_CASE_ADDED').length
   const recentDob = payload.summary.systems_with_recent_dob_activity ?? 0
   const recentAcris = acrisSummary.systems_with_recent_acris_activity ?? 0
-  const plutoMatches = payload.summary.systems_with_pluto_context ?? 0
-  const oathMatches = payload.summary.systems_with_oath_cases ?? 0
   const watchedRows = payload.systems.filter(row => workflow.watchedSystemIds.has(row.system_id))
   const workflowAccount = selected ? workflow.accountBySystemId.get(selected.system_id) : undefined
   const workflowMembershipIds = selected ? workflow.watchlistIdsBySystemId.get(selected.system_id) ?? new Set<string>() : new Set<string>()
+  const highPriorityChanges = monitorChanges.events.filter(event => (event.priority_score ?? 0) >= 70).length
+  const sampleChanges = monitorChanges.events.filter(event => event.event_type.includes('SAMPLE') || event.event_type.includes('SAMPLING')).length
+  const dobChanges = monitorChanges.events.filter(event => event.event_type.startsWith('DOB_')).length
+  const propertyChanges = monitorChanges.events.filter(event => event.event_type.startsWith('HPD_') || event.event_type === 'PLUTO_OWNER_CHANGED').length
+  const currentShareUrl = shareUrl(mode, filters, mode === 'account' ? selected?.system_id : mode === 'nys-account' ? selectedNys?.system_id : null)
 
   const exportWorkflow = () => exportWorkflowCsv(watchedRows, payload.metadata, workflow.accounts, workflow.memberships, workflow.watchlists)
 
-  return <main className="app-shell saas-shell">
-    <aside className="side-nav">
-      <div className="brand-lockup"><span className="brand-mark">TS</span><div><strong>TowerSignal</strong><small>Account intelligence</small></div></div>
-      <nav aria-label="TowerSignal workspace">
-        <span className="nav-label">Workspace</span>
-        <button className={mode === 'prospect' ? 'active' : ''} onClick={() => setMode('prospect')}><span aria-hidden="true">◎</span> Prospect</button>
-        <button className={mode === 'monitor' ? 'active' : ''} onClick={() => setMode('monitor')}><span aria-hidden="true">◫</span> Monitor</button>
-        <button className={mode === 'map' ? 'active' : ''} onClick={() => setMode('map')}><span aria-hidden="true">◇</span> Map</button>
-        <span className="nav-label">Market intelligence</span>
-        <button className={mode === 'nys' ? 'active' : ''} onClick={() => setMode('nys')}><span aria-hidden="true">↗</span> NYS Market</button>
-        <button className={mode === 'nys-changes' ? 'active' : ''} onClick={() => setMode('nys-changes')}><span aria-hidden="true">↻</span> NYS Changes</button>
-      </nav>
-      <div className="side-trust"><span className="status-dot" />{healthyHealth.length}/{sourceHealth.length || '—'} sources healthy<small>Updated {formatTimestamp(payload.metadata.generated_at)}</small></div>
-    </aside>
+  return <main className={`app-shell saas-shell reference-shell mode-${mode}`}>
+    <TopNavigation
+      mode={mode === 'nys-account' ? 'nys' : mode}
+      onNavigate={next => navigate(next)}
+      search={globalSearch}
+      onSearchChange={setGlobalSearch}
+      onSearchSubmit={submitGlobalSearch}
+      healthySources={healthyHealth.length}
+      sourceCount={sourceHealth.length}
+      user={workflow.user}
+      authLoading={workflow.loading}
+      authBusy={workflow.busy}
+      authError={workflow.error}
+      onSignIn={workflow.signIn}
+      onSignUp={workflow.signUp}
+      onSignOut={workflow.signOut}
+    />
 
     <div className="main-stage">
-      <header className="utility-bar">
-        <div><span className="utility-kicker">{nysMode ? 'New York State' : 'New York City'}</span><strong>{mode === 'prospect' ? 'Find accounts' : mode === 'monitor' ? 'Monitor changes' : mode === 'map' ? 'Territory map' : mode === 'nys' ? 'NYS market map' : 'NYS market changes'}</strong></div>
-        <div className="utility-actions"><span className="coverage-chip">Data refreshed {formatTimestamp(nysMode ? nysPayload.metadata.generated_at : payload.metadata.generated_at)}</span>{!nysMode && <span className="coverage-chip">{acrisAvailable && acrisMetadata.acris_cache_generated_at ? `ACRIS verified ${formatTimestamp(acrisMetadata.acris_cache_generated_at)}` : 'ACRIS timing unavailable'}</span>}<WorkflowAuthPanel user={workflow.user} loading={workflow.loading} busy={workflow.busy} error={workflow.error} onSignIn={workflow.signIn} onSignUp={workflow.signUp} onSignOut={workflow.signOut} />{!nysMode && <button className="primary" onClick={() => exportCsv(filtered, payload.metadata)}>Export {filtered.length.toLocaleString()} accounts</button>}</div>
-      </header>
+      {!['opportunities','portfolios','workflow','source-health','account','nys-account'].includes(mode) && <header className="utility-bar reference-utility-bar">
+        <div><span className="utility-kicker">{nysMode ? 'New York State' : 'New York City'}</span><strong>{mode === 'prospect' ? 'Prospect workspace' : mode === 'monitor' ? 'Monitor workspace' : mode === 'map' ? 'Map workspace' : mode === 'nys' ? 'NYS Market' : 'NYS Changes'}</strong></div>
+        <div className="utility-actions"><ShareButton url={currentShareUrl} label="Share view" /><span className="coverage-chip">Data refreshed {formatTimestamp(nysMode ? nysPayload.metadata.generated_at : payload.metadata.generated_at)}</span>{!nysMode && acrisAvailable && acrisMetadata.acris_cache_generated_at && <span className="coverage-chip">ACRIS verified {formatTimestamp(acrisMetadata.acris_cache_generated_at)}</span>}{!nysMode && <button className="primary" onClick={() => exportCsv(filtered, payload.metadata)}>Export {filtered.length.toLocaleString()} accounts</button>}</div>
+      </header>}
 
-      {mode === 'prospect' && <>
-        <section className="value-hero">
-          <div><span className="eyebrow">Commercial timing intelligence</span><h1>Know which cooling-tower accounts deserve attention now.</h1><p>TowerSignal combines public registration, sampling, inspection, OATH, DOB, recent recorded property activity, property and contact evidence into a prioritized workspace for water-treatment, Legionella, HVAC and environmental sales teams.</p></div>
-          <div className="hero-proof"><strong>{outreachReady.toLocaleString()}</strong><span>high-priority accounts</span><small>Score 70+ in the current NYC snapshot</small></div>
-        </section>
-
-        <section className="signal-grid" aria-label="Commercial signal summary">
-          <article><span className="metric-icon urgent">↗</span><div><small>Outreach-ready</small><strong>{outreachReady.toLocaleString()}</strong><span>High-priority accounts</span></div></article>
-          <article><span className="metric-icon warning">◷</span><div><small>Sampling follow-up</small><strong>{samplingFollowUp.toLocaleString()}</strong><span>Gap or missing-date signals</span></div></article>
-          <article><span className="metric-icon">§</span><div><small>New OATH activity</small><strong>{newOathCases.toLocaleString()}</strong><span>New cases in preserved history</span></div></article>
-          <article><span className="metric-icon success">✓</span><div><small>Contact-ready</small><strong>{contactReady.toLocaleString()}</strong><span>HPD contacts matched</span></div></article>
-          <article><span className="metric-icon">⌁</span><div><small>Recent DOB activity</small><strong>{recentDob.toLocaleString()}</strong><span>Commercial timing context</span></div></article>
-          <article><span className="metric-icon">⌂</span><div><small>Recent ACRIS activity</small><strong>{acrisAvailable ? recentAcris.toLocaleString() : '—'}</strong><span>{acrisAvailable ? 'Exact-BBL recorded property activity' : 'Verified cache unavailable'}</span></div></article>
-        </section>
-
-        <section className="coverage-strip"><strong>Data coverage</strong><span>{registered.toLocaleString()} NYC systems</span><span>PLUTO {pct(plutoMatches, registered)}</span><span>OATH history {pct(oathMatches, registered)}</span><span>HPD contacts {pct(contactReady, registered)}</span>{acrisAvailable && <span>ACRIS activity {pct(recentAcris, registered)}</span>}{workflow.user && <span>{workflow.watchedSystemIds.size.toLocaleString()} watched accounts</span>}<button className="link-button" onClick={() => document.getElementById('data-provenance')?.scrollIntoView({ behavior:'smooth' })}>View provenance</button></section>
-
-        <div className="prospect-layout">
+      {mode === 'prospect' && <section className="product-page prospect-reference-page">
+        <div className="product-page-heading compact-heading"><div><span className="page-kicker">New York City</span><h1>Prospect workspace</h1><p>Find source-backed accounts that deserve commercial attention now, then open a shareable account profile for the evidence and next action.</p></div></div>
+        <div className="reference-metric-grid prospect-reference-metrics" aria-label="Commercial signal summary">
+          <article><span className="reference-metric-icon urgent">↗</span><div><small>High priority accounts</small><strong>{outreachReady.toLocaleString()}</strong><span>Priority score 70+</span></div></article>
+          <article><span className="reference-metric-icon warning">◷</span><div><small>Sampling follow-up</small><strong>{samplingFollowUp.toLocaleString()}</strong><span>Gap or missing-date signals</span></div></article>
+          <article><span className="reference-metric-icon success">◎</span><div><small>Contact-ready</small><strong>{contactReady.toLocaleString()}</strong><span>HPD contacts matched</span></div></article>
+          <article><span className="reference-metric-icon">⌁</span><div><small>Recent DOB activity</small><strong>{recentDob.toLocaleString()}</strong><span>Project timing context</span></div></article>
+          <article><button className="metric-card-button" onClick={() => navigate('source-health')}><span className="reference-metric-icon success">⌂</span><span><small>Total NYC accounts</small><strong>{registered.toLocaleString()}</strong><em>{healthyHealth.length}/{sourceHealth.length || '—'} sources healthy</em></span></button></article>
+        </div>
+        <div className="prospect-layout reference-prospect-layout">
           <aside className="filter-rail">
             <Filters rows={payload.systems} value={filters} onChange={setFilters} onQuick={quick} acrisAvailable={acrisAvailable} />
             <section className="saved-views"><div className="section-title"><div><span className="eyebrow">Monitor</span><h3>Saved views</h3></div><span>{workflow.savedViews.length}</span></div><div className="save-view-row"><input aria-label="Saved view name" value={viewName} onChange={event => setViewName(event.target.value)} placeholder="e.g. Manhattan follow-up" /><button onClick={() => void saveView()} disabled={!viewName.trim() || workflow.busy}>Save</button></div>{workflow.savedViews.length === 0 ? <p>No saved views yet. Save this filter set for repeat prospecting.</p> : <div className="saved-view-list">{workflow.savedViews.map(view => <div key={view.id}><button onClick={() => setFilters({ ...initialFilters, ...view.filters })}>{view.name}</button><button className="icon-button-small" aria-label={`Delete ${view.name}`} onClick={() => void workflow.deleteView(view.id)}>×</button></div>)}</div>}<p className="microcopy">{workflow.user ? 'Saved views sync with your private workflow account.' : 'Saved views remain in this browser until you sign in to sync them.'}</p></section>
             <WorkflowPanel user={workflow.user} watchlists={workflow.watchlists} watchedSystemIds={workflow.watchedSystemIds} memberships={workflow.memberships} watchedOnly={watchedOnly} busy={workflow.busy} onToggleWatchedOnly={() => setWatchedOnly(value => !value)} onCreateWatchlist={workflow.createWatchlist} onDeleteWatchlist={workflow.deleteWatchlist} onExport={exportWorkflow} />
           </aside>
-          <section className="account-workspace"><div className="workspace-heading"><div><span className="eyebrow">Prospect workspace</span><h2>Sales-ready accounts</h2><p>{watchedOnly && workflow.user ? 'Watched accounts matching the current public-evidence filters.' : 'Prioritized by timing signal, evidence, contact context and recent activity.'}</p></div><button onClick={() => setMode('map')}>View on map</button></div><SystemTable rows={filtered} onSelect={setSelected} /></section>
+          <section className="account-workspace"><div className="workspace-heading"><div><span className="eyebrow">Account intelligence</span><h2>Sales-ready accounts</h2><p>{watchedOnly && workflow.user ? 'Watched accounts matching the current public-evidence filters.' : 'Priority is WHY NOW. Commercial enrichment remains separate from the deterministic timing score.'}</p></div><div className="workspace-heading-actions"><ShareButton url={shareUrl('prospect', filters)} label="Share filters" /><button onClick={() => navigate('map')}>View on map</button></div></div><SystemTable rows={filtered} onSelect={openAccount} /></section>
         </div>
-      </>}
+      </section>}
 
-      {mode === 'monitor' && <section className="page-section"><div className="page-heading"><div><span className="eyebrow">Account monitoring</span><h1>What changed since the last observation?</h1><p>Use preserved public-record changes to spot new reasons to investigate or re-engage an account.</p></div><div className="monitor-workflow-controls">{workflow.user && <button className={watchedOnly ? 'monitor-watch-button active' : 'monitor-watch-button'} onClick={() => setWatchedOnly(value => !value)}>{watchedOnly ? 'Watched accounts only' : 'Filter to watched accounts'}</button>}<span className="page-count">{monitorChanges.new_event_count.toLocaleString()} new events</span></div></div><ChangesView payload={monitorChanges} onSelectSystem={selectById} /></section>}
+      {mode === 'monitor' && <section className="product-page monitor-reference-page"><div className="product-page-heading"><div><span className="page-kicker">New York City · preserved history</span><h1>Monitor workspace</h1><p>What changed since the last observation? Review source-backed changes and re-open accounts when new timing evidence appears.</p></div><div className="page-actions">{workflow.user && <button className={watchedOnly ? 'active-control' : ''} onClick={() => setWatchedOnly(value => !value)}>{watchedOnly ? 'Watched accounts only' : 'Filter to watched accounts'}</button>}</div></div><div className="reference-metric-grid monitor-reference-metrics"><article><span className="reference-metric-icon urgent">↗</span><div><small>High-priority changes</small><strong>{highPriorityChanges.toLocaleString()}</strong><span>Events on score 70+ accounts</span></div></article><article><span className="reference-metric-icon warning">◷</span><div><small>Sampling changes</small><strong>{sampleChanges.toLocaleString()}</strong><span>Sample date or gap events</span></div></article><article><span className="reference-metric-icon">§</span><div><small>New OATH cases</small><strong>{newOathCases.toLocaleString()}</strong><span>Exact-matched additions</span></div></article><article><span className="reference-metric-icon success">⌁</span><div><small>DOB / permit changes</small><strong>{dobChanges.toLocaleString()}</strong><span>Project lifecycle events</span></div></article><article><span className="reference-metric-icon">⌂</span><div><small>Property / contact</small><strong>{propertyChanges.toLocaleString()}</strong><span>HPD or PLUTO changes</span></div></article></div><ChangesView payload={monitorChanges} onSelectSystem={selectById} /></section>}
 
-      {mode === 'map' && <section className="page-section"><div className="page-heading"><div><span className="eyebrow">Territory intelligence</span><h1>Explore the current opportunity set geographically.</h1><p>{watchedOnly && workflow.user ? 'Map watched accounts that also match the current public-evidence filters.' : 'Map the same filtered prospect set, then open any system to inspect its evidence and account context.'}</p></div><button className="primary" onClick={() => setMode('prospect')}>Back to prospect list</button></div><Filters rows={payload.systems} value={filters} onChange={setFilters} onQuick={quick} acrisAvailable={acrisAvailable} /><div className="map-workspace"><TowerMap systems={filtered} selectedId={selected?.system_id ?? null} onSelect={selectById} /><aside className="map-summary"><span className="eyebrow">Current territory</span><strong>{filtered.length.toLocaleString()}</strong><span>matching accounts</span><dl><div><dt>High priority</dt><dd>{filtered.filter(row => row.priority_score >= 70).length.toLocaleString()}</dd></div><div><dt>Contact-ready</dt><dd>{filtered.filter(row => (row.hpd_contact_count ?? 0) > 0).length.toLocaleString()}</dd></div><div><dt>Confirmed violation</dt><dd>{filtered.filter(row => row.confirmed_violation).length.toLocaleString()}</dd></div></dl></aside></div></section>}
+      {mode === 'map' && <section className="product-page map-reference-page"><div className="product-page-heading"><div><span className="page-kicker">New York City · territory intelligence</span><h1>Map workspace</h1><p>Explore the same filtered prospect set geographically, then open any account as a shareable source-backed profile.</p></div><div className="page-actions"><ShareButton url={shareUrl('map', filters)} label="Share map view" /></div></div><div className="map-reference-grid"><aside className="map-reference-rail"><div className="map-kpis"><article><small>High priority</small><strong>{filtered.filter(row => row.priority_score >= 70).length.toLocaleString()}</strong></article><article><small>Sampling follow-up</small><strong>{filtered.filter(row => row.signal_types.includes('POTENTIAL_SAMPLING_GAP') || row.signal_types.includes('NO_PUBLIC_SAMPLE_DATE')).length.toLocaleString()}</strong></article><article><small>Contact-ready</small><strong>{filtered.filter(row => (row.hpd_contact_count ?? 0) > 0).length.toLocaleString()}</strong></article><article><small>Matching accounts</small><strong>{filtered.length.toLocaleString()}</strong></article></div><Filters rows={payload.systems} value={filters} onChange={setFilters} onQuick={quick} acrisAvailable={acrisAvailable} /></aside><div className="map-reference-canvas"><TowerMap systems={filtered} selectedId={selected?.system_id ?? null} onSelect={openAccount} /></div></div></section>}
 
-      {mode === 'nys' && <section className="page-section"><div className="page-heading"><div><span className="eyebrow">Market expansion</span><h1>New York State registry intelligence</h1><p>Explore the official NYS cooling-tower registry outside NYC without losing the account-intelligence workflow.</p></div></div><NysRegistryView payload={nysPayload} selected={selectedNys} onSelect={setSelectedNys} /></section>}
-      {mode === 'nys-changes' && <section className="page-section"><div className="page-heading"><div><span className="eyebrow">Market monitoring</span><h1>New York State registry changes</h1><p>See newly observed equipment, status and compliance changes in the preserved NYS history.</p></div></div><NysChangesView payload={nysChanges} systems={nysPayload.systems} onSelect={setSelectedNys} /></section>}
+      {mode === 'nys' && <section className="product-page nys-reference-page"><div className="product-page-heading"><div><span className="page-kicker">New York State</span><h1>NYS Market</h1><p>Explore the official statewide cooling-tower registry outside NYC while preserving source-native status, compliance, sample and location context.</p></div></div><div className="reference-metric-grid nys-reference-metrics"><article><span className="reference-metric-icon success">◎</span><div><small>Registered equipment</small><strong>{nysPayload.summary.registered_equipment.toLocaleString()}</strong><span>Current registry extract</span></div></article><article><span className="reference-metric-icon">⌂</span><div><small>Unique properties</small><strong>{nysPayload.metadata.unique_property_count.toLocaleString()}</strong><span>Deterministic property keys</span></div></article><article><span className="reference-metric-icon urgent">!</span><div><small>Non-compliant</small><strong>{nysPayload.summary.non_compliant.toLocaleString()}</strong><span>Source-native status</span></div></article><article><span className="reference-metric-icon warning">◷</span><div><small>Sample required</small><strong>{nysPayload.summary.sample_required.toLocaleString()}</strong><span>Registry field</span></div></article><article><span className="reference-metric-icon success">⌖</span><div><small>Mapped equipment</small><strong>{nysPayload.summary.mapped_equipment.toLocaleString()}</strong><span>Usable source coordinates</span></div></article></div><NysRegistryView payload={nysPayload} selected={selectedNys} onSelect={row => row ? openNysAccount(row) : setSelectedNys(null)} /></section>}
 
-      <section className="responsible-use"><strong>Responsible use.</strong> Signals are commercial timing indicators derived from public records, not legal or health determinations. Verify current operating, testing, maintenance and compliance status before relying on a signal or contacting a property.</section>
-      <footer id="data-provenance"><div><strong>Data provenance</strong>{sourceHealth.length === 0 ? <span>Source-health metrics unavailable.</span> : sourceHealth.map(source => <span key={source.source_key}>{source.name} · {source.status} · {source.coverage_percentage == null ? 'coverage n/a' : `${source.coverage_percentage.toFixed(1)}% coverage`} · {source.displayed_entity_count.toLocaleString()} represented</span>)}</div><div><strong>Trust model</strong><span>Rules {payload.metadata.rules_version}</span><span>Priority model {payload.metadata.priority_model_version}</span><span>NYC history {changes.history_schema_version} · NYS history {nysChanges.history_schema_version}</span><span>User workflow state is private and separate from public-source evidence</span></div></footer>
+      {mode === 'nys-changes' && <section className="product-page nys-reference-page"><div className="product-page-heading"><div><span className="page-kicker">New York State · preserved history</span><h1>NYS Changes</h1><p>Review newly observed equipment and source-native status, compliance, sample and operational changes.</p></div></div><div className="reference-metric-grid"><article><span className="reference-metric-icon urgent">↗</span><div><small>Total changes</small><strong>{nysChanges.new_event_count.toLocaleString()}</strong><span>Current history delta</span></div></article><article><span className="reference-metric-icon warning">+</span><div><small>New equipment</small><strong>{nysChanges.events.filter(event => event.event_type === 'NYS_EQUIPMENT_FIRST_SEEN').length.toLocaleString()}</strong><span>First observed in history</span></div></article><article><span className="reference-metric-icon success">✓</span><div><small>Compliance changes</small><strong>{nysChanges.events.filter(event => event.event_type === 'NYS_REG_COMPLIANCE_CHANGED').length.toLocaleString()}</strong><span>Source-native status change</span></div></article><article><span className="reference-metric-icon">◉</span><div><small>Sample result changes</small><strong>{nysChanges.events.filter(event => event.event_type === 'NYS_SAMPLE_RESULT_CHANGED').length.toLocaleString()}</strong><span>Observed registry change</span></div></article><article><span className="reference-metric-icon">↻</span><div><small>Operating status</small><strong>{nysChanges.events.filter(event => event.event_type === 'NYS_CT_STATUS_CHANGED').length.toLocaleString()}</strong><span>Tower status changes</span></div></article></div><NysChangesView payload={nysChanges} systems={nysPayload.systems} onSelect={row => row ? openNysAccount(row) : setSelectedNys(null)} /></section>}
+
+      {mode === 'opportunities' && <OpportunitiesPage payload={payload} onOpenAccount={openAccount} />}
+      {mode === 'portfolios' && <PortfoliosPage payload={payload} watchedSystemIds={workflow.watchedSystemIds} onOpenAccount={openAccount} />}
+      {mode === 'workflow' && <WorkflowWorkspacePage user={workflow.user} systems={payload.systems} accounts={workflow.accounts} watchlists={workflow.watchlists} memberships={workflow.memberships} savedViews={workflow.savedViews} onOpenAccount={openAccount} />}
+      {mode === 'source-health' && <SourceHealthPage payload={payload} />}
+
+      {mode === 'account' && <section className="product-page account-profile-page"><div className="account-profile-toolbar"><div><button className="breadcrumb-back" onClick={() => navigate(returnMode === 'account' || returnMode === 'nys-account' ? 'prospect' : returnMode)}>← Back</button><span>New York City · account profile</span></div><div className="page-actions"><ShareButton url={currentShareUrl} label="Copy account link" /><button onClick={() => exportCsv(selected ? [selected] : [], payload.metadata)} disabled={!selected}>Export account</button></div></div>{selected ? <DetailPanel row={selected} metadata={payload.metadata} historyEvents={changes.events.filter(event => event.system_id === selected.system_id)} historyStartedAt={changes.history_started_at} workflowSection={<WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} />} onClose={() => navigate(returnMode === 'account' || returnMode === 'nys-account' ? 'prospect' : returnMode)} /> : <div className="reference-empty-state"><strong>Account not found in the current public snapshot.</strong><span>The share link may refer to an account that is no longer present or whose ID changed upstream.</span><button onClick={() => navigate('prospect')}>Return to Prospect</button></div>}</section>}
+
+      {mode === 'nys-account' && <section className="product-page account-profile-page"><div className="account-profile-toolbar"><div><button className="breadcrumb-back" onClick={() => navigate('nys')}>← Back to NYS Market</button><span>New York State · equipment profile</span></div><div className="page-actions"><ShareButton url={currentShareUrl} label="Copy equipment link" /></div></div>{selectedNys ? <NysDetailPanel row={selectedNys} metadata={nysPayload.metadata} onClose={() => navigate('nys')} /> : <div className="reference-empty-state"><strong>NYS equipment record not found in the current registry snapshot.</strong><button onClick={() => navigate('nys')}>Return to NYS Market</button></div>}</section>}
+
+      <section className="responsible-use reference-responsible-use"><strong>Responsible use.</strong> Signals are commercial timing indicators derived from public records, not legal or health determinations. Verify current operating, testing, maintenance and compliance status before relying on a signal or contacting a property.</section>
+      <footer id="data-provenance" className="reference-footer"><div><strong>Data provenance</strong><span>{registered.toLocaleString()} NYC systems · PLUTO {pct(payload.summary.systems_with_pluto_context ?? 0, registered)} · HPD contacts {pct(contactReady, registered)}{acrisAvailable ? ` · recent ACRIS ${pct(recentAcris, registered)}` : ''}</span></div><div><strong>Trust model</strong><span>Rules {payload.metadata.rules_version} · Priority {payload.metadata.priority_model_version} · NYC history {changes.history_schema_version} · NYS history {nysChanges.history_schema_version}</span><button className="link-button" onClick={() => navigate('source-health')}>Open Source Health &amp; Coverage</button></div></footer>
     </div>
 
-    {(mode === 'prospect' || mode === 'monitor' || mode === 'map') && <DetailPanel row={selected} metadata={payload.metadata} historyEvents={selected ? changes.events.filter(event => event.system_id === selected.system_id) : []} historyStartedAt={changes.history_started_at} workflowSection={selected ? <WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} /> : null} onClose={() => setSelected(null)} />}
-    {nysMode && <NysDetailPanel row={selectedNys} metadata={nysPayload.metadata} onClose={() => setSelectedNys(null)} />}
+    {(mode === 'prospect' || mode === 'monitor' || mode === 'map') && selected && <DetailPanel row={selected} metadata={payload.metadata} historyEvents={changes.events.filter(event => event.system_id === selected.system_id)} historyStartedAt={changes.history_started_at} workflowSection={<WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} />} onClose={() => setSelected(null)} />}
   </main>
 }

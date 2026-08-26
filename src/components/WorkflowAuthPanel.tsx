@@ -1,5 +1,11 @@
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
+
+function initials(user: WorkflowUser): string {
+  const source = user.name?.trim() || user.email.split('@')[0] || 'TS'
+  const parts = source.split(/[\s._-]+/).filter(Boolean)
+  return (parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : source.slice(0, 2)).toUpperCase()
+}
 
 export function WorkflowAuthPanel({
   user,
@@ -22,9 +28,21 @@ export function WorkflowAuthPanel({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [createAccount, setCreateAccount] = useState(false)
+  const avatar = useMemo(() => user ? initials(user) : 'TS', [user])
 
   if (loading) return <span className="workflow-sync-chip">Checking workflow sync…</span>
-  if (user) return <div className="workflow-auth signed-in"><span><strong>Workflow synced</strong><small>{user.email}</small></span>{error && <div className="workflow-error workflow-auth-error" role="alert" title={error}>{error}</div>}<button onClick={() => void onSignOut()} disabled={busy}>Sign out</button></div>
+  if (user) return <div className="workflow-auth signed-in">
+    <span className="workflow-sync-state-label">Workflow synced</span>
+    {error && <div className="workflow-error workflow-auth-error" role="alert" title={error}>{error}</div>}
+    <button className="workflow-profile-trigger" aria-label="Open workflow account menu" aria-expanded={open} onClick={() => setOpen(value => !value)}><span>{avatar}</span></button>
+    {open && <div className="workflow-profile-popover">
+      <span className="eyebrow">Private workspace</span>
+      <strong>Workflow synced</strong>
+      <small>{user.email}</small>
+      <p>Saved views, watchlists, account status, notes and next actions are private workflow data.</p>
+      <button onClick={() => void onSignOut()} disabled={busy}>{busy ? 'Signing out…' : 'Sign out'}</button>
+    </div>}
+  </div>
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -39,7 +57,7 @@ export function WorkflowAuthPanel({
   }
 
   return <div className="workflow-auth">
-    <button className="workflow-sync-button" onClick={() => setOpen(value => !value)}>Sync workflow</button>
+    <button className="workflow-sync-button" onClick={() => setOpen(value => !value)}>Sign in</button>
     {open && <div className="workflow-auth-popover">
       <div><span className="eyebrow">Private workflow state</span><strong>{createAccount ? 'Create TowerSignal login' : 'Sign in to sync'}</strong><p>Saved accounts, notes and next actions are private workflow data, separate from public-source evidence.</p></div>
       <form onSubmit={event => void submit(event)}>
