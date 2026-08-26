@@ -131,6 +131,26 @@ test('saves private account disposition without treating it as source evidence',
   expect(result.current.accountBySystemId.get('SYS-2')?.status).toBe('follow-up')
 })
 
+test('first watchlist membership does not synthesize local account state that can overwrite an unsaved draft', async () => {
+  remote.loadWorkflowSnapshot.mockResolvedValue({
+    savedViews: [],
+    watchlists: [{ id: 'default', name: 'My watchlist' }],
+    accounts: [],
+    memberships: [],
+  })
+
+  const { result } = renderHook(() => useWorkflow())
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  await act(async () => {
+    await result.current.toggleMembership('SYS-NEW', 'default', true)
+  })
+
+  expect(remote.setRemoteMembership).toHaveBeenCalledWith('SYS-NEW', 'default', true)
+  expect(result.current.watchedSystemIds.has('SYS-NEW')).toBe(true)
+  expect(result.current.watchlistIdsBySystemId.get('SYS-NEW')?.has('default')).toBe(true)
+  expect(result.current.accountBySystemId.has('SYS-NEW')).toBe(false)
+})
+
 test('includes an annotated non-watchlisted account in CRM workflow export', () => {
   const metadata = { generated_at: '2026-08-25T00:00:00Z', snapshot_date: '2026-08-25' } as Parameters<typeof workflowCsvText>[1]
   const text = workflowCsvText([], metadata, [{ system_id: 'SYS-2', status: 'follow-up', note: 'Proposal timing', next_action_date: '2026-09-15' }], [], [])
