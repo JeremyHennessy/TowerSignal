@@ -25,8 +25,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Verify cross-session persistence and RLS isolation on Neon development branch
+      - name: Verify cross-session persistence and RLS isolation on Neon production configuration
         env:
-          TOWERSIGNAL_WORKFLOW_AUTH_URL: https://ep-frosty-lab-aub4h99n.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth
-          TOWERSIGNAL_WORKFLOW_DATA_API_URL: https://ep-frosty-lab-aub4h99n.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1
-        run: node scripts/verify_workflow_persistence.mjs
+          TOWERSIGNAL_WORKFLOW_AUTH_URL: https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth
+          TOWERSIGNAL_WORKFLOW_DATA_API_URL: https://ep-silent-moon-au2icaki.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1
+        run: |
+          sed -i "s#const origin = 'http://localhost:5173'#const origin = 'https://jeremyhennessy.github.io'#" scripts/verify_workflow_persistence.mjs
+          node scripts/verify_workflow_persistence.mjs
