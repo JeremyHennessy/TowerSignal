@@ -187,7 +187,7 @@ test('opens the new commercial, portfolio, workflow and source-health workspaces
   await user.click(screen.getByRole('button', { name:'Portfolios' }))
   expect(screen.getByRole('heading', { name:'Portfolios', level:1 })).toBeInTheDocument()
   expect(screen.getAllByText('ALPHA OWNER LLC').length).toBeGreaterThanOrEqual(2)
-  expect(screen.getByText('1 multi-property groups')).toBeInTheDocument()
+  expect(screen.getByText('1 multi-property group')).toBeInTheDocument()
   expect(screen.getByText('2 cooling-tower accounts · 4 active equipment · 1 contact-ready · 750,000 sq ft PLUTO building area')).toBeInTheDocument()
 
   await user.click(screen.getByRole('button', { name:'Workflow' }))
