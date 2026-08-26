@@ -1,8 +1,8 @@
-name: Build 014 NYS changes one-card timing
+name: Build 014 NYS changes minimal-card timing
 
 on:
   push:
-    branches: [agent/build014-nys-changes-one-card-20260826]
+    branches: [agent/build014-nys-changes-minimal-card-20260826]
 
 permissions:
   contents: read
@@ -32,7 +32,7 @@ jobs:
           cp -R .production-dist/data/. public/data/
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Build one-card diagnostic candidate
+      - name: Build minimal-card diagnostic candidate
         run: |
           npm run build
           cp -R dist/. .root/TowerSignal/
@@ -46,7 +46,7 @@ jobs:
             sleep 1
           done
           curl -fsS http://localhost:4173/TowerSignal/ >/dev/null
-      - name: Time direct NYS changes transition with one real card
+      - name: Time one minimal NYS change card in WebKit
         env:
           BASE_URL: http://localhost:4173/TowerSignal/
         run: npx playwright test tests/e2e/nys-changes-direct-timing.spec.ts --project=iphone --workers=1 --reporter=list
