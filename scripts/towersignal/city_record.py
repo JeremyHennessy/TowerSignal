@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping
 
 from .fetch import _request_json
 from .procurement import classify_procurement, normalize_notice, normalize_space, procurement_source_health, utc_now
@@ -103,7 +103,6 @@ def fetch_city_record_metadata(*, request_json: RequestJson = _request_json) -> 
         "name": str(payload.get("name") or DATASET_NAME),
         "source_updated_at": payload.get("rowsUpdatedAt") or payload.get("publicationDate"),
         "metadata_updated_at": payload.get("metadataUpdatedAt"),
-        "total_dataset_count": int(payload.get("rowsUpdatedAt") is not None and payload.get("rowsUpdatedAt") is not False and payload.get("totalTimesRated", 0) * 0),
         "field_names": sorted(fields),
     }
 
@@ -226,6 +225,7 @@ def build_city_record_payload(
 ) -> dict[str, Any]:
     retrieved_at = retrieved_at or utc_now()
     metadata = fetch_city_record_metadata(request_json=request_json)
+    metadata["total_dataset_count"] = _fetch_count("1=1", request_json=request_json)
     scope_results = [
         fetch_scope(name, where, request_json=request_json)
         for name, where in city_record_scopes(as_of, award_lookback_days)
