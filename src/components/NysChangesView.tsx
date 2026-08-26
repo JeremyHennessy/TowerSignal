@@ -91,7 +91,7 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
 
 function NysChangeCard({ event, current, onSelect }: { event: NysChangeEvent; current: NysSystem | null; onSelect: (row: NysSystem | null) => void }) {
   return <article className="change-card">
-    <div className="change-card-head"><div><span className="change-type">{EVENT_LABELS[event.event_type]}</span><strong>{event.address ?? event.system_id}</strong><small>Equipment {event.source_equipment_id ?? event.system_id}{event.city ? ` · ${event.city}` : ''}</small></div><div className="change-meta"><strong>{event.detected_at}</strong><small>{event.detected_at}</small></div></div>
+    <div className="change-card-head"><div><span className="change-type">{EVENT_LABELS[event.event_type]}</span><strong>{event.address ?? event.system_id}</strong><small>Equipment {event.source_equipment_id ?? event.system_id}{event.city ? ` · ${event.city}` : ''}</small></div><div className="change-meta"><strong>{event.detected_at}</strong><small>{formatTimestamp(event.detected_at)}</small></div></div>
     <div className="change-values"><div><span>Previous</span><code>{String(event.previous_value ?? '—')}</code></div><div><span>New</span><code>{String(event.new_value ?? '—')}</code></div></div>
     <div className="change-source"><span>Source: NYS Cooling Tower Registry Weekly Extract</span><span>Evidence: {event.evidence_basis}</span>{event.source_observation_date && <span>Source observation: {event.source_observation_date}</span>}{event.source_county && <span>Published county: {event.source_county}</span>}</div>
     {current && <button onClick={() => onSelect(current)}>Open equipment detail</button>}
