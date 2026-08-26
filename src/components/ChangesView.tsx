@@ -5,14 +5,14 @@ import { StatusBadge } from './StatusBadge'
 
 const EVENT_LABELS: Record<string, string> = {
   SYSTEM_FIRST_SEEN: 'New system observed',
-  SYSTEM_NO_LONGER_PRESENT: 'No longer present in current registration snapshot',
+  SYSTEM_NO_LONGER_PRESENT: 'No longer present',
   ACTIVE_EQUIPMENT_CHANGED: 'Active equipment changed',
   SAMPLE_REPORTED: 'New public sample reported',
   LATEST_SAMPLE_CHANGED: 'Latest public sample changed',
   SAMPLING_GAP_ENTERED: 'Sampling-gap signal entered',
   SAMPLING_GAP_RESOLVED: 'Sampling-gap signal resolved',
   INSPECTION_ADDED: 'New NYC Health inspection',
-  VIOLATION_ADDED: 'New confirmed NYC Health violation',
+  VIOLATION_ADDED: 'New confirmed violation',
   VIOLATION_STATUS_CHANGED: 'Violation status changed',
   OATH_CASE_ADDED: 'New OATH case activity',
   OATH_STATUS_CHANGED: 'OATH status changed',
@@ -23,8 +23,8 @@ const EVENT_LABELS: Record<string, string> = {
   HPD_REGISTRATION_CHANGED: 'HPD registration changed',
   HPD_CONTACT_ADDED: 'HPD contact added',
   HPD_CONTACT_REMOVED: 'HPD contact removed',
-  HPD_MANAGING_AGENT_CHANGED: 'HPD managing-agent record changed',
-  DOB_JOB_FILED: 'New DOB job filing',
+  HPD_MANAGING_AGENT_CHANGED: 'Managing-agent record changed',
+  DOB_JOB_FILED: 'DOB job filed',
   DOB_STATUS_CHANGED: 'DOB filing status changed',
   DOB_PERMIT_ISSUED: 'DOB permit issued',
   DOB_JOB_APPROVED: 'DOB job approved',
@@ -32,16 +32,15 @@ const EVENT_LABELS: Record<string, string> = {
   DOB_COOLING_TOWER_MENTION_ADDED: 'Cooling tower mentioned in DOB filing',
 }
 
-const QUICK_GROUPS: Record<string, ChangeEventType[]> = {
-  'New systems': ['SYSTEM_FIRST_SEEN'],
-  'New violations': ['VIOLATION_ADDED'],
-  'New OATH activity': ['OATH_CASE_ADDED', 'OATH_STATUS_CHANGED', 'OATH_DECISION_CHANGED', 'OATH_PENALTY_CHANGED', 'OATH_BALANCE_CHANGED'],
-  'DOB project activity': ['DOB_JOB_FILED', 'DOB_STATUS_CHANGED', 'DOB_PERMIT_ISSUED', 'DOB_JOB_APPROVED', 'DOB_JOB_SIGNED_OFF', 'DOB_COOLING_TOWER_MENTION_ADDED'],
-  'New samples': ['SAMPLE_REPORTED', 'LATEST_SAMPLE_CHANGED'],
-  'Property/contact changes': ['PLUTO_OWNER_CHANGED', 'HPD_REGISTRATION_CHANGED', 'HPD_CONTACT_ADDED', 'HPD_CONTACT_REMOVED', 'HPD_MANAGING_AGENT_CHANGED'],
-  'Signals entered': ['SAMPLING_GAP_ENTERED'],
-  'Signals resolved': ['SAMPLING_GAP_RESOLVED'],
-}
+const QUICK_GROUPS: Array<{ label: string; types: ChangeEventType[] | null }> = [
+  { label: 'All changes', types: null },
+  { label: 'High priority', types: null },
+  { label: 'New violations', types: ['VIOLATION_ADDED'] },
+  { label: 'OATH activity', types: ['OATH_CASE_ADDED', 'OATH_STATUS_CHANGED', 'OATH_DECISION_CHANGED', 'OATH_PENALTY_CHANGED', 'OATH_BALANCE_CHANGED'] },
+  { label: 'DOB / permits', types: ['DOB_JOB_FILED', 'DOB_STATUS_CHANGED', 'DOB_PERMIT_ISSUED', 'DOB_JOB_APPROVED', 'DOB_JOB_SIGNED_OFF', 'DOB_COOLING_TOWER_MENTION_ADDED'] },
+  { label: 'Sampling', types: ['SAMPLE_REPORTED', 'LATEST_SAMPLE_CHANGED', 'SAMPLING_GAP_ENTERED', 'SAMPLING_GAP_RESOLVED'] },
+  { label: 'Property / contact', types: ['PLUTO_OWNER_CHANGED', 'HPD_REGISTRATION_CHANGED', 'HPD_CONTACT_ADDED', 'HPD_CONTACT_REMOVED', 'HPD_MANAGING_AGENT_CHANGED'] },
+]
 
 function compactValue(value: unknown): string {
   if (value == null) return '—'
@@ -49,13 +48,12 @@ function compactValue(value: unknown): string {
   return JSON.stringify(value)
 }
 
-function relativeTime(timestamp: string): string {
-  const ms = Date.now() - new Date(timestamp).getTime()
-  const hours = Math.max(0, Math.floor(ms / 3600000))
-  if (hours < 1) return 'less than 1 hour ago'
-  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`
-  const days = Math.floor(hours / 24)
-  return `${days} day${days === 1 ? '' : 's'} ago`
+function eventTone(event: ChangeEvent): string {
+  if (event.event_type.includes('VIOLATION') || event.event_type.includes('OATH')) return 'urgent'
+  if (event.event_type.includes('SAMPLE') || event.event_type.includes('SAMPLING')) return 'warning'
+  if (event.event_type.startsWith('DOB_')) return 'blue'
+  if (event.event_type.startsWith('HPD_') || event.event_type === 'PLUTO_OWNER_CHANGED') return 'success'
+  return 'neutral'
 }
 
 export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPayload; onSelectSystem: (systemId: string) => void }) {
@@ -65,9 +63,11 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
   const [minimumPriority, setMinimumPriority] = useState('')
   const [confidence, setConfidence] = useState('')
   const [contactOnly, setContactOnly] = useState(false)
+  const [quickLabel, setQuickLabel] = useState('All changes')
   const [quickTypes, setQuickTypes] = useState<ChangeEventType[] | null>(null)
   const [customStart, setCustomStart] = useState('')
   const [customEnd, setCustomEnd] = useState('')
+  const [page, setPage] = useState(0)
 
   const filtered = useMemo(() => payload.events.filter(event => {
     const detected = new Date(event.detected_at).getTime()
@@ -78,43 +78,69 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
     } else if (Number(days) > 0 && detected < now - Number(days) * 86400000) return false
     if (borough && event.borough !== borough) return false
     if (eventType && event.event_type !== eventType) return false
+    if (quickLabel === 'High priority' && (event.priority_score ?? 0) < 70) return false
     if (quickTypes && !quickTypes.includes(event.event_type)) return false
     if (minimumPriority && (event.priority_score ?? 0) < Number(minimumPriority)) return false
     if (confidence && event.evidence_confidence !== confidence) return false
     if (contactOnly && !event.contact_available) return false
     return true
-  }), [payload.events, days, borough, eventType, minimumPriority, confidence, contactOnly, quickTypes, customStart, customEnd])
+  }), [payload.events, days, borough, eventType, quickLabel, quickTypes, minimumPriority, confidence, contactOnly, customStart, customEnd])
 
   const boroughs = [...new Set(payload.events.map(event => event.borough).filter(Boolean))] as string[]
   const eventTypes = [...new Set(payload.events.map(event => event.event_type))]
+  const pageSize = 50
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const safePage = Math.min(page, pageCount - 1)
+  const pageRows = filtered.slice(safePage * pageSize, safePage * pageSize + pageSize)
 
-  return <section className="changes-view" aria-label="TowerSignal changes">
-    <div className="changes-intro"><div><span className="eyebrow">Historical intelligence</span><h2>What changed?</h2><p>TowerSignal compares preserved source-backed observations. Detection time is when TowerSignal first observed a difference; source dates are shown separately when available.</p></div><div className="history-status"><span>History collection began</span><strong>{formatTimestamp(payload.history_started_at)}</strong><small>Latest observation {formatTimestamp(payload.observed_at)}</small></div></div>
+  const chooseQuick = (label: string, types: ChangeEventType[] | null) => {
+    setQuickLabel(label)
+    setQuickTypes(types)
+    if (label === 'High priority') setMinimumPriority('70')
+    else if (minimumPriority === '70') setMinimumPriority('')
+    setEventType('')
+    setPage(0)
+  }
 
-    {payload.baseline_initialized && <div className="disclaimer"><strong>Historical baseline initialized.</strong> This is TowerSignal's first preserved observation. Existing systems are not being mislabeled as newly registered. Change events will accumulate as later refreshes differ from this baseline.</div>}
+  return <section className="changes-view changes-table-view" aria-label="TowerSignal changes">
+    {payload.baseline_initialized && <div className="disclaimer"><strong>Historical baseline initialized.</strong> Existing systems are not being mislabeled as newly registered. Later source snapshots are compared with this preserved baseline.</div>}
 
-    <div className="quick-change-filters"><strong>New this week</strong>{Object.entries(QUICK_GROUPS).map(([label, types]) => <button key={label} className={quickTypes === types ? 'active' : ''} onClick={() => { setDays('7'); setEventType(''); setQuickTypes(types) }}>{label}</button>)}<button onClick={() => setQuickTypes(null)}>All changes</button></div>
+    <div className="change-workspace-grid">
+      <aside className="change-filter-rail" aria-label="Monitor filters">
+        <div className="change-filter-heading"><span className="page-kicker">Filters</span><button onClick={() => { setDays('7'); setBorough(''); setEventType(''); setMinimumPriority(''); setConfidence(''); setContactOnly(false); setQuickLabel('All changes'); setQuickTypes(null); setPage(0) }}>Clear all</button></div>
+        <label>Time range<select value={days} onChange={event => { setDays(event.target.value); setPage(0) }}><option value="1">Past 24 hours</option><option value="7">Past 7 days</option><option value="30">Past 30 days</option><option value="custom">Custom dates</option><option value="0">All retained</option></select></label>
+        {days === 'custom' && <><label>From<input type="date" value={customStart} onChange={event => setCustomStart(event.target.value)} /></label><label>To<input type="date" value={customEnd} onChange={event => setCustomEnd(event.target.value)} /></label></>}
+        <label>Borough<select value={borough} onChange={event => { setBorough(event.target.value); setPage(0) }}><option value="">All boroughs</option>{boroughs.map(value => <option key={value}>{value}</option>)}</select></label>
+        <label>Change type<select value={eventType} onChange={event => { setEventType(event.target.value); setQuickLabel('All changes'); setQuickTypes(null); setPage(0) }}><option value="">All change types</option>{eventTypes.map(value => <option key={value} value={value}>{EVENT_LABELS[value] ?? value}</option>)}</select></label>
+        <label>Minimum priority<input type="number" min="0" max="100" value={minimumPriority} onChange={event => { setMinimumPriority(event.target.value); setQuickLabel('All changes'); setPage(0) }} placeholder="Any score" /></label>
+        <label>Evidence<select value={confidence} onChange={event => { setConfidence(event.target.value); setPage(0) }}><option value="">All evidence</option><option value="CONFIRMED">Confirmed</option><option value="STRONG_SIGNAL">Strong signal</option><option value="VERIFY">Verify</option></select></label>
+        <label className="change-check"><input type="checkbox" checked={contactOnly} onChange={event => { setContactOnly(event.target.checked); setPage(0) }} /><span>Contact-ready only</span></label>
+      </aside>
 
-    <div className="change-filters">
-      <label>Period<select value={days} onChange={event => { setDays(event.target.value); setQuickTypes(null) }}><option value="1">Today</option><option value="7">7 days</option><option value="30">30 days</option><option value="custom">Custom</option><option value="0">All retained</option></select></label>
-      {days === 'custom' && <><label>From<input type="date" value={customStart} onChange={event => setCustomStart(event.target.value)} /></label><label>To<input type="date" value={customEnd} onChange={event => setCustomEnd(event.target.value)} /></label></>}
-      <label>Borough<select value={borough} onChange={event => setBorough(event.target.value)}><option value="">All</option>{boroughs.map(value => <option key={value}>{value}</option>)}</select></label>
-      <label>Event type<select value={eventType} onChange={event => { setEventType(event.target.value); setQuickTypes(null) }}><option value="">All</option>{eventTypes.map(value => <option key={value} value={value}>{EVENT_LABELS[value] ?? value}</option>)}</select></label>
-      <label>Minimum priority<input type="number" min="0" max="100" value={minimumPriority} onChange={event => setMinimumPriority(event.target.value)} placeholder="0" /></label>
-      <label>Evidence<select value={confidence} onChange={event => setConfidence(event.target.value)}><option value="">All</option><option value="CONFIRMED">Confirmed</option><option value="STRONG_SIGNAL">Strong signal</option><option value="VERIFY">Verify</option></select></label>
-      <label className="checkbox-label"><input type="checkbox" checked={contactOnly} onChange={event => setContactOnly(event.target.checked)} />Contact available</label>
+      <div className="change-table-workspace">
+        <div className="change-table-topline"><div><span className="page-kicker">Historical intelligence</span><h2>What changed?</h2><p>Detection time is when TowerSignal first observed a difference between preserved public-source snapshots.</p></div><div className="history-status compact"><span>History began</span><strong>{formatTimestamp(payload.history_started_at)}</strong><small>Latest observation {formatTimestamp(payload.observed_at)}</small></div></div>
+
+        <div className="change-tabs" role="tablist" aria-label="Change categories">{QUICK_GROUPS.map(group => <button key={group.label} className={quickLabel === group.label ? 'active' : ''} onClick={() => chooseQuick(group.label, group.types)}>{group.label}<span>{group.label === 'All changes' ? payload.events.length : ''}</span></button>)}</div>
+
+        <div className="reference-table-card monitor-change-table-card">
+          <div className="reference-table-heading"><div><strong>{filtered.length.toLocaleString()} new events</strong><span>{pageRows.length ? `Showing ${safePage * pageSize + 1}–${safePage * pageSize + pageRows.length}` : 'No matching events'} · preserved source-backed history</span></div></div>
+          {pageRows.length === 0 ? <div className="reference-empty-state compact"><strong>No observed changes match these filters.</strong><span>Adjust the period or evidence filters to inspect retained history.</span></div> : <div className="reference-table-scroll"><table className="reference-table change-reference-table"><thead><tr><th>Time</th><th>Account</th><th>Change</th><th>Previous → New</th><th>Priority</th><th>Source</th><th>Evidence</th><th>Action</th></tr></thead><tbody>{pageRows.map((event, index) => <ChangeRow key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} onSelectSystem={onSelectSystem} />)}</tbody></table></div>}
+          {pageCount > 1 && <div className="reference-pagination"><span>Page {safePage + 1} of {pageCount}</span><div><button disabled={safePage === 0} onClick={() => setPage(Math.max(0, safePage - 1))}>Previous</button><button disabled={safePage >= pageCount - 1} onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))}>Next</button></div></div>}
+        </div>
+      </div>
     </div>
-
-    <div className="change-count">{filtered.length.toLocaleString()} change{filtered.length === 1 ? '' : 's'} in current view</div>
-    {filtered.length === 0 ? <div className="empty-changes"><strong>No observed changes match these filters.</strong><span>{payload.baseline_initialized ? 'TowerSignal has established the first historical baseline; future refreshes will be compared against it.' : 'Adjust the period or filters to inspect retained history.'}</span></div> : <div className="change-list">{filtered.map((event, index) => <ChangeCard key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} onSelectSystem={onSelectSystem} />)}</div>}
   </section>
 }
 
-function ChangeCard({ event, onSelectSystem }: { event: ChangeEvent; onSelectSystem: (systemId: string) => void }) {
-  return <article className="change-card">
-    <div className="change-card-head"><div><span className="change-type">{EVENT_LABELS[event.event_type] ?? event.event_type}</span><strong>{event.address ?? event.system_id}</strong><small>System {event.system_id}{event.borough ? ` · ${event.borough}` : ''}</small></div><div className="change-meta"><strong>{relativeTime(event.detected_at)}</strong><small>{formatTimestamp(event.detected_at)}</small>{event.evidence_confidence && <StatusBadge value={event.evidence_confidence} />}</div></div>
-    <div className="change-values"><div><span>Previous</span><code>{compactValue(event.previous_value)}</code></div><div><span>New</span><code>{compactValue(event.new_value)}</code></div></div>
-    <div className="change-source"><span>Source: {event.source}</span><span>Evidence: {event.evidence_basis}</span>{event.source_observation_date && <span>Source observation: {formatDate(event.source_observation_date)}</span>}{event.priority_score != null && <span>Priority {event.priority_score}</span>}{event.contact_available && <span>HPD contact data available</span>}</div>
-    <button onClick={() => onSelectSystem(event.system_id)}>Open account detail</button>
-  </article>
+function ChangeRow({ event, onSelectSystem }: { event: ChangeEvent; onSelectSystem: (systemId: string) => void }) {
+  return <tr className="change-reference-row" onClick={() => onSelectSystem(event.system_id)}>
+    <td><strong>{formatTimestamp(event.detected_at)}</strong>{event.source_observation_date && <small>source {formatDate(event.source_observation_date)}</small>}</td>
+    <td><strong>{event.address ?? event.system_id}</strong><small>{event.borough ? `${event.borough} · ` : ''}{event.system_id}</small></td>
+    <td><span className={`change-kind change-kind-${eventTone(event)}`}>{EVENT_LABELS[event.event_type] ?? event.event_type}</span></td>
+    <td><div className="change-inline-values"><span>{compactValue(event.previous_value)}</span><b>→</b><strong>{compactValue(event.new_value)}</strong></div></td>
+    <td>{event.priority_score == null ? '—' : <strong className={event.priority_score >= 70 ? 'priority-text-high' : ''}>{event.priority_score}</strong>}</td>
+    <td><strong>{event.source}</strong>{event.contact_available && <small>contact-ready</small>}</td>
+    <td>{event.evidence_confidence ? <StatusBadge value={event.evidence_confidence} /> : <span className="muted-label">—</span>}<small>{event.evidence_basis}</small></td>
+    <td><button className="table-link" onClick={click => { click.stopPropagation(); onSelectSystem(event.system_id) }}>Open →</button></td>
+  </tr>
 }
