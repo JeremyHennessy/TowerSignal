@@ -1,0 +1,56 @@
+/* Narrow fixes discovered while reviewing Build 015 before merge. */
+.reference-top-nav .workflow-sync-state-label{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  padding:0!important;
+  margin:-1px!important;
+  overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;
+  border:0!important;
+}
+.reference-top-nav .workflow-auth.signed-in>.workflow-profile-trigger{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid #d9e8e3;
+  background:#f5fbf9;
+  color:#0d5648;
+  font-size:10px;
+  font-weight:900;
+  padding:0;
+  display:grid;
+  place-items:center;
+}
+.reference-top-nav .workflow-auth.signed-in>.workflow-profile-trigger::before{content:none}
+.reference-top-nav .workflow-profile-trigger>span{display:block!important;color:inherit;font-size:10px;font-weight:900}
+.reference-top-nav .workflow-profile-popover{
+  position:absolute;
+  right:0;
+  top:42px;
+  width:280px;
+  z-index:120;
+  background:#fff;
+  color:var(--ref-ink);
+  border:1px solid var(--ref-border);
+  border-radius:12px;
+  box-shadow:0 18px 50px rgba(5,19,26,.2);
+  padding:16px;
+}
+.reference-top-nav .workflow-profile-popover>strong,
+.reference-top-nav .workflow-profile-popover>small{display:block}
+.reference-top-nav .workflow-profile-popover>strong{font-size:12px;margin-top:5px}
+.reference-top-nav .workflow-profile-popover>small{font-size:9px;color:var(--ref-muted);margin-top:2px}
+.reference-top-nav .workflow-profile-popover p{font-size:10px;line-height:1.5;color:var(--ref-muted);margin:10px 0}
+.reference-top-nav .workflow-profile-popover>button{
+  width:100%;
+  min-height:34px;
+  border:1px solid var(--ref-border);
+  background:#fff;
+  color:#30414b;
+  border-radius:8px;
+  padding:7px 9px;
+  font-size:10px;
+  font-weight:750;
+}
