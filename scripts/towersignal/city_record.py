@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Any, Callable, Mapping
+from urllib.parse import urlencode
 
 from .fetch import _request_json
 from .procurement import classify_procurement, normalize_notice, normalize_space, procurement_source_health, utc_now
@@ -56,7 +57,7 @@ TEXT_FIELDS = (
     "printout_3",
 )
 
-RequestJson = Callable[..., Any]
+RequestJson = Callable[[str], Any]
 
 
 @dataclass(frozen=True)
@@ -70,6 +71,10 @@ class ScopeResult:
 
 def _floating_timestamp(day: date) -> str:
     return f"{day.isoformat()}T00:00:00.000"
+
+
+def _query_url(url: str, params: Mapping[str, Any]) -> str:
+    return f"{url}?{urlencode(params)}"
 
 
 def city_record_scopes(as_of: date, award_lookback_days: int = DEFAULT_AWARD_LOOKBACK_DAYS) -> tuple[tuple[str, str], ...]:
@@ -108,7 +113,7 @@ def fetch_city_record_metadata(*, request_json: RequestJson = _request_json) -> 
 
 
 def _fetch_count(where: str, *, request_json: RequestJson) -> int:
-    payload = request_json(RESOURCE_URL, params={"$select": "count(*) AS count", "$where": where})
+    payload = request_json(_query_url(RESOURCE_URL, {"$select": "count(*) AS count", "$where": where}))
     if not isinstance(payload, list) or len(payload) != 1 or not isinstance(payload[0], dict):
         raise RuntimeError("City Record count query returned an unexpected shape")
     raw = payload[0].get("count")
@@ -135,13 +140,15 @@ def fetch_scope(
     offset = 0
     while offset < expected:
         page = request_json(
-            RESOURCE_URL,
-            params={
-                "$where": where,
-                "$order": "request_id ASC",
-                "$limit": min(page_size, expected - offset),
-                "$offset": offset,
-            },
+            _query_url(
+                RESOURCE_URL,
+                {
+                    "$where": where,
+                    "$order": "request_id ASC",
+                    "$limit": min(page_size, expected - offset),
+                    "$offset": offset,
+                },
+            )
         )
         if not isinstance(page, list):
             raise RuntimeError(f"City Record {name} page at offset {offset} is not a list")
