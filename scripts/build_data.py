@@ -253,6 +253,8 @@ def build(output_dir: Path) -> dict:
             "score_components": scoring["components"],
             "oath_case_count": len(oath_cases),
             "pluto_match": building_context is not None,
+            "pluto_owner_name": building_context.get("owner_name") if building_context else None,
+            "pluto_building_area_sqft": building_context.get("building_area_sqft") if building_context else None,
             "dob_activity_count": dob_summary["activity_count"],
             "dob_recent_activity_count": dob_summary["recent_activity_count"],
             "dob_explicit_cooling_tower_count": dob_summary["explicit_cooling_tower_count"],
