@@ -46,7 +46,7 @@ Public-source pages and account profiles are linkable. Private workflow state re
 | NYS Market | Reframed in new shell | NYS registry weekly extract, source-native status/compliance/sample/location | statewide commercial enrichment where authoritative sources support it |
 | NYS Changes | Reframed in new shell | Preserved source-native NYS change history | additional authoritative NYS account/property enrichment |
 | Opportunities | New first-class workspace | Current timing score, sample signals, HPD contact readiness, DOB activity, OATH, ACRIS | City Record solicitations, Checkbook NYC awards/spend/vendors; deterministic procurement linkage; Opportunity Score |
-| Portfolios | New first-class workspace | PLUTO match readiness, HPD contact readiness, ACRIS timing, watched-account context | deterministic owner-group index built from PLUTO + HPD + ACRIS evidence with confidence labels |
+| Portfolios | New first-class workspace | Exact-BBL PLUTO owner name/building area in the account summary, exact normalized owner-name groups, HPD contact readiness, ACRIS timing, watched-account context | strengthen grouping confidence with HPD registration/contact and ACRIS party evidence; portfolio filters and scoring |
 | Workflow | New first-class workspace | Existing private saved views, watchlists, disposition, notes and next-action dates | organization/workspace membership, assignments, shared private notes/tasks, audit trail, role permissions |
 | Source Health & Coverage | New first-class workspace | current source-health payload, coverage/freshness/count/status diagnostics | health entries for every future source and deterministic history of source-health regressions |
 | NYC Account Profile | Full-page, deep-linkable | complete current detailed account payload and private workflow section | Opportunity Score, portfolio block, mechanical profile, procurement, sustainability/capital context, linked facility intelligence |
@@ -102,7 +102,7 @@ Current production account payloads do not yet contain live City Record or Check
 
 ### Portfolios
 
-The detailed NYC account records contain PLUTO owner context, but the current summary payload does not emit an owner-group index. Build 015 does not fetch thousands of detail files in the browser or infer corporate parents from similar names. Until a deterministic portfolio index is generated, the page shows the gap and safe individual research candidates.
+Build 015 emits the existing exact-BBL PLUTO `owner_name` and building-area context into the normalized account summary, then groups only identical owner names after whitespace/case normalization. These groups are labelled **CONTEXT / PLUTO OWNER NAME**. They are useful account-grouping evidence, but they are not proof of a corporate parent, operator responsibility, procurement relationship or current service relationship. HPD registration/contact and ACRIS party evidence should strengthen future confidence labels rather than silently changing the meaning of the PLUTO group.
 
 ### Opportunity Score
 
@@ -114,7 +114,7 @@ Public-source mismatches and gaps remain leads for verification, not legal/compl
 
 ## Recommended data implementation sequence after UI sign-off
 
-1. Emit portfolio-ready owner/property fields into the normalized summary payload and build a confidence-labelled portfolio index.
+1. Strengthen portfolio confidence with HPD registration/contact and ACRIS party evidence while preserving the current PLUTO-only context label.
 2. Ingest City Record and Checkbook NYC into a normalized procurement model with exact identifiers and conservative property linkage.
 3. Add facility intelligence and classification.
 4. Add LL84, LL87 and LL97 commercial/mechanical/capital context.
