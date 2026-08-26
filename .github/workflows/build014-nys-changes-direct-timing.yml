@@ -1,8 +1,8 @@
-name: Build 014 NYS changes raw-card timing
+name: Build 014 NYS changes timestamp-card timing
 
 on:
   push:
-    branches: [agent/build014-nys-changes-raw-card-20260826]
+    branches: [agent/build014-nys-changes-timestamp-card-20260826]
 
 permissions:
   contents: read
@@ -32,7 +32,7 @@ jobs:
           cp -R .production-dist/data/. public/data/
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Build raw-card diagnostic candidate
+      - name: Build timestamp-card diagnostic candidate
         run: |
           npm run build
           cp -R dist/. .root/TowerSignal/
@@ -46,7 +46,7 @@ jobs:
             sleep 1
           done
           curl -fsS http://localhost:4173/TowerSignal/ >/dev/null
-      - name: Time full NYS card markup with raw values in WebKit
+      - name: Time raw NYS card plus one formatted timestamp in WebKit
         env:
           BASE_URL: http://localhost:4173/TowerSignal/
         run: npx playwright test tests/e2e/nys-changes-direct-timing.spec.ts --project=iphone --workers=1 --reporter=list
