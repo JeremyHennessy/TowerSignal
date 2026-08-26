@@ -2,6 +2,7 @@ import sys
 import unittest
 from datetime import date
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -26,19 +27,21 @@ class FakeCityRecordApi:
         self.fail = fail
         self.calls = []
 
-    def __call__(self, url, params=None, **_kwargs):
-        self.calls.append((url, params))
+    def __call__(self, url):
         if self.fail:
             raise TimeoutError("source timeout")
-        if url == METADATA_URL:
+        split = urlsplit(url)
+        base_url = f"{split.scheme}://{split.netloc}{split.path}"
+        params = {key: values[-1] for key, values in parse_qs(split.query).items()}
+        self.calls.append((base_url, params))
+        if base_url == METADATA_URL:
             return {
                 "name": "City Record Online",
                 "rowsUpdatedAt": 1787500000,
                 "columns": [{"fieldName": field} for field in sorted(self.metadata_fields)],
             }
-        if url != RESOURCE_URL:
-            raise AssertionError(url)
-        params = params or {}
+        if base_url != RESOURCE_URL:
+            raise AssertionError(base_url)
         where = params.get("$where")
         rows = list(self.rows_by_where.get(where, []))
         if params.get("$select") == "count(*) AS count":
@@ -103,7 +106,7 @@ class CityRecordTests(unittest.TestCase):
         self.assertEqual(result.expected_count, 3)
         self.assertEqual(len(result.rows), 3)
         page_calls = [params for url, params in api.calls if url == RESOURCE_URL and params.get("$select") is None]
-        self.assertEqual([call["$offset"] for call in page_calls], [0, 2])
+        self.assertEqual([call["$offset"] for call in page_calls], ["0", "2"])
         self.assertTrue(all(call["$order"] == "request_id ASC" for call in page_calls))
 
     def test_empty_scope_is_valid_complete_source_state(self):
