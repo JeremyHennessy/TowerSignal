@@ -50,7 +50,7 @@ const nysPayload = {
   summary:{registered_equipment:2,mapped_equipment:2,non_compliant:1,compliant:1,sample_required:1,update_required:0,missing_legionella_result:0,disinfection_required:0,decommissioned:0,out_of_service:0,multi_equipment_properties:1,equipment_at_multi_equipment_properties:2,max_equipment_per_property:2,published_county_counts:{Madison:2},status_counts:{Sample_Required:1,'Legionella Sampled':1},compliance_counts:{'Non-compliant':1,Compliant:1},sample_result_counts:{lt20:2},operation_duration_counts:{'Year-round':2}},
   systems:[
     {system_id:'NYS-100',source_equipment_id:'100',jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC',source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',property_key:'252 genesee st|oneida|13421',property_equipment_count:2,regulation_compliance:'Non-compliant',ct_status:'Sample_Required',last_update_days:8,last_sampled_days:99,latest_sample_date:'2026-05-11',latest_sample_result:'lt20',operation_duration:'Year-round',latitude:43.078739,longitude:-75.6493,coordinate_status:'VALID',source_latitude_raw:'43.078739',source_longitude_raw:'-75.6493'},
-    {system_id:'NYS-101',source_equipment_id:'101',jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC',source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',property_key:'252 genesee st|oneida|13421',property_equipment_count:2,regulation_compliance:'Compliant',ct_status:'Legionella Sampled',last_update_days:2,last_sampled_days:29,latest_sample_date:'2026-07-20',latest_sample_result:'lt20',operation_duration:'Year-round',latitude:43.078739,longitude:-75.6493,coordinate_status:'VALID',source_latitude_raw:'43.078739',source_longitude_raw:'-75.6493'},
+    {system_id:'NYS-101',source_equipment_id:'101',jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC',source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',property_key:'252 genesee st|oneida|13421',property_equipment_count:2,regulation_compliance:'Compliant',ct_status:'Legionella Sampled',last_update_days:2,last_sampled_days:29,latest_sample_date:'2026-07-20',latest_sample_result:'lt20',operation_duration:'Year-round',latitude:43.078739,longitude:-73.94,coordinate_status:'VALID',source_latitude_raw:'43.078739',source_longitude_raw:'-75.6493'},
   ],
 }
 
@@ -71,6 +71,7 @@ const detail = {
 }
 
 beforeEach(() => {
+  window.location.hash = ''
   vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
     const url = String(input)
     const responsePayload = url.includes('/details/') ? detail
@@ -85,16 +86,19 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals())
 
-test('renders the commercial account-intelligence dashboard after dataset load', async () => {
+test('renders the redesigned commercial account-intelligence workspace after dataset load', async () => {
   render(<App />)
-  expect(await screen.findByText('Know which cooling-tower accounts deserve attention now.')).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name:'Prospect workspace', level:1 })).toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '2 matching systems')).toBeInTheDocument()
-  expect(screen.getByText('New OATH activity')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name:'Monitor' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name:'NYS Market' })).toBeInTheDocument()
+  expect(screen.getByText('High priority accounts')).toBeInTheDocument()
+  expect(screen.getByText('Sampling follow-up')).toBeInTheDocument()
+  for (const name of ['Monitor','Map','NYS Market','NYS Changes','Opportunities','Portfolios','Workflow']) {
+    expect(screen.getByRole('button', { name })).toBeInTheDocument()
+  }
+  expect(screen.getByRole('button', { name:'Source Health & Coverage' })).toBeInTheDocument()
 })
 
-test('filters records and opens details with DOB project history', async () => {
+test('filters records and opens a shareable full account profile with DOB project history', async () => {
   const user = userEvent.setup()
   render(<App />)
   await screen.findByText('10 ALPHA ST')
@@ -104,6 +108,8 @@ test('filters records and opens details with DOB project history', async () => {
   await user.clear(screen.getByPlaceholderText('Address, system ID, BIN…'))
   await user.click(screen.getByText('10 ALPHA ST'))
   await waitFor(() => expect(screen.getByRole('heading', { name:'Identity' })).toBeInTheDocument())
+  expect(window.location.hash).toBe('#/account/SYS-1')
+  expect(screen.getByRole('button', { name:'Copy account link' })).toBeInTheDocument()
   const detailPanel = screen.getByRole('complementary', { name: 'Selected cooling tower detail' })
   expect(within(detailPanel).getByText('Potential sampling gap')).toBeInTheDocument()
   expect(within(detailPanel).getByRole('heading', { name:'DOB NOW project activity' })).toBeInTheDocument()
@@ -140,7 +146,7 @@ test('opens the Monitor product mode with source-backed change evidence', async 
   render(<App />)
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'Monitor' }))
-  expect(screen.getByRole('heading', { name:'What changed since the last observation?' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name:'Monitor workspace', level:1 })).toBeInTheDocument()
   expect(screen.getAllByText('New public sample reported')).toHaveLength(2)
   expect(screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')).toBeInTheDocument()
   expect(screen.getByText('Evidence: SYSTEM_ID_EXACT')).toBeInTheDocument()
@@ -151,7 +157,7 @@ test('opens the NYS Market mode without NYC score semantics', async () => {
   render(<App />)
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'NYS Market' }))
-  expect(screen.getByRole('heading', { name:'New York State registry intelligence' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name:'NYS Market', level:1 })).toBeInTheDocument()
   expect(screen.getByText('Source non-compliant')).toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '2 matching NYS equipment records')).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name:'Non-compliant' }))
@@ -164,7 +170,29 @@ test('opens NYS Changes and shows Equipment_ID-exact evidence', async () => {
   render(<App />)
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'NYS Changes' }))
-  expect(screen.getByRole('heading', { name:'New York State registry changes' })).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name:'NYS Changes', level:1 })).toBeInTheDocument()
   expect(screen.getAllByText('NYS cooling-tower status changed')).toHaveLength(2)
   expect(screen.getByText('Evidence: EQUIPMENT_ID_EXACT')).toBeInTheDocument()
+})
+
+test('opens the new commercial, portfolio, workflow and source-health workspaces without fabricating unsupported data', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await screen.findByText('10 ALPHA ST')
+
+  await user.click(screen.getByRole('button', { name:'Opportunities' }))
+  expect(screen.getByRole('heading', { name:'Opportunities workspace', level:1 })).toBeInTheDocument()
+  expect(screen.getByText('Procurement intelligence is not in the current production account payload.')).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name:'Portfolios' }))
+  expect(screen.getByRole('heading', { name:'Portfolios', level:1 })).toBeInTheDocument()
+  expect(screen.getByText('The current account summary does not expose the PLUTO owner name needed to render ownership groups safely.')).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name:'Workflow' }))
+  expect(screen.getByRole('heading', { name:/Workflow workspace/, level:1 })).toBeInTheDocument()
+  expect(screen.getByText('Sign in from the profile control to sync workflow state across sessions and devices.')).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name:'Source Health & Coverage' }))
+  expect(screen.getByRole('heading', { name:'Source Health & Coverage', level:1 })).toBeInTheDocument()
+  expect(screen.getByText('Source-health metrics are not available in this payload.')).toBeInTheDocument()
 })
