@@ -57,6 +57,7 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
 
   const eventTypes = [...new Set(payload.events.map(event => event.event_type))]
   const counties = [...new Set(payload.events.map(event => event.source_county).filter(Boolean))].sort() as string[]
+  const systemById = useMemo(() => new Map(systems.map(row => [row.system_id, row])), [systems])
 
   return <section className="changes-view" aria-label="TowerSignal NYS changes">
     <div className="changes-intro"><div><span className="eyebrow">NYS historical intelligence</span><h2>What changed in the statewide registry?</h2><p>TowerSignal preserves the official weekly NYS snapshot separately from NYC history. Detection time is when TowerSignal first observed a difference; a source sample date is shown only when the source publishes one for that field.</p></div><div className="history-status"><span>NYS history collection began</span><strong>{formatTimestamp(payload.history_started_at)}</strong><small>Latest observation {formatTimestamp(payload.observed_at)}</small></div></div>
@@ -73,12 +74,11 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
     </div>
 
     <div className="change-count">{filtered.length.toLocaleString()} NYS change{filtered.length === 1 ? '' : 's'} in current view</div>
-    {filtered.length === 0 ? <div className="empty-changes"><strong>No observed NYS changes match these filters.</strong><span>{payload.baseline_initialized ? 'TowerSignal has established the first statewide baseline; later weekly snapshots will be compared against it.' : 'Adjust the period or filters to inspect retained NYS history.'}</span></div> : <div className="change-list">{filtered.map((event, index) => <NysChangeCard key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} systems={systems} onSelect={onSelect} />)}</div>}
+    {filtered.length === 0 ? <div className="empty-changes"><strong>No observed NYS changes match these filters.</strong><span>{payload.baseline_initialized ? 'TowerSignal has established the first statewide baseline; later weekly snapshots will be compared against it.' : 'Adjust the period or filters to inspect retained NYS history.'}</span></div> : <div className="change-list">{filtered.map((event, index) => <NysChangeCard key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} current={systemById.get(event.system_id) ?? null} onSelect={onSelect} />)}</div>}
   </section>
 }
 
-function NysChangeCard({ event, systems, onSelect }: { event: NysChangeEvent; systems: NysSystem[]; onSelect: (row: NysSystem | null) => void }) {
-  const current = systems.find(row => row.system_id === event.system_id) ?? null
+function NysChangeCard({ event, current, onSelect }: { event: NysChangeEvent; current: NysSystem | null; onSelect: (row: NysSystem | null) => void }) {
   return <article className="change-card">
     <div className="change-card-head"><div><span className="change-type">{EVENT_LABELS[event.event_type]}</span><strong>{event.address ?? event.system_id}</strong><small>Equipment {event.source_equipment_id ?? event.system_id}{event.city ? ` · ${event.city}` : ''}</small></div><div className="change-meta"><strong>{relativeTime(event.detected_at)}</strong><small>{formatTimestamp(event.detected_at)}</small></div></div>
     <div className="change-values"><div><span>Previous</span><code>{compactValue(event.previous_value)}</code></div><div><span>New</span><code>{compactValue(event.new_value)}</code></div></div>
