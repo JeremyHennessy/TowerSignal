@@ -57,7 +57,7 @@ export function WorkflowAuthPanel({
   }
 
   return <div className="workflow-auth">
-    <button className="workflow-sync-button" onClick={() => setOpen(value => !value)}>Sync workflow</button>
+    <button className="workflow-sync-button" onClick={() => setOpen(value => !value)}>Sign in</button>
     {open && <div className="workflow-auth-popover">
       <div><span className="eyebrow">Private workflow state</span><strong>{createAccount ? 'Create TowerSignal login' : 'Sign in to sync'}</strong><p>Saved accounts, notes and next actions are private workflow data, separate from public-source evidence.</p></div>
       <form onSubmit={event => void submit(event)}>
