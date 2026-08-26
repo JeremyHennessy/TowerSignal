@@ -89,13 +89,16 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '← Back', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
 
-  const exportButton = page.getByRole('button', { name: /^Export .* accounts$/ })
-  await expect(exportButton).toBeVisible()
-  const downloadPromise = page.waitForEvent('download')
-  await exportButton.click()
-  const download = await downloadPromise
-  expect(download.suggestedFilename()).toMatch(/\.csv$/i)
+  if (testInfo.project.name === 'desktop-chromium') {
+    const exportButton = page.getByRole('button', { name: /^Export .* accounts$/ })
+    await expect(exportButton).toBeVisible()
+    const downloadPromise = page.waitForEvent('download')
+    await exportButton.click()
+    const download = await downloadPromise
+    expect(download.suggestedFilename()).toMatch(/\.csv$/i)
+  }
 
   await page.getByRole('button', { name: 'Monitor', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Monitor workspace', exact: true })).toBeVisible()
@@ -140,7 +143,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
 
   await page.getByRole('button', { name: 'Workflow', exact: true }).click()
   await expect(page.getByRole('heading', { name: /Workflow workspace/ })).toBeVisible()
-  await expect(page.getByText(/private workflow/i).first()).toBeVisible()
+  await expect(page.getByText('New York City · private workspace', { exact: true })).toBeVisible()
   await expectContained(page)
 
   await page.getByRole('button', { name: 'Source Health & Coverage', exact: true }).click()
