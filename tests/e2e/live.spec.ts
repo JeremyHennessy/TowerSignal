@@ -8,18 +8,27 @@ const expectContained = async (page: import('@playwright/test').Page) => {
   expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
 }
 
-test('hosted TowerSignal commercial workspace is functional across NYC and NYS modes', async ({ page }, testInfo) => {
+function captureDiagnostics(page: import('@playwright/test').Page, baseURL: string) {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
   page.on('requestfailed', request => {
     try {
-      if (new URL(request.url()).origin === new URL(testInfo.project.use.baseURL as string).origin) {
+      if (new URL(request.url()).origin === new URL(baseURL).origin) {
         sameOriginFailures.push(`${request.url()} :: ${request.failure()?.errorText}`)
       }
     } catch { /* ignore non-URL diagnostics */ }
   })
+  return { consoleErrors, sameOriginFailures }
+}
 
+function assertDiagnostics(consoleErrors: string[], sameOriginFailures: string[]) {
+  expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
+  expect(consoleErrors, `Console errors:\n${consoleErrors.join('\n')}`).toEqual([])
+}
+
+test('hosted TowerSignal NYC commercial workspace is functional', async ({ page }, testInfo) => {
+  const diagnostics = captureDiagnostics(page, testInfo.project.use.baseURL as string)
   await page.goto('./', { waitUntil: 'networkidle' })
 
   await expect(page.getByRole('button', { name: 'Prospect', exact: true })).toBeVisible()
@@ -113,6 +122,16 @@ test('hosted TowerSignal commercial workspace is functional across NYC and NYS m
   expect(mapContainment).toEqual({ overflow: 'hidden', isolation: 'isolate', position: 'relative' })
   await expectContained(page)
 
+  assertDiagnostics(diagnostics.consoleErrors, diagnostics.sameOriginFailures)
+})
+
+test('hosted TowerSignal NYS workspace is functional', async ({ page }, testInfo) => {
+  const diagnostics = captureDiagnostics(page, testInfo.project.use.baseURL as string)
+  await page.goto('./', { waitUntil: 'networkidle' })
+
+  await expect(page.getByRole('button', { name: 'NYS Market', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'NYS Changes', exact: true })).toBeVisible()
+
   await page.getByRole('button', { name: 'NYS Market', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'New York State registry intelligence' })).toBeVisible()
   await expect(page.getByLabel('NYS registry filters')).toBeVisible()
@@ -126,6 +145,5 @@ test('hosted TowerSignal commercial workspace is functional across NYC and NYS m
   await expect(page.getByText('NYS history collection began')).toBeVisible()
   await expectContained(page)
 
-  expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
-  expect(consoleErrors, `Console errors:\n${consoleErrors.join('\n')}`).toEqual([])
+  assertDiagnostics(diagnostics.consoleErrors, diagnostics.sameOriginFailures)
 })
