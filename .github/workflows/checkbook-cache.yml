@@ -9,21 +9,25 @@ on:
     paths:
       - '.github/workflows/checkbook-cache.yml'
       - 'scripts/towersignal/checkbook.py'
+      - 'scripts/towersignal/checkbook_recent.py'
       - 'scripts/towersignal/procurement.py'
       - 'scripts/build_checkbook_cache.py'
       - 'scripts/validate_checkbook_cache.py'
       - 'scripts/verify_live_checkbook.py'
       - 'tests/python/test_checkbook.py'
+      - 'tests/python/test_checkbook_recent.py'
   pull_request:
     branches: [main]
     paths:
       - '.github/workflows/checkbook-cache.yml'
       - 'scripts/towersignal/checkbook.py'
+      - 'scripts/towersignal/checkbook_recent.py'
       - 'scripts/towersignal/procurement.py'
       - 'scripts/build_checkbook_cache.py'
       - 'scripts/validate_checkbook_cache.py'
       - 'scripts/verify_live_checkbook.py'
       - 'tests/python/test_checkbook.py'
+      - 'tests/python/test_checkbook_recent.py'
 
 permissions:
   contents: write
@@ -35,14 +39,14 @@ concurrency:
 jobs:
   build-cache:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Build bounded Checkbook NYC procurement cache
-        run: python scripts/build_checkbook_cache.py --output checkbook-cache/cache.json --page-size 20000
+        run: python scripts/build_checkbook_cache.py --output checkbook-cache/cache.json --page-size 5000 --fiscal-year-count 5
       - name: Validate cache structure, freshness and production volume
         run: python scripts/validate_checkbook_cache.py --cache checkbook-cache/cache.json --max-age-days 1 --require-production-volume
       - name: Independently verify sampled prime contracts against live Checkbook NYC
