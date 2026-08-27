@@ -11,6 +11,8 @@ from towersignal.checkbook import (
     CITYWIDE_EXCLUDED_COLUMNS,
     CITYWIDE_SCOPE,
     CITYWIDE_SOURCE,
+    CITYWIDE_SUBVENDOR_COLUMNS,
+    CITYWIDE_SUBVENDOR_SCOPE,
     EDC_SCOPE,
     EDC_SOURCE,
     CheckbookSourceError,
@@ -132,6 +134,8 @@ class FakeCheckbookApi:
             return b"<response><status><result>error</result><messages><message><code>1000</code><description>bad request</description></message></messages></status></response>"
 
         rows = self.citywide if domain == "Contracts" else self.edc if domain == "Contracts_OGE" else []
+        if domain == "Contracts" and criteria.get("contract_includes_sub_vendors") == "1":
+            rows = [row for row in rows if row.get("sub_vendor")]
         contract_id = criteria.get("contract_id")
         if contract_id:
             identity = "prime_contract_id" if domain == "Contracts" else "contract_id"
@@ -154,7 +158,7 @@ class FakeCheckbookApi:
 
 
 class CheckbookTests(unittest.TestCase):
-    def test_citywide_request_uses_live_safe_contract_and_criteria(self):
+    def test_citywide_request_uses_compact_live_safe_prime_contract(self):
         payload = build_request_xml(CITYWIDE_SCOPE, records_from=1, max_records=20000)
         root = ET.fromstring(payload)
         self.assertEqual(root.findtext("type_of_data"), "Contracts")
@@ -166,8 +170,21 @@ class CheckbookTests(unittest.TestCase):
         }
         self.assertEqual(criteria, {"status": "registered", "category": "expense"})
         columns = {node.text for node in root.findall("./response_columns/column")}
-        self.assertTrue(set(CITYWIDE_COLUMNS).issubset(columns))
+        self.assertEqual(columns, set(CITYWIDE_COLUMNS))
         self.assertTrue(set(CITYWIDE_EXCLUDED_COLUMNS).isdisjoint(columns))
+        self.assertFalse(any(column.startswith("sub_") for column in columns))
+
+    def test_citywide_subvendor_request_is_separately_bounded(self):
+        root = ET.fromstring(build_request_xml(CITYWIDE_SUBVENDOR_SCOPE, records_from=1, max_records=20000))
+        criteria = {
+            node.findtext("name"): node.findtext("value")
+            for node in root.findall("./search_criteria/criteria")
+        }
+        self.assertEqual(criteria["contract_includes_sub_vendors"], "1")
+        columns = {node.text for node in root.findall("./response_columns/column")}
+        self.assertEqual(columns, set(CITYWIDE_SUBVENDOR_COLUMNS))
+        self.assertIn("sub_contract_purpose", columns)
+        self.assertNotIn("prime_contract_current_amount", columns)
 
     def test_edc_request_uses_separate_oge_domain(self):
         root = ET.fromstring(build_request_xml(EDC_SCOPE, records_from=1, max_records=50))
@@ -260,6 +277,8 @@ class CheckbookTests(unittest.TestCase):
         self.assertEqual(subs[0]["source_contract_id"], "SUB-2")
         self.assertEqual(subs[0]["service_category"], "LEGIONELLA_TESTING")
         self.assertEqual(subs[0]["parent_contract_id"], "CT1")
+        self.assertEqual(payload["summary"]["citywide_subvendor_source_transaction_count"], 2)
+        self.assertTrue(payload["source_health"][CITYWIDE_SOURCE]["subvendor_pagination_complete"])
 
     def test_conflicting_duplicate_prime_material_fails_closed(self):
         first = citywide_row("CT1", "Cooling tower cleaning", amount="100")
@@ -308,11 +327,13 @@ class CheckbookTests(unittest.TestCase):
         )
         summary = payload["summary"]
         self.assertEqual(summary["citywide_source_transaction_count"], 3)
+        self.assertEqual(summary["citywide_subvendor_source_transaction_count"], 0)
         self.assertEqual(summary["edc_source_transaction_count"], 2)
         self.assertEqual(summary["relevant_contract_count"], 3)
         self.assertEqual(summary["unresolved_vendor_count"], 3)
         self.assertIn("not company revenue", summary["value_semantics"].lower())
         self.assertEqual(payload["source_health"][CITYWIDE_SOURCE]["status"], "WARNING")
+        self.assertTrue(payload["source_health"][CITYWIDE_SOURCE]["subvendor_pagination_complete"])
         self.assertEqual(payload["source_health"][EDC_SOURCE]["status"], "WARNING")
         self.assertTrue(all(row["raw"] for row in payload["contracts"]))
         self.assertTrue(all(row["facility_match_confidence"] == "UNLINKED" for row in payload["contracts"]))

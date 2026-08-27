@@ -5,7 +5,6 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from typing import Any, Callable, Iterable, Mapping, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -33,9 +32,7 @@ EDC_SOURCE = "NYC_CHECKBOOK_EDC"
 
 CITYWIDE_COLUMNS = (
     "prime_contract_id",
-    "contract_includes_sub_vendors",
     "prime_vendor",
-    "prime_vendor_mwbe_category",
     "prime_contract_purpose",
     "prime_contract_original_amount",
     "prime_contract_current_amount",
@@ -43,7 +40,6 @@ CITYWIDE_COLUMNS = (
     "prime_contract_start_date",
     "prime_contract_end_date",
     "prime_contracting_agency",
-    "prime_oca_number",
     "prime_contract_version",
     "parent_contract_id",
     "prime_contract_type",
@@ -51,14 +47,11 @@ CITYWIDE_COLUMNS = (
     "prime_contract_expense_category",
     "prime_contract_industry",
     "prime_contract_pin",
-    "prime_contract_apt_pin",
-    "percent_covid_spending",
-    "percent_other_spending",
-    "prime_woman_owned_business",
-    "prime_emerging_business",
-    "mocs_registered",
-    "contract_class",
-    "document_code",
+)
+
+CITYWIDE_SUBVENDOR_COLUMNS = (
+    "prime_contract_id",
+    "prime_contracting_agency",
     "sub_vendor",
     "sub_vendor_mwbe_category",
     "sub_contract_purpose",
@@ -193,6 +186,19 @@ CITYWIDE_SCOPE = ScopeSpec(
     identity_field="prime_contract_id",
 )
 
+CITYWIDE_SUBVENDOR_SCOPE = ScopeSpec(
+    name="CITYWIDE_REGISTERED_EXPENSE_SUBVENDORS",
+    source=CITYWIDE_SOURCE,
+    type_of_data="Contracts",
+    criteria=(
+        ("status", "value", "registered"),
+        ("category", "value", "expense"),
+        ("contract_includes_sub_vendors", "value", "1"),
+    ),
+    columns=CITYWIDE_SUBVENDOR_COLUMNS,
+    identity_field="prime_contract_id",
+)
+
 EDC_SCOPE = ScopeSpec(
     name="NYCEDC_REGISTERED_EXPENSE",
     source=EDC_SOURCE,
@@ -269,10 +275,7 @@ def parse_response_xml(payload: bytes | str, *, identity_field: str) -> tuple[in
     transactions = root.findall("./result_records/contract_transactions/transaction")
     rows: list[dict[str, str]] = []
     for transaction in transactions:
-        row = {
-            child.tag: normalize_space(child.text or "")
-            for child in list(transaction)
-        }
+        row = {child.tag: normalize_space(child.text or "") for child in list(transaction)}
         if not normalize_space(row.get(identity_field)):
             raise CheckbookSourceError(f"Checkbook NYC transaction is missing required identity {identity_field}")
         rows.append(row)
@@ -307,15 +310,13 @@ def fetch_scope(
             expected_count = page_count
         elif page_count != expected_count:
             raise CheckbookSourceError(
-                f"Checkbook NYC {spec.name} record_count changed during pagination: "
-                f"{expected_count} -> {page_count}"
+                f"Checkbook NYC {spec.name} record_count changed during pagination: {expected_count} -> {page_count}"
             )
 
         if not page_rows:
             if len(rows) < expected_count:
                 raise CheckbookSourceError(
-                    f"Checkbook NYC {spec.name} pagination ended early at "
-                    f"{len(rows)} of {expected_count}"
+                    f"Checkbook NYC {spec.name} pagination ended early at {len(rows)} of {expected_count}"
                 )
             break
 
@@ -435,10 +436,7 @@ def _normalize_citywide_prime(row: Mapping[str, str], *, retrieved_at: str) -> d
             "expense_category": normalize_space(row.get("prime_contract_expense_category")) or None,
             "industry": normalize_space(row.get("prime_contract_industry")) or None,
             "pin": normalize_space(row.get("prime_contract_pin")) or None,
-            "apt_pin": normalize_space(row.get("prime_contract_apt_pin")) or None,
-            "oca_number": normalize_space(row.get("prime_oca_number")) or None,
             "contract_version": normalize_space(row.get("prime_contract_version")) or None,
-            "document_code": normalize_space(row.get("document_code")) or None,
             "observed_value_evidence": "SOURCE_REPORTED_PUBLIC_CONTRACT",
         }
     )
@@ -588,6 +586,11 @@ def build_checkbook_cache(
 ) -> dict[str, Any]:
     retrieved_at = retrieved_at or utc_now()
     citywide_scope = fetch_scope(CITYWIDE_SCOPE, request_xml=request_xml, page_size=page_size)
+    citywide_subvendor_scope = fetch_scope(
+        CITYWIDE_SUBVENDOR_SCOPE,
+        request_xml=request_xml,
+        page_size=page_size,
+    )
     edc_scope = fetch_scope(EDC_SCOPE, request_xml=request_xml, page_size=page_size)
 
     citywide_primes = _collapse_rows(
@@ -606,7 +609,7 @@ def build_checkbook_cache(
         contract = _normalize_citywide_prime(row, retrieved_at=retrieved_at)
         if contract["service_category"] != "UNRELATED":
             citywide_contracts.append(contract)
-    for row in citywide_scope.rows:
+    for row in citywide_subvendor_scope.rows:
         subcontract = _normalize_citywide_subcontract(row, retrieved_at=retrieved_at)
         if subcontract is not None:
             citywide_contracts.append(subcontract)
@@ -620,8 +623,15 @@ def build_checkbook_cache(
     edc_contracts = _dedupe_contracts(edc_contracts)
 
     all_contracts = _dedupe_contracts([*citywide_contracts, *edc_contracts])
+    citywide_health = _source_health_for_scope(citywide_scope, citywide_contracts, retrieved_at=retrieved_at)
+    citywide_health.update(
+        {
+            "subvendor_record_count": citywide_subvendor_scope.expected_count,
+            "subvendor_pagination_complete": citywide_subvendor_scope.pagination_complete,
+        }
+    )
     source_health = {
-        CITYWIDE_SOURCE: _source_health_for_scope(citywide_scope, citywide_contracts, retrieved_at=retrieved_at),
+        CITYWIDE_SOURCE: citywide_health,
         EDC_SOURCE: _source_health_for_scope(edc_scope, edc_contracts, retrieved_at=retrieved_at),
     }
 
@@ -648,6 +658,12 @@ def build_checkbook_cache(
                     "pagination_complete": citywide_scope.pagination_complete,
                 },
                 {
+                    "name": citywide_subvendor_scope.spec.name,
+                    "source": citywide_subvendor_scope.spec.source,
+                    "record_count": citywide_subvendor_scope.expected_count,
+                    "pagination_complete": citywide_subvendor_scope.pagination_complete,
+                },
+                {
                     "name": edc_scope.spec.name,
                     "source": edc_scope.spec.source,
                     "record_count": edc_scope.expected_count,
@@ -665,6 +681,7 @@ def build_checkbook_cache(
         },
         "summary": {
             "citywide_source_transaction_count": citywide_scope.expected_count,
+            "citywide_subvendor_source_transaction_count": citywide_subvendor_scope.expected_count,
             "citywide_unique_prime_contract_count": len(citywide_primes),
             "citywide_relevant_contract_count": len(citywide_contracts),
             "edc_source_transaction_count": edc_scope.expected_count,

@@ -14,15 +14,25 @@ Build 016C1 adds a durable, independently verified Checkbook NYC contract cache.
 
 The source adapter covers:
 
-- Citywide registered expense contracts (`type_of_data=Contracts`);
+- Citywide registered expense prime contracts (`type_of_data=Contracts`);
+- a separately bounded Citywide subcontract scope limited to source rows reporting subvendors;
 - NYCEDC registered expense contracts through the Other Government Entities domain (`type_of_data=Contracts_OGE`, code `z81`);
-- prime contract evidence;
-- relevant subcontract evidence when the subcontract's own purpose text supports TowerSignal's service taxonomy;
-- exact source-side counts and fail-closed pagination;
+- relevant subcontract evidence only when the subcontract's own purpose text supports TowerSignal's service taxonomy;
+- exact source-side counts and fail-closed pagination for every scope;
 - source-reported original/current contract amounts and spend-to-date;
 - explicit source health and raw source provenance.
 
 NYCHA is explicitly deferred to a separate adapter because Checkbook exposes NYCHA at release/line-item granularity with a materially different source contract.
+
+## Bounded retrieval design
+
+The first live C1 attempt proved that requesting the full Citywide universe with prime and subcontract columns together was unnecessarily slow for a repeatable verification workflow. C1 therefore keeps the same evidence scope while separating retrieval by purpose:
+
+1. the full registered-expense Citywide universe is requested with a compact prime-contract response column set sufficient for identity, classification, agency, dates, amounts, spend and contract context;
+2. subcontract fields are retrieved through a separate registered-expense scope filtered by `contract_includes_sub_vendors=1`;
+3. NYCEDC remains a separate OGE scope.
+
+This is a transport/performance correction, not a reduction in evidence rules. Each scope still requires source-reported counts to remain stable through pagination and the final retrieved transaction count to match exactly.
 
 ## API safety contract
 

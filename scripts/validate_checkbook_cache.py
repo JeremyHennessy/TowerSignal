@@ -109,6 +109,20 @@ def validate_cache(
         if int(entry.get("normalized_contract_count") or 0) != source_counts[source_name]:
             raise ValueError(f"Checkbook normalized count mismatch for {source_name}")
 
+    citywide_health = health.get("NYC_CHECKBOOK_CITYWIDE")
+    if not isinstance(citywide_health, Mapping):
+        raise ValueError("Missing Citywide Checkbook source health")
+    if citywide_health.get("subvendor_pagination_complete") is not True:
+        raise ValueError("Checkbook Citywide subcontract pagination is incomplete")
+    try:
+        subvendor_source_count = int(citywide_health.get("subvendor_record_count") or 0)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Checkbook Citywide subvendor_record_count is invalid") from exc
+    if subvendor_source_count < 0:
+        raise ValueError("Checkbook Citywide subvendor_record_count is negative")
+    if int(summary.get("citywide_subvendor_source_transaction_count") or 0) != subvendor_source_count:
+        raise ValueError("Checkbook Citywide subcontract source count does not match source health")
+
     if int(summary.get("relevant_contract_count") or -1) != len(contracts):
         raise ValueError("Checkbook relevant_contract_count does not match contracts array")
 
@@ -127,6 +141,7 @@ def validate_cache(
         "generated_at": payload.get("generated_at"),
         "relevant_contracts": len(contracts),
         "citywide_source_transaction_count": int(summary.get("citywide_source_transaction_count") or 0),
+        "citywide_subvendor_source_transaction_count": subvendor_source_count,
         "edc_source_transaction_count": int(summary.get("edc_source_transaction_count") or 0),
         "source_counts": source_counts,
     }
