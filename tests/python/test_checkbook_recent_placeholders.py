@@ -16,6 +16,7 @@ def row(
     spent="50",
     expense_category="Services",
     purpose="Cooling tower cleaning",
+    start_date="2025-01-01",
     end_date="2027-12-31",
     contract_type="WORK/LABOR",
 ):
@@ -26,7 +27,7 @@ def row(
         "prime_contract_original_amount": amount,
         "prime_contract_current_amount": amount,
         "prime_vendor_spent_to_date": spent,
-        "prime_contract_start_date": "2025-01-01",
+        "prime_contract_start_date": start_date,
         "prime_contract_end_date": end_date,
         "prime_contracting_agency": "Health + Hospitals",
         "prime_contract_version": "2",
@@ -45,14 +46,16 @@ class CheckbookPlaceholderResolutionTests(unittest.TestCase):
             amount="175",
             spent="120",
             expense_category="DATA PROCESSING EQUIPMENT MAINTENANCE",
-            end_date="2027-01-31",
+            start_date="2027-03-27",
+            end_date="2027-09-17",
             contract_type="WORK/LABOR",
         )
         placeholder = row(
             amount="0",
             spent="0",
             expense_category="CONTRACTUAL SERVICES GENERAL, DATA PROCESSING EQUIPMENT MAINTENANCE",
-            end_date="2027-10-22",
+            start_date="2027-10-16",
+            end_date="2028-04-08",
             contract_type="REQUIREMENTS-SERVICES",
         )
         chosen = _choose_prime_version_candidate(
@@ -65,8 +68,10 @@ class CheckbookPlaceholderResolutionTests(unittest.TestCase):
         self.assertEqual(chosen["prime_vendor_spent_to_date"], "120")
         self.assertEqual(chosen["prime_contract_expense_category"], "DATA PROCESSING EQUIPMENT MAINTENANCE")
         self.assertEqual(chosen["prime_contract_type"], "WORK/LABOR")
-        self.assertEqual(chosen["prime_contract_end_date"], "2027-01-31")
-        self.assertEqual(chosen["_source_observed_end_dates"], "2027-01-31|2027-10-22")
+        self.assertEqual(chosen["prime_contract_start_date"], "2027-03-27")
+        self.assertEqual(chosen["prime_contract_end_date"], "2027-09-17")
+        self.assertEqual(chosen["_source_observed_start_dates"], "2027-03-27|2027-10-16")
+        self.assertEqual(chosen["_source_observed_end_dates"], "2027-09-17|2028-04-08")
         self.assertEqual(
             json.loads(chosen["_source_expense_category_variants"]),
             [
