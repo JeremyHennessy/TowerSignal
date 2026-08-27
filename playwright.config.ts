@@ -17,7 +17,7 @@ export default defineConfig({
       name: 'desktop-chromium',
       testIgnore: /auth\.setup\.ts/,
       dependencies: ['setup-desktop'],
-      use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/desktop.json' },
+      use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'setup-iphone',
@@ -28,7 +28,7 @@ export default defineConfig({
       name: 'iphone',
       testIgnore: /auth\.setup\.ts/,
       dependencies: ['setup-iphone'],
-      use: { ...devices['iPhone 13'], storageState: 'playwright/.auth/iphone.json' },
+      use: { ...devices['iPhone 13'] },
     },
   ],
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],

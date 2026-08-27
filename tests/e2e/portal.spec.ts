@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test('authenticated Home and Account pages are linkable and signout returns to login', async ({ page }) => {
   await page.goto('./#/home', { waitUntil: 'networkidle' })

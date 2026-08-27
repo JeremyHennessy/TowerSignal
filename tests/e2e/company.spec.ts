@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 const expectContained = async (page: import('@playwright/test').Page) => {
   const viewportWidth = page.viewportSize()?.width ?? 0
