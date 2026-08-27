@@ -66,17 +66,26 @@ def _fetch_fiscal_year_partitions(
     )
 
 
+def _version_key(value: str | None) -> tuple[int, int | str]:
+    text = normalize_space(value)
+    if text.isdigit():
+        return (1, int(text))
+    return (0, text)
+
+
 def _latest_partition_rows(
     partitions: Sequence[tuple[int, ScopeResult]],
     *,
     identity_field: str,
     material_fields: Sequence[str],
 ) -> tuple[dict[str, str], ...]:
-    """Choose the latest fiscal-year observation for each prime contract.
+    """Choose the latest fiscal-year/latest-version observation for each prime contract.
 
-    Contract values and spend can legitimately change between fiscal years. We therefore
-    fail closed only on conflicting material rows inside the same fiscal-year partition;
-    older-year observations do not override newer source observations.
+    Contract values and spend can legitimately change between fiscal years and between
+    source-native contract versions inside the same fiscal year. TowerSignal therefore
+    selects the latest fiscal-year partition and then the highest source-reported
+    ``prime_contract_version``. Conflicting material rows within that selected version
+    still fail closed.
     """
     grouped: dict[str, dict[int, list[Mapping[str, str]]]] = {}
     for fiscal_year, scope in partitions:
@@ -87,14 +96,22 @@ def _latest_partition_rows(
             grouped.setdefault(identity, {}).setdefault(fiscal_year, []).append(row)
 
     selected: list[dict[str, str]] = []
+    signature_fields = tuple(field for field in material_fields if field != "prime_contract_version")
     for identity in sorted(grouped):
         by_year = grouped[identity]
         latest_year = max(by_year)
-        candidates = by_year[latest_year]
-        signatures = {_material_key(row, material_fields) for row in candidates}
+        fiscal_year_candidates = by_year[latest_year]
+        latest_version_key = max(_version_key(row.get("prime_contract_version")) for row in fiscal_year_candidates)
+        candidates = [
+            row for row in fiscal_year_candidates
+            if _version_key(row.get("prime_contract_version")) == latest_version_key
+        ]
+        signatures = {_material_key(row, signature_fields) for row in candidates}
         if len(signatures) > 1:
+            selected_version = normalize_space(candidates[0].get("prime_contract_version")) or "(blank)"
             raise CheckbookSourceError(
-                f"Checkbook NYC returned conflicting material fields for {identity_field}={identity} in FY{latest_year}"
+                f"Checkbook NYC returned conflicting material fields for {identity_field}={identity} "
+                f"in FY{latest_year} version {selected_version}"
             )
         row = dict(candidates[0])
         row["_fiscal_year_scope"] = str(latest_year)
