@@ -30,7 +30,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
           registeredSystems: systems.summary.registered_systems,
           highPriorityAccounts: systems.systems.filter(row => row.priority_score >= 70).length,
           recentChanges: changes.new_event_count,
-          procurementRecords: procurement.cityRecord.notices.length + procurement.checkbook.contracts.length,
+          procurementRecords: procurement.cityRecord.notices.length + procurement.checkbook.contracts.length + procurement.nysAuthorities.contracts.length,
           observedCompanies: companies.summary.observed_vendor_company_count,
           generatedAt: systems.metadata.generated_at,
         })
@@ -69,7 +69,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
         <article><small>NYC registered systems</small><strong>{summary.registeredSystems.toLocaleString()}</strong><span>Current source-backed account universe</span></article>
         <article><small>High-priority accounts</small><strong>{summary.highPriorityAccounts.toLocaleString()}</strong><span>Priority Score 1.0 ≥ 70</span></article>
         <article><small>New deterministic changes</small><strong>{summary.recentChanges.toLocaleString()}</strong><span>Current history-build delta</span></article>
-        <article><small>Procurement observations</small><strong>{summary.procurementRecords.toLocaleString()}</strong><span>City Record + verified Checkbook</span></article>
+        <article><small>Procurement observations</small><strong>{summary.procurementRecords.toLocaleString()}</strong><span>NYC + statewide NY authority sources</span></article>
         <article><small>Observed vendor companies</small><strong>{summary.observedCompanies.toLocaleString()}</strong><span>Conservative company identities</span></article>
       </div>}
 
