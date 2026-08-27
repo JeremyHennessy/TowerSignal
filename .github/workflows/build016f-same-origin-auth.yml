@@ -1,0 +1,103 @@
+name: Build 016F same-origin auth candidate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'functions/**'
+      - 'src/workflow/remoteClient.ts'
+      - 'vite.config.ts'
+      - '.github/workflows/build016f-same-origin-auth.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  same-origin-auth-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out durable TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+      - name: Check out last verified ACRIS cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-acris
+          path: .acris-store
+          fetch-depth: 1
+          sparse-checkout: data/acris
+      - name: Check out last verified Checkbook NYC cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-checkbook
+          path: .checkbook-store
+          fetch-depth: 1
+          sparse-checkout: data/checkbook
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Generate current production-equivalent data
+        run: |
+          python scripts/build_data.py --output public/data
+          python scripts/build_city_record_procurement.py --output public/data/procurement-city-record.json
+          python scripts/validate_checkbook_cache.py --cache .checkbook-store/data/checkbook/cache.json --max-age-days 2 --require-production-volume
+          cp .checkbook-store/data/checkbook/cache.json public/data/procurement-checkbook.json
+          python scripts/build_company_intelligence.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --output public/data/companies.json
+          python scripts/validate_company_intelligence.py --companies public/data/companies.json --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json
+          python scripts/build_deal_validation.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --cohort data/fixtures/deal-validation-cohort.json --output public/data/deal-validation.json
+          python scripts/validate_deal_validation.py --report public/data/deal-validation.json
+          python scripts/attach_acris.py --output public/data --cache .acris-store/data/acris/cache.json
+          python scripts/build_nys_data.py --output public/data
+          python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
+          python scripts/attach_acris_health.py --output public/data
+          python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
+          python scripts/build_nys_history.py --output public/data --previous-snapshot .history-store/data/history/nys/latest.json --previous-events .history-store/data/history/nys/events.json
+      - name: Lint, typecheck and unit test unchanged application surface
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+      - name: Build same-origin auth candidate
+        env:
+          VITE_NEON_AUTH_URL: same-origin
+          VITE_BASE_PATH: /
+        run: npm run build
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Start Cloudflare Pages-compatible local host
+        run: |
+          npx --yes wrangler@latest pages dev dist --ip 127.0.0.1 --port 8788 > /tmp/towersignal-wrangler.log 2>&1 &
+          echo $! > /tmp/towersignal-wrangler.pid
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/towersignal-wrangler.log
+          exit 1
+      - name: Verify Login to sign-out on desktop and iPhone
+        env:
+          BASE_URL: http://127.0.0.1:8788/
+        run: npm run test:e2e
+      - name: Show proxy host log on failure
+        if: failure()
+        run: cat /tmp/towersignal-wrangler.log || true
+      - name: Upload browser verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build016f-same-origin-auth-browser-verification
+          path: playwright-report
+          retention-days: 7
