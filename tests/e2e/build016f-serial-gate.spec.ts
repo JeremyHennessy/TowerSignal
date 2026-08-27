@@ -62,5 +62,7 @@ test('Build 016F serial Login → Home → Prospect → Account Profile → Comp
 
   await page.getByRole('button', { name: 'Sign out', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })).toBeVisible()
-  await expect(context.cookies()).resolves.toHaveLength(0)
+  const cookiesAfterSignout = await context.cookies()
+  console.log(`016F_GATE ${testInfo.project.name} cookies_after_signout`, JSON.stringify(safeCookies(cookiesAfterSignout)))
+  expect(cookiesAfterSignout).toHaveLength(0)
 })
