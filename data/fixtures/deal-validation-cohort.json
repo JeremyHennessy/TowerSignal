@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0",
+  "curated_as_of": "2026-08-27",
+  "methodology_note": "Acquisition outcomes and exact aliases are curated from cited primary company/acquirer announcements. Alias matching in the validation is exact after case/punctuation normalization with legal suffixes preserved; no fuzzy entity resolution is permitted.",
+  "validation_gate": {
+    "min_observed_outcome_targets": 3,
+    "min_screened_outcome_targets": 2
+  },
+  "screen_experiment": {
+    "anchor_target_id": "barclay_2024",
+    "cutoff_date": "2024-11-01"
+  },
+  "targets": [
+    {
+      "id": "rmc_peak_rock_2023",
+      "canonical_name": "Rochester Midland Corporation",
+      "aliases": ["ROCHESTER MIDLAND CORPORATION", "ROCHESTER MIDLAND CORP", "RMC"],
+      "outcome_date": "2023-08-04",
+      "acquirer": "Peak Rock Capital affiliate",
+      "outcome_type": "PLATFORM_ACQUISITION",
+      "primary_source_url": "https://peakrockcapital.com/images/news/pdf/Peak%20Rock%20Capital%20affiliate%20completes%20previously%20announced%20acquisition%20of%20Rochester%20Midland%20Corporation_vF.pdf",
+      "source_scope_relation": "NEW_YORK_STATE_OUTSIDE_NYC_PROCUREMENT_SCOPE",
+      "market": "Rochester, NY / multinational"
+    },
+    {
+      "id": "norkem_2024",
+      "canonical_name": "Norkem Group",
+      "aliases": ["NORKEM INC", "JACKLYN INDUSTRIES INC", "SOLUTIONS WATER MANAGEMENT INC"],
+      "outcome_date": "2024-08-29",
+      "acquirer": "Rochester Midland Corporation",
+      "outcome_type": "ADD_ON_ACQUISITION",
+      "primary_source_url": "https://www.rochestermidland.com/news/rochester-midland-corporation-acquires-the-norkem-group/",
+      "source_scope_relation": "OUTSIDE_CURRENT_NYC_PROCUREMENT_SCOPE",
+      "market": "Ontario, Canada"
+    },
+    {
+      "id": "iwt_2024",
+      "canonical_name": "Industrial Water Technologies",
+      "aliases": ["INDUSTRIAL WATER TECHNOLOGIES INC", "INDUSTRIAL WATER TECHNOLOGIES"],
+      "outcome_date": "2024-09-18",
+      "acquirer": "Rochester Midland Corporation",
+      "outcome_type": "ADD_ON_ACQUISITION",
+      "primary_source_url": "https://www.rochestermidland.com/news/rochester-midland-corporation-acquires-industrial-water-technologies-inc/",
+      "source_scope_relation": "NYC_METRO_ADJACENT",
+      "market": "Tinton Falls, NJ / New York Metro"
+    },
+    {
+      "id": "barclay_2024",
+      "canonical_name": "Barclay Water Management",
+      "aliases": ["BARCLAY WATER MGMT INC", "BARCLAY WATER MANAGEMENT INC", "BARCLAY WATER MGMT"],
+      "outcome_date": "2024-11-01",
+      "acquirer": "Ecolab",
+      "outcome_type": "STRATEGIC_ACQUISITION",
+      "primary_source_url": "https://investor.ecolab.com/news/news-details/2024/Ecolab-Acquires-Barclay-Water-Management/default.aspx",
+      "source_scope_relation": "NYC_CORE",
+      "market": "Northeastern United States"
+    },
+    {
+      "id": "ocs_2025",
+      "canonical_name": "OCS Chemical Engineering",
+      "aliases": ["OCS CHEMICAL ENGINEERING", "OCS CHEMICAL ENGINEERING INC"],
+      "outcome_date": "2025-05-05",
+      "acquirer": "Rochester Midland Corporation",
+      "outcome_type": "ADD_ON_ACQUISITION",
+      "primary_source_url": "https://www.rochestermidland.com/news/rochester-midland-corporation-acquires-ocs-chemical-engineering/",
+      "source_scope_relation": "NYC_METRO_ADJACENT",
+      "market": "Cortlandt Manor, NY / Northeast"
+    },
+    {
+      "id": "ccwt_2025",
+      "canonical_name": "Comprehensive Chemical and Water Treatment",
+      "aliases": ["COMPREHENSIVE CHEMICAL AND WATER TREATMENT INC", "COMPREHENSIVE CHEMICAL WATER TREATMENT INC"],
+      "outcome_date": "2025-05-19",
+      "acquirer": "Rochester Midland Corporation",
+      "outcome_type": "ADD_ON_ACQUISITION",
+      "primary_source_url": "https://www.rochestermidland.com/news/rochester-midland-corporation-acquires-comprehensive-chemical-water-treatment/",
+      "source_scope_relation": "OUTSIDE_CURRENT_NYC_PROCUREMENT_SCOPE",
+      "market": "Saskatchewan, Canada"
+    },
+    {
+      "id": "decon_2025",
+      "canonical_name": "Decon Water Technologies",
+      "aliases": ["DECON WATER TECHNOLOGIES LLC", "DECON WATER TECHNOLOGIES"],
+      "outcome_date": "2025-08-28",
+      "acquirer": "Rochester Midland Corporation",
+      "outcome_type": "ADD_ON_ACQUISITION",
+      "primary_source_url": "https://www.rochestermidland.com/news/rochester-midland-corporation-acquires-decon-water-technologies/",
+      "source_scope_relation": "OUTSIDE_CURRENT_NYC_PROCUREMENT_SCOPE",
+      "market": "Phoenix, AZ"
+    },
+    {
+      "id": "solid_blend_2026",
+      "canonical_name": "Solid Blend Technologies",
+      "aliases": ["SOLID BLEND TECHNOLOGIES INC", "SOLID BLEND TECHNOLOGIES"],
+      "outcome_date": "2026-02-12",
+      "acquirer": "Rochester Midland Corporation",
+      "outcome_type": "ADD_ON_ACQUISITION",
+      "primary_source_url": "https://www.rochestermidland.com/news/rochester-midland-acquires-solid-blend-technologies/",
+      "source_scope_relation": "OUTSIDE_CURRENT_NYC_PROCUREMENT_SCOPE",
+      "market": "Dayton, OH"
+    },
+    {
+      "id": "tower_water_2026",
+      "canonical_name": "Tower Water",
+      "aliases": ["TOWER WATER", "TOWER CLEANING PLUS INC"],
+      "outcome_date": "2026-06-10",
+      "acquirer": "Sylmar Group",
+      "outcome_type": "PLATFORM_ADD_ON_ACQUISITION",
+      "primary_source_url": "https://sylmargrp.com/sylmar-group-acquires-tower-water-building-the-leading-water-treatment-platform-in-the-northeast/",
+      "source_scope_relation": "NYC_CORE",
+      "market": "New York Metro",
+      "external_pre_outcome_evidence": [
+        {
+          "source": "NJSTART",
+          "source_record_id": "25-GNSV1-84367",
+          "source_url": "https://www.njstart.gov/bso/external/purchaseorder/poSummary.sda?docId=25-GNSV1-84367&external=true&parentUrl=close&releaseNbr=0",
+          "vendor": "Tower Cleaning Plus Inc",
+          "entered_date": "2024-07-31",
+          "contract_begin_date": "2024-08-12",
+          "evidence_note": "Official contract names Tower Cleaning Plus Inc as vendor, references a Tower Water countersigned offer attachment, and records towerwater.com notification addresses. This source is not currently ingested by TowerSignal."
+        }
+      ]
+    },
+    {
+      "id": "claritychem_2026",
+      "canonical_name": "ClarityChem",
+      "aliases": ["CLARITYCHEM INC", "CHEMASTERS LLC", "CHEMATRIX LLC"],
+      "outcome_date": "2026-06-17",
+      "acquirer": "Rochester Midland Corporation",
+      "outcome_type": "ADD_ON_ACQUISITION",
+      "primary_source_url": "https://www.rochestermidland.com/news/rmc-acquires-claritychem-inc/",
+      "source_scope_relation": "NEW_YORK_STATE_OUTSIDE_NYC_PROCUREMENT_SCOPE",
+      "market": "Depew, NY"
+    }
+  ]
+}
