@@ -1,0 +1,30 @@
+name: Diagnostic 016F modern WebKit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/diag-016f-modern-webkit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  modern-webkit-auth:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install repository dependencies
+        run: npm install --no-audit --no-fund
+      - name: Overlay current Playwright test harness only
+        run: npm install --no-save --no-audit --no-fund @playwright/test@1.62.1
+      - name: Install current WebKit
+        run: npx playwright install --with-deps webkit
+      - name: Verify deployed authenticated iPhone flow
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test --project=iphone
