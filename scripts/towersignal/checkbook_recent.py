@@ -38,6 +38,7 @@ PRIME_MONEY_FIELDS = (
     "prime_contract_current_amount",
     "prime_vendor_spent_to_date",
 )
+PRIME_START_DATE_FIELD = "prime_contract_start_date"
 PRIME_END_DATE_FIELD = "prime_contract_end_date"
 PRIME_CONTEXT_VARIANT_FIELDS = (
     "prime_contract_expense_category",
@@ -153,10 +154,10 @@ def _choose_prime_version_candidate(
 
     Live Checkbook evidence shows that a registered contract/version may be returned as
     one populated value row plus companion rows whose monetary fields are all zero.
-    Companion rows can carry later end dates and different source expense-category or
-    contract-type strings while retaining the same contract identity, vendor, purpose,
-    agency and procurement method. TowerSignal keeps those contextual observations
-    separately while retaining the populated value row as the primary source row.
+    Companion rows can carry alternate source-reported start/end dates and different
+    expense-category or contract-type strings while retaining the same contract identity,
+    vendor, purpose, agency and procurement method. TowerSignal keeps those contextual
+    observations separately while retaining the populated value row as the primary row.
 
     Multiple identity-bearing nonblank values or multiple distinct nonzero monetary
     signatures remain hard failures.
@@ -164,12 +165,25 @@ def _choose_prime_version_candidate(
     structural_fields = tuple(
         field
         for field in material_fields
-        if field not in {"prime_contract_version", PRIME_END_DATE_FIELD, *PRIME_MONEY_FIELDS, *PRIME_CONTEXT_VARIANT_FIELDS}
+        if field not in {
+            "prime_contract_version",
+            PRIME_START_DATE_FIELD,
+            PRIME_END_DATE_FIELD,
+            *PRIME_MONEY_FIELDS,
+            *PRIME_CONTEXT_VARIANT_FIELDS,
+        }
     )
     selected_version = normalize_space(candidates[0].get("prime_contract_version")) or "(blank)"
     resolved_structural = _compatible_structural_values(
         candidates,
         structural_fields,
+        identity=identity,
+        fiscal_year=fiscal_year,
+        selected_version=selected_version,
+    )
+    observed_start_dates = _observed_dates(
+        candidates,
+        PRIME_START_DATE_FIELD,
         identity=identity,
         fiscal_year=fiscal_year,
         selected_version=selected_version,
@@ -210,6 +224,8 @@ def _choose_prime_version_candidate(
     chosen["_source_duplicate_row_count"] = str(len(candidates))
     if resolution:
         chosen["_source_duplicate_resolution"] = resolution
+    if observed_start_dates:
+        chosen["_source_observed_start_dates"] = "|".join(observed_start_dates)
     if observed_end_dates:
         chosen["_source_observed_end_dates"] = "|".join(observed_end_dates)
     if expense_category_variants:
@@ -373,6 +389,14 @@ def _attach_source_resolution(contract: dict[str, Any], row: Mapping[str, str]) 
     if resolution:
         contract["source_duplicate_resolution"] = resolution
 
+    observed_start_dates = tuple(
+        value for value in normalize_space(row.get("_source_observed_start_dates")).split("|") if value
+    )
+    if observed_start_dates:
+        contract["source_observed_start_dates"] = list(observed_start_dates)
+        if len(observed_start_dates) > 1:
+            contract["start_date_resolution"] = "MULTIPLE_SOURCE_VARIANTS"
+
     observed_end_dates = tuple(
         value for value in normalize_space(row.get("_source_observed_end_dates")).split("|") if value
     )
@@ -474,6 +498,9 @@ def build_recent_checkbook_cache(
                 1
                 for row in citywide_contracts
                 if row.get("source_duplicate_resolution") == "NONZERO_OVER_ZERO_PLACEHOLDER"
+            ),
+            "start_date_variant_resolution_count": sum(
+                1 for row in citywide_contracts if row.get("start_date_resolution") == "MULTIPLE_SOURCE_VARIANTS"
             ),
             "latest_end_date_resolution_count": sum(
                 1 for row in citywide_contracts if row.get("end_date_resolution") == "LATEST_OBSERVED_SAME_VERSION"
