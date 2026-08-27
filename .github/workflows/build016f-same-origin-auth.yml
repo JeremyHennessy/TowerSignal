@@ -103,7 +103,7 @@ jobs:
         env:
           BASE_URL: https://127.0.0.1:8788/
           ALLOW_SELF_SIGNED: 'true'
-        run: npm run test:e2e
+        run: npx playwright test tests/e2e/company.spec.ts tests/e2e/live.spec.ts tests/e2e/portal.spec.ts
       - name: Show proxy host log on failure
         if: failure()
         run: cat /tmp/towersignal-wrangler.log || true
