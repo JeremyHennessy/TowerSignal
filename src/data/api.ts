@@ -55,10 +55,18 @@ export async function loadNysAuthorityProcurement(): Promise<NysAuthorityProcure
 }
 
 export async function loadProcurement(): Promise<ProcurementBundle> {
-  const [cityRecord, checkbook, nysAuthorities] = await Promise.all([
-    loadCityRecordProcurement(), loadCheckbookProcurement(), loadNysAuthorityProcurement(),
-  ])
-  return { cityRecord, checkbook, nysAuthorities }
+  const [cityRecord, checkbook] = await Promise.all([loadCityRecordProcurement(), loadCheckbookProcurement()])
+  try {
+    const nysAuthorities = await loadNysAuthorityProcurement()
+    return { cityRecord, checkbook, nysAuthorities, sourceErrors: {} }
+  } catch (error) {
+    return {
+      cityRecord,
+      checkbook,
+      nysAuthorities: null,
+      sourceErrors: { nysAuthorities: error instanceof Error ? error.message : 'NYS authority procurement is unavailable' },
+    }
+  }
 }
 
 export async function loadCompanies(): Promise<CompanyIntelligencePayload> {
