@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { SystemSummary, SystemsPayload } from '../types/data'
 import type { AcrisSummaryFields } from '../types/acris'
 import type { ProcurementBundle, ProcurementRecord } from '../types/procurement'
+import { loadProcurement } from '../data/api'
 import { formatDate } from '../domain/labels'
 import { ShareButton } from './ShareButton'
 
@@ -38,27 +39,28 @@ function categoryLabel(value: string): string {
   return value.replaceAll('_', ' ').toLowerCase().replace(/(^|\s)\S/g, match => match.toUpperCase())
 }
 
-export function OpportunitiesPage({ payload, procurement, onOpenAccount }: {
-  payload: SystemsPayload
-  procurement: ProcurementBundle
-  onOpenAccount: (row: SystemSummary) => void
-}) {
+export function OpportunitiesPage({ payload, onOpenAccount }: { payload: SystemsPayload; onOpenAccount: (row: SystemSummary) => void }) {
   const [sourceFilter, setSourceFilter] = useState('ALL')
   const [categoryFilter, setCategoryFilter] = useState('ALL')
+  const [procurement, setProcurement] = useState<ProcurementBundle | null>(null)
+  const [procurementError, setProcurementError] = useState<string | null>(null)
+
+  useEffect(() => {
+    loadProcurement()
+      .then(setProcurement)
+      .catch(error => setProcurementError(error instanceof Error ? error.message : 'Unable to load procurement intelligence'))
+  }, [])
+
   const rows = payload.systems
-  const highPriority = rows.filter(row => row.priority_score >= 70)
-  const sampleFollowUp = rows.filter(row => row.signal_types.includes('POTENTIAL_SAMPLING_GAP') || row.signal_types.includes('NO_PUBLIC_SAMPLE_DATE'))
-  const contactReady = rows.filter(row => (row.hpd_contact_count ?? 0) > 0)
-  const recentDob = rows.filter(row => (row.dob_recent_activity_count ?? 0) > 0)
   const ranked = [...rows]
     .filter(row => row.priority_score >= 50 || (row.dob_recent_activity_count ?? 0) > 0 || (row.hpd_contact_count ?? 0) > 0)
     .sort((a, b) => b.priority_score - a.priority_score || (b.dob_recent_activity_count ?? 0) - (a.dob_recent_activity_count ?? 0))
     .slice(0, 50)
 
-  const procurementRows = useMemo(() => [
+  const procurementRows = useMemo(() => procurement ? [
     ...procurement.cityRecord.notices,
     ...procurement.checkbook.contracts,
-  ].sort((a, b) => (procurementDate(b) ?? '').localeCompare(procurementDate(a) ?? '')), [procurement])
+  ].sort((a, b) => (procurementDate(b) ?? '').localeCompare(procurementDate(a) ?? '')) : [], [procurement])
 
   const categories = useMemo(() => [...new Set(procurementRows.map(row => row.service_category))].sort(), [procurementRows])
   const filteredProcurement = useMemo(() => procurementRows.filter(row => {
@@ -68,7 +70,7 @@ export function OpportunitiesPage({ payload, procurement, onOpenAccount }: {
     return true
   }).slice(0, 100), [procurementRows, sourceFilter, categoryFilter])
 
-  const observedContractValue = procurement.checkbook.contracts.reduce((sum, row) => sum + (row.current_amount ?? 0), 0)
+  const observedContractValue = procurement?.checkbook.contracts.reduce((sum, row) => sum + (row.current_amount ?? 0), 0) ?? 0
   const unresolved = procurementRows.filter(row => row.vendor_raw && !row.company_id).length
 
   return <section className="product-page opportunities-page">
@@ -77,38 +79,43 @@ export function OpportunitiesPage({ payload, procurement, onOpenAccount }: {
       <div className="page-actions"><ShareButton label="Share this view" /></div>
     </div>
 
-    <div className="reference-metric-grid">
-      <article><span className="reference-metric-icon urgent">↗</span><div><small>Open solicitations</small><strong>{number.format(procurement.cityRecord.summary.open_relevant_opportunities)}</strong><span>Relevant City Record notices</span></div></article>
-      <article><span className="reference-metric-icon warning">◷</span><div><small>Recent awards</small><strong>{number.format(procurement.cityRecord.summary.recent_relevant_awards)}</strong><span>City Record lookback window</span></div></article>
-      <article><span className="reference-metric-icon success">◎</span><div><small>Verified contracts</small><strong>{number.format(procurement.checkbook.summary.relevant_contract_count)}</strong><span>Relevant Checkbook records</span></div></article>
-      <article><span className="reference-metric-icon">$</span><div><small>Observed contract value</small><strong>{currency.format(observedContractValue)}</strong><span>Checkbook current amounts · not revenue</span></div></article>
-      <article><span className="reference-metric-icon">?</span><div><small>Unresolved vendors</small><strong>{number.format(unresolved)}</strong><span>Preserved for company resolution</span></div></article>
-    </div>
+    {procurementError && <div className="reference-empty-state"><strong>Procurement intelligence is unavailable.</strong><span>{procurementError}</span><span>TowerSignal will not substitute roadmap examples or fixture bids for a failed production source.</span></div>}
+    {!procurement && !procurementError && <div className="reference-empty-state"><strong>Loading verified procurement intelligence…</strong><span>City Record and the durable Checkbook cache are loaded independently from the account dataset.</span></div>}
 
-    <div className="roadmap-data-banner">
-      <div><span className="roadmap-status">LIVE SOURCE DATA</span><strong>City Record + verified Checkbook NYC are connected.</strong><p>City Record is fetched and validated during the product build. Checkbook is published only from its independently verified durable cache. Exact source IDs, classifications, confidence and source links remain available for review.</p></div>
-      <div className="roadmap-source-list"><span>City Record · {procurement.cityRecord.source_health.status}</span><span>Checkbook · verified {formatDate(procurement.checkbook.generated_at)}</span><span>No inferred property linkage</span></div>
-    </div>
-
-    <div className="reference-table-card">
-      <div className="reference-table-heading">
-        <div><strong>Public procurement intelligence</strong><span>{number.format(filteredProcurement.length)} shown · {number.format(procurementRows.length)} relevant source-backed records loaded</span></div>
-        <div className="page-actions">
-          <label>Source <select aria-label="Procurement source" value={sourceFilter} onChange={event => setSourceFilter(event.target.value)}><option value="ALL">All</option><option value="CITY_RECORD">City Record</option><option value="CHECKBOOK">Checkbook NYC</option></select></label>
-          <label>Service <select aria-label="Procurement service category" value={categoryFilter} onChange={event => setCategoryFilter(event.target.value)}><option value="ALL">All services</option>{categories.map(category => <option key={category} value={category}>{categoryLabel(category)}</option>)}</select></label>
-        </div>
+    {procurement && <>
+      <div className="reference-metric-grid">
+        <article><span className="reference-metric-icon urgent">↗</span><div><small>Open solicitations</small><strong>{number.format(procurement.cityRecord.summary.open_relevant_opportunities)}</strong><span>Relevant City Record notices</span></div></article>
+        <article><span className="reference-metric-icon warning">◷</span><div><small>Recent awards</small><strong>{number.format(procurement.cityRecord.summary.recent_relevant_awards)}</strong><span>City Record lookback window</span></div></article>
+        <article><span className="reference-metric-icon success">◎</span><div><small>Verified contracts</small><strong>{number.format(procurement.checkbook.summary.relevant_contract_count)}</strong><span>Relevant Checkbook records</span></div></article>
+        <article><span className="reference-metric-icon">$</span><div><small>Observed contract value</small><strong>{currency.format(observedContractValue)}</strong><span>Checkbook current amounts · not revenue</span></div></article>
+        <article><span className="reference-metric-icon">?</span><div><small>Unresolved vendors</small><strong>{number.format(unresolved)}</strong><span>Preserved for company resolution</span></div></article>
       </div>
-      <div className="reference-table-scroll"><table className="reference-table procurement-table"><thead><tr><th>Procurement</th><th>Source</th><th>Agency / buyer</th><th>Vendor</th><th>Service</th><th>Observed value</th><th>Date</th><th>Evidence</th></tr></thead><tbody>{filteredProcurement.map(row => <tr key={row.procurement_id}>
-        <td><strong>{row.title ?? row.description ?? row.source_record_id}</strong><small>{row.source_contract_id ?? row.notice_id ?? row.source_record_id}</small></td>
-        <td><strong>{sourceLabel(row)}</strong><small>{row.status ?? 'source record'}</small></td>
-        <td>{row.agency ?? row.buyer_name ?? '—'}</td>
-        <td>{row.vendor_raw ? <><strong>{row.vendor_raw}</strong><small>{row.company_match_confidence ?? 'UNRESOLVED'}</small></> : <span className="muted-label">Not yet awarded / not published</span>}</td>
-        <td><strong>{categoryLabel(row.service_category)}</strong><small>{row.service_confidence}</small></td>
-        <td>{procurementAmount(row) == null ? '—' : currency.format(procurementAmount(row) ?? 0)}<small>{row.observed_value_evidence ?? row.amount_evidence ?? 'No amount published'}</small></td>
-        <td>{procurementDate(row) ? formatDate(procurementDate(row) ?? '') : '—'}<small>{row.due_date ? 'due date' : row.start_date ? 'contract start' : 'source date'}</small></td>
-        <td>{row.source_url ? <a className="table-link" href={row.source_url} target="_blank" rel="noreferrer">Open source ↗</a> : '—'}<small>{row.facility_match_confidence ?? row.tower_link_confidence ?? 'UNLINKED'} facility/account</small></td>
-      </tr>)}</tbody></table></div>
-    </div>
+
+      <div className="roadmap-data-banner">
+        <div><span className="roadmap-status">LIVE SOURCE DATA</span><strong>City Record + verified Checkbook NYC are connected.</strong><p>City Record is fetched and validated during the product build. Checkbook is published only from its independently verified durable cache. Exact source IDs, classifications, confidence and source links remain available for review.</p></div>
+        <div className="roadmap-source-list"><span>City Record · {procurement.cityRecord.source_health.status}</span><span>Checkbook · verified {formatDate(procurement.checkbook.generated_at)}</span><span>No inferred property linkage</span></div>
+      </div>
+
+      <div className="reference-table-card">
+        <div className="reference-table-heading">
+          <div><strong>Public procurement intelligence</strong><span>{number.format(filteredProcurement.length)} shown · {number.format(procurementRows.length)} relevant source-backed records loaded</span></div>
+          <div className="page-actions">
+            <label>Source <select aria-label="Procurement source" value={sourceFilter} onChange={event => setSourceFilter(event.target.value)}><option value="ALL">All</option><option value="CITY_RECORD">City Record</option><option value="CHECKBOOK">Checkbook NYC</option></select></label>
+            <label>Service <select aria-label="Procurement service category" value={categoryFilter} onChange={event => setCategoryFilter(event.target.value)}><option value="ALL">All services</option>{categories.map(category => <option key={category} value={category}>{categoryLabel(category)}</option>)}</select></label>
+          </div>
+        </div>
+        <div className="reference-table-scroll"><table className="reference-table procurement-table"><thead><tr><th>Procurement</th><th>Source</th><th>Agency / buyer</th><th>Vendor</th><th>Service</th><th>Observed value</th><th>Date</th><th>Evidence</th></tr></thead><tbody>{filteredProcurement.map(row => <tr key={row.procurement_id}>
+          <td><strong>{row.title ?? row.description ?? row.source_record_id}</strong><small>{row.source_contract_id ?? row.notice_id ?? row.source_record_id}</small></td>
+          <td><strong>{sourceLabel(row)}</strong><small>{row.status ?? 'source record'}</small></td>
+          <td>{row.agency ?? row.buyer_name ?? '—'}</td>
+          <td>{row.vendor_raw ? <><strong>{row.vendor_raw}</strong><small>{row.company_match_confidence ?? 'UNRESOLVED'}</small></> : <span className="muted-label">Not yet awarded / not published</span>}</td>
+          <td><strong>{categoryLabel(row.service_category)}</strong><small>{row.service_confidence}</small></td>
+          <td>{procurementAmount(row) == null ? '—' : currency.format(procurementAmount(row) ?? 0)}<small>{row.observed_value_evidence ?? row.amount_evidence ?? 'No amount published'}</small></td>
+          <td>{procurementDate(row) ? formatDate(procurementDate(row) ?? '') : '—'}<small>{row.due_date ? 'due date' : row.start_date ? 'contract start' : 'source date'}</small></td>
+          <td>{row.source_url ? <a className="table-link" href={row.source_url} target="_blank" rel="noreferrer">Open source ↗</a> : '—'}<small>{row.facility_match_confidence ?? row.tower_link_confidence ?? 'UNLINKED'} facility/account</small></td>
+        </tr>)}</tbody></table></div>
+      </div>
+    </>}
 
     <div className="reference-table-card">
       <div className="reference-table-heading"><div><strong>Current account timing opportunities</strong><span>{number.format(ranked.length)} highest-ranked accounts shown separately from procurement evidence</span></div></div>
