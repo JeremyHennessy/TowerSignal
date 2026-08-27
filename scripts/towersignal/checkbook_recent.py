@@ -83,6 +83,32 @@ def _money_signature(row: Mapping[str, str]) -> tuple[float | None, ...]:
     return tuple(parse_money(row.get(field)) for field in PRIME_MONEY_FIELDS)
 
 
+def _compatible_structural_values(
+    candidates: Sequence[Mapping[str, str]],
+    structural_fields: Sequence[str],
+    *,
+    identity: str,
+    fiscal_year: int,
+    selected_version: str,
+) -> dict[str, str]:
+    """Return the single nonblank value for each structural field, or fail on disagreement."""
+    resolved: dict[str, str] = {}
+    for field in structural_fields:
+        nonblank = {
+            normalize_space(row.get(field))
+            for row in candidates
+            if normalize_space(row.get(field))
+        }
+        if len(nonblank) > 1:
+            raise CheckbookSourceError(
+                f"Checkbook NYC returned conflicting non-monetary fields for prime_contract_id={identity} "
+                f"in FY{fiscal_year} version {selected_version} field {field}"
+            )
+        if nonblank:
+            resolved[field] = next(iter(nonblank))
+    return resolved
+
+
 def _choose_prime_version_candidate(
     candidates: Sequence[Mapping[str, str]],
     *,
@@ -92,50 +118,55 @@ def _choose_prime_version_candidate(
 ) -> dict[str, str]:
     """Collapse source duplicates without inventing contract values.
 
-    Live Checkbook evidence shows that one registered contract/version can be returned
-    multiple times with identical non-monetary fields: one row contains the reported
-    contract amounts/spend and companion rows contain zero in all three monetary fields.
-    Those all-zero companions are source placeholders, not independent contract values.
+    Live Checkbook evidence shows that a registered contract/version may be returned as
+    one populated value row plus companion rows whose three monetary fields are all zero.
+    Companion rows can also omit an otherwise populated descriptive field. TowerSignal
+    treats those as source placeholders only when all nonblank descriptive values agree.
 
-    We select the unique non-zero monetary row only when every non-monetary field is
-    identical and every alternate monetary signature is exactly all-zero. Any other
-    disagreement remains a hard failure.
+    Multiple distinct nonblank descriptive values or multiple distinct nonzero monetary
+    signatures remain hard failures.
     """
     structural_fields = tuple(
         field
         for field in material_fields
         if field not in {"prime_contract_version", *PRIME_MONEY_FIELDS}
     )
-    structural_signatures = {_material_key(row, structural_fields) for row in candidates}
     selected_version = normalize_space(candidates[0].get("prime_contract_version")) or "(blank)"
-    if len(structural_signatures) > 1:
-        raise CheckbookSourceError(
-            f"Checkbook NYC returned conflicting non-monetary fields for prime_contract_id={identity} "
-            f"in FY{fiscal_year} version {selected_version}"
-        )
+    resolved_structural = _compatible_structural_values(
+        candidates,
+        structural_fields,
+        identity=identity,
+        fiscal_year=fiscal_year,
+        selected_version=selected_version,
+    )
 
     money_by_signature: dict[tuple[float | None, ...], Mapping[str, str]] = {}
     for row in candidates:
         money_by_signature.setdefault(_money_signature(row), row)
+
+    resolution: str | None = None
     if len(money_by_signature) == 1:
         chosen = dict(next(iter(money_by_signature.values())))
-        chosen["_source_duplicate_row_count"] = str(len(candidates))
         if len(candidates) > 1:
-            chosen["_source_duplicate_resolution"] = "IDENTICAL_DUPLICATES"
-        return chosen
+            resolution = "COMPATIBLE_DUPLICATES"
+    else:
+        zero_signature = (0.0, 0.0, 0.0)
+        nonzero_signatures = [signature for signature in money_by_signature if signature != zero_signature]
+        if zero_signature in money_by_signature and len(nonzero_signatures) == 1 and len(money_by_signature) == 2:
+            chosen = dict(money_by_signature[nonzero_signatures[0]])
+            resolution = "NONZERO_OVER_ZERO_PLACEHOLDER"
+        else:
+            raise CheckbookSourceError(
+                f"Checkbook NYC returned conflicting monetary fields for prime_contract_id={identity} "
+                f"in FY{fiscal_year} version {selected_version}"
+            )
 
-    zero_signature = (0.0, 0.0, 0.0)
-    nonzero_signatures = [signature for signature in money_by_signature if signature != zero_signature]
-    if zero_signature in money_by_signature and len(nonzero_signatures) == 1 and len(money_by_signature) == 2:
-        chosen = dict(money_by_signature[nonzero_signatures[0]])
-        chosen["_source_duplicate_row_count"] = str(len(candidates))
-        chosen["_source_duplicate_resolution"] = "NONZERO_OVER_ZERO_PLACEHOLDER"
-        return chosen
-
-    raise CheckbookSourceError(
-        f"Checkbook NYC returned conflicting monetary fields for prime_contract_id={identity} "
-        f"in FY{fiscal_year} version {selected_version}"
-    )
+    for field, value in resolved_structural.items():
+        chosen[field] = value
+    chosen["_source_duplicate_row_count"] = str(len(candidates))
+    if resolution:
+        chosen["_source_duplicate_resolution"] = resolution
+    return chosen
 
 
 def _latest_partition_rows(
