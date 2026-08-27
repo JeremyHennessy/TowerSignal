@@ -41,6 +41,13 @@ jobs:
           path: .acris-store
           fetch-depth: 1
           sparse-checkout: data/acris
+      - name: Check out last verified Checkbook NYC cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-checkbook
+          path: .checkbook-store
+          fetch-depth: 1
+          sparse-checkout: data/checkbook
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -53,6 +60,10 @@ jobs:
         run: python scripts/build_data.py --output public/data
       - name: Fetch, validate and normalize NYC City Record procurement
         run: python scripts/build_city_record_procurement.py --output public/data/procurement-city-record.json
+      - name: Attach last verified Checkbook NYC procurement cache
+        run: |
+          python scripts/validate_checkbook_cache.py --cache .checkbook-store/data/checkbook/cache.json --max-age-days 2 --require-production-volume
+          cp .checkbook-store/data/checkbook/cache.json public/data/procurement-checkbook.json
       - name: Attach last verified ACRIS timing cache
         run: python scripts/attach_acris.py --output public/data --cache .acris-store/data/acris/cache.json
       - name: Validate verified ACRIS cache when present
