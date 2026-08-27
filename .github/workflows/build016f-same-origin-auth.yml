@@ -7,6 +7,7 @@ on:
       - 'functions/**'
       - 'src/workflow/remoteClient.ts'
       - 'vite.config.ts'
+      - 'playwright.config.ts'
       - 'tests/e2e/build016f-serial-gate.spec.ts'
       - '.github/workflows/build016f-same-origin-auth.yml'
 
@@ -76,12 +77,12 @@ jobs:
         run: npm run build
       - name: Install browser engines
         run: npx playwright install --with-deps chromium webkit
-      - name: Start Cloudflare Pages-compatible local host
+      - name: Start Cloudflare Pages-compatible HTTPS local host
         run: |
-          npx --yes wrangler@latest pages dev dist --ip 127.0.0.1 --port 8788 > /tmp/towersignal-wrangler.log 2>&1 &
+          npx --yes wrangler@latest pages dev dist --ip 127.0.0.1 --port 8788 --local-protocol=https > /tmp/towersignal-wrangler.log 2>&1 &
           echo $! > /tmp/towersignal-wrangler.pid
           for i in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then
+            if curl --insecure --fail --silent https://127.0.0.1:8788/ >/dev/null; then
               exit 0
             fi
             sleep 1
@@ -90,15 +91,18 @@ jobs:
           exit 1
       - name: Verify exact serial chain on desktop
         env:
-          BASE_URL: http://127.0.0.1:8788/
+          BASE_URL: https://127.0.0.1:8788/
+          ALLOW_SELF_SIGNED: 'true'
         run: npx playwright test tests/e2e/build016f-serial-gate.spec.ts --project=desktop-chromium --no-deps
       - name: Verify exact serial chain on iPhone WebKit
         env:
-          BASE_URL: http://127.0.0.1:8788/
+          BASE_URL: https://127.0.0.1:8788/
+          ALLOW_SELF_SIGNED: 'true'
         run: npx playwright test tests/e2e/build016f-serial-gate.spec.ts --project=iphone --no-deps
       - name: Verify full existing suite after serial boundary passes
         env:
-          BASE_URL: http://127.0.0.1:8788/
+          BASE_URL: https://127.0.0.1:8788/
+          ALLOW_SELF_SIGNED: 'true'
         run: npm run test:e2e
       - name: Show proxy host log on failure
         if: failure()
