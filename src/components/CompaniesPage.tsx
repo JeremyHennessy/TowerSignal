@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadCompanies } from '../data/api'
 import type { CompanyIntelligencePayload, CompanyIntelligenceRecord } from '../types/company'
-import { formatDate } from '../domain/labels'
+import { formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
 
 const number = new Intl.NumberFormat('en-US')
@@ -54,7 +54,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
 
       <div className="reference-table-card">
         <div className="reference-table-heading">
-          <div><strong>Company &amp; vendor intelligence</strong><span>{number.format(companies.length)} shown · generated {formatDate(payload.generated_at)}</span></div>
+          <div><strong>Company &amp; vendor intelligence</strong><span>{number.format(companies.length)} shown · generated {formatTimestamp(payload.generated_at)}</span></div>
           <div className="page-actions company-filter-actions">
             <input aria-label="Company search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Company, alias or public buyer…" />
             <select aria-label="Company service category" value={category} onChange={event => setCategory(event.target.value)}><option value="ALL">All services</option>{categories.map(value => <option key={value} value={value}>{categoryLabel(value)}</option>)}</select>
