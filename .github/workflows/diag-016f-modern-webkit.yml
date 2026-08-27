@@ -24,7 +24,7 @@ jobs:
         run: npm install --no-save --no-audit --no-fund @playwright/test@1.62.1
       - name: Install current WebKit
         run: npx playwright install --with-deps webkit
-      - name: Verify deployed authenticated iPhone flow
+      - name: Classify deployed WebKit auth persistence boundary
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-        run: npx playwright test --project=iphone
+        run: npx playwright test tests/e2e/auth-persistence.diag.spec.ts --project=iphone --no-deps
