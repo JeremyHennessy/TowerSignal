@@ -39,6 +39,7 @@ class CompanyIntelligenceTests(unittest.TestCase):
         self.assertEqual(payload["summary"]["observed_vendor_company_count"], 1)
         company = payload["companies"][0]
         self.assertEqual(company["identity_confidence"], "STRONG")
+        self.assertEqual(company["cross_source_resolution_confidence"], "STRONG")
         self.assertEqual(company["strict_vendor_key"], "BARCLAY WATER MGMT INC")
         self.assertEqual(company["metrics"]["observed_contract_count"], 2)
         self.assertEqual(company["metrics"]["observed_customer_count"], 2)
@@ -57,13 +58,22 @@ class CompanyIntelligenceTests(unittest.TestCase):
             self.assertEqual(company["cross_source_resolution_confidence"], "VERIFY")
             self.assertEqual(len(company["candidate_related_company_ids"]), 1)
 
-    def test_short_generic_alias_like_rmc_is_observed_but_not_promoted_to_parent_relationship(self):
+    def test_short_generic_alias_like_rmc_remains_verify_and_unresolved(self):
         payload = build_company_intelligence([
             contract("RMC", procurement_id="p1"),
         ], generated_at="2026-08-27T00:00:00Z", as_of=date(2026, 8, 27))
         company = payload["companies"][0]
         self.assertEqual(company["canonical_name"], "RMC")
         self.assertEqual(company["identity_scope"], "OBSERVED_PUBLIC_PROCUREMENT_VENDOR_LABEL")
+        self.assertEqual(company["identity_confidence"], "VERIFY")
+        self.assertEqual(company["cross_source_resolution_confidence"], "VERIFY")
+        self.assertEqual(company["cross_source_resolution_method"], "AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL")
+        self.assertEqual(company["aliases"][0]["confidence"], "VERIFY")
+        self.assertEqual(payload["summary"]["companies_requiring_resolution_review"], 1)
+        self.assertEqual(payload["summary"]["unresolved_observation_count"], 1)
+        self.assertEqual(payload["unresolved_vendor_observations"][0]["vendor_raw"], "RMC")
+        self.assertEqual(payload["unresolved_vendor_observations"][0]["resolution_confidence"], "VERIFY")
+        self.assertEqual(payload["unresolved_vendor_observations"][0]["candidate_company_ids"], [])
         self.assertIsNone(company["current_parent_company_id"])
         self.assertIsNone(company["current_sponsor_company_id"])
 
