@@ -17,6 +17,7 @@ def row(
     expense_category="Services",
     purpose="Cooling tower cleaning",
     end_date="2027-12-31",
+    contract_type="WORK/LABOR",
 ):
     return {
         "prime_contract_id": "CT1",
@@ -30,7 +31,7 @@ def row(
         "prime_contracting_agency": "Health + Hospitals",
         "prime_contract_version": "2",
         "parent_contract_id": "-",
-        "prime_contract_type": "WORK/LABOR",
+        "prime_contract_type": contract_type,
         "prime_contract_award_method": "RENEWAL OF CONTRACT",
         "prime_contract_expense_category": expense_category,
         "prime_contract_industry": "Services",
@@ -45,12 +46,14 @@ class CheckbookPlaceholderResolutionTests(unittest.TestCase):
             spent="120",
             expense_category="DATA PROCESSING EQUIPMENT MAINTENANCE",
             end_date="2027-01-31",
+            contract_type="WORK/LABOR",
         )
         placeholder = row(
             amount="0",
             spent="0",
             expense_category="CONTRACTUAL SERVICES GENERAL, DATA PROCESSING EQUIPMENT MAINTENANCE",
             end_date="2027-10-22",
+            contract_type="REQUIREMENTS-SERVICES",
         )
         chosen = _choose_prime_version_candidate(
             [populated, placeholder],
@@ -61,6 +64,7 @@ class CheckbookPlaceholderResolutionTests(unittest.TestCase):
         self.assertEqual(chosen["prime_contract_current_amount"], "175")
         self.assertEqual(chosen["prime_vendor_spent_to_date"], "120")
         self.assertEqual(chosen["prime_contract_expense_category"], "DATA PROCESSING EQUIPMENT MAINTENANCE")
+        self.assertEqual(chosen["prime_contract_type"], "WORK/LABOR")
         self.assertEqual(chosen["prime_contract_end_date"], "2027-01-31")
         self.assertEqual(chosen["_source_observed_end_dates"], "2027-01-31|2027-10-22")
         self.assertEqual(
@@ -69,6 +73,10 @@ class CheckbookPlaceholderResolutionTests(unittest.TestCase):
                 "CONTRACTUAL SERVICES GENERAL, DATA PROCESSING EQUIPMENT MAINTENANCE",
                 "DATA PROCESSING EQUIPMENT MAINTENANCE",
             ],
+        )
+        self.assertEqual(
+            json.loads(chosen["_source_contract_type_variants"]),
+            ["REQUIREMENTS-SERVICES", "WORK/LABOR"],
         )
         self.assertEqual(chosen["_source_duplicate_row_count"], "2")
         self.assertEqual(chosen["_source_duplicate_resolution"], "NONZERO_OVER_ZERO_PLACEHOLDER")
