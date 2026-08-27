@@ -8,8 +8,28 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   use: { baseURL, trace: 'retain-on-failure' },
   projects: [
-    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'iphone', use: { ...devices['iPhone 13'] } },
+    {
+      name: 'setup-desktop',
+      testMatch: /auth\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'desktop-chromium',
+      testIgnore: /auth\.setup\.ts/,
+      dependencies: ['setup-desktop'],
+      use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/desktop.json' },
+    },
+    {
+      name: 'setup-iphone',
+      testMatch: /auth\.setup\.ts/,
+      use: { ...devices['iPhone 13'] },
+    },
+    {
+      name: 'iphone',
+      testIgnore: /auth\.setup\.ts/,
+      dependencies: ['setup-iphone'],
+      use: { ...devices['iPhone 13'], storageState: 'playwright/.auth/iphone.json' },
+    },
   ],
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
 })

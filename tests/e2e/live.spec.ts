@@ -20,7 +20,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  await page.goto('./', { waitUntil: 'networkidle' })
+  await page.goto('./#/prospect', { waitUntil: 'networkidle' })
 
   for (const name of ['Prospect','Monitor','Map','NYS Market','NYS Changes','Opportunities','Portfolios','Workflow']) {
     await expect(page.getByRole('button', { name, exact: true })).toBeVisible()
