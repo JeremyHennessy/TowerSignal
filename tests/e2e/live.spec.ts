@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 const requireAcris = process.env.REQUIRE_ACRIS === 'true'
 
@@ -136,6 +136,9 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.getByText('Public procurement intelligence', { exact: true })).toBeVisible()
   await expect(page.getByLabel('Procurement source')).toBeVisible()
   await expect(page.locator('.procurement-table tbody tr').first()).toBeVisible()
+  await expect(page.getByText('Statewide authority records', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Procurement source').locator('option[value="NYS_AUTHORITIES"]')).toHaveCount(1)
+  await expect(page.getByText(/NYS authorities · 4\/4 healthy/)).toBeVisible()
   await expect(page.getByText('Current account timing opportunities', { exact: true })).toBeVisible()
   await expect(page.locator('.opportunity-table tbody tr').first()).toBeVisible()
   await expectContained(page)
