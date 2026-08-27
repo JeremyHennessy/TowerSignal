@@ -59,6 +59,26 @@ const nysChanges = {
   events:[{event_type:'NYS_CT_STATUS_CHANGED',system_id:'NYS-100',source_equipment_id:'100',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',detected_at:'2026-08-21T20:05:00Z',source_observation_date:null,previous_value:'Legionella Sampled',new_value:'Sample_Required',source:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',evidence_basis:'EQUIPMENT_ID_EXACT'}],
 }
 
+const procurementHealth = {
+  schema_version:'1.0', source:'NYC_CITY_RECORD', status:'HEALTHY', last_success:'2026-08-21T20:00:00Z', last_attempt:'2026-08-21T20:00:00Z', record_count:2, relevant_record_count:1, normalized_contract_count:0, normalized_notice_count:1, resolved_company_count:0, unresolved_vendor_count:0, facility_link_count:0, exact_tower_link_count:0, pagination_complete:true, schema_valid:true, freshness:'CURRENT', status_reasons:[],
+}
+
+const cityRecordProcurement = {
+  schema_version:'1.0', generated_at:'2026-08-21T20:00:00Z',
+  source:{dataset_id:'dg92-zbpx',name:'NYC City Record Online (CROL)',retrieved_at:'2026-08-21T20:00:00Z',as_of_date:'2026-08-21',award_lookback_days:730},
+  summary:{scoped_record_count:2,relevant_record_count:1,open_relevant_opportunities:1,recent_relevant_awards:0,unresolved_vendor_count:0,classification_counts:{COOLING_TOWER_MAINTENANCE:1}},
+  source_health:procurementHealth,
+  notices:[{schema_version:'1.0',procurement_id:'notice-city-1',source:'NYC_CITY_RECORD',source_record_id:'city-1',notice_id:'N1',agency:'DCAS',title:'Cooling tower maintenance services',procurement_text:'Cooling tower maintenance services',service_category:'COOLING_TOWER_MAINTENANCE',service_confidence:'CONFIRMED',classification_terms:['cooling tower maintenance'],classification_reason:'Explicit cooling-tower maintenance language',due_date:'2026-09-15',status:'OPEN',scope:'OPEN_SOLICITATIONS',source_url:'https://example.test/city-record/1',retrieved_at:'2026-08-21T20:00:00Z'}],
+}
+
+const checkbookProcurement = {
+  schema_version:'1.0',generated_at:'2026-08-21T20:00:00Z',
+  source:{name:'Checkbook NYC Contracts API',api_url:'https://example.test/checkbook-api',documentation_url:'https://example.test/checkbook-docs',retrieved_at:'2026-08-21T20:00:00Z'},
+  summary:{citywide_source_transaction_count:2,citywide_subvendor_source_transaction_count:0,citywide_unique_prime_contract_count:2,citywide_relevant_contract_count:1,edc_source_transaction_count:0,edc_unique_prime_contract_count:0,edc_unique_contract_line_count:0,edc_relevant_contract_count:0,relevant_contract_count:1,unresolved_vendor_count:1,classification_counts:{WATER_TREATMENT:1},value_semantics:'Observed source-reported public contract values; not company revenue.'},
+  source_health:{NYC_CHECKBOOK_CITYWIDE:{...procurementHealth,source:'NYC_CHECKBOOK_CITYWIDE',record_count:2,relevant_record_count:1,normalized_contract_count:1,normalized_notice_count:0,unresolved_vendor_count:1,status:'WARNING',status_reasons:['ENTITY_RESOLUTION_UNCERTAINTY']}},
+  contracts:[{schema_version:'1.0',procurement_id:'contract-checkbook-1',source:'NYC_CHECKBOOK_CITYWIDE',source_record_id:'PC1',source_contract_id:'PC1',vendor_raw:'ALPHA WATER SERVICES LLC',vendor_role:'PRIME',company_id:null,company_match_confidence:'UNRESOLVED',company_resolution_method:'NO_SAFE_MATCH',buyer_name:'DCAS',agency:'DCAS',title:'Water treatment services',description:'Water treatment services',service_category:'WATER_TREATMENT',service_confidence:'CONFIRMED',classification_terms:['water treatment'],classification_reason:'Explicit water-treatment language',current_amount:250000,original_amount:250000,spend_to_date:100000,start_date:'2026-01-01',end_date:'2027-01-01',status:'REGISTERED',observed_value_evidence:'SOURCE_REPORTED_PUBLIC_CONTRACT',source_url:'https://example.test/checkbook/PC1',retrieved_at:'2026-08-21T20:00:00Z',facility_match_confidence:'UNLINKED',tower_link_confidence:'UNLINKED'}],
+}
+
 const detail = {
   schema_version:'1.0', metadata:payload.metadata,
   identity:{ system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',source_latitude_raw:'40.75',source_longitude_raw:'-73.99' },
@@ -75,6 +95,8 @@ beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
     const url = String(input)
     const responsePayload = url.includes('/details/') ? detail
+      : url.includes('/data/procurement-city-record.json') ? cityRecordProcurement
+      : url.includes('/data/procurement-checkbook.json') ? checkbookProcurement
       : url.includes('/data/nys-changes.json') ? nysChanges
       : url.includes('/data/nys-systems.json') ? nysPayload
       : url.includes('/data/changes.json') ? changes
@@ -175,14 +197,19 @@ test('opens NYS Changes and shows Equipment_ID-exact evidence', async () => {
   expect(screen.getByText('Evidence: EQUIPMENT_ID_EXACT')).toBeInTheDocument()
 })
 
-test('opens the new commercial, portfolio, workflow and source-health workspaces without fabricating unsupported data', async () => {
+test('opens the commercial, portfolio, workflow and source-health workspaces without fabricating unsupported data', async () => {
   const user = userEvent.setup()
   render(<App />)
   await screen.findByText('10 ALPHA ST')
 
   await user.click(screen.getByRole('button', { name:'Opportunities' }))
   expect(screen.getByRole('heading', { name:'Opportunities workspace', level:1 })).toBeInTheDocument()
-  expect(screen.getByText('Procurement intelligence is not in the current production account payload.')).toBeInTheDocument()
+  expect(await screen.findByText('LIVE SOURCE DATA')).toBeInTheDocument()
+  expect(screen.getByText('Public procurement intelligence')).toBeInTheDocument()
+  expect(screen.getByText('Cooling tower maintenance services')).toBeInTheDocument()
+  expect(screen.getByText('ALPHA WATER SERVICES LLC')).toBeInTheDocument()
+  expect(screen.getByText('$250,000')).toBeInTheDocument()
+  expect(screen.getByText('Current account timing opportunities')).toBeInTheDocument()
 
   await user.click(screen.getByRole('button', { name:'Portfolios' }))
   expect(screen.getByRole('heading', { name:'Portfolios', level:1 })).toBeInTheDocument()
@@ -197,4 +224,7 @@ test('opens the new commercial, portfolio, workflow and source-health workspaces
   await user.click(screen.getByRole('button', { name:'Source Health & Coverage' }))
   expect(screen.getByRole('heading', { name:'Source Health & Coverage', level:1 })).toBeInTheDocument()
   expect(screen.getByText('Source-health metrics are not available in this payload.')).toBeInTheDocument()
+  expect(await screen.findByText('Procurement sources')).toBeInTheDocument()
+  expect(screen.getByText('NYC_CITY_RECORD')).toBeInTheDocument()
+  expect(screen.getByText('NYC_CHECKBOOK_CITYWIDE')).toBeInTheDocument()
 })
