@@ -5,6 +5,7 @@ from datetime import date
 from typing import Any, Iterable, Mapping
 
 from .procurement import (
+    GENERIC_COMPANY_WORDS,
     company_alias_record,
     company_record,
     derive_company_metrics,
@@ -23,6 +24,17 @@ def strict_vendor_key(value: str | None) -> str:
     INC. Broader corporate resolution remains a reviewable candidate relationship.
     """
     return normalize_company_name(value, strip_legal_suffixes=False)
+
+
+def _ambiguous_base_name(value: str) -> bool:
+    """Return True when an observed vendor label is too weak to treat as a strong identity.
+
+    Single-token labels/acronyms such as RMC and labels made only from generic service
+    words remain review candidates even when no competing source label is currently
+    observed. This prevents absence of a collision from being misread as identity proof.
+    """
+    tokens = normalize_company_name(value).split()
+    return len(tokens) < 2 or all(token in GENERIC_COMPANY_WORDS for token in tokens)
 
 
 def _observation_date(row: Mapping[str, Any]) -> str | None:
@@ -82,6 +94,8 @@ def build_company_intelligence(
         sources = sorted({normalize_space(str(row.get("source") or "")) for row in company_rows if row.get("source")})
         buyers = sorted({normalize_space(str(row.get("buyer_name") or row.get("agency") or "")) for row in company_rows if normalize_space(str(row.get("buyer_name") or row.get("agency") or ""))})
         categories = sorted({normalize_space(str(row.get("service_category") or "")) for row in company_rows if normalize_space(str(row.get("service_category") or ""))})
+        base_name = normalize_company_name(strict_key)
+        ambiguous_identity = _ambiguous_base_name(base_name)
 
         aliases = []
         alias_seen: set[tuple[str, str]] = set()
@@ -97,8 +111,12 @@ def build_company_intelligence(
                 alias,
                 source=source,
                 address=normalize_space(str(row.get("vendor_address") or "")) or None,
-                confidence="STRONG",
-                resolution_method="EXACT_SOURCE_LABEL_SUFFIX_PRESERVED",
+                confidence="VERIFY" if ambiguous_identity else "STRONG",
+                resolution_method=(
+                    "AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL"
+                    if ambiguous_identity
+                    else "EXACT_SOURCE_LABEL_SUFFIX_PRESERVED"
+                ),
             ))
 
         checkbook_contracts = [row for row in company_rows if str(row.get("source") or "") != "NYC_CITY_RECORD"]
@@ -106,16 +124,22 @@ def build_company_intelligence(
         city_record_rows = [row for row in company_rows if str(row.get("source") or "") == "NYC_CITY_RECORD"]
         recent_awards = sum(1 for row in city_record_rows if str(row.get("scope") or "") == "RECENT_AWARDS")
 
-        base_name = normalize_company_name(strict_key)
         candidate_ids = sorted(set(base_name_to_company_ids.get(base_name, ())) - {company_id})
-        resolution_confidence = "VERIFY" if candidate_ids else "STRONG"
-        resolution_method = "LEGAL_SUFFIX_OR_SOURCE_VARIANT_REQUIRES_REVIEW" if candidate_ids else "EXACT_SOURCE_LABEL_SUFFIX_PRESERVED"
+        if candidate_ids:
+            resolution_confidence = "VERIFY"
+            resolution_method = "LEGAL_SUFFIX_OR_SOURCE_VARIANT_REQUIRES_REVIEW"
+        elif ambiguous_identity:
+            resolution_confidence = "VERIFY"
+            resolution_method = "AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL"
+        else:
+            resolution_confidence = "STRONG"
+            resolution_method = "EXACT_SOURCE_LABEL_SUFFIX_PRESERVED"
 
         record = company_record(
             canonical_name,
             company_id=company_id,
             company_type="OBSERVED_PROCUREMENT_VENDOR",
-            identity_confidence="STRONG",
+            identity_confidence="VERIFY" if ambiguous_identity else "STRONG",
             first_seen=dates[0] if dates else None,
             last_seen=dates[-1] if dates else None,
         )
@@ -140,7 +164,7 @@ def build_company_intelligence(
         })
         companies.append(record)
 
-        if candidate_ids:
+        if candidate_ids or ambiguous_identity:
             for row in company_rows:
                 unresolved_observations.append({
                     "procurement_id": row.get("procurement_id"),
