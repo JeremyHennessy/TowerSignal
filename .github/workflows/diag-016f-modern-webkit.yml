@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  modern-webkit-auth:
+  browser-auth-control:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -22,9 +22,14 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Overlay current Playwright test harness only
         run: npm install --no-save --no-audit --no-fund @playwright/test@1.62.1
-      - name: Install current WebKit
-        run: npx playwright install --with-deps webkit
-      - name: Classify deployed WebKit auth persistence boundary
+      - name: Install current Chromium and WebKit
+        run: npx playwright install --with-deps chromium webkit
+      - name: Control — classify deployed Chromium auth persistence
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/auth-persistence.diag.spec.ts --project=desktop-chromium --no-deps
+      - name: Experiment — classify deployed WebKit auth persistence
+        if: always()
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
         run: npx playwright test tests/e2e/auth-persistence.diag.spec.ts --project=iphone --no-deps
