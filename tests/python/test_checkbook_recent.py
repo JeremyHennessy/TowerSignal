@@ -132,13 +132,14 @@ class RecentCheckbookTests(unittest.TestCase):
         self.assertEqual(nyc_fiscal_year(date(2026, 7, 1)), 2027)
         self.assertEqual(recent_nyc_fiscal_years(date(2026, 8, 27), 5), (2023, 2024, 2025, 2026, 2027))
 
-    def test_recent_builder_selects_latest_fiscal_year_and_contract_version(self):
+    def test_recent_builder_selects_latest_version_and_nonzero_source_row(self):
         api = FakeRecentCheckbookApi(
             prime_by_year={
                 2025: [prime_row("CT1", "Cooling tower water treatment", amount="100", spent="20", version="1")],
                 2027: [
                     prime_row("CT1", "Cooling tower water treatment", amount="150", spent="100", version="1"),
                     prime_row("CT1", "Cooling tower water treatment", amount="175", spent="120", version="2"),
+                    prime_row("CT1", "Cooling tower water treatment", amount="0", spent="0", version="2"),
                     prime_row("CT2", "Bottled water delivery", amount="50", spent="50"),
                 ],
             },
@@ -168,6 +169,8 @@ class RecentCheckbookTests(unittest.TestCase):
         self.assertEqual(primes[0]["spend_to_date"], 120.0)
         self.assertEqual(primes[0]["contract_version"], "2")
         self.assertEqual(primes[0]["source_fiscal_year"], 2027)
+        self.assertEqual(primes[0]["source_duplicate_row_count"], 2)
+        self.assertEqual(primes[0]["source_duplicate_resolution"], "NONZERO_OVER_ZERO_PLACEHOLDER")
 
         subs = [
             row for row in payload["contracts"]
@@ -176,8 +179,26 @@ class RecentCheckbookTests(unittest.TestCase):
         self.assertEqual(len(subs), 1)
         self.assertEqual(subs[0]["spend_to_date"], 40.0)
         self.assertEqual(subs[0]["source_fiscal_year"], 2027)
-        self.assertEqual(payload["summary"]["citywide_source_transaction_count"], 4)
+        self.assertEqual(payload["summary"]["citywide_source_transaction_count"], 5)
         self.assertEqual(payload["summary"]["citywide_subvendor_source_transaction_count"], 2)
+
+    def test_two_nonzero_monetary_variants_still_fail_closed(self):
+        api = FakeRecentCheckbookApi(
+            prime_by_year={
+                2027: [
+                    prime_row("CT1", "Cooling tower cleaning", amount="100", spent="50", version="2"),
+                    prime_row("CT1", "Cooling tower cleaning", amount="200", spent="75", version="2"),
+                ]
+            }
+        )
+        with self.assertRaisesRegex(CheckbookSourceError, "conflicting monetary fields"):
+            build_recent_checkbook_cache(
+                as_of=date(2026, 8, 27),
+                fiscal_year_count=1,
+                request_xml=api,
+                retrieved_at="2026-08-27T01:00:00Z",
+                page_size=2,
+            )
 
     def test_partition_failure_propagates_instead_of_publishing_partial_cache(self):
         api = FakeRecentCheckbookApi(fail_year=2026)
