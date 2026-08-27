@@ -181,6 +181,48 @@ class RecentCheckbookTests(unittest.TestCase):
         self.assertEqual(subs[0]["source_fiscal_year"], 2027)
         self.assertEqual(payload["summary"]["citywide_source_transaction_count"], 5)
         self.assertEqual(payload["summary"]["citywide_subvendor_source_transaction_count"], 2)
+        self.assertEqual(payload["summary"]["citywide_unique_prime_contract_count"], 2)
+        self.assertEqual(payload["summary"]["citywide_relevant_prime_contract_count"], 1)
+
+    def test_unrelated_prime_vendor_variants_do_not_block_relevant_cache(self):
+        api = FakeRecentCheckbookApi(
+            prime_by_year={
+                2027: [
+                    prime_row("IRRELEVANT", "Shelter and facilities services", amount="100", vendor="Entity A"),
+                    prime_row("IRRELEVANT", "Shelter and facilities services", amount="0", spent="0", vendor="Entity B"),
+                    prime_row("RELEVANT", "Cooling tower cleaning", amount="200", vendor="Water Vendor"),
+                ]
+            }
+        )
+        payload = build_recent_checkbook_cache(
+            as_of=date(2026, 8, 27),
+            fiscal_year_count=1,
+            request_xml=api,
+            retrieved_at="2026-08-27T01:00:00Z",
+            page_size=3,
+        )
+        primes = [row for row in payload["contracts"] if row["vendor_role"] == "PRIME"]
+        self.assertEqual([row["source_contract_id"] for row in primes], ["RELEVANT"])
+        self.assertEqual(payload["summary"]["citywide_unique_prime_contract_count"], 2)
+        self.assertEqual(payload["summary"]["citywide_relevant_prime_contract_count"], 1)
+
+    def test_relevant_prime_vendor_variants_still_fail_closed(self):
+        api = FakeRecentCheckbookApi(
+            prime_by_year={
+                2027: [
+                    prime_row("CT1", "Cooling tower cleaning", amount="200", vendor="Water Vendor A"),
+                    prime_row("CT1", "Cooling tower cleaning", amount="0", spent="0", vendor="Water Vendor B"),
+                ]
+            }
+        )
+        with self.assertRaisesRegex(CheckbookSourceError, "field prime_vendor"):
+            build_recent_checkbook_cache(
+                as_of=date(2026, 8, 27),
+                fiscal_year_count=1,
+                request_xml=api,
+                retrieved_at="2026-08-27T01:00:00Z",
+                page_size=2,
+            )
 
     def test_two_nonzero_monetary_variants_still_fail_closed(self):
         api = FakeRecentCheckbookApi(
