@@ -1,0 +1,84 @@
+name: Build 016F bearer diagnostic
+
+on:
+  push:
+    branches: [agent/build016f-fast-verify]
+
+permissions:
+  contents: read
+
+jobs:
+  bearer-diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe Managed Neon Auth session-token bearer support
+        shell: bash
+        env:
+          AUTH_BASE: https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth
+          TEST_EMAIL: towersignal-e2e-33112994937-1-desktop@example.com
+          TEST_PASSWORD: TowerSignal-E2E-2026!
+          TRUSTED_ORIGIN: https://jeremyhennessy.github.io
+        run: |
+          set -euo pipefail
+          body="$(mktemp)"
+          bearer_body="$(mktemp)"
+          cookie_body="$(mktemp)"
+          jar="$(mktemp)"
+
+          sign_status="$(curl --silent --show-error --location \
+            --request POST "$AUTH_BASE/sign-in/email" \
+            --header "Origin: $TRUSTED_ORIGIN" \
+            --header 'Content-Type: application/json' \
+            --cookie-jar "$jar" \
+            --output "$body" \
+            --write-out '%{http_code}' \
+            --data "{\"email\":\"$TEST_EMAIL\",\"password\":\"$TEST_PASSWORD\",\"rememberMe\":false}")"
+
+          token="$(jq -r '.token // empty' "$body")"
+          echo "sign_in_http=$sign_status"
+          if [[ -z "$token" ]]; then
+            echo 'sign_in_returned_session_token=no'
+            jq -c '{code,message,error}' "$body" 2>/dev/null || true
+            exit 1
+          fi
+          echo 'sign_in_returned_session_token=yes'
+
+          cookie_status="$(curl --silent --show-error \
+            --request GET "$AUTH_BASE/get-session" \
+            --header "Origin: $TRUSTED_ORIGIN" \
+            --cookie "$jar" \
+            --output "$cookie_body" \
+            --write-out '%{http_code}')"
+          cookie_user="$(jq -r 'if ((.user.email // .data.user.email // "") | length) > 0 then "yes" else "no" end' "$cookie_body" 2>/dev/null || echo no)"
+          echo "cookie_control_http=$cookie_status"
+          echo "cookie_control_authenticated_user=$cookie_user"
+
+          bearer_status="$(curl --silent --show-error \
+            --request GET "$AUTH_BASE/get-session" \
+            --header "Origin: $TRUSTED_ORIGIN" \
+            --header "Authorization: Bearer $token" \
+            --output "$bearer_body" \
+            --write-out '%{http_code}')"
+          bearer_user="$(jq -r 'if ((.user.email // .data.user.email // "") | length) > 0 then "yes" else "no" end' "$bearer_body" 2>/dev/null || echo no)"
+          echo "bearer_http=$bearer_status"
+          echo "bearer_authenticated_user=$bearer_user"
+
+          signout_status="$(curl --silent --show-error \
+            --request POST "$AUTH_BASE/sign-out" \
+            --header "Origin: $TRUSTED_ORIGIN" \
+            --header 'Content-Type: application/json' \
+            --cookie "$jar" \
+            --output /dev/null \
+            --write-out '%{http_code}')"
+          echo "cleanup_sign_out_http=$signout_status"
+
+          if [[ "$cookie_user" != 'yes' ]]; then
+            echo 'diagnostic_result=invalid_control_session'
+            exit 1
+          fi
+
+          if [[ "$bearer_user" == 'yes' ]]; then
+            echo 'diagnostic_result=BEARER_SUPPORTED'
+          else
+            echo 'diagnostic_result=BEARER_NOT_SUPPORTED'
+          fi
