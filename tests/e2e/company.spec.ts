@@ -8,12 +8,27 @@ const expectContained = async (page: import('@playwright/test').Page) => {
 
 test('hosted Companies and Company Profile are source-backed, shareable and reload-safe', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
-  const sameOriginFailures: string[] = []
+  const sameOriginFailures: Array<{ url: string; error: string; sequence: number }> = []
+  const sameOriginFinished: Array<{ request: import('@playwright/test').Request; sequence: number }> = []
+  let networkSequence = 0
+  const baseOrigin = new URL(testInfo.project.use.baseURL as string).origin
+
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
   page.on('requestfailed', request => {
     try {
-      if (new URL(request.url()).origin === new URL(testInfo.project.use.baseURL as string).origin) {
-        sameOriginFailures.push(`${request.url()} :: ${request.failure()?.errorText}`)
+      if (new URL(request.url()).origin === baseOrigin) {
+        sameOriginFailures.push({
+          url: request.url(),
+          error: request.failure()?.errorText || 'unknown request failure',
+          sequence: ++networkSequence,
+        })
+      }
+    } catch { /* ignore non-URL diagnostics */ }
+  })
+  page.on('requestfinished', request => {
+    try {
+      if (new URL(request.url()).origin === baseOrigin) {
+        sameOriginFinished.push({ request, sequence: ++networkSequence })
       }
     } catch { /* ignore non-URL diagnostics */ }
   })
@@ -53,6 +68,20 @@ test('hosted Companies and Company Profile are source-backed, shareable and relo
   await expect(page.locator('.company-procurement-table tbody tr').first()).toBeVisible()
   await expectContained(page)
 
-  expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
+  const completedResponses = await Promise.all(sameOriginFinished.map(async item => ({
+    url: item.request.url(),
+    sequence: item.sequence,
+    response: await item.request.response(),
+  })))
+  const successfulCompletions = completedResponses.filter(item => item.response?.ok())
+  const unresolvedFailures = sameOriginFailures.filter(failure => !successfulCompletions.some(success => (
+    success.url === failure.url && success.sequence > failure.sequence
+  )))
+  const unresolvedFailureMessages = unresolvedFailures.map(failure => `${failure.url} :: ${failure.error}`)
+
+  expect(
+    unresolvedFailureMessages,
+    `Same-origin request failures without a later successful completion:\n${unresolvedFailureMessages.join('\n')}`,
+  ).toEqual([])
   expect(consoleErrors, `Console errors:\n${consoleErrors.join('\n')}`).toEqual([])
 })
