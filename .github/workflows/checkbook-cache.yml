@@ -16,6 +16,7 @@ on:
       - 'scripts/verify_live_checkbook.py'
       - 'tests/python/test_checkbook.py'
       - 'tests/python/test_checkbook_recent.py'
+      - 'tests/python/test_checkbook_recent_placeholders.py'
   pull_request:
     branches: [main]
     paths:
@@ -28,6 +29,7 @@ on:
       - 'scripts/verify_live_checkbook.py'
       - 'tests/python/test_checkbook.py'
       - 'tests/python/test_checkbook_recent.py'
+      - 'tests/python/test_checkbook_recent_placeholders.py'
 
 permissions:
   contents: write
