@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import date
 from typing import Any, Mapping, Sequence
 
@@ -38,6 +39,7 @@ PRIME_MONEY_FIELDS = (
     "prime_vendor_spent_to_date",
 )
 PRIME_END_DATE_FIELD = "prime_contract_end_date"
+PRIME_CONTEXT_VARIANT_FIELDS = ("prime_contract_expense_category",)
 
 
 def nyc_fiscal_year(as_of: date) -> int:
@@ -92,7 +94,7 @@ def _compatible_structural_values(
     fiscal_year: int,
     selected_version: str,
 ) -> dict[str, str]:
-    """Return the single nonblank value for each structural field, or fail on disagreement."""
+    """Return the single nonblank value for each identity-bearing field, or fail."""
     resolved: dict[str, str] = {}
     for field in structural_fields:
         nonblank = {
@@ -133,6 +135,10 @@ def _observed_dates(
     return tuple(sorted(observed))
 
 
+def _observed_text_values(candidates: Sequence[Mapping[str, str]], field: str) -> tuple[str, ...]:
+    return tuple(sorted({normalize_space(row.get(field)) for row in candidates if normalize_space(row.get(field))}))
+
+
 def _choose_prime_version_candidate(
     candidates: Sequence[Mapping[str, str]],
     *,
@@ -144,18 +150,17 @@ def _choose_prime_version_candidate(
 
     Live Checkbook evidence shows that a registered contract/version may be returned as
     one populated value row plus companion rows whose monetary fields are all zero.
-    Companion rows can omit descriptive values and can carry a later source-reported end
-    date. TowerSignal keeps the unique populated monetary row, requires all other
-    nonblank descriptive values to agree, and records the latest observed end date as an
-    explicitly derived field on the normalized contract.
+    Companion rows can carry later end dates and different source expense-category
+    strings while retaining the same contract identity, vendor, purpose, agency and
+    procurement method. TowerSignal keeps those contextual observations separately.
 
-    Multiple distinct nonblank descriptive values (other than end date) or multiple
-    distinct nonzero monetary signatures remain hard failures.
+    Multiple identity-bearing nonblank values or multiple distinct nonzero monetary
+    signatures remain hard failures.
     """
     structural_fields = tuple(
         field
         for field in material_fields
-        if field not in {"prime_contract_version", PRIME_END_DATE_FIELD, *PRIME_MONEY_FIELDS}
+        if field not in {"prime_contract_version", PRIME_END_DATE_FIELD, *PRIME_MONEY_FIELDS, *PRIME_CONTEXT_VARIANT_FIELDS}
     )
     selected_version = normalize_space(candidates[0].get("prime_contract_version")) or "(blank)"
     resolved_structural = _compatible_structural_values(
@@ -172,6 +177,7 @@ def _choose_prime_version_candidate(
         fiscal_year=fiscal_year,
         selected_version=selected_version,
     )
+    expense_category_variants = _observed_text_values(candidates, "prime_contract_expense_category")
 
     money_by_signature: dict[tuple[float | None, ...], Mapping[str, str]] = {}
     for row in candidates:
@@ -201,6 +207,8 @@ def _choose_prime_version_candidate(
         chosen["_source_duplicate_resolution"] = resolution
     if observed_end_dates:
         chosen["_source_observed_end_dates"] = "|".join(observed_end_dates)
+    if expense_category_variants:
+        chosen["_source_expense_category_variants"] = json.dumps(expense_category_variants)
     return chosen
 
 
@@ -337,6 +345,13 @@ def _attach_source_resolution(contract: dict[str, Any], row: Mapping[str, str]) 
             contract["end_date"] = latest_observed_end
             contract["end_date_resolution"] = "LATEST_OBSERVED_SAME_VERSION"
 
+    expense_variants_json = normalize_space(row.get("_source_expense_category_variants"))
+    if expense_variants_json:
+        expense_variants = list(json.loads(expense_variants_json))
+        contract["source_expense_category_variants"] = expense_variants
+        if len(expense_variants) > 1:
+            contract["expense_category_resolution"] = "MULTIPLE_SOURCE_VARIANTS"
+
 
 def build_recent_checkbook_cache(
     *,
@@ -416,6 +431,9 @@ def build_recent_checkbook_cache(
             ),
             "latest_end_date_resolution_count": sum(
                 1 for row in citywide_contracts if row.get("end_date_resolution") == "LATEST_OBSERVED_SAME_VERSION"
+            ),
+            "expense_category_variant_resolution_count": sum(
+                1 for row in citywide_contracts if row.get("expense_category_resolution") == "MULTIPLE_SOURCE_VARIANTS"
             ),
         }
     )
