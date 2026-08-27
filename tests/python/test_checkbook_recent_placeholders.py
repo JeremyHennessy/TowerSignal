@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -38,9 +39,19 @@ def row(
 
 
 class CheckbookPlaceholderResolutionTests(unittest.TestCase):
-    def test_nonzero_row_wins_and_all_source_end_dates_are_retained(self):
-        populated = row(amount="175", spent="120", expense_category="Services", end_date="2027-01-31")
-        placeholder = row(amount="0", spent="0", expense_category="", end_date="2027-10-22")
+    def test_nonzero_row_wins_and_context_variants_are_retained(self):
+        populated = row(
+            amount="175",
+            spent="120",
+            expense_category="DATA PROCESSING EQUIPMENT MAINTENANCE",
+            end_date="2027-01-31",
+        )
+        placeholder = row(
+            amount="0",
+            spent="0",
+            expense_category="CONTRACTUAL SERVICES GENERAL, DATA PROCESSING EQUIPMENT MAINTENANCE",
+            end_date="2027-10-22",
+        )
         chosen = _choose_prime_version_candidate(
             [populated, placeholder],
             identity="CT1",
@@ -49,13 +60,20 @@ class CheckbookPlaceholderResolutionTests(unittest.TestCase):
         )
         self.assertEqual(chosen["prime_contract_current_amount"], "175")
         self.assertEqual(chosen["prime_vendor_spent_to_date"], "120")
-        self.assertEqual(chosen["prime_contract_expense_category"], "Services")
+        self.assertEqual(chosen["prime_contract_expense_category"], "DATA PROCESSING EQUIPMENT MAINTENANCE")
         self.assertEqual(chosen["prime_contract_end_date"], "2027-01-31")
         self.assertEqual(chosen["_source_observed_end_dates"], "2027-01-31|2027-10-22")
+        self.assertEqual(
+            json.loads(chosen["_source_expense_category_variants"]),
+            [
+                "CONTRACTUAL SERVICES GENERAL, DATA PROCESSING EQUIPMENT MAINTENANCE",
+                "DATA PROCESSING EQUIPMENT MAINTENANCE",
+            ],
+        )
         self.assertEqual(chosen["_source_duplicate_row_count"], "2")
         self.assertEqual(chosen["_source_duplicate_resolution"], "NONZERO_OVER_ZERO_PLACEHOLDER")
 
-    def test_distinct_nonblank_descriptive_values_still_fail_closed(self):
+    def test_distinct_nonblank_identity_values_still_fail_closed(self):
         first = row(amount="175", spent="120", purpose="Cooling tower cleaning")
         second = row(amount="0", spent="0", purpose="Different supported purpose")
         with self.assertRaisesRegex(CheckbookSourceError, "conflicting non-monetary fields"):
