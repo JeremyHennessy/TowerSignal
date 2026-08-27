@@ -39,7 +39,10 @@ PRIME_MONEY_FIELDS = (
     "prime_vendor_spent_to_date",
 )
 PRIME_END_DATE_FIELD = "prime_contract_end_date"
-PRIME_CONTEXT_VARIANT_FIELDS = ("prime_contract_expense_category",)
+PRIME_CONTEXT_VARIANT_FIELDS = (
+    "prime_contract_expense_category",
+    "prime_contract_type",
+)
 
 
 def nyc_fiscal_year(as_of: date) -> int:
@@ -150,9 +153,10 @@ def _choose_prime_version_candidate(
 
     Live Checkbook evidence shows that a registered contract/version may be returned as
     one populated value row plus companion rows whose monetary fields are all zero.
-    Companion rows can carry later end dates and different source expense-category
-    strings while retaining the same contract identity, vendor, purpose, agency and
-    procurement method. TowerSignal keeps those contextual observations separately.
+    Companion rows can carry later end dates and different source expense-category or
+    contract-type strings while retaining the same contract identity, vendor, purpose,
+    agency and procurement method. TowerSignal keeps those contextual observations
+    separately while retaining the populated value row as the primary source row.
 
     Multiple identity-bearing nonblank values or multiple distinct nonzero monetary
     signatures remain hard failures.
@@ -178,6 +182,7 @@ def _choose_prime_version_candidate(
         selected_version=selected_version,
     )
     expense_category_variants = _observed_text_values(candidates, "prime_contract_expense_category")
+    contract_type_variants = _observed_text_values(candidates, "prime_contract_type")
 
     money_by_signature: dict[tuple[float | None, ...], Mapping[str, str]] = {}
     for row in candidates:
@@ -209,6 +214,8 @@ def _choose_prime_version_candidate(
         chosen["_source_observed_end_dates"] = "|".join(observed_end_dates)
     if expense_category_variants:
         chosen["_source_expense_category_variants"] = json.dumps(expense_category_variants)
+    if contract_type_variants:
+        chosen["_source_contract_type_variants"] = json.dumps(contract_type_variants)
     return chosen
 
 
@@ -352,6 +359,13 @@ def _attach_source_resolution(contract: dict[str, Any], row: Mapping[str, str]) 
         if len(expense_variants) > 1:
             contract["expense_category_resolution"] = "MULTIPLE_SOURCE_VARIANTS"
 
+    contract_type_variants_json = normalize_space(row.get("_source_contract_type_variants"))
+    if contract_type_variants_json:
+        contract_type_variants = list(json.loads(contract_type_variants_json))
+        contract["source_contract_type_variants"] = contract_type_variants
+        if len(contract_type_variants) > 1:
+            contract["contract_type_resolution"] = "MULTIPLE_SOURCE_VARIANTS"
+
 
 def build_recent_checkbook_cache(
     *,
@@ -434,6 +448,9 @@ def build_recent_checkbook_cache(
             ),
             "expense_category_variant_resolution_count": sum(
                 1 for row in citywide_contracts if row.get("expense_category_resolution") == "MULTIPLE_SOURCE_VARIANTS"
+            ),
+            "contract_type_variant_resolution_count": sum(
+                1 for row in citywide_contracts if row.get("contract_type_resolution") == "MULTIPLE_SOURCE_VARIANTS"
             ),
         }
     )
