@@ -368,6 +368,35 @@ EDC_MATERIAL_FIELDS = (
 )
 
 
+def _source_row_identity(row: Mapping[str, str], identity_field: str) -> tuple[str, str]:
+    """Return the public source identity used to collapse exact duplicate transactions.
+
+    Citywide contract IDs are contract-grained. NYCEDC registered-expense results are
+    line-grained: the Checkbook contract API documents ``entity_contract_number`` as
+    the OGE contract identifier and ``commodity_line`` as the line associated with an
+    EDC contract. Live source evidence also shows a single FMS ``contract_id`` spanning
+    multiple entity contracts/commodity lines and vendors. Keep those source records
+    separate instead of treating the shared FMS document ID as the complete row key.
+    """
+    primary = normalize_space(row.get(identity_field))
+    if not primary:
+        raise CheckbookSourceError(f"Source row missing identity {identity_field}")
+
+    if identity_field == "contract_id" and (
+        "entity_contract_number" in row or "commodity_line" in row
+    ):
+        entity_contract_number = normalize_space(row.get("entity_contract_number"))
+        commodity_line = normalize_space(row.get("commodity_line"))
+        if entity_contract_number or commodity_line:
+            source_identity = (
+                f"{primary}|entity_contract_number={entity_contract_number or '(blank)'}"
+                f"|commodity_line={commodity_line or '(blank)'}"
+            )
+            return primary, source_identity
+
+    return primary, primary
+
+
 def _collapse_rows(
     rows: Sequence[Mapping[str, str]],
     *,
@@ -375,19 +404,21 @@ def _collapse_rows(
     material_fields: Sequence[str],
 ) -> tuple[dict[str, str], ...]:
     grouped: dict[str, list[Mapping[str, str]]] = {}
+    primary_by_source_identity: dict[str, str] = {}
     for row in rows:
-        identity = normalize_space(row.get(identity_field))
-        if not identity:
-            raise CheckbookSourceError(f"Source row missing identity {identity_field}")
-        grouped.setdefault(identity, []).append(row)
+        primary, source_identity = _source_row_identity(row, identity_field)
+        grouped.setdefault(source_identity, []).append(row)
+        primary_by_source_identity[source_identity] = primary
 
     collapsed: list[dict[str, str]] = []
-    for identity in sorted(grouped):
-        candidates = grouped[identity]
+    for source_identity in sorted(grouped):
+        candidates = grouped[source_identity]
         signatures = {_material_key(row, material_fields) for row in candidates}
         if len(signatures) > 1:
+            primary = primary_by_source_identity[source_identity]
             raise CheckbookSourceError(
-                f"Checkbook NYC returned conflicting material fields for {identity_field}={identity}"
+                f"Checkbook NYC returned conflicting material fields for {identity_field}={primary} "
+                f"source_record_identity={source_identity}"
             )
         collapsed.append(dict(candidates[0]))
     return tuple(collapsed)
@@ -499,12 +530,20 @@ def _normalize_citywide_subcontract(row: Mapping[str, str], *, retrieved_at: str
 
 def _normalize_edc_contract(row: Mapping[str, str], *, retrieved_at: str) -> dict[str, Any]:
     contract_id = normalize_space(row.get("contract_id"))
+    entity_contract_number = normalize_space(row.get("entity_contract_number"))
+    commodity_line = normalize_space(row.get("commodity_line"))
     vendor = normalize_space(row.get("prime_vendor")) or None
     purpose = normalize_space(row.get("purpose")) or None
     buyer = normalize_space(row.get("other_government_entities")) or "NYCEDC"
+    source_record_id = stable_id(
+        "checkbook-edc-line",
+        contract_id,
+        entity_contract_number,
+        commodity_line,
+    )
     contract = normalize_contract(
         source=EDC_SOURCE,
-        source_record_id=contract_id,
+        source_record_id=source_record_id,
         source_contract_id=contract_id,
         vendor_raw=vendor,
         buyer_name=buyer,
@@ -534,8 +573,9 @@ def _normalize_edc_contract(row: Mapping[str, str], *, retrieved_at: str) -> dic
             "contract_version": normalize_space(row.get("version")) or None,
             "document_code": normalize_space(row.get("document_code")) or None,
             "budget_name": normalize_space(row.get("budget_name")) or None,
-            "commodity_line": normalize_space(row.get("commodity_line")) or None,
-            "entity_contract_number": normalize_space(row.get("entity_contract_number")) or None,
+            "commodity_line": commodity_line or None,
+            "entity_contract_number": entity_contract_number or None,
+            "source_record_identity_basis": "contract_id+entity_contract_number+commodity_line",
             "observed_value_evidence": "SOURCE_REPORTED_PUBLIC_CONTRACT",
         }
     )
@@ -640,6 +680,12 @@ def build_checkbook_cache(
         category = str(contract.get("service_category") or "UNRELATED")
         classification_counts[category] = classification_counts.get(category, 0) + 1
 
+    edc_unique_contract_ids = {
+        normalize_space(row.get("contract_id"))
+        for row in edc_primes
+        if normalize_space(row.get("contract_id"))
+    }
+
     return {
         "schema_version": "1.0",
         "generated_at": retrieved_at,
@@ -685,7 +731,8 @@ def build_checkbook_cache(
             "citywide_unique_prime_contract_count": len(citywide_primes),
             "citywide_relevant_contract_count": len(citywide_contracts),
             "edc_source_transaction_count": edc_scope.expected_count,
-            "edc_unique_prime_contract_count": len(edc_primes),
+            "edc_unique_prime_contract_count": len(edc_unique_contract_ids),
+            "edc_unique_contract_line_count": len(edc_primes),
             "edc_relevant_contract_count": len(edc_contracts),
             "relevant_contract_count": len(all_contracts),
             "unresolved_vendor_count": sum(1 for row in all_contracts if row.get("vendor_raw") and not row.get("company_id")),
