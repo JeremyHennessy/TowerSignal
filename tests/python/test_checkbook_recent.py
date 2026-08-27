@@ -15,7 +15,7 @@ from towersignal.checkbook_recent import (
 )
 
 
-def prime_row(contract_id, purpose, *, amount="100", spent="50", vendor="Example Water LLC"):
+def prime_row(contract_id, purpose, *, amount="100", spent="50", vendor="Example Water LLC", version="1"):
     return {
         "prime_contract_id": str(contract_id),
         "prime_vendor": vendor,
@@ -26,7 +26,7 @@ def prime_row(contract_id, purpose, *, amount="100", spent="50", vendor="Example
         "prime_contract_start_date": "2024-01-01",
         "prime_contract_end_date": "2028-12-31",
         "prime_contracting_agency": "Health + Hospitals",
-        "prime_contract_version": "1",
+        "prime_contract_version": version,
         "parent_contract_id": "",
         "prime_contract_type": "05",
         "prime_contract_award_method": "01",
@@ -132,12 +132,13 @@ class RecentCheckbookTests(unittest.TestCase):
         self.assertEqual(nyc_fiscal_year(date(2026, 7, 1)), 2027)
         self.assertEqual(recent_nyc_fiscal_years(date(2026, 8, 27), 5), (2023, 2024, 2025, 2026, 2027))
 
-    def test_recent_builder_selects_latest_observation_without_all_years_query(self):
+    def test_recent_builder_selects_latest_fiscal_year_and_contract_version(self):
         api = FakeRecentCheckbookApi(
             prime_by_year={
-                2025: [prime_row("CT1", "Cooling tower water treatment", amount="100", spent="20")],
+                2025: [prime_row("CT1", "Cooling tower water treatment", amount="100", spent="20", version="1")],
                 2027: [
-                    prime_row("CT1", "Cooling tower water treatment", amount="175", spent="120"),
+                    prime_row("CT1", "Cooling tower water treatment", amount="150", spent="100", version="1"),
+                    prime_row("CT1", "Cooling tower water treatment", amount="175", spent="120", version="2"),
                     prime_row("CT2", "Bottled water delivery", amount="50", spent="50"),
                 ],
             },
@@ -165,6 +166,7 @@ class RecentCheckbookTests(unittest.TestCase):
         self.assertEqual(primes[0]["source_contract_id"], "CT1")
         self.assertEqual(primes[0]["current_amount"], 175.0)
         self.assertEqual(primes[0]["spend_to_date"], 120.0)
+        self.assertEqual(primes[0]["contract_version"], "2")
         self.assertEqual(primes[0]["source_fiscal_year"], 2027)
 
         subs = [
@@ -174,7 +176,7 @@ class RecentCheckbookTests(unittest.TestCase):
         self.assertEqual(len(subs), 1)
         self.assertEqual(subs[0]["spend_to_date"], 40.0)
         self.assertEqual(subs[0]["source_fiscal_year"], 2027)
-        self.assertEqual(payload["summary"]["citywide_source_transaction_count"], 3)
+        self.assertEqual(payload["summary"]["citywide_source_transaction_count"], 4)
         self.assertEqual(payload["summary"]["citywide_subvendor_source_transaction_count"], 2)
 
     def test_partition_failure_propagates_instead_of_publishing_partial_cache(self):
