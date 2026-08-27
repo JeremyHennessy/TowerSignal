@@ -61,7 +61,7 @@ export function OpportunitiesPage({ payload, onOpenAccount }: { payload: Systems
   const procurementRows = useMemo(() => procurement ? [
     ...procurement.cityRecord.notices,
     ...procurement.checkbook.contracts,
-    ...procurement.nysAuthorities.contracts,
+    ...(procurement.nysAuthorities?.contracts ?? []),
   ].sort((a, b) => (procurementDate(b) ?? '').localeCompare(procurementDate(a) ?? '')) : [], [procurement])
 
   const categories = useMemo(() => [...new Set(procurementRows.map(row => row.service_category))].sort(), [procurementRows])
@@ -75,6 +75,8 @@ export function OpportunitiesPage({ payload, onOpenAccount }: { payload: Systems
 
   const observedContractValue = procurement?.checkbook.contracts.reduce((sum, row) => sum + (row.current_amount ?? 0), 0) ?? 0
   const unresolved = procurementRows.filter(row => row.vendor_raw && !row.company_id).length
+  const nysHealthyCount = procurement?.nysAuthorities?.source_health.filter(row => row.status === 'HEALTHY').length ?? 0
+  const nysSourceCount = procurement?.nysAuthorities?.source_health.length ?? 0
 
   return <section className="product-page opportunities-page">
     <div className="product-page-heading">
@@ -86,25 +88,26 @@ export function OpportunitiesPage({ payload, onOpenAccount }: { payload: Systems
     {!procurement && !procurementError && <div className="reference-empty-state"><strong>Loading verified procurement intelligence…</strong><span>City Record, durable Checkbook and NYS public-authority procurement are loaded independently from the account dataset.</span></div>}
 
     {procurement && <>
+      {procurement.sourceErrors.nysAuthorities && <div className="reference-empty-state procurement-source-warning"><strong>NYS authority procurement is unavailable.</strong><span>{procurement.sourceErrors.nysAuthorities}</span><span>Verified NYC City Record and Checkbook intelligence remains available; TowerSignal does not substitute fixture or roadmap data for the failed statewide source.</span></div>}
       <div className="reference-metric-grid">
         <article><span className="reference-metric-icon urgent">↗</span><div><small>Open solicitations</small><strong>{number.format(procurement.cityRecord.summary.open_relevant_opportunities)}</strong><span>Relevant City Record notices</span></div></article>
         <article><span className="reference-metric-icon warning">◷</span><div><small>Recent awards</small><strong>{number.format(procurement.cityRecord.summary.recent_relevant_awards)}</strong><span>City Record lookback window</span></div></article>
         <article><span className="reference-metric-icon success">◎</span><div><small>Verified NYC contracts</small><strong>{number.format(procurement.checkbook.summary.relevant_contract_count)}</strong><span>Relevant Checkbook records</span></div></article>
-        <article><span className="reference-metric-icon">NY</span><div><small>Statewide authority records</small><strong>{number.format(procurement.nysAuthorities.summary.relevant_contract_count)}</strong><span>Four ABO procurement datasets</span></div></article>
+        <article><span className="reference-metric-icon">NY</span><div><small>Statewide authority records</small><strong>{procurement.nysAuthorities ? number.format(procurement.nysAuthorities.summary.relevant_contract_count) : '—'}</strong><span>{procurement.nysAuthorities ? 'Four ABO procurement datasets' : 'Source unavailable'}</span></div></article>
         <article><span className="reference-metric-icon">$</span><div><small>Observed NYC contract value</small><strong>{currency.format(observedContractValue)}</strong><span>Checkbook current amounts · not revenue</span></div></article>
         <article><span className="reference-metric-icon">?</span><div><small>Unresolved vendors</small><strong>{number.format(unresolved)}</strong><span>Preserved for company resolution</span></div></article>
       </div>
 
       <div className="roadmap-data-banner">
-        <div><span className="roadmap-status">LIVE SOURCE DATA</span><strong>NYC City Record + verified Checkbook + NYS authority procurement are connected.</strong><p>NYS authority records come from official Authorities Budget Office reports covering State Authorities, Local Authorities, Local Development Corporations and Industrial Development Agencies. Exact source provenance, classifications and value semantics remain available for review.</p></div>
-        <div className="roadmap-source-list"><span>City Record · {procurement.cityRecord.source_health.status}</span><span>Checkbook · verified {formatDate(procurement.checkbook.generated_at)}</span><span>NYS authorities · {procurement.nysAuthorities.source_health.filter(row => row.status === 'HEALTHY').length}/{procurement.nysAuthorities.source_health.length} healthy</span><span>No inferred property linkage</span></div>
+        <div><span className="roadmap-status">LIVE SOURCE DATA</span><strong>{procurement.nysAuthorities ? 'NYC City Record + verified Checkbook + NYS authority procurement are connected.' : 'NYC City Record + verified Checkbook are connected; NYS authority source is degraded.'}</strong><p>NYS authority records come from official Authorities Budget Office reports covering State Authorities, Local Authorities, Local Development Corporations and Industrial Development Agencies. Exact source provenance, classifications and value semantics remain available for review whenever that source is healthy.</p></div>
+        <div className="roadmap-source-list"><span>City Record · {procurement.cityRecord.source_health.status}</span><span>Checkbook · verified {formatDate(procurement.checkbook.generated_at)}</span><span>NYS authorities · {procurement.nysAuthorities ? `${nysHealthyCount}/${nysSourceCount} healthy` : 'unavailable'}</span><span>No inferred property linkage</span></div>
       </div>
 
       <div className="reference-table-card">
         <div className="reference-table-heading">
           <div><strong>Public procurement intelligence</strong><span>{number.format(filteredProcurement.length)} shown · {number.format(procurementRows.length)} relevant source-backed records loaded</span></div>
           <div className="page-actions">
-            <label>Source <select aria-label="Procurement source" value={sourceFilter} onChange={event => setSourceFilter(event.target.value)}><option value="ALL">All</option><option value="CITY_RECORD">City Record</option><option value="CHECKBOOK">Checkbook NYC</option><option value="NYS_AUTHORITIES">NYS authorities</option></select></label>
+            <label>Source <select aria-label="Procurement source" value={sourceFilter} onChange={event => setSourceFilter(event.target.value)}><option value="ALL">All</option><option value="CITY_RECORD">City Record</option><option value="CHECKBOOK">Checkbook NYC</option>{procurement.nysAuthorities && <option value="NYS_AUTHORITIES">NYS authorities</option>}</select></label>
             <label>Service <select aria-label="Procurement service category" value={categoryFilter} onChange={event => setCategoryFilter(event.target.value)}><option value="ALL">All services</option>{categories.map(category => <option key={category} value={category}>{categoryLabel(category)}</option>)}</select></label>
           </div>
         </div>
