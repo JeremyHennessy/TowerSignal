@@ -35,7 +35,7 @@ test('hosted Companies and Company Profile are source-backed, shareable and relo
   await expect(page).toHaveURL(/#\/company\//)
   await expect(page.getByText('Observed public procurement vendor profile', { exact:true })).toBeVisible()
   await expect(page.getByRole('button', { name:'Copy company link', exact:true })).toBeVisible()
-  await expect(page.getByText('Cross-source resolution', { exact:true })).toBeVisible()
+  await expect(page.getByText('Cross-source resolution', { exact:true }).first()).toBeVisible()
   await expect(page.getByText(/not revenue/i).first()).toBeVisible()
   await expect(page.getByText(/No parent, sponsor, acquisition or private-company financial claims/)).toBeVisible()
   await expect(page.locator('.company-procurement-table tbody tr').first()).toBeVisible()
@@ -49,7 +49,7 @@ test('hosted Companies and Company Profile are source-backed, shareable and relo
   await page.reload({ waitUntil:'networkidle' })
   await expect(page).toHaveURL(companyUrl)
   await expect(page.locator('.company-profile-heading h1')).toHaveText(profileHeading)
-  await expect(page.getByText('Cross-source resolution', { exact:true })).toBeVisible()
+  await expect(page.getByText('Cross-source resolution', { exact:true }).first()).toBeVisible()
   await expect(page.locator('.company-procurement-table tbody tr').first()).toBeVisible()
   await expectContained(page)
 
