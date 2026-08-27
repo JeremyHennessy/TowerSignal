@@ -1,4 +1,4 @@
-name: Diagnose Neon bearer session
+name: Diagnose Neon WebKit session
 
 on:
   push:
@@ -16,5 +16,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Probe bearer session support
-        run: node scripts/diagnose_neon_bearer.mjs
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install WebKit
+        run: npx playwright install --with-deps webkit
+      - name: Probe immediate WebKit Neon session
+        run: node scripts/diagnose_webkit_cookie.mjs
