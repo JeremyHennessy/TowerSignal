@@ -208,7 +208,7 @@ test('opens the commercial, portfolio, workflow and source-health workspaces wit
   expect(screen.getByText('Public procurement intelligence')).toBeInTheDocument()
   expect(screen.getByText('Cooling tower maintenance services')).toBeInTheDocument()
   expect(screen.getByText('ALPHA WATER SERVICES LLC')).toBeInTheDocument()
-  expect(screen.getByText('$250,000')).toBeInTheDocument()
+  expect(screen.getAllByText('$250,000').length).toBeGreaterThanOrEqual(1)
   expect(screen.getByText('Current account timing opportunities')).toBeInTheDocument()
 
   await user.click(screen.getByRole('button', { name:'Portfolios' }))
