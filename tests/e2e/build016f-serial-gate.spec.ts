@@ -56,7 +56,7 @@ test('Build 016F serial Login → Home → Prospect → Account Profile → Comp
   await expect(page).toHaveURL(/#\/companies$/)
   await expect(page.getByRole('heading', { name: 'Companies', exact: true })).toBeVisible()
 
-  await page.getByRole('button', { name: 'My account', exact: true }).click()
+  await page.getByRole('button', { name: 'Open TowerSignal account', exact: true }).click()
   await expect(page).toHaveURL(/#\/my-account$/)
   await expect(page.getByRole('heading', { name: 'E2E Verification', exact: true })).toBeVisible()
 
