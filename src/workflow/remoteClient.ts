@@ -11,7 +11,10 @@ import type {
 const DEFAULT_AUTH_URL = 'https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth'
 const DEFAULT_DATA_API_URL = 'https://ep-silent-moon-au2icaki.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1'
 
-const authUrl = import.meta.env.VITE_NEON_AUTH_URL || DEFAULT_AUTH_URL
+const configuredAuthUrl = import.meta.env.VITE_NEON_AUTH_URL
+const authUrl = configuredAuthUrl === 'same-origin'
+  ? `${window.location.origin}/api/auth`
+  : configuredAuthUrl || DEFAULT_AUTH_URL
 const dataApiUrl = import.meta.env.VITE_NEON_DATA_API_URL || DEFAULT_DATA_API_URL
 
 export const workflowRuntimeEnabled = import.meta.env.MODE !== 'test'
