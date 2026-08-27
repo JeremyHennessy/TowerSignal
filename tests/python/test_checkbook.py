@@ -285,7 +285,7 @@ class CheckbookTests(unittest.TestCase):
         edc = [row for row in payload["contracts"] if row["source"] == EDC_SOURCE]
         self.assertEqual(len(edc), 1)
         self.assertEqual(edc[0]["source_contract_id"], "EDC1")
-        self.assertEqual(edc[0]["service_category"], "COOLING_TOWER_MAINTENANCE")
+        self.assertEqual(edc[0]["service_category"], "COOLING_TOWER_REPAIR")
         self.assertEqual(edc[0]["company_match_confidence"], "UNRESOLVED")
         self.assertEqual(edc[0]["tower_link_confidence"], "UNLINKED")
 
