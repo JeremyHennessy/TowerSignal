@@ -3,7 +3,7 @@ import type { WorkflowUser } from '../types/workflow'
 import { ShareButton } from './ShareButton'
 import { WorkflowAuthPanel } from './WorkflowAuthPanel'
 
-export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'opportunities' | 'portfolios' | 'workflow' | 'source-health' | 'account'
+export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'opportunities' | 'companies' | 'portfolios' | 'workflow' | 'source-health' | 'account'
 
 const navigation: Array<{ mode: WorkspaceMode; label: string }> = [
   { mode: 'prospect', label: 'Prospect' },
@@ -12,6 +12,7 @@ const navigation: Array<{ mode: WorkspaceMode; label: string }> = [
   { mode: 'nys', label: 'NYS Market' },
   { mode: 'nys-changes', label: 'NYS Changes' },
   { mode: 'opportunities', label: 'Opportunities' },
+  { mode: 'companies', label: 'Companies' },
   { mode: 'portfolios', label: 'Portfolios' },
   { mode: 'workflow', label: 'Workflow' },
 ]

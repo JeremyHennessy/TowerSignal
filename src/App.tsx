@@ -4,6 +4,7 @@ import type { SystemSummary, SystemsPayload } from './types/data'
 import type { AcrisMetadataFields, AcrisPayloadSummaryFields } from './types/acris'
 import type { ChangesPayload } from './types/history'
 import type { NysChangesPayload, NysSystem, NysSystemsPayload } from './types/nys'
+import type { CompanyIntelligenceRecord } from './types/company'
 import { formatTimestamp } from './domain/labels'
 import { ChangesView } from './components/ChangesView'
 import { DetailPanel } from './components/DetailPanel'
@@ -16,6 +17,8 @@ import { TowerMap } from './components/TowerMap'
 import { WorkflowAccountSection } from './components/WorkflowAccountSection'
 import { WorkflowPanel } from './components/WorkflowPanel'
 import { OpportunitiesPage } from './components/OpportunitiesPage'
+import { CompaniesPage } from './components/CompaniesPage'
+import { CompanyProfilePage } from './components/CompanyProfilePage'
 import { PortfoliosPage } from './components/PortfoliosPage'
 import { SourceHealthPage } from './components/SourceHealthPage'
 import { WorkflowWorkspacePage } from './components/WorkflowWorkspacePage'
@@ -25,9 +28,9 @@ import { exportCsv } from './utils/export'
 import { exportWorkflowCsv } from './utils/workflowExport'
 import { useWorkflow } from './workflow/useWorkflow'
 
-type ProductMode = WorkspaceMode | 'nys-account'
+type ProductMode = WorkspaceMode | 'nys-account' | 'company'
 
-const validModes = new Set<ProductMode>(['prospect','monitor','map','nys','nys-changes','opportunities','portfolios','workflow','source-health','account','nys-account'])
+const validModes = new Set<ProductMode>(['prospect','monitor','map','nys','nys-changes','opportunities','companies','company','portfolios','workflow','source-health','account','nys-account'])
 const filterKeys = Object.keys(initialFilters) as Array<keyof FilterState>
 
 function pct(value: number, total: number): string {
@@ -76,6 +79,7 @@ export default function App() {
   const [filters, setFilters] = useState<FilterState>({ ...initialFilters, ...initialRoute.filters })
   const [selected, setSelected] = useState<SystemSummary | null>(null)
   const [selectedNys, setSelectedNys] = useState<NysSystem | null>(null)
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(initialRoute.mode === 'company' ? initialRoute.id : null)
   const [mode, setMode] = useState<ProductMode>(initialRoute.mode)
   const [returnMode, setReturnMode] = useState<ProductMode>('prospect')
   const [viewName, setViewName] = useState('')
@@ -109,6 +113,11 @@ export default function App() {
       } else if (route.mode !== 'nys-account') {
         setSelectedNys(null)
       }
+      if (route.mode === 'company' && route.id) {
+        setSelectedCompanyId(route.id)
+      } else if (route.mode !== 'company') {
+        setSelectedCompanyId(null)
+      }
     }
     apply()
     window.addEventListener('hashchange', apply)
@@ -126,26 +135,33 @@ export default function App() {
   }, [changes, watchedOnly, workflow.user, workflow.watchedSystemIds])
 
   const navigate = useCallback((next: ProductMode) => {
-    if (next === 'account' || next === 'nys-account') return
+    if (next === 'account' || next === 'nys-account' || next === 'company') return
     setMode(next)
     setSelected(null)
     setSelectedNys(null)
+    setSelectedCompanyId(null)
     window.location.hash = routeHash(next)
   }, [])
 
   const openAccount = useCallback((row: SystemSummary) => {
-    setReturnMode(mode === 'account' || mode === 'nys-account' ? 'prospect' : mode)
+    setReturnMode(mode === 'account' || mode === 'nys-account' || mode === 'company' ? 'prospect' : mode)
     setSelected(row)
     setMode('account')
     window.location.hash = routeHash('account', row.system_id)
   }, [mode])
 
   const openNysAccount = useCallback((row: NysSystem) => {
-    setReturnMode(mode === 'account' || mode === 'nys-account' ? 'nys' : mode)
+    setReturnMode(mode === 'account' || mode === 'nys-account' || mode === 'company' ? 'nys' : mode)
     setSelectedNys(row)
     setMode('nys-account')
     window.location.hash = routeHash('nys-account', row.system_id)
   }, [mode])
+
+  const openCompany = useCallback((company: CompanyIntelligenceRecord) => {
+    setSelectedCompanyId(company.company_id)
+    setMode('company')
+    window.location.hash = routeHash('company', company.company_id)
+  }, [])
 
   const selectById = useCallback((id: string) => {
     const row = payload?.systems.find(item => item.system_id === id)
@@ -174,6 +190,7 @@ export default function App() {
     const search = globalSearch.trim()
     setFilters({ ...initialFilters, search })
     setMode('prospect')
+    setSelectedCompanyId(null)
     window.location.hash = routeHash('prospect', null, { ...initialFilters, search })
   }
 
@@ -200,13 +217,13 @@ export default function App() {
   const sampleChanges = monitorChanges.events.filter(event => event.event_type.includes('SAMPLE') || event.event_type.includes('SAMPLING')).length
   const dobChanges = monitorChanges.events.filter(event => event.event_type.startsWith('DOB_')).length
   const propertyChanges = monitorChanges.events.filter(event => event.event_type.startsWith('HPD_') || event.event_type === 'PLUTO_OWNER_CHANGED').length
-  const currentShareUrl = shareUrl(mode, filters, mode === 'account' ? selected?.system_id : mode === 'nys-account' ? selectedNys?.system_id : null)
+  const currentShareUrl = shareUrl(mode, filters, mode === 'account' ? selected?.system_id : mode === 'nys-account' ? selectedNys?.system_id : mode === 'company' ? selectedCompanyId : null)
 
   const exportWorkflow = () => exportWorkflowCsv(watchedRows, payload.metadata, workflow.accounts, workflow.memberships, workflow.watchlists)
 
   return <main className={`app-shell saas-shell reference-shell mode-${mode}`}>
     <TopNavigation
-      mode={mode === 'nys-account' ? 'nys' : mode}
+      mode={mode === 'nys-account' ? 'nys' : mode === 'company' ? 'companies' : mode}
       onNavigate={next => navigate(next)}
       search={globalSearch}
       onSearchChange={setGlobalSearch}
@@ -223,7 +240,7 @@ export default function App() {
     />
 
     <div className="main-stage">
-      {!['opportunities','portfolios','workflow','source-health','account','nys-account'].includes(mode) && <header className="utility-bar reference-utility-bar">
+      {!['opportunities','companies','company','portfolios','workflow','source-health','account','nys-account'].includes(mode) && <header className="utility-bar reference-utility-bar">
         <div><span className="utility-kicker">{nysMode ? 'New York State' : 'New York City'}</span><strong>{mode === 'prospect' ? 'Prospect workspace' : mode === 'monitor' ? 'Monitor workspace' : mode === 'map' ? 'Map workspace' : mode === 'nys' ? 'NYS Market' : 'NYS Changes'}</strong></div>
         <div className="utility-actions"><ShareButton url={currentShareUrl} label="Share view" /><span className="coverage-chip">Data refreshed {formatTimestamp(nysMode ? nysPayload.metadata.generated_at : payload.metadata.generated_at)}</span>{!nysMode && acrisAvailable && acrisMetadata.acris_cache_generated_at && <span className="coverage-chip">ACRIS verified {formatTimestamp(acrisMetadata.acris_cache_generated_at)}</span>}{!nysMode && <button className="primary" onClick={() => exportCsv(filtered, payload.metadata)}>Export {filtered.length.toLocaleString()} accounts</button>}</div>
       </header>}
@@ -256,11 +273,14 @@ export default function App() {
       {mode === 'nys-changes' && <section className="product-page nys-reference-page"><div className="product-page-heading"><div><span className="page-kicker">New York State · preserved history</span><h1>NYS Changes</h1><p>Review newly observed equipment and source-native status, compliance, sample and operational changes.</p></div></div><div className="reference-metric-grid"><article><span className="reference-metric-icon urgent">↗</span><div><small>Total changes</small><strong>{nysChanges.new_event_count.toLocaleString()}</strong><span>Current history delta</span></div></article><article><span className="reference-metric-icon warning">+</span><div><small>New equipment</small><strong>{nysChanges.events.filter(event => event.event_type === 'NYS_EQUIPMENT_FIRST_SEEN').length.toLocaleString()}</strong><span>First observed in history</span></div></article><article><span className="reference-metric-icon success">✓</span><div><small>Compliance changes</small><strong>{nysChanges.events.filter(event => event.event_type === 'NYS_REG_COMPLIANCE_CHANGED').length.toLocaleString()}</strong><span>Source-native status change</span></div></article><article><span className="reference-metric-icon">◉</span><div><small>Sample result changes</small><strong>{nysChanges.events.filter(event => event.event_type === 'NYS_SAMPLE_RESULT_CHANGED').length.toLocaleString()}</strong><span>Observed registry change</span></div></article><article><span className="reference-metric-icon">↻</span><div><small>Operating status</small><strong>{nysChanges.events.filter(event => event.event_type === 'NYS_CT_STATUS_CHANGED').length.toLocaleString()}</strong><span>Tower status changes</span></div></article></div><NysChangesView payload={nysChanges} systems={nysPayload.systems} onSelect={row => row ? openNysAccount(row) : setSelectedNys(null)} /></section>}
 
       {mode === 'opportunities' && <OpportunitiesPage payload={payload} onOpenAccount={openAccount} />}
+      {mode === 'companies' && <CompaniesPage onOpenCompany={openCompany} />}
+      {mode === 'company' && selectedCompanyId && <CompanyProfilePage companyId={selectedCompanyId} onBack={() => navigate('companies')} onOpenCompany={openCompany} />}
+      {mode === 'company' && !selectedCompanyId && <section className="product-page company-profile-page"><div className="reference-empty-state"><strong>Company ID is missing from this share link.</strong><button onClick={() => navigate('companies')}>Return to Companies</button></div></section>}
       {mode === 'portfolios' && <PortfoliosPage payload={payload} watchedSystemIds={workflow.watchedSystemIds} onOpenAccount={openAccount} />}
       {mode === 'workflow' && <WorkflowWorkspacePage user={workflow.user} systems={payload.systems} accounts={workflow.accounts} watchlists={workflow.watchlists} memberships={workflow.memberships} savedViews={workflow.savedViews} onOpenAccount={openAccount} />}
       {mode === 'source-health' && <SourceHealthPage payload={payload} />}
 
-      {mode === 'account' && <section className="product-page account-profile-page"><div className="account-profile-toolbar"><div><button className="breadcrumb-back" onClick={() => navigate(returnMode === 'account' || returnMode === 'nys-account' ? 'prospect' : returnMode)}>← Back</button><span>New York City · account profile</span></div><div className="page-actions"><ShareButton url={currentShareUrl} label="Copy account link" /><button onClick={() => exportCsv(selected ? [selected] : [], payload.metadata)} disabled={!selected}>Export account</button></div></div>{selected ? <DetailPanel row={selected} metadata={payload.metadata} historyEvents={changes.events.filter(event => event.system_id === selected.system_id)} historyStartedAt={changes.history_started_at} workflowSection={<WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} />} onClose={() => navigate(returnMode === 'account' || returnMode === 'nys-account' ? 'prospect' : returnMode)} /> : <div className="reference-empty-state"><strong>Account not found in the current public snapshot.</strong><span>The share link may refer to an account that is no longer present or whose ID changed upstream.</span><button onClick={() => navigate('prospect')}>Return to Prospect</button></div>}</section>}
+      {mode === 'account' && <section className="product-page account-profile-page"><div className="account-profile-toolbar"><div><button className="breadcrumb-back" onClick={() => navigate(returnMode === 'account' || returnMode === 'nys-account' || returnMode === 'company' ? 'prospect' : returnMode)}>← Back</button><span>New York City · account profile</span></div><div className="page-actions"><ShareButton url={currentShareUrl} label="Copy account link" /><button onClick={() => exportCsv(selected ? [selected] : [], payload.metadata)} disabled={!selected}>Export account</button></div></div>{selected ? <DetailPanel row={selected} metadata={payload.metadata} historyEvents={changes.events.filter(event => event.system_id === selected.system_id)} historyStartedAt={changes.history_started_at} workflowSection={<WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} />} onClose={() => navigate(returnMode === 'account' || returnMode === 'nys-account' || returnMode === 'company' ? 'prospect' : returnMode)} /> : <div className="reference-empty-state"><strong>Account not found in the current public snapshot.</strong><span>The share link may refer to an account that is no longer present or whose ID changed upstream.</span><button onClick={() => navigate('prospect')}>Return to Prospect</button></div>}</section>}
 
       {mode === 'nys-account' && <section className="product-page account-profile-page"><div className="account-profile-toolbar"><div><button className="breadcrumb-back" onClick={() => navigate('nys')}>← Back to NYS Market</button><span>New York State · equipment profile</span></div><div className="page-actions"><ShareButton url={currentShareUrl} label="Copy equipment link" /></div></div>{selectedNys ? <NysDetailPanel row={selectedNys} metadata={nysPayload.metadata} onClose={() => navigate('nys')} /> : <div className="reference-empty-state"><strong>NYS equipment record not found in the current registry snapshot.</strong><button onClick={() => navigate('nys')}>Return to NYS Market</button></div>}</section>}
 

@@ -2,6 +2,7 @@ import type { SystemDetail, SystemsPayload } from '../types/data'
 import type { ChangesPayload } from '../types/history'
 import type { NysChangesPayload, NysSystemsPayload } from '../types/nys'
 import type { CheckbookProcurementPayload, CityRecordProcurementPayload, ProcurementBundle } from '../types/procurement'
+import type { CompanyIntelligencePayload } from '../types/company'
 
 const base = import.meta.env.BASE_URL
 
@@ -50,6 +51,14 @@ export async function loadCheckbookProcurement(): Promise<CheckbookProcurementPa
 export async function loadProcurement(): Promise<ProcurementBundle> {
   const [cityRecord, checkbook] = await Promise.all([loadCityRecordProcurement(), loadCheckbookProcurement()])
   return { cityRecord, checkbook }
+}
+
+export async function loadCompanies(): Promise<CompanyIntelligencePayload> {
+  const payload = await loadJson<CompanyIntelligencePayload>('companies.json', 'TowerSignal company intelligence')
+  if (!payload?.summary || !Array.isArray(payload?.companies) || !Array.isArray(payload?.unresolved_vendor_observations)) {
+    throw new Error('TowerSignal company intelligence dataset is malformed')
+  }
+  return payload
 }
 
 export function systemDetailUrl(systemId: string): string {
