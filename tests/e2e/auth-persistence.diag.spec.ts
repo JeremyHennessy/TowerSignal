@@ -1,9 +1,5 @@
 import { expect, test } from '@playwright/test'
 
-function cookieSummary(cookies: Awaited<ReturnType<Parameters<typeof test>[0]>> extends never ? never : never) {
-  return cookies
-}
-
 test('classify hosted WebKit auth persistence boundary', async ({ page, context }) => {
   const authResponses: Array<{ url: string; status: number }> = []
   page.on('response', (response) => {
