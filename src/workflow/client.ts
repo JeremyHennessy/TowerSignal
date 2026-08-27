@@ -12,8 +12,8 @@ export async function signInWorkflow(email: string, password: string): Promise<W
   return (await loadRemote()).signInWorkflow(email, password)
 }
 
-export async function signUpWorkflow(email: string, password: string): Promise<WorkflowUser> {
-  return (await loadRemote()).signUpWorkflow(email, password)
+export async function signUpWorkflow(email: string, password: string, name?: string): Promise<WorkflowUser> {
+  return (await loadRemote()).signUpWorkflow(email, password, name)
 }
 
 export async function signOutWorkflow(): Promise<void> {
