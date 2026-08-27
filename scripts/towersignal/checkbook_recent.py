@@ -29,7 +29,7 @@ from .checkbook import (
     _source_health_for_scope,
     fetch_scope,
 )
-from .procurement import normalize_space, parse_iso_date, parse_money, utc_now
+from .procurement import classify_procurement, normalize_space, parse_iso_date, parse_money, utc_now
 
 DEFAULT_FISCAL_YEAR_COUNT = 5
 
@@ -219,13 +219,27 @@ def _choose_prime_version_candidate(
     return chosen
 
 
+def _prime_candidates_are_relevant(candidates: Sequence[Mapping[str, str]]) -> bool:
+    """Classify only after the bounded source partition has been fully retrieved.
+
+    Material entity/value reconciliation is required only for records that can enter the
+    TowerSignal procurement cache. Source anomalies on contracts whose every latest
+    version purpose is unrelated are not silently treated as relevant data problems.
+    If any candidate is relevant, the full strict reconciliation rules still apply.
+    """
+    return any(
+        classify_procurement(row.get("prime_contract_purpose")).service_category != "UNRELATED"
+        for row in candidates
+    )
+
+
 def _latest_partition_rows(
     partitions: Sequence[tuple[int, ScopeResult]],
     *,
     identity_field: str,
     material_fields: Sequence[str],
 ) -> tuple[dict[str, str], ...]:
-    """Choose the latest fiscal-year/latest-version observation for each prime contract."""
+    """Choose latest fiscal-year/latest-version observations for relevant prime contracts."""
     grouped: dict[str, dict[int, list[Mapping[str, str]]]] = {}
     for fiscal_year, scope in partitions:
         for row in scope.rows:
@@ -244,6 +258,8 @@ def _latest_partition_rows(
             row for row in fiscal_year_candidates
             if _version_key(row.get("prime_contract_version")) == latest_version_key
         ]
+        if not _prime_candidates_are_relevant(candidates):
+            continue
         row = _choose_prime_version_candidate(
             candidates,
             identity=identity,
@@ -253,6 +269,15 @@ def _latest_partition_rows(
         row["_fiscal_year_scope"] = str(latest_year)
         selected.append(row)
     return tuple(selected)
+
+
+def _unique_identity_count(partitions: Sequence[tuple[int, ScopeResult]], field: str) -> int:
+    return len({
+        normalize_space(row.get(field))
+        for _, scope in partitions
+        for row in scope.rows
+        if normalize_space(row.get(field))
+    })
 
 
 SUBCONTRACT_MATERIAL_FIELDS = (
@@ -295,15 +320,22 @@ def _latest_subcontract_rows(
         by_year = grouped[key]
         latest_year = max(by_year)
         candidates = by_year[latest_year]
-        signatures = {_material_key(row, SUBCONTRACT_MATERIAL_FIELDS) for row in candidates}
+        relevant_candidates = [
+            row
+            for row in candidates
+            if classify_procurement(row.get("sub_contract_purpose")).service_category != "UNRELATED"
+        ]
+        if not relevant_candidates:
+            continue
+        signatures = {_material_key(row, SUBCONTRACT_MATERIAL_FIELDS) for row in relevant_candidates}
         if len(signatures) > 1:
             raise CheckbookSourceError(
-                f"Checkbook NYC returned conflicting subcontract fields for {key!r} in FY{latest_year}"
+                f"Checkbook NYC returned conflicting relevant subcontract fields for {key!r} in FY{latest_year}"
             )
-        row = dict(candidates[0])
+        row = dict(relevant_candidates[0])
         row["_fiscal_year_scope"] = str(latest_year)
-        row["_source_duplicate_row_count"] = str(len(candidates))
-        if len(candidates) > 1:
+        row["_source_duplicate_row_count"] = str(len(relevant_candidates))
+        if len(relevant_candidates) > 1:
             row["_source_duplicate_resolution"] = "IDENTICAL_DUPLICATES"
         selected.append(row)
     return tuple(selected)
@@ -504,7 +536,8 @@ def build_recent_checkbook_cache(
         "summary": {
             "citywide_source_transaction_count": citywide_aggregate.expected_count,
             "citywide_subvendor_source_transaction_count": subvendor_aggregate.expected_count,
-            "citywide_unique_prime_contract_count": len(citywide_primes),
+            "citywide_unique_prime_contract_count": _unique_identity_count(citywide_partitions, "prime_contract_id"),
+            "citywide_relevant_prime_contract_count": len(citywide_primes),
             "citywide_relevant_contract_count": len(citywide_contracts),
             "edc_source_transaction_count": edc_scope.expected_count,
             "edc_unique_prime_contract_count": len(edc_primes),
