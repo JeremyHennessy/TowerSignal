@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('classify hosted WebKit auth persistence boundary', async ({ page, context }) => {
+test('classify hosted browser auth persistence boundary', async ({ page, context }, testInfo) => {
   const authResponses: Array<{ url: string; status: number }> = []
   page.on('response', (response) => {
     const url = response.url()
@@ -11,7 +11,8 @@ test('classify hosted WebKit auth persistence boundary', async ({ page, context 
 
   const runId = process.env.GITHUB_RUN_ID || 'local'
   const attempt = process.env.GITHUB_RUN_ATTEMPT || '1'
-  const email = `towersignal-e2e-${runId}-${attempt}-cookie-diag@example.com`
+  const project = testInfo.project.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()
+  const email = `towersignal-e2e-${runId}-${attempt}-${project}-cookie-diag@example.com`
   const password = 'TowerSignal-E2E-2026!'
 
   await page.goto('./#/home', { waitUntil: 'networkidle' })
@@ -37,8 +38,8 @@ test('classify hosted WebKit auth persistence boundary', async ({ page, context 
   }))
 
   const afterSignup = summarize(await context.cookies())
-  console.log('AUTH_DIAG cookies_after_signup', JSON.stringify(afterSignup))
-  console.log('AUTH_DIAG responses_after_signup', JSON.stringify(authResponses))
+  console.log(`AUTH_DIAG ${testInfo.project.name} cookies_after_signup`, JSON.stringify(afterSignup))
+  console.log(`AUTH_DIAG ${testInfo.project.name} responses_after_signup`, JSON.stringify(authResponses))
 
   authResponses.length = 0
   await page.goto('./#/home', { waitUntil: 'networkidle' })
@@ -47,10 +48,10 @@ test('classify hosted WebKit auth persistence boundary', async ({ page, context 
   const homeAfterNavigation = await page.getByRole('heading', { name: /Good (morning|afternoon|evening), E2E/ }).isVisible().catch(() => false)
   const afterNavigation = summarize(await context.cookies())
 
-  console.log('AUTH_DIAG login_after_navigation', String(loginAfterNavigation))
-  console.log('AUTH_DIAG home_after_navigation', String(homeAfterNavigation))
-  console.log('AUTH_DIAG cookies_after_navigation', JSON.stringify(afterNavigation))
-  console.log('AUTH_DIAG responses_after_navigation', JSON.stringify(authResponses))
+  console.log(`AUTH_DIAG ${testInfo.project.name} login_after_navigation`, String(loginAfterNavigation))
+  console.log(`AUTH_DIAG ${testInfo.project.name} home_after_navigation`, String(homeAfterNavigation))
+  console.log(`AUTH_DIAG ${testInfo.project.name} cookies_after_navigation`, JSON.stringify(afterNavigation))
+  console.log(`AUTH_DIAG ${testInfo.project.name} responses_after_navigation`, JSON.stringify(authResponses))
 
-  expect(homeAfterNavigation, 'authenticated session must survive a full WebKit navigation').toBe(true)
+  expect(homeAfterNavigation, 'authenticated session must survive a full navigation').toBe(true)
 })
