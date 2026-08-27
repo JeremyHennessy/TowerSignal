@@ -1,0 +1,599 @@
+from __future__ import annotations
+
+import json
+from datetime import date
+from typing import Any, Mapping, Sequence
+
+from .checkbook import (
+    API_URL,
+    CONTRACT_API_URL,
+    CITYWIDE_PRIME_MATERIAL_FIELDS,
+    CITYWIDE_SCOPE,
+    CITYWIDE_SOURCE,
+    CITYWIDE_SUBVENDOR_SCOPE,
+    EDC_MATERIAL_FIELDS,
+    EDC_SCOPE,
+    EDC_SOURCE,
+    MIN_REQUEST_INTERVAL_SECONDS,
+    PAGE_SIZE,
+    CheckbookSourceError,
+    RequestXml,
+    ScopeResult,
+    _collapse_rows,
+    _dedupe_contracts,
+    _default_request_xml,
+    _material_key,
+    _normalize_citywide_prime,
+    _normalize_citywide_subcontract,
+    _normalize_edc_contract,
+    _source_health_for_scope,
+    fetch_scope,
+)
+from .procurement import classify_procurement, normalize_space, parse_iso_date, parse_money, utc_now
+
+DEFAULT_FISCAL_YEAR_COUNT = 5
+
+PRIME_MONEY_FIELDS = (
+    "prime_contract_original_amount",
+    "prime_contract_current_amount",
+    "prime_vendor_spent_to_date",
+)
+PRIME_START_DATE_FIELD = "prime_contract_start_date"
+PRIME_END_DATE_FIELD = "prime_contract_end_date"
+PRIME_CONTEXT_VARIANT_FIELDS = (
+    "prime_contract_expense_category",
+    "prime_contract_type",
+    "prime_vendor",
+)
+
+
+def nyc_fiscal_year(as_of: date) -> int:
+    """Return the NYC fiscal year containing ``as_of`` (July 1 through June 30)."""
+    return as_of.year + 1 if as_of.month >= 7 else as_of.year
+
+
+def recent_nyc_fiscal_years(as_of: date, count: int = DEFAULT_FISCAL_YEAR_COUNT) -> tuple[int, ...]:
+    if count <= 0:
+        raise ValueError("fiscal_year_count must be positive")
+    current = nyc_fiscal_year(as_of)
+    return tuple(range(current - count + 1, current + 1))
+
+
+def _fetch_fiscal_year_partitions(
+    spec,
+    fiscal_years: Sequence[int],
+    *,
+    request_xml: RequestXml,
+    page_size: int,
+) -> tuple[tuple[int, ScopeResult], ...]:
+    return tuple(
+        (
+            fiscal_year,
+            fetch_scope(
+                spec,
+                request_xml=request_xml,
+                page_size=page_size,
+                extra_criteria=(("fiscal_year", "value", str(fiscal_year)),),
+            ),
+        )
+        for fiscal_year in fiscal_years
+    )
+
+
+def _version_key(value: str | None) -> tuple[int, int | str]:
+    text = normalize_space(value)
+    if text.isdigit():
+        return (1, int(text))
+    return (0, text)
+
+
+def _money_signature(row: Mapping[str, str]) -> tuple[float | None, ...]:
+    return tuple(parse_money(row.get(field)) for field in PRIME_MONEY_FIELDS)
+
+
+def _compatible_structural_values(
+    candidates: Sequence[Mapping[str, str]],
+    structural_fields: Sequence[str],
+    *,
+    identity: str,
+    fiscal_year: int,
+    selected_version: str,
+) -> dict[str, str]:
+    """Return the single nonblank value for each identity-bearing field, or fail."""
+    resolved: dict[str, str] = {}
+    for field in structural_fields:
+        nonblank = {
+            normalize_space(row.get(field))
+            for row in candidates
+            if normalize_space(row.get(field))
+        }
+        if len(nonblank) > 1:
+            raise CheckbookSourceError(
+                f"Checkbook NYC returned conflicting non-monetary fields for prime_contract_id={identity} "
+                f"in FY{fiscal_year} version {selected_version} field {field}"
+            )
+        if nonblank:
+            resolved[field] = next(iter(nonblank))
+    return resolved
+
+
+def _observed_dates(
+    candidates: Sequence[Mapping[str, str]],
+    field: str,
+    *,
+    identity: str,
+    fiscal_year: int,
+    selected_version: str,
+) -> tuple[str, ...]:
+    observed: set[str] = set()
+    for row in candidates:
+        raw = normalize_space(row.get(field))
+        if not raw:
+            continue
+        parsed = parse_iso_date(raw)
+        if not parsed:
+            raise CheckbookSourceError(
+                f"Checkbook NYC returned unparseable {field} for prime_contract_id={identity} "
+                f"in FY{fiscal_year} version {selected_version}: {raw!r}"
+            )
+        observed.add(parsed)
+    return tuple(sorted(observed))
+
+
+def _observed_text_values(candidates: Sequence[Mapping[str, str]], field: str) -> tuple[str, ...]:
+    return tuple(sorted({normalize_space(row.get(field)) for row in candidates if normalize_space(row.get(field))}))
+
+
+def _choose_prime_version_candidate(
+    candidates: Sequence[Mapping[str, str]],
+    *,
+    identity: str,
+    fiscal_year: int,
+    material_fields: Sequence[str],
+) -> dict[str, str]:
+    """Collapse source duplicates without inventing contract values.
+
+    Live Checkbook evidence shows that a registered contract/version may be returned as
+    one populated value row plus companion rows whose monetary fields are all zero.
+    Companion rows can carry alternate source-reported start/end dates, expense-category,
+    contract-type, and vendor-label strings while retaining the same contract ID/version,
+    purpose, agency and procurement method. TowerSignal keeps those contextual source
+    observations separately while retaining the populated value row as the primary row.
+
+    Multiple identity-bearing nonblank values or multiple distinct nonzero monetary
+    signatures remain hard failures. Multiple vendor labels are not merged into a company
+    identity; company resolution remains explicitly unresolved in Build 016C1.
+    """
+    structural_fields = tuple(
+        field
+        for field in material_fields
+        if field not in {
+            "prime_contract_version",
+            PRIME_START_DATE_FIELD,
+            PRIME_END_DATE_FIELD,
+            *PRIME_MONEY_FIELDS,
+            *PRIME_CONTEXT_VARIANT_FIELDS,
+        }
+    )
+    selected_version = normalize_space(candidates[0].get("prime_contract_version")) or "(blank)"
+    resolved_structural = _compatible_structural_values(
+        candidates,
+        structural_fields,
+        identity=identity,
+        fiscal_year=fiscal_year,
+        selected_version=selected_version,
+    )
+    observed_start_dates = _observed_dates(
+        candidates,
+        PRIME_START_DATE_FIELD,
+        identity=identity,
+        fiscal_year=fiscal_year,
+        selected_version=selected_version,
+    )
+    observed_end_dates = _observed_dates(
+        candidates,
+        PRIME_END_DATE_FIELD,
+        identity=identity,
+        fiscal_year=fiscal_year,
+        selected_version=selected_version,
+    )
+    expense_category_variants = _observed_text_values(candidates, "prime_contract_expense_category")
+    contract_type_variants = _observed_text_values(candidates, "prime_contract_type")
+    vendor_variants = _observed_text_values(candidates, "prime_vendor")
+
+    money_by_signature: dict[tuple[float | None, ...], Mapping[str, str]] = {}
+    for row in candidates:
+        money_by_signature.setdefault(_money_signature(row), row)
+
+    resolution: str | None = None
+    if len(money_by_signature) == 1:
+        chosen = dict(next(iter(money_by_signature.values())))
+        if len(candidates) > 1:
+            resolution = "COMPATIBLE_DUPLICATES"
+    else:
+        zero_signature = (0.0, 0.0, 0.0)
+        nonzero_signatures = [signature for signature in money_by_signature if signature != zero_signature]
+        if zero_signature in money_by_signature and len(nonzero_signatures) == 1 and len(money_by_signature) == 2:
+            chosen = dict(money_by_signature[nonzero_signatures[0]])
+            resolution = "NONZERO_OVER_ZERO_PLACEHOLDER"
+        else:
+            raise CheckbookSourceError(
+                f"Checkbook NYC returned conflicting monetary fields for prime_contract_id={identity} "
+                f"in FY{fiscal_year} version {selected_version}"
+            )
+
+    for field, value in resolved_structural.items():
+        chosen[field] = value
+    chosen["_source_duplicate_row_count"] = str(len(candidates))
+    if resolution:
+        chosen["_source_duplicate_resolution"] = resolution
+    if observed_start_dates:
+        chosen["_source_observed_start_dates"] = "|".join(observed_start_dates)
+    if observed_end_dates:
+        chosen["_source_observed_end_dates"] = "|".join(observed_end_dates)
+    if expense_category_variants:
+        chosen["_source_expense_category_variants"] = json.dumps(expense_category_variants)
+    if contract_type_variants:
+        chosen["_source_contract_type_variants"] = json.dumps(contract_type_variants)
+    if vendor_variants:
+        chosen["_source_vendor_variants"] = json.dumps(vendor_variants)
+    return chosen
+
+
+def _prime_candidates_are_relevant(candidates: Sequence[Mapping[str, str]]) -> bool:
+    """Classify only after the bounded source partition has been fully retrieved.
+
+    Material entity/value reconciliation is required only for records that can enter the
+    TowerSignal procurement cache. Source anomalies on contracts whose every latest
+    version purpose is unrelated are not silently treated as relevant data problems.
+    If any candidate is relevant, the full strict reconciliation rules still apply.
+    """
+    return any(
+        classify_procurement(row.get("prime_contract_purpose")).service_category != "UNRELATED"
+        for row in candidates
+    )
+
+
+def _latest_partition_rows(
+    partitions: Sequence[tuple[int, ScopeResult]],
+    *,
+    identity_field: str,
+    material_fields: Sequence[str],
+) -> tuple[dict[str, str], ...]:
+    """Choose latest fiscal-year/latest-version observations for relevant prime contracts."""
+    grouped: dict[str, dict[int, list[Mapping[str, str]]]] = {}
+    for fiscal_year, scope in partitions:
+        for row in scope.rows:
+            identity = normalize_space(row.get(identity_field))
+            if not identity:
+                raise CheckbookSourceError(f"Source row missing identity {identity_field}")
+            grouped.setdefault(identity, {}).setdefault(fiscal_year, []).append(row)
+
+    selected: list[dict[str, str]] = []
+    for identity in sorted(grouped):
+        by_year = grouped[identity]
+        latest_year = max(by_year)
+        fiscal_year_candidates = by_year[latest_year]
+        latest_version_key = max(_version_key(row.get("prime_contract_version")) for row in fiscal_year_candidates)
+        candidates = [
+            row for row in fiscal_year_candidates
+            if _version_key(row.get("prime_contract_version")) == latest_version_key
+        ]
+        if not _prime_candidates_are_relevant(candidates):
+            continue
+        row = _choose_prime_version_candidate(
+            candidates,
+            identity=identity,
+            fiscal_year=latest_year,
+            material_fields=material_fields,
+        )
+        row["_fiscal_year_scope"] = str(latest_year)
+        selected.append(row)
+    return tuple(selected)
+
+
+def _unique_identity_count(partitions: Sequence[tuple[int, ScopeResult]], field: str) -> int:
+    return len({
+        normalize_space(row.get(field))
+        for _, scope in partitions
+        for row in scope.rows
+        if normalize_space(row.get(field))
+    })
+
+
+SUBCONTRACT_MATERIAL_FIELDS = (
+    "sub_vendor",
+    "sub_contract_purpose",
+    "sub_contract_status",
+    "sub_contract_original_amount",
+    "sub_contract_current_amount",
+    "sub_vendor_paid_to_date",
+    "sub_contract_start_date",
+    "sub_contract_end_date",
+)
+
+
+def _subcontract_key(row: Mapping[str, str]) -> tuple[str, ...]:
+    prime_id = normalize_space(row.get("prime_contract_id"))
+    reference = normalize_space(row.get("sub_contract_reference_id"))
+    if reference:
+        return (prime_id, "REF", reference)
+    return (
+        prime_id,
+        "COMPOSITE",
+        normalize_space(row.get("sub_vendor")),
+        normalize_space(row.get("sub_contract_purpose")),
+        normalize_space(row.get("sub_contract_start_date")),
+        normalize_space(row.get("sub_contract_end_date")),
+    )
+
+
+def _latest_subcontract_rows(
+    partitions: Sequence[tuple[int, ScopeResult]],
+) -> tuple[dict[str, str], ...]:
+    grouped: dict[tuple[str, ...], dict[int, list[Mapping[str, str]]]] = {}
+    for fiscal_year, scope in partitions:
+        for row in scope.rows:
+            grouped.setdefault(_subcontract_key(row), {}).setdefault(fiscal_year, []).append(row)
+
+    selected: list[dict[str, str]] = []
+    for key in sorted(grouped):
+        by_year = grouped[key]
+        latest_year = max(by_year)
+        candidates = by_year[latest_year]
+        relevant_candidates = [
+            row
+            for row in candidates
+            if classify_procurement(row.get("sub_contract_purpose")).service_category != "UNRELATED"
+        ]
+        if not relevant_candidates:
+            continue
+        signatures = {_material_key(row, SUBCONTRACT_MATERIAL_FIELDS) for row in relevant_candidates}
+        if len(signatures) > 1:
+            raise CheckbookSourceError(
+                f"Checkbook NYC returned conflicting relevant subcontract fields for {key!r} in FY{latest_year}"
+            )
+        row = dict(relevant_candidates[0])
+        row["_fiscal_year_scope"] = str(latest_year)
+        row["_source_duplicate_row_count"] = str(len(relevant_candidates))
+        if len(relevant_candidates) > 1:
+            row["_source_duplicate_resolution"] = "IDENTICAL_DUPLICATES"
+        selected.append(row)
+    return tuple(selected)
+
+
+def _aggregate_scope(spec, partitions: Sequence[tuple[int, ScopeResult]]) -> ScopeResult:
+    return ScopeResult(
+        spec=spec,
+        expected_count=sum(scope.expected_count for _, scope in partitions),
+        rows=(),
+        pagination_complete=all(scope.pagination_complete for _, scope in partitions),
+    )
+
+
+def _partition_metadata(
+    partitions: Sequence[tuple[int, ScopeResult]],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "name": f"{scope.spec.name}_FY{fiscal_year}",
+            "source": scope.spec.source,
+            "fiscal_year": fiscal_year,
+            "record_count": scope.expected_count,
+            "pagination_complete": scope.pagination_complete,
+        }
+        for fiscal_year, scope in partitions
+    ]
+
+
+def _attach_source_resolution(contract: dict[str, Any], row: Mapping[str, str]) -> None:
+    contract["source_fiscal_year"] = int(row["_fiscal_year_scope"])
+    duplicate_count = int(row.get("_source_duplicate_row_count") or 1)
+    contract["source_duplicate_row_count"] = duplicate_count
+    resolution = normalize_space(row.get("_source_duplicate_resolution"))
+    if resolution:
+        contract["source_duplicate_resolution"] = resolution
+
+    observed_start_dates = tuple(
+        value for value in normalize_space(row.get("_source_observed_start_dates")).split("|") if value
+    )
+    if observed_start_dates:
+        contract["source_observed_start_dates"] = list(observed_start_dates)
+        if len(observed_start_dates) > 1:
+            contract["start_date_resolution"] = "MULTIPLE_SOURCE_VARIANTS"
+
+    observed_end_dates = tuple(
+        value for value in normalize_space(row.get("_source_observed_end_dates")).split("|") if value
+    )
+    if observed_end_dates:
+        contract["source_observed_end_dates"] = list(observed_end_dates)
+        latest_observed_end = max(observed_end_dates)
+        if latest_observed_end != contract.get("end_date"):
+            contract["source_value_row_end_date"] = contract.get("end_date")
+            contract["end_date"] = latest_observed_end
+            contract["end_date_resolution"] = "LATEST_OBSERVED_SAME_VERSION"
+
+    expense_variants_json = normalize_space(row.get("_source_expense_category_variants"))
+    if expense_variants_json:
+        expense_variants = list(json.loads(expense_variants_json))
+        contract["source_expense_category_variants"] = expense_variants
+        if len(expense_variants) > 1:
+            contract["expense_category_resolution"] = "MULTIPLE_SOURCE_VARIANTS"
+
+    contract_type_variants_json = normalize_space(row.get("_source_contract_type_variants"))
+    if contract_type_variants_json:
+        contract_type_variants = list(json.loads(contract_type_variants_json))
+        contract["source_contract_type_variants"] = contract_type_variants
+        if len(contract_type_variants) > 1:
+            contract["contract_type_resolution"] = "MULTIPLE_SOURCE_VARIANTS"
+
+    vendor_variants_json = normalize_space(row.get("_source_vendor_variants"))
+    if vendor_variants_json:
+        vendor_variants = list(json.loads(vendor_variants_json))
+        contract["source_vendor_variants"] = vendor_variants
+        if len(vendor_variants) > 1:
+            contract["vendor_evidence_resolution"] = "MULTIPLE_SOURCE_VARIANTS_UNRESOLVED"
+            contract["company_id"] = None
+            contract["company_match_confidence"] = "UNRESOLVED"
+            contract["company_resolution_method"] = "SOURCE_VENDOR_VARIANTS_NOT_RESOLVED"
+
+
+def build_recent_checkbook_cache(
+    *,
+    as_of: date | None = None,
+    fiscal_year_count: int = DEFAULT_FISCAL_YEAR_COUNT,
+    request_xml: RequestXml = _default_request_xml,
+    retrieved_at: str | None = None,
+    page_size: int = PAGE_SIZE,
+) -> dict[str, Any]:
+    as_of = as_of or date.today()
+    retrieved_at = retrieved_at or utc_now()
+    fiscal_years = recent_nyc_fiscal_years(as_of, fiscal_year_count)
+
+    citywide_partitions = _fetch_fiscal_year_partitions(
+        CITYWIDE_SCOPE,
+        fiscal_years,
+        request_xml=request_xml,
+        page_size=page_size,
+    )
+    subvendor_partitions = _fetch_fiscal_year_partitions(
+        CITYWIDE_SUBVENDOR_SCOPE,
+        fiscal_years,
+        request_xml=request_xml,
+        page_size=page_size,
+    )
+    edc_scope = fetch_scope(EDC_SCOPE, request_xml=request_xml, page_size=page_size)
+
+    citywide_primes = _latest_partition_rows(
+        citywide_partitions,
+        identity_field="prime_contract_id",
+        material_fields=CITYWIDE_PRIME_MATERIAL_FIELDS,
+    )
+    citywide_subcontracts = _latest_subcontract_rows(subvendor_partitions)
+    edc_primes = _collapse_rows(
+        edc_scope.rows,
+        identity_field="contract_id",
+        material_fields=EDC_MATERIAL_FIELDS,
+    )
+
+    citywide_contracts: list[dict[str, Any]] = []
+    for row in citywide_primes:
+        contract = _normalize_citywide_prime(row, retrieved_at=retrieved_at)
+        if contract["service_category"] != "UNRELATED":
+            _attach_source_resolution(contract, row)
+            citywide_contracts.append(contract)
+    for row in citywide_subcontracts:
+        subcontract = _normalize_citywide_subcontract(row, retrieved_at=retrieved_at)
+        if subcontract is not None:
+            _attach_source_resolution(subcontract, row)
+            citywide_contracts.append(subcontract)
+    citywide_contracts = _dedupe_contracts(citywide_contracts)
+
+    edc_contracts = [
+        contract
+        for row in edc_primes
+        if (contract := _normalize_edc_contract(row, retrieved_at=retrieved_at))["service_category"] != "UNRELATED"
+    ]
+    edc_contracts = _dedupe_contracts(edc_contracts)
+    all_contracts = _dedupe_contracts([*citywide_contracts, *edc_contracts])
+
+    citywide_aggregate = _aggregate_scope(CITYWIDE_SCOPE, citywide_partitions)
+    subvendor_aggregate = _aggregate_scope(CITYWIDE_SUBVENDOR_SCOPE, subvendor_partitions)
+    citywide_health = _source_health_for_scope(
+        citywide_aggregate,
+        citywide_contracts,
+        retrieved_at=retrieved_at,
+    )
+    citywide_health.update(
+        {
+            "fiscal_years": list(fiscal_years),
+            "subvendor_record_count": subvendor_aggregate.expected_count,
+            "subvendor_pagination_complete": subvendor_aggregate.pagination_complete,
+            "zero_placeholder_duplicate_resolution_count": sum(
+                1
+                for row in citywide_contracts
+                if row.get("source_duplicate_resolution") == "NONZERO_OVER_ZERO_PLACEHOLDER"
+            ),
+            "start_date_variant_resolution_count": sum(
+                1 for row in citywide_contracts if row.get("start_date_resolution") == "MULTIPLE_SOURCE_VARIANTS"
+            ),
+            "latest_end_date_resolution_count": sum(
+                1 for row in citywide_contracts if row.get("end_date_resolution") == "LATEST_OBSERVED_SAME_VERSION"
+            ),
+            "expense_category_variant_resolution_count": sum(
+                1 for row in citywide_contracts if row.get("expense_category_resolution") == "MULTIPLE_SOURCE_VARIANTS"
+            ),
+            "contract_type_variant_resolution_count": sum(
+                1 for row in citywide_contracts if row.get("contract_type_resolution") == "MULTIPLE_SOURCE_VARIANTS"
+            ),
+            "vendor_variant_resolution_count": sum(
+                1
+                for row in citywide_contracts
+                if row.get("vendor_evidence_resolution") == "MULTIPLE_SOURCE_VARIANTS_UNRESOLVED"
+            ),
+        }
+    )
+    source_health = {
+        CITYWIDE_SOURCE: citywide_health,
+        EDC_SOURCE: _source_health_for_scope(edc_scope, edc_contracts, retrieved_at=retrieved_at),
+    }
+
+    classification_counts: dict[str, int] = {}
+    for contract in all_contracts:
+        category = str(contract.get("service_category") or "UNRELATED")
+        classification_counts[category] = classification_counts.get(category, 0) + 1
+
+    return {
+        "schema_version": "1.0",
+        "generated_at": retrieved_at,
+        "source": {
+            "name": "Checkbook NYC Contracts API",
+            "api_url": API_URL,
+            "documentation_url": CONTRACT_API_URL,
+            "retrieved_at": retrieved_at,
+            "page_size": page_size,
+            "request_rate_floor_seconds": MIN_REQUEST_INTERVAL_SECONDS,
+            "historical_coverage": {
+                "mode": "RECENT_FISCAL_YEAR_WINDOW",
+                "as_of_date": as_of.isoformat(),
+                "fiscal_years": list(fiscal_years),
+                "fiscal_year_count": len(fiscal_years),
+                "older_years_status": "DEFERRED_DURABLE_BACKFILL",
+                "reason": "The Checkbook all-years registered-expense query is not repeatably bounded enough for the verified daily/PR cache gate.",
+            },
+            "scopes": [
+                *_partition_metadata(citywide_partitions),
+                *_partition_metadata(subvendor_partitions),
+                {
+                    "name": edc_scope.spec.name,
+                    "source": edc_scope.spec.source,
+                    "record_count": edc_scope.expected_count,
+                    "pagination_complete": edc_scope.pagination_complete,
+                },
+            ],
+            "deferred_scopes": [
+                {
+                    "name": "NYCHA",
+                    "type_of_data": "Contracts_NYCHA",
+                    "status": "DEFERRED_SEPARATE_ADAPTER",
+                    "reason": "NYCHA contract data uses release and line-item granularity and requires a separate normalization contract.",
+                }
+            ],
+        },
+        "summary": {
+            "citywide_source_transaction_count": citywide_aggregate.expected_count,
+            "citywide_subvendor_source_transaction_count": subvendor_aggregate.expected_count,
+            "citywide_unique_prime_contract_count": _unique_identity_count(citywide_partitions, "prime_contract_id"),
+            "citywide_relevant_prime_contract_count": len(citywide_primes),
+            "citywide_relevant_contract_count": len(citywide_contracts),
+            "edc_source_transaction_count": edc_scope.expected_count,
+            "edc_unique_prime_contract_count": len(edc_primes),
+            "edc_relevant_contract_count": len(edc_contracts),
+            "relevant_contract_count": len(all_contracts),
+            "unresolved_vendor_count": sum(1 for row in all_contracts if row.get("vendor_raw") and not row.get("company_id")),
+            "classification_counts": dict(sorted(classification_counts.items())),
+            "value_semantics": "Observed source-reported public contract/subcontract values and spend-to-date; not company revenue or a complete customer book.",
+        },
+        "source_health": source_health,
+        "contracts": all_contracts,
+    }

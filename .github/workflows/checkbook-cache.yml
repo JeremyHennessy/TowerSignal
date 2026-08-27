@@ -1,0 +1,123 @@
+name: Refresh verified Checkbook NYC cache
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '41 8 * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/checkbook-cache.yml'
+      - 'scripts/towersignal/checkbook.py'
+      - 'scripts/towersignal/checkbook_recent.py'
+      - 'scripts/towersignal/procurement.py'
+      - 'scripts/build_checkbook_cache.py'
+      - 'scripts/validate_checkbook_cache.py'
+      - 'scripts/verify_live_checkbook.py'
+      - 'tests/python/test_checkbook.py'
+      - 'tests/python/test_checkbook_recent.py'
+      - 'tests/python/test_checkbook_recent_placeholders.py'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/checkbook-cache.yml'
+      - 'scripts/towersignal/checkbook.py'
+      - 'scripts/towersignal/checkbook_recent.py'
+      - 'scripts/towersignal/procurement.py'
+      - 'scripts/build_checkbook_cache.py'
+      - 'scripts/validate_checkbook_cache.py'
+      - 'scripts/verify_live_checkbook.py'
+      - 'tests/python/test_checkbook.py'
+      - 'tests/python/test_checkbook_recent.py'
+      - 'tests/python/test_checkbook_recent_placeholders.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: towersignal-checkbook-cache-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build bounded Checkbook NYC procurement cache
+        run: python scripts/build_checkbook_cache.py --output checkbook-cache/cache.json --page-size 5000 --fiscal-year-count 5
+      - name: Validate cache structure, freshness and production volume
+        run: python scripts/validate_checkbook_cache.py --cache checkbook-cache/cache.json --max-age-days 1 --require-production-volume
+      - name: Independently verify sampled prime contracts against live Checkbook NYC
+        run: python scripts/verify_live_checkbook.py --cache checkbook-cache/cache.json --sample-size 2
+      - name: Upload verified Checkbook NYC cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-checkbook-cache
+          path: checkbook-cache/cache.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified Checkbook NYC cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-checkbook-cache
+          path: .verified-checkbook
+      - name: Revalidate verified Checkbook NYC cache
+        run: python scripts/validate_checkbook_cache.py --cache .verified-checkbook/cache.json --max-age-days 1 --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+
+  persist-cache:
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out durable Checkbook cache branch
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-checkbook
+          fetch-depth: 1
+      - name: Download verified Checkbook NYC cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-checkbook-cache
+          path: .verified-checkbook
+      - name: Persist verified Checkbook NYC cache
+        run: |
+          mkdir -p data/checkbook
+          cp .verified-checkbook/cache.json data/checkbook/cache.json
+          git config user.name "TowerSignal Checkbook Cache Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/checkbook/cache.json
+          if git diff --cached --quiet; then
+            echo "Checkbook cache unchanged"
+          else
+            git commit -m "data: persist verified Checkbook NYC procurement cache [skip ci]"
+            git push origin HEAD:data/towersignal-checkbook
+          fi
