@@ -121,5 +121,8 @@ export interface NysAuthorityProcurementPayload {
 export interface ProcurementBundle {
   cityRecord: CityRecordProcurementPayload
   checkbook: CheckbookProcurementPayload
-  nysAuthorities: NysAuthorityProcurementPayload
+  nysAuthorities: NysAuthorityProcurementPayload | null
+  sourceErrors: {
+    nysAuthorities?: string
+  }
 }
