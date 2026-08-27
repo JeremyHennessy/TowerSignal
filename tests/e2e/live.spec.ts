@@ -132,7 +132,11 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
 
   await page.getByRole('button', { name: 'Opportunities', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Opportunities workspace', exact: true })).toBeVisible()
-  await expect(page.getByText('Procurement intelligence is not in the current production account payload.', { exact: true })).toBeVisible()
+  await expect(page.getByText('LIVE SOURCE DATA', { exact: true })).toBeVisible()
+  await expect(page.getByText('Public procurement intelligence', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Procurement source')).toBeVisible()
+  await expect(page.locator('.procurement-table tbody tr').first()).toBeVisible()
+  await expect(page.getByText('Current account timing opportunities', { exact: true })).toBeVisible()
   await expect(page.locator('.opportunity-table tbody tr').first()).toBeVisible()
   await expectContained(page)
 
@@ -149,6 +153,8 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await page.getByRole('button', { name: 'Source Health & Coverage', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Source Health & Coverage', exact: true })).toBeVisible()
   await expect(page.locator('.source-health-table tbody tr').first()).toBeVisible()
+  await expect(page.getByText('Procurement sources', { exact: true })).toBeVisible()
+  await expect(page.locator('.procurement-health-table tbody tr').first()).toBeVisible()
   await expect(page.locator('.health-failed')).toHaveCount(0)
   await expectContained(page)
 
