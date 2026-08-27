@@ -28,9 +28,15 @@ from .checkbook import (
     _source_health_for_scope,
     fetch_scope,
 )
-from .procurement import normalize_space, utc_now
+from .procurement import normalize_space, parse_money, utc_now
 
 DEFAULT_FISCAL_YEAR_COUNT = 5
+
+PRIME_MONEY_FIELDS = (
+    "prime_contract_original_amount",
+    "prime_contract_current_amount",
+    "prime_vendor_spent_to_date",
+)
 
 
 def nyc_fiscal_year(as_of: date) -> int:
@@ -73,20 +79,72 @@ def _version_key(value: str | None) -> tuple[int, int | str]:
     return (0, text)
 
 
+def _money_signature(row: Mapping[str, str]) -> tuple[float | None, ...]:
+    return tuple(parse_money(row.get(field)) for field in PRIME_MONEY_FIELDS)
+
+
+def _choose_prime_version_candidate(
+    candidates: Sequence[Mapping[str, str]],
+    *,
+    identity: str,
+    fiscal_year: int,
+    material_fields: Sequence[str],
+) -> dict[str, str]:
+    """Collapse source duplicates without inventing contract values.
+
+    Live Checkbook evidence shows that one registered contract/version can be returned
+    multiple times with identical non-monetary fields: one row contains the reported
+    contract amounts/spend and companion rows contain zero in all three monetary fields.
+    Those all-zero companions are source placeholders, not independent contract values.
+
+    We select the unique non-zero monetary row only when every non-monetary field is
+    identical and every alternate monetary signature is exactly all-zero. Any other
+    disagreement remains a hard failure.
+    """
+    structural_fields = tuple(
+        field
+        for field in material_fields
+        if field not in {"prime_contract_version", *PRIME_MONEY_FIELDS}
+    )
+    structural_signatures = {_material_key(row, structural_fields) for row in candidates}
+    selected_version = normalize_space(candidates[0].get("prime_contract_version")) or "(blank)"
+    if len(structural_signatures) > 1:
+        raise CheckbookSourceError(
+            f"Checkbook NYC returned conflicting non-monetary fields for prime_contract_id={identity} "
+            f"in FY{fiscal_year} version {selected_version}"
+        )
+
+    money_by_signature: dict[tuple[float | None, ...], Mapping[str, str]] = {}
+    for row in candidates:
+        money_by_signature.setdefault(_money_signature(row), row)
+    if len(money_by_signature) == 1:
+        chosen = dict(next(iter(money_by_signature.values())))
+        chosen["_source_duplicate_row_count"] = str(len(candidates))
+        if len(candidates) > 1:
+            chosen["_source_duplicate_resolution"] = "IDENTICAL_DUPLICATES"
+        return chosen
+
+    zero_signature = (0.0, 0.0, 0.0)
+    nonzero_signatures = [signature for signature in money_by_signature if signature != zero_signature]
+    if zero_signature in money_by_signature and len(nonzero_signatures) == 1 and len(money_by_signature) == 2:
+        chosen = dict(money_by_signature[nonzero_signatures[0]])
+        chosen["_source_duplicate_row_count"] = str(len(candidates))
+        chosen["_source_duplicate_resolution"] = "NONZERO_OVER_ZERO_PLACEHOLDER"
+        return chosen
+
+    raise CheckbookSourceError(
+        f"Checkbook NYC returned conflicting monetary fields for prime_contract_id={identity} "
+        f"in FY{fiscal_year} version {selected_version}"
+    )
+
+
 def _latest_partition_rows(
     partitions: Sequence[tuple[int, ScopeResult]],
     *,
     identity_field: str,
     material_fields: Sequence[str],
 ) -> tuple[dict[str, str], ...]:
-    """Choose the latest fiscal-year/latest-version observation for each prime contract.
-
-    Contract values and spend can legitimately change between fiscal years and between
-    source-native contract versions inside the same fiscal year. TowerSignal therefore
-    selects the latest fiscal-year partition and then the highest source-reported
-    ``prime_contract_version``. Conflicting material rows within that selected version
-    still fail closed.
-    """
+    """Choose the latest fiscal-year/latest-version observation for each prime contract."""
     grouped: dict[str, dict[int, list[Mapping[str, str]]]] = {}
     for fiscal_year, scope in partitions:
         for row in scope.rows:
@@ -96,7 +154,6 @@ def _latest_partition_rows(
             grouped.setdefault(identity, {}).setdefault(fiscal_year, []).append(row)
 
     selected: list[dict[str, str]] = []
-    signature_fields = tuple(field for field in material_fields if field != "prime_contract_version")
     for identity in sorted(grouped):
         by_year = grouped[identity]
         latest_year = max(by_year)
@@ -106,14 +163,12 @@ def _latest_partition_rows(
             row for row in fiscal_year_candidates
             if _version_key(row.get("prime_contract_version")) == latest_version_key
         ]
-        signatures = {_material_key(row, signature_fields) for row in candidates}
-        if len(signatures) > 1:
-            selected_version = normalize_space(candidates[0].get("prime_contract_version")) or "(blank)"
-            raise CheckbookSourceError(
-                f"Checkbook NYC returned conflicting material fields for {identity_field}={identity} "
-                f"in FY{latest_year} version {selected_version}"
-            )
-        row = dict(candidates[0])
+        row = _choose_prime_version_candidate(
+            candidates,
+            identity=identity,
+            fiscal_year=latest_year,
+            material_fields=material_fields,
+        )
         row["_fiscal_year_scope"] = str(latest_year)
         selected.append(row)
     return tuple(selected)
@@ -166,6 +221,9 @@ def _latest_subcontract_rows(
             )
         row = dict(candidates[0])
         row["_fiscal_year_scope"] = str(latest_year)
+        row["_source_duplicate_row_count"] = str(len(candidates))
+        if len(candidates) > 1:
+            row["_source_duplicate_resolution"] = "IDENTICAL_DUPLICATES"
         selected.append(row)
     return tuple(selected)
 
@@ -192,6 +250,15 @@ def _partition_metadata(
         }
         for fiscal_year, scope in partitions
     ]
+
+
+def _attach_source_resolution(contract: dict[str, Any], row: Mapping[str, str]) -> None:
+    contract["source_fiscal_year"] = int(row["_fiscal_year_scope"])
+    duplicate_count = int(row.get("_source_duplicate_row_count") or 1)
+    contract["source_duplicate_row_count"] = duplicate_count
+    resolution = normalize_space(row.get("_source_duplicate_resolution"))
+    if resolution:
+        contract["source_duplicate_resolution"] = resolution
 
 
 def build_recent_checkbook_cache(
@@ -236,12 +303,12 @@ def build_recent_checkbook_cache(
     for row in citywide_primes:
         contract = _normalize_citywide_prime(row, retrieved_at=retrieved_at)
         if contract["service_category"] != "UNRELATED":
-            contract["source_fiscal_year"] = int(row["_fiscal_year_scope"])
+            _attach_source_resolution(contract, row)
             citywide_contracts.append(contract)
     for row in citywide_subcontracts:
         subcontract = _normalize_citywide_subcontract(row, retrieved_at=retrieved_at)
         if subcontract is not None:
-            subcontract["source_fiscal_year"] = int(row["_fiscal_year_scope"])
+            _attach_source_resolution(subcontract, row)
             citywide_contracts.append(subcontract)
     citywide_contracts = _dedupe_contracts(citywide_contracts)
 
@@ -265,6 +332,11 @@ def build_recent_checkbook_cache(
             "fiscal_years": list(fiscal_years),
             "subvendor_record_count": subvendor_aggregate.expected_count,
             "subvendor_pagination_complete": subvendor_aggregate.pagination_complete,
+            "zero_placeholder_duplicate_resolution_count": sum(
+                1
+                for row in citywide_contracts
+                if row.get("source_duplicate_resolution") == "NONZERO_OVER_ZERO_PLACEHOLDER"
+            ),
         }
     )
     source_health = {
