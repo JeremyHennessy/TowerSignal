@@ -7,6 +7,7 @@ on:
       - 'functions/**'
       - 'src/workflow/remoteClient.ts'
       - 'vite.config.ts'
+      - 'tests/e2e/build016f-serial-gate.spec.ts'
       - '.github/workflows/build016f-same-origin-auth.yml'
 
 permissions:
@@ -87,7 +88,15 @@ jobs:
           done
           cat /tmp/towersignal-wrangler.log
           exit 1
-      - name: Verify Login to sign-out on desktop and iPhone
+      - name: Verify exact serial chain on desktop
+        env:
+          BASE_URL: http://127.0.0.1:8788/
+        run: npx playwright test tests/e2e/build016f-serial-gate.spec.ts --project=desktop-chromium --no-deps
+      - name: Verify exact serial chain on iPhone WebKit
+        env:
+          BASE_URL: http://127.0.0.1:8788/
+        run: npx playwright test tests/e2e/build016f-serial-gate.spec.ts --project=iphone --no-deps
+      - name: Verify full existing suite after serial boundary passes
         env:
           BASE_URL: http://127.0.0.1:8788/
         run: npm run test:e2e
