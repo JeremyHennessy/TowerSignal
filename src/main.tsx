@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
+import { AuthGate } from './auth/AuthGate'
 import './styles/app.css'
 import './styles/history.css'
 import './styles/nys.css'
@@ -11,5 +11,6 @@ import './styles/workflow.css'
 import './styles/product-redesign.css'
 import './styles/product-redesign-fixes.css'
 import './styles/product-redesign-final.css'
+import './styles/auth-gate.css'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>)
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AuthGate /></React.StrictMode>)
