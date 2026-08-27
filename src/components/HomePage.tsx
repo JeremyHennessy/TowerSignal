@@ -30,7 +30,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
           registeredSystems: systems.summary.registered_systems,
           highPriorityAccounts: systems.systems.filter(row => row.priority_score >= 70).length,
           recentChanges: changes.new_event_count,
-          procurementRecords: procurement.cityRecord.notices.length + procurement.checkbook.contracts.length + procurement.nysAuthorities.contracts.length,
+          procurementRecords: procurement.cityRecord.notices.length + procurement.checkbook.contracts.length + (procurement.nysAuthorities?.contracts.length ?? 0),
           observedCompanies: companies.summary.observed_vendor_company_count,
           generatedAt: systems.metadata.generated_at,
         })
