@@ -101,7 +101,7 @@ class FakeRecentCheckbookApi:
         columns = [node.text or "" for node in root.findall("./response_columns/column")]
         fiscal_year = int(criteria["fiscal_year"]) if criteria.get("fiscal_year") else None
         self.calls.append((domain, fiscal_year, dict(criteria)))
-        if fiscal_year == self.fail_year:
+        if self.fail_year is not None and fiscal_year == self.fail_year:
             raise CheckbookSourceError(f"fixture failure FY{fiscal_year}")
 
         if domain == "Contracts_OGE":
