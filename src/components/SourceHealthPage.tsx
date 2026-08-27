@@ -29,7 +29,6 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
   const failed = health.filter(source => source.status === 'FAILED').length
   const coverages = health.map(source => source.coverage_percentage).filter((value): value is number => value != null)
   const averageCoverage = coverages.length > 0 ? coverages.reduce((sum, value) => sum + value, 0) / coverages.length : null
-  const retrievedRows = health.reduce((sum, source) => sum + source.retrieved_record_count, 0)
   const procurementRecords = procurementHealth.reduce((sum, source) => sum + source.record_count, 0)
 
   return <section className="product-page source-health-page">
