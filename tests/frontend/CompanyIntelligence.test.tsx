@@ -47,7 +47,8 @@ test('Companies shows observed value semantics and keeps RMC in VERIFY review', 
   expect(screen.getByText('RMC')).toBeInTheDocument()
   expect(screen.getAllByText('VERIFY').length).toBeGreaterThanOrEqual(1)
   expect(screen.getAllByText('not company revenue').length).toBeGreaterThanOrEqual(1)
-  expect(screen.getByText('$250,000')).toBeInTheDocument()
+  expect(screen.getAllByText('$250,000')).toHaveLength(2)
+  expect(screen.queryByText('Invalid Date')).not.toBeInTheDocument()
 
   await user.click(screen.getAllByRole('button', { name:'Open company →' })[0])
   expect(openCompany).toHaveBeenCalledWith(alphaCompany)
