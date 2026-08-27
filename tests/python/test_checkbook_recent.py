@@ -206,23 +206,29 @@ class RecentCheckbookTests(unittest.TestCase):
         self.assertEqual(payload["summary"]["citywide_unique_prime_contract_count"], 2)
         self.assertEqual(payload["summary"]["citywide_relevant_prime_contract_count"], 1)
 
-    def test_relevant_prime_vendor_variants_still_fail_closed(self):
+    def test_relevant_prime_vendor_variants_remain_unresolved_source_evidence(self):
         api = FakeRecentCheckbookApi(
             prime_by_year={
                 2027: [
-                    prime_row("CT1", "Cooling tower cleaning", amount="200", vendor="Water Vendor A"),
-                    prime_row("CT1", "Cooling tower cleaning", amount="0", spent="0", vendor="Water Vendor B"),
+                    prime_row("CT1", "Cooling tower cleaning", amount="200", vendor="Water Vendor Legal Name"),
+                    prime_row("CT1", "Cooling tower cleaning", amount="0", spent="0", vendor="Water Vendor Alias"),
                 ]
             }
         )
-        with self.assertRaisesRegex(CheckbookSourceError, "field prime_vendor"):
-            build_recent_checkbook_cache(
-                as_of=date(2026, 8, 27),
-                fiscal_year_count=1,
-                request_xml=api,
-                retrieved_at="2026-08-27T01:00:00Z",
-                page_size=2,
-            )
+        payload = build_recent_checkbook_cache(
+            as_of=date(2026, 8, 27),
+            fiscal_year_count=1,
+            request_xml=api,
+            retrieved_at="2026-08-27T01:00:00Z",
+            page_size=2,
+        )
+        contract = payload["contracts"][0]
+        self.assertEqual(contract["vendor_raw"], "Water Vendor Legal Name")
+        self.assertEqual(contract["source_vendor_variants"], ["Water Vendor Alias", "Water Vendor Legal Name"])
+        self.assertEqual(contract["vendor_evidence_resolution"], "MULTIPLE_SOURCE_VARIANTS_UNRESOLVED")
+        self.assertIsNone(contract["company_id"])
+        self.assertEqual(contract["company_match_confidence"], "UNRESOLVED")
+        self.assertEqual(contract["company_resolution_method"], "SOURCE_VENDOR_VARIANTS_NOT_RESOLVED")
 
     def test_two_nonzero_monetary_variants_still_fail_closed(self):
         api = FakeRecentCheckbookApi(
