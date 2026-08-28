@@ -14,6 +14,7 @@ on:
       - scripts/build_toronto_poc_demo_accounts.py
       - scripts/pull_toronto_bulk_sources.py
       - scripts/pull_toronto_additional_sources.py
+      - scripts/enrich_toronto_targeted_large_sources.py
       - scripts/normalize_toronto_warehouse.py
       - scripts/join_toronto_warehouse_to_poc.py
       - docs/TORONTO_POC.md
@@ -54,6 +55,7 @@ jobs:
           python -m py_compile scripts/build_toronto_poc_demo_accounts.py
           python -m py_compile scripts/pull_toronto_bulk_sources.py
           python -m py_compile scripts/pull_toronto_additional_sources.py
+          python -m py_compile scripts/enrich_toronto_targeted_large_sources.py
           python -m py_compile scripts/normalize_toronto_warehouse.py
           python -m py_compile scripts/join_toronto_warehouse_to_poc.py
 
@@ -84,6 +86,9 @@ jobs:
       - name: Normalize Toronto warehouse municipal scope and licences
         run: python scripts/normalize_toronto_warehouse.py --output data/toronto/warehouse/current
 
+      - name: Target business licences and 311 to POC property spine
+        run: python scripts/enrich_toronto_targeted_large_sources.py --poc data/toronto/poc/current --warehouse data/toronto/warehouse/current
+
       - name: Join warehouse sources to POC properties
         run: python scripts/join_toronto_warehouse_to_poc.py --poc data/toronto/poc/current --warehouse data/toronto/warehouse/current
 
@@ -97,6 +102,8 @@ jobs:
           python -m json.tool data/toronto/warehouse/current/source_inventory.json >/dev/null
           python -m json.tool data/toronto/warehouse/current/join_summary.json >/dev/null
           python -m json.tool data/toronto/warehouse/current/property_joins.json >/dev/null
+          python -m json.tool data/toronto/warehouse/current/business_licence_matches.json >/dev/null
+          python -m json.tool data/toronto/warehouse/current/311_matches.json >/dev/null
           python -m json.tool data/toronto/warehouse/current/open_licensed/renewable_energy_installations.json >/dev/null
           python -m json.tool data/toronto/warehouse/current/open_licensed/311_service_requests_metadata.json >/dev/null
           python -m json.tool data/toronto/warehouse/current/open_licensed/mls_business_licences_permits_metadata.json >/dev/null
