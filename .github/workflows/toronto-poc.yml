@@ -27,17 +27,17 @@ permissions:
 
 concurrency:
   group: toronto-poc-extract
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   extract:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Checkout exact branch head
+      - name: Checkout exact event head
         uses: actions/checkout@v4
         with:
-          ref: agent/toronto-poc-20260828
+          ref: ${{ github.sha }}
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
