@@ -20,33 +20,35 @@ def load_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def rows_from_payload(payload: dict[str, Any], path: Path) -> list[dict[str, Any]]:
+    for key in ("contracts", "notices", "records"):
+        rows = payload.get(key)
+        if isinstance(rows, list):
+            return [row for row in rows if isinstance(row, dict)]
+    raise SystemExit(f"Procurement input has no contracts[], notices[] or records[]: {path}")
+
+
 def normalized_tokens(value: Any) -> list[str]:
     return re.findall(r"[A-Z0-9]+", str(value or "").upper())
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate TowerSignal company intelligence against City Record + Checkbook inputs.")
+    parser = argparse.ArgumentParser(description="Validate TowerSignal company intelligence against normalized procurement inputs.")
     parser.add_argument("--companies", default="public/data/companies.json")
     parser.add_argument("--city-record", default="public/data/procurement-city-record.json")
     parser.add_argument("--checkbook", default="public/data/procurement-checkbook.json")
+    parser.add_argument("--extra-procurement", action="append", default=[], help="Additional normalized procurement payload; may be repeated.")
     args = parser.parse_args()
 
     company_payload = load_json(Path(args.companies))
-    city_record = load_json(Path(args.city_record))
-    checkbook = load_json(Path(args.checkbook))
+    input_paths = [Path(args.city_record), Path(args.checkbook), *[Path(value) for value in args.extra_procurement]]
+    source_rows = [row for path in input_paths for row in rows_from_payload(load_json(path), path)]
     companies = company_payload.get("companies")
-    notices = city_record.get("notices")
-    contracts = checkbook.get("contracts")
     unresolved = company_payload.get("unresolved_vendor_observations")
     if not isinstance(companies, list) or not isinstance(unresolved, list):
         raise SystemExit("Company payload is missing companies[] or unresolved_vendor_observations[]")
-    if not isinstance(notices, list) or not isinstance(contracts, list):
-        raise SystemExit("Procurement inputs are missing notices[] or contracts[]")
 
-    source_vendor_rows = [
-        row for row in [*notices, *contracts]
-        if isinstance(row, dict) and str(row.get("vendor_raw") or "").strip()
-    ]
+    source_vendor_rows = [row for row in source_rows if str(row.get("vendor_raw") or "").strip()]
     source_by_id: dict[str, dict[str, Any]] = {}
     for row in source_vendor_rows:
         procurement_id = str(row.get("procurement_id") or "").strip()
@@ -114,9 +116,15 @@ def main() -> int:
                 if str(procurement_id) not in unresolved_ids:
                     raise SystemExit(f"VERIFY company observation is missing from unresolved review queue: {procurement_id}")
 
+    source_counts: dict[str, int] = {}
+    for row in source_vendor_rows:
+        source = str(row.get("source") or "UNKNOWN")
+        source_counts[source] = source_counts.get(source, 0) + 1
     print(json.dumps({
         "company_count": len(companies),
+        "source_payload_count": len(input_paths),
         "source_vendor_observation_count": len(source_vendor_rows),
+        "source_counts": dict(sorted(source_counts.items())),
         "unresolved_review_count": len(unresolved),
         "exact_coverage": True,
         "unsupported_parent_or_sponsor_assignments": 0,
