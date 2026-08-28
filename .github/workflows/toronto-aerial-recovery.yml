@@ -1,0 +1,72 @@
+name: Toronto Aerial Recovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/toronto-market-20260828
+    paths:
+      - .github/workflows/toronto-aerial-recovery.yml
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout current Toronto branch head
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install aerial dependencies
+        run: python -m pip install --disable-pip-version-check 'numpy>=2,<3' 'pillow>=11,<13' 'scikit-learn>=1.6,<2'
+
+      - name: Download successful Toronto core artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/toronto/market/current
+          gh run download 33214362483 --repo JeremyHennessy/TowerSignal --name toronto-market-core --dir data/toronto/market/current
+
+      - name: Recover WGS84 coordinates from Address Points geometry
+        run: python scripts/toronto_aerial_recovery.py
+
+      - name: Run targeted 2025 aerial weak-label model
+        run: python scripts/toronto_aerial_detector.py --max-score 1200 --save-review 50
+
+      - name: Validate recovered aerial outputs
+        run: |
+          python -m json.tool data/toronto/market/current/coordinate_recovery_report.json >/dev/null
+          python -m json.tool data/toronto/market/current/property_spine.json >/dev/null
+          python -m json.tool data/toronto/market/current/aerial_model_report.json >/dev/null
+          test -f data/toronto/market/current/aerial_candidates.json && python -m json.tool data/toronto/market/current/aerial_candidates.json >/dev/null || true
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('data/toronto/market/current')
+          coords=json.loads((p/'coordinate_recovery_report.json').read_text())
+          report=json.loads((p/'aerial_model_report.json').read_text())
+          assert coords['properties_with_usable_coordinates_after_recovery'] >= 100
+          assert report['training']['usable_images'] >= 20, report['training']
+          print(json.dumps({'coordinates':coords,'aerial_status':report.get('status'),'training':report.get('training'),'weak_label_validation':report.get('weak_label_validation')},indent=2))
+          PY
+
+      - name: Upload recovered aerial package
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-aerial-recovered
+          path: |
+            data/toronto/market/current/property_spine.json
+            data/toronto/market/current/coordinate_recovery_report.json
+            data/toronto/market/current/aerial_model_report.json
+            data/toronto/market/current/aerial_candidates.json
+            data/toronto/market/current/work/aerial_review/
+          if-no-files-found: error
+          retention-days: 30
