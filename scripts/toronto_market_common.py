@@ -23,6 +23,12 @@ STREET_TYPES = {
 DIRECTIONS = {"NORTH":"N","SOUTH":"S","EAST":"E","WEST":"W","N":"N","S":"S","E":"E","W":"W"}
 PROPERTY_ADDRESS_KEYS = {"address", "siteaddress", "facilityaddress", "propertyaddress", "fulladdress", "premisesaddress", "locationaddress", "streetaddress", "address1"}
 EXCLUDED_ADDRESS_KEY_FRAGMENTS = {"mail", "email", "owner", "contractor", "vendor", "consultant", "manager", "certifier", "billing", "contact", "head", "office"}
+FIELD_ALIASES = {
+    # Current Toronto One Address Repository schema names the civic address
+    # ADDRESS_FULL. Keep the generic ADDRESS accessor used by the market spine,
+    # but resolve it explicitly to that current municipal source field.
+    "address": ("addressfull",),
+}
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -61,6 +67,9 @@ def get_value(record: dict[str, Any], *names: str) -> Any:
         key = normalize_key(name)
         if key in index:
             return index[key]
+        for alias in FIELD_ALIASES.get(key, ()):
+            if alias in index:
+                return index[alias]
     return None
 
 def iter_record_objects(payload: Any) -> Iterable[dict[str, Any]]:
