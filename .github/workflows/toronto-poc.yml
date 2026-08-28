@@ -1,0 +1,65 @@
+name: Toronto POC Extract
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/toronto-poc-20260828
+    paths:
+      - scripts/build_toronto_poc.py
+      - docs/TORONTO_POC.md
+      - .github/workflows/toronto-poc.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: toronto-poc-extract
+  cancel-in-progress: false
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-poc-20260828
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile extractor
+        run: python -m py_compile scripts/build_toronto_poc.py
+
+      - name: Extract Toronto POC evidence
+        run: python scripts/build_toronto_poc.py --output data/toronto/poc/current
+
+      - name: Validate generated JSON
+        run: |
+          python -m json.tool data/toronto/poc/current/summary.json >/dev/null
+          python -m json.tool data/toronto/poc/current/properties.json >/dev/null
+          python -m json.tool data/toronto/poc/current/evidence.json >/dev/null
+
+      - name: Upload extraction artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-poc-${{ github.run_id }}
+          path: data/toronto/poc/current/
+          retention-days: 30
+
+      - name: Persist successful POC snapshot on experiment branch
+        shell: bash
+        run: |
+          if git diff --quiet -- data/toronto/poc/current; then
+            echo "Toronto POC snapshot unchanged."
+            exit 0
+          fi
+          git config user.name "TowerSignal Toronto POC Bot"
+          git config user.email "towersignal-poc@users.noreply.github.com"
+          git add data/toronto/poc/current
+          git commit -m "Toronto POC: refresh extracted public-record evidence"
+          git push origin HEAD:agent/toronto-poc-20260828
