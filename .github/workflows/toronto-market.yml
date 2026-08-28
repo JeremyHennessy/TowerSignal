@@ -1,0 +1,214 @@
+name: Toronto Market Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/toronto-market-20260828
+    paths:
+      - scripts/toronto_market_common.py
+      - scripts/toronto_market_core.py
+      - scripts/toronto_aic_corpus.py
+      - scripts/toronto_aerial_detector.py
+      - docs/TORONTO_MARKET.md
+      - .github/workflows/toronto-market.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: toronto-market-build
+  cancel-in-progress: true
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout exact event head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile Toronto market scripts
+        run: |
+          python -m py_compile \
+            scripts/toronto_market_common.py \
+            scripts/toronto_market_core.py \
+            scripts/toronto_aic_corpus.py \
+            scripts/toronto_aerial_detector.py
+
+      - name: Build canonical GeoID spine and official-source joins
+        run: python scripts/toronto_market_core.py core
+
+      - name: Validate core outputs
+        run: |
+          python -m json.tool data/toronto/market/current/property_spine.json >/dev/null
+          python -m json.tool data/toronto/market/current/reconciliation_summary.json >/dev/null
+          python -m json.tool data/toronto/market/current/property_source_links.json >/dev/null
+          python -m json.tool data/toronto/market/current/open_licensed/toronto_highrise_residential_health_hazards.json >/dev/null
+          python -m json.tool data/toronto/market/current/open_licensed/toronto_aic_applications.json >/dev/null
+          python -m json.tool data/toronto/market/current/construction_act_source_policy.json >/dev/null
+
+      - name: Upload core market state
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-market-core
+          path: data/toronto/market/current/
+          retention-days: 30
+
+  aic-corpus:
+    needs: core
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - name: Checkout exact event head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PDF parser
+        run: python -m pip install --disable-pip-version-check 'pypdf>=5,<7'
+
+      - name: Restore core market state
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-market-core
+          path: data/toronto/market/current
+
+      - name: Parse AIC supporting-document shard
+        run: python scripts/toronto_aic_corpus.py --shard-index ${{ matrix.shard }} --shard-count 8 --workers 2
+
+      - name: Upload AIC shard
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-aic-shard-${{ matrix.shard }}
+          path: data/toronto/market/current/work/aic_corpus_shard_${{ matrix.shard }}.json
+          retention-days: 30
+
+  aerial:
+    needs: core
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout exact event head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install aerial-analysis dependencies
+        run: python -m pip install --disable-pip-version-check 'numpy>=2,<3' 'pillow>=11,<13' 'scikit-learn>=1.6,<2'
+
+      - name: Restore core market state
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-market-core
+          path: data/toronto/market/current
+
+      - name: Build targeted 2025 aerial weak-label detector
+        run: python scripts/toronto_aerial_detector.py --max-score 1200 --save-review 50
+
+      - name: Upload aerial analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-aerial-analysis
+          path: |
+            data/toronto/market/current/aerial_model_report.json
+            data/toronto/market/current/aerial_candidates.json
+            data/toronto/market/current/work/aerial_review/
+          if-no-files-found: warn
+          retention-days: 30
+
+  finalize:
+    needs: [core, aic-corpus, aerial]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout exact event head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Restore core market state
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-market-core
+          path: data/toronto/market/current
+
+      - name: Restore all AIC shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: toronto-aic-shard-*
+          path: data/toronto/market/current/work
+          merge-multiple: true
+
+      - name: Restore aerial analysis
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-aerial-analysis
+          path: data/toronto/market/current
+
+      - name: Build AIC aggregate, relationship graph and coverage report
+        run: python scripts/toronto_market_core.py finalize
+
+      - name: Validate final public-safe outputs
+        run: |
+          for file in \
+            data/toronto/market/current/aic_corpus_summary.json \
+            data/toronto/market/current/aic_document_index.json \
+            data/toronto/market/current/aic_application_scan_status.json \
+            data/toronto/market/current/aic_explicit_tower_candidates.json \
+            data/toronto/market/current/entity_graph.json \
+            data/toronto/market/current/coverage_report.json; do
+              python -m json.tool "$file" >/dev/null
+          done
+          if [ -f data/toronto/market/current/aerial_model_report.json ]; then
+            python -m json.tool data/toronto/market/current/aerial_model_report.json >/dev/null
+          fi
+
+      - name: Upload full Toronto market artifact before cleanup
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-market-full-${{ github.run_id }}
+          path: data/toronto/market/current/
+          retention-days: 30
+
+      - name: Remove artifact-only working files before Git persistence
+        run: rm -rf data/toronto/market/current/work
+
+      - name: Persist successful Toronto market snapshot
+        run: |
+          if [ -z "$(git status --porcelain -- data/toronto/market/current)" ]; then
+            echo "Toronto market snapshot unchanged."
+            exit 0
+          fi
+          git config user.name "TowerSignal Toronto Market Bot"
+          git config user.email "towersignal-market@users.noreply.github.com"
+          git add data/toronto/market/current
+          git commit -m "Toronto market: refresh canonical property and evidence layers"
+          git push origin HEAD:agent/toronto-market-20260828
