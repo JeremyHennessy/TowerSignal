@@ -8,6 +8,7 @@ on:
     paths:
       - scripts/build_toronto_poc.py
       - scripts/enrich_toronto_poc_tdsb_identity.py
+      - scripts/normalize_toronto_poc_permit_timing.py
       - docs/TORONTO_POC.md
       - .github/workflows/toronto-poc.yml
 
@@ -37,9 +38,13 @@ jobs:
         run: |
           python -m py_compile scripts/build_toronto_poc.py
           python -m py_compile scripts/enrich_toronto_poc_tdsb_identity.py
+          python -m py_compile scripts/normalize_toronto_poc_permit_timing.py
 
       - name: Extract Toronto POC evidence
         run: python scripts/build_toronto_poc.py --output data/toronto/poc/current
+
+      - name: Normalize permit source state versus recency
+        run: python scripts/normalize_toronto_poc_permit_timing.py --output data/toronto/poc/current
 
       - name: Enrich exact TDSB school identity
         run: python scripts/enrich_toronto_poc_tdsb_identity.py --output data/toronto/poc/current
