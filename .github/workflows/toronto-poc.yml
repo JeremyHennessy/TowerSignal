@@ -14,6 +14,7 @@ on:
       - scripts/build_toronto_poc_demo_accounts.py
       - scripts/pull_toronto_bulk_sources.py
       - scripts/pull_toronto_additional_sources.py
+      - scripts/pull_ontario_open_building_environment.py
       - scripts/enrich_toronto_targeted_large_sources.py
       - scripts/normalize_toronto_warehouse.py
       - scripts/join_toronto_warehouse_to_poc.py
@@ -55,6 +56,7 @@ jobs:
           python -m py_compile scripts/build_toronto_poc_demo_accounts.py
           python -m py_compile scripts/pull_toronto_bulk_sources.py
           python -m py_compile scripts/pull_toronto_additional_sources.py
+          python -m py_compile scripts/pull_ontario_open_building_environment.py
           python -m py_compile scripts/enrich_toronto_targeted_large_sources.py
           python -m py_compile scripts/normalize_toronto_warehouse.py
           python -m py_compile scripts/join_toronto_warehouse_to_poc.py
@@ -83,6 +85,9 @@ jobs:
       - name: Pull additional Toronto source families
         run: python scripts/pull_toronto_additional_sources.py --output data/toronto/warehouse/current
 
+      - name: Pull Ontario open EWRB and compliance report history
+        run: python scripts/pull_ontario_open_building_environment.py --output data/toronto/warehouse/current
+
       - name: Normalize Toronto warehouse municipal scope and licences
         run: python scripts/normalize_toronto_warehouse.py --output data/toronto/warehouse/current
 
@@ -107,6 +112,8 @@ jobs:
           python -m json.tool data/toronto/warehouse/current/open_licensed/renewable_energy_installations.json >/dev/null
           python -m json.tool data/toronto/warehouse/current/open_licensed/311_service_requests_metadata.json >/dev/null
           python -m json.tool data/toronto/warehouse/current/open_licensed/mls_business_licences_permits_metadata.json >/dev/null
+          python -m json.tool data/toronto/warehouse/current/open_licensed/ontario_ewrb_large_buildings.json >/dev/null
+          python -m json.tool data/toronto/warehouse/current/open_licensed/ontario_environmental_compliance_reports.json >/dev/null
 
       - name: Upload Toronto POC artifact
         uses: actions/upload-artifact@v4
