@@ -119,6 +119,30 @@ class ExplicitDbaIdentityTests(unittest.TestCase):
         self.assertEqual(target["matched_alias_keys"], [])
         self.assertEqual(target["exact_source_observation_count"], 0)
 
+    def test_methodology_revision_lock_blocks_score_authorization_after_coverage_thresholds_pass(self):
+        cohort = tower_water_cohort()
+        cohort["validation_gate"] = {
+            "min_observed_outcome_targets": 1,
+            "min_screened_outcome_targets": 1,
+            "score_authorization_locked": True,
+            "score_authorization_lock_reason": "Independent holdout required after identity-method revision.",
+        }
+        rows = [
+            contract("Tower Cleaning Plus D/B/A Tower Water", procurement_id="p1", buyer="Buyer A"),
+            contract("Tower Cleaning Plus D/B/A Tower Water", procurement_id="p2", buyer="Buyer A"),
+            contract("Tower Cleaning Plus D/B/A Tower Water", procurement_id="p3", buyer="Buyer B"),
+        ]
+        report = build_deal_validation(rows, cohort, generated_at="2026-08-28T00:00:00Z")
+        gate = report["validation_gate"]
+        self.assertTrue(report["targets"][0]["relationship_density_screen_pass"])
+        self.assertTrue(gate["coverage_thresholds_passed"])
+        self.assertTrue(gate["score_authorization_locked"])
+        self.assertFalse(gate["passed"])
+        self.assertFalse(gate["opportunity_score_2_allowed"])
+        self.assertFalse(gate["home_deal_model_allowed"])
+        self.assertEqual(gate["conclusion"], "COVERAGE_THRESHOLDS_MET_HOLDOUT_REQUIRED")
+        self.assertEqual(gate["recommended_next_step"], "RUN_INDEPENDENT_HOLDOUT_VALIDATION")
+
 
 if __name__ == "__main__":
     unittest.main()
