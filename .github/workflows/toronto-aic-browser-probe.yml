@@ -1,0 +1,72 @@
+name: Toronto AIC Browser Probe
+
+on:
+  push:
+    branches:
+      - agent/toronto-market-20260828
+    paths:
+      - .github/workflows/toronto-aic-browser-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright client only
+        run: python -m pip install --disable-pip-version-check playwright
+      - name: Use installed Edge browser to execute City reCAPTCHA and call read APIs
+        shell: python
+        run: |
+          import json
+          from playwright.sync_api import sync_playwright
+
+          SITEKEY='6LeN_XIUAAAAAEd8X21vFtkJ3_c7uA0xpUGcrGpe'
+          PAGE='https://www.toronto.ca/city-government/planning-development/application-details/?id=5565655&pid=881473&title=40-BUSHBY-DR'
+          targets=[
+              ('40 Bushby Dr','5565655'),
+              ('100 Borough Dr','5351645'),
+              ('115 Jarvis St','5742439'),
+          ]
+
+          with sync_playwright() as p:
+              browser=p.chromium.launch(channel='msedge',headless=True,args=['--disable-gpu','--no-sandbox'])
+              page=browser.new_page(viewport={'width':1280,'height':900})
+              response=page.goto(PAGE,wait_until='domcontentloaded',timeout=120000)
+              print('PAGE_STATUS=',response.status if response else None,'TITLE=',page.title())
+              page.wait_for_function("typeof grecaptcha !== 'undefined' && typeof grecaptcha.execute === 'function'",timeout=120000)
+              print('GRECAPTCHA_READY=1')
+
+              for label,folder in targets:
+                  result=page.evaluate("""async ({sitekey, folder}) => {
+                    await new Promise(resolve => grecaptcha.ready(resolve));
+                    const token = await grecaptcha.execute(sitekey);
+                    const response = await fetch('https://api.toronto.ca/aic/getapplicationattachments', {
+                      method: 'POST',
+                      headers: {'Content-Type':'application/json','g-recaptcha-response':token},
+                      body: JSON.stringify({folderRsn:String(folder), time:''})
+                    });
+                    const text = await response.text();
+                    return {status: response.status, contentType: response.headers.get('content-type'), text};
+                  }""", {'sitekey':SITEKEY,'folder':folder})
+                  print('ATTACHMENTS_RESULT=',label,'FOLDER=',folder,'STATUS=',result['status'],'TYPE=',result['contentType'],'BODY=',result['text'][:30000].replace('\n',' '))
+
+                  details=page.evaluate("""async ({sitekey, folder}) => {
+                    await new Promise(resolve => grecaptcha.ready(resolve));
+                    const token = await grecaptcha.execute(sitekey);
+                    const response = await fetch('https://api.toronto.ca/aic/getapplicationdetails', {
+                      method: 'POST',
+                      headers: {'Content-Type':'application/json','g-recaptcha-response':token},
+                      body: JSON.stringify({folderRsn:String(folder), time:''})
+                    });
+                    const text = await response.text();
+                    return {status: response.status, contentType: response.headers.get('content-type'), text};
+                  }""", {'sitekey':SITEKEY,'folder':folder})
+                  print('DETAILS_RESULT=',label,'FOLDER=',folder,'STATUS=',details['status'],'TYPE=',details['contentType'],'BODY=',details['text'][:12000].replace('\n',' '))
+              browser.close()
