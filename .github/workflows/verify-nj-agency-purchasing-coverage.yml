@@ -1,0 +1,50 @@
+name: Verify NJ agency purchasing coverage
+
+on:
+  push:
+    branches: [agent/build016h-procurement-coverage-diagnostic]
+    paths:
+      - '.github/workflows/verify-nj-agency-purchasing-coverage.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe-nj-yourmoney:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe official NJ YourMoney Agency Purchasing dataset
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint='https://data.nj.gov/resource/ubnu-tqu7.json'
+          aliases=(
+            'INDUSTRIAL WATER TECHNOLOGIES'
+            'TOWER WATER'
+            'TOWER CLEANING PLUS'
+            'ROCHESTER MIDLAND'
+            'BARCLAY WATER'
+            'OCS CHEMICAL'
+            'CLARITYCHEM'
+          )
+
+          echo 'dataset=NJ_YOURMONEY_AGENCY_PURCHASING'
+          echo 'dataset_id=ubnu-tqu7'
+
+          sample="$(mktemp)"
+          curl --fail --silent --show-error --get "$endpoint" \
+            --data-urlencode '$limit=1' \
+            --output "$sample"
+          echo "sample_keys=$(jq -c '.[0] | keys' "$sample")"
+
+          for alias in "${aliases[@]}"; do
+            out="$(mktemp)"
+            curl --fail --silent --show-error --get "$endpoint" \
+              --data-urlencode "$q=$alias" \
+              --data-urlencode '$limit=500' \
+              --output "$out"
+            count="$(jq 'length' "$out")"
+            exact_count="$(jq --arg a "$alias" '[.[] | select(((.vendor_name // "") | ascii_upcase) == $a)] | length' "$out")"
+            echo "alias=$alias rows=$count exact_vendor_rows=$exact_count"
+            jq -c --arg a "$alias" '.[] | select((((.vendor_name // "") | ascii_upcase) | contains($a)) or (((.vendor_name // "") | ascii_upcase) == $a)) | {fiscal_year,fy_through_date,department_agency_desc,commodity_sector_desc,vendor_name,ytd_amt}' "$out" | head -n 25 || true
+          done
