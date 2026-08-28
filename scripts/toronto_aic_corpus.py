@@ -97,19 +97,25 @@ def discover_documents(url: str) -> tuple[list[dict[str, str]], str]:
     return list(docs.values()), sha256_bytes(body)
 
 
-def pdf_text_and_metadata(data: bytes, max_pages: int = 250) -> tuple[str, int, str | None]:
+def pdf_text_and_metadata(data: bytes, max_pages: int = 250) -> tuple[str, int, str | None, list[dict[str,Any]]]:
     try:
         reader = PdfReader(io.BytesIO(data), strict=False)
         chunks: list[str] = []
+        excerpts: list[dict[str,Any]] = []
         pages = min(len(reader.pages), max_pages)
-        for page in reader.pages[:pages]:
+        for page_number,page in enumerate(reader.pages[:pages],start=1):
             try:
-                chunks.append(page.extract_text() or "")
+                page_text=page.extract_text() or "";chunks.append(page_text)
+                for name,pattern in SIGNALS.items():
+                    match=pattern.search(page_text)
+                    if match:
+                        start=max(0,match.start()-160);end=min(len(page_text),match.end()+240)
+                        excerpts.append({"signal":name,"page_number":page_number,"excerpt":clean_text(page_text[start:end])[:500]})
             except Exception:
                 chunks.append("")
-        return "\n".join(chunks), len(reader.pages), None
+        return "\n".join(chunks), len(reader.pages), None, excerpts[:100]
     except Exception as exc:
-        return "", 0, f"{type(exc).__name__}: {exc}"
+        return "", 0, f"{type(exc).__name__}: {exc}", []
 
 
 def classify_document(label: str, url: str, text: str) -> list[str]:
@@ -147,18 +153,21 @@ def process_document(doc: dict[str, str]) -> dict[str, Any]:
         if data[:5] != b"%PDF-":
             result.update({"parse_status": "NOT_PDF", "categories": ["OTHER"]})
             return result
-        text, page_count, error = pdf_text_and_metadata(data)
+        text, page_count, error, excerpts = pdf_text_and_metadata(data)
         result["page_count"] = page_count
         result["text_chars_extracted"] = len(text)
-        result["parse_status"] = "PARSED" if error is None else "PDF_PARSE_ERROR"
+        result["parse_status"] = ("SCANNED_OR_IMAGE_ONLY" if error is None and page_count and not clean_text(text) else "PARSED") if error is None else ("ENCRYPTED" if "encrypt" in error.lower() else "CORRUPT_OR_UNREADABLE")
         if error:
             result["parse_error"] = error
         result["categories"] = classify_document(result["label"], url, text)
         result["signal_counts"] = {name: len(pattern.findall(text)) for name, pattern in SIGNALS.items()}
+        result["evidence_excerpts"] = excerpts
+        result["extraction_confidence"] = "TEXT_EXTRACTED" if clean_text(text) else "OCR_REQUIRED"
         result["role_candidates"] = role_candidates(text)
         return result
     except Exception as exc:
-        result.update({"parse_status": "FETCH_ERROR", "error": f"{type(exc).__name__}: {exc}", "categories": []})
+        error=f"{type(exc).__name__}: {exc}";status="OVERSIZED_SKIPPED" if "exceeded" in error.lower() else "FETCH_ERROR"
+        result.update({"parse_status": status, "error": error, "categories": []})
         return result
 
 
@@ -176,6 +185,23 @@ def process_application(app: dict[str, Any]) -> dict[str, Any]:
     }
     if not url:
         output["page_status"] = "NO_AIC_URL"
+        return output
+    # The current AIC detail page is only a JavaScript shell. Supporting-document
+    # metadata is returned by api.toronto.ca/aic/getapplicationattachments after
+    # a per-session reCAPTCHA token. Do not misreport the shell as a successfully
+    # scanned document page and do not bypass that access control.
+    parsed_url=urlparse(url)
+    if parsed_url.path.lower()=="/aic/index.do" and (parsed_url.hostname or "").lower() in {"app.toronto.ca","secure.toronto.ca"}:
+        output["page_status"] = "ATTACHMENT_API_RECAPTCHA_REQUIRED"
+        output["access_limitation"] = {
+            "api": "https://api.toronto.ca/aic/getapplicationattachments",
+            "evidence": "Official AIC client main1.0.0.js POSTs folderRsn with a g-recaptcha-response token.",
+            "next_path": "Obtain an official bulk/API access agreement or permission for a reproducible non-interactive feed.",
+        }
+        return output
+    if parsed_url.path.lower()=="/developmentapplications/associatedapplicationslist.do":
+        output["page_status"]="LEGACY_REDIRECT_NO_ATTACHMENT_CATALOGUE"
+        output["access_limitation"]={"evidence":"Representative legacy endpoint redirects to the generic current AIC landing page without document metadata.","next_path":"Retain catalogue identity; use an official attachment feed when available."}
         return output
     try:
         docs, page_hash = discover_documents(url)
@@ -214,10 +240,18 @@ def build(market: Path, shard_index: int, shard_count: int, max_applications: in
         "shard_count": shard_count,
         "applications_total_source": len(apps),
         "applications_in_shard": len(selected),
+        "application_pages_attempted": len(selected),
         "application_pages_fetched": sum(1 for r in results if r.get("page_status") == "FETCHED"),
         "application_page_fetch_errors": sum(1 for r in results if r.get("page_status") == "FETCH_ERROR"),
+        "application_attachment_api_gated": sum(1 for r in results if r.get("page_status") == "ATTACHMENT_API_RECAPTCHA_REQUIRED"),
+        "application_legacy_redirects_without_attachment_catalogue": sum(1 for r in results if r.get("page_status") == "LEGACY_REDIRECT_NO_ATTACHMENT_CATALOGUE"),
         "documents_discovered": len(documents),
         "documents_parsed": sum(1 for d in documents if d.get("parse_status") == "PARSED"),
+        "documents_scanned_or_image_only": sum(1 for d in documents if d.get("parse_status") == "SCANNED_OR_IMAGE_ONLY"),
+        "documents_encrypted": sum(1 for d in documents if d.get("parse_status") == "ENCRYPTED"),
+        "documents_corrupt_or_unreadable": sum(1 for d in documents if d.get("parse_status") == "CORRUPT_OR_UNREADABLE"),
+        "documents_oversized_skipped": sum(1 for d in documents if d.get("parse_status") == "OVERSIZED_SKIPPED"),
+        "documents_not_pdf": sum(1 for d in documents if d.get("parse_status") == "NOT_PDF"),
         "documents_fetch_errors": sum(1 for d in documents if d.get("parse_status") == "FETCH_ERROR"),
         "target_document_count": len(important),
         "documents_with_mechanical_signals": len(signal_docs),

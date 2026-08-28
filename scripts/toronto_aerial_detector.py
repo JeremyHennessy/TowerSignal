@@ -108,7 +108,7 @@ def build(market: Path, max_score: int, save_review: int) -> dict[str, Any]:
             y.append(1 if is_confirmed(prop) else 0)
             usable_props.append(prop)
             if is_confirmed(prop):
-                (review_dir / f"confirmed_{prop['geo_id']}.png").write_bytes(data)
+                (review_dir / f"confirmed_{prop['address_point_id']}.png").write_bytes(data)
         except Exception as exc:
             fetch_errors.append({"property_id": prop.get("property_id"), "error": f"{type(exc).__name__}: {exc}"})
 
@@ -169,7 +169,7 @@ def build(market: Path, max_score: int, save_review: int) -> dict[str, Any]:
             score = float(model.predict_proba(feat.reshape(1, -1))[0, 1])
             entry = {
                 "property_id": prop.get("property_id"),
-                "geo_id": prop.get("geo_id"),
+                "address_point_id": prop.get("address_point_id"),
                 "address": prop.get("display_address"),
                 "aerial_visual_similarity_score": round(score, 6),
                 "review_state": "UNREVIEWED_WEAK_MODEL",
@@ -182,7 +182,7 @@ def build(market: Path, max_score: int, save_review: int) -> dict[str, Any]:
 
     candidates.sort(key=lambda c: c["aerial_visual_similarity_score"], reverse=True)
     for score, prop, data in sorted(scored_images, key=lambda item: item[0], reverse=True)[:save_review]:
-        (review_dir / f"candidate_{score:.4f}_{prop['geo_id']}.png").write_bytes(data)
+        (review_dir / f"candidate_{score:.4f}_{prop['address_point_id']}.png").write_bytes(data)
 
     report["training"]["fetch_errors"] = fetch_errors
     report["scoring"] = {
