@@ -46,5 +46,9 @@ jobs:
             count="$(jq 'length' "$out")"
             exact_count="$(jq --arg a "$alias" '[.[] | select(((.vendor_name // "") | ascii_upcase) == $a)] | length' "$out")"
             echo "alias=$alias rows=$count exact_vendor_rows=$exact_count"
-            jq -c --arg a "$alias" '.[] | select((((.vendor_name // "") | ascii_upcase) | contains($a)) or (((.vendor_name // "") | ascii_upcase) == $a)) | {fiscal_year,fy_through_date,department_agency_desc,commodity_sector_desc,vendor_name,ytd_amt}' "$out" | head -n 25 || true
+            if [[ "$count" -le 25 ]]; then
+              jq -c '.[] | {fiscal_year,fy_through_date,department_agency_desc,commodity_sector_desc,vendor_name,ytd_amt}' "$out"
+            else
+              jq -c --arg a "$alias" '.[] | select((((.vendor_name // "") | ascii_upcase) | contains($a)) or (((.vendor_name // "") | ascii_upcase) == $a)) | {fiscal_year,fy_through_date,department_agency_desc,commodity_sector_desc,vendor_name,ytd_amt}' "$out" | head -n 25 || true
+            fi
           done
