@@ -21,47 +21,42 @@ jobs:
         with:
           ref: ${{ github.sha }}
 
-      - name: Inspect exact Address Points IDs against known POC addresses
+      - name: Inspect unresolved POC identities against current Address Points
         shell: python
         run: |
           import csv
           import io
-          import re
           import urllib.request
 
-          def canon(value):
-              text = re.sub(r"[^A-Z0-9]+", " ", str(value or "").upper()).strip()
-              replacements = {"STREET":"ST","ROAD":"RD","AVENUE":"AVE","BOULEVARD":"BLVD","DRIVE":"DR","COURT":"CRT","CRESCENT":"CRES","WEST":"W","EAST":"E","NORTH":"N","SOUTH":"S"}
-              return " ".join(replacements.get(token, token) for token in text.split())
-
-          poc = list(csv.DictReader(open("data/toronto/poc/current/properties.csv", encoding="utf-8-sig")))
-          targets = {}
-          for row in poc:
-              key = canon(str(row.get("address") or "").split(",")[0])
-              if key:
-                  targets.setdefault(key, []).append({"property_key": row.get("property_key"), "geo_id": row.get("geo_id"), "address": row.get("address")})
-
+          missing_ids = {"14188741", "8127974", "12763885"}
+          target_streets = {
+              "YORK RD": {"1"},
+              "BAY ST": {"10", "20"},
+              "LAKE SHORE BLVD W": {"3197", "3199"},
+              "HUMBER COLLEGE BLVD": {"89"},
+              "ADELAIDE ST W": {"90", "94"},
+          }
           url = "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/64d4e54b-738f-4cd9-a9e7-8050fac8a52f/download/address-points-4326.csv"
-          request = urllib.request.Request(url, headers={"User-Agent": "TowerSignal-Toronto-Diagnostic/0.2"})
+          request = urllib.request.Request(url, headers={"User-Agent": "TowerSignal-Toronto-Diagnostic/0.3"})
           with urllib.request.urlopen(request, timeout=120) as response:
               raw = response.read()
           reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig", errors="replace")))
-          print("FIELDNAMES=", reader.fieldnames)
-          matches = []
+          id_hits = []
+          address_hits = []
+          fields = (
+              "ADDRESS_POINT_ID", "ADDRESS_POINT_ID_LINK", "ADDRESS_ID", "ADDRESS_ID_LINK",
+              "ADDRESS_STRING_ID", "LINEAR_NAME_ID", "CENTRELINE_ID", "ADDRESS_NUMBER",
+              "LO_NUM", "HI_NUM", "LINEAR_NAME_FULL", "ADDRESS_FULL", "PLACE_NAME",
+              "ADDRESS_STATUS", "MUNICIPALITY", "MUNICIPALITY_NAME"
+          )
           for row in reader:
-              key = canon(row.get("ADDRESS_FULL"))
-              if key not in targets:
-                  continue
-              for source in targets[key]:
-                  matches.append({
-                      "poc": source,
-                      "address_point": {k: row.get(k) for k in (
-                          "ADDRESS_POINT_ID", "ADDRESS_ID", "ADDRESS_STRING_ID", "LINEAR_NAME_ID",
-                          "CENTRELINE_ID", "ADDRESS_NUMBER", "LINEAR_NAME_FULL", "ADDRESS_FULL",
-                          "MUNICIPALITY", "MUNICIPALITY_NAME", "ADDRESS_STATUS"
-                      )}
-                  })
-          print("POC_TARGETS=", len(poc))
-          print("EXACT_ADDRESS_POINT_MATCH_ROWS=", len(matches))
-          for match in matches[:40]:
-              print("MATCH=", match)
+              if row.get("ADDRESS_POINT_ID") in missing_ids:
+                  id_hits.append({k: row.get(k) for k in fields})
+              street = str(row.get("LINEAR_NAME_FULL") or "").upper()
+              number = str(row.get("ADDRESS_NUMBER") or "").upper()
+              if street in target_streets and number in target_streets[street]:
+                  address_hits.append({k: row.get(k) for k in fields})
+          print("MISSING_ID_HITS=", id_hits)
+          print("TARGET_ADDRESS_HITS_COUNT=", len(address_hits))
+          for hit in address_hits:
+              print("TARGET_ADDRESS_HIT=", hit)
