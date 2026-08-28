@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema_version": "toronto-poc-0.1",
-    "generated_at": "2026-08-28T19:07:05.340185Z",
+    "generated_at": "2026-08-28T19:10:27.369912Z",
     "jurisdiction": "TORONTO_ON",
     "status": "EXPERIMENTAL_POC",
     "evidence_contract": {
@@ -20,7 +20,19 @@
       "source_active_permit_confirmed_cooling_tower_properties": 21,
       "recent_365d_source_active_permit_confirmed_cooling_tower_properties": 3,
       "properties_with_rentsafe_context": 19,
-      "confirmed_cooling_tower_properties_with_rentsafe_context": 5
+      "confirmed_cooling_tower_properties_with_rentsafe_context": 5,
+      "confirmed_properties_by_lifecycle_event": {
+        "ALTER_REPAIR_OR_UPGRADE_TOWER": 2,
+        "INSTALL_OR_ADD_TOWER": 7,
+        "REPLACE_OR_RENEW_TOWER": 21,
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER": 6
+      },
+      "recent_365d_confirmed_properties_by_lifecycle_event": {
+        "INSTALL_OR_ADD_TOWER": 2,
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER": 1
+      },
+      "recent_365d_permit_project_keys": 3,
+      "shared_recent_description_groups_across_addresses": 1
     },
     "sources": {
       "permits": {
@@ -195,7 +207,34 @@
       "recent_activity_window_days": 365,
       "recent_activity": "Source-active permit record with a usable event date no more than 365 days before POC generation.",
       "old_source_active_records": "Retained as equipment/project evidence but not represented as recent activity."
-    }
+    },
+    "tower_lifecycle_contract": {
+      "classification_basis": "Deterministic phrases in explicit public permit descriptions; no model inference.",
+      "precedence": [
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER",
+        "REPLACE_OR_RENEW_TOWER",
+        "INSTALL_OR_ADD_TOWER",
+        "ALTER_REPAIR_OR_UPGRADE_TOWER",
+        "EXPLICIT_TOWER_UNSPECIFIED"
+      ],
+      "current_presence_caveat": "A permit can describe existing, proposed, replaced, or removed equipment. CONFIRMED means explicit documentary tower evidence, not guaranteed current post-project tower presence."
+    },
+    "potential_project_aliases": [
+      {
+        "description_fingerprint": "8798b0177ebeac4f",
+        "addresses": [
+          "50 OAK ST",
+          "620 DUNDAS ST E"
+        ],
+        "evidence_ids": [
+          "permit:active:26 102675 MSA:00:cooling_tower",
+          "permit:active:26 102675 MSA:01:cooling_tower",
+          "permit:active:26 102725 PSA:00:cooling_tower",
+          "permit:active:26 102725 PSA:01:cooling_tower"
+        ],
+        "interpretation": "Identical recent permit description appears at multiple addresses; do not assume independent commercial opportunities without project-level reconciliation."
+      }
+    ]
   },
   "properties": [
     {
@@ -226,7 +265,12 @@
       "supporting_evidence_ids": [],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:2001",
@@ -263,7 +307,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:2021",
@@ -300,7 +349,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:2040",
@@ -336,7 +390,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:2063",
@@ -370,7 +429,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:3127",
@@ -404,7 +468,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:3180",
@@ -434,7 +503,12 @@
       "supporting_evidence_ids": [],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:3430",
@@ -469,7 +543,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:3432",
@@ -504,7 +583,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:3448",
@@ -538,7 +622,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "tdsb-schno:4175",
@@ -572,7 +661,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:5219",
@@ -609,7 +703,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "tdsb-schno:5262",
@@ -643,7 +742,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "OWNER_REPORTED_HIGH_RENEWAL_NEED"
     },
     {
       "property_key": "toronto-geoid:13505515",
@@ -684,7 +788,19 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:20 137758 BLD",
+        "toronto-permit:20 137758 HVA",
+        "toronto-permit:20 206221 BLD",
+        "toronto-permit:20 206221 HVA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:8392955",
@@ -738,7 +854,16 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "15 SCADDING AVE"
-      }
+      },
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:10 134645 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:828085",
@@ -771,7 +896,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:98 015945 HVA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:504793",
@@ -803,7 +937,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:08 228223 BLD"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:10133201",
@@ -835,7 +978,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:20 165219 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:7204478",
@@ -867,7 +1019,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:17 220512 BLD"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:7762637",
@@ -899,7 +1060,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:14 259939 BLD"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:8351164",
@@ -931,7 +1101,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:17 140238 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:10757635",
@@ -965,7 +1144,17 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:17 253386 BLD",
+        "toronto-permit:17 253386 HVA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-address:0fe02942cdb7892c",
@@ -997,7 +1186,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:23 216429 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:509769",
@@ -1033,7 +1231,18 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:18 107026 BLD",
+        "toronto-permit:18 107026 HVA",
+        "toronto-permit:18 107026 PLB"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:7730109",
@@ -1074,7 +1283,17 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:11 307336 BLD",
+        "toronto-permit:11 307336 HVA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:12167660",
@@ -1106,7 +1325,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "ALTER_REPAIR_OR_UPGRADE_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:18 227566 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-address:e594fd4f2a055b06",
@@ -1138,7 +1366,20 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": true,
-      "latest_recent_permit_activity_date": "2026-02-09"
+      "latest_recent_permit_activity_date": "2026-02-09",
+      "tower_lifecycle_events": [
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "permit_project_keys": [
+        "toronto-permit:26 102675 MSA"
+      ],
+      "recent_permit_project_keys_365d": [
+        "toronto-permit:26 102675 MSA"
+      ],
+      "commercial_disposition": "NEW_OR_EXPANDED_TOWER_SIGNAL"
     },
     {
       "property_key": "toronto-geoid:20055459",
@@ -1192,7 +1433,20 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "50 ROSEHILL AVE"
-      }
+      },
+      "tower_lifecycle_events": [
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER"
+      ],
+      "permit_project_keys": [
+        "toronto-permit:25 219194 MSA"
+      ],
+      "recent_permit_project_keys_365d": [
+        "toronto-permit:25 219194 MSA"
+      ],
+      "commercial_disposition": "VERIFY_RETIREMENT_OR_CONVERSION_NOT_NEW_TOWER_LEAD"
     },
     {
       "property_key": "toronto-geoid:8351177",
@@ -1246,7 +1500,16 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "55 THE ESPLANADE"
-      }
+      },
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:10 134639 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:20362101",
@@ -1282,7 +1545,22 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": true,
-      "latest_recent_permit_activity_date": "2026-08-21"
+      "latest_recent_permit_activity_date": "2026-08-21",
+      "tower_lifecycle_events": [
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "permit_project_keys": [
+        "toronto-permit:26 102675 MSA",
+        "toronto-permit:26 102725 PSA"
+      ],
+      "recent_permit_project_keys_365d": [
+        "toronto-permit:26 102675 MSA",
+        "toronto-permit:26 102725 PSA"
+      ],
+      "commercial_disposition": "NEW_OR_EXPANDED_TOWER_SIGNAL"
     },
     {
       "property_key": "toronto-geoid:3569436",
@@ -1314,7 +1592,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:19 111480 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:8155599",
@@ -1346,7 +1633,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:16 193795 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:507981",
@@ -1380,7 +1676,17 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:14 125487 BLD",
+        "toronto-permit:14 125487 HVA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:8127974",
@@ -1412,7 +1718,16 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:12 148282 BLD"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:4153974",
@@ -1444,7 +1759,16 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:16 241073 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:14038411",
@@ -1476,7 +1800,16 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:22 100336 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:20258361",
@@ -1512,7 +1845,19 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "ALTER_REPAIR_OR_UPGRADE_TOWER",
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:17 183143 BLD",
+        "toronto-permit:17 183143 HVA",
+        "toronto-permit:17 183143 PLB"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:8206111",
@@ -1550,7 +1895,19 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:17 138724 BLD",
+        "toronto-permit:17 138724 FSU",
+        "toronto-permit:17 138724 HVA",
+        "toronto-permit:17 138724 PLB"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:14601706",
@@ -1582,7 +1939,16 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:18 189994 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:772764",
@@ -1618,7 +1984,18 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "INSTALL_OR_ADD_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:16 101967 BLD",
+        "toronto-permit:16 101967 HVA",
+        "toronto-permit:16 101967 PLB"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:14674985",
@@ -1672,7 +2049,16 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "270 MILAN ST"
-      }
+      },
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:23 147719 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:3993557",
@@ -1704,7 +2090,16 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:18 186589 BLD"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:6868910",
@@ -1736,7 +2131,16 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:25 153112 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:871468",
@@ -1794,7 +2198,18 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "355 ST CLAIR AVE W"
-      }
+      },
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:21 246868 BLD",
+        "toronto-permit:21 246868 HVA",
+        "toronto-permit:21 246868 PLB"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:13501524",
@@ -1830,7 +2245,16 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "REPLACE_OR_RENEW_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:20 186423 BLD"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:14078150",
@@ -1866,7 +2290,17 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:24 176926 BLD",
+        "toronto-permit:24 176926 HVA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:568395",
@@ -1898,7 +2332,16 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:20 211644 MSA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:6727800",
@@ -1932,7 +2375,17 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [
+        "RETIRE_OR_CONVERT_AWAY_FROM_TOWER"
+      ],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [
+        "toronto-permit:18 177761 BLD",
+        "toronto-permit:18 177761 HVA"
+      ],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "CONFIRMED_TOWER_HISTORY_OR_UNDATED_NEED"
     },
     {
       "property_key": "toronto-geoid:10663925",
@@ -1960,7 +2413,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:6666985",
@@ -2013,7 +2471,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "1 CHURCH ST"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8087262",
@@ -2041,7 +2504,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8133817",
@@ -2069,7 +2537,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8677414",
@@ -2100,7 +2573,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8708498",
@@ -2130,7 +2608,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": true,
-      "latest_recent_permit_activity_date": "2025-09-19"
+      "latest_recent_permit_activity_date": "2025-09-19",
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:14188741",
@@ -2161,7 +2644,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7929398",
@@ -2189,7 +2677,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:856375",
@@ -2217,7 +2710,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:785208",
@@ -2247,7 +2745,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7929297",
@@ -2276,7 +2779,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10759047",
@@ -2326,7 +2834,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "11 WALMER RD"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7274128",
@@ -2354,7 +2867,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:873387",
@@ -2385,7 +2903,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:852873",
@@ -2420,7 +2943,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:772677",
@@ -2448,7 +2976,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10750671",
@@ -2478,7 +3011,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": true,
-      "latest_recent_permit_activity_date": "2025-09-08"
+      "latest_recent_permit_activity_date": "2025-09-08",
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:14200071",
@@ -2510,7 +3048,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:6282913",
@@ -2539,7 +3082,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8105939",
@@ -2569,7 +3117,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:321805",
@@ -2597,7 +3150,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:4030670",
@@ -2625,7 +3183,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": true,
-      "latest_recent_permit_activity_date": "2026-08-19"
+      "latest_recent_permit_activity_date": "2026-08-19",
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:3327203",
@@ -2653,7 +3216,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": true,
-      "latest_recent_permit_activity_date": "2026-07-15"
+      "latest_recent_permit_activity_date": "2026-07-15",
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:12601262",
@@ -2681,7 +3249,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10154617",
@@ -2734,7 +3307,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "1900 SHEPPARD AVE W"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8535820",
@@ -2770,7 +3348,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": true,
-      "latest_recent_permit_activity_date": "2026-05-27"
+      "latest_recent_permit_activity_date": "2026-05-27",
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:874651",
@@ -2799,7 +3382,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:20573",
@@ -2828,7 +3416,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:13977191",
@@ -2863,7 +3456,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8354416",
@@ -2892,7 +3490,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7042041",
@@ -2942,7 +3545,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "24 MABELLE AVE"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:20120574",
@@ -2992,7 +3600,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "246 SACKVILLE ST"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:5222597",
@@ -3024,7 +3637,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10906700",
@@ -3074,7 +3692,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "25 ELM ST"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:6168206",
@@ -3124,7 +3747,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "25 HENRY LANE TER"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7042042",
@@ -3174,7 +3802,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "25 MABELLE AVE"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:6868899",
@@ -3202,7 +3835,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:855387",
@@ -3230,7 +3868,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:30010555",
@@ -3261,7 +3904,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:9638452",
@@ -3290,7 +3938,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:796549",
@@ -3319,7 +3972,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-address:c972c91ae7b1dc29",
@@ -3350,7 +4008,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:30033035",
@@ -3379,7 +4042,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:12387715",
@@ -3429,7 +4097,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "330 JARVIS ST"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:772686",
@@ -3465,7 +4138,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:9135228",
@@ -3494,7 +4172,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:9086232",
@@ -3523,7 +4206,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:3065725",
@@ -3552,7 +4240,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:536800",
@@ -3582,7 +4275,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:6332564",
@@ -3620,7 +4318,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:566155",
@@ -3670,7 +4373,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "44 STUBBS DR"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7730267",
@@ -3698,7 +4406,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:994432",
@@ -3748,7 +4461,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "50 CORDOVA AVE"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:20260181",
@@ -3777,7 +4495,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:12601290",
@@ -3805,7 +4528,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:13501978",
@@ -3833,7 +4561,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:3841975",
@@ -3861,7 +4594,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8535679",
@@ -3889,7 +4627,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8087258",
@@ -3920,7 +4663,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7792268",
@@ -3948,7 +4696,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7792698",
@@ -3980,7 +4733,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:13498043",
@@ -4009,7 +4767,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:12763889",
@@ -4037,7 +4800,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-address:16a352860622bb56",
@@ -4065,7 +4833,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8038154",
@@ -4094,7 +4867,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:870176",
@@ -4125,7 +4903,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7570431",
@@ -4155,7 +4938,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:30025476",
@@ -4184,7 +4972,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:367187",
@@ -4215,7 +5008,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:828395",
@@ -4247,7 +5045,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:13503978",
@@ -4278,7 +5081,12 @@
       ],
       "source_active_permit_record": true,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:364214",
@@ -4306,7 +5114,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:1031968",
@@ -4334,7 +5147,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:1008107",
@@ -4362,7 +5180,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:3232917",
@@ -4390,7 +5213,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:772675",
@@ -4418,7 +5246,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:11267781",
@@ -4446,7 +5279,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:3147705",
@@ -4476,7 +5314,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:6275805",
@@ -4504,7 +5347,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:856376",
@@ -4532,7 +5380,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7793159",
@@ -4560,7 +5413,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7792536",
@@ -4588,7 +5446,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8344802",
@@ -4616,7 +5479,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:30044709",
@@ -4645,7 +5513,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:11835376",
@@ -4676,7 +5549,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:11901996",
@@ -4704,7 +5582,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7792529",
@@ -4737,7 +5620,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7683835",
@@ -4765,7 +5653,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8087336",
@@ -4798,7 +5691,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:11484425",
@@ -4827,7 +5725,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8896615",
@@ -4877,7 +5780,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "262 RIDLEY BLVD"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10011100",
@@ -4905,7 +5813,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10536994",
@@ -4933,7 +5846,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7063055",
@@ -4961,7 +5879,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8676866",
@@ -4989,7 +5912,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:12601206",
@@ -5019,7 +5947,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:514036",
@@ -5047,7 +5980,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:14601300",
@@ -5075,7 +6013,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:5573901",
@@ -5126,7 +6069,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "384 MOUNT PLEASANT RD"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8067836",
@@ -5154,7 +6102,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:13494194",
@@ -5182,7 +6135,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8676857",
@@ -5214,7 +6172,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:6350053",
@@ -5243,7 +6206,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10142946",
@@ -5271,7 +6239,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7929642",
@@ -5300,7 +6273,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:5336734",
@@ -5329,7 +6307,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8351179",
@@ -5357,7 +6340,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:323008",
@@ -5385,7 +6373,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:578559",
@@ -5413,7 +6406,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7641683",
@@ -5441,7 +6439,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:20097934",
@@ -5491,7 +6494,12 @@
         "cooling_room": null,
         "match_basis": "EXACT_CANONICAL_MUNICIPAL_ADDRESS",
         "canonical_address": "50 MATILDA ST"
-      }
+      },
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:2854062",
@@ -5519,7 +6527,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10906589",
@@ -5548,7 +6561,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:987965",
@@ -5579,7 +6597,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:536810",
@@ -5607,7 +6630,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7929870",
@@ -5636,7 +6664,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:11227032",
@@ -5665,7 +6698,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7950444",
@@ -5693,7 +6731,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7978539",
@@ -5721,7 +6764,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7730195",
@@ -5749,7 +6797,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:874010",
@@ -5777,7 +6830,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:10222905",
@@ -5806,7 +6864,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:8408205",
@@ -5834,7 +6897,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:836549",
@@ -5862,7 +6930,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7792587",
@@ -5890,7 +6963,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:7642546",
@@ -5918,7 +6996,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:364211",
@@ -5947,7 +7030,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:12763885",
@@ -5975,7 +7063,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     },
     {
       "property_key": "toronto-geoid:9531813",
@@ -6003,7 +7096,12 @@
       ],
       "source_active_permit_record": false,
       "recent_source_active_permit_activity_365d": false,
-      "latest_recent_permit_activity_date": null
+      "latest_recent_permit_activity_date": null,
+      "tower_lifecycle_events": [],
+      "recent_tower_lifecycle_events_365d": [],
+      "permit_project_keys": [],
+      "recent_permit_project_keys_365d": [],
+      "commercial_disposition": "NO_TOWER_ASSERTION"
     }
   ]
 }

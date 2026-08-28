@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-poc-0.1",
-  "generated_at": "2026-08-28T19:07:05.340185Z",
+  "generated_at": "2026-08-28T19:10:27.369912Z",
   "jurisdiction": "TORONTO_ON",
   "status": "EXPERIMENTAL_POC",
   "evidence_contract": {
@@ -19,7 +19,19 @@
     "source_active_permit_confirmed_cooling_tower_properties": 21,
     "recent_365d_source_active_permit_confirmed_cooling_tower_properties": 3,
     "properties_with_rentsafe_context": 19,
-    "confirmed_cooling_tower_properties_with_rentsafe_context": 5
+    "confirmed_cooling_tower_properties_with_rentsafe_context": 5,
+    "confirmed_properties_by_lifecycle_event": {
+      "ALTER_REPAIR_OR_UPGRADE_TOWER": 2,
+      "INSTALL_OR_ADD_TOWER": 7,
+      "REPLACE_OR_RENEW_TOWER": 21,
+      "RETIRE_OR_CONVERT_AWAY_FROM_TOWER": 6
+    },
+    "recent_365d_confirmed_properties_by_lifecycle_event": {
+      "INSTALL_OR_ADD_TOWER": 2,
+      "RETIRE_OR_CONVERT_AWAY_FROM_TOWER": 1
+    },
+    "recent_365d_permit_project_keys": 3,
+    "shared_recent_description_groups_across_addresses": 1
   },
   "sources": {
     "permits": {
@@ -194,5 +206,32 @@
     "recent_activity_window_days": 365,
     "recent_activity": "Source-active permit record with a usable event date no more than 365 days before POC generation.",
     "old_source_active_records": "Retained as equipment/project evidence but not represented as recent activity."
-  }
+  },
+  "tower_lifecycle_contract": {
+    "classification_basis": "Deterministic phrases in explicit public permit descriptions; no model inference.",
+    "precedence": [
+      "RETIRE_OR_CONVERT_AWAY_FROM_TOWER",
+      "REPLACE_OR_RENEW_TOWER",
+      "INSTALL_OR_ADD_TOWER",
+      "ALTER_REPAIR_OR_UPGRADE_TOWER",
+      "EXPLICIT_TOWER_UNSPECIFIED"
+    ],
+    "current_presence_caveat": "A permit can describe existing, proposed, replaced, or removed equipment. CONFIRMED means explicit documentary tower evidence, not guaranteed current post-project tower presence."
+  },
+  "potential_project_aliases": [
+    {
+      "description_fingerprint": "8798b0177ebeac4f",
+      "addresses": [
+        "50 OAK ST",
+        "620 DUNDAS ST E"
+      ],
+      "evidence_ids": [
+        "permit:active:26 102675 MSA:00:cooling_tower",
+        "permit:active:26 102675 MSA:01:cooling_tower",
+        "permit:active:26 102725 PSA:00:cooling_tower",
+        "permit:active:26 102725 PSA:01:cooling_tower"
+      ],
+      "interpretation": "Identical recent permit description appears at multiple addresses; do not assume independent commercial opportunities without project-level reconciliation."
+    }
+  ]
 }
