@@ -1,7 +1,7 @@
 import type { SystemDetail, SystemsPayload } from '../types/data'
 import type { ChangesPayload } from '../types/history'
 import type { NysChangesPayload, NysSystemsPayload } from '../types/nys'
-import type { CheckbookProcurementPayload, CityRecordProcurementPayload, ProcurementBundle } from '../types/procurement'
+import type { CheckbookProcurementPayload, CityRecordProcurementPayload, NysAuthorityProcurementPayload, ProcurementBundle } from '../types/procurement'
 import type { CompanyIntelligencePayload } from '../types/company'
 
 const base = import.meta.env.BASE_URL
@@ -48,9 +48,25 @@ export async function loadCheckbookProcurement(): Promise<CheckbookProcurementPa
   return payload
 }
 
+export async function loadNysAuthorityProcurement(): Promise<NysAuthorityProcurementPayload> {
+  const payload = await loadJson<NysAuthorityProcurementPayload>('procurement-nys-authorities.json', 'NYS authority procurement')
+  if (!Array.isArray(payload?.source_health) || !Array.isArray(payload?.contracts)) throw new Error('NYS authority procurement dataset is malformed')
+  return payload
+}
+
 export async function loadProcurement(): Promise<ProcurementBundle> {
   const [cityRecord, checkbook] = await Promise.all([loadCityRecordProcurement(), loadCheckbookProcurement()])
-  return { cityRecord, checkbook }
+  try {
+    const nysAuthorities = await loadNysAuthorityProcurement()
+    return { cityRecord, checkbook, nysAuthorities, sourceErrors: {} }
+  } catch (error) {
+    return {
+      cityRecord,
+      checkbook,
+      nysAuthorities: null,
+      sourceErrors: { nysAuthorities: error instanceof Error ? error.message : 'NYS authority procurement is unavailable' },
+    }
+  }
 }
 
 export async function loadCompanies(): Promise<CompanyIntelligencePayload> {

@@ -72,27 +72,15 @@ export interface ProcurementRecord {
   tower_link_confidence?: FacilityLinkConfidence | null
   entity_contract_number?: string | null
   commodity_line?: string | null
+  source_dataset_id?: string | null
+  source_fiscal_year_end?: string | null
 }
 
 export interface CityRecordProcurementPayload {
   schema_version: string
   generated_at: string
-  source: {
-    dataset_id: string
-    name: string
-    dataset_page?: string
-    retrieved_at: string
-    as_of_date: string
-    award_lookback_days: number
-  }
-  summary: {
-    scoped_record_count: number
-    relevant_record_count: number
-    open_relevant_opportunities: number
-    recent_relevant_awards: number
-    unresolved_vendor_count: number
-    classification_counts: Record<string, number>
-  }
+  source: { dataset_id: string; name: string; dataset_page?: string; retrieved_at: string; as_of_date: string; award_lookback_days: number }
+  summary: { scoped_record_count: number; relevant_record_count: number; open_relevant_opportunities: number; recent_relevant_awards: number; unresolved_vendor_count: number; classification_counts: Record<string, number> }
   source_health: ProcurementSourceHealth
   notices: ProcurementRecord[]
 }
@@ -100,31 +88,41 @@ export interface CityRecordProcurementPayload {
 export interface CheckbookProcurementPayload {
   schema_version: string
   generated_at: string
-  source: {
-    name: string
-    api_url: string
-    documentation_url: string
-    retrieved_at: string
-  }
-  summary: {
-    citywide_source_transaction_count: number
-    citywide_subvendor_source_transaction_count: number
-    citywide_unique_prime_contract_count: number
-    citywide_relevant_contract_count: number
-    edc_source_transaction_count: number
-    edc_unique_prime_contract_count: number
-    edc_unique_contract_line_count?: number
-    edc_relevant_contract_count: number
-    relevant_contract_count: number
-    unresolved_vendor_count: number
-    classification_counts: Record<string, number>
-    value_semantics: string
-  }
+  source: { name: string; api_url: string; documentation_url: string; retrieved_at: string }
+  summary: { citywide_source_transaction_count: number; citywide_subvendor_source_transaction_count: number; citywide_unique_prime_contract_count: number; citywide_relevant_contract_count: number; edc_source_transaction_count: number; edc_unique_prime_contract_count: number; edc_unique_contract_line_count?: number; edc_relevant_contract_count: number; relevant_contract_count: number; unresolved_vendor_count: number; classification_counts: Record<string, number>; value_semantics: string }
   source_health: Record<string, ProcurementSourceHealth>
+  contracts: ProcurementRecord[]
+}
+
+export interface NysAuthoritySourceHealth {
+  source: string
+  dataset_id: string
+  dataset_name: string
+  status: string
+  record_count: number
+  retrieved_candidate_count: number
+  relevant_record_count: number
+  vendor_record_count: number
+  pagination_complete: boolean
+  schema_valid: boolean
+  retrieved_at: string
+  coverage_note: string
+}
+
+export interface NysAuthorityProcurementPayload {
+  schema_version: string
+  generated_at: string
+  source: { name: string; api_root: string; dataset_ids: string[]; coverage: string; value_semantics: string }
+  summary: { source_dataset_count: number; source_record_count: number; retrieved_candidate_count: number; relevant_contract_count: number; vendor_record_count: number; classification_counts: Record<string, number>; value_semantics: string }
+  source_health: NysAuthoritySourceHealth[]
   contracts: ProcurementRecord[]
 }
 
 export interface ProcurementBundle {
   cityRecord: CityRecordProcurementPayload
   checkbook: CheckbookProcurementPayload
+  nysAuthorities: NysAuthorityProcurementPayload | null
+  sourceErrors: {
+    nysAuthorities?: string
+  }
 }

@@ -64,12 +64,16 @@ jobs:
         run: |
           python scripts/validate_checkbook_cache.py --cache .checkbook-store/data/checkbook/cache.json --max-age-days 2 --require-production-volume
           cp .checkbook-store/data/checkbook/cache.json public/data/procurement-checkbook.json
+      - name: Fetch and normalize statewide NYS authority procurement
+        run: python scripts/build_nys_authority_procurement.py --output public/data/procurement-nys-authorities.json --cohort data/fixtures/deal-validation-cohort.json
+      - name: Validate statewide NYS authority procurement
+        run: python scripts/validate_nys_authority_procurement.py --input public/data/procurement-nys-authorities.json
       - name: Build conservative observed-vendor company intelligence
-        run: python scripts/build_company_intelligence.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --output public/data/companies.json
-      - name: Verify City Record + Checkbook company aggregation
-        run: python scripts/validate_company_intelligence.py --companies public/data/companies.json --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json
+        run: python scripts/build_company_intelligence.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json --output public/data/companies.json
+      - name: Verify cross-source company aggregation
+        run: python scripts/validate_company_intelligence.py --companies public/data/companies.json --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json
       - name: Build empirical Deal Intelligence validation
-        run: python scripts/build_deal_validation.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --cohort data/fixtures/deal-validation-cohort.json --output public/data/deal-validation.json
+        run: python scripts/build_deal_validation.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json --cohort data/fixtures/deal-validation-cohort.json --output public/data/deal-validation.json
       - name: Validate Deal Intelligence methodology and gate
         run: python scripts/validate_deal_validation.py --report public/data/deal-validation.json
       - name: Attach last verified ACRIS timing cache

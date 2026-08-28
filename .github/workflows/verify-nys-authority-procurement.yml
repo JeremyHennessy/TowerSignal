@@ -1,0 +1,53 @@
+name: Verify NYS authority procurement
+
+on:
+  push:
+    branches: [agent/build016g-nys-procurement]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out last verified Checkbook NYC cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-checkbook
+          path: .checkbook-store
+          fetch-depth: 1
+          sparse-checkout: data/checkbook
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch current City Record procurement
+        run: python scripts/build_city_record_procurement.py --output public/data/procurement-city-record.json
+      - name: Attach and validate durable Checkbook procurement
+        run: |
+          python scripts/validate_checkbook_cache.py --cache .checkbook-store/data/checkbook/cache.json --max-age-days 2 --require-production-volume
+          cp .checkbook-store/data/checkbook/cache.json public/data/procurement-checkbook.json
+      - name: Fetch statewide NYS authority procurement
+        run: python scripts/build_nys_authority_procurement.py --output public/data/procurement-nys-authorities.json --cohort data/fixtures/deal-validation-cohort.json
+      - name: Validate statewide NYS authority procurement
+        run: python scripts/validate_nys_authority_procurement.py --input public/data/procurement-nys-authorities.json
+      - name: Rebuild cross-source company intelligence
+        run: python scripts/build_company_intelligence.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json --output public/data/companies.json
+      - name: Validate cross-source company aggregation
+        run: python scripts/validate_company_intelligence.py --companies public/data/companies.json --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json
+      - name: Rerun empirical Deal Intelligence validation
+        run: python scripts/build_deal_validation.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json --cohort data/fixtures/deal-validation-cohort.json --output public/data/deal-validation.json
+      - name: Validate Deal Intelligence methodology and fixed gate
+        run: python scripts/validate_deal_validation.py --report public/data/deal-validation.json
+      - name: Publish verification artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nys-authority-procurement-proof
+          path: |
+            public/data/procurement-city-record.json
+            public/data/procurement-nys-authorities.json
+            public/data/companies.json
+            public/data/deal-validation.json
+          retention-days: 14
