@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema_version": "toronto-poc-0.1",
-    "generated_at": "2026-08-28T18:55:30.883601Z",
+    "generated_at": "2026-08-28T18:58:55.083729Z",
     "jurisdiction": "TORONTO_ON",
     "status": "EXPERIMENTAL_POC",
     "evidence_contract": {
@@ -79,7 +79,13 @@
         "school_page_failure_rate": 0.0,
         "matched_confirmed_cooling_tower_schools": 13,
         "matched_schools_with_retained_related_rows": 13,
-        "fetch_failures": []
+        "fetch_failures": [],
+        "identity_enrichment": {
+          "matched_school_count": 13,
+          "match_basis": "EXACT_TDSB_SCHOOL_NUMBER",
+          "canonical_page_template": "https://www.tdsb.on.ca/Find-your/Schools/schno/{school_id}",
+          "identity_failures": 0
+        }
       }
     },
     "query_terms": [
@@ -96,8 +102,8 @@
       "property_key": "tdsb-schno:1924",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "650 Cosburn Ave, East York, ON, M4C 2V2",
+      "property_name": "East York Collegiate Institute",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -123,8 +129,8 @@
       "property_key": "tdsb-schno:2001",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "544 Horner Ave, Etobicoke, ON, M8W 2C2",
+      "property_name": "Sir Adam Beck Junior School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -157,8 +163,8 @@
       "property_key": "tdsb-schno:2021",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "44 Cordova Ave, Etobicoke, ON, M9A 2H5",
+      "property_name": "Islington Junior Middle School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -191,8 +197,8 @@
       "property_key": "tdsb-schno:2040",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "1 York Rd, Etobicoke, ON, M9R 3C8",
+      "property_name": "Kingsview Village Junior School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -224,8 +230,8 @@
       "property_key": "tdsb-schno:2063",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "85 Mount Olive Dr, Etobicoke, ON, M9V 2C9",
+      "property_name": "Highfield Junior School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -255,8 +261,8 @@
       "property_key": "tdsb-schno:3127",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "25 Forest Manor Rd, North York, ON, M2J 1M4",
+      "property_name": "Forest Manor Public School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -286,8 +292,8 @@
       "property_key": "tdsb-schno:3180",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "4505 Jane St, North York, ON, M3N 2K7",
+      "property_name": "Brookview Middle School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -313,8 +319,8 @@
       "property_key": "tdsb-schno:3430",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "100 Princess Ave, North York, ON, M2N 3R7",
+      "property_name": "Earl Haig Secondary School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -345,8 +351,8 @@
       "property_key": "tdsb-schno:3432",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "50 Francine Dr, North York, ON, M2H 2G6",
+      "property_name": "A Y Jackson Secondary School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -377,8 +383,8 @@
       "property_key": "tdsb-schno:3448",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "755 Oakdale Rd, North York, ON, M3N 1W7",
+      "property_name": "Westview Centennial Secondary School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -408,8 +414,8 @@
       "property_key": "tdsb-schno:4175",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "720 Midland Ave, Scarborough, ON, M1K 4C9",
+      "property_name": "Scarborough Centre for Alternative Studies",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -439,8 +445,8 @@
       "property_key": "tdsb-schno:5219",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "350 Parliament St, Toronto, ON, M5A 2Z7",
+      "property_name": "Lord Dufferin Junior and Senior Public School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [
@@ -473,8 +479,8 @@
       "property_key": "tdsb-schno:5262",
       "jurisdiction": "TORONTO_ON",
       "tower_status": "CONFIRMED",
-      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
-      "property_name": "Renewal Needs Backlog",
+      "address": "78 Seaforth Ave, Toronto, ON, M6K 3L2",
+      "property_name": "Parkdale Junior and Senior Public School",
       "organization": "Toronto District School Board",
       "geo_id": null,
       "equipment_types": [

@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-poc-0.1",
-  "generated_at": "2026-08-28T18:55:30.883601Z",
+  "generated_at": "2026-08-28T18:58:55.083729Z",
   "jurisdiction": "TORONTO_ON",
   "status": "EXPERIMENTAL_POC",
   "evidence_contract": {
@@ -78,7 +78,13 @@
       "school_page_failure_rate": 0.0,
       "matched_confirmed_cooling_tower_schools": 13,
       "matched_schools_with_retained_related_rows": 13,
-      "fetch_failures": []
+      "fetch_failures": [],
+      "identity_enrichment": {
+        "matched_school_count": 13,
+        "match_basis": "EXACT_TDSB_SCHOOL_NUMBER",
+        "canonical_page_template": "https://www.tdsb.on.ca/Find-your/Schools/schno/{school_id}",
+        "identity_failures": 0
+      }
     }
   },
   "query_terms": [
