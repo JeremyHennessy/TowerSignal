@@ -10,6 +10,7 @@ on:
       - scripts/enrich_toronto_poc_tdsb_identity.py
       - scripts/normalize_toronto_poc_permit_timing.py
       - scripts/enrich_toronto_poc_rentsafe.py
+      - scripts/build_toronto_poc_demo_accounts.py
       - docs/TORONTO_POC.md
       - .github/workflows/toronto-poc.yml
 
@@ -41,6 +42,7 @@ jobs:
           python -m py_compile scripts/enrich_toronto_poc_tdsb_identity.py
           python -m py_compile scripts/normalize_toronto_poc_permit_timing.py
           python -m py_compile scripts/enrich_toronto_poc_rentsafe.py
+          python -m py_compile scripts/build_toronto_poc_demo_accounts.py
 
       - name: Extract Toronto POC evidence
         run: python scripts/build_toronto_poc.py --output data/toronto/poc/current
@@ -54,12 +56,16 @@ jobs:
       - name: Join exact RentSafeTO account context
         run: python scripts/enrich_toronto_poc_rentsafe.py --output data/toronto/poc/current
 
+      - name: Assemble deterministic demo accounts
+        run: python scripts/build_toronto_poc_demo_accounts.py --output data/toronto/poc/current
+
       - name: Validate generated JSON
         run: |
           python -m json.tool data/toronto/poc/current/summary.json >/dev/null
           python -m json.tool data/toronto/poc/current/properties.json >/dev/null
           python -m json.tool data/toronto/poc/current/evidence.json >/dev/null
           python -m json.tool data/toronto/poc/current/rentsafe_matches.json >/dev/null
+          python -m json.tool data/toronto/poc/current/demo_accounts.json >/dev/null
 
       - name: Upload extraction artifact
         uses: actions/upload-artifact@v4
