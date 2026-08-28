@@ -6,7 +6,7 @@
   "portal_url": "https://open.toronto.ca/dataset/municipal-licensing-and-standards-business-licences-and-permits/",
   "license": "Open Government Licence - Toronto",
   "license_basis": "Toronto Open Data portal-wide licence.",
-  "retrieved_at": "2026-08-28T19:36:42.083447Z",
+  "retrieved_at": "2026-08-28T19:51:36.689520Z",
   "mode": "METADATA_ONLY_PENDING_TARGETED_EXTRACTION",
   "reason": "Potential occupant/operator enrichment source. Register metadata first because the full citywide licence universe is broader than TowerSignal and should be queried against the property spine rather than indiscriminately replicated.",
   "resources": [

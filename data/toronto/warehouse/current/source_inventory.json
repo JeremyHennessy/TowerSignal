@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-warehouse-0.1",
-  "generated_at": "2026-08-28T19:36:42.083447Z",
+  "generated_at": "2026-08-28T19:51:37.207914Z",
   "jurisdiction": "TORONTO_ON",
   "purpose": "Raw/near-raw source warehouse for TowerSignal Toronto discovery and commercial intelligence. No Toronto priority score.",
   "open_licensed_sources": [
@@ -11,7 +11,7 @@
       "package_id": "f78fe449-53f4-4962-9ec8-8f7eeece1072",
       "portal_url": "https://open.toronto.ca/dataset/tobids-awarded-contracts/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "resource": {
         "id": "e211f003-5909-4bea-bd96-d75899d8e612",
         "name": "Awarded Contracts",
@@ -51,7 +51,7 @@
       "package_id": "9b17b1bc-7227-44da-83ea-fc1ef3359176",
       "portal_url": "https://open.toronto.ca/dataset/capital-project-pipeline/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "resource": {
         "id": "e33e036f-a898-4b90-b626-84abba557bbd",
         "name": "Capital Project Pipeline",
@@ -91,7 +91,7 @@
       "package_id": "a7a327c5-4e25-4881-816d-c8b145e02832",
       "portal_url": "https://open.toronto.ca/dataset/development-pipeline/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "resource": {
         "id": "7aad5dbd-a769-4bd5-b5d2-f9bb605b6bf9",
         "name": "Development Pipeline",
@@ -131,7 +131,7 @@
       "package_id": "ae8eebf8-42fe-426f-b5f8-5baa8ff0bfb8",
       "portal_url": "https://open.toronto.ca/dataset/chemical-tracking-chemtrac/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "resource": {
         "id": "eb0480e5-6265-4d5d-b582-f112ebc7cc4f",
         "name": "Chemtrac Data 2024",
@@ -171,7 +171,7 @@
       "package_id": "4ef82789-e038-44ef-a478-a8f3590c3eb1",
       "portal_url": "https://open.toronto.ca/dataset/apartment-building-evaluation/",
       "license": "open-government-licence-toronto",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "resource": {
         "id": "244f7a02-da5c-425b-b55f-fbdd133dd732",
         "name": "Apartment Building Evaluations 2023 - current",
@@ -210,7 +210,7 @@
       "package_id": "b5fa8322-6acf-410e-affd-b4916ae7a249",
       "portal_url": "https://open.toronto.ca/dataset/upcoming-and-recently-completed-affordable-housing-units/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "resource": {
         "id": "1cef72d8-4bc0-4705-a4ba-998bcb4605ef",
         "name": "Affordable Rental Housing Pipeline",
@@ -250,7 +250,7 @@
       "package_id": "abedd8bc-e3dd-4d45-8e69-79165a76e4fa",
       "portal_url": "https://open.toronto.ca/dataset/address-points-municipal-toronto-one-address-repository/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "mode": "METADATA_ONLY",
       "reason": "Large geospatial spine; use targeted joins rather than duplicating full city geometry in git.",
       "resources": [
@@ -344,7 +344,7 @@
       "package_id": "09a930cc-2a52-49b2-866d-52ac7f769a73",
       "portal_url": "https://open.toronto.ca/dataset/topographic-mapping-building-outlines/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "mode": "METADATA_ONLY",
       "reason": "Large geospatial source; retain metadata and add targeted spatial extraction later.",
       "resources": [
@@ -421,7 +421,7 @@
       "source_url": "https://data.ontario.ca/dataset/5e976319-9769-4f77-aab9-d170e0131efe/resource/b6b569cf-5d3a-4b96-9972-ea428c316278/download/2024_final_data_set.xlsx",
       "catalogue_url": "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector",
       "license": "Open Government Licence - Ontario",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "download_bytes": 4065478,
       "source_row_count": 11857,
       "toronto_candidate_row_count": 1863,
@@ -437,7 +437,7 @@
       "portal_url": "https://open.toronto.ca/dataset/renewable-energy-installations/",
       "license": "Open Government Licence - Toronto",
       "license_basis": "Toronto Open Data portal-wide licence.",
-      "retrieved_at": "2026-08-28T19:36:42.083447Z",
+      "retrieved_at": "2026-08-28T19:51:36.689520Z",
       "resource": {
         "id": "05a84a1c-a707-4792-9e89-0d8176f1fd7b",
         "name": "Renewable Energy Installations",
@@ -458,7 +458,7 @@
       "portal_url": "https://open.toronto.ca/dataset/311-service-requests-customer-initiated/",
       "license": "Open Government Licence - Toronto",
       "license_basis": "Toronto Open Data portal-wide licence.",
-      "retrieved_at": "2026-08-28T19:36:42.083447Z",
+      "retrieved_at": "2026-08-28T19:51:36.689520Z",
       "mode": "METADATA_ONLY_PENDING_TARGETED_EXTRACTION",
       "reason": "Large service-request feed. Register resources now; use bounded/property-relevant extraction later. City-published analysis notes the open feed covers only a subset of total 311 requests/divisions, so absence cannot be interpreted as no complaint.",
       "resources": [
@@ -616,7 +616,7 @@
       "portal_url": "https://open.toronto.ca/dataset/municipal-licensing-and-standards-business-licences-and-permits/",
       "license": "Open Government Licence - Toronto",
       "license_basis": "Toronto Open Data portal-wide licence.",
-      "retrieved_at": "2026-08-28T19:36:42.083447Z",
+      "retrieved_at": "2026-08-28T19:51:36.689520Z",
       "mode": "METADATA_ONLY_PENDING_TARGETED_EXTRACTION",
       "reason": "Potential occupant/operator enrichment source. Register metadata first because the full citywide licence universe is broader than TowerSignal and should be queried against the property spine rather than indiscriminately replicated.",
       "resources": [
@@ -661,19 +661,1200 @@
           "datastore_active": false
         }
       ]
+    },
+    {
+      "key": "ontario_ewrb_large_buildings",
+      "title": "Energy and water usage of large buildings in Ontario",
+      "package_name": "energy-and-water-usage-of-large-buildings-in-ontario",
+      "package_id": "0eab2faf-6186-4a5b-8de1-b15872943c24",
+      "catalogue_url": "https://data.ontario.ca/dataset/energy-and-water-usage-of-large-buildings-in-ontario",
+      "license": "Open Government Licence – Ontario",
+      "license_gate": "Catalogue licence label must normalize to contain both 'Open Government Licence' and 'Ontario'.",
+      "retrieved_at": "2026-08-28T19:51:37.207914Z",
+      "selection_mode": "all_english_xlsx",
+      "resource_count": 8,
+      "toronto_row_count": 11595,
+      "resources": [
+        {
+          "id": "74c0e959-9683-4263-ba24-d047acfef681",
+          "name": "2018",
+          "format": "XLSX",
+          "url": "https://data.ontario.ca/dataset/0eab2faf-6186-4a5b-8de1-b15872943c24/resource/74c0e959-9683-4263-ba24-d047acfef681/download/ontario_large_building_energy_water_ghgs-2018.xlsx",
+          "last_modified": "2020-08-31T17:38:06.620829",
+          "language": "english",
+          "year": 2018,
+          "source_row_count": 534,
+          "toronto_row_count": 253,
+          "scope_basis_counts": {
+            "EXACT_CITY_OR_MUNICIPALITY_FIELD": 534
+          }
+        },
+        {
+          "id": "357cd5e3-03e0-42fe-9bea-21b1126fd9ad",
+          "name": "Data Dictionary",
+          "format": "XLSX",
+          "url": "https://data.ontario.ca/dataset/0eab2faf-6186-4a5b-8de1-b15872943c24/resource/357cd5e3-03e0-42fe-9bea-21b1126fd9ad/download/ontario_large_building_energy_water_ghgs_data_dictionary.xlsx",
+          "last_modified": "2020-08-31T17:39:08.519976",
+          "language": "english",
+          "year": null,
+          "source_row_count": 143,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 143
+          }
+        },
+        {
+          "id": "bda9443d-dd2b-427f-b239-03820fa2ca3d",
+          "name": "2019",
+          "format": "XLSX",
+          "url": "https://data.ontario.ca/dataset/0eab2faf-6186-4a5b-8de1-b15872943c24/resource/bda9443d-dd2b-427f-b239-03820fa2ca3d/download/ontario_large_building_energy_water_ghgs-2019.xlsx",
+          "last_modified": "2021-02-25T19:49:38.846630",
+          "language": "english",
+          "year": 2019,
+          "source_row_count": 3093,
+          "toronto_row_count": 1328,
+          "scope_basis_counts": {
+            "EXACT_CITY_OR_MUNICIPALITY_FIELD": 3093
+          }
+        },
+        {
+          "id": "5753b180-7c21-485e-8324-e232b59ce19e",
+          "name": "2020",
+          "format": "XLSX",
+          "url": "https://data.ontario.ca/dataset/0eab2faf-6186-4a5b-8de1-b15872943c24/resource/5753b180-7c21-485e-8324-e232b59ce19e/download/energy_large_building_energy_water_ghgs-2020_.xlsx",
+          "last_modified": "2021-12-14T18:22:27.532074",
+          "language": "english",
+          "year": 2020,
+          "source_row_count": 3491,
+          "toronto_row_count": 1430,
+          "scope_basis_counts": {
+            "EXACT_CITY_OR_MUNICIPALITY_FIELD": 3491
+          }
+        },
+        {
+          "id": "e7292ae5-90b9-4c6c-bd7b-75f4fab48142",
+          "name": "2021",
+          "format": "XLSX",
+          "url": "https://data.ontario.ca/dataset/0eab2faf-6186-4a5b-8de1-b15872943c24/resource/e7292ae5-90b9-4c6c-bd7b-75f4fab48142/download/ewrb_odc_data_prep_2022_updated_sept_28_2023.xlsx",
+          "last_modified": "2023-09-28T14:50:11.399112",
+          "language": "english",
+          "year": 2021,
+          "source_row_count": 3611,
+          "toronto_row_count": 1415,
+          "scope_basis_counts": {
+            "EXACT_CITY_OR_MUNICIPALITY_FIELD": 3611
+          }
+        },
+        {
+          "id": "f53db89b-d5e0-49ea-aa85-70453d969453",
+          "name": "2022",
+          "format": "XLSX",
+          "url": "https://data.ontario.ca/dataset/0eab2faf-6186-4a5b-8de1-b15872943c24/resource/f53db89b-d5e0-49ea-aa85-70453d969453/download/energy_large_building_energy_water_ghgs_2022.xlsx",
+          "last_modified": "2024-12-24T15:06:09.746424",
+          "language": "english",
+          "year": 2023,
+          "source_row_count": 6864,
+          "toronto_row_count": 2445,
+          "scope_basis_counts": {
+            "EXACT_CITY_OR_MUNICIPALITY_FIELD": 6864
+          }
+        },
+        {
+          "id": "980458c7-81df-4ffe-8543-71907583cc87",
+          "name": "2023",
+          "format": "XLSX",
+          "url": "https://data.ontario.ca/dataset/0eab2faf-6186-4a5b-8de1-b15872943c24/resource/980458c7-81df-4ffe-8543-71907583cc87/download/energy_large_building_energy_water_ghgs-2023.xlsx",
+          "last_modified": "2024-12-24T15:07:02.737575",
+          "language": "english",
+          "year": 2023,
+          "source_row_count": 6361,
+          "toronto_row_count": 2265,
+          "scope_basis_counts": {
+            "EXACT_CITY_OR_MUNICIPALITY_FIELD": 6361
+          }
+        },
+        {
+          "id": "aeb34aef-5029-4b65-8093-c86ad682b037",
+          "name": "2024",
+          "format": "XLSX",
+          "url": "https://data.ontario.ca/dataset/0eab2faf-6186-4a5b-8de1-b15872943c24/resource/aeb34aef-5029-4b65-8093-c86ad682b037/download/odc_final_dataset_2024.xlsx",
+          "last_modified": "2026-01-13T16:28:55.320451",
+          "language": "english",
+          "year": 2024,
+          "source_row_count": 6739,
+          "toronto_row_count": 2459,
+          "scope_basis_counts": {
+            "EXACT_CITY_OR_MUNICIPALITY_FIELD": 6739
+          }
+        }
+      ],
+      "scope_contract": "Exact Toronto/Etobicoke/North York/Scarborough/East York/York city-or-municipality field; fallback only to a Toronto M-postal code contained in an address field.",
+      "absence": "No row is not evidence that a property/facility has no relevant equipment, activity, or compliance history."
+    },
+    {
+      "key": "ontario_environmental_compliance_reports",
+      "title": "Environmental Compliance Reports",
+      "package_name": "environmental-compliance-reports",
+      "package_id": "13cab7d0-4dac-4b44-b102-eaf3ca83684d",
+      "catalogue_url": "https://data.ontario.ca/dataset/environmental-compliance-reports",
+      "license": "Open Government Licence – Ontario",
+      "license_gate": "Catalogue licence label must normalize to contain both 'Open Government Licence' and 'Ontario'.",
+      "retrieved_at": "2026-08-28T19:51:37.207914Z",
+      "selection_mode": "all_tabular",
+      "resource_count": 60,
+      "toronto_row_count": 56,
+      "resources": [
+        {
+          "id": "d90144d8-a8ec-403a-b8e3-48567eec2db3",
+          "name": "2020 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Air_Emissions_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2020,
+          "source_row_count": 173,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 173
+          }
+        },
+        {
+          "id": "63d8242b-66fa-4ceb-b3c2-682fc245185c",
+          "name": "2020 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Air_Emissions_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2020,
+          "source_row_count": 173,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 173
+          }
+        },
+        {
+          "id": "8342525a-33ce-4097-82f4-677dcb6662e4",
+          "name": "2020 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Industrial_Sewage_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2020,
+          "source_row_count": 225,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 225
+          }
+        },
+        {
+          "id": "9accccb4-6e3f-48e6-b9f5-b3d09f176a54",
+          "name": "2020 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Industrial_Sewage_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2020,
+          "source_row_count": 225,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 225
+          }
+        },
+        {
+          "id": "c091f158-dc6c-4113-b70a-bdafa9e1f46a",
+          "name": "2020 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Municipal_Private_Sewage_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2020,
+          "source_row_count": 340,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 340
+          }
+        },
+        {
+          "id": "be91336d-df92-4e87-8282-542db5e3e6cd",
+          "name": "2020 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Municipal_Private_Sewage_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2020,
+          "source_row_count": 340,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 340
+          }
+        },
+        {
+          "id": "af239ccb-20d1-4705-b106-7c6a2af402a1",
+          "name": "2020 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Air_Emissions_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2020,
+          "source_row_count": 174,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 174
+          }
+        },
+        {
+          "id": "dfcc410a-ce40-4be9-acad-596bffd4a903",
+          "name": "2020 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Air_Emissions_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2020,
+          "source_row_count": 174,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 174
+          }
+        },
+        {
+          "id": "2161cfce-a89c-4aa8-b013-1d448c35db3f",
+          "name": "2020 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Industrial_Sewage_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2020,
+          "source_row_count": 226,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 226
+          }
+        },
+        {
+          "id": "934f2baa-62a0-4184-89ee-0173fe41f0e0",
+          "name": "2020 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Industrial_Sewage_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2020,
+          "source_row_count": 226,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 226
+          }
+        },
+        {
+          "id": "c3cd6f62-0fd0-4b9a-95a9-4d177d2e9040",
+          "name": "2020 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Municipal_Private_Sewage_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2020,
+          "source_row_count": 341,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 341
+          }
+        },
+        {
+          "id": "4410ca11-d927-48c4-8eb7-81219622363f",
+          "name": "2020 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2020_Municipal_Private_Sewage_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2020,
+          "source_row_count": 341,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 341
+          }
+        },
+        {
+          "id": "d5adb1b8-ce36-456c-b087-c8445f7170fc",
+          "name": "2021 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Air_Emissions_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2021,
+          "source_row_count": 135,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 135
+          }
+        },
+        {
+          "id": "c940063e-038d-4b00-a12b-d225663f2b6a",
+          "name": "2021 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Air_Emissions_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2021,
+          "source_row_count": 135,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 135
+          }
+        },
+        {
+          "id": "a41c69d2-9292-46dd-ac9b-e201180d9715",
+          "name": "2021 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Industrial_Sewage_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2021,
+          "source_row_count": 267,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 267
+          }
+        },
+        {
+          "id": "1787f99a-2504-4edd-ab4c-b2607b1895fa",
+          "name": "2021 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Industrial_Sewage_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2021,
+          "source_row_count": 267,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 267
+          }
+        },
+        {
+          "id": "d99a5e05-7eba-4d84-b4d1-e9dcd015150a",
+          "name": "2021 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Municipal_Private_Sewage_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2021,
+          "source_row_count": 485,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 485
+          }
+        },
+        {
+          "id": "8ec22002-a135-4583-a29a-62d12e13adf5",
+          "name": "2021 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Municipal_Private_Sewage_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2021,
+          "source_row_count": 485,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 485
+          }
+        },
+        {
+          "id": "8033ccd0-70ec-49b8-9b11-dd8e3c3681ea",
+          "name": "2021 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Air_Emissions_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2021,
+          "source_row_count": 134,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 134
+          }
+        },
+        {
+          "id": "bcb2d43a-899a-43a9-9010-e82272dc58ec",
+          "name": "2021 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Air_Emissions_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2021,
+          "source_row_count": 134,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 134
+          }
+        },
+        {
+          "id": "644bbef6-bb1e-4038-9531-d1658ae39618",
+          "name": "2021 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Industrial_Sewage_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2021,
+          "source_row_count": 266,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 266
+          }
+        },
+        {
+          "id": "0cfc32d4-79a9-4afb-86bb-44a3b597e548",
+          "name": "2021 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Industrial_Sewage_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2021,
+          "source_row_count": 266,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 266
+          }
+        },
+        {
+          "id": "113beeea-6516-46eb-a75c-bfbffcab722c",
+          "name": "2021 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Municipal_Private_Sewage_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2021,
+          "source_row_count": 484,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 484
+          }
+        },
+        {
+          "id": "5bc481ce-a8a7-4dac-8d1a-b2542bcd22e5",
+          "name": "2021 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2021_Municipal_Private_Sewage_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2021,
+          "source_row_count": 484,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 484
+          }
+        },
+        {
+          "id": "8e183a30-02fc-4753-bc3d-774f4d88dce4",
+          "name": "2022 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Air_Emissions_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2022,
+          "source_row_count": 220,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 220
+          }
+        },
+        {
+          "id": "41149730-5749-4844-bc94-fd29bcd31320",
+          "name": "2022 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Air_Emissions_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2022,
+          "source_row_count": 220,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 220
+          }
+        },
+        {
+          "id": "b45781a8-c827-4b2e-8c63-7c2735aaa5e5",
+          "name": "2022 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Industrial_Sewage_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2022,
+          "source_row_count": 355,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 355
+          }
+        },
+        {
+          "id": "bdec5852-946e-43e0-8ac1-da34fc1cc1be",
+          "name": "2022 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Industrial_Sewage_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2022,
+          "source_row_count": 355,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 355
+          }
+        },
+        {
+          "id": "4d0a1615-4798-48f1-a3a9-19d7e40c4eb6",
+          "name": "2022 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Municipal_Private_Sewage_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2022,
+          "source_row_count": 761,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 761
+          }
+        },
+        {
+          "id": "878f426b-7511-49ad-9d9a-8cafe35cffdf",
+          "name": "2022 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Municipal_Private_Sewage_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2022,
+          "source_row_count": 761,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 761
+          }
+        },
+        {
+          "id": "7088f8a3-b658-4e03-8fca-5f4f126cd668",
+          "name": "2022 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Air_Emissions_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2022,
+          "source_row_count": 220,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 220
+          }
+        },
+        {
+          "id": "97b85134-32c0-4450-9566-f0f41dd31188",
+          "name": "2022 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Air_Emissions_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2022,
+          "source_row_count": 220,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 220
+          }
+        },
+        {
+          "id": "7e7b588c-e7eb-4e0a-92a7-b9becef8c2c2",
+          "name": "2022 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Industrial_Sewage_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2022,
+          "source_row_count": 355,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 355
+          }
+        },
+        {
+          "id": "fde369c6-cded-47e5-a513-cd1dc906206a",
+          "name": "2022 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Industrial_Sewage_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2022,
+          "source_row_count": 355,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 355
+          }
+        },
+        {
+          "id": "8fdf61e6-e793-4f70-813d-214523e4faf8",
+          "name": "2022 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Municipal_Private_Sewage_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2022,
+          "source_row_count": 761,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 761
+          }
+        },
+        {
+          "id": "87a404af-a665-48a8-b38f-8a15be25fd76",
+          "name": "2022 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2022_Municipal_Private_Sewage_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2022,
+          "source_row_count": 761,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 761
+          }
+        },
+        {
+          "id": "29d34f97-2c48-4ce4-8110-f96180884736",
+          "name": "2023 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_AIR_Emissions_All_Regions1.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2023,
+          "source_row_count": 295,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 295
+          }
+        },
+        {
+          "id": "ea905e97-9309-4c55-a2fe-c5d6cbc0f21a",
+          "name": "2023 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_AIR_Emissions_All_Regions_FR1.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2023,
+          "source_row_count": 295,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 295
+          }
+        },
+        {
+          "id": "318ffc6c-6ca1-40e2-9b30-aa7ea3178a9f",
+          "name": "2023 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_Industrial_Sewage_All_Regions1.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2023,
+          "source_row_count": 408,
+          "toronto_row_count": 3,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 405,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 3
+          }
+        },
+        {
+          "id": "5dd623ed-5fee-43b7-b1ce-2d2d834eb4b0",
+          "name": "2023 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_Industrial_Sewage_All_Regions_FR1.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2023,
+          "source_row_count": 408,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 408
+          }
+        },
+        {
+          "id": "a6e1908e-be31-45dd-a0cc-b6e15aad447a",
+          "name": "2023 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_Municipal_Private_Sewage_All_Regions1.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2023,
+          "source_row_count": 761,
+          "toronto_row_count": 1,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 760,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 1
+          }
+        },
+        {
+          "id": "82876c6d-87a2-4c43-b93a-e104e5daee55",
+          "name": "2023 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_Municipal_Private_Sewage_All_Regions_FR1.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2023,
+          "source_row_count": 761,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 761
+          }
+        },
+        {
+          "id": "7e24688a-a613-456d-b039-750fc86c3dfb",
+          "name": "2023 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_AIR_Emissions_All_Regions1.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2023,
+          "source_row_count": 295,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 295
+          }
+        },
+        {
+          "id": "bfa8dd19-a38a-4395-b115-76e79dfcb0e4",
+          "name": "2023 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_AIR_Emissions_All_Regions_FR1.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2023,
+          "source_row_count": 295,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 295
+          }
+        },
+        {
+          "id": "46296aeb-5a9d-41fc-9bcd-b6a400ac5133",
+          "name": "2023 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_Industrial_Sewage_All_Regions1.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2023,
+          "source_row_count": 408,
+          "toronto_row_count": 3,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 405,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 3
+          }
+        },
+        {
+          "id": "dd25ce82-7209-4978-a92c-0e85dcf05885",
+          "name": "2023 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_Industrial_Sewage_All_Regions_FR1.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2023,
+          "source_row_count": 408,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 408
+          }
+        },
+        {
+          "id": "e55aee40-9891-455a-846b-73d6cd4ea959",
+          "name": "2023 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_Municipal_Private_Sewage_All_Regions7.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2023,
+          "source_row_count": 761,
+          "toronto_row_count": 1,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 760,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 1
+          }
+        },
+        {
+          "id": "a3532545-103c-4097-ba14-3e06d2dd2c8b",
+          "name": "2023 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2023_ECR_Municipal_Private_Sewage_All_Regions_FR1.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2023,
+          "source_row_count": 761,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 761
+          }
+        },
+        {
+          "id": "84ab44db-a814-4980-a1b7-bace66ad9a5e",
+          "name": "2024 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_AIR_Emissions_AllRegions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2024,
+          "source_row_count": 279,
+          "toronto_row_count": 1,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 278,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 1
+          }
+        },
+        {
+          "id": "6c610f50-c6e4-4037-892f-ad06ac4eabd0",
+          "name": "2024 air emissions",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_AIR_Emissions_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2024,
+          "source_row_count": 279,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 279
+          }
+        },
+        {
+          "id": "3ce019e8-784b-4ee2-84d0-080592ecc4cf",
+          "name": "2024 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_Industrial%20Sewage_Emissions_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2024,
+          "source_row_count": 353,
+          "toronto_row_count": 1,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 352,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 1
+          }
+        },
+        {
+          "id": "b3ee1c7b-b577-46fe-b3bd-68b064d5f6b9",
+          "name": "2024 industrial sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_Industrial%20Sewage_Emissions_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2024,
+          "source_row_count": 353,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 353
+          }
+        },
+        {
+          "id": "d7adbdc5-40dd-4312-91da-e3483e2f5bd9",
+          "name": "2024 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_Municipal_Private_Sewage_Emissions_All_Regions.xlsx",
+          "last_modified": null,
+          "language": "english",
+          "year": 2024,
+          "source_row_count": 795,
+          "toronto_row_count": 22,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 773,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 22
+          }
+        },
+        {
+          "id": "d3df502e-4e29-4b82-aef7-1c1139dfa15f",
+          "name": "2024 municipal/private sewage",
+          "format": "XLSX",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_Municipal_Private_Sewage_Emissions_All_Regions_FR.xlsx",
+          "last_modified": null,
+          "language": "french",
+          "year": 2024,
+          "source_row_count": 795,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 795
+          }
+        },
+        {
+          "id": "c8d27e55-7441-44a9-9dac-6f2a288489e4",
+          "name": "2024 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_AIR_Emissions_AllRegions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2024,
+          "source_row_count": 279,
+          "toronto_row_count": 1,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 278,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 1
+          }
+        },
+        {
+          "id": "abf92958-7eeb-4861-917b-d8313fa8b3b9",
+          "name": "2024 air emissions",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_AIR_Emissions_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2024,
+          "source_row_count": 279,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 279
+          }
+        },
+        {
+          "id": "fb82dc66-56c3-47e7-ba7d-ca9adbc3dc77",
+          "name": "2024 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_Industrial%20Sewage_Emissions_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2024,
+          "source_row_count": 353,
+          "toronto_row_count": 1,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 352,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 1
+          }
+        },
+        {
+          "id": "57c18807-8d69-4b30-b8a4-237139d81cc3",
+          "name": "2024 industrial sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_Industrial%20Sewage_Emissions_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2024,
+          "source_row_count": 353,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 353
+          }
+        },
+        {
+          "id": "65ac8430-5aa3-4c2d-b464-d20ebdf0ba29",
+          "name": "2024 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_Municipal_Private_Sewage_Emissions_All_Regions.csv",
+          "last_modified": null,
+          "language": "english",
+          "year": 2024,
+          "source_row_count": 795,
+          "toronto_row_count": 22,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 773,
+            "TORONTO_POSTAL_CODE_IN_ADDRESS_FIELD": 22
+          }
+        },
+        {
+          "id": "01d90ac3-8d63-4e7b-a647-ee1bb9e42e0e",
+          "name": "2024 municipal/private sewage",
+          "format": "CSV",
+          "url": "https://files.ontario.ca/moe_mapping/downloads/4Other/ECR/2024_ECR_Municipal_Private_Sewage_Emissions_All_Regions_FR.csv",
+          "last_modified": null,
+          "language": "french",
+          "year": 2024,
+          "source_row_count": 795,
+          "toronto_row_count": 0,
+          "scope_basis_counts": {
+            "NO_DETERMINISTIC_TORONTO_FIELD": 795
+          }
+        }
+      ],
+      "scope_contract": "Exact Toronto/Etobicoke/North York/Scarborough/East York/York city-or-municipality field; fallback only to a Toronto M-postal code contained in an address field.",
+      "absence": "No row is not evidence that a property/facility has no relevant equipment, activity, or compliance history."
+    },
+    {
+      "key": "chemtrac_history",
+      "title": "Chemical Tracking (ChemTrac)",
+      "portal_url": "https://open.toronto.ca/dataset/chemical-tracking-chemtrac/",
+      "license": "Open Government Licence - Toronto",
+      "resource_count": 20,
+      "row_count": 37964,
+      "resources": [
+        {
+          "year": 2010,
+          "resource_id": "2c937a48-ace8-4b2a-be43-a7f9c9b5c791",
+          "name": "Chemtrac Data 2010",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 803
+        },
+        {
+          "year": 2010,
+          "resource_id": "19800c1a-6784-48b3-8b90-922a91871ad6",
+          "name": "Chemtrac Data 2010.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:45:33.999324",
+          "row_count": 803
+        },
+        {
+          "year": 2011,
+          "resource_id": "240beb92-003b-4b1c-b6eb-284695bf0170",
+          "name": "Chemtrac Data 2011",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 1645
+        },
+        {
+          "year": 2011,
+          "resource_id": "5ed3a534-fa56-4639-a407-25fae15bd9a4",
+          "name": "Chemtrac Data 2011.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:45:27.431231",
+          "row_count": 1645
+        },
+        {
+          "year": 2012,
+          "resource_id": "32e5a508-b52f-43b2-84ce-808757d11962",
+          "name": "Chemtrac Data 2012",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 2584
+        },
+        {
+          "year": 2012,
+          "resource_id": "4dcdbb55-6c81-4380-a623-7449268d586a",
+          "name": "Chemtrac Data 2012.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:45:20.630862",
+          "row_count": 2584
+        },
+        {
+          "year": 2013,
+          "resource_id": "c2c7e858-2dbc-4313-b3bf-152b3851d93e",
+          "name": "Chemtrac Data 2013",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 2517
+        },
+        {
+          "year": 2013,
+          "resource_id": "7e9343d6-4284-414a-b55f-b8b30125df85",
+          "name": "Chemtrac Data 2013.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:45:13.732124",
+          "row_count": 2517
+        },
+        {
+          "year": 2014,
+          "resource_id": "2beee9d8-e32d-4ad2-b337-4df9df4444d0",
+          "name": "Chemtrac Data 2014",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 2221
+        },
+        {
+          "year": 2014,
+          "resource_id": "725f4585-93bb-4cc0-94fc-a76b8cd0c3a1",
+          "name": "Chemtrac Data 2014.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:45:06.513257",
+          "row_count": 2221
+        },
+        {
+          "year": 2015,
+          "resource_id": "19498a6d-9768-47c2-be97-9173fb15d927",
+          "name": "Chemtrac Data 2015",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 2021
+        },
+        {
+          "year": 2015,
+          "resource_id": "3facf14c-4384-469b-a5d3-79804ba9b0a9",
+          "name": "Chemtrac Data 2015.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:44:58.995609",
+          "row_count": 2021
+        },
+        {
+          "year": 2016,
+          "resource_id": "5bf7d7d2-d57e-478f-9f03-d8027a1e836a",
+          "name": "Chemtrac Data 2016",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 1985
+        },
+        {
+          "year": 2016,
+          "resource_id": "39e53e4c-8a29-4fd4-876e-7584a0b9a131",
+          "name": "Chemtrac Data 2016.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:44:51.181313",
+          "row_count": 1985
+        },
+        {
+          "year": 2017,
+          "resource_id": "82b6b099-4f19-407b-946c-fdad94b65607",
+          "name": "Chemtrac Data 2017",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 1987
+        },
+        {
+          "year": 2017,
+          "resource_id": "6aca9c31-3b9a-483a-bcca-a1c631d7b25b",
+          "name": "Chemtrac Data 2017.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:44:44.222769",
+          "row_count": 1987
+        },
+        {
+          "year": 2018,
+          "resource_id": "8550465e-1222-43f6-b9cd-1ddd3ad70b92",
+          "name": "Chemtrac Data 2018",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 1942
+        },
+        {
+          "year": 2018,
+          "resource_id": "e789e297-1bf5-4847-8341-16fe894e9975",
+          "name": "Chemtrac Data 2018.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:44:37.175438",
+          "row_count": 1942
+        },
+        {
+          "year": 2024,
+          "resource_id": "eb0480e5-6265-4d5d-b582-f112ebc7cc4f",
+          "name": "Chemtrac Data 2024",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 1277
+        },
+        {
+          "year": 2024,
+          "resource_id": "718a66a4-7895-4151-977a-925bdc22ad69",
+          "name": "Chemtrac Data 2024.csv",
+          "format": "CSV",
+          "last_modified": "2026-02-20T18:44:30.171686",
+          "row_count": 1277
+        }
+      ],
+      "known_gap": "Toronto Open Data notes ChemTRAC data from 2019 through 2023 is unavailable due to COVID-19 related reporting interruptions."
+    },
+    {
+      "key": "toronto_public_notices",
+      "source_url": "https://secure.toronto.ca/nm/notices.json",
+      "documentation_url": "https://secure.toronto.ca/nm/opendata.do",
+      "license": "Open Government Licence - Toronto",
+      "licence_basis": "City Clerk publishes this as an Open Data API; use follows the City of Toronto Open Government Licence for City Open Data information.",
+      "source_notice_count": 2948,
+      "planning_notice_count": 1524,
+      "matched_planning_notice_count": 9,
+      "matched_poc_address_count": 7,
+      "matched_confirmed_tower_address_count": 1,
+      "match_basis": "EXACT_CANONICAL_ADDRESS_FROM_NOTICE_ADDRESS_LIST_TO_POC_ADDRESS",
+      "background_documents": "BackgroundInformationList is retained as source document context; document contents are not automatically treated as cooling-tower evidence."
     }
   ],
   "rights_review_sources": [
     {
       "key": "ontario_access_environment",
       "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-      "retrieved_at": "2026-08-28T19:36:18.639993Z",
+      "retrieved_at": "2026-08-28T19:51:24.978104Z",
       "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
       "layers": {
         "environmental_compliance_approvals": {
           "key": "environmental_compliance_approvals",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:36:18.639993Z",
+          "retrieved_at": "2026-08-28T19:51:24.978104Z",
           "scope": "EXACT_SOURCE_MUNICIPALITY_FIELD",
           "bbox_wgs84": [
             -79.6393,
@@ -714,7 +1895,7 @@
         "environmental_activity_sector_registrations": {
           "key": "environmental_activity_sector_registrations",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:36:18.639993Z",
+          "retrieved_at": "2026-08-28T19:51:24.978104Z",
           "scope": "EXACT_SOURCE_MUNICIPALITY_FIELD",
           "bbox_wgs84": [
             -79.6393,
@@ -755,7 +1936,7 @@
         "permits_to_take_water": {
           "key": "permits_to_take_water",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:36:18.639993Z",
+          "retrieved_at": "2026-08-28T19:51:24.978104Z",
           "scope": "TORONTO_APPROXIMATE_BOUNDING_BOX",
           "bbox_wgs84": [
             -79.6393,
@@ -839,6 +2020,28 @@
       "mls_business_licences_permits": {
         "resources": 5
       }
+    }
+  },
+  "ontario_open_building_environment_pull": {
+    "ontario_ewrb_large_buildings": {
+      "toronto_row_count": 11595,
+      "resource_count": 8
+    },
+    "ontario_environmental_compliance_reports": {
+      "toronto_row_count": 56,
+      "resource_count": 60
+    }
+  },
+  "historical_and_notice_pull": {
+    "chemtrac_history": {
+      "row_count": 37964,
+      "resource_count": 20
+    },
+    "public_notices": {
+      "source_notice_count": 2948,
+      "planning_notice_count": 1524,
+      "matched_poc_address_count": 7,
+      "matched_confirmed_tower_address_count": 1
     }
   },
   "normalization": {
