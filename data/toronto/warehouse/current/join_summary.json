@@ -1,0 +1,28 @@
+{
+  "schema_version": "toronto-warehouse-join-0.1",
+  "jurisdiction": "TORONTO_ON",
+  "join_contract": {
+    "structured_sources": "Exact canonical municipal street-address equality only.",
+    "document_sources": "Exact canonical full property-address token sequence in normalized document text only.",
+    "fuzzy_matching": false,
+    "no_match_semantics": "No exact match does not mean the source lacks relevant records; it means this deterministic join did not establish identity.",
+    "tower_semantics": "Warehouse context never creates or upgrades cooling-tower confirmation."
+  },
+  "poc_property_count": 177,
+  "joined_property_count": 68,
+  "confirmed_tower_joined_property_count": 14,
+  "properties_with_matches_by_source": {
+    "affordable_housing_pipeline": 2,
+    "apartment_building_evaluation": 19,
+    "chemtrac_2024": 16,
+    "development_pipeline": 16,
+    "ontario_bps_energy_2024": 29,
+    "tobids_awarded_contracts": 3
+  },
+  "confirmed_tower_properties_with_matches_by_source": {
+    "apartment_building_evaluation": 5,
+    "development_pipeline": 3,
+    "ontario_bps_energy_2024": 6,
+    "tobids_awarded_contracts": 1
+  }
+}

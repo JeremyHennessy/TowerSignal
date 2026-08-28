@@ -4,8 +4,8 @@
   "package_name": "topographic-mapping-building-outlines",
   "package_id": "09a930cc-2a52-49b2-866d-52ac7f769a73",
   "portal_url": "https://open.toronto.ca/dataset/topographic-mapping-building-outlines/",
-  "license": "License not specified",
-  "retrieved_at": "2026-08-28T19:19:50.337785Z",
+  "license": "Open Government Licence - Toronto",
+  "retrieved_at": "2026-08-28T19:27:22.150677Z",
   "mode": "METADATA_ONLY",
   "reason": "Large geospatial source; retain metadata and add targeted spatial extraction later.",
   "resources": [
@@ -73,5 +73,6 @@
       "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/c2db1245-84e8-4309-ba98-b48eb240a53a/download/building-outlines-2952.gpkg",
       "datastore_active": false
     }
-  ]
+  ],
+  "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
 }

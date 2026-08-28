@@ -4,8 +4,8 @@
   "package_name": "address-points-municipal-toronto-one-address-repository",
   "package_id": "abedd8bc-e3dd-4d45-8e69-79165a76e4fa",
   "portal_url": "https://open.toronto.ca/dataset/address-points-municipal-toronto-one-address-repository/",
-  "license": "License not specified",
-  "retrieved_at": "2026-08-28T19:19:50.337785Z",
+  "license": "Open Government Licence - Toronto",
+  "retrieved_at": "2026-08-28T19:27:22.150677Z",
   "mode": "METADATA_ONLY",
   "reason": "Large geospatial spine; use targeted joins rather than duplicating full city geometry in git.",
   "resources": [
@@ -89,5 +89,6 @@
       "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/921563fc-aeab-4e1f-82bd-c7bdae6dc26a/download/readme-address-feature-codes.txt",
       "datastore_active": false
     }
-  ]
+  ],
+  "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
 }

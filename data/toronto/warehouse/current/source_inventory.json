@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-warehouse-0.1",
-  "generated_at": "2026-08-28T19:19:50.337785Z",
+  "generated_at": "2026-08-28T19:27:22.150677Z",
   "jurisdiction": "TORONTO_ON",
   "purpose": "Raw/near-raw source warehouse for TowerSignal Toronto discovery and commercial intelligence. No Toronto priority score.",
   "open_licensed_sources": [
@@ -10,8 +10,8 @@
       "package_name": "tobids-awarded-contracts",
       "package_id": "f78fe449-53f4-4962-9ec8-8f7eeece1072",
       "portal_url": "https://open.toronto.ca/dataset/tobids-awarded-contracts/",
-      "license": "License not specified",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "license": "Open Government Licence - Toronto",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "resource": {
         "id": "e211f003-5909-4bea-bd96-d75899d8e612",
         "name": "Awarded Contracts",
@@ -41,7 +41,8 @@
         "mechanical",
         "hvac",
         "boiler"
-      ]
+      ],
+      "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
     },
     {
       "key": "capital_project_pipeline",
@@ -49,8 +50,8 @@
       "package_name": "capital-project-pipeline",
       "package_id": "9b17b1bc-7227-44da-83ea-fc1ef3359176",
       "portal_url": "https://open.toronto.ca/dataset/capital-project-pipeline/",
-      "license": "License not specified",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "license": "Open Government Licence - Toronto",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "resource": {
         "id": "e33e036f-a898-4b90-b626-84abba557bbd",
         "name": "Capital Project Pipeline",
@@ -80,7 +81,8 @@
         "mechanical",
         "hvac",
         "boiler"
-      ]
+      ],
+      "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
     },
     {
       "key": "development_pipeline",
@@ -88,8 +90,8 @@
       "package_name": "development-pipeline",
       "package_id": "a7a327c5-4e25-4881-816d-c8b145e02832",
       "portal_url": "https://open.toronto.ca/dataset/development-pipeline/",
-      "license": "License not specified",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "license": "Open Government Licence - Toronto",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "resource": {
         "id": "7aad5dbd-a769-4bd5-b5d2-f9bb605b6bf9",
         "name": "Development Pipeline",
@@ -119,7 +121,8 @@
         "mechanical",
         "hvac",
         "boiler"
-      ]
+      ],
+      "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
     },
     {
       "key": "chemtrac_2024",
@@ -127,8 +130,8 @@
       "package_name": "chemical-tracking-chemtrac",
       "package_id": "ae8eebf8-42fe-426f-b5f8-5baa8ff0bfb8",
       "portal_url": "https://open.toronto.ca/dataset/chemical-tracking-chemtrac/",
-      "license": "License not specified",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "license": "Open Government Licence - Toronto",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "resource": {
         "id": "eb0480e5-6265-4d5d-b582-f112ebc7cc4f",
         "name": "Chemtrac Data 2024",
@@ -158,7 +161,8 @@
         "mechanical",
         "hvac",
         "boiler"
-      ]
+      ],
+      "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
     },
     {
       "key": "apartment_building_evaluation",
@@ -167,7 +171,7 @@
       "package_id": "4ef82789-e038-44ef-a478-a8f3590c3eb1",
       "portal_url": "https://open.toronto.ca/dataset/apartment-building-evaluation/",
       "license": "open-government-licence-toronto",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "resource": {
         "id": "244f7a02-da5c-425b-b55f-fbdd133dd732",
         "name": "Apartment Building Evaluations 2023 - current",
@@ -205,8 +209,8 @@
       "package_name": "upcoming-and-recently-completed-affordable-housing-units",
       "package_id": "b5fa8322-6acf-410e-affd-b4916ae7a249",
       "portal_url": "https://open.toronto.ca/dataset/upcoming-and-recently-completed-affordable-housing-units/",
-      "license": "License not specified",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "license": "Open Government Licence - Toronto",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "resource": {
         "id": "1cef72d8-4bc0-4705-a4ba-998bcb4605ef",
         "name": "Affordable Rental Housing Pipeline",
@@ -236,7 +240,8 @@
         "mechanical",
         "hvac",
         "boiler"
-      ]
+      ],
+      "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
     },
     {
       "key": "address_points",
@@ -244,8 +249,8 @@
       "package_name": "address-points-municipal-toronto-one-address-repository",
       "package_id": "abedd8bc-e3dd-4d45-8e69-79165a76e4fa",
       "portal_url": "https://open.toronto.ca/dataset/address-points-municipal-toronto-one-address-repository/",
-      "license": "License not specified",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "license": "Open Government Licence - Toronto",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "mode": "METADATA_ONLY",
       "reason": "Large geospatial spine; use targeted joins rather than duplicating full city geometry in git.",
       "resources": [
@@ -329,7 +334,8 @@
           "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/921563fc-aeab-4e1f-82bd-c7bdae6dc26a/download/readme-address-feature-codes.txt",
           "datastore_active": false
         }
-      ]
+      ],
+      "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
     },
     {
       "key": "building_outlines",
@@ -337,8 +343,8 @@
       "package_name": "topographic-mapping-building-outlines",
       "package_id": "09a930cc-2a52-49b2-866d-52ac7f769a73",
       "portal_url": "https://open.toronto.ca/dataset/topographic-mapping-building-outlines/",
-      "license": "License not specified",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "license": "Open Government Licence - Toronto",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "mode": "METADATA_ONLY",
       "reason": "Large geospatial source; retain metadata and add targeted spatial extraction later.",
       "resources": [
@@ -406,7 +412,8 @@
           "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/c2db1245-84e8-4309-ba98-b48eb240a53a/download/building-outlines-2952.gpkg",
           "datastore_active": false
         }
-      ]
+      ],
+      "license_basis": "Toronto Open Data portal-wide licence; package metadata did not provide a useful licence label."
     },
     {
       "key": "ontario_bps_energy_2024",
@@ -414,26 +421,27 @@
       "source_url": "https://data.ontario.ca/dataset/5e976319-9769-4f77-aab9-d170e0131efe/resource/b6b569cf-5d3a-4b96-9972-ea428c316278/download/2024_final_data_set.xlsx",
       "catalogue_url": "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector",
       "license": "Open Government Licence - Ontario",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "download_bytes": 4065478,
       "source_row_count": 11857,
-      "toronto_candidate_row_count": 1892,
-      "keyword_match_row_count": 74,
-      "candidate_contract": "Row text contains Toronto, Etobicoke, Scarborough, North York, or East York; candidate universe only, not a cooling-tower assertion."
+      "toronto_candidate_row_count": 1863,
+      "keyword_match_row_count": 70,
+      "candidate_contract": "Exact City field is Toronto, Etobicoke, North York, Scarborough, East York, or York. These are facility candidates only and do not establish cooling-tower presence.",
+      "pre_normalization_candidate_row_count": 1892
     }
   ],
   "rights_review_sources": [
     {
       "key": "ontario_access_environment",
       "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "retrieved_at": "2026-08-28T19:27:22.150677Z",
       "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
       "layers": {
         "environmental_compliance_approvals": {
           "key": "environmental_compliance_approvals",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:19:50.337785Z",
-          "scope": "TORONTO_APPROXIMATE_BOUNDING_BOX",
+          "retrieved_at": "2026-08-28T19:27:22.150677Z",
+          "scope": "EXACT_SOURCE_MUNICIPALITY_FIELD",
           "bbox_wgs84": [
             -79.6393,
             43.581,
@@ -441,8 +449,8 @@
             43.8554
           ],
           "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
-          "feature_count": 9388,
-          "keyword_match_feature_count": 2,
+          "feature_count": 6613,
+          "keyword_match_feature_count": 1,
           "layer_id": 1,
           "name": "Environmental Compliance Approvals",
           "max_record_count": 2000,
@@ -466,13 +474,15 @@
             "MOE_DISTRICT",
             "SWP_AREA_NAME",
             "LINKSOURCE"
-          ]
+          ],
+          "pre_normalization_feature_count": 9388,
+          "municipal_scope_contract": "Source MUNICIPALITY must equal Toronto, Etobicoke, North York, Scarborough, East York, or York."
         },
         "environmental_activity_sector_registrations": {
           "key": "environmental_activity_sector_registrations",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:19:50.337785Z",
-          "scope": "TORONTO_APPROXIMATE_BOUNDING_BOX",
+          "retrieved_at": "2026-08-28T19:27:22.150677Z",
+          "scope": "EXACT_SOURCE_MUNICIPALITY_FIELD",
           "bbox_wgs84": [
             -79.6393,
             43.581,
@@ -480,8 +490,8 @@
             43.8554
           ],
           "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
-          "feature_count": 3571,
-          "keyword_match_feature_count": 22,
+          "feature_count": 2711,
+          "keyword_match_feature_count": 21,
           "layer_id": 3,
           "name": "Environmental Activity and Sector Registrations",
           "max_record_count": 2000,
@@ -505,12 +515,14 @@
             "MOE_DISTRICT",
             "SWP_AREA_NAME",
             "LINKSOURCE"
-          ]
+          ],
+          "pre_normalization_feature_count": 3571,
+          "municipal_scope_contract": "Source MUNICIPALITY must equal Toronto, Etobicoke, North York, Scarborough, East York, or York."
         },
         "permits_to_take_water": {
           "key": "permits_to_take_water",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:19:50.337785Z",
+          "retrieved_at": "2026-08-28T19:27:22.150677Z",
           "scope": "TORONTO_APPROXIMATE_BOUNDING_BOX",
           "bbox_wgs84": [
             -79.6393,
@@ -580,5 +592,27 @@
     "source_absence": "No record in any source is not evidence that a property lacks a cooling tower.",
     "keyword_hits": "Keyword matches are discovery aids only and do not establish equipment identity or commercial need.",
     "rights_review": "Data under rights_review is fetched for source evaluation/artifact inspection and must not be republished to git until reuse rights are confirmed."
+  },
+  "normalization": {
+    "toronto_portal_license_labels_normalized": 7,
+    "bps_city_scope": {
+      "before": 1892,
+      "after": 1863,
+      "keyword_matches": 70
+    },
+    "access_environment_scope": {
+      "environmental_activity_sector_registrations": {
+        "before": 3571,
+        "after": 2711
+      },
+      "environmental_compliance_approvals": {
+        "before": 9388,
+        "after": 6613
+      },
+      "permits_to_take_water": {
+        "before": 2541,
+        "after": 2541
+      }
+    }
   }
 }
