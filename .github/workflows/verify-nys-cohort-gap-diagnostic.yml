@@ -1,0 +1,47 @@
+name: Verify NYS cohort coverage gaps
+
+on:
+  push:
+    branches: [agent/build016h-procurement-coverage-diagnostic]
+    paths:
+      - '.github/workflows/verify-nys-cohort-gap-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe-existing-nys-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe aliases across already-ingested NYS ABO datasets
+        shell: bash
+        run: |
+          set -euo pipefail
+          declare -A datasets=(
+            [NYS_ABO_STATE_AUTHORITIES]='ehig-g5x3'
+            [NYS_ABO_LOCAL_AUTHORITIES]='8w5p-k45m'
+            [NYS_ABO_LOCAL_DEVELOPMENT_CORPORATIONS]='d84c-dk28'
+            [NYS_ABO_INDUSTRIAL_DEVELOPMENT_AGENCIES]='p3p6-xqr5'
+          )
+          aliases=(
+            'OCS CHEMICAL ENGINEERING'
+            'CC-00082'
+            'ROCHESTER MIDLAND'
+            'CLARITYCHEM'
+            'TOWER WATER'
+          )
+
+          for source in "${!datasets[@]}"; do
+            dataset="${datasets[$source]}"
+            endpoint="https://data.ny.gov/resource/${dataset}.json"
+            echo "source=$source dataset_id=$dataset"
+            for alias in "${aliases[@]}"; do
+              out="$(mktemp)"
+              curl --fail --silent --show-error --get "$endpoint" \
+                --data-urlencode "$q=$alias" \
+                --data-urlencode '$limit=100' \
+                --output "$out"
+              echo "alias=$alias rows=$(jq 'length' "$out")"
+              jq -c '.[]' "$out" | head -n 5 || true
+            done
+          done
