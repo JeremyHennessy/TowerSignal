@@ -38,7 +38,7 @@ jobs:
             for alias in "${aliases[@]}"; do
               out="$(mktemp)"
               curl --fail --silent --show-error --get "$endpoint" \
-                --data-urlencode "$q=$alias" \
+                --data-urlencode "\$q=$alias" \
                 --data-urlencode '$limit=100' \
                 --output "$out"
               echo "alias=$alias rows=$(jq 'length' "$out")"
