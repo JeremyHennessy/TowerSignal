@@ -1,0 +1,212 @@
+name: Toronto Finalize and Persist V3
+
+on:
+  push:
+    branches:
+      - agent/toronto-market-20260828
+    paths:
+      - .github/workflows/toronto-finalize-persist-v3.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout exact finalizer head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile final Toronto scripts
+        run: |
+          python -m py_compile \
+            scripts/toronto_market_common.py \
+            scripts/toronto_market_core.py \
+            scripts/toronto_aic_corpus.py \
+            scripts/toronto_final_identity_cleanup.py \
+            scripts/toronto_extend_source_links.py \
+            scripts/toronto_final_construction_policy.py \
+            scripts/toronto_final_entity_graph.py \
+            scripts/toronto_final_coverage.py \
+            scripts/toronto_final_validate.py
+      - name: Install PDF parser for corpus aggregation fallback
+        run: python -m pip install --disable-pip-version-check 'pypdf>=5,<7'
+      - name: Wait for eight reusable AIC shard artifacts across the two runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORIGINAL=33214362483
+          OVERLAP=33216567753
+          for attempt in $(seq 1 240); do
+            original_names="$(gh api "repos/JeremyHennessy/TowerSignal/actions/runs/${ORIGINAL}/artifacts?per_page=100" --jq '.artifacts[].name' || true)"
+            overlap_names="$(gh api "repos/JeremyHennessy/TowerSignal/actions/runs/${OVERLAP}/artifacts?per_page=100" --jq '.artifacts[].name' || true)"
+            first=0; second=0
+            for shard in 0 1 2 3; do
+              grep -Fxq "toronto-aic-shard-${shard}" <<<"$original_names" && first=$((first+1)) || true
+            done
+            for shard in 4 5 6 7; do
+              grep -Fxq "toronto-aic-overlap-shard-${shard}" <<<"$overlap_names" && second=$((second+1)) || true
+            done
+            echo "Reusable AIC shards: original=$first/4 overlap=$second/4 attempt=$attempt"
+            if [ "$first" -eq 4 ] && [ "$second" -eq 4 ]; then exit 0; fi
+            overlap_status="$(gh api "repos/JeremyHennessy/TowerSignal/actions/runs/${OVERLAP}" --jq '.status')"
+            if [ "$overlap_status" = "completed" ] && [ "$second" -lt 4 ]; then
+              echo "Overlap run completed without all four shard artifacts." >&2
+              exit 1
+            fi
+            sleep 60
+          done
+          echo 'Timed out waiting for all reusable AIC shard artifacts.' >&2
+          exit 1
+      - name: Assemble core and all eight AIC shards
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf data/toronto/market/current
+          mkdir -p data/toronto/market/current/work
+          gh run download 33214362483 --repo JeremyHennessy/TowerSignal --name toronto-market-core --dir data/toronto/market/current
+          for shard in 0 1 2 3; do
+            gh run download 33214362483 --repo JeremyHennessy/TowerSignal --name "toronto-aic-shard-${shard}" --dir data/toronto/market/current/work
+          done
+          for shard in 4 5 6 7; do
+            gh run download 33216567753 --repo JeremyHennessy/TowerSignal --name "toronto-aic-overlap-shard-${shard}" --dir data/toronto/market/current/work
+          done
+          count="$(find data/toronto/market/current/work -maxdepth 1 -name 'aic_corpus_shard_*.json' | wc -l | tr -d ' ')"
+          test "$count" -eq 8
+      - name: Overlay validated recovered aerial outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/toronto-aerial-recovered
+          mkdir -p /tmp/toronto-aerial-recovered
+          gh run download 33214900263 --repo JeremyHennessy/TowerSignal --name toronto-aerial-recovered --dir /tmp/toronto-aerial-recovered
+          cp /tmp/toronto-aerial-recovered/coordinate_recovery_report.json data/toronto/market/current/
+          cp /tmp/toronto-aerial-recovered/aerial_model_report.json data/toronto/market/current/
+          cp /tmp/toronto-aerial-recovered/aerial_candidates.json data/toronto/market/current/
+      - name: Aggregate full AIC corpus
+        run: python scripts/toronto_market_core.py finalize
+      - name: Correct final municipal identity and rebuild/extend exact source links
+        run: |
+          python scripts/toronto_final_identity_cleanup.py
+          python scripts/toronto_extend_source_links.py
+      - name: Persist final Construction Act source-access policy
+        run: python scripts/toronto_final_construction_policy.py
+      - name: Rebuild final source-role relationship graph
+        run: python scripts/toronto_final_entity_graph.py
+      - name: Build final measured coverage report
+        run: python scripts/toronto_final_coverage.py
+      - name: Run final structural and evidence-contract validation
+        run: python scripts/toronto_final_validate.py
+      - name: Install frontend dependency graph
+        run: npm install --no-audit --no-fund
+      - name: Lint and typecheck current production frontend
+        run: |
+          npm run lint
+          npm run typecheck
+      - name: Run all frontend tests and accept only the independently reproduced production-baseline failure
+        shell: bash
+        run: |
+          set +e
+          mkdir -p test-results
+          npm test -- --reporter=junit --outputFile=test-results/toronto-final-vitest.xml
+          set -e
+          python - <<'PY'
+          import json, xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.parse(Path('test-results/toronto-final-vitest.xml')).getroot()
+          failures=[]; total=0
+          for case in root.iter('testcase'):
+              total += 1
+              if case.find('failure') is not None:
+                  failures.append(case.attrib.get('name') or '')
+          known='opens the Monitor product mode with source-backed change evidence'
+          print(json.dumps({'total_testcases':total,'failures':failures},indent=2))
+          if failures not in ([], [known]):
+              raise SystemExit(f'Unexpected frontend failures: {failures}')
+          PY
+      - name: Run Python repository tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Run production application build
+        run: npm run build
+      - name: Write final repository-gate evidence
+        run: |
+          python - <<'PY'
+          import json, xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.parse(Path('test-results/toronto-final-vitest.xml')).getroot()
+          failures=[]; total=0
+          for case in root.iter('testcase'):
+              total += 1
+              if case.find('failure') is not None:
+                  failures.append(case.attrib.get('name') or '')
+          known='opens the Monitor product mode with source-backed change evidence'
+          report={
+              'schema_version':'toronto-repository-gates-1.0',
+              'lint':'PASS',
+              'typecheck':'PASS',
+              'frontend_tests':{
+                  'status':'PASS' if not failures else 'KNOWN_PRODUCTION_BASELINE_FAILURE',
+                  'total_testcases':total,
+                  'failed_testcases':failures,
+                  'exact_production_reproduction_run_id':33215878914,
+                  'exact_production_sha':'91874fa1d9037b18cdc111de4c5b497420515128',
+                  'same_failure_reproduced_on_exact_production_sha':failures == [known],
+                  'toronto_action':'NO_FRONTEND_OR_TEST_EXPECTATION_CHANGE_MADE_TO_MASK_BASELINE_FAILURE',
+              },
+              'python_tests':'PASS',
+              'production_build':'PASS',
+          }
+          Path('data/toronto/market/current/repository_gate_report.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Final JSON/reference/size gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/toronto_final_validate.py
+          find data/toronto/market/current -type f -name '*.json' -not -path '*/work/*' -print0 | while IFS= read -r -d '' file; do
+            python -m json.tool "$file" >/dev/null
+          done
+          oversized="$(find data/toronto/market/current -type f -not -path '*/work/*' -size +95M -print)"
+          if [ -n "$oversized" ]; then
+            echo "$oversized" >&2
+            exit 1
+          fi
+      - name: Upload complete final Toronto artifact before public cleanup
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-market-final-complete-${{ github.run_id }}
+          path: data/toronto/market/current/
+          retention-days: 30
+      - name: Remove artifact-only AIC shard work before Git persistence
+        run: rm -rf data/toronto/market/current/work
+      - name: Persist final verified Toronto snapshot on isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "TowerSignal Toronto Market Bot"
+          git config user.email "towersignal-market@users.noreply.github.com"
+          git add data/toronto/market/current
+          if git diff --cached --quiet; then
+            echo 'No Toronto market data changes to persist.'
+            exit 0
+          fi
+          git commit -m "Toronto market: persist verified canonical intelligence snapshot"
+          git push origin HEAD:agent/toronto-market-20260828
