@@ -62,7 +62,7 @@ def main() -> None:
     signal_doc_count = sum(any((d.get("signal_counts") or {}).values()) for d in documents)
 
     if isinstance(tower_candidates, dict):
-        candidate_records = tower_candidates.get("candidates") or tower_candidates.get("properties") or []
+        candidate_records = tower_candidates.get("documents") or tower_candidates.get("candidates") or tower_candidates.get("properties") or []
     elif isinstance(tower_candidates, list):
         candidate_records = tower_candidates
     else:
@@ -75,9 +75,10 @@ def main() -> None:
     else:
         aerial_records = []
 
+    aerial_scoring = aerial.get("scoring") or {}
     graph_counts = graph.get("counts") or {}
     report = {
-        "schema_version": "toronto-market-coverage-1.0",
+        "schema_version": "toronto-market-coverage-1.1",
         "generated_at": utc_now(),
         "coverage_contract": {
             "meaning": "Measured source, reconciliation, document, relationship and screening coverage only.",
@@ -108,6 +109,7 @@ def main() -> None:
         "source_coverage": source_coverage,
         "aic_coverage": {
             "applications_total_source": aic.get("applications_total_source"),
+            "unique_applications_scanned": aic.get("unique_applications_scanned"),
             "applications_in_shards": aic.get("applications_in_shards"),
             "application_pages_fetched": aic.get("application_pages_fetched"),
             "application_page_fetch_errors": aic.get("application_page_fetch_errors"),
@@ -136,8 +138,8 @@ def main() -> None:
             "requested_positive_properties": (aerial.get("training") or {}).get("requested_positive_properties"),
             "requested_weak_controls": (aerial.get("training") or {}).get("requested_weak_controls"),
             "usable_training_images": (aerial.get("training") or {}).get("usable_images"),
-            "candidate_properties_requested": aerial.get("candidate_properties_requested"),
-            "candidate_properties_scored": aerial.get("candidate_properties_scored"),
+            "candidate_properties_requested": aerial_scoring.get("candidate_properties_requested"),
+            "candidate_properties_scored": aerial_scoring.get("candidate_properties_scored"),
             "persisted_candidate_records": len(aerial_records),
             "weak_label_validation": aerial.get("weak_label_validation"),
             "interpretation": "Weak-label visual similarity only. The measured discrimination is not cooling-tower detection accuracy and no aerial score upgrades tower confirmation.",
