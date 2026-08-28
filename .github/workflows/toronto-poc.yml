@@ -10,6 +10,7 @@ on:
       - scripts/enrich_toronto_poc_tdsb_identity.py
       - scripts/normalize_toronto_poc_permit_timing.py
       - scripts/enrich_toronto_poc_rentsafe.py
+      - scripts/classify_toronto_poc_lifecycle.py
       - scripts/build_toronto_poc_demo_accounts.py
       - docs/TORONTO_POC.md
       - .github/workflows/toronto-poc.yml
@@ -42,6 +43,7 @@ jobs:
           python -m py_compile scripts/enrich_toronto_poc_tdsb_identity.py
           python -m py_compile scripts/normalize_toronto_poc_permit_timing.py
           python -m py_compile scripts/enrich_toronto_poc_rentsafe.py
+          python -m py_compile scripts/classify_toronto_poc_lifecycle.py
           python -m py_compile scripts/build_toronto_poc_demo_accounts.py
 
       - name: Extract Toronto POC evidence
@@ -55,6 +57,9 @@ jobs:
 
       - name: Join exact RentSafeTO account context
         run: python scripts/enrich_toronto_poc_rentsafe.py --output data/toronto/poc/current
+
+      - name: Classify source-backed tower lifecycle direction
+        run: python scripts/classify_toronto_poc_lifecycle.py --output data/toronto/poc/current
 
       - name: Assemble deterministic demo accounts
         run: python scripts/build_toronto_poc_demo_accounts.py --output data/toronto/poc/current
