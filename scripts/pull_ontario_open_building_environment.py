@@ -89,7 +89,7 @@ def sheet_rows(sheet) -> list[dict[str, Any]]:
     header: list[str] | None = None
     for row in iterator:
         values = list(row)
-        nonempty = sum(value is not None and str(value).strip() for value in values)
+        nonempty = sum(1 for value in values if value is not None and str(value).strip())
         if nonempty >= 3:
             header = [clean_header(value, idx) for idx, value in enumerate(values)]
             break
