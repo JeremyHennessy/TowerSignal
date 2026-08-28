@@ -12,6 +12,7 @@ on:
       - scripts/enrich_toronto_poc_rentsafe.py
       - scripts/classify_toronto_poc_lifecycle.py
       - scripts/build_toronto_poc_demo_accounts.py
+      - scripts/pull_toronto_bulk_sources.py
       - docs/TORONTO_POC.md
       - .github/workflows/toronto-poc.yml
 
@@ -25,7 +26,7 @@ concurrency:
 jobs:
   extract:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout exact branch head
         uses: actions/checkout@v4
@@ -37,6 +38,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install Toronto warehouse parser dependency
+        run: python -m pip install --disable-pip-version-check 'openpyxl>=3.1,<4'
+
       - name: Compile Toronto POC scripts
         run: |
           python -m py_compile scripts/build_toronto_poc.py
@@ -45,6 +49,7 @@ jobs:
           python -m py_compile scripts/enrich_toronto_poc_rentsafe.py
           python -m py_compile scripts/classify_toronto_poc_lifecycle.py
           python -m py_compile scripts/build_toronto_poc_demo_accounts.py
+          python -m py_compile scripts/pull_toronto_bulk_sources.py
 
       - name: Extract Toronto POC evidence
         run: python scripts/build_toronto_poc.py --output data/toronto/poc/current
@@ -64,6 +69,9 @@ jobs:
       - name: Assemble deterministic demo accounts
         run: python scripts/build_toronto_poc_demo_accounts.py --output data/toronto/poc/current
 
+      - name: Pull broad Toronto and Ontario warehouse sources
+        run: python scripts/pull_toronto_bulk_sources.py --output data/toronto/warehouse/current
+
       - name: Validate generated JSON
         run: |
           python -m json.tool data/toronto/poc/current/summary.json >/dev/null
@@ -71,23 +79,35 @@ jobs:
           python -m json.tool data/toronto/poc/current/evidence.json >/dev/null
           python -m json.tool data/toronto/poc/current/rentsafe_matches.json >/dev/null
           python -m json.tool data/toronto/poc/current/demo_accounts.json >/dev/null
+          python -m json.tool data/toronto/warehouse/current/source_inventory.json >/dev/null
 
-      - name: Upload extraction artifact
+      - name: Upload Toronto POC artifact
         uses: actions/upload-artifact@v4
         with:
           name: toronto-poc-${{ github.run_id }}
           path: data/toronto/poc/current/
           retention-days: 30
 
-      - name: Persist successful POC snapshot on experiment branch
+      - name: Upload full Toronto source warehouse artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-warehouse-${{ github.run_id }}
+          path: data/toronto/warehouse/current/
+          retention-days: 30
+
+      - name: Remove rights-review raw records before public git persistence
+        shell: bash
+        run: rm -rf data/toronto/warehouse/current/rights_review
+
+      - name: Persist successful Toronto snapshots on experiment branch
         shell: bash
         run: |
-          if [ -z "$(git status --porcelain -- data/toronto/poc/current)" ]; then
-            echo "Toronto POC snapshot unchanged."
+          if [ -z "$(git status --porcelain -- data/toronto/poc/current data/toronto/warehouse/current)" ]; then
+            echo "Toronto snapshots unchanged."
             exit 0
           fi
           git config user.name "TowerSignal Toronto POC Bot"
           git config user.email "towersignal-poc@users.noreply.github.com"
-          git add data/toronto/poc/current
-          git commit -m "Toronto POC: refresh extracted public-record evidence"
+          git add data/toronto/poc/current data/toronto/warehouse/current
+          git commit -m "Toronto POC: refresh extracted public-record evidence and warehouse"
           git push origin HEAD:agent/toronto-poc-20260828
