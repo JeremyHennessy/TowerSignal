@@ -4,6 +4,7 @@ from collections import Counter, defaultdict
 from datetime import date
 from typing import Any, Iterable, Mapping
 
+from .company_identity import explicit_dba_aliases
 from .procurement import (
     GENERIC_COMPANY_WORDS,
     company_alias_record,
@@ -102,22 +103,36 @@ def build_company_intelligence(
         for row in company_rows:
             alias = normalize_space(str(row.get("vendor_raw") or ""))
             source = normalize_space(str(row.get("source") or ""))
+            address = normalize_space(str(row.get("vendor_address") or "")) or None
             marker = (alias, source)
-            if not alias or marker in alias_seen:
-                continue
-            alias_seen.add(marker)
-            aliases.append(company_alias_record(
-                company_id,
-                alias,
-                source=source,
-                address=normalize_space(str(row.get("vendor_address") or "")) or None,
-                confidence="VERIFY" if ambiguous_identity else "STRONG",
-                resolution_method=(
-                    "AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL"
-                    if ambiguous_identity
-                    else "EXACT_SOURCE_LABEL_SUFFIX_PRESERVED"
-                ),
-            ))
+            if alias and marker not in alias_seen:
+                alias_seen.add(marker)
+                aliases.append(company_alias_record(
+                    company_id,
+                    alias,
+                    source=source,
+                    address=address,
+                    confidence="VERIFY" if ambiguous_identity else "STRONG",
+                    resolution_method=(
+                        "AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL"
+                        if ambiguous_identity
+                        else "EXACT_SOURCE_LABEL_SUFFIX_PRESERVED"
+                    ),
+                ))
+
+            for dba_alias in explicit_dba_aliases(alias):
+                dba_marker = (dba_alias, source)
+                if dba_marker in alias_seen:
+                    continue
+                alias_seen.add(dba_marker)
+                aliases.append(company_alias_record(
+                    company_id,
+                    dba_alias,
+                    source=source,
+                    address=address,
+                    confidence="CONFIRMED",
+                    resolution_method="EXPLICIT_SOURCE_DBA_ALIAS",
+                ))
 
         checkbook_contracts = [row for row in company_rows if str(row.get("source") or "") != "NYC_CITY_RECORD"]
         metrics = derive_company_metrics(checkbook_contracts, as_of=as_of)
@@ -152,6 +167,10 @@ def build_company_intelligence(
             "cross_source_resolution_method": resolution_method,
             "candidate_related_company_ids": candidate_ids,
             "aliases": sorted(aliases, key=lambda row: (str(row.get("source") or ""), str(row.get("alias") or ""))),
+            "explicit_dba_alias_count": sum(
+                1 for alias_row in aliases
+                if alias_row.get("resolution_method") == "EXPLICIT_SOURCE_DBA_ALIAS"
+            ),
             "observed_sources": sources,
             "observed_buyers": buyers,
             "service_categories": categories,
@@ -192,6 +211,7 @@ def build_company_intelligence(
             "cross_source_exact_label_company_count": sum(1 for company in companies if len(company.get("observed_sources") or []) > 1),
             "companies_requiring_resolution_review": sum(1 for company in companies if company.get("cross_source_resolution_confidence") == "VERIFY"),
             "unresolved_observation_count": len(unresolved_observations),
+            "explicit_dba_alias_count": sum(int(company.get("explicit_dba_alias_count") or 0) for company in companies),
             "value_semantics": "Observed source-reported public contract values; not company revenue, enterprise value, or a complete customer book.",
         },
         "companies": companies,
