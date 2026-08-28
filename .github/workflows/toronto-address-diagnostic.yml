@@ -1,0 +1,40 @@
+name: Toronto Address Points Diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/toronto-market-20260828
+    paths:
+      - .github/workflows/toronto-address-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact event head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Inspect exact Address Points CSV schema
+        shell: python
+        run: |
+          import csv
+          import io
+          import urllib.request
+
+          url = "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/64d4e54b-738f-4cd9-a9e7-8050fac8a52f/download/address-points-4326.csv"
+          request = urllib.request.Request(url, headers={"User-Agent": "TowerSignal-Toronto-Diagnostic/0.1"})
+          with urllib.request.urlopen(request, timeout=120) as response:
+              raw = response.read()
+          reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig", errors="replace")))
+          print("FIELDNAMES=", reader.fieldnames)
+          for index, row in enumerate(reader):
+              print("ROW", index, {key: row.get(key) for key in (reader.fieldnames or [])[:20]})
+              if index >= 2:
+                  break
