@@ -1,0 +1,92 @@
+{
+  "schema_version": "toronto-poc-0.1",
+  "generated_at": "2026-08-28T18:55:30.883601Z",
+  "jurisdiction": "TORONTO_ON",
+  "status": "EXPERIMENTAL_POC",
+  "evidence_contract": {
+    "confirmed_tower": "Only public-source text explicitly matching cooling tower/cooling towers.",
+    "related_equipment": "Evaporative condenser is confirmed related equipment but is not relabeled as a cooling tower.",
+    "supporting": "Chiller, condenser-water, and chemical-feed references are supporting commercial/mechanical context only.",
+    "absence": "No matching record is not evidence that a property lacks a cooling tower."
+  },
+  "counts": {
+    "evidence_rows": 384,
+    "unique_properties_with_any_retained_evidence": 177,
+    "confirmed_cooling_tower_properties": 48,
+    "confirmed_cooling_tower_properties_from_permits": 35,
+    "confirmed_cooling_tower_properties_from_tdsb": 13,
+    "active_permit_confirmed_cooling_tower_properties": 21,
+    "properties_with_no_tower_assertion_but_related_supporting_evidence": 129
+  },
+  "sources": {
+    "permits": {
+      "active": {
+        "resource_id": "6d0229af-bc54-46de-9c2b-26759b01dd05",
+        "source_url": "https://open.toronto.ca/dataset/building-permits-active-permits/",
+        "query_terms": [
+          "cooling tower",
+          "cooling towers",
+          "evaporative condenser",
+          "chiller",
+          "condenser water",
+          "chemical feed"
+        ],
+        "query_totals": {
+          "cooling tower": 0,
+          "cooling towers": 0,
+          "evaporative condenser": 0,
+          "chiller": 135,
+          "condenser water": 0,
+          "chemical feed": 0
+        },
+        "unique_records_returned_across_queries": 135
+      },
+      "cleared": {
+        "resource_id": "a96c0ba4-3026-402b-b09d-5b1268b8f810",
+        "source_url": "https://open.toronto.ca/dataset/building-permits-cleared-permits/",
+        "query_terms": [
+          "cooling tower",
+          "cooling towers",
+          "evaporative condenser",
+          "chiller",
+          "condenser water",
+          "chemical feed"
+        ],
+        "query_totals": {
+          "cooling tower": 0,
+          "cooling towers": 0,
+          "evaporative condenser": 0,
+          "chiller": 153,
+          "condenser water": 0,
+          "chemical feed": 0
+        },
+        "unique_records_returned_across_queries": 152
+      }
+    },
+    "tdsb": {
+      "source_url": "https://www.tdsb.on.ca/Community/Planning/School-Facilities/Facility-Condition-Index",
+      "list_urls": [
+        "https://www.tdsb.on.ca/Find-your/School/By-School-Name/Elementary",
+        "https://www.tdsb.on.ca/Find-your/School/By-School-Name/Secondary"
+      ],
+      "discovery_counts_by_page": {
+        "https://www.tdsb.on.ca/Find-your/School/By-School-Name/Elementary": 470,
+        "https://www.tdsb.on.ca/Find-your/School/By-School-Name/Secondary": 113
+      },
+      "unique_school_ids_discovered": 581,
+      "school_pages_failed": 0,
+      "school_page_failure_rate": 0.0,
+      "matched_confirmed_cooling_tower_schools": 13,
+      "matched_schools_with_retained_related_rows": 13,
+      "fetch_failures": []
+    }
+  },
+  "query_terms": [
+    "cooling tower",
+    "cooling towers",
+    "evaporative condenser",
+    "chiller",
+    "condenser water",
+    "chemical feed"
+  ]
+}

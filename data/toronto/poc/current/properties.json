@@ -1,0 +1,4951 @@
+{
+  "metadata": {
+    "schema_version": "toronto-poc-0.1",
+    "generated_at": "2026-08-28T18:55:30.883601Z",
+    "jurisdiction": "TORONTO_ON",
+    "status": "EXPERIMENTAL_POC",
+    "evidence_contract": {
+      "confirmed_tower": "Only public-source text explicitly matching cooling tower/cooling towers.",
+      "related_equipment": "Evaporative condenser is confirmed related equipment but is not relabeled as a cooling tower.",
+      "supporting": "Chiller, condenser-water, and chemical-feed references are supporting commercial/mechanical context only.",
+      "absence": "No matching record is not evidence that a property lacks a cooling tower."
+    },
+    "counts": {
+      "evidence_rows": 384,
+      "unique_properties_with_any_retained_evidence": 177,
+      "confirmed_cooling_tower_properties": 48,
+      "confirmed_cooling_tower_properties_from_permits": 35,
+      "confirmed_cooling_tower_properties_from_tdsb": 13,
+      "active_permit_confirmed_cooling_tower_properties": 21,
+      "properties_with_no_tower_assertion_but_related_supporting_evidence": 129
+    },
+    "sources": {
+      "permits": {
+        "active": {
+          "resource_id": "6d0229af-bc54-46de-9c2b-26759b01dd05",
+          "source_url": "https://open.toronto.ca/dataset/building-permits-active-permits/",
+          "query_terms": [
+            "cooling tower",
+            "cooling towers",
+            "evaporative condenser",
+            "chiller",
+            "condenser water",
+            "chemical feed"
+          ],
+          "query_totals": {
+            "cooling tower": 0,
+            "cooling towers": 0,
+            "evaporative condenser": 0,
+            "chiller": 135,
+            "condenser water": 0,
+            "chemical feed": 0
+          },
+          "unique_records_returned_across_queries": 135
+        },
+        "cleared": {
+          "resource_id": "a96c0ba4-3026-402b-b09d-5b1268b8f810",
+          "source_url": "https://open.toronto.ca/dataset/building-permits-cleared-permits/",
+          "query_terms": [
+            "cooling tower",
+            "cooling towers",
+            "evaporative condenser",
+            "chiller",
+            "condenser water",
+            "chemical feed"
+          ],
+          "query_totals": {
+            "cooling tower": 0,
+            "cooling towers": 0,
+            "evaporative condenser": 0,
+            "chiller": 153,
+            "condenser water": 0,
+            "chemical feed": 0
+          },
+          "unique_records_returned_across_queries": 152
+        }
+      },
+      "tdsb": {
+        "source_url": "https://www.tdsb.on.ca/Community/Planning/School-Facilities/Facility-Condition-Index",
+        "list_urls": [
+          "https://www.tdsb.on.ca/Find-your/School/By-School-Name/Elementary",
+          "https://www.tdsb.on.ca/Find-your/School/By-School-Name/Secondary"
+        ],
+        "discovery_counts_by_page": {
+          "https://www.tdsb.on.ca/Find-your/School/By-School-Name/Elementary": 470,
+          "https://www.tdsb.on.ca/Find-your/School/By-School-Name/Secondary": 113
+        },
+        "unique_school_ids_discovered": 581,
+        "school_pages_failed": 0,
+        "school_page_failure_rate": 0.0,
+        "matched_confirmed_cooling_tower_schools": 13,
+        "matched_schools_with_retained_related_rows": 13,
+        "fetch_failures": []
+      }
+    },
+    "query_terms": [
+      "cooling tower",
+      "cooling towers",
+      "evaporative condenser",
+      "chiller",
+      "condenser water",
+      "chemical feed"
+    ]
+  },
+  "properties": [
+    {
+      "property_key": "tdsb-schno:1924",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [
+        "tdsb:1924:cooling_tower:0"
+      ],
+      "supporting_evidence_ids": []
+    },
+    {
+      "property_key": "tdsb-schno:2001",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH",
+        "MEDIUM"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [
+        "tdsb:2001:cooling_tower:2"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:2001:chemical_feed:0",
+        "tdsb:2001:chiller:1"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:2021",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH",
+        "MEDIUM"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [
+        "tdsb:2021:cooling_tower:2"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:2021:chemical_feed:0",
+        "tdsb:2021:chiller:1"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:2040",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [
+        "tdsb:2040:cooling_tower:2"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:2040:chemical_feed:0",
+        "tdsb:2040:chiller:1"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:2063",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "tdsb:2063:cooling_tower:1"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:2063:chemical_feed:0"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:3127",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "tdsb:3127:cooling_tower:1"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:3127:chiller:0"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:3180",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [
+        "tdsb:3180:cooling_tower:0"
+      ],
+      "supporting_evidence_ids": []
+    },
+    {
+      "property_key": "tdsb-schno:3430",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH",
+        "MEDIUM"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "tdsb:3430:cooling_tower:1"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:3430:chemical_feed:0"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:3432",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH",
+        "MEDIUM"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "tdsb:3432:cooling_tower:1"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:3432:chemical_feed:0"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:3448",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "MEDIUM"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "tdsb:3448:cooling_tower:1"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:3448:chemical_feed:0"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:4175",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "tdsb:4175:cooling_tower:1"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:4175:chiller:0"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:5219",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH",
+        "MEDIUM"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [
+        "tdsb:5219:cooling_tower:2"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:5219:chemical_feed:0",
+        "tdsb:5219:chiller:1"
+      ]
+    },
+    {
+      "property_key": "tdsb-schno:5262",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "system, roofing, etc.). Although there is no specific timeframe to repair/replace these systems, it is recommended to do it as soon as funding becomes available",
+      "property_name": "Renewal Needs Backlog",
+      "organization": "Toronto District School Board",
+      "geo_id": null,
+      "equipment_types": [
+        "chemical_feed",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "TDSB_COOLING_TOWER_RENEWAL",
+        "TDSB_RELATED_MECHANICAL_RENEWAL"
+      ],
+      "renewal_priorities": [
+        "HIGH"
+      ],
+      "latest_source_event_date": null,
+      "source_keys": [
+        "tdsb_facility_condition_renewal"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "tdsb:5262:cooling_tower:1"
+      ],
+      "supporting_evidence_ids": [
+        "tdsb:5262:chemical_feed:0"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:13505515",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "1 PEMBERTON AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "13505515",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT",
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2020-11-16",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 8,
+      "explicit_tower_evidence_ids": [
+        "permit:active:20 206221 BLD:00:cooling_tower",
+        "permit:active:20 206221 HVA:00:cooling_tower",
+        "permit:cleared:20 137758 BLD:00:cooling_tower",
+        "permit:cleared:20 137758 HVA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:20 206221 BLD:00:chiller",
+        "permit:active:20 206221 HVA:00:chiller",
+        "permit:cleared:20 137758 BLD:00:chiller",
+        "permit:cleared:20 137758 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8392955",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "15 SCADDING AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8392955",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2010-03-30",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:10 134645 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:10 134645 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:828085",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "200 KING ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "828085",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-06-08",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [
+        "permit:active:98 015945 HVA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:22 123361 BLD:01:chiller",
+        "permit:active:98 015945 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:504793",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "205 CUMMER AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "504793",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2008-12-23",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:08 228223 BLD:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:08 228223 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10133201",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "22 ST CLAIR AVE E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10133201",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2020-09-22",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:20 165219 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:20 165219 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7204478",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "2301 MIDLAND AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7204478",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-09-29",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:17 220512 BLD:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:17 220512 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7762637",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "25 GROSVENOR ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7762637",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2014-12-05",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:14 259939 BLD:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:14 259939 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8351164",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "25 THE ESPLANADE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8351164",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-06-09",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:17 140238 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:17 140238 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10757635",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "30 THE QUEENSWAY",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10757635",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-12-08",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 4,
+      "explicit_tower_evidence_ids": [
+        "permit:active:17 253386 BLD:00:cooling_tower",
+        "permit:active:17 253386 HVA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:17 253386 BLD:00:chiller",
+        "permit:active:17 253386 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-address:0fe02942cdb7892c",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "323 RICHMOND ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": null,
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-10-26",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:23 216429 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:23 216429 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:509769",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "3401 DUFFERIN ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "509769",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-02-09",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [
+        "permit:active:18 107026 BLD:00:cooling_tower",
+        "permit:active:18 107026 HVA:00:cooling_tower",
+        "permit:active:18 107026 PLB:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:18 107026 BLD:00:chiller",
+        "permit:active:18 107026 HVA:00:chiller",
+        "permit:active:18 107026 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7730109",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "380 VICTORIA ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7730109",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT",
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-08-18",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 8,
+      "explicit_tower_evidence_ids": [
+        "permit:active:11 307336 BLD:00:cooling_tower",
+        "permit:active:11 307336 BLD:01:cooling_tower",
+        "permit:cleared:11 307336 HVA:00:cooling_tower",
+        "permit:cleared:11 307336 HVA:01:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:11 307336 BLD:00:chiller",
+        "permit:active:11 307336 BLD:01:chiller",
+        "permit:cleared:11 307336 HVA:00:chiller",
+        "permit:cleared:11 307336 HVA:01:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:12167660",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "4905 DUFFERIN ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "12167660",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-10-29",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:18 227566 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:18 227566 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-address:e594fd4f2a055b06",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "50 OAK ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": null,
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-02-09",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:26 102675 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:26 102675 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:20055459",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "50 ROSEHILL AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "20055459",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-09-11",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:25 219194 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:25 219194 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8351177",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "55 THE ESPLANADE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8351177",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2010-03-30",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:10 134639 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:10 134639 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:20362101",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "620 DUNDAS ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "20362101",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-08-21",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [
+        "permit:active:26 102675 MSA:01:cooling_tower",
+        "permit:active:26 102725 PSA:00:cooling_tower",
+        "permit:active:26 102725 PSA:01:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:26 102675 MSA:01:chiller",
+        "permit:active:26 102725 PSA:00:chiller",
+        "permit:active:26 102725 PSA:01:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:3569436",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "7 BISHOP AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "3569436",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2019-02-27",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:19 111480 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:19 111480 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8155599",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "700 EGLINTON AVE W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8155599",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2016-09-08",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:16 193795 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:16 193795 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:507981",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "703 DON MILLS RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "507981",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2014-12-18",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 4,
+      "explicit_tower_evidence_ids": [
+        "permit:active:14 125487 BLD:00:cooling_tower",
+        "permit:active:14 125487 HVA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:14 125487 BLD:00:chiller",
+        "permit:active:14 125487 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8127974",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "89 HUMBER COLLEGE BLVD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8127974",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "ACTIVE_COOLING_TOWER_PERMIT",
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2012-06-13",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:active:12 148282 BLD:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:active:12 148282 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:4153974",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "10 GUILDWOOD PKWY",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "4153974",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-06-01",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:16 241073 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:16 241073 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:14038411",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "1040 DUFFERIN ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "14038411",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-01-05",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:22 100336 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:22 100336 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:20258361",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "171 FRONT ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "20258361",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-06-12",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:17 183143 BLD:00:cooling_tower",
+        "permit:cleared:17 183143 HVA:00:cooling_tower",
+        "permit:cleared:17 183143 PLB:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:17 183143 BLD:00:chiller",
+        "permit:cleared:17 183143 HVA:00:chiller",
+        "permit:cleared:17 183143 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8206111",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "200 EGLINTON AVE W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8206111",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2019-05-15",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 8,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:17 138724 BLD:00:cooling_tower",
+        "permit:cleared:17 138724 FSU:00:cooling_tower",
+        "permit:cleared:17 138724 HVA:00:cooling_tower",
+        "permit:cleared:17 138724 PLB:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:17 138724 BLD:00:chiller",
+        "permit:cleared:17 138724 FSU:00:chiller",
+        "permit:cleared:17 138724 HVA:00:chiller",
+        "permit:cleared:17 138724 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:14601706",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "21 HILLCREST AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "14601706",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-12-06",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:18 189994 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 189994 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:772764",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "246 BLOOR ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "772764",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-01-26",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:16 101967 BLD:00:cooling_tower",
+        "permit:cleared:16 101967 HVA:00:cooling_tower",
+        "permit:cleared:16 101967 PLB:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:16 101967 BLD:00:chiller",
+        "permit:cleared:16 101967 HVA:00:chiller",
+        "permit:cleared:16 101967 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:14674985",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "270 MILAN ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "14674985",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-05-13",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:23 147719 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:23 147719 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:3993557",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "298 JARVIS ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "3993557",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-06-13",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:18 186589 BLD:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 186589 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6868910",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "319 MERTON ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6868910",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-11-20",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:25 153112 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:25 153112 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:871468",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "355 ST CLAIR AVE W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "871468",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-10-24",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:21 246868 BLD:00:cooling_tower",
+        "permit:cleared:21 246868 HVA:00:cooling_tower",
+        "permit:cleared:21 246868 PLB:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:21 246868 BLD:00:chiller",
+        "permit:cleared:21 246868 HVA:00:chiller",
+        "permit:cleared:21 246868 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:13501524",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "555 FINCH AVE W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "13501524",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-02-02",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:20 186423 BLD:01:cooling_tower",
+        "permit:cleared:20 186423 BLD:02:cooling_tower",
+        "permit:cleared:20 186423 BLD:03:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:20 186423 BLD:01:chiller",
+        "permit:cleared:20 186423 BLD:02:chiller",
+        "permit:cleared:20 186423 BLD:03:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:14078150",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "61 YORKVILLE AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "14078150",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-05-15",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:24 176926 BLD:00:cooling_tower",
+        "permit:cleared:24 176926 BLD:01:cooling_tower",
+        "permit:cleared:24 176926 HVA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:24 176926 BLD:00:chiller",
+        "permit:cleared:24 176926 BLD:01:chiller",
+        "permit:cleared:24 176926 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:568395",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "8 THE DONWAY E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "568395",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-07-02",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:20 211644 MSA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:20 211644 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6727800",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "CONFIRMED",
+      "address": "888 BIRCHMOUNT RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6727800",
+      "equipment_types": [
+        "chiller",
+        "cooling_tower"
+      ],
+      "commercial_signals": [
+        "COOLING_TOWER_PROJECT_HISTORY",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-03-14",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 4,
+      "explicit_tower_evidence_ids": [
+        "permit:cleared:18 177761 BLD:00:cooling_tower",
+        "permit:cleared:18 177761 HVA:00:cooling_tower"
+      ],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 177761 BLD:00:chiller",
+        "permit:cleared:18 177761 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10663925",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "1 AUSTIN TER",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10663925",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2016-10-19",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:16 114715 BLD:01:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6666985",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "1 CHURCH ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6666985",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-12-07",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:19 236222 BLD:00:chiller",
+        "permit:cleared:19 236222 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8087262",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "1 HARBOUR SQ",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8087262",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-03-27",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:17 118472 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8133817",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "1 WARRENDALE CRT",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8133817",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2015-03-12",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:15 123294 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8677414",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "10 WELLINGTON ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8677414",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:07 282618 HVA:00:chiller",
+        "permit:cleared:07 282618 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8708498",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "10 YONGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8708498",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-09-19",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:24 254917 MSA:00:chiller",
+        "permit:active:24 254917 MSA:01:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:14188741",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "10-20 BAY ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "14188741",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-04-12",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:10 123759 BLD:00:chiller",
+        "permit:cleared:10 123759 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7929398",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "100 KING ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7929398",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2010-04-26",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:10 154642 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:856375",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "100 QUEEN ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "856375",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "1997-12-18",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:97 024979 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:785208",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "101 COLLEGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "785208",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2010-05-13",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:10 118427 BLD:00:chiller",
+        "permit:active:10 118427 PLB:00:chiller",
+        "permit:active:10 118446 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7929297",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "107 WELLINGTON ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7929297",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2013-05-07",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:13 144583 BLD:00:chiller",
+        "permit:active:13 144583 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10759047",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "11 WALMER RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10759047",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-10-28",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:22 202915 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7274128",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "110 DREWRY AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7274128",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2012-03-15",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:12 133171 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:873387",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "110 ST GEORGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "873387",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-05-12",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:07 113215 BLD:00:chiller",
+        "permit:cleared:07 113215 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:852873",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "120 PEARL ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "852873",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-07-27",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:19 220615 BLD:00:chiller",
+        "permit:active:19 220615 BLD:01:chiller",
+        "permit:active:19 220615 HVA:00:chiller",
+        "permit:active:19 220615 HVA:01:chiller",
+        "permit:cleared:21 184308 BLD:00:chiller",
+        "permit:cleared:21 184308 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:772677",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "121 BLOOR ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "772677",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-12-07",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:17 260128 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10750671",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "130 OVERLEA BLVD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10750671",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-09-08",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:25 152062 BLD:00:chiller",
+        "permit:active:25 152062 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:14200071",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "130 QUEEN ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "14200071",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:07 102642 BLD:00:chiller",
+        "permit:cleared:07 102642 HVA:00:chiller",
+        "permit:cleared:07 102642 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6282913",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "150 SHERWAY DR",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6282913",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-02-17",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:17 101794 BLD:00:chiller",
+        "permit:active:17 101794 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8105939",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "16 RUSSELL ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8105939",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2020-08-27",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:20 169130 BLD:00:chiller",
+        "permit:active:20 169130 HVA:00:chiller",
+        "permit:active:20 169130 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:321805",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "161 COMMANDER BLVD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "321805",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2006-10-10",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:06 174923 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:4030670",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "170 ST GEORGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "4030670",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-08-19",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:26 214094 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:3327203",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "1755 STEELES AVE W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "3327203",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-07-15",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:26 185369 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:12601262",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "190 SIMCOE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "12601262",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2011-05-19",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:11 181530 PSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10154617",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "1900 SHEPPARD AVE W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10154617",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-12-10",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:23 231889 HVA:00:chiller",
+        "permit:cleared:23 231889 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8535820",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "2 BLOOR ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8535820",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-07-28",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:24 220059 BLD:00:chiller",
+        "permit:active:24 220059 BLD:01:chiller",
+        "permit:active:24 220059 STS:00:chiller",
+        "permit:cleared:24 220059 HVA:00:chiller",
+        "permit:cleared:24 220059 PLB:00:chiller",
+        "permit:cleared:24 220059 PLB:01:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:874651",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "2 STRACHAN AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "874651",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-01-09",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:07 108065 MSA:00:chiller",
+        "permit:active:16 243334 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:20573",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "200 DAWES RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "20573",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2007-08-27",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:07 244027 BLD:00:chiller",
+        "permit:active:07 244027 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:13977191",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "222 BREMNER BLVD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "13977191",
+      "equipment_types": [
+        "chiller",
+        "condenser_water"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-04-28",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 5,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:16 272011 MSA:00:chiller",
+        "permit:active:16 272011 MSA:00:condenser_water",
+        "permit:active:19 257346 BLD:00:chiller",
+        "permit:active:19 257346 HVA:00:chiller",
+        "permit:cleared:20 135776 FSU:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8354416",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "230 THE ESPLANADE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8354416",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-06-25",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:25 162766 BLD:00:chiller",
+        "permit:active:25 162766 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7042041",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "24 MABELLE AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7042041",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2012-02-08",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:12 105936 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:20120574",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "246 SACKVILLE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "20120574",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2019-07-12",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:19 170187 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:5222597",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "25 BRUCEWOOD CRES",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "5222597",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-01-11",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:21 129217 HVA:00:chiller",
+        "permit:cleared:21 128105 MSA:00:chiller",
+        "permit:cleared:21 129217 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10906700",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "25 ELM ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10906700",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-06-01",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:17 154046 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6168206",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "25 HENRY LANE TER",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6168206",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-11-22",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:21 230995 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7042042",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "25 MABELLE AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7042042",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2012-02-08",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:12 105945 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6868899",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "253 MERTON ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6868899",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-11-22",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:21 230470 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:855387",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "27 QUEEN ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "855387",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2004-03-10",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:04 103596 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:30010555",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "3 MARINE PARADE DR",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "30010555",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-06-16",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:20 200232 BLD:00:chiller",
+        "permit:cleared:20 200232 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:9638452",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "3050 LAWRENCE AVE E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "9638452",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2013-05-06",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:13 109026 BLD:00:chiller",
+        "permit:active:13 109026 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:796549",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "317 DUNDAS ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "796549",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2004-07-26",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:04 100486 MSA:00:chiller",
+        "permit:active:04 150933 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-address:c972c91ae7b1dc29",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "3197-3199 LAKE SHORE BLVD W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": null,
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:08 109575 HVA:00:chiller",
+        "permit:cleared:08 109575 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:30033035",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "32 REES ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "30033035",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2013-01-09",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:12 261184 BLD:00:chiller",
+        "permit:active:12 261184 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:12387715",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "330 JARVIS ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "12387715",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-11-15",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:17 249171 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:772686",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "333 BLOOR ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "772686",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-02-06",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 7,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:22 110097 FSU:00:chiller",
+        "permit:cleared:22 110097 BLD:00:chiller",
+        "permit:cleared:22 110097 BLD:01:chiller",
+        "permit:cleared:22 110097 HVA:00:chiller",
+        "permit:cleared:22 110097 HVA:01:chiller",
+        "permit:cleared:22 110097 PLB:00:chiller",
+        "permit:cleared:22 110097 PLB:01:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:9135228",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "36 GREENFIELD AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "9135228",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2015-05-14",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:15 141097 BLD:00:chiller",
+        "permit:active:15 141097 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:9086232",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "399 BATHURST ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "9086232",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-09-18",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:24 187970 BLD:00:chiller",
+        "permit:active:24 187970 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:3065725",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "40 UNIVERSITY AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "3065725",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-01-04",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:19 134808 BLD:00:chiller",
+        "permit:active:19 134808 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:536800",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "4001 LESLIE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "536800",
+      "equipment_types": [
+        "chiller",
+        "condenser_water"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-03-02",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:18 115669 MSA:00:chiller",
+        "permit:active:18 115669 MSA:00:condenser_water"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6332564",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "4171 SHEPPARD AVE E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6332564",
+      "equipment_types": [
+        "chiller",
+        "condenser_water"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-12-11",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 8,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:21 234133 BLD:00:chiller",
+        "permit:active:21 234133 BLD:00:condenser_water",
+        "permit:active:21 234133 BLD:01:chiller",
+        "permit:active:21 234133 BLD:01:condenser_water",
+        "permit:active:21 234133 PLB:00:chiller",
+        "permit:active:21 234133 PLB:00:condenser_water",
+        "permit:cleared:21 234133 HVA:00:chiller",
+        "permit:cleared:21 234133 HVA:00:condenser_water"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:566155",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "44 STUBBS DR",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "566155",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-01-05",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:23 232775 PSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7730267",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "45 CARLTON ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7730267",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2009-03-20",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:09 116902 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:994432",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "50 CORDOVA AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "994432",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2012-02-08",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:12 105950 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:20260181",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "50 ST JOSEPH ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "20260181",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2016-09-23",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:16 132968 BLD:00:chiller",
+        "permit:active:16 132968 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:12601290",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "500 UNIVERSITY AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "12601290",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2002-03-01",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:02 112494 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:13501978",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "501 CONSUMERS RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "13501978",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2016-03-07",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:16 124320 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:3841975",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "5100 YONGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "3841975",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2014-12-09",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:14 248729 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8535679",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "55 BLOOR ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8535679",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-12-20",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:23 228301 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8087258",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "55 HARBOUR SQ",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8087258",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-11-24",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:10 289918 BLD:00:chiller",
+        "permit:cleared:10 289930 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7792268",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "595 BAY ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7792268",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2004-02-11",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:04 107516 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7792698",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "600 UNIVERSITY AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7792698",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:08 113707 BLD:00:chiller",
+        "permit:active:08 113707 PLB:00:chiller",
+        "permit:cleared:08 113707 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:13498043",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "610 UNIVERSITY AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "13498043",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2012-10-30",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:12 252900 BLD:00:chiller",
+        "permit:active:12 252900 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:12763889",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "65 QUEEN ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "12763889",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2008-12-10",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:08 222029 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-address:16a352860622bb56",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "71 SIMCOE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": null,
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-04-04",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:17 126227 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8038154",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "72 STERLING RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8038154",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-05-28",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:25 147474 BLD:00:chiller",
+        "permit:active:25 147474 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:870176",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "720 SPADINA AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "870176",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-25",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:10 123902 BLD:00:chiller",
+        "permit:cleared:10 123902 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7570431",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "816 LOGAN AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7570431",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-02-09",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:21 252037 BLD:00:chiller",
+        "permit:active:21 252037 HVA:00:chiller",
+        "permit:active:21 252037 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:30025476",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "9 LESLIE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "30025476",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-06-04",
+      "source_keys": [
+        "toronto_building_permits_active"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:25 124430 BLD:00:chiller",
+        "permit:active:25 124430 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:367187",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "9 NEILSON RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "367187",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-01-09",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:13 127635 BLD:00:chiller",
+        "permit:cleared:13 127635 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:828395",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "905 KING ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "828395",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-01-19",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:17 125235 BLD:00:chiller",
+        "permit:active:17 125235 HVA:00:chiller",
+        "permit:cleared:17 125235 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:13503978",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "941 PROGRESS AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "13503978",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "ACTIVE_MECHANICAL_PERMIT",
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-06-18",
+      "source_keys": [
+        "toronto_building_permits_active",
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:active:23 125684 BLD:00:chiller",
+        "permit:cleared:23 125684 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:364214",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "10 MILNER BUSINESS CRT",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "364214",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-08-26",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:24 115648 PSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:1031968",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "10 SHORNCLIFFE RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "1031968",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:04 145264 DST:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:1008107",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "101 HUMBER COLLEGE BLVD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "1008107",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-03-15",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:17 106758 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:3232917",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "115 GOWAN AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "3232917",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-07-07",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:20 213097 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:772675",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "117 BLOOR ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "772675",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:05 128750 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:11267781",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "122 ARROW RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "11267781",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:02 108120 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:3147705",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "123 EASTSIDE DR",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "3147705",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-05-24",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:20 166439 BLD:02:chiller",
+        "permit:cleared:20 166439 HVA:02:chiller",
+        "permit:cleared:20 166439 PLB:03:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6275805",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "123 GARRATT BLVD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6275805",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-08-01",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:91 251005 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:856376",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "123 QUEEN ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "856376",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-07-30",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:10 164766 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7793159",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "150 COLLEGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7793159",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-07-14",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:17 124769 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7792536",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "150 GERRARD ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7792536",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:06 132759 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8344802",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "151 KING ST E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8344802",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-12-20",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:16 122462 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:30044709",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "160 FRONT ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "30044709",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-05-19",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:25 227769 MSA:00:chiller",
+        "permit:cleared:25 227775 PSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:11835376",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "2 SHEPPARD AVE E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "11835376",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-07-07",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 4,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:16 269570 BLD:00:chiller",
+        "permit:cleared:16 269570 FSU:00:chiller",
+        "permit:cleared:16 269570 HVA:00:chiller",
+        "permit:cleared:16 269570 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:11901996",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "20 EGLINTON AVE W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "11901996",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-12-11",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:23 177600 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7792529",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "200 ELIZABETH ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7792529",
+      "equipment_types": [
+        "chiller",
+        "condenser_water"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-01-02",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 5,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 122974 MSA:00:chiller",
+        "permit:cleared:23 148319 BLD:00:chiller",
+        "permit:cleared:23 148319 BLD:00:condenser_water",
+        "permit:cleared:23 148319 HVA:00:chiller",
+        "permit:cleared:23 148319 HVA:00:condenser_water"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7683835",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "218 CARLTON ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7683835",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-06-10",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:22 116316 BLD:01:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8087336",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "222 BAY ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8087336",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-08-23",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 6,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:17 158998 BLD:00:chiller",
+        "permit:cleared:17 158998 BLD:01:chiller",
+        "permit:cleared:17 158998 FSU:00:chiller",
+        "permit:cleared:17 158998 HVA:00:chiller",
+        "permit:cleared:17 158998 HVA:01:chiller",
+        "permit:cleared:17 158998 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:11484425",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "2235 SHEPPARD AVE E",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "11484425",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-03-23",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 223090 BLD:00:chiller",
+        "permit:cleared:18 223090 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8896615",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "262 RIDLEY BLVD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8896615",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:00 150850 CMB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10011100",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "30 DEE AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10011100",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-03-14",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:20 199320 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10536994",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "300 LESMILL RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10536994",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:09 176786 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7063055",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "310 HUMBERLINE DR",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7063055",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:04 154251 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8676866",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "33 YONGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8676866",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-02-12",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:22 149597 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:12601206",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "345 RUMSEY RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "12601206",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-12-05",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 3,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 135634 BLD:00:chiller",
+        "permit:cleared:18 135634 HVA:00:chiller",
+        "permit:cleared:18 135634 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:514036",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "35 FAIRVIEW MALL DR",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "514036",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-06-18",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:10 294879 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:14601300",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "380 THE WEST MALL",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "14601300",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-05-22",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:99 110036 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:5573901",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "384 MOUNT PLEASANT RD",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "5573901",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-02-17",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:19 166147 BLD:00:chiller",
+        "permit:cleared:19 166147 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8067836",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "390 BAY ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8067836",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:06 163836 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:13494194",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "390 THE WEST MALL",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "13494194",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-02-27",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:16 118684 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8676857",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "40 KING ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8676857",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-11-24",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 5,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:15 122874 MSA:00:chiller",
+        "permit:cleared:15 122874 MSA:02:chiller",
+        "permit:cleared:17 132350 MSA:00:chiller",
+        "permit:cleared:17 142212 BLD:00:chiller",
+        "permit:cleared:18 146884 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:6350053",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "40 ST GEORGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "6350053",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:07 130832 BLD:00:chiller",
+        "permit:cleared:07 130832 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10142946",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "40 WYNFORD DR",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10142946",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-11-20",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:10 111457 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7929642",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "43 SIMCOE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7929642",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-09-26",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:25 222795 MSA:00:chiller",
+        "permit:cleared:25 222827 PSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:5336734",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "4330 DUFFERIN ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "5336734",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-11-12",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:21 146637 BLD:00:chiller",
+        "permit:cleared:21 146637 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8351179",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "45 THE ESPLANADE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8351179",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-12-27",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:12 106418 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:323008",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "470 CORONATION DR",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "323008",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-07-18",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:13 259593 BLD:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:578559",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "4950 YONGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "578559",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-09-26",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 220634 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7641683",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "50 GOULD ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7641683",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-03-01",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 271784 BLD:02:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:20097934",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "50 MATILDA ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "20097934",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2021-12-06",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:19 254652 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:2854062",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "522 UNIVERSITY AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "2854062",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-12-24",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:11 169500 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10906589",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "525 BAY ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10906589",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2023-06-16",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:22 110068 MSA:00:chiller",
+        "permit:cleared:22 110079 PSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:987965",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "60 BIRMINGHAM ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "987965",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 4,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:04 135164 BLD:00:chiller",
+        "permit:cleared:04 135164 PLB:00:chiller",
+        "permit:cleared:05 112139 BLD:00:chiller",
+        "permit:cleared:05 112139 PLB:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:536810",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "6100 LESLIE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "536810",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2024-04-10",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:23 206892 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7929870",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "627 QUEENS QUAY W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7929870",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2022-08-09",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:21 179090 BLD:00:chiller",
+        "permit:cleared:21 179090 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:11227032",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "65 ST GEORGE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "11227032",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2019-01-23",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:16 139983 BLD:00:chiller",
+        "permit:cleared:16 139983 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7950444",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "66 COLLIER ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7950444",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-10-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 119106 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7978539",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "69 YORKVILLE AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7978539",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2018-07-17",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 120842 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7730195",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "70 ALEXANDER ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7730195",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-10-11",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:17 218727 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:874010",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "70 ST JOSEPH ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "874010",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2025-10-20",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:15 208094 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:10222905",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "77 ADELAIDE ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "10222905",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2020-02-13",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:19 113534 BLD:00:chiller",
+        "permit:cleared:19 113534 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:8408205",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "77 BLOOR ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "8408205",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-01-26",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:14 242259 BLD:01:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:836549",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "77 MAITLAND PL",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "836549",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2020-09-17",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:19 102596 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7792587",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "790 BAY ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7792587",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2019-07-22",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:18 271551 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:7642546",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "81 DALHOUSIE ST",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "7642546",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:07 287273 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:364211",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "825 MILNER AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "364211",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2026-06-08",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 2,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:10 139595 DST:00:chiller",
+        "permit:cleared:10 139595 HVA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:12763885",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "90-94 ADELAIDE ST W",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "12763885",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-08-18",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:17 139058 MSA:00:chiller"
+      ]
+    },
+    {
+      "property_key": "toronto-geoid:9531813",
+      "jurisdiction": "TORONTO_ON",
+      "tower_status": "NO_TOWER_ASSERTION",
+      "address": "99 YORKVILLE AVE",
+      "property_name": null,
+      "organization": null,
+      "geo_id": "9531813",
+      "equipment_types": [
+        "chiller"
+      ],
+      "commercial_signals": [
+        "HISTORICAL_MECHANICAL_PROJECT"
+      ],
+      "renewal_priorities": [],
+      "latest_source_event_date": "2017-01-20",
+      "source_keys": [
+        "toronto_building_permits_cleared"
+      ],
+      "evidence_count": 1,
+      "explicit_tower_evidence_ids": [],
+      "supporting_evidence_ids": [
+        "permit:cleared:16 131955 MSA:00:chiller"
+      ]
+    }
+  ]
+}
