@@ -7,6 +7,7 @@ on:
       - agent/toronto-poc-20260828
     paths:
       - scripts/build_toronto_poc.py
+      - scripts/enrich_toronto_poc_tdsb_identity.py
       - docs/TORONTO_POC.md
       - .github/workflows/toronto-poc.yml
 
@@ -32,11 +33,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Compile extractor
-        run: python -m py_compile scripts/build_toronto_poc.py
+      - name: Compile Toronto POC scripts
+        run: |
+          python -m py_compile scripts/build_toronto_poc.py
+          python -m py_compile scripts/enrich_toronto_poc_tdsb_identity.py
 
       - name: Extract Toronto POC evidence
         run: python scripts/build_toronto_poc.py --output data/toronto/poc/current
+
+      - name: Enrich exact TDSB school identity
+        run: python scripts/enrich_toronto_poc_tdsb_identity.py --output data/toronto/poc/current
 
       - name: Validate generated JSON
         run: |
