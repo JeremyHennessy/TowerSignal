@@ -1,0 +1,93 @@
+name: Toronto AIC Backend Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-market-20260828
+    paths:
+      - .github/workflows/toronto-aic-backend-diagnostic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Fetch current Application Details HTML and inspect assets
+        shell: python
+        run: |
+          import html, re, urllib.parse, urllib.request
+          from pathlib import Path
+
+          url='https://www.toronto.ca/city-government/planning-development/application-details/?id=5565655&pid=881473&title=40-BUSHBY-DR'
+          req=urllib.request.Request(url,headers={
+              'User-Agent':'Mozilla/5.0 (compatible; TowerSignal-Toronto-AIC-Diagnostic/1.0)',
+              'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          })
+          with urllib.request.urlopen(req,timeout=60) as response:
+              body=response.read().decode('utf-8',errors='replace')
+              print('PAGE_STATUS=',response.status,'BYTES=',len(body),'FINAL_URL=',response.geturl())
+              print('PAGE_CONTENT_TYPE=',response.headers.get('content-type'))
+          Path('/tmp/application-details.html').write_text(body,encoding='utf-8')
+          print('PAGE_API_LIKE_LINES=')
+          for line in body.splitlines():
+              low=line.lower()
+              if any(term in low for term in ('application-details','wp-json','api/','folderrsn','propertyrsn','aic','arcgis','feature')):
+                  print(line[:2000])
+
+          srcs=[]
+          for raw in re.findall(r'<script[^>]+src=[\"\']([^\"\']+)',body,re.I):
+              src=html.unescape(raw)
+              src=urllib.parse.urljoin(url,src)
+              if src not in srcs: srcs.append(src)
+          print('SCRIPT_COUNT=',len(srcs))
+          for src in srcs:
+              print('SCRIPT=',src)
+
+          patterns=(
+              'application-details','applicationdetails','folderrsn','propertyrsn','aic','wp-json',
+              '/api/','api.', 'document', 'supporting', 'attachment', 'folderRsn', 'PROPERTYRSN',
+              'FOLDERRSN','FeatureServer/60','cot_geospatial11'
+          )
+          for index,src in enumerate(srcs):
+              try:
+                  r=urllib.request.Request(src,headers={'User-Agent':'Mozilla/5.0 (compatible; TowerSignal-Toronto-AIC-Diagnostic/1.0)'})
+                  with urllib.request.urlopen(r,timeout=60) as response:
+                      data=response.read(8_000_000).decode('utf-8',errors='replace')
+              except Exception as exc:
+                  print('SCRIPT_FETCH_ERROR=',src,type(exc).__name__,str(exc))
+                  continue
+              low=data.lower()
+              if not any(p.lower() in low for p in patterns):
+                  continue
+              print('MATCHING_SCRIPT=',src,'BYTES=',len(data))
+              for p in patterns:
+                  pos=low.find(p.lower())
+                  if pos >= 0:
+                      start=max(0,pos-800); end=min(len(data),pos+1800)
+                      print('PATTERN=',p,'CONTEXT=',data[start:end].replace('\n',' ')[:3000])
+
+      - name: Probe likely current application-data endpoints discovered from public identifiers
+        shell: python
+        run: |
+          import json, urllib.parse, urllib.request
+          candidates=[
+            'https://www.toronto.ca/wp-json/wp/v2/search?search=5565655',
+            'https://www.toronto.ca/wp-json/',
+            'https://secure.toronto.ca/AIC/api/',
+            'https://secure.toronto.ca/aic/api/',
+          ]
+          for url in candidates:
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (compatible; TowerSignal-Toronto-AIC-Diagnostic/1.0)','Accept':'application/json,text/plain,*/*'})
+                  with urllib.request.urlopen(req,timeout=30) as response:
+                      body=response.read(200000).decode('utf-8',errors='replace')
+                      print('PROBE=',url,'STATUS=',response.status,'TYPE=',response.headers.get('content-type'),'BODY=',body[:4000].replace('\n',' '))
+              except Exception as exc:
+                  print('PROBE_ERROR=',url,type(exc).__name__,str(exc))
