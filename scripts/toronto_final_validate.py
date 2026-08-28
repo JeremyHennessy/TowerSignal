@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import math
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -131,17 +131,18 @@ def main() -> None:
 
     assert (aerial.get("training") or {}).get("usable_images", 0) >= 20, "aerial stage did not actually train"
     assert aerial.get("status") == "WEAK_LABEL_MODEL_FIT"
-    assert int(aerial.get("candidate_properties_scored") or 0) > 0
+    aerial_scoring = aerial.get("scoring") or {}
+    assert int(aerial_scoring.get("candidate_properties_scored") or 0) > 0, "aerial stage did not score candidate properties"
 
-    # AIC completion is measured, not assumed from presence of code.
     app_total = int(aic.get("applications_total_source") or 0)
     apps_in_shards = int(aic.get("applications_in_shards") or 0)
+    unique_apps = int(aic.get("unique_applications_scanned") or 0)
     assert app_total > 0 and apps_in_shards == app_total, f"AIC scan incomplete: source={app_total}, shards={apps_in_shards}"
+    assert unique_apps == app_total, f"AIC unique-application scan incomplete: source={app_total}, unique={unique_apps}"
     parsed_docs = int(aic.get("documents_parsed") or 0)
     discovered_docs = int(aic.get("documents_discovered") or 0)
     assert discovered_docs >= parsed_docs >= 0
 
-    # Build representative QA queues without pretending that automated sampling is manual review.
     unresolved = [r for r in records if not r.get("resolved")]
     resolved_by_status: dict[str, list[Any]] = defaultdict(list)
     for r in records:
@@ -178,7 +179,7 @@ def main() -> None:
     mechanical_docs = [d for d in docs if any((d.get("signal_counts") or {}).values())]
 
     qa_report = {
-        "schema_version": "toronto-final-qa-1.0",
+        "schema_version": "toronto-final-qa-1.1",
         "generated_at": utc_now(),
         "status": "STRUCTURAL_VALIDATION_PASSED",
         "json_files_validated": len(parsed),
@@ -195,7 +196,7 @@ def main() -> None:
             "aic_document_index_records": len(docs),
             "aic_tower_signal_documents": len(tower_docs),
             "aic_any_target_signal_documents": len(mechanical_docs),
-            "aerial_candidates_scored": aerial.get("candidate_properties_scored"),
+            "aerial_candidates_scored": aerial_scoring.get("candidate_properties_scored"),
         },
         "unresolved_properties": unresolved,
         "representative_resolution_samples": {status: sample(items) for status, items in sorted(resolved_by_status.items())},
@@ -210,6 +211,7 @@ def main() -> None:
             "all_entity_graph_property_refs_exist": True,
             "true_market_coverage_unknown_denominator": True,
             "aerial_scores_do_not_upgrade_tower_confirmation": True,
+            "aic_unique_application_scan_complete": True,
         },
     }
     write_json(MARKET / "qa_report.json", qa_report)
