@@ -8,6 +8,7 @@ on:
     paths:
       - scripts/toronto_market_common.py
       - scripts/toronto_market_core.py
+      - scripts/toronto_identity_normalize.py
       - scripts/toronto_aic_corpus.py
       - scripts/toronto_aerial_detector.py
       - docs/TORONTO_MARKET.md
@@ -23,7 +24,7 @@ concurrency:
 jobs:
   core:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - name: Checkout exact event head
         uses: actions/checkout@v4
@@ -40,20 +41,44 @@ jobs:
           python -m py_compile \
             scripts/toronto_market_common.py \
             scripts/toronto_market_core.py \
+            scripts/toronto_identity_normalize.py \
             scripts/toronto_aic_corpus.py \
             scripts/toronto_aerial_detector.py
 
-      - name: Build canonical GeoID spine and official-source joins
+      - name: Build canonical source candidates and official-source joins
         run: python scripts/toronto_market_core.py core
+
+      - name: Normalize current municipal Address Point identity
+        run: python scripts/toronto_identity_normalize.py
 
       - name: Validate core outputs
         run: |
-          python -m json.tool data/toronto/market/current/property_spine.json >/dev/null
-          python -m json.tool data/toronto/market/current/reconciliation_summary.json >/dev/null
-          python -m json.tool data/toronto/market/current/property_source_links.json >/dev/null
-          python -m json.tool data/toronto/market/current/open_licensed/toronto_highrise_residential_health_hazards.json >/dev/null
-          python -m json.tool data/toronto/market/current/open_licensed/toronto_aic_applications.json >/dev/null
-          python -m json.tool data/toronto/market/current/construction_act_source_policy.json >/dev/null
+          for file in \
+            data/toronto/market/current/property_spine.json \
+            data/toronto/market/current/identity_contract.json \
+            data/toronto/market/current/reconciliation_summary.json \
+            data/toronto/market/current/reconciliation_details.json \
+            data/toronto/market/current/property_source_links.json \
+            data/toronto/market/current/open_licensed/toronto_highrise_residential_health_hazards.json \
+            data/toronto/market/current/open_licensed/toronto_aic_applications.json \
+            data/toronto/market/current/construction_act_source_policy.json; do
+              python -m json.tool "$file" >/dev/null
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          market=Path('data/toronto/market/current')
+          spine=json.loads((market/'property_spine.json').read_text())
+          recon=json.loads((market/'reconciliation_details.json').read_text())
+          props=spine['properties']
+          ids=[p['property_id'] for p in props]
+          assert len(ids)==len(set(ids)), 'duplicate canonical property IDs'
+          assert all(i.startswith('toronto-address-point:') for i in ids), 'old Toronto property ID namespace remains'
+          assert len(recon['records'])==177, 'POC reconciliation ledger must contain 177 records'
+          assert len({r['property_key'] for r in recon['records']})==177, 'POC reconciliation keys not unique'
+          assert recon['resolved_count']+recon['unresolved_count']==177
+          print(json.dumps({'canonical_properties':len(props),'poc_resolved':recon['resolved_count'],'poc_unresolved':recon['unresolved_count']},indent=2))
+          PY
 
       - name: Upload core market state
         uses: actions/upload-artifact@v4
@@ -179,6 +204,9 @@ jobs:
       - name: Validate final public-safe outputs
         run: |
           for file in \
+            data/toronto/market/current/property_spine.json \
+            data/toronto/market/current/identity_contract.json \
+            data/toronto/market/current/reconciliation_details.json \
             data/toronto/market/current/aic_corpus_summary.json \
             data/toronto/market/current/aic_document_index.json \
             data/toronto/market/current/aic_application_scan_status.json \
@@ -190,6 +218,29 @@ jobs:
           if [ -f data/toronto/market/current/aerial_model_report.json ]; then
             python -m json.tool data/toronto/market/current/aerial_model_report.json >/dev/null
           fi
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+          market=Path('data/toronto/market/current')
+          def load(name): return json.loads((market/name).read_text())
+          spine=load('property_spine.json'); links=load('property_source_links.json'); graph=load('entity_graph.json'); coverage=load('coverage_report.json')
+          ids={p['property_id'] for p in spine['properties']}
+          assert len(ids)==len(spine['properties'])
+          assert all(l['property_id'] in ids for l in links.get('links',[])), 'broken property source link'
+          for edge in graph.get('edges',[]):
+            pid=edge.get('property_id') or edge.get('target_property_id') or edge.get('source_property_id')
+            if pid: assert pid in ids, f'broken entity graph property reference {pid}'
+          def walk(v):
+            if isinstance(v,float): assert math.isfinite(v), 'NaN/Infinity in output'
+            elif isinstance(v,dict):
+              for x in v.values(): walk(x)
+            elif isinstance(v,list):
+              for x in v: walk(x)
+          for payload in (spine,links,graph,coverage): walk(payload)
+          true_cov=coverage.get('true_cooling_tower_market_coverage',{})
+          assert true_cov.get('coverage_percent') is None, 'true Toronto market denominator must remain unknown unless separately validated'
+          print('final structural validation passed')
+          PY
 
       - name: Upload full Toronto market artifact before cleanup
         uses: actions/upload-artifact@v4
