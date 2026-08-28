@@ -1,0 +1,158 @@
+{
+  "key": "311_service_requests",
+  "title": "311 Service Requests - Customer Initiated",
+  "package_name": "311-service-requests-customer-initiated",
+  "package_id": "2e54bc0e-4399-4076-b717-351df5918ae7",
+  "portal_url": "https://open.toronto.ca/dataset/311-service-requests-customer-initiated/",
+  "license": "Open Government Licence - Toronto",
+  "license_basis": "Toronto Open Data portal-wide licence.",
+  "retrieved_at": "2026-08-28T19:32:54.521688Z",
+  "mode": "METADATA_ONLY_PENDING_TARGETED_EXTRACTION",
+  "reason": "Large service-request feed. Register resources now; use bounded/property-relevant extraction later. City-published analysis notes the open feed covers only a subset of total 311 requests/divisions, so absence cannot be interpreted as no complaint.",
+  "resources": [
+    {
+      "id": "99b7f283-7345-4f5a-a126-d078ed4f3419",
+      "name": "311 Service Requests 2026",
+      "format": "ZIP",
+      "last_modified": "2026-08-08T20:00:09",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/99b7f283-7345-4f5a-a126-d078ed4f3419/download/sr2026.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "f3db05ab-2588-4159-89f7-56c74d1d8201",
+      "name": "311 Service Requests 2025",
+      "format": "ZIP",
+      "last_modified": "2026-01-08T21:00:18",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/f3db05ab-2588-4159-89f7-56c74d1d8201/download/sr2025.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "f46b640d-d465-4f8b-9db5-5000a08295cd",
+      "name": "311 Service Requests 2024",
+      "format": "ZIP",
+      "last_modified": "2025-01-08T21:00:16",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/f46b640d-d465-4f8b-9db5-5000a08295cd/download/sr2024.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "079766f3-815d-4257-8731-5ff6b0c84c13",
+      "name": "311 Service Requests 2023",
+      "format": "ZIP",
+      "last_modified": "2024-01-08T21:00:18",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/079766f3-815d-4257-8731-5ff6b0c84c13/download/sr2023.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "f00a3313-f074-463e-89a7-26563084fbef",
+      "name": "311 Service Requests 2022",
+      "format": "ZIP",
+      "last_modified": "2023-02-08T21:00:13",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/f00a3313-f074-463e-89a7-26563084fbef/download/sr2022.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "95145825-04b4-40d8-b883-9d114b5853c4",
+      "name": "311 Service Requests 2021",
+      "format": "ZIP",
+      "last_modified": "2025-10-16T19:31:44.253472",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/95145825-04b4-40d8-b883-9d114b5853c4/download/sr2021.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "04169bcc-860f-465d-b562-caab023b6f3c",
+      "name": "311 service requests 2020",
+      "format": "ZIP",
+      "last_modified": "2025-10-16T19:31:32.143472",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/04169bcc-860f-465d-b562-caab023b6f3c/download/sr2020.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "120c0545-0a03-4ab0-ab08-f149d4ca61fc",
+      "name": "311-service-requests-2019",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:30:13.999061",
+      "url": "https://www.toronto.ca/data/311/opendata/servicerequest/SR2019.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "5cce361d-35af-4251-802e-1b1ea1306a07",
+      "name": "311-service-requests-2018",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:30:12.172484",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/5cce361d-35af-4251-802e-1b1ea1306a07/download/311-service-requests-2018.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "0b45485e-690d-425b-a69b-8b8c4f039f2b",
+      "name": "311-service-requests-2017",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:30:08.635236",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/0b45485e-690d-425b-a69b-8b8c4f039f2b/download/311-service-requests-2017.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "4c6f5bed-5e7f-41c9-95c0-7181e048cdcf",
+      "name": "311-service-requests-2016",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:30:05.287481",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/4c6f5bed-5e7f-41c9-95c0-7181e048cdcf/download/311-service-requests-2016.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "e33b6300-8899-4f73-8ed0-febe10cbce92",
+      "name": "311-service-requests-2015",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:30:01.847306",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/e33b6300-8899-4f73-8ed0-febe10cbce92/download/311-service-requests-2015.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "de039d83-15fe-4a22-ad84-b0389a8c04d9",
+      "name": "311-service-requests-2014",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:29:58.395105",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/de039d83-15fe-4a22-ad84-b0389a8c04d9/download/311-service-requests-2014.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "ddd49c44-e32f-4b9c-8053-39e0398ae665",
+      "name": "311-service-requests-2013",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:29:54.800765",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/ddd49c44-e32f-4b9c-8053-39e0398ae665/download/311-service-requests-2013.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "5f0fd6dc-401d-422d-965d-f55cc98ec3f1",
+      "name": "311-service-requests-2012",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:29:51.559719",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/5f0fd6dc-401d-422d-965d-f55cc98ec3f1/download/311-service-requests-2012.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "c98df60e-530c-4e3d-a0c9-d21f0af350c9",
+      "name": "311-service-requests-2011",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:29:48.613739",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/c98df60e-530c-4e3d-a0c9-d21f0af350c9/download/311-service-requests-2011.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "e256aa93-1c8e-4b2e-ba63-a269081b3f55",
+      "name": "311-service-requests-2010",
+      "format": "ZIP",
+      "last_modified": "2019-07-23T16:29:45.715180",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/e256aa93-1c8e-4b2e-ba63-a269081b3f55/download/311-service-requests-2010.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "bb11ece8-a2b3-401a-92c0-fa115f867fff",
+      "name": "311-service-requests-readme",
+      "format": "XLSX",
+      "last_modified": "2019-07-23T16:30:17.086581",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/bb11ece8-a2b3-401a-92c0-fa115f867fff/download/311-service-requests-readme.xlsx",
+      "datastore_active": false
+    }
+  ]
+}

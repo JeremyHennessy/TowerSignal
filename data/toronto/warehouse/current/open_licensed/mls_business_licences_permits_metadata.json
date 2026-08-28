@@ -1,0 +1,54 @@
+{
+  "key": "mls_business_licences_permits",
+  "title": "Municipal Licensing and Standards - Business Licences and Permits",
+  "package_name": "municipal-licensing-and-standards-business-licences-and-permits",
+  "package_id": "57b2285f-4f80-45fb-ae3e-41a02c3a137f",
+  "portal_url": "https://open.toronto.ca/dataset/municipal-licensing-and-standards-business-licences-and-permits/",
+  "license": "Open Government Licence - Toronto",
+  "license_basis": "Toronto Open Data portal-wide licence.",
+  "retrieved_at": "2026-08-28T19:32:54.521688Z",
+  "mode": "METADATA_ONLY_PENDING_TARGETED_EXTRACTION",
+  "reason": "Potential occupant/operator enrichment source. Register metadata first because the full citywide licence universe is broader than TowerSignal and should be queried against the property spine rather than indiscriminately replicated.",
+  "resources": [
+    {
+      "id": "169e90ba-3ae0-43dd-8b2f-919e87002f50",
+      "name": "Business licences data",
+      "format": "CSV",
+      "last_modified": "2022-12-01T05:49:06",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/57b2285f-4f80-45fb-ae3e-41a02c3a137f/resource/169e90ba-3ae0-43dd-8b2f-919e87002f50/download/business.licences.csv",
+      "datastore_active": true
+    },
+    {
+      "id": "6f2e2588-059e-48fe-aaec-9582e161eee9",
+      "name": "Business licences data.json",
+      "format": "JSON",
+      "last_modified": "2026-08-28T06:11:48.983514",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/57b2285f-4f80-45fb-ae3e-41a02c3a137f/resource/6f2e2588-059e-48fe-aaec-9582e161eee9/download/business-licences-data.json",
+      "datastore_active": false
+    },
+    {
+      "id": "8d2350bb-1dc4-42f2-9244-7981d8dde172",
+      "name": "Business licences data.xml",
+      "format": "XML",
+      "last_modified": "2026-08-28T06:11:47.430362",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/57b2285f-4f80-45fb-ae3e-41a02c3a137f/resource/8d2350bb-1dc4-42f2-9244-7981d8dde172/download/business-licences-data.xml",
+      "datastore_active": false
+    },
+    {
+      "id": "54bddc5e-92d9-4102-89c1-43e82f8f4d2d",
+      "name": "Business licences data.csv",
+      "format": "CSV",
+      "last_modified": "2026-08-28T06:11:45.514313",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/57b2285f-4f80-45fb-ae3e-41a02c3a137f/resource/54bddc5e-92d9-4102-89c1-43e82f8f4d2d/download/business-licences-data.csv",
+      "datastore_active": false
+    },
+    {
+      "id": "e8f9b428-11c5-42a6-8f17-47824b5d035f",
+      "name": "business-licence-readme",
+      "format": "XLS",
+      "last_modified": "2019-07-23T19:53:53.689206",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/57b2285f-4f80-45fb-ae3e-41a02c3a137f/resource/e8f9b428-11c5-42a6-8f17-47824b5d035f/download/mls_business_licences_permits_readme.xls",
+      "datastore_active": false
+    }
+  ]
+}
