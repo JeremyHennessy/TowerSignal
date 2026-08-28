@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-warehouse-0.1",
-  "generated_at": "2026-08-28T19:32:54.521688Z",
+  "generated_at": "2026-08-28T19:36:42.083447Z",
   "jurisdiction": "TORONTO_ON",
   "purpose": "Raw/near-raw source warehouse for TowerSignal Toronto discovery and commercial intelligence. No Toronto priority score.",
   "open_licensed_sources": [
@@ -11,7 +11,7 @@
       "package_id": "f78fe449-53f4-4962-9ec8-8f7eeece1072",
       "portal_url": "https://open.toronto.ca/dataset/tobids-awarded-contracts/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "resource": {
         "id": "e211f003-5909-4bea-bd96-d75899d8e612",
         "name": "Awarded Contracts",
@@ -51,7 +51,7 @@
       "package_id": "9b17b1bc-7227-44da-83ea-fc1ef3359176",
       "portal_url": "https://open.toronto.ca/dataset/capital-project-pipeline/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "resource": {
         "id": "e33e036f-a898-4b90-b626-84abba557bbd",
         "name": "Capital Project Pipeline",
@@ -91,7 +91,7 @@
       "package_id": "a7a327c5-4e25-4881-816d-c8b145e02832",
       "portal_url": "https://open.toronto.ca/dataset/development-pipeline/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "resource": {
         "id": "7aad5dbd-a769-4bd5-b5d2-f9bb605b6bf9",
         "name": "Development Pipeline",
@@ -131,7 +131,7 @@
       "package_id": "ae8eebf8-42fe-426f-b5f8-5baa8ff0bfb8",
       "portal_url": "https://open.toronto.ca/dataset/chemical-tracking-chemtrac/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "resource": {
         "id": "eb0480e5-6265-4d5d-b582-f112ebc7cc4f",
         "name": "Chemtrac Data 2024",
@@ -171,7 +171,7 @@
       "package_id": "4ef82789-e038-44ef-a478-a8f3590c3eb1",
       "portal_url": "https://open.toronto.ca/dataset/apartment-building-evaluation/",
       "license": "open-government-licence-toronto",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "resource": {
         "id": "244f7a02-da5c-425b-b55f-fbdd133dd732",
         "name": "Apartment Building Evaluations 2023 - current",
@@ -210,7 +210,7 @@
       "package_id": "b5fa8322-6acf-410e-affd-b4916ae7a249",
       "portal_url": "https://open.toronto.ca/dataset/upcoming-and-recently-completed-affordable-housing-units/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "resource": {
         "id": "1cef72d8-4bc0-4705-a4ba-998bcb4605ef",
         "name": "Affordable Rental Housing Pipeline",
@@ -250,7 +250,7 @@
       "package_id": "abedd8bc-e3dd-4d45-8e69-79165a76e4fa",
       "portal_url": "https://open.toronto.ca/dataset/address-points-municipal-toronto-one-address-repository/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "mode": "METADATA_ONLY",
       "reason": "Large geospatial spine; use targeted joins rather than duplicating full city geometry in git.",
       "resources": [
@@ -344,7 +344,7 @@
       "package_id": "09a930cc-2a52-49b2-866d-52ac7f769a73",
       "portal_url": "https://open.toronto.ca/dataset/topographic-mapping-building-outlines/",
       "license": "Open Government Licence - Toronto",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "mode": "METADATA_ONLY",
       "reason": "Large geospatial source; retain metadata and add targeted spatial extraction later.",
       "resources": [
@@ -421,7 +421,7 @@
       "source_url": "https://data.ontario.ca/dataset/5e976319-9769-4f77-aab9-d170e0131efe/resource/b6b569cf-5d3a-4b96-9972-ea428c316278/download/2024_final_data_set.xlsx",
       "catalogue_url": "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector",
       "license": "Open Government Licence - Ontario",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "download_bytes": 4065478,
       "source_row_count": 11857,
       "toronto_candidate_row_count": 1863,
@@ -437,7 +437,7 @@
       "portal_url": "https://open.toronto.ca/dataset/renewable-energy-installations/",
       "license": "Open Government Licence - Toronto",
       "license_basis": "Toronto Open Data portal-wide licence.",
-      "retrieved_at": "2026-08-28T19:32:54.521688Z",
+      "retrieved_at": "2026-08-28T19:36:42.083447Z",
       "resource": {
         "id": "05a84a1c-a707-4792-9e89-0d8176f1fd7b",
         "name": "Renewable Energy Installations",
@@ -458,7 +458,7 @@
       "portal_url": "https://open.toronto.ca/dataset/311-service-requests-customer-initiated/",
       "license": "Open Government Licence - Toronto",
       "license_basis": "Toronto Open Data portal-wide licence.",
-      "retrieved_at": "2026-08-28T19:32:54.521688Z",
+      "retrieved_at": "2026-08-28T19:36:42.083447Z",
       "mode": "METADATA_ONLY_PENDING_TARGETED_EXTRACTION",
       "reason": "Large service-request feed. Register resources now; use bounded/property-relevant extraction later. City-published analysis notes the open feed covers only a subset of total 311 requests/divisions, so absence cannot be interpreted as no complaint.",
       "resources": [
@@ -616,7 +616,7 @@
       "portal_url": "https://open.toronto.ca/dataset/municipal-licensing-and-standards-business-licences-and-permits/",
       "license": "Open Government Licence - Toronto",
       "license_basis": "Toronto Open Data portal-wide licence.",
-      "retrieved_at": "2026-08-28T19:32:54.521688Z",
+      "retrieved_at": "2026-08-28T19:36:42.083447Z",
       "mode": "METADATA_ONLY_PENDING_TARGETED_EXTRACTION",
       "reason": "Potential occupant/operator enrichment source. Register metadata first because the full citywide licence universe is broader than TowerSignal and should be queried against the property spine rather than indiscriminately replicated.",
       "resources": [
@@ -667,13 +667,13 @@
     {
       "key": "ontario_access_environment",
       "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-      "retrieved_at": "2026-08-28T19:32:39.872207Z",
+      "retrieved_at": "2026-08-28T19:36:18.639993Z",
       "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
       "layers": {
         "environmental_compliance_approvals": {
           "key": "environmental_compliance_approvals",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:32:39.872207Z",
+          "retrieved_at": "2026-08-28T19:36:18.639993Z",
           "scope": "EXACT_SOURCE_MUNICIPALITY_FIELD",
           "bbox_wgs84": [
             -79.6393,
@@ -714,7 +714,7 @@
         "environmental_activity_sector_registrations": {
           "key": "environmental_activity_sector_registrations",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:32:39.872207Z",
+          "retrieved_at": "2026-08-28T19:36:18.639993Z",
           "scope": "EXACT_SOURCE_MUNICIPALITY_FIELD",
           "bbox_wgs84": [
             -79.6393,
@@ -755,7 +755,7 @@
         "permits_to_take_water": {
           "key": "permits_to_take_water",
           "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
-          "retrieved_at": "2026-08-28T19:32:39.872207Z",
+          "retrieved_at": "2026-08-28T19:36:18.639993Z",
           "scope": "TORONTO_APPROXIMATE_BOUNDING_BOX",
           "bbox_wgs84": [
             -79.6393,
@@ -861,6 +861,95 @@
         "before": 2541,
         "after": 2541
       }
+    }
+  },
+  "targeted_large_source_extraction": {
+    "business_licences": {
+      "source_key": "mls_business_licences_permits",
+      "source_url": "https://open.toronto.ca/dataset/municipal-licensing-and-standards-business-licences-and-permits/",
+      "resource": {
+        "id": "54bddc5e-92d9-4102-89c1-43e82f8f4d2d",
+        "name": "Business licences data.csv",
+        "format": "CSV",
+        "last_modified": "2026-08-28T06:11:45.514313",
+        "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/57b2285f-4f80-45fb-ae3e-41a02c3a137f/resource/54bddc5e-92d9-4102-89c1-43e82f8f4d2d/download/business-licences-data.csv",
+        "datastore_active": false
+      },
+      "download_bytes": 34569243,
+      "source_row_count": 159701,
+      "field_names": [
+        "_id",
+        "Category",
+        "Licence No.",
+        "Operating Name",
+        "Issued",
+        "Client Name",
+        "Business Phone",
+        "Business Phone Ext.",
+        "Licence Address Line 1",
+        "Licence Address Line 2",
+        "Licence Address Line 3",
+        "Ward",
+        "Conditions",
+        "Free Form Conditions Line 1",
+        "Free Form Conditions Line 2",
+        "Plate No.",
+        "Endorsements",
+        "Cancel Date",
+        "Last Record Update"
+      ],
+      "address_fields_used": [
+        "Licence Address Line 1",
+        "Licence Address Line 2",
+        "Licence Address Line 3"
+      ],
+      "join_basis": "EXACT_CANONICAL_ADDRESS_FIELD_EQUALITY",
+      "matched_poc_address_count": 99,
+      "matched_confirmed_tower_address_count": 26,
+      "matched_source_row_count": 1688,
+      "semantics": "Business licence rows are occupant/operator context only; they never establish cooling-tower service responsibility."
+    },
+    "service_311_2026": {
+      "source_key": "311_service_requests",
+      "source_url": "https://open.toronto.ca/dataset/311-service-requests-customer-initiated/",
+      "resource": {
+        "id": "99b7f283-7345-4f5a-a126-d078ed4f3419",
+        "name": "311 Service Requests 2026",
+        "format": "ZIP",
+        "last_modified": "2026-08-08T20:00:09",
+        "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2e54bc0e-4399-4076-b717-351df5918ae7/resource/99b7f283-7345-4f5a-a126-d078ed4f3419/download/sr2026.zip",
+        "datastore_active": false
+      },
+      "download_bytes": 4997655,
+      "source_row_count": 337196,
+      "join_basis": "EXACT_CANONICAL_ADDRESS_OR_LOCATION_FIELD_EQUALITY",
+      "matched_poc_address_count": 1,
+      "matched_confirmed_tower_address_count": 1,
+      "matched_source_row_count": 1,
+      "coverage_caveat": "Large service-request feed. Register resources now; use bounded/property-relevant extraction later. City-published analysis notes the open feed covers only a subset of total 311 requests/divisions, so absence cannot be interpreted as no complaint.",
+      "semantics": "311 rows are complaint/service context only. A row does not establish a cooling-tower issue, and absence is not evidence of no complaint.",
+      "member_diagnostics": [
+        {
+          "member": "SR2026.csv",
+          "field_names": [
+            "Creation Date",
+            "Status",
+            "First 3 Chars of Postal Code",
+            "Intersection Street 1",
+            "Intersection Street 2",
+            "Ward",
+            "Service Request Type",
+            "Division",
+            "Section"
+          ],
+          "address_location_fields_used": [
+            "Intersection Street 1",
+            "Intersection Street 2"
+          ],
+          "row_count": 337196,
+          "matched_row_count": 1
+        }
+      ]
     }
   }
 }

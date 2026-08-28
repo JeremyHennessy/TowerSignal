@@ -5,7 +5,7 @@
   "package_id": "09a930cc-2a52-49b2-866d-52ac7f769a73",
   "portal_url": "https://open.toronto.ca/dataset/topographic-mapping-building-outlines/",
   "license": "Open Government Licence - Toronto",
-  "retrieved_at": "2026-08-28T19:32:39.872207Z",
+  "retrieved_at": "2026-08-28T19:36:18.639993Z",
   "mode": "METADATA_ONLY",
   "reason": "Large geospatial source; retain metadata and add targeted spatial extraction later.",
   "resources": [

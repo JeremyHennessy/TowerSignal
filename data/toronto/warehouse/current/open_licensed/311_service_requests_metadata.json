@@ -6,7 +6,7 @@
   "portal_url": "https://open.toronto.ca/dataset/311-service-requests-customer-initiated/",
   "license": "Open Government Licence - Toronto",
   "license_basis": "Toronto Open Data portal-wide licence.",
-  "retrieved_at": "2026-08-28T19:32:54.521688Z",
+  "retrieved_at": "2026-08-28T19:36:42.083447Z",
   "mode": "METADATA_ONLY_PENDING_TARGETED_EXTRACTION",
   "reason": "Large service-request feed. Register resources now; use bounded/property-relevant extraction later. City-published analysis notes the open feed covers only a subset of total 311 requests/divisions, so absence cannot be interpreted as no complaint.",
   "resources": [
