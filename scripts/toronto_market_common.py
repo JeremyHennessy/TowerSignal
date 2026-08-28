@@ -28,6 +28,10 @@ FIELD_ALIASES = {
     # ADDRESS_FULL. Keep the generic ADDRESS accessor used by the market spine,
     # but resolve it explicitly to that current municipal source field.
     "address": ("addressfull",),
+    # Building-permit GEO_ID values were directly verified against the current
+    # One Address Repository and correspond to ADDRESS_POINT_ID. The current
+    # Address Points CSV no longer exposes a GEO_ID-named column.
+    "geoid": ("addresspointid",),
 }
 
 def utc_now() -> str:
