@@ -1,0 +1,584 @@
+{
+  "schema_version": "toronto-warehouse-0.1",
+  "generated_at": "2026-08-28T19:19:50.337785Z",
+  "jurisdiction": "TORONTO_ON",
+  "purpose": "Raw/near-raw source warehouse for TowerSignal Toronto discovery and commercial intelligence. No Toronto priority score.",
+  "open_licensed_sources": [
+    {
+      "key": "tobids_awarded_contracts",
+      "title": "Toronto Bids Awarded Contracts",
+      "package_name": "tobids-awarded-contracts",
+      "package_id": "f78fe449-53f4-4962-9ec8-8f7eeece1072",
+      "portal_url": "https://open.toronto.ca/dataset/tobids-awarded-contracts/",
+      "license": "License not specified",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "resource": {
+        "id": "e211f003-5909-4bea-bd96-d75899d8e612",
+        "name": "Awarded Contracts",
+        "format": "CSV",
+        "last_modified": null,
+        "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/e211f003-5909-4bea-bd96-d75899d8e612",
+        "datastore_active": true
+      },
+      "retrieval": {
+        "retrieval": "CKAN_DATASTORE",
+        "reported_total": 7670
+      },
+      "quality_note": null,
+      "row_count": 7670,
+      "keyword_match_row_count": 163,
+      "keywords": [
+        "cooling tower",
+        "cooling towers",
+        "chiller",
+        "chillers",
+        "condenser water",
+        "evaporative condenser",
+        "water treatment",
+        "cooling water",
+        "legionella",
+        "chemical feed",
+        "mechanical",
+        "hvac",
+        "boiler"
+      ]
+    },
+    {
+      "key": "capital_project_pipeline",
+      "title": "Capital Projects Pipeline",
+      "package_name": "capital-project-pipeline",
+      "package_id": "9b17b1bc-7227-44da-83ea-fc1ef3359176",
+      "portal_url": "https://open.toronto.ca/dataset/capital-project-pipeline/",
+      "license": "License not specified",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "resource": {
+        "id": "e33e036f-a898-4b90-b626-84abba557bbd",
+        "name": "Capital Project Pipeline",
+        "format": "XLSX",
+        "last_modified": null,
+        "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/e33e036f-a898-4b90-b626-84abba557bbd",
+        "datastore_active": true
+      },
+      "retrieval": {
+        "retrieval": "CKAN_DATASTORE",
+        "reported_total": 46
+      },
+      "quality_note": null,
+      "row_count": 46,
+      "keyword_match_row_count": 1,
+      "keywords": [
+        "cooling tower",
+        "cooling towers",
+        "chiller",
+        "chillers",
+        "condenser water",
+        "evaporative condenser",
+        "water treatment",
+        "cooling water",
+        "legionella",
+        "chemical feed",
+        "mechanical",
+        "hvac",
+        "boiler"
+      ]
+    },
+    {
+      "key": "development_pipeline",
+      "title": "Development Pipeline",
+      "package_name": "development-pipeline",
+      "package_id": "a7a327c5-4e25-4881-816d-c8b145e02832",
+      "portal_url": "https://open.toronto.ca/dataset/development-pipeline/",
+      "license": "License not specified",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "resource": {
+        "id": "7aad5dbd-a769-4bd5-b5d2-f9bb605b6bf9",
+        "name": "Development Pipeline",
+        "format": "CSV",
+        "last_modified": null,
+        "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/7aad5dbd-a769-4bd5-b5d2-f9bb605b6bf9",
+        "datastore_active": true
+      },
+      "retrieval": {
+        "retrieval": "CKAN_DATASTORE",
+        "reported_total": 2411
+      },
+      "quality_note": null,
+      "row_count": 2411,
+      "keyword_match_row_count": 193,
+      "keywords": [
+        "cooling tower",
+        "cooling towers",
+        "chiller",
+        "chillers",
+        "condenser water",
+        "evaporative condenser",
+        "water treatment",
+        "cooling water",
+        "legionella",
+        "chemical feed",
+        "mechanical",
+        "hvac",
+        "boiler"
+      ]
+    },
+    {
+      "key": "chemtrac_2024",
+      "title": "Chemical Tracking (ChemTrac)",
+      "package_name": "chemical-tracking-chemtrac",
+      "package_id": "ae8eebf8-42fe-426f-b5f8-5baa8ff0bfb8",
+      "portal_url": "https://open.toronto.ca/dataset/chemical-tracking-chemtrac/",
+      "license": "License not specified",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "resource": {
+        "id": "eb0480e5-6265-4d5d-b582-f112ebc7cc4f",
+        "name": "Chemtrac Data 2024",
+        "format": "CSV",
+        "last_modified": null,
+        "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/eb0480e5-6265-4d5d-b582-f112ebc7cc4f",
+        "datastore_active": true
+      },
+      "retrieval": {
+        "retrieval": "CKAN_DATASTORE",
+        "reported_total": 1277
+      },
+      "quality_note": null,
+      "row_count": 1277,
+      "keyword_match_row_count": 22,
+      "keywords": [
+        "cooling tower",
+        "cooling towers",
+        "chiller",
+        "chillers",
+        "condenser water",
+        "evaporative condenser",
+        "water treatment",
+        "cooling water",
+        "legionella",
+        "chemical feed",
+        "mechanical",
+        "hvac",
+        "boiler"
+      ]
+    },
+    {
+      "key": "apartment_building_evaluation",
+      "title": "Apartment Building Evaluation",
+      "package_name": "apartment-building-evaluation",
+      "package_id": "4ef82789-e038-44ef-a478-a8f3590c3eb1",
+      "portal_url": "https://open.toronto.ca/dataset/apartment-building-evaluation/",
+      "license": "open-government-licence-toronto",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "resource": {
+        "id": "244f7a02-da5c-425b-b55f-fbdd133dd732",
+        "name": "Apartment Building Evaluations 2023 - current",
+        "format": "CSV",
+        "last_modified": null,
+        "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/244f7a02-da5c-425b-b55f-fbdd133dd732",
+        "datastore_active": true
+      },
+      "retrieval": {
+        "retrieval": "CKAN_DATASTORE",
+        "reported_total": 6252
+      },
+      "quality_note": "City Open Data has an active notice that this dataset is incomplete/not updating correctly; retain source warning.",
+      "row_count": 6252,
+      "keyword_match_row_count": 0,
+      "keywords": [
+        "cooling tower",
+        "cooling towers",
+        "chiller",
+        "chillers",
+        "condenser water",
+        "evaporative condenser",
+        "water treatment",
+        "cooling water",
+        "legionella",
+        "chemical feed",
+        "mechanical",
+        "hvac",
+        "boiler"
+      ]
+    },
+    {
+      "key": "affordable_housing_pipeline",
+      "title": "Affordable Housing Pipeline",
+      "package_name": "upcoming-and-recently-completed-affordable-housing-units",
+      "package_id": "b5fa8322-6acf-410e-affd-b4916ae7a249",
+      "portal_url": "https://open.toronto.ca/dataset/upcoming-and-recently-completed-affordable-housing-units/",
+      "license": "License not specified",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "resource": {
+        "id": "1cef72d8-4bc0-4705-a4ba-998bcb4605ef",
+        "name": "Affordable Rental Housing Pipeline",
+        "format": "GeoJSON",
+        "last_modified": null,
+        "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/1cef72d8-4bc0-4705-a4ba-998bcb4605ef",
+        "datastore_active": true
+      },
+      "retrieval": {
+        "retrieval": "CKAN_DATASTORE",
+        "reported_total": 271
+      },
+      "quality_note": null,
+      "row_count": 271,
+      "keyword_match_row_count": 0,
+      "keywords": [
+        "cooling tower",
+        "cooling towers",
+        "chiller",
+        "chillers",
+        "condenser water",
+        "evaporative condenser",
+        "water treatment",
+        "cooling water",
+        "legionella",
+        "chemical feed",
+        "mechanical",
+        "hvac",
+        "boiler"
+      ]
+    },
+    {
+      "key": "address_points",
+      "title": "Address Points (Municipal) - Toronto One Address Repository",
+      "package_name": "address-points-municipal-toronto-one-address-repository",
+      "package_id": "abedd8bc-e3dd-4d45-8e69-79165a76e4fa",
+      "portal_url": "https://open.toronto.ca/dataset/address-points-municipal-toronto-one-address-repository/",
+      "license": "License not specified",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "mode": "METADATA_ONLY",
+      "reason": "Large geospatial spine; use targeted joins rather than duplicating full city geometry in git.",
+      "resources": [
+        {
+          "id": "0b3756af-9caf-4f0f-ac28-9c6617adede4",
+          "name": "Address Points",
+          "format": "GeoJSON",
+          "last_modified": null,
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/0b3756af-9caf-4f0f-ac28-9c6617adede4",
+          "datastore_active": true
+        },
+        {
+          "id": "64d4e54b-738f-4cd9-a9e7-8050fac8a52f",
+          "name": "Address Points - 4326.csv",
+          "format": "CSV",
+          "last_modified": "2026-08-28T11:41:04.261467",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/64d4e54b-738f-4cd9-a9e7-8050fac8a52f/download/address-points-4326.csv",
+          "datastore_active": false
+        },
+        {
+          "id": "1773fd12-6df9-40d4-9280-b3d2f46253c9",
+          "name": "Address Points - 4326.zip",
+          "format": "SHP",
+          "last_modified": "2026-08-28T11:41:09.242558",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/1773fd12-6df9-40d4-9280-b3d2f46253c9/download/address-points-4326.zip",
+          "datastore_active": false
+        },
+        {
+          "id": "f9557b4f-724f-47ff-9326-c9d55050f648",
+          "name": "Address Points - 4326.gpkg",
+          "format": "gpkg",
+          "last_modified": "2026-08-28T11:41:16.887726",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/f9557b4f-724f-47ff-9326-c9d55050f648/download/address-points-4326.gpkg",
+          "datastore_active": false
+        },
+        {
+          "id": "b1c2ab72-dfe7-4b29-8550-6d1cfaa61733",
+          "name": "Address Points - 4326.geojson",
+          "format": "GeoJSON",
+          "last_modified": "2026-08-28T11:41:20.089274",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/b1c2ab72-dfe7-4b29-8550-6d1cfaa61733/download/address-points-4326.geojson",
+          "datastore_active": false
+        },
+        {
+          "id": "7d5590f0-cfd5-4381-87d0-baf7dbf4921c",
+          "name": "Address Points - 2952.csv",
+          "format": "CSV",
+          "last_modified": "2026-08-28T11:41:24.756145",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/7d5590f0-cfd5-4381-87d0-baf7dbf4921c/download/address-points-2952.csv",
+          "datastore_active": false
+        },
+        {
+          "id": "b1f62401-c064-4080-a8e0-117f9d5b1920",
+          "name": "Address Points - 2952.zip",
+          "format": "SHP",
+          "last_modified": "2026-08-28T11:41:29.147581",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/b1f62401-c064-4080-a8e0-117f9d5b1920/download/address-points-2952.zip",
+          "datastore_active": false
+        },
+        {
+          "id": "9a7495b3-055c-4c9c-b3b3-e164c3cc6b03",
+          "name": "Address Points - 2952.gpkg",
+          "format": "gpkg",
+          "last_modified": "2026-08-28T11:41:36.772785",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/9a7495b3-055c-4c9c-b3b3-e164c3cc6b03/download/address-points-2952.gpkg",
+          "datastore_active": false
+        },
+        {
+          "id": "205a52a3-7c88-49ec-ab8a-cc4c71a99935",
+          "name": "Address Points - 2952.geojson",
+          "format": "GeoJSON",
+          "last_modified": "2025-01-21T11:51:58.521497",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/205a52a3-7c88-49ec-ab8a-cc4c71a99935/download/address-points-2952.geojson",
+          "datastore_active": false
+        },
+        {
+          "id": "921563fc-aeab-4e1f-82bd-c7bdae6dc26a",
+          "name": "readme-address-feature-codes",
+          "format": "TXT",
+          "last_modified": "2019-07-23T16:30:55.648995",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/921563fc-aeab-4e1f-82bd-c7bdae6dc26a/download/readme-address-feature-codes.txt",
+          "datastore_active": false
+        }
+      ]
+    },
+    {
+      "key": "building_outlines",
+      "title": "Topographic Mapping – Building Outlines",
+      "package_name": "topographic-mapping-building-outlines",
+      "package_id": "09a930cc-2a52-49b2-866d-52ac7f769a73",
+      "portal_url": "https://open.toronto.ca/dataset/topographic-mapping-building-outlines/",
+      "license": "License not specified",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "mode": "METADATA_ONLY",
+      "reason": "Large geospatial source; retain metadata and add targeted spatial extraction later.",
+      "resources": [
+        {
+          "id": "8c8cf295-9b2c-4d51-96c2-b276767902d8",
+          "name": "Building Outlines",
+          "format": "GeoJSON",
+          "last_modified": null,
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/8c8cf295-9b2c-4d51-96c2-b276767902d8",
+          "datastore_active": true
+        },
+        {
+          "id": "41372651-b2eb-4f1e-91d9-b5280b2f0ccd",
+          "name": "Building Outlines - 4326.csv",
+          "format": "CSV",
+          "last_modified": "2026-04-05T00:36:40.486303",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/41372651-b2eb-4f1e-91d9-b5280b2f0ccd/download/building-outlines-4326.csv",
+          "datastore_active": false
+        },
+        {
+          "id": "670f5902-8d4c-40cb-bded-d29ddc09a97d",
+          "name": "Building Outlines - 4326.zip",
+          "format": "SHP",
+          "last_modified": "2026-04-05T00:36:43.974768",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/670f5902-8d4c-40cb-bded-d29ddc09a97d/download/building-outlines-4326.zip",
+          "datastore_active": false
+        },
+        {
+          "id": "0441f3a6-b23e-40c9-b56c-6b459db565d8",
+          "name": "Building Outlines - 4326.gpkg",
+          "format": "gpkg",
+          "last_modified": "2026-04-05T00:36:46.918828",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/0441f3a6-b23e-40c9-b56c-6b459db565d8/download/building-outlines-4326.gpkg",
+          "datastore_active": false
+        },
+        {
+          "id": "8364d47f-6a39-439d-8e9c-4ea1a7506e53",
+          "name": "Building Outlines - 4326.geojson",
+          "format": "GeoJSON",
+          "last_modified": "2026-04-05T00:36:49.864449",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/8364d47f-6a39-439d-8e9c-4ea1a7506e53/download/building-outlines-4326.geojson",
+          "datastore_active": false
+        },
+        {
+          "id": "1e613126-4eca-43e6-9cb6-2100c83f4a24",
+          "name": "Building Outlines - 2952.csv",
+          "format": "CSV",
+          "last_modified": "2026-04-05T00:36:54.352175",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/1e613126-4eca-43e6-9cb6-2100c83f4a24/download/building-outlines-2952.csv",
+          "datastore_active": false
+        },
+        {
+          "id": "ecc368a5-91cc-4b3f-b258-4b0893597f8d",
+          "name": "Building Outlines - 2952.zip",
+          "format": "SHP",
+          "last_modified": "2026-04-05T00:36:57.677429",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/ecc368a5-91cc-4b3f-b258-4b0893597f8d/download/building-outlines-2952.zip",
+          "datastore_active": false
+        },
+        {
+          "id": "c2db1245-84e8-4309-ba98-b48eb240a53a",
+          "name": "Building Outlines - 2952.gpkg",
+          "format": "gpkg",
+          "last_modified": "2026-04-05T00:37:00.808852",
+          "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/c2db1245-84e8-4309-ba98-b48eb240a53a/download/building-outlines-2952.gpkg",
+          "datastore_active": false
+        }
+      ]
+    },
+    {
+      "key": "ontario_bps_energy_2024",
+      "title": "Ontario Broader Public Sector Energy Use and GHG Emissions - 2024",
+      "source_url": "https://data.ontario.ca/dataset/5e976319-9769-4f77-aab9-d170e0131efe/resource/b6b569cf-5d3a-4b96-9972-ea428c316278/download/2024_final_data_set.xlsx",
+      "catalogue_url": "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector",
+      "license": "Open Government Licence - Ontario",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "download_bytes": 4065478,
+      "source_row_count": 11857,
+      "toronto_candidate_row_count": 1892,
+      "keyword_match_row_count": 74,
+      "candidate_contract": "Row text contains Toronto, Etobicoke, Scarborough, North York, or East York; candidate universe only, not a cooling-tower assertion."
+    }
+  ],
+  "rights_review_sources": [
+    {
+      "key": "ontario_access_environment",
+      "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
+      "retrieved_at": "2026-08-28T19:19:50.337785Z",
+      "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
+      "layers": {
+        "environmental_compliance_approvals": {
+          "key": "environmental_compliance_approvals",
+          "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
+          "retrieved_at": "2026-08-28T19:19:50.337785Z",
+          "scope": "TORONTO_APPROXIMATE_BOUNDING_BOX",
+          "bbox_wgs84": [
+            -79.6393,
+            43.581,
+            -79.115,
+            43.8554
+          ],
+          "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
+          "feature_count": 9388,
+          "keyword_match_feature_count": 2,
+          "layer_id": 1,
+          "name": "Environmental Compliance Approvals",
+          "max_record_count": 2000,
+          "field_names": [
+            "OBJECTID",
+            "APPROVAL_NUMBER",
+            "PDF_LINK",
+            "BUSINESS_NAME",
+            "ADDRESS",
+            "MUNICIPALITY",
+            "POSTAL_CODE",
+            "APPROVAL_DATE",
+            "APPROVAL_TYPE",
+            "PROJECT_TYPE",
+            "STATUS",
+            "LATITUDE",
+            "LONGITUDE",
+            "DATASOURCE",
+            "REFRESH_DATE",
+            "SHAPE",
+            "MOE_DISTRICT",
+            "SWP_AREA_NAME",
+            "LINKSOURCE"
+          ]
+        },
+        "environmental_activity_sector_registrations": {
+          "key": "environmental_activity_sector_registrations",
+          "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
+          "retrieved_at": "2026-08-28T19:19:50.337785Z",
+          "scope": "TORONTO_APPROXIMATE_BOUNDING_BOX",
+          "bbox_wgs84": [
+            -79.6393,
+            43.581,
+            -79.115,
+            43.8554
+          ],
+          "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
+          "feature_count": 3571,
+          "keyword_match_feature_count": 22,
+          "layer_id": 3,
+          "name": "Environmental Activity and Sector Registrations",
+          "max_record_count": 2000,
+          "field_names": [
+            "OBJECTID",
+            "APPROVAL_NUMBER",
+            "PDF_LINK",
+            "BUSINESS_NAME",
+            "ADDRESS",
+            "MUNICIPALITY",
+            "POSTAL_CODE",
+            "APPROVAL_DATE",
+            "APPROVAL_TYPE",
+            "PROJECT_TYPE",
+            "STATUS",
+            "LATITUDE",
+            "LONGITUDE",
+            "DATASOURCE",
+            "REFRESH_DATE",
+            "SHAPE",
+            "MOE_DISTRICT",
+            "SWP_AREA_NAME",
+            "LINKSOURCE"
+          ]
+        },
+        "permits_to_take_water": {
+          "key": "permits_to_take_water",
+          "source_service": "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer",
+          "retrieved_at": "2026-08-28T19:19:50.337785Z",
+          "scope": "TORONTO_APPROXIMATE_BOUNDING_BOX",
+          "bbox_wgs84": [
+            -79.6393,
+            43.581,
+            -79.115,
+            43.8554
+          ],
+          "rights_status": "PUBLIC_ACCESS_REUSE_REVIEW_REQUIRED_BEFORE_GIT_REPUBLICATION",
+          "feature_count": 2541,
+          "keyword_match_feature_count": 0,
+          "layer_id": 5,
+          "name": "Permit to Take Water",
+          "max_record_count": 2000,
+          "field_names": [
+            "OBJECTID",
+            "APPROVAL_NUMBER",
+            "PDF_LINK",
+            "BUSINESS_NAME",
+            "ADDRESS",
+            "MUNICIPALITY",
+            "POSTAL_CODE",
+            "APPROVAL_DATE",
+            "APPROVAL_TYPE",
+            "PROJECT_TYPE",
+            "STATUS",
+            "LATITUDE",
+            "LONGITUDE",
+            "DATASOURCE",
+            "REFRESH_DATE",
+            "SHAPE",
+            "MOE_DISTRICT",
+            "SWP_AREA_NAME",
+            "LINKSOURCE"
+          ]
+        }
+      }
+    }
+  ],
+  "discovered_not_bulk_ingested": [
+    {
+      "key": "application_information_centre_documents",
+      "source_url": "https://www.toronto.ca/city-government/planning-development/application-information-centre/",
+      "status": "DISCOVERED_DOCUMENT_HEAVY_NOT_BULK_INGESTED_YET",
+      "reason": "Requires application/document enumeration and PDF text extraction; source is daily-current."
+    },
+    {
+      "key": "construction_act_certificates",
+      "source_url": "https://www.ontario.ca/laws/statute/90c30",
+      "status": "DISCOVERED_REUSE_REVIEW_REQUIRED",
+      "reason": "Certificates are public records, but bulk publication platforms are third-party; verify reuse/automation terms before republishing scraped records."
+    },
+    {
+      "key": "tssa_bpv",
+      "source_url": "https://www.tssa.org/guideline-access-public-information",
+      "status": "DISCOVERED_PAID_OR_REQUEST_BASED_BULK",
+      "reason": "TSSA offers address inquiries and bulk database products; not an unauthenticated open bulk feed."
+    },
+    {
+      "key": "toronto_aerial_2025_8cm",
+      "source_url": "https://gis.toronto.ca/arcgis/rest/services/basemap/cot_ortho_2025_color_8cm/MapServer",
+      "status": "DISCOVERED_SERVICE_METADATA_ONLY",
+      "reason": "Imagery tiles are a computer-vision enrichment source, not suitable for duplicating wholesale into git."
+    }
+  ],
+  "failures": [],
+  "contracts": {
+    "source_absence": "No record in any source is not evidence that a property lacks a cooling tower.",
+    "keyword_hits": "Keyword matches are discovery aids only and do not establish equipment identity or commercial need.",
+    "rights_review": "Data under rights_review is fetched for source evaluation/artifact inspection and must not be republished to git until reuse rights are confirmed."
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "key": "building_outlines",
+  "title": "Topographic Mapping – Building Outlines",
+  "package_name": "topographic-mapping-building-outlines",
+  "package_id": "09a930cc-2a52-49b2-866d-52ac7f769a73",
+  "portal_url": "https://open.toronto.ca/dataset/topographic-mapping-building-outlines/",
+  "license": "License not specified",
+  "retrieved_at": "2026-08-28T19:19:50.337785Z",
+  "mode": "METADATA_ONLY",
+  "reason": "Large geospatial source; retain metadata and add targeted spatial extraction later.",
+  "resources": [
+    {
+      "id": "8c8cf295-9b2c-4d51-96c2-b276767902d8",
+      "name": "Building Outlines",
+      "format": "GeoJSON",
+      "last_modified": null,
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/8c8cf295-9b2c-4d51-96c2-b276767902d8",
+      "datastore_active": true
+    },
+    {
+      "id": "41372651-b2eb-4f1e-91d9-b5280b2f0ccd",
+      "name": "Building Outlines - 4326.csv",
+      "format": "CSV",
+      "last_modified": "2026-04-05T00:36:40.486303",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/41372651-b2eb-4f1e-91d9-b5280b2f0ccd/download/building-outlines-4326.csv",
+      "datastore_active": false
+    },
+    {
+      "id": "670f5902-8d4c-40cb-bded-d29ddc09a97d",
+      "name": "Building Outlines - 4326.zip",
+      "format": "SHP",
+      "last_modified": "2026-04-05T00:36:43.974768",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/670f5902-8d4c-40cb-bded-d29ddc09a97d/download/building-outlines-4326.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "0441f3a6-b23e-40c9-b56c-6b459db565d8",
+      "name": "Building Outlines - 4326.gpkg",
+      "format": "gpkg",
+      "last_modified": "2026-04-05T00:36:46.918828",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/0441f3a6-b23e-40c9-b56c-6b459db565d8/download/building-outlines-4326.gpkg",
+      "datastore_active": false
+    },
+    {
+      "id": "8364d47f-6a39-439d-8e9c-4ea1a7506e53",
+      "name": "Building Outlines - 4326.geojson",
+      "format": "GeoJSON",
+      "last_modified": "2026-04-05T00:36:49.864449",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/8364d47f-6a39-439d-8e9c-4ea1a7506e53/download/building-outlines-4326.geojson",
+      "datastore_active": false
+    },
+    {
+      "id": "1e613126-4eca-43e6-9cb6-2100c83f4a24",
+      "name": "Building Outlines - 2952.csv",
+      "format": "CSV",
+      "last_modified": "2026-04-05T00:36:54.352175",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/1e613126-4eca-43e6-9cb6-2100c83f4a24/download/building-outlines-2952.csv",
+      "datastore_active": false
+    },
+    {
+      "id": "ecc368a5-91cc-4b3f-b258-4b0893597f8d",
+      "name": "Building Outlines - 2952.zip",
+      "format": "SHP",
+      "last_modified": "2026-04-05T00:36:57.677429",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/ecc368a5-91cc-4b3f-b258-4b0893597f8d/download/building-outlines-2952.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "c2db1245-84e8-4309-ba98-b48eb240a53a",
+      "name": "Building Outlines - 2952.gpkg",
+      "format": "gpkg",
+      "last_modified": "2026-04-05T00:37:00.808852",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/09a930cc-2a52-49b2-866d-52ac7f769a73/resource/c2db1245-84e8-4309-ba98-b48eb240a53a/download/building-outlines-2952.gpkg",
+      "datastore_active": false
+    }
+  ]
+}

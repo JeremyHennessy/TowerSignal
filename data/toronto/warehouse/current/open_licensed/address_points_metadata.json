@@ -1,0 +1,93 @@
+{
+  "key": "address_points",
+  "title": "Address Points (Municipal) - Toronto One Address Repository",
+  "package_name": "address-points-municipal-toronto-one-address-repository",
+  "package_id": "abedd8bc-e3dd-4d45-8e69-79165a76e4fa",
+  "portal_url": "https://open.toronto.ca/dataset/address-points-municipal-toronto-one-address-repository/",
+  "license": "License not specified",
+  "retrieved_at": "2026-08-28T19:19:50.337785Z",
+  "mode": "METADATA_ONLY",
+  "reason": "Large geospatial spine; use targeted joins rather than duplicating full city geometry in git.",
+  "resources": [
+    {
+      "id": "0b3756af-9caf-4f0f-ac28-9c6617adede4",
+      "name": "Address Points",
+      "format": "GeoJSON",
+      "last_modified": null,
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/datastore/dump/0b3756af-9caf-4f0f-ac28-9c6617adede4",
+      "datastore_active": true
+    },
+    {
+      "id": "64d4e54b-738f-4cd9-a9e7-8050fac8a52f",
+      "name": "Address Points - 4326.csv",
+      "format": "CSV",
+      "last_modified": "2026-08-28T11:41:04.261467",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/64d4e54b-738f-4cd9-a9e7-8050fac8a52f/download/address-points-4326.csv",
+      "datastore_active": false
+    },
+    {
+      "id": "1773fd12-6df9-40d4-9280-b3d2f46253c9",
+      "name": "Address Points - 4326.zip",
+      "format": "SHP",
+      "last_modified": "2026-08-28T11:41:09.242558",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/1773fd12-6df9-40d4-9280-b3d2f46253c9/download/address-points-4326.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "f9557b4f-724f-47ff-9326-c9d55050f648",
+      "name": "Address Points - 4326.gpkg",
+      "format": "gpkg",
+      "last_modified": "2026-08-28T11:41:16.887726",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/f9557b4f-724f-47ff-9326-c9d55050f648/download/address-points-4326.gpkg",
+      "datastore_active": false
+    },
+    {
+      "id": "b1c2ab72-dfe7-4b29-8550-6d1cfaa61733",
+      "name": "Address Points - 4326.geojson",
+      "format": "GeoJSON",
+      "last_modified": "2026-08-28T11:41:20.089274",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/b1c2ab72-dfe7-4b29-8550-6d1cfaa61733/download/address-points-4326.geojson",
+      "datastore_active": false
+    },
+    {
+      "id": "7d5590f0-cfd5-4381-87d0-baf7dbf4921c",
+      "name": "Address Points - 2952.csv",
+      "format": "CSV",
+      "last_modified": "2026-08-28T11:41:24.756145",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/7d5590f0-cfd5-4381-87d0-baf7dbf4921c/download/address-points-2952.csv",
+      "datastore_active": false
+    },
+    {
+      "id": "b1f62401-c064-4080-a8e0-117f9d5b1920",
+      "name": "Address Points - 2952.zip",
+      "format": "SHP",
+      "last_modified": "2026-08-28T11:41:29.147581",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/b1f62401-c064-4080-a8e0-117f9d5b1920/download/address-points-2952.zip",
+      "datastore_active": false
+    },
+    {
+      "id": "9a7495b3-055c-4c9c-b3b3-e164c3cc6b03",
+      "name": "Address Points - 2952.gpkg",
+      "format": "gpkg",
+      "last_modified": "2026-08-28T11:41:36.772785",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/9a7495b3-055c-4c9c-b3b3-e164c3cc6b03/download/address-points-2952.gpkg",
+      "datastore_active": false
+    },
+    {
+      "id": "205a52a3-7c88-49ec-ab8a-cc4c71a99935",
+      "name": "Address Points - 2952.geojson",
+      "format": "GeoJSON",
+      "last_modified": "2025-01-21T11:51:58.521497",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/205a52a3-7c88-49ec-ab8a-cc4c71a99935/download/address-points-2952.geojson",
+      "datastore_active": false
+    },
+    {
+      "id": "921563fc-aeab-4e1f-82bd-c7bdae6dc26a",
+      "name": "readme-address-feature-codes",
+      "format": "TXT",
+      "last_modified": "2019-07-23T16:30:55.648995",
+      "url": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/921563fc-aeab-4e1f-82bd-c7bdae6dc26a/download/readme-address-feature-codes.txt",
+      "datastore_active": false
+    }
+  ]
+}
