@@ -40,7 +40,7 @@ jobs:
           for alias in "${aliases[@]}"; do
             out="$(mktemp)"
             curl --fail --silent --show-error --get "$endpoint" \
-              --data-urlencode "$q=$alias" \
+              --data-urlencode "\$q=$alias" \
               --data-urlencode '$limit=500' \
               --output "$out"
             count="$(jq 'length' "$out")"
