@@ -1,0 +1,29 @@
+name: Production Monitor Test Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-market-20260828
+    paths:
+      - .github/workflows/main-monitor-test-diagnostic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact production Build 016G
+        uses: actions/checkout@v4
+        with:
+          ref: 91874fa1d9037b18cdc111de4c5b497420515128
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact repository dependency graph
+        run: npm install --no-audit --no-fund
+      - name: Run Monitor product-mode test on production SHA
+        run: npm test -- --run tests/frontend/App.test.tsx -t "opens the Monitor product mode with source-backed change evidence"
