@@ -1,7 +1,7 @@
 {
   "metadata": {
     "schema_version": "toronto-poc-0.1",
-    "generated_at": "2026-08-28T18:58:55.083729Z",
+    "generated_at": "2026-08-28T19:01:32.840591Z",
     "jurisdiction": "TORONTO_ON",
     "status": "EXPERIMENTAL_POC",
     "evidence_contract": {
@@ -16,8 +16,9 @@
       "confirmed_cooling_tower_properties": 48,
       "confirmed_cooling_tower_properties_from_permits": 35,
       "confirmed_cooling_tower_properties_from_tdsb": 13,
-      "active_permit_confirmed_cooling_tower_properties": 21,
-      "properties_with_no_tower_assertion_but_related_supporting_evidence": 129
+      "properties_with_no_tower_assertion_but_related_supporting_evidence": 129,
+      "source_active_permit_confirmed_cooling_tower_properties": 21,
+      "recent_365d_source_active_permit_confirmed_cooling_tower_properties": 3
     },
     "sources": {
       "permits": {
@@ -95,7 +96,13 @@
       "chiller",
       "condenser water",
       "chemical feed"
-    ]
+    ],
+    "permit_timing_contract": {
+      "source_active": "Record is present in the City of Toronto Active Permits dataset; this does not by itself mean recent buying activity.",
+      "recent_activity_window_days": 365,
+      "recent_activity": "Source-active permit record with a usable event date no more than 365 days before POC generation.",
+      "old_source_active_records": "Retained as equipment/project evidence but not represented as recent activity."
+    }
   },
   "properties": [
     {
@@ -123,7 +130,10 @@
       "explicit_tower_evidence_ids": [
         "tdsb:1924:cooling_tower:0"
       ],
-      "supporting_evidence_ids": []
+      "supporting_evidence_ids": [],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:2001",
@@ -157,7 +167,10 @@
       "supporting_evidence_ids": [
         "tdsb:2001:chemical_feed:0",
         "tdsb:2001:chiller:1"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:2021",
@@ -191,7 +204,10 @@
       "supporting_evidence_ids": [
         "tdsb:2021:chemical_feed:0",
         "tdsb:2021:chiller:1"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:2040",
@@ -224,7 +240,10 @@
       "supporting_evidence_ids": [
         "tdsb:2040:chemical_feed:0",
         "tdsb:2040:chiller:1"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:2063",
@@ -255,7 +274,10 @@
       ],
       "supporting_evidence_ids": [
         "tdsb:2063:chemical_feed:0"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:3127",
@@ -286,7 +308,10 @@
       ],
       "supporting_evidence_ids": [
         "tdsb:3127:chiller:0"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:3180",
@@ -313,7 +338,10 @@
       "explicit_tower_evidence_ids": [
         "tdsb:3180:cooling_tower:0"
       ],
-      "supporting_evidence_ids": []
+      "supporting_evidence_ids": [],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:3430",
@@ -345,7 +373,10 @@
       ],
       "supporting_evidence_ids": [
         "tdsb:3430:chemical_feed:0"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:3432",
@@ -377,7 +408,10 @@
       ],
       "supporting_evidence_ids": [
         "tdsb:3432:chemical_feed:0"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:3448",
@@ -408,7 +442,10 @@
       ],
       "supporting_evidence_ids": [
         "tdsb:3448:chemical_feed:0"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:4175",
@@ -439,7 +476,10 @@
       ],
       "supporting_evidence_ids": [
         "tdsb:4175:chiller:0"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:5219",
@@ -473,7 +513,10 @@
       "supporting_evidence_ids": [
         "tdsb:5219:chemical_feed:0",
         "tdsb:5219:chiller:1"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "tdsb-schno:5262",
@@ -504,7 +547,10 @@
       ],
       "supporting_evidence_ids": [
         "tdsb:5262:chemical_feed:0"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:13505515",
@@ -519,8 +565,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "COOLING_TOWER_PROJECT_HISTORY",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
@@ -542,7 +588,10 @@
         "permit:active:20 206221 HVA:00:chiller",
         "permit:cleared:20 137758 BLD:00:chiller",
         "permit:cleared:20 137758 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8392955",
@@ -557,8 +606,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2010-03-30",
@@ -571,7 +620,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:10 134645 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:828085",
@@ -586,8 +638,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2022-06-08",
@@ -601,7 +653,10 @@
       "supporting_evidence_ids": [
         "permit:active:22 123361 BLD:01:chiller",
         "permit:active:98 015945 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:504793",
@@ -616,8 +671,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2008-12-23",
@@ -630,7 +685,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:08 228223 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10133201",
@@ -645,8 +703,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2020-09-22",
@@ -659,7 +717,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:20 165219 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7204478",
@@ -674,8 +735,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-09-29",
@@ -688,7 +749,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:17 220512 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7762637",
@@ -703,8 +767,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2014-12-05",
@@ -717,7 +781,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:14 259939 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8351164",
@@ -732,8 +799,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-06-09",
@@ -746,7 +813,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:17 140238 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10757635",
@@ -761,8 +831,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-12-08",
@@ -777,7 +847,10 @@
       "supporting_evidence_ids": [
         "permit:active:17 253386 BLD:00:chiller",
         "permit:active:17 253386 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-address:0fe02942cdb7892c",
@@ -792,8 +865,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2023-10-26",
@@ -806,7 +879,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:23 216429 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:509769",
@@ -821,8 +897,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2018-02-09",
@@ -839,7 +915,10 @@
         "permit:active:18 107026 BLD:00:chiller",
         "permit:active:18 107026 HVA:00:chiller",
         "permit:active:18 107026 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7730109",
@@ -854,8 +933,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "COOLING_TOWER_PROJECT_HISTORY",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
@@ -877,7 +956,10 @@
         "permit:active:11 307336 BLD:01:chiller",
         "permit:cleared:11 307336 HVA:00:chiller",
         "permit:cleared:11 307336 HVA:01:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:12167660",
@@ -892,8 +974,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2018-10-29",
@@ -906,7 +988,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:18 227566 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-address:e594fd4f2a055b06",
@@ -921,8 +1006,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "RECENT_SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "RECENT_SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2026-02-09",
@@ -935,7 +1020,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:26 102675 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": true,
+      "latest_recent_permit_activity_date": "2026-02-09"
     },
     {
       "property_key": "toronto-geoid:20055459",
@@ -950,8 +1038,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "RECENT_SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "RECENT_SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2025-09-11",
@@ -964,7 +1052,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:25 219194 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": true,
+      "latest_recent_permit_activity_date": "2025-09-11"
     },
     {
       "property_key": "toronto-geoid:8351177",
@@ -979,8 +1070,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2010-03-30",
@@ -993,7 +1084,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:10 134639 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:20362101",
@@ -1008,8 +1102,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "RECENT_SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "RECENT_SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2026-08-21",
@@ -1026,7 +1120,10 @@
         "permit:active:26 102675 MSA:01:chiller",
         "permit:active:26 102725 PSA:00:chiller",
         "permit:active:26 102725 PSA:01:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": true,
+      "latest_recent_permit_activity_date": "2026-08-21"
     },
     {
       "property_key": "toronto-geoid:3569436",
@@ -1041,8 +1138,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2019-02-27",
@@ -1055,7 +1152,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:19 111480 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8155599",
@@ -1070,8 +1170,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2016-09-08",
@@ -1084,7 +1184,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:16 193795 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:507981",
@@ -1099,8 +1202,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2014-12-18",
@@ -1115,7 +1218,10 @@
       "supporting_evidence_ids": [
         "permit:active:14 125487 BLD:00:chiller",
         "permit:active:14 125487 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8127974",
@@ -1130,8 +1236,8 @@
         "cooling_tower"
       ],
       "commercial_signals": [
-        "ACTIVE_COOLING_TOWER_PERMIT",
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_COOLING_TOWER_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2012-06-13",
@@ -1144,7 +1250,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:active:12 148282 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:4153974",
@@ -1173,7 +1282,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:cleared:16 241073 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:14038411",
@@ -1202,7 +1314,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:cleared:22 100336 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:20258361",
@@ -1235,7 +1350,10 @@
         "permit:cleared:17 183143 BLD:00:chiller",
         "permit:cleared:17 183143 HVA:00:chiller",
         "permit:cleared:17 183143 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8206111",
@@ -1270,7 +1388,10 @@
         "permit:cleared:17 138724 FSU:00:chiller",
         "permit:cleared:17 138724 HVA:00:chiller",
         "permit:cleared:17 138724 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:14601706",
@@ -1299,7 +1420,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:cleared:18 189994 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:772764",
@@ -1332,7 +1456,10 @@
         "permit:cleared:16 101967 BLD:00:chiller",
         "permit:cleared:16 101967 HVA:00:chiller",
         "permit:cleared:16 101967 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:14674985",
@@ -1361,7 +1488,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:cleared:23 147719 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:3993557",
@@ -1390,7 +1520,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:cleared:18 186589 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6868910",
@@ -1419,7 +1552,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:cleared:25 153112 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:871468",
@@ -1452,7 +1588,10 @@
         "permit:cleared:21 246868 BLD:00:chiller",
         "permit:cleared:21 246868 HVA:00:chiller",
         "permit:cleared:21 246868 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:13501524",
@@ -1485,7 +1624,10 @@
         "permit:cleared:20 186423 BLD:01:chiller",
         "permit:cleared:20 186423 BLD:02:chiller",
         "permit:cleared:20 186423 BLD:03:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:14078150",
@@ -1518,7 +1660,10 @@
         "permit:cleared:24 176926 BLD:00:chiller",
         "permit:cleared:24 176926 BLD:01:chiller",
         "permit:cleared:24 176926 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:568395",
@@ -1547,7 +1692,10 @@
       ],
       "supporting_evidence_ids": [
         "permit:cleared:20 211644 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6727800",
@@ -1578,7 +1726,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:18 177761 BLD:00:chiller",
         "permit:cleared:18 177761 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10663925",
@@ -1592,7 +1743,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2016-10-19",
@@ -1603,7 +1754,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:16 114715 BLD:01:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6666985",
@@ -1617,7 +1771,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -1631,7 +1785,10 @@
       "supporting_evidence_ids": [
         "permit:active:19 236222 BLD:00:chiller",
         "permit:cleared:19 236222 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8087262",
@@ -1645,7 +1802,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-03-27",
@@ -1656,7 +1813,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:17 118472 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8133817",
@@ -1670,7 +1830,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2015-03-12",
@@ -1681,7 +1841,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:15 123294 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8677414",
@@ -1695,7 +1858,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -1709,7 +1872,10 @@
       "supporting_evidence_ids": [
         "permit:active:07 282618 HVA:00:chiller",
         "permit:cleared:07 282618 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8708498",
@@ -1723,7 +1889,8 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "RECENT_SOURCE_ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2025-09-19",
@@ -1735,7 +1902,10 @@
       "supporting_evidence_ids": [
         "permit:active:24 254917 MSA:00:chiller",
         "permit:active:24 254917 MSA:01:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": true,
+      "latest_recent_permit_activity_date": "2025-09-19"
     },
     {
       "property_key": "toronto-geoid:14188741",
@@ -1749,7 +1919,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -1763,7 +1933,10 @@
       "supporting_evidence_ids": [
         "permit:active:10 123759 BLD:00:chiller",
         "permit:cleared:10 123759 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7929398",
@@ -1777,7 +1950,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2010-04-26",
@@ -1788,7 +1961,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:10 154642 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:856375",
@@ -1802,7 +1978,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "1997-12-18",
@@ -1813,7 +1989,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:97 024979 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:785208",
@@ -1827,7 +2006,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2010-05-13",
@@ -1840,7 +2019,10 @@
         "permit:active:10 118427 BLD:00:chiller",
         "permit:active:10 118427 PLB:00:chiller",
         "permit:active:10 118446 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7929297",
@@ -1854,7 +2036,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2013-05-07",
@@ -1866,7 +2048,10 @@
       "supporting_evidence_ids": [
         "permit:active:13 144583 BLD:00:chiller",
         "permit:active:13 144583 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10759047",
@@ -1880,7 +2065,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2022-10-28",
@@ -1891,7 +2076,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:22 202915 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7274128",
@@ -1905,7 +2093,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2012-03-15",
@@ -1916,7 +2104,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:12 133171 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:873387",
@@ -1930,7 +2121,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -1944,7 +2135,10 @@
       "supporting_evidence_ids": [
         "permit:active:07 113215 BLD:00:chiller",
         "permit:cleared:07 113215 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:852873",
@@ -1958,7 +2152,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -1976,7 +2170,10 @@
         "permit:active:19 220615 HVA:01:chiller",
         "permit:cleared:21 184308 BLD:00:chiller",
         "permit:cleared:21 184308 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:772677",
@@ -1990,7 +2187,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-12-07",
@@ -2001,7 +2198,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:17 260128 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10750671",
@@ -2015,7 +2215,8 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "RECENT_SOURCE_ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2025-09-08",
@@ -2027,7 +2228,10 @@
       "supporting_evidence_ids": [
         "permit:active:25 152062 BLD:00:chiller",
         "permit:active:25 152062 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": true,
+      "latest_recent_permit_activity_date": "2025-09-08"
     },
     {
       "property_key": "toronto-geoid:14200071",
@@ -2041,7 +2245,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2056,7 +2260,10 @@
         "permit:active:07 102642 BLD:00:chiller",
         "permit:cleared:07 102642 HVA:00:chiller",
         "permit:cleared:07 102642 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6282913",
@@ -2070,7 +2277,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-02-17",
@@ -2082,7 +2289,10 @@
       "supporting_evidence_ids": [
         "permit:active:17 101794 BLD:00:chiller",
         "permit:active:17 101794 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8105939",
@@ -2096,7 +2306,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2020-08-27",
@@ -2109,7 +2319,10 @@
         "permit:active:20 169130 BLD:00:chiller",
         "permit:active:20 169130 HVA:00:chiller",
         "permit:active:20 169130 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:321805",
@@ -2123,7 +2336,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2006-10-10",
@@ -2134,7 +2347,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:06 174923 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:4030670",
@@ -2148,7 +2364,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "RECENT_SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2026-08-19",
@@ -2159,7 +2375,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:26 214094 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": true,
+      "latest_recent_permit_activity_date": "2026-08-19"
     },
     {
       "property_key": "toronto-geoid:3327203",
@@ -2173,7 +2392,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "RECENT_SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2026-07-15",
@@ -2184,7 +2403,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:26 185369 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": true,
+      "latest_recent_permit_activity_date": "2026-07-15"
     },
     {
       "property_key": "toronto-geoid:12601262",
@@ -2198,7 +2420,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2011-05-19",
@@ -2209,7 +2431,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:11 181530 PSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10154617",
@@ -2223,7 +2448,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2237,7 +2462,10 @@
       "supporting_evidence_ids": [
         "permit:active:23 231889 HVA:00:chiller",
         "permit:cleared:23 231889 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8535820",
@@ -2251,7 +2479,8 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "RECENT_SOURCE_ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2269,7 +2498,10 @@
         "permit:cleared:24 220059 HVA:00:chiller",
         "permit:cleared:24 220059 PLB:00:chiller",
         "permit:cleared:24 220059 PLB:01:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": true,
+      "latest_recent_permit_activity_date": "2026-05-27"
     },
     {
       "property_key": "toronto-geoid:874651",
@@ -2283,7 +2515,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-01-09",
@@ -2295,7 +2527,10 @@
       "supporting_evidence_ids": [
         "permit:active:07 108065 MSA:00:chiller",
         "permit:active:16 243334 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:20573",
@@ -2309,7 +2544,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2007-08-27",
@@ -2321,7 +2556,10 @@
       "supporting_evidence_ids": [
         "permit:active:07 244027 BLD:00:chiller",
         "permit:active:07 244027 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:13977191",
@@ -2336,7 +2574,7 @@
         "condenser_water"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2353,7 +2591,10 @@
         "permit:active:19 257346 BLD:00:chiller",
         "permit:active:19 257346 HVA:00:chiller",
         "permit:cleared:20 135776 FSU:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8354416",
@@ -2367,7 +2608,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2025-06-25",
@@ -2379,7 +2620,10 @@
       "supporting_evidence_ids": [
         "permit:active:25 162766 BLD:00:chiller",
         "permit:active:25 162766 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7042041",
@@ -2393,7 +2637,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2012-02-08",
@@ -2404,7 +2648,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:12 105936 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:20120574",
@@ -2418,7 +2665,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2019-07-12",
@@ -2429,7 +2676,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:19 170187 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:5222597",
@@ -2443,7 +2693,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2458,7 +2708,10 @@
         "permit:active:21 129217 HVA:00:chiller",
         "permit:cleared:21 128105 MSA:00:chiller",
         "permit:cleared:21 129217 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10906700",
@@ -2472,7 +2725,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-06-01",
@@ -2483,7 +2736,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:17 154046 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6168206",
@@ -2497,7 +2753,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2021-11-22",
@@ -2508,7 +2764,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:21 230995 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7042042",
@@ -2522,7 +2781,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2012-02-08",
@@ -2533,7 +2792,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:12 105945 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6868899",
@@ -2547,7 +2809,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2021-11-22",
@@ -2558,7 +2820,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:21 230470 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:855387",
@@ -2572,7 +2837,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2004-03-10",
@@ -2583,7 +2848,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:04 103596 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:30010555",
@@ -2597,7 +2865,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2611,7 +2879,10 @@
       "supporting_evidence_ids": [
         "permit:active:20 200232 BLD:00:chiller",
         "permit:cleared:20 200232 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:9638452",
@@ -2625,7 +2896,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2013-05-06",
@@ -2637,7 +2908,10 @@
       "supporting_evidence_ids": [
         "permit:active:13 109026 BLD:00:chiller",
         "permit:active:13 109026 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:796549",
@@ -2651,7 +2925,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2004-07-26",
@@ -2663,7 +2937,10 @@
       "supporting_evidence_ids": [
         "permit:active:04 100486 MSA:00:chiller",
         "permit:active:04 150933 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-address:c972c91ae7b1dc29",
@@ -2677,7 +2954,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2691,7 +2968,10 @@
       "supporting_evidence_ids": [
         "permit:active:08 109575 HVA:00:chiller",
         "permit:cleared:08 109575 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:30033035",
@@ -2705,7 +2985,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2013-01-09",
@@ -2717,7 +2997,10 @@
       "supporting_evidence_ids": [
         "permit:active:12 261184 BLD:00:chiller",
         "permit:active:12 261184 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:12387715",
@@ -2731,7 +3014,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-11-15",
@@ -2742,7 +3025,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:17 249171 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:772686",
@@ -2756,7 +3042,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2775,7 +3061,10 @@
         "permit:cleared:22 110097 HVA:01:chiller",
         "permit:cleared:22 110097 PLB:00:chiller",
         "permit:cleared:22 110097 PLB:01:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:9135228",
@@ -2789,7 +3078,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2015-05-14",
@@ -2801,7 +3090,10 @@
       "supporting_evidence_ids": [
         "permit:active:15 141097 BLD:00:chiller",
         "permit:active:15 141097 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:9086232",
@@ -2815,7 +3107,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2024-09-18",
@@ -2827,7 +3119,10 @@
       "supporting_evidence_ids": [
         "permit:active:24 187970 BLD:00:chiller",
         "permit:active:24 187970 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:3065725",
@@ -2841,7 +3136,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2022-01-04",
@@ -2853,7 +3148,10 @@
       "supporting_evidence_ids": [
         "permit:active:19 134808 BLD:00:chiller",
         "permit:active:19 134808 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:536800",
@@ -2868,7 +3166,7 @@
         "condenser_water"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2018-03-02",
@@ -2880,7 +3178,10 @@
       "supporting_evidence_ids": [
         "permit:active:18 115669 MSA:00:chiller",
         "permit:active:18 115669 MSA:00:condenser_water"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6332564",
@@ -2895,7 +3196,7 @@
         "condenser_water"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -2915,7 +3216,10 @@
         "permit:active:21 234133 PLB:00:condenser_water",
         "permit:cleared:21 234133 HVA:00:chiller",
         "permit:cleared:21 234133 HVA:00:condenser_water"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:566155",
@@ -2929,7 +3233,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2024-01-05",
@@ -2940,7 +3244,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:23 232775 PSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7730267",
@@ -2954,7 +3261,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2009-03-20",
@@ -2965,7 +3272,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:09 116902 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:994432",
@@ -2979,7 +3289,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2012-02-08",
@@ -2990,7 +3300,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:12 105950 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:20260181",
@@ -3004,7 +3317,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2016-09-23",
@@ -3016,7 +3329,10 @@
       "supporting_evidence_ids": [
         "permit:active:16 132968 BLD:00:chiller",
         "permit:active:16 132968 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:12601290",
@@ -3030,7 +3346,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2002-03-01",
@@ -3041,7 +3357,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:02 112494 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:13501978",
@@ -3055,7 +3374,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2016-03-07",
@@ -3066,7 +3385,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:16 124320 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:3841975",
@@ -3080,7 +3402,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2014-12-09",
@@ -3091,7 +3413,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:14 248729 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8535679",
@@ -3105,7 +3430,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2023-12-20",
@@ -3116,7 +3441,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:23 228301 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8087258",
@@ -3130,7 +3458,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -3144,7 +3472,10 @@
       "supporting_evidence_ids": [
         "permit:active:10 289918 BLD:00:chiller",
         "permit:cleared:10 289930 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7792268",
@@ -3158,7 +3489,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2004-02-11",
@@ -3169,7 +3500,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:04 107516 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7792698",
@@ -3183,7 +3517,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -3198,7 +3532,10 @@
         "permit:active:08 113707 BLD:00:chiller",
         "permit:active:08 113707 PLB:00:chiller",
         "permit:cleared:08 113707 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:13498043",
@@ -3212,7 +3549,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2012-10-30",
@@ -3224,7 +3561,10 @@
       "supporting_evidence_ids": [
         "permit:active:12 252900 BLD:00:chiller",
         "permit:active:12 252900 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:12763889",
@@ -3238,7 +3578,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2008-12-10",
@@ -3249,7 +3589,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:08 222029 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-address:16a352860622bb56",
@@ -3263,7 +3606,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2017-04-04",
@@ -3274,7 +3617,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:active:17 126227 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8038154",
@@ -3288,7 +3634,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2025-05-28",
@@ -3300,7 +3646,10 @@
       "supporting_evidence_ids": [
         "permit:active:25 147474 BLD:00:chiller",
         "permit:active:25 147474 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:870176",
@@ -3314,7 +3663,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -3328,7 +3677,10 @@
       "supporting_evidence_ids": [
         "permit:active:10 123902 BLD:00:chiller",
         "permit:cleared:10 123902 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7570431",
@@ -3342,7 +3694,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2022-02-09",
@@ -3355,7 +3707,10 @@
         "permit:active:21 252037 BLD:00:chiller",
         "permit:active:21 252037 HVA:00:chiller",
         "permit:active:21 252037 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:30025476",
@@ -3369,7 +3724,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT"
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT"
       ],
       "renewal_priorities": [],
       "latest_source_event_date": "2025-06-04",
@@ -3381,7 +3736,10 @@
       "supporting_evidence_ids": [
         "permit:active:25 124430 BLD:00:chiller",
         "permit:active:25 124430 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:367187",
@@ -3395,7 +3753,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -3409,7 +3767,10 @@
       "supporting_evidence_ids": [
         "permit:active:13 127635 BLD:00:chiller",
         "permit:cleared:13 127635 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:828395",
@@ -3423,7 +3784,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -3438,7 +3799,10 @@
         "permit:active:17 125235 BLD:00:chiller",
         "permit:active:17 125235 HVA:00:chiller",
         "permit:cleared:17 125235 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:13503978",
@@ -3452,7 +3816,7 @@
         "chiller"
       ],
       "commercial_signals": [
-        "ACTIVE_MECHANICAL_PERMIT",
+        "SOURCE_ACTIVE_MECHANICAL_PERMIT",
         "HISTORICAL_MECHANICAL_PROJECT"
       ],
       "renewal_priorities": [],
@@ -3466,7 +3830,10 @@
       "supporting_evidence_ids": [
         "permit:active:23 125684 BLD:00:chiller",
         "permit:cleared:23 125684 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": true,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:364214",
@@ -3491,7 +3858,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:24 115648 PSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:1031968",
@@ -3516,7 +3886,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:04 145264 DST:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:1008107",
@@ -3541,7 +3914,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:17 106758 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:3232917",
@@ -3566,7 +3942,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:20 213097 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:772675",
@@ -3591,7 +3970,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:05 128750 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:11267781",
@@ -3616,7 +3998,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:02 108120 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:3147705",
@@ -3643,7 +4028,10 @@
         "permit:cleared:20 166439 BLD:02:chiller",
         "permit:cleared:20 166439 HVA:02:chiller",
         "permit:cleared:20 166439 PLB:03:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6275805",
@@ -3668,7 +4056,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:91 251005 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:856376",
@@ -3693,7 +4084,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:10 164766 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7793159",
@@ -3718,7 +4112,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:17 124769 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7792536",
@@ -3743,7 +4140,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:06 132759 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8344802",
@@ -3768,7 +4168,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:16 122462 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:30044709",
@@ -3794,7 +4197,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:25 227769 MSA:00:chiller",
         "permit:cleared:25 227775 PSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:11835376",
@@ -3822,7 +4228,10 @@
         "permit:cleared:16 269570 FSU:00:chiller",
         "permit:cleared:16 269570 HVA:00:chiller",
         "permit:cleared:16 269570 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:11901996",
@@ -3847,7 +4256,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:23 177600 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7792529",
@@ -3877,7 +4289,10 @@
         "permit:cleared:23 148319 BLD:00:condenser_water",
         "permit:cleared:23 148319 HVA:00:chiller",
         "permit:cleared:23 148319 HVA:00:condenser_water"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7683835",
@@ -3902,7 +4317,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:22 116316 BLD:01:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8087336",
@@ -3932,7 +4350,10 @@
         "permit:cleared:17 158998 HVA:00:chiller",
         "permit:cleared:17 158998 HVA:01:chiller",
         "permit:cleared:17 158998 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:11484425",
@@ -3958,7 +4379,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:18 223090 BLD:00:chiller",
         "permit:cleared:18 223090 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8896615",
@@ -3983,7 +4407,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:00 150850 CMB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10011100",
@@ -4008,7 +4435,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:20 199320 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10536994",
@@ -4033,7 +4463,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:09 176786 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7063055",
@@ -4058,7 +4491,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:04 154251 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8676866",
@@ -4083,7 +4519,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:22 149597 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:12601206",
@@ -4110,7 +4549,10 @@
         "permit:cleared:18 135634 BLD:00:chiller",
         "permit:cleared:18 135634 HVA:00:chiller",
         "permit:cleared:18 135634 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:514036",
@@ -4135,7 +4577,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:10 294879 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:14601300",
@@ -4160,7 +4605,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:99 110036 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:5573901",
@@ -4186,7 +4634,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:19 166147 BLD:00:chiller",
         "permit:cleared:19 166147 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8067836",
@@ -4211,7 +4662,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:06 163836 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:13494194",
@@ -4236,7 +4690,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:16 118684 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8676857",
@@ -4265,7 +4722,10 @@
         "permit:cleared:17 132350 MSA:00:chiller",
         "permit:cleared:17 142212 BLD:00:chiller",
         "permit:cleared:18 146884 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:6350053",
@@ -4291,7 +4751,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:07 130832 BLD:00:chiller",
         "permit:cleared:07 130832 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10142946",
@@ -4316,7 +4779,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:10 111457 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7929642",
@@ -4342,7 +4808,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:25 222795 MSA:00:chiller",
         "permit:cleared:25 222827 PSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:5336734",
@@ -4368,7 +4837,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:21 146637 BLD:00:chiller",
         "permit:cleared:21 146637 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8351179",
@@ -4393,7 +4865,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:12 106418 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:323008",
@@ -4418,7 +4893,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:13 259593 BLD:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:578559",
@@ -4443,7 +4921,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:18 220634 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7641683",
@@ -4468,7 +4949,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:18 271784 BLD:02:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:20097934",
@@ -4493,7 +4977,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:19 254652 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:2854062",
@@ -4518,7 +5005,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:11 169500 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10906589",
@@ -4544,7 +5034,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:22 110068 MSA:00:chiller",
         "permit:cleared:22 110079 PSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:987965",
@@ -4572,7 +5065,10 @@
         "permit:cleared:04 135164 PLB:00:chiller",
         "permit:cleared:05 112139 BLD:00:chiller",
         "permit:cleared:05 112139 PLB:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:536810",
@@ -4597,7 +5093,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:23 206892 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7929870",
@@ -4623,7 +5122,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:21 179090 BLD:00:chiller",
         "permit:cleared:21 179090 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:11227032",
@@ -4649,7 +5151,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:16 139983 BLD:00:chiller",
         "permit:cleared:16 139983 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7950444",
@@ -4674,7 +5179,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:18 119106 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7978539",
@@ -4699,7 +5207,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:18 120842 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7730195",
@@ -4724,7 +5235,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:17 218727 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:874010",
@@ -4749,7 +5263,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:15 208094 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:10222905",
@@ -4775,7 +5292,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:19 113534 BLD:00:chiller",
         "permit:cleared:19 113534 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:8408205",
@@ -4800,7 +5320,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:14 242259 BLD:01:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:836549",
@@ -4825,7 +5348,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:19 102596 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7792587",
@@ -4850,7 +5376,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:18 271551 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:7642546",
@@ -4875,7 +5404,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:07 287273 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:364211",
@@ -4901,7 +5433,10 @@
       "supporting_evidence_ids": [
         "permit:cleared:10 139595 DST:00:chiller",
         "permit:cleared:10 139595 HVA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:12763885",
@@ -4926,7 +5461,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:17 139058 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     },
     {
       "property_key": "toronto-geoid:9531813",
@@ -4951,7 +5489,10 @@
       "explicit_tower_evidence_ids": [],
       "supporting_evidence_ids": [
         "permit:cleared:16 131955 MSA:00:chiller"
-      ]
+      ],
+      "source_active_permit_record": false,
+      "recent_source_active_permit_activity_365d": false,
+      "latest_recent_permit_activity_date": null
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-poc-0.1",
-  "generated_at": "2026-08-28T18:58:55.083729Z",
+  "generated_at": "2026-08-28T19:01:32.840591Z",
   "jurisdiction": "TORONTO_ON",
   "status": "EXPERIMENTAL_POC",
   "evidence_contract": {
@@ -15,8 +15,9 @@
     "confirmed_cooling_tower_properties": 48,
     "confirmed_cooling_tower_properties_from_permits": 35,
     "confirmed_cooling_tower_properties_from_tdsb": 13,
-    "active_permit_confirmed_cooling_tower_properties": 21,
-    "properties_with_no_tower_assertion_but_related_supporting_evidence": 129
+    "properties_with_no_tower_assertion_but_related_supporting_evidence": 129,
+    "source_active_permit_confirmed_cooling_tower_properties": 21,
+    "recent_365d_source_active_permit_confirmed_cooling_tower_properties": 3
   },
   "sources": {
     "permits": {
@@ -94,5 +95,11 @@
     "chiller",
     "condenser water",
     "chemical feed"
-  ]
+  ],
+  "permit_timing_contract": {
+    "source_active": "Record is present in the City of Toronto Active Permits dataset; this does not by itself mean recent buying activity.",
+    "recent_activity_window_days": 365,
+    "recent_activity": "Source-active permit record with a usable event date no more than 365 days before POC generation.",
+    "old_source_active_records": "Retained as equipment/project evidence but not represented as recent activity."
+  }
 }
