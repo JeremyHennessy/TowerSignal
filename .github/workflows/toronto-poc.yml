@@ -13,6 +13,8 @@ on:
       - scripts/classify_toronto_poc_lifecycle.py
       - scripts/build_toronto_poc_demo_accounts.py
       - scripts/pull_toronto_bulk_sources.py
+      - scripts/normalize_toronto_warehouse.py
+      - scripts/join_toronto_warehouse_to_poc.py
       - docs/TORONTO_POC.md
       - .github/workflows/toronto-poc.yml
 
@@ -50,6 +52,8 @@ jobs:
           python -m py_compile scripts/classify_toronto_poc_lifecycle.py
           python -m py_compile scripts/build_toronto_poc_demo_accounts.py
           python -m py_compile scripts/pull_toronto_bulk_sources.py
+          python -m py_compile scripts/normalize_toronto_warehouse.py
+          python -m py_compile scripts/join_toronto_warehouse_to_poc.py
 
       - name: Extract Toronto POC evidence
         run: python scripts/build_toronto_poc.py --output data/toronto/poc/current
@@ -72,6 +76,12 @@ jobs:
       - name: Pull broad Toronto and Ontario warehouse sources
         run: python scripts/pull_toronto_bulk_sources.py --output data/toronto/warehouse/current
 
+      - name: Normalize Toronto warehouse municipal scope and licences
+        run: python scripts/normalize_toronto_warehouse.py --output data/toronto/warehouse/current
+
+      - name: Join warehouse sources to POC properties
+        run: python scripts/join_toronto_warehouse_to_poc.py --poc data/toronto/poc/current --warehouse data/toronto/warehouse/current
+
       - name: Validate generated JSON
         run: |
           python -m json.tool data/toronto/poc/current/summary.json >/dev/null
@@ -80,6 +90,8 @@ jobs:
           python -m json.tool data/toronto/poc/current/rentsafe_matches.json >/dev/null
           python -m json.tool data/toronto/poc/current/demo_accounts.json >/dev/null
           python -m json.tool data/toronto/warehouse/current/source_inventory.json >/dev/null
+          python -m json.tool data/toronto/warehouse/current/join_summary.json >/dev/null
+          python -m json.tool data/toronto/warehouse/current/property_joins.json >/dev/null
 
       - name: Upload Toronto POC artifact
         uses: actions/upload-artifact@v4
