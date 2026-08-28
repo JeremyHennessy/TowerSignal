@@ -72,6 +72,13 @@ def package_show(package_id: str) -> dict[str, Any]:
     return ckan("package_show", {"id": package_id})
 
 
+def normalize_licence_label(value: Any) -> str:
+    text = str(value or "")
+    text = re.sub(r"[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]", "-", text)
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    return text
+
+
 def clean_header(value: Any, index: int) -> str:
     text = re.sub(r"\s+", " ", str(value or "")).strip()
     return text or f"column_{index + 1}"
@@ -205,24 +212,11 @@ def parse_resource(resource: dict[str, Any]) -> list[dict[str, Any]]:
     raise RuntimeError(f"Unsupported Ontario format {fmt!r}")
 
 
-def compact_identifying_fields(record: dict[str, Any]) -> dict[str, Any]:
-    keep_terms = (
-        "address", "city", "municip", "postal", "facility", "site", "company", "organization",
-        "property", "ewrb", "inspection", "compliance", "sector", "type", "status", "date", "water",
-        "energy", "ghg", "emission", "violation", "offence", "order", "activity",
-    )
-    output = {}
-    for key, value in record.items():
-        normalized = key.lower()
-        if any(term in normalized for term in keep_terms):
-            output[key] = value
-    return output or record
-
-
 def build_source(spec: dict[str, Any], output_dir: Path, retrieved_at: str) -> dict[str, Any]:
     package = package_show(spec["package"])
     licence = str(package.get("license_title") or "").strip()
-    if ONTARIO_LICENSE.lower() not in licence.lower():
+    normalized_licence = normalize_licence_label(licence)
+    if "open government licence" not in normalized_licence or "ontario" not in normalized_licence:
         raise RuntimeError(
             f"Ontario source {spec['key']} is not explicitly under Open Government Licence - Ontario: {licence!r}"
         )
@@ -261,7 +255,8 @@ def build_source(spec: dict[str, Any], output_dir: Path, retrieved_at: str) -> d
             "package_name": package.get("name"),
             "package_id": package.get("id"),
             "catalogue_url": f"https://data.ontario.ca/dataset/{package.get('name')}",
-            "license": ONTARIO_LICENSE,
+            "license": licence,
+            "license_gate": "Catalogue licence label must normalize to contain both 'Open Government Licence' and 'Ontario'.",
             "retrieved_at": retrieved_at,
             "selection_mode": spec["mode"],
             "resource_count": len(selected),
