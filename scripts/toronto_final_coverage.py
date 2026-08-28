@@ -55,6 +55,7 @@ def main() -> None:
     documentary_confirmed = tower_status_counts.get("CONFIRMED", 0)
     supporting_only = tower_status_counts.get("SUPPORTING_ONLY", 0)
 
+    aic_blocked = aic.get("status") == "BLOCKED_EXTERNAL_ACCESS_CONTROL"
     documents = [d for d in aic_index.get("documents", []) if isinstance(d, dict)]
     parse_counts = Counter(str(d.get("parse_status") or "UNKNOWN") for d in documents)
     zero_text = sum((d.get("parse_status") == "PARSED") and int(d.get("text_chars_extracted") or 0) == 0 for d in documents)
@@ -67,6 +68,7 @@ def main() -> None:
         candidate_records = tower_candidates
     else:
         candidate_records = []
+    aic_candidate_count = None if aic_blocked else len(candidate_records)
 
     if isinstance(aerial_candidates, dict):
         aerial_records = aerial_candidates.get("candidates") or []
@@ -78,10 +80,10 @@ def main() -> None:
     aerial_scoring = aerial.get("scoring") or {}
     graph_counts = graph.get("counts") or {}
     report = {
-        "schema_version": "toronto-market-coverage-1.1",
+        "schema_version": "toronto-market-coverage-1.2",
         "generated_at": utc_now(),
         "coverage_contract": {
-            "meaning": "Measured source, reconciliation, document, relationship and screening coverage only.",
+            "meaning": "Measured source, reconciliation, document-access, relationship and screening coverage only.",
             "true_market_denominator": "No validated total installed Toronto cooling-tower population has been established from public data.",
             "prohibition": "Canonical candidate properties, AIC applications, large buildings, and aerial-screened properties are not substituted for the unknown tower-population denominator.",
         },
@@ -103,12 +105,15 @@ def main() -> None:
             "original_poc_confirmed_properties": documentary_confirmed,
             "original_poc_supporting_only_properties": supporting_only,
             "original_poc_status_counts": dict(tower_status_counts),
-            "aic_explicit_tower_candidate_records": len(candidate_records),
+            "aic_explicit_tower_candidate_records": aic_candidate_count,
+            "aic_candidate_status": "NOT_MEASURED_DOCUMENT_TRANSPORT_BLOCKED" if aic_blocked else "MEASURED_FROM_PARSED_DOCUMENTS",
             "contract": "AIC candidates remain evidence/review candidates unless separately promoted by the TowerSignal evidence contract.",
         },
         "source_coverage": source_coverage,
         "aic_coverage": {
-            "applications_total_source": aic.get("applications_total_source"),
+            "status": aic.get("status"),
+            "application_catalogue_records": aic.get("applications_total_source"),
+            "document_transport_blocked": aic_blocked,
             "unique_applications_scanned": aic.get("unique_applications_scanned"),
             "applications_in_shards": aic.get("applications_in_shards"),
             "application_pages_fetched": aic.get("application_pages_fetched"),
@@ -118,12 +123,13 @@ def main() -> None:
             "documents_fetch_errors": aic.get("documents_fetch_errors"),
             "target_document_count": aic.get("target_document_count"),
             "documents_with_mechanical_signals": aic.get("documents_with_mechanical_signals"),
-            "document_index_records": len(documents),
-            "parse_status_counts": dict(parse_counts),
-            "parsed_documents_with_zero_text_ocr_gap": zero_text,
-            "category_counts": dict(category_counts),
-            "documents_with_any_target_signal": signal_doc_count,
-            "explicit_tower_candidate_records": len(candidate_records),
+            "document_index_records": None if aic_blocked else len(documents),
+            "parse_status_counts": None if aic_blocked else dict(parse_counts),
+            "parsed_documents_with_zero_text_ocr_gap": None if aic_blocked else zero_text,
+            "category_counts": None if aic_blocked else dict(category_counts),
+            "documents_with_any_target_signal": None if aic_blocked else signal_doc_count,
+            "explicit_tower_candidate_records": aic_candidate_count,
+            "transport_note": "Current City attachment APIs require browser-generated reCAPTCHA; bulk document extraction was not bypassed." if aic_blocked else None,
         },
         "relationship_coverage": {
             "edge_count": graph_counts.get("edges"),
