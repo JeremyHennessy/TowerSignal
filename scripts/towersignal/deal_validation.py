@@ -261,10 +261,23 @@ def build_deal_validation(
     gate = cohort.get("validation_gate") or {}
     min_observed = int(gate.get("min_observed_outcome_targets") or 3)
     min_screened = int(gate.get("min_screened_outcome_targets") or 2)
-    gate_passed = observed_outcomes >= min_observed and observed_screened_outcomes >= min_screened
+    coverage_thresholds_passed = observed_outcomes >= min_observed and observed_screened_outcomes >= min_screened
+    score_authorization_locked = gate.get("score_authorization_locked") is True
+    score_authorization_lock_reason = normalize_space(str(gate.get("score_authorization_lock_reason") or "")) or None
+    gate_passed = coverage_thresholds_passed and not score_authorization_locked
 
     in_market_misses = sum(target["coverage_status"] == "IN_MARKET_NOT_OBSERVED" for target in targets)
     outside_scope = sum(target["coverage_status"] == "OUTSIDE_CURRENT_NYC_PROCUREMENT_SCOPE" for target in targets)
+
+    if coverage_thresholds_passed and score_authorization_locked:
+        conclusion = "COVERAGE_THRESHOLDS_MET_HOLDOUT_REQUIRED"
+        recommended_next_step = "RUN_INDEPENDENT_HOLDOUT_VALIDATION"
+    elif gate_passed:
+        conclusion = "VALIDATED_FOR_SCORE_EXPERIMENT"
+        recommended_next_step = "BUILD_SCORE_EXPERIMENT"
+    else:
+        conclusion = "NOT_VALIDATED_CURRENT_SOURCE_COVERAGE"
+        recommended_next_step = "EXPAND_PROCUREMENT_SOURCE_COVERAGE_BEFORE_SCORING"
 
     return {
         "schema_version": DEAL_VALIDATION_SCHEMA_VERSION,
@@ -306,19 +319,14 @@ def build_deal_validation(
         "validation_gate": {
             "min_observed_outcome_targets": min_observed,
             "min_screened_outcome_targets": min_screened,
+            "coverage_thresholds_passed": coverage_thresholds_passed,
+            "score_authorization_locked": score_authorization_locked,
+            "score_authorization_lock_reason": score_authorization_lock_reason,
             "passed": gate_passed,
-            "conclusion": (
-                "VALIDATED_FOR_SCORE_EXPERIMENT"
-                if gate_passed
-                else "NOT_VALIDATED_CURRENT_SOURCE_COVERAGE"
-            ),
+            "conclusion": conclusion,
             "opportunity_score_2_allowed": gate_passed,
             "home_deal_model_allowed": gate_passed,
-            "recommended_next_step": (
-                "BUILD_SCORE_EXPERIMENT"
-                if gate_passed
-                else "EXPAND_PROCUREMENT_SOURCE_COVERAGE_BEFORE_SCORING"
-            ),
+            "recommended_next_step": recommended_next_step,
         },
         "targets": targets,
         "screen_experiment": {
