@@ -54,7 +54,7 @@ jobs:
       - name: Persist successful POC snapshot on experiment branch
         shell: bash
         run: |
-          if git diff --quiet -- data/toronto/poc/current; then
+          if [ -z "$(git status --porcelain -- data/toronto/poc/current)" ]; then
             echo "Toronto POC snapshot unchanged."
             exit 0
           fi
