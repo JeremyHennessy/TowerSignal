@@ -1,0 +1,43 @@
+name: Toronto AIC API Probe
+
+on:
+  push:
+    branches:
+      - agent/toronto-market-20260828
+    paths:
+      - .github/workflows/toronto-aic-api-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe current AIC APIs
+        shell: python
+        run: |
+          import json, urllib.error, urllib.request
+          endpoints=['getapplicationdetails','getapplicationattachments']
+          variants=[('no_token',{}),('blank_token',{'g-recaptcha-response':''}),('fake_token',{'g-recaptcha-response':'test'})]
+          for endpoint in endpoints:
+            for label,extra in variants:
+              url=f'https://api.toronto.ca/aic/{endpoint}'
+              data=json.dumps({'folderRsn':'5565655','time':''}).encode()
+              headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64)','Accept':'application/json,text/plain,*/*','Content-Type':'application/json','Origin':'https://www.toronto.ca','Referer':'https://www.toronto.ca/'}
+              headers.update(extra)
+              req=urllib.request.Request(url,data=data,headers=headers,method='POST')
+              try:
+                with urllib.request.urlopen(req,timeout=30) as r:
+                  body=r.read(500000).decode('utf-8',errors='replace')
+                  print('RESULT',endpoint,label,'STATUS',r.status,'TYPE',r.headers.get('content-type'),'BODY',body[:8000].replace('\n',' '))
+              except urllib.error.HTTPError as exc:
+                body=exc.read(500000).decode('utf-8',errors='replace')
+                print('HTTP_ERROR',endpoint,label,'STATUS',exc.code,'BODY',body[:8000].replace('\n',' '))
+              except Exception as exc:
+                print('ERROR',endpoint,label,type(exc).__name__,str(exc))
