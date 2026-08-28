@@ -18,6 +18,9 @@ def evidence_summary(item: dict[str, Any]) -> dict[str, Any]:
         "equipment_type": item.get("equipment_type"),
         "evidence_confidence": item.get("evidence_confidence"),
         "signal_type": item.get("signal_type"),
+        "tower_lifecycle_event": item.get("tower_lifecycle_event"),
+        "permit_project_key": item.get("permit_project_key"),
+        "description_fingerprint": item.get("description_fingerprint"),
         "event_date": item.get("event_date"),
         "priority": item.get("priority"),
         "description": item.get("description"),
@@ -36,7 +39,12 @@ def account_record(
         "property_name": property_item.get("property_name"),
         "organization": property_item.get("organization"),
         "tower_status": property_item.get("tower_status"),
+        "tower_lifecycle_events": property_item.get("tower_lifecycle_events") or [],
+        "recent_tower_lifecycle_events_365d": property_item.get("recent_tower_lifecycle_events_365d") or [],
+        "commercial_disposition": property_item.get("commercial_disposition"),
         "commercial_signals": property_item.get("commercial_signals") or [],
+        "permit_project_keys": property_item.get("permit_project_keys") or [],
+        "recent_permit_project_keys_365d": property_item.get("recent_permit_project_keys_365d") or [],
         "renewal_priorities": property_item.get("renewal_priorities") or [],
         "latest_source_event_date": property_item.get("latest_source_event_date"),
         "recent_source_active_permit_activity_365d": bool(
@@ -65,8 +73,13 @@ def write_flat_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "property_name",
         "organization",
         "tower_status",
+        "tower_lifecycle_events",
+        "recent_tower_lifecycle_events_365d",
+        "commercial_disposition",
         "latest_source_event_date",
         "latest_recent_permit_activity_date",
+        "permit_project_keys",
+        "recent_permit_project_keys_365d",
         "renewal_priorities",
         "property_management_company",
         "property_type",
@@ -90,8 +103,17 @@ def write_flat_csv(path: Path, rows: list[dict[str, Any]]) -> None:
                     "property_name": row.get("property_name"),
                     "organization": row.get("organization"),
                     "tower_status": row.get("tower_status"),
+                    "tower_lifecycle_events": " | ".join(row.get("tower_lifecycle_events") or []),
+                    "recent_tower_lifecycle_events_365d": " | ".join(
+                        row.get("recent_tower_lifecycle_events_365d") or []
+                    ),
+                    "commercial_disposition": row.get("commercial_disposition"),
                     "latest_source_event_date": row.get("latest_source_event_date"),
                     "latest_recent_permit_activity_date": row.get("latest_recent_permit_activity_date"),
+                    "permit_project_keys": " | ".join(row.get("permit_project_keys") or []),
+                    "recent_permit_project_keys_365d": " | ".join(
+                        row.get("recent_permit_project_keys_365d") or []
+                    ),
                     "renewal_priorities": " | ".join(row.get("renewal_priorities") or []),
                     "property_management_company": rentsafe.get("property_management_company"),
                     "property_type": rentsafe.get("property_type"),
@@ -118,12 +140,27 @@ def build(output_dir: Path) -> dict[str, Any]:
     evidence_by_id = {item["evidence_id"]: item for item in evidence}
 
     confirmed = [item for item in properties if item.get("tower_status") == "CONFIRMED"]
-    recent_permit = [
-        item for item in confirmed if item.get("recent_source_active_permit_activity_365d")
+
+    def has_recent(item: dict[str, Any], event: str) -> bool:
+        return event in (item.get("recent_tower_lifecycle_events_365d") or [])
+
+    recent_install = [item for item in confirmed if has_recent(item, "INSTALL_OR_ADD_TOWER")]
+    recent_replace = [item for item in confirmed if has_recent(item, "REPLACE_OR_RENEW_TOWER")]
+    recent_retire = [item for item in confirmed if has_recent(item, "RETIRE_OR_CONVERT_AWAY_FROM_TOWER")]
+    known_recent_lifecycle = {
+        item.get("property_key") for item in recent_install + recent_replace + recent_retire
+    }
+    recent_unspecified = [
+        item
+        for item in confirmed
+        if item.get("recent_source_active_permit_activity_365d")
+        and item.get("property_key") not in known_recent_lifecycle
     ]
-    recent_permit.sort(
-        key=lambda item: str(item.get("latest_recent_permit_activity_date") or ""), reverse=True
-    )
+
+    for group in (recent_install, recent_replace, recent_retire, recent_unspecified):
+        group.sort(
+            key=lambda item: str(item.get("latest_recent_permit_activity_date") or ""), reverse=True
+        )
 
     rentsafe_accounts = [item for item in confirmed if item.get("rentsafe")]
     rentsafe_accounts.sort(
@@ -152,7 +189,10 @@ def build(output_dir: Path) -> dict[str, Any]:
             output.append(account)
         return output
 
-    recent_records = tagged(recent_permit, "RECENT_CONFIRMED_TOWER_PERMIT_ACTIVITY")
+    install_records = tagged(recent_install, "RECENT_INSTALL_OR_ADD_TOWER")
+    replace_records = tagged(recent_replace, "RECENT_REPLACE_OR_RENEW_TOWER")
+    retire_records = tagged(recent_retire, "RECENT_RETIRE_OR_CONVERT_AWAY_FROM_TOWER")
+    unspecified_records = tagged(recent_unspecified, "RECENT_TOWER_ACTIVITY_LIFECYCLE_UNSPECIFIED")
     rentsafe_records = tagged(rentsafe_accounts, "CONFIRMED_TOWER_WITH_RENTSAFE_ACCOUNT_CONTEXT")
     tdsb_records = tagged(tdsb_high, "TDSB_HIGH_RENEWAL_CONFIRMED_TOWER")
 
@@ -161,14 +201,24 @@ def build(output_dir: Path) -> dict[str, Any]:
             "generated_at": summary.get("generated_at"),
             "jurisdiction": "TORONTO_ON",
             "status": "EXPERIMENTAL_POC",
-            "ranking_contract": "No Toronto priority score is applied. Segments are deterministic evidence filters only.",
+            "ranking_contract": "No Toronto priority score is applied. Segments are deterministic source-backed evidence filters only.",
+            "current_presence_caveat": (summary.get("tower_lifecycle_contract") or {}).get(
+                "current_presence_caveat"
+            ),
+            "potential_project_aliases": summary.get("potential_project_aliases") or [],
             "counts": {
-                "recent_confirmed_tower_permit_activity": len(recent_records),
+                "recent_install_or_add_tower": len(install_records),
+                "recent_replace_or_renew_tower": len(replace_records),
+                "recent_retire_or_convert_away_from_tower": len(retire_records),
+                "recent_tower_activity_lifecycle_unspecified": len(unspecified_records),
                 "confirmed_tower_with_rentsafe_account_context": len(rentsafe_records),
                 "tdsb_high_renewal_confirmed_tower": len(tdsb_records),
             },
         },
-        "recent_confirmed_tower_permit_activity": recent_records,
+        "recent_install_or_add_tower": install_records,
+        "recent_replace_or_renew_tower": replace_records,
+        "recent_retire_or_convert_away_from_tower": retire_records,
+        "recent_tower_activity_lifecycle_unspecified": unspecified_records,
         "confirmed_tower_with_rentsafe_account_context": rentsafe_records,
         "tdsb_high_renewal_confirmed_tower": tdsb_records,
     }
@@ -176,7 +226,14 @@ def build(output_dir: Path) -> dict[str, Any]:
         json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
-    flat_rows = recent_records + rentsafe_records + tdsb_records
+    flat_rows = (
+        install_records
+        + replace_records
+        + retire_records
+        + unspecified_records
+        + rentsafe_records
+        + tdsb_records
+    )
     write_flat_csv(output_dir / "demo_accounts.csv", flat_rows)
     print(json.dumps(payload["metadata"]["counts"], indent=2))
     return payload
