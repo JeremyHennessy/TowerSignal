@@ -1,0 +1,45 @@
+{
+  "schema_version": "toronto-aic-access-1.0",
+  "generated_at": "2026-08-29T01:04:14.105443Z",
+  "status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
+  "application_catalogue_records": 15844,
+  "catalogue_source": "City of Toronto AIC FeatureServer layer 60",
+  "current_public_page": "https://www.toronto.ca/city-government/planning-development/application-details/",
+  "current_read_apis": [
+    "https://api.toronto.ca/aic/getapplicationdetails",
+    "https://api.toronto.ca/aic/getapplicationattachments"
+  ],
+  "current_transport_contract": {
+    "browser_javascript_observation": "Current Toronto AIC JavaScript POSTs numeric folderRsn to the two api.toronto.ca/aic read endpoints and sends a browser-generated g-recaptcha-response header.",
+    "server_probe_result": "No-token, blank-token and fake-token probes returned HTTP 400 for both read endpoints.",
+    "legacy_transport_result": "The stored legacy secure.toronto.ca/AIC encrypted URLs returned HTTP 403 for almost all current applications in the attempted corpus partitions.",
+    "representative_invalid_partition": {
+      "workflow_run_id": 33217943951,
+      "partition": 0,
+      "applications": 495,
+      "application_pages_fetched": 3,
+      "application_page_fetch_errors": 492,
+      "interpretation": "This partition is retained only as transport diagnostics and is not counted as document-corpus coverage."
+    },
+    "current_api_probe_run_id": 33220422803,
+    "backend_trace_run_id": 33220200456
+  },
+  "decision": {
+    "automated_document_ingestion": "BLOCKED",
+    "reason": "The current public supporting-document API is guarded by reCAPTCHA. TowerSignal will not defeat or bypass that anti-bot/access control for bulk extraction.",
+    "metadata_ingestion": "ALLOWED_AND_COMPLETED",
+    "next_permitted_paths": [
+      "City-provided documented bulk/API access that does not require bypassing reCAPTCHA",
+      "written City permission or data feed",
+      "manual review of specific applications for prospect/account verification",
+      "other open-licensed City documents already exposed outside the reCAPTCHA-gated AIC attachment API"
+    ]
+  },
+  "coverage_semantics": {
+    "document_corpus_complete": false,
+    "document_corpus_coverage_percent": null,
+    "cooling_tower_candidates_from_aic_documents": null,
+    "ocr_gap": null,
+    "warning": "Zero parsed AIC documents is not evidence that applications have no supporting documents."
+  }
+}

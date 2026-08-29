@@ -1,0 +1,8 @@
+{
+  "schema_version": "toronto-aic-explicit-tower-candidates-1.0",
+  "generated_at": "2026-08-29T01:04:14.106632Z",
+  "status": "NOT_MEASURED_DOCUMENT_TRANSPORT_BLOCKED",
+  "documents": [],
+  "candidate_count": null,
+  "warning": "AIC document candidates are unknown because the supporting-document corpus could not be lawfully automated through the current reCAPTCHA-gated public transport."
+}

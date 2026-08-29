@@ -1,0 +1,308 @@
+{
+  "schema_version": "toronto-market-coverage-1.2",
+  "generated_at": "2026-08-29T01:05:46.278333Z",
+  "coverage_contract": {
+    "meaning": "Measured source, reconciliation, document-access, relationship and screening coverage only.",
+    "true_market_denominator": "No validated total installed Toronto cooling-tower population has been established from public data.",
+    "prohibition": "Canonical candidate properties, AIC applications, large buildings, and aerial-screened properties are not substituted for the unknown tower-population denominator."
+  },
+  "poc_reconciliation": {
+    "original_properties": 177,
+    "resolved_to_current_address_point": 173,
+    "unresolved_with_explicit_status": 4,
+    "reconciliation_fraction": 0.9774011299435028,
+    "resolution_status_counts": {
+      "EXACT_UNIQUE_CIVIC_ADDRESS_AFTER_CANONICALIZER_FIX": 1,
+      "EXACT_UNIQUE_CIVIC_ADDRESS_MATCH": 38,
+      "LEGACY_GEOID_MATCHED_CURRENT_ADDRESS_POINT_ID": 134,
+      "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED": 3,
+      "NO_CURRENT_ADDRESS_POINT_MATCH": 1
+    }
+  },
+  "expanded_property_universe": {
+    "canonical_address_point_properties": 13055,
+    "original_poc_properties_present_in_spine": 169,
+    "expanded_properties_beyond_original_poc": 12886,
+    "properties_with_usable_coordinates": 13055,
+    "unresolved_candidate_addresses": 2330
+  },
+  "documentary_tower_evidence": {
+    "original_poc_confirmed_properties": 48,
+    "original_poc_supporting_only_properties": 0,
+    "original_poc_status_counts": {
+      "CONFIRMED": 48,
+      "NO_TOWER_ASSERTION": 129
+    },
+    "aic_explicit_tower_candidate_records": null,
+    "aic_candidate_status": "NOT_MEASURED_DOCUMENT_TRANSPORT_BLOCKED",
+    "contract": "AIC candidates remain evidence/review candidates unless separately promoted by the TowerSignal evidence contract."
+  },
+  "source_coverage": {
+    "chemtrac_history": {
+      "status": "JOINED",
+      "source_records": 37964,
+      "records_with_property_address": 37944,
+      "matched_records": 29090,
+      "matched_canonical_properties": 1973,
+      "ambiguous_address_rows_not_forced": 0,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.15112983531214094,
+      "source_record_match_fraction": 0.7662522389632284,
+      "unmatched_source_records": 8874
+    },
+    "ontario_ewrb_large_buildings": {
+      "status": "JOINED",
+      "source_records": 11595,
+      "records_with_property_address": 0,
+      "matched_records": 0,
+      "matched_canonical_properties": 0,
+      "ambiguous_address_rows_not_forced": 0,
+      "identity_limitation": "PUBLIC_SOURCE_HAS_NO_DETERMINISTIC_PROPERTY_ADDRESS_FIELD",
+      "candidate_universe_property_link_fraction": 0.0,
+      "source_record_match_fraction": 0.0,
+      "unmatched_source_records": 11595
+    },
+    "ontario_environmental_compliance_reports": {
+      "status": "JOINED",
+      "source_records": 56,
+      "records_with_property_address": 56,
+      "matched_records": 4,
+      "matched_canonical_properties": 2,
+      "ambiguous_address_rows_not_forced": 0,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.00015319800842589047,
+      "source_record_match_fraction": 0.07142857142857142,
+      "unmatched_source_records": 52
+    },
+    "toronto_highrise_residential_health_hazards": {
+      "status": "JOINED",
+      "source_records": 1245,
+      "records_with_property_address": 1245,
+      "matched_records": 1010,
+      "matched_canonical_properties": 678,
+      "ambiguous_address_rows_not_forced": 0,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.05193412485637687,
+      "source_record_match_fraction": 0.8112449799196787,
+      "unmatched_source_records": 235
+    },
+    "toronto_aic_applications": {
+      "status": "JOINED",
+      "source_records": 15844,
+      "records_with_property_address": 15844,
+      "matched_records": 11209,
+      "matched_canonical_properties": 7203,
+      "ambiguous_address_rows_not_forced": 5,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.5517426273458444,
+      "source_record_match_fraction": 0.7074602373138097,
+      "unmatched_source_records": 4635
+    },
+    "development_pipeline": {
+      "status": "JOINED",
+      "source_records": 2411,
+      "records_with_property_address": 2411,
+      "matched_records": 1780,
+      "matched_canonical_properties": 1703,
+      "ambiguous_address_rows_not_forced": 1,
+      "links_added": 1780,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.13044810417464572,
+      "source_record_match_fraction": 0.7382828701783493,
+      "unmatched_source_records": 631
+    },
+    "apartment_building_evaluation": {
+      "status": "JOINED",
+      "source_records": 6252,
+      "records_with_property_address": 6252,
+      "matched_records": 5288,
+      "matched_canonical_properties": 3018,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 5288,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.2311757947146687,
+      "source_record_match_fraction": 0.8458093410108766,
+      "unmatched_source_records": 964
+    },
+    "ontario_bps_energy_2024": {
+      "status": "JOINED",
+      "source_records": 0,
+      "records_with_property_address": 0,
+      "matched_records": 0,
+      "matched_canonical_properties": 0,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 0,
+      "identity_limitation": "NO_DETERMINISTIC_PROPERTY_ADDRESS_EXTRACTED_FROM_PERSISTED_SOURCE_FILE",
+      "candidate_universe_property_link_fraction": 0.0,
+      "source_record_match_fraction": null,
+      "unmatched_source_records": 0
+    },
+    "affordable_housing_pipeline": {
+      "status": "JOINED",
+      "source_records": 271,
+      "records_with_property_address": 271,
+      "matched_records": 179,
+      "matched_canonical_properties": 169,
+      "ambiguous_address_rows_not_forced": 1,
+      "links_added": 179,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.012945231711987745,
+      "source_record_match_fraction": 0.6605166051660517,
+      "unmatched_source_records": 92
+    },
+    "renewable_energy_installations": {
+      "status": "JOINED",
+      "source_records": 100,
+      "records_with_property_address": 100,
+      "matched_records": 85,
+      "matched_canonical_properties": 81,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 85,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.006204519341248564,
+      "source_record_match_fraction": 0.85,
+      "unmatched_source_records": 15
+    },
+    "capital_project_pipeline": {
+      "status": "JOINED",
+      "source_records": 46,
+      "records_with_property_address": 0,
+      "matched_records": 0,
+      "matched_canonical_properties": 0,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 0,
+      "identity_limitation": "NO_DETERMINISTIC_PROPERTY_ADDRESS_EXTRACTED_FROM_PERSISTED_SOURCE_FILE",
+      "candidate_universe_property_link_fraction": 0.0,
+      "source_record_match_fraction": 0.0,
+      "unmatched_source_records": 46
+    },
+    "chemtrac_2024": {
+      "status": "JOINED",
+      "source_records": 1277,
+      "records_with_property_address": 1277,
+      "matched_records": 973,
+      "matched_canonical_properties": 515,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 973,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.03944848716966679,
+      "source_record_match_fraction": 0.7619420516836335,
+      "unmatched_source_records": 304
+    },
+    "business_licence_matches_prior_poc": {
+      "status": "JOINED",
+      "source_records": 1688,
+      "records_with_property_address": 1688,
+      "matched_records": 1452,
+      "matched_canonical_properties": 88,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 1452,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 0.00674071237073918,
+      "source_record_match_fraction": 0.8601895734597157,
+      "unmatched_source_records": 236
+    },
+    "311_matches_prior_poc": {
+      "status": "JOINED",
+      "source_records": 1,
+      "records_with_property_address": 1,
+      "matched_records": 1,
+      "matched_canonical_properties": 1,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 1,
+      "identity_limitation": null,
+      "candidate_universe_property_link_fraction": 7.659900421294524e-05,
+      "source_record_match_fraction": 1.0,
+      "unmatched_source_records": 0
+    },
+    "tobids_awarded_contracts_exact_document_address_prior_poc": {
+      "status": "JOINED_FROM_PREVIOUSLY_VALIDATED_POC_DOCUMENT_MATCHES",
+      "matched_records": 5,
+      "matched_canonical_properties": 3,
+      "links_added": 5,
+      "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text.",
+      "candidate_universe_property_link_fraction": 0.0002297970126388357
+    },
+    "capital_project_pipeline_exact_document_address_prior_poc": {
+      "status": "JOINED_FROM_PREVIOUSLY_VALIDATED_POC_DOCUMENT_MATCHES",
+      "matched_records": 0,
+      "matched_canonical_properties": 0,
+      "links_added": 0,
+      "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text.",
+      "candidate_universe_property_link_fraction": 0.0
+    },
+    "toronto_public_notices_exact_prior_poc": {
+      "status": "JOINED_FROM_EXPLICIT_NOTICE_ADDRESS_LIST",
+      "matched_records": 7,
+      "matched_canonical_properties": 6,
+      "links_added": 7,
+      "candidate_universe_property_link_fraction": 0.0004595940252776714
+    }
+  },
+  "aic_coverage": {
+    "status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
+    "application_catalogue_records": 15844,
+    "document_transport_blocked": true,
+    "unique_applications_scanned": 0,
+    "applications_in_shards": 0,
+    "application_pages_fetched": 0,
+    "application_page_fetch_errors": null,
+    "documents_discovered": null,
+    "documents_parsed": 0,
+    "documents_fetch_errors": null,
+    "target_document_count": null,
+    "documents_with_mechanical_signals": null,
+    "document_index_records": null,
+    "parse_status_counts": null,
+    "parsed_documents_with_zero_text_ocr_gap": null,
+    "category_counts": null,
+    "documents_with_any_target_signal": null,
+    "explicit_tower_candidate_records": null,
+    "transport_note": "Current City attachment APIs require browser-generated reCAPTCHA; bulk document extraction was not bypassed."
+  },
+  "relationship_coverage": {
+    "edge_count": 2617,
+    "relationship_counts": {
+      "PROPERTY_MANAGER_OF": 2612,
+      "SUCCESSFUL_BIDDER_AT_PROPERTY": 5
+    },
+    "properties_by_relationship": {
+      "PROPERTY_MANAGER_OF": 2603,
+      "SUCCESSFUL_BIDDER_AT_PROPERTY": 3
+    },
+    "chain_coverage": {
+      "properties_with_owner": 0,
+      "properties_with_property_manager": 2603,
+      "properties_with_engineer_or_consultant": 0,
+      "properties_with_contractor_or_successful_bidder": 3,
+      "properties_with_facility_operator_or_reporter": 0
+    },
+    "construction_act_statuses": {
+      "Daily Commercial News / ConstructConnect": "PERMISSION_REQUIRED",
+      "Link2Build": "PERMISSION_REQUIRED",
+      "Ontario Construction News": "PERMISSION_REQUIRED"
+    }
+  },
+  "aerial_screening": {
+    "status": "WEAK_LABEL_MODEL_FIT",
+    "canonical_properties_with_coordinates": 13055,
+    "requested_positive_properties": 46,
+    "requested_weak_controls": 92,
+    "usable_training_images": 138,
+    "candidate_properties_requested": 1200,
+    "candidate_properties_scored": 1200,
+    "persisted_candidate_records": 1200,
+    "weak_label_validation": {
+      "folds": 5,
+      "roc_auc_vs_weak_labels": 0.5099243856332704,
+      "balanced_accuracy_at_0_5_vs_weak_labels": 0.532608695652174,
+      "warning": "These are discrimination metrics against weak documentary labels, not validated cooling-tower detection accuracy."
+    },
+    "interpretation": "Weak-label visual similarity only. The measured discrimination is not cooling-tower detection accuracy and no aerial score upgrades tower confirmation."
+  },
+  "true_cooling_tower_market_coverage": {
+    "coverage_percent": null,
+    "status": "UNKNOWN_DENOMINATOR",
+    "reason": "No defensible public total installed cooling-tower denominator for Toronto has been established."
+  }
+}

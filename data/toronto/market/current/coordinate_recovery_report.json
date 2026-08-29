@@ -1,0 +1,12 @@
+{
+  "schema_version": "toronto-address-point-coordinate-recovery-1.0",
+  "generated_at": "2026-08-29T01:03:15.108250Z",
+  "source": "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/64d4e54b-738f-4cd9-a9e7-8050fac8a52f/download/address-points-4326.csv",
+  "source_contract": "Current 4326 CSV geometry field is GeoJSON-like MultiPoint in WGS84 order [longitude, latitude].",
+  "canonical_properties": 13054,
+  "target_address_point_ids": 13054,
+  "matched_address_point_rows": 13054,
+  "coordinates_filled": 13054,
+  "invalid_or_missing_geometry": 0,
+  "properties_with_usable_coordinates_after_recovery": 13054
+}

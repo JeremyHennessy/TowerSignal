@@ -1,0 +1,52 @@
+{
+  "schema_version": "toronto-construction-act-source-policy-1.0",
+  "generated_at": "2026-08-29T01:05:45.079909Z",
+  "decision": "PERMISSION_REQUIRED_FOR_AUTOMATED_BULK_INGESTION",
+  "legal_context": {
+    "ontario_publication_rule": "Current Ontario Construction Act regulation designates construction trade news websites for publication of statutory certificates/notices.",
+    "reuse_distinction": "A statutory requirement that a certificate be published publicly is not itself a bulk commercial-reuse licence for a third-party publisher's website/database.",
+    "tower_signal_value": "When lawfully available, certificates can provide property address, improvement description, completion date, owner, contractor and payment-certifier/consultant relationships."
+  },
+  "sources": [
+    {
+      "publisher": "Daily Commercial News / ConstructConnect",
+      "automation_status": "PERMISSION_REQUIRED",
+      "public_entrypoint": "https://canada.constructconnect.com/dcn/certificates-and-notices",
+      "terms_status": "Current service/acceptable-use terms restrict automated scraping/repackaging absent authorization.",
+      "required_next_step": "Obtain written permission, compatible API agreement or licensed feed before automated ingestion."
+    },
+    {
+      "publisher": "Link2Build",
+      "automation_status": "PERMISSION_REQUIRED",
+      "public_entrypoint": "https://www.link2build.ca/certificates/",
+      "terms_status": "Current site terms restrict extracting underlying data and republishing outside permitted use.",
+      "required_next_step": "Obtain written permission, compatible API agreement or licensed feed before automated ingestion."
+    },
+    {
+      "publisher": "Ontario Construction News",
+      "automation_status": "PERMISSION_REQUIRED",
+      "public_entrypoint": "https://ontarioconstructionnews.com/forms",
+      "terms_status": "Public certificate search exists, but site use is governed by publisher terms/subscription framework; no open commercial bulk-reuse licence or bulk API grant was established in this review.",
+      "required_next_step": "Obtain written permission/licence or a compatible publisher feed before automated bulk ingestion."
+    }
+  ],
+  "lawful_open_alternatives_already_used": [
+    "City of Toronto building permits and project/development data",
+    "Toronto Application Information Centre application metadata and City-hosted supporting documents",
+    "Toronto Bids awarded contracts/procurement records",
+    "Ontario environmental compliance/open-government datasets",
+    "RentSafeTO registration/evaluation data",
+    "TDSB facility renewal records"
+  ],
+  "relationship_adapter": {
+    "status": "READY_FOR_LICENSED_INPUT",
+    "roles": [
+      "OWNER",
+      "CONTRACTOR",
+      "PAYMENT_CERTIFIER",
+      "SUBCONTRACTOR",
+      "ENGINEER_OR_CONSULTANT"
+    ],
+    "contract": "Construction Act edges stay absent until source use is permitted; their absence does not block other Toronto relationship sources."
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "schema_version": "toronto-source-link-extension-1.0",
+  "generated_at": "2026-08-29T01:05:44.891617Z",
+  "total_links_after_extension": 51083,
+  "properties_with_any_link": 12463,
+  "structured_extensions": {
+    "development_pipeline": {
+      "status": "JOINED",
+      "source_records": 2411,
+      "records_with_property_address": 2411,
+      "matched_records": 1780,
+      "matched_canonical_properties": 1703,
+      "ambiguous_address_rows_not_forced": 1,
+      "links_added": 1780,
+      "identity_limitation": null
+    },
+    "apartment_building_evaluation": {
+      "status": "JOINED",
+      "source_records": 6252,
+      "records_with_property_address": 6252,
+      "matched_records": 5288,
+      "matched_canonical_properties": 3018,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 5288,
+      "identity_limitation": null
+    },
+    "ontario_bps_energy_2024": {
+      "status": "JOINED",
+      "source_records": 0,
+      "records_with_property_address": 0,
+      "matched_records": 0,
+      "matched_canonical_properties": 0,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 0,
+      "identity_limitation": "NO_DETERMINISTIC_PROPERTY_ADDRESS_EXTRACTED_FROM_PERSISTED_SOURCE_FILE"
+    },
+    "affordable_housing_pipeline": {
+      "status": "JOINED",
+      "source_records": 271,
+      "records_with_property_address": 271,
+      "matched_records": 179,
+      "matched_canonical_properties": 169,
+      "ambiguous_address_rows_not_forced": 1,
+      "links_added": 179,
+      "identity_limitation": null
+    },
+    "renewable_energy_installations": {
+      "status": "JOINED",
+      "source_records": 100,
+      "records_with_property_address": 100,
+      "matched_records": 85,
+      "matched_canonical_properties": 81,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 85,
+      "identity_limitation": null
+    },
+    "capital_project_pipeline": {
+      "status": "JOINED",
+      "source_records": 46,
+      "records_with_property_address": 0,
+      "matched_records": 0,
+      "matched_canonical_properties": 0,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 0,
+      "identity_limitation": "NO_DETERMINISTIC_PROPERTY_ADDRESS_EXTRACTED_FROM_PERSISTED_SOURCE_FILE"
+    },
+    "chemtrac_2024": {
+      "status": "JOINED",
+      "source_records": 1277,
+      "records_with_property_address": 1277,
+      "matched_records": 973,
+      "matched_canonical_properties": 515,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 973,
+      "identity_limitation": null
+    },
+    "business_licence_matches_prior_poc": {
+      "status": "JOINED",
+      "source_records": 1688,
+      "records_with_property_address": 1688,
+      "matched_records": 1452,
+      "matched_canonical_properties": 88,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 1452,
+      "identity_limitation": null
+    },
+    "311_matches_prior_poc": {
+      "status": "JOINED",
+      "source_records": 1,
+      "records_with_property_address": 1,
+      "matched_records": 1,
+      "matched_canonical_properties": 1,
+      "ambiguous_address_rows_not_forced": 0,
+      "links_added": 1,
+      "identity_limitation": null
+    }
+  },
+  "prior_document_match_extensions": {
+    "tobids_awarded_contracts_exact_document_address_prior_poc": {
+      "status": "JOINED_FROM_PREVIOUSLY_VALIDATED_POC_DOCUMENT_MATCHES",
+      "matched_records": 5,
+      "matched_canonical_properties": 3,
+      "links_added": 5,
+      "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text."
+    },
+    "capital_project_pipeline_exact_document_address_prior_poc": {
+      "status": "JOINED_FROM_PREVIOUSLY_VALIDATED_POC_DOCUMENT_MATCHES",
+      "matched_records": 0,
+      "matched_canonical_properties": 0,
+      "links_added": 0,
+      "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text."
+    },
+    "toronto_public_notices_exact_prior_poc": {
+      "status": "JOINED_FROM_EXPLICIT_NOTICE_ADDRESS_LIST",
+      "matched_records": 7,
+      "matched_canonical_properties": 6,
+      "links_added": 7
+    }
+  }
+}

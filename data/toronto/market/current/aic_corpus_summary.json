@@ -1,0 +1,37 @@
+{
+  "schema_version": "toronto-aic-corpus-summary-1.0",
+  "generated_at": "2026-08-29T01:04:14.105886Z",
+  "status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
+  "applications_total_source": 15844,
+  "unique_applications_scanned": 0,
+  "applications_in_shards": 0,
+  "application_pages_fetched": 0,
+  "application_page_fetch_errors": null,
+  "documents_discovered": null,
+  "documents_parsed": 0,
+  "documents_fetch_errors": null,
+  "target_document_count": null,
+  "documents_with_mechanical_signals": null,
+  "document_transport": {
+    "browser_javascript_observation": "Current Toronto AIC JavaScript POSTs numeric folderRsn to the two api.toronto.ca/aic read endpoints and sends a browser-generated g-recaptcha-response header.",
+    "server_probe_result": "No-token, blank-token and fake-token probes returned HTTP 400 for both read endpoints.",
+    "legacy_transport_result": "The stored legacy secure.toronto.ca/AIC encrypted URLs returned HTTP 403 for almost all current applications in the attempted corpus partitions.",
+    "representative_invalid_partition": {
+      "workflow_run_id": 33217943951,
+      "partition": 0,
+      "applications": 495,
+      "application_pages_fetched": 3,
+      "application_page_fetch_errors": 492,
+      "interpretation": "This partition is retained only as transport diagnostics and is not counted as document-corpus coverage."
+    },
+    "current_api_probe_run_id": 33220422803,
+    "backend_trace_run_id": 33220200456
+  },
+  "coverage_caveat": {
+    "document_corpus_complete": false,
+    "document_corpus_coverage_percent": null,
+    "cooling_tower_candidates_from_aic_documents": null,
+    "ocr_gap": null,
+    "warning": "Zero parsed AIC documents is not evidence that applications have no supporting documents."
+  }
+}

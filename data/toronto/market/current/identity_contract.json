@@ -1,0 +1,18 @@
+{
+  "schema_version": "toronto-address-identity-contract-1.1",
+  "generated_at": "2026-08-29T01:05:17.739407Z",
+  "canonical_property_key": "toronto-address-point:<ADDRESS_POINT_ID>",
+  "canonical_source": "City of Toronto One Address Repository / Address Points",
+  "fields": {
+    "ADDRESS_POINT_ID": "Canonical TowerSignal Toronto civic-address identifier.",
+    "ADDRESS_ID": "Related City address identifier retained for joins/provenance.",
+    "ADDRESS_POINT_ID_LINK": "City-provided linked Address Point identifier; relationship retained without inventing parent/ownership semantics.",
+    "ADDRESS_ID_LINK": "City-provided linked Address identifier; relationship retained without inventing parent/ownership semantics.",
+    "ADDRESS_STRING_ID": "Address-string identifier retained as provenance.",
+    "CENTRELINE_ID": "Street centreline identifier retained as provenance/context."
+  },
+  "legacy_mapping": "Building-permit GEO_ID values were directly checked against the current Address Points source and correspond to ADDRESS_POINT_ID where the historical ID remains represented. Missing historical values are not silently treated as current IDs; exact civic address resolution is recorded separately.",
+  "fuzzy_matching": false,
+  "canonical_address_rule": "Only the civic-address segment before the first comma is canonicalized; municipality names are not stripped from inside valid street names.",
+  "known_fix": "Pre-1.1 logic could truncate Royal York Rd, York Rd and New Toronto St. Final 1.1 cleanup repairs existing canonical addresses and regenerates joins."
+}

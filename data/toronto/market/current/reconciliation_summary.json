@@ -1,0 +1,42 @@
+{
+  "schema_version": "toronto-reconciliation-summary-1.1",
+  "generated_at": "2026-08-29T01:05:42.092883Z",
+  "identity_contract": {
+    "canonical_id": "toronto-address-point:<ADDRESS_POINT_ID>",
+    "canonical_identifier_type": "City of Toronto One Address Repository ADDRESS_POINT_ID",
+    "address_id_role": "Related municipal address identifier retained as an attribute; not used as TowerSignal canonical key in this phase.",
+    "link_fields": "ADDRESS_POINT_ID_LINK and ADDRESS_ID_LINK are retained as explicit City-provided relationships and are not assumed to be ownership/parcel-parent relationships.",
+    "legacy_geo_id": "Toronto building-permit GEO_ID values were empirically verified to correspond to current ADDRESS_POINT_ID where the historical identifier remains current. Legacy values are retained for provenance/backward mapping.",
+    "fuzzy_matching": false,
+    "tower_semantics": "Property identity never creates or upgrades cooling-tower confirmation.",
+    "canonical_address_rule": "Canonicalize only the civic-address segment before the first comma; valid street-name tokens YORK/TORONTO are never stripped.",
+    "version": "toronto-address-point-1.1"
+  },
+  "counts": {
+    "original_poc_properties": 177,
+    "original_poc_resolved": 172,
+    "original_poc_unresolved": 5,
+    "poc_resolution_categories": {
+      "AMBIGUOUS_MUNICIPAL_ADDRESS": 1,
+      "EXACT_LEGACY_GEO_ID_VALUE_AS_CURRENT_ADDRESS_POINT_ID": 154,
+      "EXACT_UNIQUE_CIVIC_ADDRESS": 18,
+      "NO_CURRENT_MUNICIPAL_MATCH": 4
+    },
+    "candidate_addresses_total": 16594,
+    "canonical_properties_resolved": 13055,
+    "expanded_properties_beyond_original_poc": 12886,
+    "unresolved_candidate_addresses": 2330,
+    "address_point_rows_scanned": 525469,
+    "original_poc_reconciled_to_address_point_id": 173,
+    "original_poc_unreconciled": 4,
+    "properties_with_usable_coordinates": 13055,
+    "address_point_rows_scanned_final_cleanup": 525469
+  },
+  "resolution_status_counts": {
+    "EXACT_UNIQUE_CIVIC_ADDRESS_AFTER_CANONICALIZER_FIX": 1,
+    "EXACT_UNIQUE_CIVIC_ADDRESS_MATCH": 38,
+    "LEGACY_GEOID_MATCHED_CURRENT_ADDRESS_POINT_ID": 134,
+    "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED": 3,
+    "NO_CURRENT_ADDRESS_POINT_MATCH": 1
+  }
+}

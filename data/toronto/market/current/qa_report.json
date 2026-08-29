@@ -1,0 +1,440 @@
+{
+  "schema_version": "toronto-final-qa-1.2",
+  "generated_at": "2026-08-29T01:05:51.175755Z",
+  "status": "STRUCTURAL_VALIDATION_PASSED",
+  "json_files_validated": 21,
+  "counts": {
+    "canonical_properties": 13055,
+    "poc_reconciliation_rows": 177,
+    "poc_resolved": 173,
+    "poc_unresolved": 4,
+    "source_links": 51083,
+    "entity_edges": 2617,
+    "aic_application_catalogue": 15844,
+    "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
+    "aic_documents_parsed": null,
+    "aerial_candidates_scored": 1200
+  },
+  "unresolved_properties": [
+    {
+      "property_key": "toronto-geoid:8127974",
+      "input_address": "89 HUMBER COLLEGE BLVD",
+      "input_legacy_geo_id": "8127974",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_MATCH",
+      "resolved": false,
+      "candidate_address_point_ids": [],
+      "candidate_addresses": []
+    },
+    {
+      "property_key": "toronto-geoid:14188741",
+      "input_address": "10-20 BAY ST",
+      "input_legacy_geo_id": "14188741",
+      "resolution_status": "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED",
+      "resolved": false,
+      "candidate_address_point_ids": [],
+      "candidate_addresses": []
+    },
+    {
+      "property_key": "toronto-address:c972c91ae7b1dc29",
+      "input_address": "3197-3199 LAKE SHORE BLVD W",
+      "input_legacy_geo_id": null,
+      "resolution_status": "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED",
+      "resolved": false,
+      "candidate_address_point_ids": [],
+      "candidate_addresses": []
+    },
+    {
+      "property_key": "toronto-geoid:12763885",
+      "input_address": "90-94 ADELAIDE ST W",
+      "input_legacy_geo_id": "12763885",
+      "resolution_status": "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED",
+      "resolved": false,
+      "candidate_address_point_ids": [],
+      "candidate_addresses": []
+    }
+  ],
+  "representative_resolution_samples": {
+    "EXACT_UNIQUE_CIVIC_ADDRESS_AFTER_CANONICALIZER_FIX": [
+      {
+        "property_key": "tdsb-schno:2040",
+        "property_id": "toronto-address-point:1045581",
+        "input_address": "1 York Rd, Etobicoke, ON, M9R 3C8",
+        "canonical_address": "1 YORK RD"
+      }
+    ],
+    "EXACT_UNIQUE_CIVIC_ADDRESS_MATCH": [
+      {
+        "property_key": "tdsb-schno:1924",
+        "property_id": "toronto-address-point:7794431",
+        "input_address": "650 Cosburn Ave, East York, ON, M4C 2V2",
+        "canonical_address": "650 COSBURN AVE"
+      },
+      {
+        "property_key": "toronto-geoid:6727800",
+        "property_id": "toronto-address-point:5463930",
+        "input_address": "888 BIRCHMOUNT RD",
+        "canonical_address": "2201 EGLINTON AVE E"
+      },
+      {
+        "property_key": "toronto-geoid:13494194",
+        "property_id": "toronto-address-point:14601300",
+        "input_address": "390 THE WEST MALL",
+        "canonical_address": "380 THE W MALL"
+      }
+    ],
+    "LEGACY_GEOID_MATCHED_CURRENT_ADDRESS_POINT_ID": [
+      {
+        "property_key": "toronto-geoid:13505515",
+        "property_id": "toronto-address-point:13505515",
+        "input_address": "1 PEMBERTON AVE",
+        "canonical_address": "1 PEMBERTON AVE"
+      },
+      {
+        "property_key": "toronto-geoid:6332564",
+        "property_id": "toronto-address-point:6332564",
+        "input_address": "4171 SHEPPARD AVE E",
+        "canonical_address": "4171 SHEPPARD AVE E"
+      },
+      {
+        "property_key": "toronto-geoid:9531813",
+        "property_id": "toronto-address-point:9531813",
+        "input_address": "99 YORKVILLE AVE",
+        "canonical_address": "99 YORKVILLE AVE"
+      }
+    ]
+  },
+  "representative_historical_join_samples": {
+    "311_matches_prior_poc": [
+      {
+        "property_id": "toronto-address-point:4153974",
+        "source_record_id": "311_matches_prior_poc:row:0",
+        "source_address": "10 GUILDWOOD PKWY",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "affordable_housing_pipeline": [
+      {
+        "property_id": "toronto-address-point:10222988",
+        "source_record_id": "affordable_housing_pipeline:239:238",
+        "source_address": "57 Spadina Avenue",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:6303087",
+        "source_record_id": "affordable_housing_pipeline:149:148",
+        "source_address": "21 Windermere Ave",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:9947936",
+        "source_record_id": "affordable_housing_pipeline:104:103",
+        "source_address": "349 George Street",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "apartment_building_evaluation": [
+      {
+        "property_id": "toronto-address-point:1000361",
+        "source_record_id": "apartment_building_evaluation:3257:3256",
+        "source_address": "618 EVANS AVE",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:57091",
+        "source_record_id": "apartment_building_evaluation:4410:4409",
+        "source_address": "19 DENISON RD E",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:9980236",
+        "source_record_id": "apartment_building_evaluation:6228:6227",
+        "source_address": "540 SHERBOURNE ST",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "business_licence_matches_prior_poc": [
+      {
+        "property_id": "toronto-address-point:1008107",
+        "source_record_id": "business_licence_matches_prior_poc:row:1180",
+        "source_address": "101 HUMBER COLLEGE BLVD",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:7792268",
+        "source_record_id": "business_licence_matches_prior_poc:row:492",
+        "source_address": "595 BAY ST",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:987965",
+        "source_record_id": "business_licence_matches_prior_poc:row:1066",
+        "source_address": "60 BIRMINGHAM ST",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "chemtrac_2024": [
+      {
+        "property_id": "toronto-address-point:1000257",
+        "source_record_id": "chemtrac_2024:474:473",
+        "source_address": "365 Evans Avenue",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:395227",
+        "source_record_id": "chemtrac_2024:65:64",
+        "source_address": "15 Wallsend Drive",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:996700",
+        "source_record_id": "chemtrac_2024:384:383",
+        "source_address": "235 Dixon Rd",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "chemtrac_history": [
+      {
+        "property_id": "toronto-address-point:1000254",
+        "source_record_id": "chemtrac_history:230:25125",
+        "source_address": "360 Evans Ave",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:396846",
+        "source_record_id": "chemtrac_history:1596:36637",
+        "source_address": "27 West Hill Drive",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:999869",
+        "source_record_id": "chemtrac_history:2412:32352",
+        "source_address": "65 Enterprise Road",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "development_pipeline": [
+      {
+        "property_id": "toronto-address-point:1000253",
+        "source_record_id": "development_pipeline:1400:1399",
+        "source_address": "350 EVANS AVE",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:509132",
+        "source_record_id": "development_pipeline:2231:2230",
+        "source_address": "172 DREWRY AVE",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:9980743",
+        "source_record_id": "development_pipeline:1439:1438",
+        "source_address": "1151 WESTON RD",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "ontario_environmental_compliance_reports": [
+      {
+        "property_id": "toronto-address-point:20037861",
+        "source_record_id": "ontario_environmental_compliance_reports:row:33",
+        "source_address": "470 UNWIN AVE, TORONTO, ON M4M 3M9",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:361902",
+        "source_record_id": "ontario_environmental_compliance_reports:row:32",
+        "source_address": "3450 MCNICOLL AVE, TORONTO, ON M1V 5J7",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:361902",
+        "source_record_id": "ontario_environmental_compliance_reports:row:8",
+        "source_address": "3450 MCNICOLL AVE, TORONTO, ON M1V 5J7",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "renewable_energy_installations": [
+      {
+        "property_id": "toronto-address-point:1007854",
+        "source_record_id": "renewable_energy_installations:73:72",
+        "source_address": "259 Horner Ave",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:523759",
+        "source_record_id": "renewable_energy_installations:45:44",
+        "source_address": "165 Grenoble Dr",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:996452",
+        "source_record_id": "renewable_energy_installations:18:17",
+        "source_address": "150 Disco Rd",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "tobids_awarded_contracts_exact_document_address_prior_poc": [
+      {
+        "property_id": "toronto-address-point:3841975",
+        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:5065962940",
+        "source_address": "5100 YONGE ST",
+        "match_basis": "PREVIOUSLY_VALIDATED_EXACT_PROPERTY_ADDRESS_TOKEN_IN_DOCUMENT_TEXT_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+      },
+      {
+        "property_id": "toronto-address-point:856375",
+        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:4823171082",
+        "source_address": "100 QUEEN ST W",
+        "match_basis": "PREVIOUSLY_VALIDATED_EXACT_PROPERTY_ADDRESS_TOKEN_IN_DOCUMENT_TEXT_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+      },
+      {
+        "property_id": "toronto-address-point:856375",
+        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:5440016362",
+        "source_address": "100 QUEEN ST W",
+        "match_basis": "PREVIOUSLY_VALIDATED_EXACT_PROPERTY_ADDRESS_TOKEN_IN_DOCUMENT_TEXT_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+      }
+    ],
+    "toronto_aic_applications": [
+      {
+        "property_id": "toronto-address-point:1000252",
+        "source_record_id": "toronto_aic_applications:12439:12438",
+        "source_address": "340 EVANS AVE",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:536640",
+        "source_record_id": "toronto_aic_applications:5792:5791",
+        "source_address": "25 LEITH HILL RD",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:999738",
+        "source_record_id": "toronto_aic_applications:11739:11738",
+        "source_address": "47 EMERALD CRES",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "toronto_highrise_residential_health_hazards": [
+      {
+        "property_id": "toronto-address-point:1000365",
+        "source_record_id": "toronto_highrise_residential_health_hazards:260:259",
+        "source_address": "625 EVANS AVE",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:549672",
+        "source_record_id": "toronto_highrise_residential_health_hazards:382:381",
+        "source_address": "10 PARKWAY FOREST DR",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:9980350",
+        "source_record_id": "toronto_highrise_residential_health_hazards:983:982",
+        "source_address": "588 PARLIAMENT ST",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "toronto_public_notices_exact_prior_poc": [
+      {
+        "property_id": "toronto-address-point:14200071",
+        "source_record_id": "toronto_public_notices_exact_prior_poc:4464",
+        "source_address": "130 QUEEN ST W",
+        "match_basis": "EXPLICIT_NOTICE_ADDRESS_LIST_EXACT_MATCH_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+      },
+      {
+        "property_id": "toronto-address-point:6275805",
+        "source_record_id": "toronto_public_notices_exact_prior_poc:6347",
+        "source_address": "123 GARRATT BLVD",
+        "match_basis": "EXPLICIT_NOTICE_ADDRESS_LIST_EXACT_MATCH_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+      },
+      {
+        "property_id": "toronto-address-point:8535820",
+        "source_record_id": "toronto_public_notices_exact_prior_poc:7529",
+        "source_address": "2 BLOOR ST E",
+        "match_basis": "EXPLICIT_NOTICE_ADDRESS_LIST_EXACT_MATCH_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+      }
+    ]
+  },
+  "representative_relationship_samples": {
+    "PROPERTY_MANAGER_OF": [
+      {
+        "property_id": "toronto-address-point:2676310",
+        "from_node": "org:cf68bc7c3266e849a455",
+        "source_key": "rentsafe_registration",
+        "basis": "EXPLICIT_PROP_MANAGEMENT_COMPANY_NAME_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "evidence": {
+          "rsn": 4288743,
+          "site_address": "78  PEMBROKE ST "
+        }
+      },
+      {
+        "property_id": "toronto-address-point:9796719",
+        "from_node": "org:e35833c3f9f4c3dbe041",
+        "source_key": "rentsafe_registration",
+        "basis": "EXPLICIT_PROP_MANAGEMENT_COMPANY_NAME_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "evidence": {
+          "rsn": 4169109,
+          "site_address": "1442  LAWRENCE AVE W"
+        }
+      },
+      {
+        "property_id": "toronto-address-point:576049",
+        "from_node": "org:297f6e89ffb53bf9c6ae",
+        "source_key": "rentsafe_registration",
+        "basis": "EXPLICIT_PROP_MANAGEMENT_COMPANY_NAME_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "evidence": {
+          "rsn": 4154668,
+          "site_address": "205  WILSON AVE "
+        }
+      }
+    ],
+    "SUCCESSFUL_BIDDER_AT_PROPERTY": [
+      {
+        "property_id": "toronto-address-point:507981",
+        "from_node": "org:2fe466ca6e17fd66a706",
+        "source_key": "tobids_awarded_contracts",
+        "basis": "SUCCESSFUL_SUPPLIER_IN_EXACT_PROPERTY_AWARD_MATCH",
+        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "evidence": {
+          "document_number": "4730517384",
+          "award_date": "2024-12-19",
+          "award": "1723129.00"
+        }
+      },
+      {
+        "property_id": "toronto-address-point:856375",
+        "from_node": "org:dcf85243b5424725b762",
+        "source_key": "tobids_awarded_contracts",
+        "basis": "SUCCESSFUL_SUPPLIER_IN_EXACT_PROPERTY_AWARD_MATCH",
+        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "evidence": {
+          "document_number": "5165763442",
+          "award_date": "2025-06-13",
+          "award": "1119344.00"
+        }
+      },
+      {
+        "property_id": "toronto-address-point:3841975",
+        "from_node": "org:18f67f5479e7f7ba34ba",
+        "source_key": "tobids_awarded_contracts",
+        "basis": "SUCCESSFUL_SUPPLIER_IN_EXACT_PROPERTY_AWARD_MATCH",
+        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "evidence": {
+          "document_number": "5065962940",
+          "award_date": null,
+          "award": "None"
+        }
+      }
+    ]
+  },
+  "evidence_contract_checks": {
+    "all_properties_current_address_point_namespace": true,
+    "all_resolved_poc_refs_exist": true,
+    "all_source_link_refs_exist": true,
+    "all_entity_graph_property_refs_exist": true,
+    "true_market_coverage_unknown_denominator": true,
+    "aerial_scores_do_not_upgrade_tower_confirmation": true,
+    "aic_blocker_not_misreported_as_zero_documents": true
+  }
+}

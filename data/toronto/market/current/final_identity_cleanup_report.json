@@ -1,0 +1,59 @@
+{
+  "schema_version": "toronto-final-identity-cleanup-1.0",
+  "generated_at": "2026-08-29T01:05:42.093356Z",
+  "poc_resolved": 173,
+  "poc_unresolved": 4,
+  "recovered_poc_keys": [
+    "tdsb-schno:2040"
+  ],
+  "canonical_properties": 13055,
+  "properties_with_coordinates": 13055,
+  "source_link_count": 41313,
+  "source_summaries": {
+    "chemtrac_history": {
+      "status": "JOINED",
+      "source_records": 37964,
+      "records_with_property_address": 37944,
+      "matched_records": 29090,
+      "matched_canonical_properties": 1973,
+      "ambiguous_address_rows_not_forced": 0,
+      "identity_limitation": null
+    },
+    "ontario_ewrb_large_buildings": {
+      "status": "JOINED",
+      "source_records": 11595,
+      "records_with_property_address": 0,
+      "matched_records": 0,
+      "matched_canonical_properties": 0,
+      "ambiguous_address_rows_not_forced": 0,
+      "identity_limitation": "PUBLIC_SOURCE_HAS_NO_DETERMINISTIC_PROPERTY_ADDRESS_FIELD"
+    },
+    "ontario_environmental_compliance_reports": {
+      "status": "JOINED",
+      "source_records": 56,
+      "records_with_property_address": 56,
+      "matched_records": 4,
+      "matched_canonical_properties": 2,
+      "ambiguous_address_rows_not_forced": 0,
+      "identity_limitation": null
+    },
+    "toronto_highrise_residential_health_hazards": {
+      "status": "JOINED",
+      "source_records": 1245,
+      "records_with_property_address": 1245,
+      "matched_records": 1010,
+      "matched_canonical_properties": 678,
+      "ambiguous_address_rows_not_forced": 0,
+      "identity_limitation": null
+    },
+    "toronto_aic_applications": {
+      "status": "JOINED",
+      "source_records": 15844,
+      "records_with_property_address": 15844,
+      "matched_records": 11209,
+      "matched_canonical_properties": 7203,
+      "ambiguous_address_rows_not_forced": 5,
+      "identity_limitation": null
+    }
+  }
+}
