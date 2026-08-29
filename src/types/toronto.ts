@@ -45,6 +45,17 @@ export interface TorontoUnresolvedPocProperty {
   candidate_address_point_ids: string[]
 }
 
+export interface TorontoSourceCoverageSummary {
+  status?: string
+  source_records?: number
+  records_with_property_address?: number
+  matched_records?: number
+  matched_canonical_properties?: number
+  unmatched_source_records?: number
+  identity_limitation?: string | null
+  scope_limitation?: string | null
+}
+
 export interface TorontoMarketPayload {
   schema_version: string
   generated_at: string
@@ -65,7 +76,7 @@ export interface TorontoMarketPayload {
     status: 'UNKNOWN_DENOMINATOR'
     coverage_percent: null
   }
-  source_coverage: Record<string, Record<string, unknown>>
+  source_coverage: Record<string, TorontoSourceCoverageSummary>
   limitations: string[]
   unresolved_poc: TorontoUnresolvedPocProperty[]
   properties: TorontoProperty[]
