@@ -2,7 +2,7 @@ import { type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 import { ShareButton } from './ShareButton'
 
-export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'opportunities' | 'companies' | 'portfolios' | 'workflow' | 'source-health' | 'account'
+export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'toronto' | 'opportunities' | 'companies' | 'portfolios' | 'workflow' | 'source-health' | 'account'
 
 const navigation: Array<{ mode: WorkspaceMode; label: string }> = [
   { mode: 'prospect', label: 'Prospect' },
@@ -45,6 +45,7 @@ export function TopNavigation({
   healthySources,
   sourceCount,
   user,
+  torontoEnabled,
 }: {
   mode: WorkspaceMode
   onNavigate: (mode: WorkspaceMode) => void
@@ -54,6 +55,7 @@ export function TopNavigation({
   healthySources: number
   sourceCount: number
   user: WorkflowUser | null
+  torontoEnabled: boolean
   authLoading: boolean
   authBusy: boolean
   authError: string | null
@@ -70,6 +72,7 @@ export function TopNavigation({
     <button className="reference-brand" onClick={() => goPortal('#/home')} aria-label="TowerSignal home"><span className="reference-brand-mark"><TowerSignalMark /></span><strong>TowerSignal</strong></button>
     <nav aria-label="TowerSignal workspace"><button onClick={() => goPortal('#/home')}>Home</button>{navigation.map(item => <button key={item.mode} className={mode === item.mode || (mode === 'account' && item.mode === 'prospect') ? 'active' : ''} onClick={() => onNavigate(item.mode)}>{item.label}</button>)}</nav>
     <div className="reference-nav-tools">
+      {torontoEnabled && <select className="toronto-market-select" aria-label="Market" value={mode === 'toronto' ? 'toronto' : mode === 'nys' || mode === 'nys-changes' ? 'nys' : 'nyc'} onChange={event => onNavigate(event.target.value === 'toronto' ? 'toronto' : event.target.value === 'nys' ? 'nys' : 'prospect')}><option value="nyc">New York City</option><option value="nys">New York State</option><option value="toronto">Toronto Beta</option></select>}
       <form className="global-account-search" onSubmit={submit}><span aria-hidden="true">⌕</span><input aria-label="Search accounts or locations" value={search} onChange={event => onSearchChange(event.target.value)} placeholder="Search accounts or locations" /></form>
       <ShareButton label="Share" className="global-share-button" />
       <button className={`source-health-nav-button ${mode === 'source-health' ? 'active' : ''}`} onClick={() => onNavigate('source-health')} aria-label="Source Health & Coverage" title="Source Health & Coverage"><span className="status-dot" /><span className="source-health-nav-label">{healthySources}/{sourceCount || '—'}</span></button>

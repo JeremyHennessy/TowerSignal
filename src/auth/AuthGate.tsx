@@ -8,6 +8,8 @@ import { getWorkflowSession, signInWorkflow, signOutWorkflow, signUpWorkflow } f
 
 type GateRoute = 'home' | 'account' | 'app'
 
+const TORONTO_PREVIEW = import.meta.env.VITE_TORONTO_PREVIEW === 'true'
+
 function currentRoute(): GateRoute {
   const raw = window.location.hash.replace(/^#\/?/, '').split('?')[0]
   if (!raw || raw === 'home') return 'home'
@@ -84,6 +86,7 @@ export function AuthGate() {
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
   }
 
+  if (TORONTO_PREVIEW && window.location.hash.replace(/^#\/?/, '').startsWith('toronto')) return <App />
   if (checking) return <main className="auth-check-page"><div className="auth-check-card"><span className="auth-brand-mark">TS</span><h1>TowerSignal</h1><p>Verifying authenticated workspace…</p></div></main>
 
   if (!user) return <AuthLandingPage initialError={sessionError} onSignIn={signIn} onSignUp={signUp} />

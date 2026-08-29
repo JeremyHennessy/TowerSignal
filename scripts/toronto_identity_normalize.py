@@ -89,7 +89,11 @@ def normalize() -> dict[str, Any]:
     poc_by_key = {text(r.get("property_key")): r for r in poc if text(r.get("property_key"))}
     target_addresses = {canonical_street_address(text(r.get("address"))) for r in poc if canonical_street_address(text(r.get("address")))}
     target_addresses.update(text(p.get("canonical_address")) for p in spine["properties"] if text(p.get("canonical_address")))
-    target_ids = {text(p.get("geo_id")) for p in spine["properties"] if text(p.get("geo_id"))}
+    target_ids = {
+        text(p.get("address_point_id") or p.get("canonical_identifier") or p.get("geo_id"))
+        for p in spine["properties"]
+        if text(p.get("address_point_id") or p.get("canonical_identifier") or p.get("geo_id"))
+    }
     target_ids.update(text(r.get("geo_id")) for r in poc if text(r.get("geo_id")))
 
     by_id, by_address, scanned = load_address_points(target_addresses, target_ids)
@@ -98,7 +102,7 @@ def normalize() -> dict[str, Any]:
     prop_by_poc_key: dict[str, dict[str, Any]] = {}
 
     for prop in spine["properties"]:
-        current_id = text(prop.get("geo_id"))
+        current_id = text(prop.get("address_point_id") or prop.get("canonical_identifier") or prop.get("geo_id"))
         canon = text(prop.get("canonical_address"))
         municipal = by_id.get(current_id)
         if municipal is None and canon:

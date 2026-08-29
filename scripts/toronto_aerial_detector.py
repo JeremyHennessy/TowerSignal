@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import io
 import json
 import math
@@ -83,7 +84,18 @@ def is_weak_control(prop: dict[str, Any]) -> bool:
     return bool(prop.get("is_original_poc_property")) and not is_confirmed(prop)
 
 
-def build(market: Path, max_score: int, save_review: int) -> dict[str, Any]:
+def fetch_many(props: list[dict[str, Any]], workers: int) -> list[tuple[dict[str, Any], tuple[np.ndarray, bytes, str] | None, str | None]]:
+    def attempt(prop: dict[str, Any]) -> tuple[dict[str, Any], tuple[np.ndarray, bytes, str] | None, str | None]:
+        try:
+            return prop, fetch_property(prop), None
+        except Exception as exc:
+            return prop, None, f"{type(exc).__name__}: {exc}"
+
+    with ThreadPoolExecutor(max_workers=max(1, workers)) as executor:
+        return list(executor.map(attempt, props))
+
+
+def build(market: Path, max_score: int, save_review: int, workers: int = 8) -> dict[str, Any]:
     spine = read_json(market / "property_spine.json") or {}
     props = [p for p in spine.get("properties", []) if isinstance(p, dict)]
     positives = [p for p in props if is_confirmed(p)]
@@ -98,19 +110,18 @@ def build(market: Path, max_score: int, save_review: int) -> dict[str, Any]:
     review_dir = market / "work" / "aerial_review"
     review_dir.mkdir(parents=True, exist_ok=True)
 
-    for prop in train_props:
-        try:
-            fetched = fetch_property(prop)
-            if not fetched:
-                continue
-            feat, data, url = fetched
-            X.append(feat)
-            y.append(1 if is_confirmed(prop) else 0)
-            usable_props.append(prop)
-            if is_confirmed(prop):
-                (review_dir / f"confirmed_{prop['address_point_id']}.png").write_bytes(data)
-        except Exception as exc:
-            fetch_errors.append({"property_id": prop.get("property_id"), "error": f"{type(exc).__name__}: {exc}"})
+    for prop, fetched, error in fetch_many(train_props, workers):
+        if error:
+            fetch_errors.append({"property_id": prop.get("property_id"), "error": error})
+            continue
+        if not fetched:
+            continue
+        feat, data, url = fetched
+        X.append(feat)
+        y.append(1 if is_confirmed(prop) else 0)
+        usable_props.append(prop)
+        if is_confirmed(prop):
+            (review_dir / f"confirmed_{prop['address_point_id']}.png").write_bytes(data)
 
     report: dict[str, Any] = {
         "schema_version": "toronto-aerial-weak-label-0.1",
@@ -160,25 +171,24 @@ def build(market: Path, max_score: int, save_review: int) -> dict[str, Any]:
     )[:max_score]
     candidates: list[dict[str, Any]] = []
     scored_images: list[tuple[float, dict[str, Any], bytes]] = []
-    for prop in score_props:
-        try:
-            fetched = fetch_property(prop)
-            if not fetched:
-                continue
-            feat, data, url = fetched
-            score = float(model.predict_proba(feat.reshape(1, -1))[0, 1])
-            entry = {
-                "property_id": prop.get("property_id"),
-                "address_point_id": prop.get("address_point_id"),
-                "address": prop.get("display_address"),
-                "aerial_visual_similarity_score": round(score, 6),
-                "review_state": "UNREVIEWED_WEAK_MODEL",
-                "imagery_request": url,
-            }
-            candidates.append(entry)
-            scored_images.append((score, prop, data))
-        except Exception as exc:
-            fetch_errors.append({"property_id": prop.get("property_id"), "error": f"{type(exc).__name__}: {exc}"})
+    for prop, fetched, error in fetch_many(score_props, workers):
+        if error:
+            fetch_errors.append({"property_id": prop.get("property_id"), "error": error})
+            continue
+        if not fetched:
+            continue
+        feat, data, url = fetched
+        score = float(model.predict_proba(feat.reshape(1, -1))[0, 1])
+        entry = {
+            "property_id": prop.get("property_id"),
+            "address_point_id": prop.get("address_point_id"),
+            "address": prop.get("display_address"),
+            "aerial_visual_similarity_score": round(score, 6),
+            "review_state": "UNREVIEWED_WEAK_MODEL",
+            "imagery_request": url,
+        }
+        candidates.append(entry)
+        scored_images.append((score, prop, data))
 
     candidates.sort(key=lambda c: c["aerial_visual_similarity_score"], reverse=True)
     for score, prop, data in sorted(scored_images, key=lambda item: item[0], reverse=True)[:save_review]:
@@ -205,8 +215,9 @@ def main() -> None:
     p.add_argument("--market", type=Path, default=ROOT / "data/toronto/market/current")
     p.add_argument("--max-score", type=int, default=1200)
     p.add_argument("--save-review", type=int, default=50)
+    p.add_argument("--workers", type=int, default=8)
     args = p.parse_args()
-    build(args.market, args.max_score, args.save_review)
+    build(args.market, args.max_score, args.save_review, args.workers)
 
 
 if __name__ == "__main__":

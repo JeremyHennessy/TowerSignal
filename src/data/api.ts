@@ -3,6 +3,7 @@ import type { ChangesPayload } from '../types/history'
 import type { NysChangesPayload, NysSystemsPayload } from '../types/nys'
 import type { CheckbookProcurementPayload, CityRecordProcurementPayload, NysAuthorityProcurementPayload, ProcurementBundle } from '../types/procurement'
 import type { CompanyIntelligencePayload } from '../types/company'
+import type { TorontoMarketPayload } from '../types/toronto'
 
 const base = import.meta.env.BASE_URL
 
@@ -33,6 +34,14 @@ export async function loadNysSystems(): Promise<NysSystemsPayload> {
 export async function loadNysChanges(): Promise<NysChangesPayload> {
   const payload = await loadJson<NysChangesPayload>('nys-changes.json', 'TowerSignal NYS history')
   if (!payload?.history_started_at || !Array.isArray(payload?.events)) throw new Error('TowerSignal NYS history dataset is malformed')
+  return payload
+}
+
+export async function loadTorontoMarket(): Promise<TorontoMarketPayload> {
+  const payload = await loadJson<TorontoMarketPayload>('toronto-market.json', 'TowerSignal Toronto market')
+  if (payload?.true_market_coverage?.status !== 'UNKNOWN_DENOMINATOR' || payload.true_market_coverage.coverage_percent !== null || !Array.isArray(payload?.properties) || !Array.isArray(payload?.unresolved_poc)) {
+    throw new Error('TowerSignal Toronto market dataset is malformed')
+  }
   return payload
 }
 

@@ -11,6 +11,8 @@ interface HomeSummary {
   generatedAt: string
 }
 
+const TORONTO_ENABLED = import.meta.env.VITE_ENABLE_TORONTO === 'true'
+
 function go(hash: string) {
   window.location.hash = hash
 }
@@ -80,6 +82,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
         <button onClick={() => go('#/companies')}><span>04</span><strong>Companies</strong><p>Review observed vendors, customers and contracts.</p></button>
         <button onClick={() => go('#/map')}><span>05</span><strong>Map</strong><p>Explore the current account universe geographically.</p></button>
         <button onClick={() => go('#/workflow')}><span>06</span><strong>Workflow</strong><p>Open your private watchlists, notes and next actions.</p></button>
+        {TORONTO_ENABLED && <button onClick={() => go('#/toronto')}><span>07</span><strong>Toronto Beta</strong><p>Explore the isolated municipal property and evidence universe.</p></button>}
       </div>
 
       <section className="home-methodology-note">

@@ -10,6 +10,16 @@ on:
       - scripts/toronto_market_core.py
       - scripts/toronto_aic_corpus.py
       - scripts/toronto_aerial_detector.py
+      - scripts/toronto_aerial_recovery.py
+      - scripts/toronto_aic_access_status.py
+      - scripts/toronto_identity_normalize.py
+      - scripts/toronto_final_identity_cleanup.py
+      - scripts/toronto_extend_source_links.py
+      - scripts/toronto_final_construction_policy.py
+      - scripts/toronto_final_entity_graph.py
+      - scripts/toronto_final_coverage.py
+      - scripts/toronto_final_validate.py
+      - scripts/build_toronto_app_data.py
       - docs/TORONTO_MARKET.md
       - .github/workflows/toronto-market.yml
 
@@ -18,7 +28,7 @@ permissions:
 
 concurrency:
   group: toronto-market-build
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   core:
@@ -42,9 +52,19 @@ jobs:
             scripts/toronto_market_core.py \
             scripts/toronto_aic_corpus.py \
             scripts/toronto_aerial_detector.py \
+            scripts/toronto_aerial_recovery.py \
+            scripts/toronto_aic_access_status.py \
+            scripts/toronto_identity_normalize.py \
+            scripts/toronto_final_identity_cleanup.py \
+            scripts/toronto_extend_source_links.py \
+            scripts/toronto_final_construction_policy.py \
+            scripts/toronto_final_entity_graph.py \
+            scripts/toronto_final_coverage.py \
+            scripts/toronto_final_validate.py \
+            scripts/build_toronto_app_data.py \
             scripts/validate_toronto_market.py
 
-      - name: Build canonical GeoID spine and official-source joins
+      - name: Build canonical Address Point spine and official-source joins
         run: python scripts/toronto_market_core.py core
 
       - name: Validate core outputs
@@ -127,7 +147,9 @@ jobs:
           path: data/toronto/market/current
 
       - name: Build targeted 2025 aerial weak-label detector
-        run: python scripts/toronto_aerial_detector.py --max-score 1200 --save-review 50
+        run: |
+          python scripts/toronto_aerial_recovery.py
+          python scripts/toronto_aerial_detector.py --max-score 1200 --save-review 50 --workers 8
 
       - name: Upload aerial analysis
         uses: actions/upload-artifact@v4
@@ -136,6 +158,7 @@ jobs:
           path: |
             data/toronto/market/current/aerial_model_report.json
             data/toronto/market/current/aerial_candidates.json
+            data/toronto/market/current/coordinate_recovery_report.json
             data/toronto/market/current/work/aerial_review/
           if-no-files-found: warn
           retention-days: 30
@@ -177,6 +200,27 @@ jobs:
       - name: Build AIC aggregate, relationship graph and coverage report
         run: python scripts/toronto_market_core.py finalize
 
+      - name: Record the verified current AIC document-access boundary
+        run: python scripts/toronto_aic_access_status.py
+
+      - name: Apply final municipal identity contract and extended exact joins
+        run: |
+          python scripts/toronto_identity_normalize.py
+          python scripts/toronto_final_identity_cleanup.py
+          python scripts/toronto_extend_source_links.py
+
+      - name: Rebuild final source-role relationships and measured coverage
+        run: |
+          python scripts/toronto_final_construction_policy.py
+          python scripts/toronto_final_entity_graph.py
+          python scripts/toronto_final_coverage.py
+
+      - name: Run final structural and evidence-contract validation
+        run: python scripts/toronto_final_validate.py
+
+      - name: Build feature-gated Toronto application payload
+        run: python scripts/build_toronto_app_data.py
+
       - name: Validate final public-safe outputs
         run: |
           for file in \
@@ -192,6 +236,8 @@ jobs:
             python -m json.tool data/toronto/market/current/aerial_model_report.json >/dev/null
           fi
           python scripts/validate_toronto_market.py
+          python -m json.tool public/data/toronto-market.json >/dev/null
+          python scripts/toronto_final_validate.py
 
       - name: Upload full Toronto market artifact before cleanup
         uses: actions/upload-artifact@v4
@@ -205,12 +251,12 @@ jobs:
 
       - name: Persist successful Toronto market snapshot
         run: |
-          if [ -z "$(git status --porcelain -- data/toronto/market/current)" ]; then
+          if [ -z "$(git status --porcelain -- data/toronto/market/current public/data/toronto-market.json)" ]; then
             echo "Toronto market snapshot unchanged."
             exit 0
           fi
           git config user.name "TowerSignal Toronto Market Bot"
           git config user.email "towersignal-market@users.noreply.github.com"
-          git add data/toronto/market/current
-          git commit -m "Toronto market: refresh canonical property and evidence layers"
+          git add data/toronto/market/current public/data/toronto-market.json
+          git commit -m "Toronto market: persist validated snapshot and app payload"
           git push origin HEAD:agent/toronto-market-20260828

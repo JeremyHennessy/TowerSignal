@@ -27,10 +27,12 @@ import { TopNavigation, type WorkspaceMode } from './components/TopNavigation'
 import { exportCsv } from './utils/export'
 import { exportWorkflowCsv } from './utils/workflowExport'
 import { useWorkflow } from './workflow/useWorkflow'
+import { TorontoMarketPage } from './components/TorontoMarketPage'
 
 type ProductMode = WorkspaceMode | 'nys-account' | 'company'
 
-const validModes = new Set<ProductMode>(['prospect','monitor','map','nys','nys-changes','opportunities','companies','company','portfolios','workflow','source-health','account','nys-account'])
+const TORONTO_ENABLED = import.meta.env.VITE_ENABLE_TORONTO === 'true'
+const validModes = new Set<ProductMode>(['prospect','monitor','map','nys','nys-changes',...(TORONTO_ENABLED ? ['toronto' as const] : []),'opportunities','companies','company','portfolios','workflow','source-health','account','nys-account'])
 const filterKeys = Object.keys(initialFilters) as Array<keyof FilterState>
 
 function pct(value: number, total: number): string {
@@ -88,6 +90,7 @@ export default function App() {
   const workflow = useWorkflow()
 
   useEffect(() => {
+    if (mode === 'toronto' || payload || changes || nysPayload || nysChanges) return
     Promise.all([loadSystems(), loadChanges(), loadNysSystems(), loadNysChanges()])
       .then(([systemsPayload, changesPayload, nysSystemsPayload, nysChangesPayload]) => {
         setPayload(systemsPayload)
@@ -96,7 +99,7 @@ export default function App() {
         setNysChanges(nysChangesPayload)
       })
       .catch(err => setError(err instanceof Error ? err.message : 'Unable to load TowerSignal data'))
-  }, [])
+  }, [mode, payload, changes, nysPayload, nysChanges])
 
   useEffect(() => {
     const apply = () => {
@@ -194,6 +197,31 @@ export default function App() {
     window.location.hash = routeHash('prospect', null, { ...initialFilters, search })
   }
 
+  if (mode === 'toronto' && TORONTO_ENABLED) return <main className="app-shell saas-shell reference-shell mode-toronto">
+    <TopNavigation
+      mode="toronto"
+      onNavigate={next => navigate(next)}
+      search={globalSearch}
+      onSearchChange={setGlobalSearch}
+      onSearchSubmit={submitGlobalSearch}
+      healthySources={0}
+      sourceCount={0}
+      user={workflow.user}
+      torontoEnabled
+      authLoading={workflow.loading}
+      authBusy={workflow.busy}
+      authError={workflow.error}
+      onSignIn={workflow.signIn}
+      onSignUp={workflow.signUp}
+      onSignOut={workflow.signOut}
+    />
+    <div className="main-stage">
+      <TorontoMarketPage />
+      <section className="responsible-use reference-responsible-use"><strong>Responsible use.</strong> Toronto identity and context signals are derived from public records. Verify current equipment, operating and relationship status before relying on a record or contacting a property.</section>
+      <footer id="data-provenance" className="reference-footer"><div><strong>Toronto evidence boundary</strong><span>Municipal Address Point identity · source roles preserved · aerial signals are review-only</span></div><div><strong>Coverage boundary</strong><span>Unknown installed-market denominator · AIC document transport blocked · Construction Act permission required</span></div></footer>
+    </div>
+  </main>
+
   if (error) return <main className="app-shell"><div className="fatal-state"><div className="brand-lockup"><span className="brand-mark">TS</span><strong>TowerSignal</strong></div><h2>Intelligence workspace unavailable</h2><p>{error}</p><p>The application will not substitute fixture or mock records for a failed production dataset.</p></div></main>
   if (!payload || !changes || !nysPayload || !nysChanges || !monitorChanges) return <main className="app-shell"><div className="loading-page"><div className="brand-mark">TS</div><h1>TowerSignal</h1><p>Building the latest account-intelligence workspace…</p></div></main>
 
@@ -231,6 +259,7 @@ export default function App() {
       healthySources={healthyHealth.length}
       sourceCount={sourceHealth.length}
       user={workflow.user}
+      torontoEnabled={TORONTO_ENABLED}
       authLoading={workflow.loading}
       authBusy={workflow.busy}
       authError={workflow.error}
@@ -240,7 +269,7 @@ export default function App() {
     />
 
     <div className="main-stage">
-      {!['opportunities','companies','company','portfolios','workflow','source-health','account','nys-account'].includes(mode) && <header className="utility-bar reference-utility-bar">
+      {!['opportunities','companies','company','portfolios','workflow','source-health','account','nys-account','toronto'].includes(mode) && <header className="utility-bar reference-utility-bar">
         <div><span className="utility-kicker">{nysMode ? 'New York State' : 'New York City'}</span><strong>{mode === 'prospect' ? 'Prospect workspace' : mode === 'monitor' ? 'Monitor workspace' : mode === 'map' ? 'Map workspace' : mode === 'nys' ? 'NYS Market' : 'NYS Changes'}</strong></div>
         <div className="utility-actions"><ShareButton url={currentShareUrl} label="Share view" /><span className="coverage-chip">Data refreshed {formatTimestamp(nysMode ? nysPayload.metadata.generated_at : payload.metadata.generated_at)}</span>{!nysMode && acrisAvailable && acrisMetadata.acris_cache_generated_at && <span className="coverage-chip">ACRIS verified {formatTimestamp(acrisMetadata.acris_cache_generated_at)}</span>}{!nysMode && <button className="primary" onClick={() => exportCsv(filtered, payload.metadata)}>Export {filtered.length.toLocaleString()} accounts</button>}</div>
       </header>}

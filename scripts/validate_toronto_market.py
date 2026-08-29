@@ -23,7 +23,7 @@ def validate(market:Path)->dict[str,int]:
     spine=payloads["property_spine.json"];properties=spine["properties"];property_ids=[p["property_id"] for p in properties]
     assert len(property_ids)==len(set(property_ids)),"duplicate canonical property_id"
     assert len(spine["poc_reconciliation"])==spine["counts"]["original_poc_properties"]==177,"POC outcome count mismatch"
-    assert all(p.get("canonical_identifier_type")=="TORONTO_ADDRESS_POINT_ID" for p in properties),"invalid canonical identifier type"
+    assert all(p.get("canonical_identifier_type")=="CITY_OF_TORONTO_ADDRESS_POINT_ID" for p in properties),"invalid canonical identifier type"
     assert all(-79.7<=float(p["longitude"])<=-79.0 and 43.5<=float(p["latitude"])<=44.0 for p in properties),"invalid Toronto coordinate"
     property_set=set(property_ids);links=payloads["property_source_links.json"]["links"]
     assert all(link["property_id"] in property_set for link in links),"broken property source link"

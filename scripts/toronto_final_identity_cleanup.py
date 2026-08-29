@@ -255,10 +255,15 @@ def main() -> None:
                     continue
                 prop = matches[0]
                 rid = next((rec.get(k) for k in ("_id","OBJECTID","id","APPLICATION_NUMBER","FOLDERRSN") if rec.get(k) not in (None,"")), None)
+                # Several historical source packages reuse their local `_id`
+                # values across annual/partitioned record arrays. Keep the
+                # persisted row index in the source identity so distinct
+                # source observations cannot collapse into duplicate edges.
+                source_record_id = f"{source}:{rid}:{idx}" if rid is not None else f"{source}:row:{idx}"
                 links.append({
                     "property_id": prop["property_id"],
                     "source_key": source,
-                    "source_record_id": f"{source}:{rid if rid is not None else idx}",
+                    "source_record_id": source_record_id,
                     "source_row_index": idx,
                     "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
                     "source_address": address,

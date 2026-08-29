@@ -65,7 +65,10 @@ def main() -> None:
                     continue
                 prop = matches[0]
                 rid = next((rec.get(k) for k in ("_id", "OBJECTID", "id", "APPLICATION_NUMBER", "FOLDERRSN", "RSN", "document_number", "noticeId") if rec.get(k) not in (None, "")), None)
-                source_record_id = f"{source}:{rid if rid is not None else idx}"
+                # Persisted record arrays can reuse local IDs across source
+                # partitions. Include the row index to retain a unique,
+                # reproducible source observation identity.
+                source_record_id = f"{source}:{rid}:{idx}" if rid is not None else f"{source}:row:{idx}"
                 key = (prop["property_id"], source, source_record_id)
                 if key not in existing:
                     links.append({
