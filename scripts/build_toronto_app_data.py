@@ -98,7 +98,10 @@ def main() -> None:
             evidence_status = "NO_TOWER_ASSERTION"
         evidence_counts[evidence_status] += 1
         property_links = sorted(links_by_property.get(property_id, []), key=lambda item: (item["source_key"], item["source_record_id"]))
-        source_keys = sorted(set(prop.get("source_keys") or []) | {item["source_key"] for item in property_links})
+        # App source filters represent persisted, referentially validated joins.
+        # The spine's source_keys also include candidate-discovery provenance and
+        # must not be presented as though those records were joined to a property.
+        source_keys = sorted({item["source_key"] for item in property_links})
         properties.append({
             "property_id": property_id,
             "address_point_id": str(prop.get("address_point_id") or ""),
@@ -133,6 +136,17 @@ def main() -> None:
         raise RuntimeError("Toronto app data cannot publish a manufactured market coverage percentage")
     if len(unresolved) != int(reconciliation.get("unresolved_count") or 0):
         raise RuntimeError("Unresolved POC queue does not match reconciliation count")
+
+    for source_key, source_summary in (coverage.get("source_coverage") or {}).items():
+        expected = source_summary.get("matched_canonical_properties")
+        if not isinstance(expected, int):
+            continue
+        actual = sum(source_key in prop["source_keys"] for prop in properties)
+        if actual != expected:
+            raise RuntimeError(
+                f"Toronto app source-filter count mismatch for {source_key}: "
+                f"expected {expected}, found {actual}"
+            )
 
     payload = {
         "schema_version": "toronto-market-app-1.0",
