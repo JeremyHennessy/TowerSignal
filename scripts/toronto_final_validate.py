@@ -42,9 +42,13 @@ def main() -> None:
 
     parsed={}
     for path in MARKET.rglob("*.json"):
-        if "work" in path.parts: continue
+        # GitHub Actions checks repositories out beneath /home/runner/work/.
+        # Only exclude the snapshot's artifact-only work directory, not an
+        # identically named ancestor outside MARKET.
+        relative_path = path.relative_to(MARKET)
+        if "work" in relative_path.parts: continue
         payload=json.loads(path.read_text(encoding="utf-8")); walk_finite(payload,str(path.relative_to(MARKET)))
-        parsed[str(path.relative_to(MARKET))]=payload
+        parsed[str(relative_path)]=payload
 
     with POC_CSV.open("r",encoding="utf-8-sig",newline="") as handle: poc=list(csv.DictReader(handle))
     assert len(poc)==177
