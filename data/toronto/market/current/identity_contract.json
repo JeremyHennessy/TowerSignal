@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-address-identity-contract-1.1",
-  "generated_at": "2026-08-29T01:05:17.739407Z",
+  "generated_at": "2026-08-29T20:25:40.195078Z",
   "canonical_property_key": "toronto-address-point:<ADDRESS_POINT_ID>",
   "canonical_source": "City of Toronto One Address Repository / Address Points",
   "fields": {

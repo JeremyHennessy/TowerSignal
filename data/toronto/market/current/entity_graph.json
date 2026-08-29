@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-entity-graph-1.0",
-  "generated_at": "2026-08-29T01:05:45.822415Z",
+  "generated_at": "2026-08-29T20:26:07.637416Z",
   "relationship_contract": {
     "ownership": "Only explicit OWNER-labelled source text may create OWNER_OF; manager/operator/reporter/supplier are never relabelled owner.",
     "aic": "AIC text-pattern role edges are review-required and are not treated as verified legal relationships until reviewed.",
@@ -27,8 +27,8 @@
     }
   },
   "counts": {
-    "nodes": 13957,
-    "property_nodes": 13055,
+    "nodes": 13969,
+    "property_nodes": 13067,
     "organization_nodes": 902,
     "edges": 2617,
     "relationships": {
@@ -8983,6 +8983,12 @@
       "address_point_id": "11186989"
     },
     {
+      "node_id": "toronto-address-point:11226415",
+      "node_type": "PROPERTY",
+      "address": "34 Grierson Rd",
+      "address_point_id": "11226415"
+    },
+    {
       "node_id": "toronto-address-point:11226459",
       "node_type": "PROPERTY",
       "address": "6 Auburndale Crt",
@@ -13699,6 +13705,12 @@
       "address_point_id": "14188883"
     },
     {
+      "node_id": "toronto-address-point:14188885",
+      "node_type": "PROPERTY",
+      "address": "6020-6022 Yonge St",
+      "address_point_id": "14188885"
+    },
+    {
       "node_id": "toronto-address-point:14188897",
       "node_type": "PROPERTY",
       "address": "3-21 Drewry Ave",
@@ -17659,6 +17671,12 @@
       "address_point_id": "20232537"
     },
     {
+      "node_id": "toronto-address-point:20233952",
+      "node_type": "PROPERTY",
+      "address": "60 Heintzman St",
+      "address_point_id": "20233952"
+    },
+    {
       "node_id": "toronto-address-point:20233953",
       "node_type": "PROPERTY",
       "address": "403 Keele St",
@@ -18737,6 +18755,12 @@
       "node_type": "PROPERTY",
       "address": "21 Badgerow Ave",
       "address_point_id": "2385692"
+    },
+    {
+      "node_id": "toronto-address-point:2385693",
+      "node_type": "PROPERTY",
+      "address": "22 Badgerow Ave",
+      "address_point_id": "2385693"
     },
     {
       "node_id": "toronto-address-point:23882",
@@ -27883,6 +27907,12 @@
       "address_point_id": "3131297"
     },
     {
+      "node_id": "toronto-address-point:3131305",
+      "node_type": "PROPERTY",
+      "address": "19 Hilldowntree Rd",
+      "address_point_id": "3131305"
+    },
+    {
       "node_id": "toronto-address-point:3131412",
       "node_type": "PROPERTY",
       "address": "287 Markland Dr",
@@ -28241,6 +28271,12 @@
       "node_type": "PROPERTY",
       "address": "2830 Midland Ave",
       "address_point_id": "3216952"
+    },
+    {
+      "node_id": "toronto-address-point:321755",
+      "node_type": "PROPERTY",
+      "address": "6 Coltman Cres",
+      "address_point_id": "321755"
     },
     {
       "node_id": "toronto-address-point:321786",
@@ -34097,6 +34133,12 @@
       "node_type": "PROPERTY",
       "address": "850 Coxwell Ave",
       "address_point_id": "4257357"
+    },
+    {
+      "node_id": "toronto-address-point:4257359",
+      "node_type": "PROPERTY",
+      "address": "833 Coxwell Ave",
+      "address_point_id": "4257359"
     },
     {
       "node_id": "toronto-address-point:4257376",
@@ -52219,6 +52261,12 @@
       "address_point_id": "7632839"
     },
     {
+      "node_id": "toronto-address-point:763422",
+      "node_type": "PROPERTY",
+      "address": "32 Argyle St",
+      "address_point_id": "763422"
+    },
+    {
       "node_id": "toronto-address-point:7635334",
       "node_type": "PROPERTY",
       "address": "406 Roehampton Ave",
@@ -53879,6 +53927,12 @@
       "node_type": "PROPERTY",
       "address": "118 Pembroke St",
       "address_point_id": "7673021"
+    },
+    {
+      "node_id": "toronto-address-point:7673029",
+      "node_type": "PROPERTY",
+      "address": "185 Gerrard St E",
+      "address_point_id": "7673029"
     },
     {
       "node_id": "toronto-address-point:76731",
@@ -60517,6 +60571,12 @@
       "address_point_id": "806810"
     },
     {
+      "node_id": "toronto-address-point:807058",
+      "node_type": "PROPERTY",
+      "address": "304 Gainsborough Rd",
+      "address_point_id": "807058"
+    },
+    {
       "node_id": "toronto-address-point:807258",
       "node_type": "PROPERTY",
       "address": "22 Galt Ave",
@@ -60955,6 +61015,12 @@
       "address_point_id": "8106358"
     },
     {
+      "node_id": "toronto-address-point:8106480",
+      "node_type": "PROPERTY",
+      "address": "250 Robert St",
+      "address_point_id": "8106480"
+    },
+    {
       "node_id": "toronto-address-point:8106493",
       "node_type": "PROPERTY",
       "address": "40 Harbord St",
@@ -61337,6 +61403,12 @@
       "node_type": "PROPERTY",
       "address": "234 Glenrose Ave",
       "address_point_id": "813664"
+    },
+    {
+      "node_id": "toronto-address-point:813789",
+      "node_type": "PROPERTY",
+      "address": "81 Glenview Ave",
+      "address_point_id": "813789"
     },
     {
       "node_id": "toronto-address-point:813825",

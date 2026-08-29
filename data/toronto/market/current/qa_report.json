@@ -1,16 +1,16 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-08-29T01:05:51.175755Z",
+  "generated_at": "2026-08-29T20:26:12.591695Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
   "json_files_validated": 21,
   "counts": {
-    "canonical_properties": 13055,
+    "canonical_properties": 13067,
     "poc_reconciliation_rows": 177,
     "poc_resolved": 173,
     "poc_unresolved": 4,
-    "source_links": 51083,
+    "source_links": 51105,
     "entity_edges": 2617,
-    "aic_application_catalogue": 15844,
+    "aic_application_catalogue": 15866,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
     "aic_documents_parsed": null,
     "aerial_candidates_scored": 1200
@@ -295,19 +295,19 @@
     "toronto_aic_applications": [
       {
         "property_id": "toronto-address-point:1000252",
-        "source_record_id": "toronto_aic_applications:12439:12438",
+        "source_record_id": "toronto_aic_applications:12447:12446",
         "source_address": "340 EVANS AVE",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:536640",
-        "source_record_id": "toronto_aic_applications:5792:5791",
+        "source_record_id": "toronto_aic_applications:5799:5798",
         "source_address": "25 LEITH HILL RD",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:999738",
-        "source_record_id": "toronto_aic_applications:11739:11738",
+        "source_record_id": "toronto_aic_applications:11747:11746",
         "source_address": "47 EMERALD CRES",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
