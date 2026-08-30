@@ -69,8 +69,9 @@ function PropertyDetail({ property, sourceCatalog, onClose }: { property: Toront
       <div><dt>Original POC</dt><dd>{property.is_original_poc_property ? 'Yes' : 'No — expanded universe'}</dd></div>
     </dl>
     {property.aerial_review_rank && <section className="toronto-detail-section"><h3>Aerial review signal</h3><p>Review rank {property.aerial_review_rank}; weak-label similarity score {property.aerial_visual_similarity_score?.toFixed(3)}. This is not cooling-tower evidence.</p></section>}
-    <section className="toronto-detail-section"><h3>Source-backed property links <span>{property.source_links.length}</span></h3>{property.source_links.length ? <div className="toronto-source-list">{property.source_links.map(link => {
+    <section className="toronto-detail-section"><h3>Source-backed property links <span>{property.source_links.length}</span></h3>{property.source_links.length ? <div className="toronto-source-list">{property.source_links.map((link, index) => {
       const catalog = sourceCatalog[link.source_key]
+      const isFirstSourceRecord = property.source_links.findIndex(item => item.source_key === link.source_key) === index
       return <article key={`${link.source_key}:${link.source_record_id}`}>
         <strong>{sourceLabel(link.source_key)}</strong>
         <span>{link.record_title || link.source_record_id}</span>
@@ -80,9 +81,9 @@ function PropertyDetail({ property, sourceCatalog, onClose }: { property: Toront
         <small>{humanize(link.match_basis)}</small>
         <div className="toronto-source-actions">
           {link.record_url && link.record_link_label && <a href={link.record_url} target="_blank" rel="noreferrer">{link.record_link_label} ↗</a>}
-          {catalog?.dataset_url && <a href={catalog.dataset_url} target="_blank" rel="noreferrer">{catalog.dataset_link_label} ↗</a>}
+          {isFirstSourceRecord && catalog?.dataset_url && <a href={catalog.dataset_url} target="_blank" rel="noreferrer">{catalog.dataset_link_label} ↗</a>}
         </div>
-        {!link.record_url && catalog?.dataset_url && <small>No durable row-level URL is published; the official source page is provided instead.</small>}
+        {isFirstSourceRecord && !link.record_url && catalog?.dataset_url && <small>No durable row-level URL is published; the official source page is provided instead.</small>}
       </article>
     })}</div> : <p>No joined enrichment record beyond the municipal property spine.</p>}</section>
     <section className="toronto-detail-section"><h3>Organizations and roles <span>{property.relationships.length}</span></h3>{property.relationships.length ? <div className="toronto-source-list">{property.relationships.map((relationship, index) => <article key={`${relationship.relationship}:${relationship.organization}:${index}`}><strong>{relationship.organization}</strong><span>{humanize(relationship.relationship)}</span><small>{sourceLabel(relationship.source_key)} · {humanize(relationship.confidence)} · {humanize(relationship.basis)}</small></article>)}</div> : <p>No defensible organization relationship is currently attached.</p>}</section>
