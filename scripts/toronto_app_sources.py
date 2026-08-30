@@ -204,8 +204,8 @@ def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict
         ))
     elif key == "toronto_public_notices_exact_prior_poc":
         notice_id = row.get("noticeId")
-        record_url = valid_public_url(f"https://secure.toronto.ca/nm/api/individual/notice/{notice_id}.do") if notice_id else None
-        result.update(record_url=record_url, record_link_label="Open public notice" if record_url else None, record_title=text(row.get("title")), record_date=date_value(row.get("noticeDate")), record_details=details(
+        result.update(dataset_link_label="Search official public-notices dataset", record_url=None, record_link_label=None, record_title=text(row.get("title")), record_date=date_value(row.get("noticeDate")), record_details=details(
+            ("Notice ID", notice_id),
             ("Planning applications", ", ".join(str(value).strip() for value in (row.get("planningApplicationNumbers") or []) if value)),
             ("Topics", ", ".join(str(value).strip() for value in (row.get("topics") or []) if value)),
         ))

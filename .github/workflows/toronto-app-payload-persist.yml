@@ -3,12 +3,14 @@ name: Persist Toronto App Payload
 on:
   push:
     branches:
-      - agent/toronto-links-normalization-20260830
+      - agent/toronto-data-usability-20260830
     paths:
       - .github/workflows/toronto-app-payload-persist.yml
       - scripts/build_toronto_app_data.py
       - scripts/toronto_app_sources.py
+      - scripts/validate_toronto_source_actions.py
       - data/toronto/market/current/**
+      - '!data/toronto/market/current/source_action_qa.json'
       - data/toronto/warehouse/current/**
 
 permissions:
@@ -22,10 +24,10 @@ jobs:
   build-validate-persist:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out isolated Toronto branch
+      - name: Check out exact isolated Toronto commit
         uses: actions/checkout@v4
         with:
-          ref: agent/toronto-links-normalization-20260830
+          ref: ${{ github.sha }}
 
       - name: Build normalized Toronto app payload
         run: python scripts/build_toronto_app_data.py
@@ -33,15 +35,21 @@ jobs:
       - name: Validate Toronto source adapter
         run: python -m unittest tests.python.test_toronto_app_sources -v
 
+      - name: Verify dataset and record action fallbacks
+        run: python scripts/validate_toronto_source_actions.py --strict
+
+      - name: Validate final public payload references
+        run: python scripts/validate_toronto_market.py
+
       - name: Persist public-safe payload
         shell: bash
         run: |
-          if git diff --quiet -- public/data/toronto-market.json; then
+          if git diff --quiet -- public/data/toronto-market.json data/toronto/market/current/source_action_qa.json; then
             echo "Toronto app payload is already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/toronto-market.json
-          git commit -m "Toronto app: persist normalized source payload"
-          git push origin HEAD:agent/toronto-links-normalization-20260830
+          git add public/data/toronto-market.json data/toronto/market/current/source_action_qa.json
+          git commit -m "Toronto app: persist verified source fallbacks"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -33,7 +33,7 @@ class TorontoAppSourceTests(unittest.TestCase):
         self.assertEqual(link["dataset_url"], "https://www.toronto.ca/city-government/planning-development/application-details/")
         self.assertEqual(link["dataset_link_label"], "Open current AIC application search")
         self.assertEqual(link["record_title"], "24 100000 STE 01 OZ")
-    def test_public_notice_gets_a_durable_record_url_and_normalized_context(self) -> None:
+    def test_public_notice_uses_dataset_fallback_and_normalized_context(self) -> None:
         link = normalize_source_link(
             {
                 "source_key": "toronto_public_notices_exact_prior_poc",
@@ -51,9 +51,11 @@ class TorontoAppSourceTests(unittest.TestCase):
                 }]
             },
         )
-        self.assertEqual(link["record_url"], "https://secure.toronto.ca/nm/api/individual/notice/7529.do")
-        self.assertEqual(link["record_link_label"], "Open public notice")
-        self.assertEqual({item["label"] for item in link["record_details"]}, {"Planning applications", "Topics"})
+        self.assertIsNone(link["record_url"])
+        self.assertIsNone(link["record_link_label"])
+        self.assertEqual(link["dataset_link_label"], "Search official public-notices dataset")
+        self.assertIn({"label": "Notice ID", "value": "7529"}, link["record_details"])
+        self.assertEqual({item["label"] for item in link["record_details"]}, {"Notice ID", "Planning applications", "Topics"})
 
 
 if __name__ == "__main__":
