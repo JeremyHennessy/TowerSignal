@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
-import { buildTorontoCsv, TorontoMarketPage } from '../../src/components/TorontoMarketPage'
+import { buildTorontoCsv, buildTorontoPropertySearchText, TorontoMarketPage } from '../../src/components/TorontoMarketPage'
 
 vi.mock('../../src/components/TorontoMarketMap', () => ({ TorontoMarketMap: () => <div data-testid="toronto-map">Toronto map</div> }))
 vi.mock('../../src/data/api', () => ({ loadTorontoMarket: vi.fn().mockResolvedValue({
@@ -45,6 +45,26 @@ test('filters by source-backed evidence without applying NYC priority semantics'
   expect(screen.getByText('10 Alpha St')).toBeInTheDocument()
   expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()
   expect(screen.queryByText(/priority score/i)).not.toBeInTheDocument()
+})
+
+test('searches normalized source evidence and organization identities', async () => {
+  const user = userEvent.setup()
+  render(<TorontoMarketPage />)
+  const search = await screen.findByPlaceholderText('Address, company, application or source record')
+
+  await user.type(search, 'Nickel')
+  expect(screen.getByText('10 Alpha St')).toBeInTheDocument()
+  expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()
+
+  await user.clear(search)
+  await user.type(search, '24 100000 STE 01 OZ')
+  expect(screen.queryByText('10 Alpha St')).not.toBeInTheDocument()
+  expect(screen.getByText('20 Beta Ave')).toBeInTheDocument()
+
+  await user.clear(search)
+  await user.type(search, 'Alpha Management')
+  expect(screen.getByText('10 Alpha St')).toBeInTheDocument()
+  expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()
 })
 
 test('filters Toronto properties by actual organization role and POC scope', async () => {
@@ -101,4 +121,13 @@ test('builds a Toronto-specific CSV with scope and source-preserved roles', () =
   expect(csv).toContain('"ORIGINAL_POC"')
   expect(csv).toContain('"chemtrac_history"')
   expect(csv).toContain('"PROPERTY_MANAGER_OF"')
+})
+
+test('builds a normalized property search document without inventing evidence', () => {
+  const text = buildTorontoPropertySearchText({
+    property_id: 'toronto-address-point:100', address_point_id: '100', display_address: '10 Alpha St', municipality: 'Toronto', longitude: -79.38, latitude: 43.65, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: true, tower_evidence_status: 'NO_TOWER_ASSERTION', source_keys: ['chemtrac_history'], source_links: [{ source_key: 'chemtrac_history', source_record_id: 'chem:1', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: '2024', record_status: null, record_details: [{ label: 'Chemical', value: 'Nickel' }] }], relationships: [{ relationship: 'FACILITY_OPERATOR_AT', organization: 'Alpha Operations', source_key: 'chemtrac_history', confidence: 'HIGH', basis: 'PUBLISHED_ROLE' }], aerial_review_rank: null, aerial_visual_similarity_score: null,
+  })
+  expect(text).toContain('nickel')
+  expect(text).toContain('alpha operations')
+  expect(text).not.toContain('confirmed documentary tower')
 })
