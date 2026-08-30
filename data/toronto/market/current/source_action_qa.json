@@ -1,14 +1,14 @@
 {
   "schema_version": "toronto-source-action-qa-1.0",
-  "generated_at": "2026-08-30T20:29:38.976243Z",
-  "status": "COMPLETED_WITH_LINK_FAILURES",
+  "generated_at": "2026-08-30T20:32:57.706620Z",
+  "status": "PASSED",
   "counts": {
     "source_families": 13,
     "unique_dataset_actions": 12,
-    "unique_record_actions": 1127,
-    "checked_record_action_sample": 5,
-    "checked_unique_urls": 17,
-    "failures": 5
+    "unique_record_actions": 0,
+    "checked_record_action_sample": 0,
+    "checked_unique_urls": 12,
+    "failures": 0
   },
   "sources": {
     "311_matches_prior_poc": {
@@ -216,89 +216,22 @@
       "fallback_message_required": true
     },
     "toronto_public_notices_exact_prior_poc": {
-      "link_level": "RECORD_AND_DATASET",
+      "link_level": "DATASET_FALLBACK",
       "dataset_action": {
         "url": "https://open.toronto.ca/dataset/public-notices/",
         "http_status": 200,
         "status": "REACHABLE"
       },
-      "record_actions": [
-        {
-          "url": "https://secure.toronto.ca/nm/api/individual/notice/3816.do",
-          "http_status": 403,
-          "status": "HTTP_ERROR",
-          "error": "HTTP 403"
-        },
-        {
-          "url": "https://secure.toronto.ca/nm/api/individual/notice/5690.do",
-          "http_status": 403,
-          "status": "HTTP_ERROR",
-          "error": "HTTP 403"
-        },
-        {
-          "url": "https://secure.toronto.ca/nm/api/individual/notice/6610.do",
-          "http_status": 403,
-          "status": "HTTP_ERROR",
-          "error": "HTTP 403"
-        },
-        {
-          "url": "https://secure.toronto.ca/nm/api/individual/notice/7285.do",
-          "http_status": 403,
-          "status": "HTTP_ERROR",
-          "error": "HTTP 403"
-        },
-        {
-          "url": "https://secure.toronto.ca/nm/api/individual/notice/7884.do",
-          "http_status": 403,
-          "status": "HTTP_ERROR",
-          "error": "HTTP 403"
-        }
-      ],
-      "available_unique_record_actions": 1127,
-      "checked_record_action_sample": 5,
+      "record_actions": [],
+      "available_unique_record_actions": 0,
+      "checked_record_action_sample": 0,
       "representative_source_record": {
         "property_id": "toronto-address-point:981849",
         "display_address": "1 Adriatic Rd",
         "source_record_id": "toronto_public_notices_exact_prior_poc:5666"
       },
-      "fallback_message_required": false
+      "fallback_message_required": true
     }
   },
-  "failures": [
-    {
-      "source_key": "toronto_public_notices_exact_prior_poc",
-      "url": "https://secure.toronto.ca/nm/api/individual/notice/3816.do",
-      "http_status": 403,
-      "status": "HTTP_ERROR",
-      "error": "HTTP 403"
-    },
-    {
-      "source_key": "toronto_public_notices_exact_prior_poc",
-      "url": "https://secure.toronto.ca/nm/api/individual/notice/5690.do",
-      "http_status": 403,
-      "status": "HTTP_ERROR",
-      "error": "HTTP 403"
-    },
-    {
-      "source_key": "toronto_public_notices_exact_prior_poc",
-      "url": "https://secure.toronto.ca/nm/api/individual/notice/6610.do",
-      "http_status": 403,
-      "status": "HTTP_ERROR",
-      "error": "HTTP 403"
-    },
-    {
-      "source_key": "toronto_public_notices_exact_prior_poc",
-      "url": "https://secure.toronto.ca/nm/api/individual/notice/7285.do",
-      "http_status": 403,
-      "status": "HTTP_ERROR",
-      "error": "HTTP 403"
-    },
-    {
-      "source_key": "toronto_public_notices_exact_prior_poc",
-      "url": "https://secure.toronto.ca/nm/api/individual/notice/7884.do",
-      "http_status": 403,
-      "status": "HTTP_ERROR",
-      "error": "HTTP 403"
-    }
-  ]
+  "failures": []
 }
