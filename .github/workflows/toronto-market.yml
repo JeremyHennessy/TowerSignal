@@ -97,6 +97,17 @@ jobs:
           path: data/toronto/market/current/
           retention-days: 30
 
+      - name: Upload normalized warehouse sources used by final joins
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-normalized-warehouse
+          path: |
+            data/toronto/warehouse/current/open_licensed/chemtrac_history.json
+            data/toronto/warehouse/current/open_licensed/ontario_ewrb_large_buildings.json
+            data/toronto/warehouse/current/open_licensed/ontario_environmental_compliance_reports.json
+            data/toronto/warehouse/current/open_licensed/toronto_public_notices.json
+          retention-days: 30
+
   aic-corpus:
     needs: core
     runs-on: ubuntu-latest
@@ -197,6 +208,12 @@ jobs:
         with:
           name: toronto-market-core
           path: data/toronto/market/current
+
+      - name: Restore normalized warehouse sources used by final joins
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-normalized-warehouse
+          path: data/toronto/warehouse/current/open_licensed
 
       - name: Restore all AIC shards
         uses: actions/download-artifact@v4
