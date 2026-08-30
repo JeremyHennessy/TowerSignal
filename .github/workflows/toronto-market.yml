@@ -74,6 +74,7 @@ jobs:
 
       - name: Refresh historical Toronto and Ontario source snapshots
         run: |
+          python -m pip install --disable-pip-version-check 'openpyxl>=3.1,<4'
           python scripts/pull_toronto_history_notices.py
           python scripts/pull_ontario_open_building_environment.py
 
