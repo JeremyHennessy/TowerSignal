@@ -35,6 +35,23 @@ function sourceLabel(value: string): string {
   return sourceLabels[value] ?? humanize(value)
 }
 
+export function buildTorontoPropertySearchText(property: TorontoProperty): string {
+  return [
+    property.display_address,
+    property.property_id,
+    property.address_point_id,
+    ...property.source_links.flatMap(link => [
+      link.source_record_id,
+      link.source_address,
+      link.record_title,
+      link.record_date,
+      link.record_status,
+      ...link.record_details.flatMap(detail => [detail.label, detail.value]),
+    ]),
+    ...property.relationships.flatMap(item => [item.organization, item.relationship, item.source_key]),
+  ].filter(Boolean).join(' ').toLowerCase()
+}
+
 function currentPropertyId(): string | null {
   const parts = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/').filter(Boolean)
   return parts[0] === 'toronto' && parts[1] ? decodeURIComponent(parts[1]) : null
@@ -120,11 +137,12 @@ export function TorontoMarketPage() {
 
   const sources = useMemo(() => payload ? [...new Set(payload.properties.flatMap(property => property.source_keys))].sort() : [], [payload])
   const relationships = useMemo(() => payload ? [...new Set(payload.properties.flatMap(property => property.relationships.map(item => item.relationship)))].sort() : [], [payload])
+  const searchIndex = useMemo(() => payload ? new Map(payload.properties.map(property => [property.property_id, buildTorontoPropertySearchText(property)])) : new Map<string, string>(), [payload])
   const filtered = useMemo(() => {
     if (!payload) return []
     const term = search.trim().toLowerCase()
     return payload.properties.filter(property => {
-      if (term && !`${property.display_address} ${property.property_id} ${property.address_point_id}`.toLowerCase().includes(term)) return false
+      if (term && !searchIndex.get(property.property_id)?.includes(term)) return false
       if (evidence && property.tower_evidence_status !== evidence) return false
       if (source && !property.source_keys.includes(source)) return false
       if (relationship && !property.relationships.some(item => item.relationship === relationship)) return false
@@ -132,7 +150,7 @@ export function TorontoMarketPage() {
       if (scope === 'expanded' && property.is_original_poc_property) return false
       return true
     })
-  }, [payload, search, evidence, source, relationship, scope])
+  }, [payload, search, evidence, source, relationship, scope, searchIndex])
 
   if (error) return <section className="product-page toronto-page"><div className="reference-empty-state"><strong>Toronto market data is unavailable.</strong><span>{error}</span></div></section>
   if (!payload) return <section className="product-page toronto-page"><div className="portal-loading">Loading the isolated Toronto market snapshot…</div></section>
@@ -150,7 +168,7 @@ export function TorontoMarketPage() {
       <article><span className="reference-metric-icon">↔</span><div><small>Entity relationships</small><strong>{payload.counts.relationship_edges.toLocaleString()}</strong><span>Source role preserved</span></div></article>
     </div>
     <div className="toronto-filters">
-      <label><span>Search</span><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Address or Address Point ID" /></label>
+      <label><span>Search</span><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Address, company, application or source record" /></label>
       <label><span>Tower evidence</span><select value={evidence} onChange={event => setEvidence(event.target.value as TorontoTowerEvidenceStatus | '')}><option value="">All evidence states</option>{Object.entries(evidenceLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <label><span>Source family</span><select value={source} onChange={event => setSource(event.target.value)}><option value="">All source families</option>{sources.map(value => <option key={value} value={value}>{sourceLabel(value)}</option>)}</select></label>
       <label><span>Organization role</span><select value={relationship} onChange={event => setRelationship(event.target.value)}><option value="">All organization roles</option>{relationships.map(value => <option key={value} value={value}>{humanize(value)}</option>)}</select></label>
