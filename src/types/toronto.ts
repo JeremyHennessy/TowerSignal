@@ -10,6 +10,18 @@ export interface TorontoSourceLink {
   source_record_id: string
   match_basis: string
   source_address: string | null
+  record_url: string | null
+  record_link_label: string | null
+  record_title: string | null
+  record_date: string | null
+  record_status: string | null
+  record_details: { label: string; value: string }[]
+}
+
+export interface TorontoSourceCatalogItem {
+  dataset_url: string
+  dataset_link_label: string
+  link_level: 'RECORD_AND_DATASET' | 'DATASET_FALLBACK'
 }
 
 export interface TorontoRelationship {
@@ -70,6 +82,8 @@ export interface TorontoMarketPayload {
     aic_document_candidates: number | null
     aerial_review_candidates: number
     source_links: number
+    record_level_source_links: number
+    official_source_families: number
     relationship_edges: number
   }
   true_market_coverage: {
@@ -77,6 +91,7 @@ export interface TorontoMarketPayload {
     coverage_percent: null
   }
   source_coverage: Record<string, TorontoSourceCoverageSummary>
+  source_catalog: Record<string, TorontoSourceCatalogItem>
   limitations: string[]
   unresolved_poc: TorontoUnresolvedPocProperty[]
   properties: TorontoProperty[]
