@@ -294,4 +294,4 @@ jobs:
           git config user.email "towersignal-market@users.noreply.github.com"
           git add data/toronto/market/current public/data/toronto-market.json
           git commit -m "Toronto market: persist validated snapshot and app payload"
-          git push origin HEAD:agent/toronto-market-20260828
+          git push origin "HEAD:${GITHUB_REF_NAME}"
