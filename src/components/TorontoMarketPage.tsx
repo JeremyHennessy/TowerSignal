@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { loadTorontoMarket } from '../data/api'
-import type { TorontoMarketPayload, TorontoProperty, TorontoTowerEvidenceStatus } from '../types/toronto'
+import type { TorontoMarketPayload, TorontoProperty, TorontoSourceCatalogItem, TorontoTowerEvidenceStatus } from '../types/toronto'
 import { TorontoMarketMap } from './TorontoMarketMap'
 
 const evidenceLabels: Record<TorontoTowerEvidenceStatus, string> = {
@@ -58,7 +58,7 @@ function exportTorontoCsv(rows: TorontoProperty[]) {
   window.setTimeout(() => URL.revokeObjectURL(link.href), 0)
 }
 
-function PropertyDetail({ property, onClose }: { property: TorontoProperty; onClose: () => void }) {
+function PropertyDetail({ property, sourceCatalog, onClose }: { property: TorontoProperty; sourceCatalog: Record<string, TorontoSourceCatalogItem>; onClose: () => void }) {
   return <aside className="toronto-detail" aria-label="Toronto property detail">
     <div className="toronto-detail-heading"><div><span className="eyebrow">Toronto property intelligence</span><h2>{property.display_address}</h2><p>{property.property_id}</p></div><button onClick={onClose} aria-label="Close Toronto property detail">×</button></div>
     <div className={`toronto-evidence-badge status-${property.tower_evidence_status.toLowerCase()}`}>{evidenceLabels[property.tower_evidence_status]}</div>
@@ -69,7 +69,22 @@ function PropertyDetail({ property, onClose }: { property: TorontoProperty; onCl
       <div><dt>Original POC</dt><dd>{property.is_original_poc_property ? 'Yes' : 'No — expanded universe'}</dd></div>
     </dl>
     {property.aerial_review_rank && <section className="toronto-detail-section"><h3>Aerial review signal</h3><p>Review rank {property.aerial_review_rank}; weak-label similarity score {property.aerial_visual_similarity_score?.toFixed(3)}. This is not cooling-tower evidence.</p></section>}
-    <section className="toronto-detail-section"><h3>Source-backed property links <span>{property.source_links.length}</span></h3>{property.source_links.length ? <div className="toronto-source-list">{property.source_links.map(link => <article key={`${link.source_key}:${link.source_record_id}`}><strong>{sourceLabel(link.source_key)}</strong><span>{link.source_record_id}</span>{link.source_address && <span>Source address: {link.source_address}</span>}<small>{humanize(link.match_basis)}</small></article>)}</div> : <p>No joined enrichment record beyond the municipal property spine.</p>}</section>
+    <section className="toronto-detail-section"><h3>Source-backed property links <span>{property.source_links.length}</span></h3>{property.source_links.length ? <div className="toronto-source-list">{property.source_links.map(link => {
+      const catalog = sourceCatalog[link.source_key]
+      return <article key={`${link.source_key}:${link.source_record_id}`}>
+        <strong>{sourceLabel(link.source_key)}</strong>
+        <span>{link.record_title || link.source_record_id}</span>
+        {(link.record_date || link.record_status) && <span>{[link.record_date, link.record_status].filter(Boolean).join(' · ')}</span>}
+        {link.source_address && <span>Source address: {link.source_address}</span>}
+        {link.record_details.length > 0 && <dl className="toronto-source-details">{link.record_details.map(item => <div key={`${item.label}:${item.value}`}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>}
+        <small>{humanize(link.match_basis)}</small>
+        <div className="toronto-source-actions">
+          {link.record_url && link.record_link_label && <a href={link.record_url} target="_blank" rel="noreferrer">{link.record_link_label} ↗</a>}
+          {catalog?.dataset_url && <a href={catalog.dataset_url} target="_blank" rel="noreferrer">{catalog.dataset_link_label} ↗</a>}
+        </div>
+        {!link.record_url && catalog?.dataset_url && <small>No durable row-level URL is published; the official source page is provided instead.</small>}
+      </article>
+    })}</div> : <p>No joined enrichment record beyond the municipal property spine.</p>}</section>
     <section className="toronto-detail-section"><h3>Organizations and roles <span>{property.relationships.length}</span></h3>{property.relationships.length ? <div className="toronto-source-list">{property.relationships.map((relationship, index) => <article key={`${relationship.relationship}:${relationship.organization}:${index}`}><strong>{relationship.organization}</strong><span>{humanize(relationship.relationship)}</span><small>{sourceLabel(relationship.source_key)} · {humanize(relationship.confidence)} · {humanize(relationship.basis)}</small></article>)}</div> : <p>No defensible organization relationship is currently attached.</p>}</section>
   </aside>
 }
@@ -143,8 +158,8 @@ export function TorontoMarketPage() {
     </div>
     <div className="toronto-result-heading"><strong>{filtered.length.toLocaleString()} matching properties</strong><span>All links use deterministic municipal identity.</span></div>
     {view === 'map' ? <TorontoMarketMap properties={filtered} selectedId={selected?.property_id ?? null} onSelect={openProperty} /> : <div className="toronto-table-wrap"><table className="toronto-table"><thead><tr><th>Property</th><th>Tower evidence</th><th>Sources</th><th>Relationships</th><th>Identity</th></tr></thead><tbody>{filtered.slice(0, 500).map(property => <tr key={property.property_id} onClick={() => openProperty(property)}><td><button>{property.display_address}</button><small>{property.address_point_id}</small></td><td><span className={`toronto-evidence-badge status-${property.tower_evidence_status.toLowerCase()}`}>{evidenceLabels[property.tower_evidence_status]}</span></td><td>{property.source_keys.length}</td><td>{property.relationships.length}</td><td>{property.identity_confidence || 'Deterministic'}</td></tr>)}</tbody></table>{filtered.length > 500 && <p className="toronto-table-limit">Showing the first 500 matching properties. Refine the filters or export the full result set.</p>}</div>}
-    <details className="toronto-coverage"><summary>Source coverage and deterministic join results</summary><div className="toronto-coverage-wrap"><table><thead><tr><th>Source</th><th>Records</th><th>Addressable</th><th>Matched records</th><th>Properties</th><th>Unmatched</th></tr></thead><tbody>{sourceCoverage.map(([key, summary]) => <tr key={key}><td><strong>{sourceLabel(key)}</strong>{(summary.identity_limitation || summary.scope_limitation) && <small>{summary.identity_limitation || summary.scope_limitation}</small>}</td><td>{summary.source_records?.toLocaleString() ?? '—'}</td><td>{summary.records_with_property_address?.toLocaleString() ?? '—'}</td><td>{summary.matched_records?.toLocaleString() ?? '—'}</td><td>{summary.matched_canonical_properties?.toLocaleString() ?? '—'}</td><td>{summary.unmatched_source_records?.toLocaleString() ?? '—'}</td></tr>)}</tbody></table></div></details>
+    <details className="toronto-coverage"><summary>Source coverage and deterministic join results</summary><div className="toronto-coverage-wrap"><table><thead><tr><th>Source</th><th>Records</th><th>Addressable</th><th>Matched records</th><th>Properties</th><th>Unmatched</th><th>Official source</th></tr></thead><tbody>{sourceCoverage.map(([key, summary]) => <tr key={key}><td><strong>{sourceLabel(key)}</strong>{(summary.identity_limitation || summary.scope_limitation) && <small>{summary.identity_limitation || summary.scope_limitation}</small>}</td><td>{summary.source_records?.toLocaleString() ?? '—'}</td><td>{summary.records_with_property_address?.toLocaleString() ?? '—'}</td><td>{summary.matched_records?.toLocaleString() ?? '—'}</td><td>{summary.matched_canonical_properties?.toLocaleString() ?? '—'}</td><td>{summary.unmatched_source_records?.toLocaleString() ?? '—'}</td><td>{payload.source_catalog[key]?.dataset_url ? <a href={payload.source_catalog[key].dataset_url} target="_blank" rel="noreferrer">Open ↗</a> : '—'}</td></tr>)}</tbody></table></div></details>
     <details className="toronto-limitations"><summary>Known data limitations</summary><ul>{payload.limitations.map(item => <li key={item}>{item}</li>)}</ul>{payload.unresolved_poc.length > 0 && <div><strong>Unresolved original POC addresses</strong><ul>{payload.unresolved_poc.map(item => <li key={item.property_key}>{item.input_address || item.property_key} — {item.resolution_status.replaceAll('_', ' ').toLowerCase()}</li>)}</ul></div>}</details>
-    {selected && <PropertyDetail property={selected} onClose={closeProperty} />}
+    {selected && <PropertyDetail property={selected} sourceCatalog={payload.source_catalog} onClose={closeProperty} />}
   </section>
 }
