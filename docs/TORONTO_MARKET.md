@@ -152,6 +152,17 @@ Third-party Construction Act publisher content is not scraped into TowerSignal w
 
 Raw AIC PDFs and aerial crops are processed as ephemeral/review artifacts and removed before public Git persistence.
 
+## Toronto app source-link contract
+
+`scripts/toronto_app_sources.py` joins every persisted property/source link back to its public-safe source row and emits bounded record context (title, date, status and source-specific fields). The app keeps two link levels distinct:
+
+- `RECORD_AND_DATASET`: a verified durable row-level page plus the official dataset page. Current persisted public-notice matches are the only source family with this level.
+- `DATASET_FALLBACK`: the publisher does not expose a defensible durable row-level URL, so the app labels and opens the official dataset or search page instead.
+
+The adapter accepts HTTPS links only from the explicit Toronto/Ontario publisher allowlist. It rejects the legacy `secure.toronto.ca/AIC/index.do` route, which returned HTTP 403 during the corpus attempt. AIC application rows retain application number, type, status, milestone and description, but link to the current official AIC search rather than manufacturing a dead application URL.
+
+Health, planning, environmental, procurement and aerial context remain separate from cooling-tower confirmation after app normalization.
+
 ## Production boundary
 
 This build does not modify the production NYC interface, production scoring, or approved UI. It runs only on `agent/toronto-market-20260828` until separately reviewed and authorized.
