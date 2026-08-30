@@ -1,0 +1,55 @@
+{
+  "schema_version": "toronto-aic-free-alternatives-1.0",
+  "generated_at": "2026-08-30T20:29:27.726126Z",
+  "status": "PARTIAL_OPEN_PUBLIC_NOTICE_CORPUS_AVAILABLE_SUPPORTING_DOCUMENTS_STILL_BLOCKED",
+  "paths": [
+    {
+      "path": "Development Applications open data",
+      "url": "https://open.toronto.ca/dataset/development-applications/",
+      "status": "OPEN_REUSE_METADATA_ONLY",
+      "result": "Catalogue/application metadata is reusable under the Toronto Open Government Licence, but this source does not expose the AIC supporting-document attachment corpus."
+    },
+    {
+      "path": "City Clerk Public Notices open data and background notice artifacts",
+      "url": "https://open.toronto.ca/dataset/public-notices/",
+      "status": "OPEN_REUSE_INGESTED",
+      "result": "1126 planning notices were linked to 1465 canonical properties through exact application numbers. Notice text is contextual evidence only."
+    },
+    {
+      "path": "Active and cleared building permits open data",
+      "url": "https://open.toronto.ca/dataset/building-permits-active-permits/",
+      "status": "OPEN_REUSE_METADATA_AVAILABLE",
+      "result": "Permit records are a lawful addressable enrichment source, but they are not copies of AIC mechanical drawings, schedules, energy, planning, or acoustic reports.",
+      "companion_url": "https://open.toronto.ca/dataset/building-permits-cleared-permits/"
+    },
+    {
+      "path": "Council/committee planning repositories",
+      "url": "https://secure.toronto.ca/council/#/committees",
+      "status": "MANUAL_OR_TARGETED_REVIEW_ONLY",
+      "result": "Meeting reports and attachments can support selected application review, but no complete deterministic AIC attachment mirror was identified."
+    },
+    {
+      "path": "Current AIC application search",
+      "url": "https://www.toronto.ca/city-government/planning-development/application-information-centre/",
+      "status": "MANUAL_REVIEW_ONLY_FOR_ATTACHMENTS",
+      "result": "The current public application search remains usable by a reviewer; automated attachments remain reCAPTCHA-gated and were not bypassed."
+    }
+  ],
+  "public_notice_results": {
+    "status": "JOINED_PUBLIC_NOTICE_TEXT_BY_EXACT_APPLICATION_NUMBER",
+    "source_records": 1524,
+    "records_with_property_address": 1437,
+    "matched_records": 1127,
+    "matched_canonical_properties": 1466,
+    "application_number_matched_records": 1126,
+    "application_number_matched_properties": 1465,
+    "matched_application_numbers": 674,
+    "property_links": 2815,
+    "links_added_by_application_number": 2808,
+    "identity_limitation": "Only exact public-notice application numbers already joined through the deterministic AIC property spine are linked; no text/address fuzzy match is used.",
+    "indexed_notice_documents": 1126,
+    "records_with_target_mechanical_terms": 175,
+    "records_with_explicit_cooling_tower_terms": 0
+  },
+  "evidence_contract": "Public notices, permits, and meeting materials do not become confirmed cooling-tower evidence. No result here is represented as the unavailable AIC supporting-document corpus."
+}

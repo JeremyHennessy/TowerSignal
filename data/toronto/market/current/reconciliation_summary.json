@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-reconciliation-summary-1.1",
-  "generated_at": "2026-08-29T20:26:04.008253Z",
+  "generated_at": "2026-08-30T20:29:24.664786Z",
   "identity_contract": {
     "canonical_id": "toronto-address-point:<ADDRESS_POINT_ID>",
     "canonical_identifier_type": "City of Toronto One Address Repository ADDRESS_POINT_ID",
@@ -14,29 +14,30 @@
   },
   "counts": {
     "original_poc_properties": 177,
-    "original_poc_resolved": 172,
-    "original_poc_unresolved": 5,
+    "original_poc_resolved": 175,
+    "original_poc_unresolved": 2,
     "poc_resolution_categories": {
       "AMBIGUOUS_MUNICIPAL_ADDRESS": 1,
       "EXACT_LEGACY_GEO_ID_VALUE_AS_CURRENT_ADDRESS_POINT_ID": 154,
       "EXACT_UNIQUE_CIVIC_ADDRESS": 18,
       "NO_CURRENT_MUNICIPAL_MATCH": 4
     },
-    "candidate_addresses_total": 16608,
-    "canonical_properties_resolved": 13067,
-    "expanded_properties_beyond_original_poc": 12898,
+    "candidate_addresses_total": 16607,
+    "canonical_properties_resolved": 13066,
+    "expanded_properties_beyond_original_poc": 12895,
     "unresolved_candidate_addresses": 2330,
     "address_point_rows_scanned": 525469,
-    "original_poc_reconciled_to_address_point_id": 173,
-    "original_poc_unreconciled": 4,
-    "properties_with_usable_coordinates": 13067,
+    "original_poc_reconciled_to_address_point_id": 175,
+    "original_poc_unreconciled": 2,
+    "properties_with_usable_coordinates": 13066,
     "address_point_rows_scanned_final_cleanup": 525469
   },
   "resolution_status_counts": {
     "EXACT_UNIQUE_CIVIC_ADDRESS_AFTER_CANONICALIZER_FIX": 1,
     "EXACT_UNIQUE_CIVIC_ADDRESS_MATCH": 38,
+    "EXPLICIT_LINKED_RANGE_ENDPOINTS_TO_CANONICAL_PARENT": 2,
     "LEGACY_GEOID_MATCHED_CURRENT_ADDRESS_POINT_ID": 134,
-    "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED": 3,
+    "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED": 1,
     "NO_CURRENT_ADDRESS_POINT_MATCH": 1
   }
 }

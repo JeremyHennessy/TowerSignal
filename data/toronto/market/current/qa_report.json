@@ -1,16 +1,16 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-08-29T20:26:12.591695Z",
+  "generated_at": "2026-08-30T20:29:43.550282Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
-  "json_files_validated": 21,
+  "json_files_validated": 24,
   "counts": {
-    "canonical_properties": 13067,
+    "canonical_properties": 13066,
     "poc_reconciliation_rows": 177,
-    "poc_resolved": 173,
-    "poc_unresolved": 4,
-    "source_links": 51105,
-    "entity_edges": 2617,
-    "aic_application_catalogue": 15866,
+    "poc_resolved": 175,
+    "poc_unresolved": 2,
+    "source_links": 39367,
+    "entity_edges": 6023,
+    "aic_application_catalogue": 15865,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
     "aic_documents_parsed": null,
     "aerial_candidates_scored": 1200
@@ -21,24 +21,6 @@
       "input_address": "89 HUMBER COLLEGE BLVD",
       "input_legacy_geo_id": "8127974",
       "resolution_status": "NO_CURRENT_ADDRESS_POINT_MATCH",
-      "resolved": false,
-      "candidate_address_point_ids": [],
-      "candidate_addresses": []
-    },
-    {
-      "property_key": "toronto-geoid:14188741",
-      "input_address": "10-20 BAY ST",
-      "input_legacy_geo_id": "14188741",
-      "resolution_status": "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED",
-      "resolved": false,
-      "candidate_address_point_ids": [],
-      "candidate_addresses": []
-    },
-    {
-      "property_key": "toronto-address:c972c91ae7b1dc29",
-      "input_address": "3197-3199 LAKE SHORE BLVD W",
-      "input_legacy_geo_id": null,
-      "resolution_status": "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED",
       "resolved": false,
       "candidate_address_point_ids": [],
       "candidate_addresses": []
@@ -80,6 +62,20 @@
         "property_id": "toronto-address-point:14601300",
         "input_address": "390 THE WEST MALL",
         "canonical_address": "380 THE W MALL"
+      }
+    ],
+    "EXPLICIT_LINKED_RANGE_ENDPOINTS_TO_CANONICAL_PARENT": [
+      {
+        "property_key": "toronto-geoid:14188741",
+        "property_id": "toronto-address-point:7929252",
+        "input_address": "10-20 BAY ST",
+        "canonical_address": "10 BAY ST"
+      },
+      {
+        "property_key": "toronto-address:c972c91ae7b1dc29",
+        "property_id": "toronto-address-point:6735910",
+        "input_address": "3197-3199 LAKE SHORE BLVD W",
+        "canonical_address": "3197 LAKE SHORE BLVD W"
       }
     ],
     "LEGACY_GEOID_MATCHED_CURRENT_ADDRESS_POINT_ID": [
@@ -195,19 +191,19 @@
     "chemtrac_history": [
       {
         "property_id": "toronto-address-point:1000254",
-        "source_record_id": "chemtrac_history:230:25125",
+        "source_record_id": "chemtrac_history:230:9999",
         "source_address": "360 Evans Ave",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:396846",
-        "source_record_id": "chemtrac_history:1596:36637",
+        "source_record_id": "chemtrac_history:1596:2398",
         "source_address": "27 West Hill Drive",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:999869",
-        "source_record_id": "chemtrac_history:2412:32352",
+        "source_record_id": "chemtrac_history:2412:7443",
         "source_address": "65 Enterprise Road",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -235,19 +231,13 @@
     "ontario_environmental_compliance_reports": [
       {
         "property_id": "toronto-address-point:20037861",
-        "source_record_id": "ontario_environmental_compliance_reports:row:33",
+        "source_record_id": "ontario_environmental_compliance_reports:row:5",
         "source_address": "470 UNWIN AVE, TORONTO, ON M4M 3M9",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:361902",
-        "source_record_id": "ontario_environmental_compliance_reports:row:32",
-        "source_address": "3450 MCNICOLL AVE, TORONTO, ON M1V 5J7",
-        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
-      },
-      {
-        "property_id": "toronto-address-point:361902",
-        "source_record_id": "ontario_environmental_compliance_reports:row:8",
+        "source_record_id": "ontario_environmental_compliance_reports:row:4",
         "source_address": "3450 MCNICOLL AVE, TORONTO, ON M1V 5J7",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -320,9 +310,9 @@
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
-        "property_id": "toronto-address-point:549672",
-        "source_record_id": "toronto_highrise_residential_health_hazards:382:381",
-        "source_address": "10 PARKWAY FOREST DR",
+        "property_id": "toronto-address-point:548154",
+        "source_record_id": "toronto_highrise_residential_health_hazards:1232:1231",
+        "source_address": "4 OVERLAND DR",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
@@ -334,26 +324,159 @@
     ],
     "toronto_public_notices_exact_prior_poc": [
       {
-        "property_id": "toronto-address-point:14200071",
-        "source_record_id": "toronto_public_notices_exact_prior_poc:4464",
-        "source_address": "130 QUEEN ST W",
-        "match_basis": "EXPLICIT_NOTICE_ADDRESS_LIST_EXACT_MATCH_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+        "property_id": "toronto-address-point:1000252",
+        "source_record_id": "toronto_public_notices_exact_prior_poc:6001",
+        "source_address": "340 EVANS AVE",
+        "match_basis": "EXACT_NORMALIZED_PUBLIC_NOTICE_APPLICATION_NUMBER_TO_DETERMINISTIC_AIC_PROPERTY_LINK"
       },
       {
-        "property_id": "toronto-address-point:6275805",
-        "source_record_id": "toronto_public_notices_exact_prior_poc:6347",
-        "source_address": "123 GARRATT BLVD",
-        "match_basis": "EXPLICIT_NOTICE_ADDRESS_LIST_EXACT_MATCH_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+        "property_id": "toronto-address-point:7171793",
+        "source_record_id": "toronto_public_notices_exact_prior_poc:6835",
+        "source_address": "41 HENDON AVE",
+        "match_basis": "EXACT_NORMALIZED_PUBLIC_NOTICE_APPLICATION_NUMBER_TO_DETERMINISTIC_AIC_PROPERTY_LINK"
       },
       {
-        "property_id": "toronto-address-point:8535820",
-        "source_record_id": "toronto_public_notices_exact_prior_poc:7529",
-        "source_address": "2 BLOOR ST E",
-        "match_basis": "EXPLICIT_NOTICE_ADDRESS_LIST_EXACT_MATCH_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+        "property_id": "toronto-address-point:9980743",
+        "source_record_id": "toronto_public_notices_exact_prior_poc:7866",
+        "source_address": "1151 WESTON RD",
+        "match_basis": "EXACT_NORMALIZED_PUBLIC_NOTICE_APPLICATION_NUMBER_TO_DETERMINISTIC_AIC_PROPERTY_LINK"
       }
     ]
   },
   "representative_relationship_samples": {
+    "CHEMTRAC_REPORTING_FACILITY_AT": [
+      {
+        "property_id": "toronto-address-point:1000254",
+        "from_node": "org:198664128d2182502b5c",
+        "source_key": "chemtrac_history",
+        "basis": "EXPLICIT_FACILITY_NAME_ON_CHEMTRAC_RECORDS_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP_OR_OPERATOR",
+        "evidence": {
+          "facility_ids": [
+            "25071"
+          ],
+          "reporting_years": [
+            "2013",
+            "2014",
+            "2015"
+          ],
+          "source_observation_count": 3
+        }
+      },
+      {
+        "property_id": "toronto-address-point:4666680",
+        "from_node": "org:071f986dbea856612841",
+        "source_key": "chemtrac_history",
+        "basis": "EXPLICIT_FACILITY_NAME_ON_CHEMTRAC_RECORDS_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP_OR_OPERATOR",
+        "evidence": {
+          "facility_ids": [
+            "24991"
+          ],
+          "reporting_years": [
+            "2012",
+            "2013"
+          ],
+          "source_observation_count": 2
+        }
+      },
+      {
+        "property_id": "toronto-address-point:999869",
+        "from_node": "org:74d2a7a6e02be54de7fe",
+        "source_key": "chemtrac_history",
+        "basis": "EXPLICIT_FACILITY_NAME_ON_CHEMTRAC_RECORDS_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP_OR_OPERATOR",
+        "evidence": {
+          "facility_ids": [
+            "22426"
+          ],
+          "reporting_years": [
+            "2013",
+            "2014"
+          ],
+          "source_observation_count": 2
+        }
+      }
+    ],
+    "LICENCE_HOLDER_AT_PROPERTY": [
+      {
+        "property_id": "toronto-address-point:1008107",
+        "from_node": "org:20398a00574e6ad2dd5a",
+        "source_key": "business_licence_matches_prior_poc",
+        "basis": "EXPLICIT_CLIENT_NAME_ON_MUNICIPAL_BUSINESS_LICENCE_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP",
+        "evidence": {
+          "licence_numbers": [
+            "B71-3846506",
+            "B71-3846508"
+          ],
+          "categories": [
+            "EATING OR DRINKING ESTABLISHMENT"
+          ],
+          "source_observation_count": 2
+        }
+      },
+      {
+        "property_id": "toronto-address-point:7792268",
+        "from_node": "org:c9214268ba792a212231",
+        "source_key": "business_licence_matches_prior_poc",
+        "basis": "EXPLICIT_CLIENT_NAME_ON_MUNICIPAL_BUSINESS_LICENCE_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP",
+        "evidence": {
+          "licence_numbers": [
+            "B50-4190201"
+          ],
+          "categories": [
+            "TAKE-OUT OR RETAIL FOOD ESTABLISHMENT"
+          ],
+          "source_observation_count": 1
+        }
+      },
+      {
+        "property_id": "toronto-address-point:987965",
+        "from_node": "org:67a6484fda1e12e8cae8",
+        "source_key": "business_licence_matches_prior_poc",
+        "basis": "EXPLICIT_CLIENT_NAME_ON_MUNICIPAL_BUSINESS_LICENCE_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP",
+        "evidence": {
+          "licence_numbers": [
+            "B71-3475204"
+          ],
+          "categories": [
+            "EATING OR DRINKING ESTABLISHMENT"
+          ],
+          "source_observation_count": 1
+        }
+      }
+    ],
+    "OWNER_OF": [
+      {
+        "property_id": "toronto-address-point:20037861",
+        "from_node": "org:a7a557362e0ccc05992a",
+        "source_key": "ontario_environmental_compliance_reports",
+        "basis": "EXPLICIT_FACILITY_OWNER_FIELD_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "evidence": {
+          "site_names": [
+            "Portlands Energy Centre"
+          ],
+          "source_observation_count": 1
+        }
+      },
+      {
+        "property_id": "toronto-address-point:361902",
+        "from_node": "org:66ef0516f958384a0d3e",
+        "source_key": "ontario_environmental_compliance_reports",
+        "basis": "EXPLICIT_FACILITY_OWNER_FIELD_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "evidence": {
+          "site_names": [
+            "Owens Corning Insulating Systems Canada LP"
+          ],
+          "source_observation_count": 1
+        }
+      }
+    ],
     "PROPERTY_MANAGER_OF": [
       {
         "property_id": "toronto-address-point:2676310",
@@ -427,6 +550,24 @@
         }
       }
     ]
+  },
+  "projected_duplicate_link_excess_by_source": {
+    "311_matches_prior_poc": 0,
+    "affordable_housing_pipeline": 0,
+    "apartment_building_evaluation": 0,
+    "business_licence_matches_prior_poc": 0,
+    "chemtrac_2024": 0,
+    "chemtrac_history": 0,
+    "development_pipeline": 0,
+    "ontario_environmental_compliance_reports": 0,
+    "renewable_energy_installations": 0,
+    "tobids_awarded_contracts_exact_document_address_prior_poc": 0,
+    "toronto_aic_applications": 58,
+    "toronto_highrise_residential_health_hazards": 0,
+    "toronto_public_notices_exact_prior_poc": 0
+  },
+  "duplicate_classification": {
+    "toronto_aic_applications": "Distinct City property-association rows sharing an application and canonical civic address; retained and grouped in presentation."
   },
   "evidence_contract_checks": {
     "all_properties_current_address_point_namespace": true,

@@ -1,14 +1,15 @@
 {
   "schema_version": "toronto-poc-reconciliation-1.1",
-  "generated_at": "2026-08-29T20:26:04.006538Z",
+  "generated_at": "2026-08-30T20:29:24.663427Z",
   "source_poc_count": 177,
-  "resolved_count": 173,
-  "unresolved_count": 4,
+  "resolved_count": 175,
+  "unresolved_count": 2,
   "resolution_status_counts": {
     "EXACT_UNIQUE_CIVIC_ADDRESS_AFTER_CANONICALIZER_FIX": 1,
     "EXACT_UNIQUE_CIVIC_ADDRESS_MATCH": 38,
+    "EXPLICIT_LINKED_RANGE_ENDPOINTS_TO_CANONICAL_PARENT": 2,
     "LEGACY_GEOID_MATCHED_CURRENT_ADDRESS_POINT_ID": 134,
-    "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED": 3,
+    "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED": 1,
     "NO_CURRENT_ADDRESS_POINT_MATCH": 1
   },
   "records": [
@@ -608,10 +609,16 @@
       "property_key": "toronto-geoid:14188741",
       "input_address": "10-20 BAY ST",
       "input_legacy_geo_id": "14188741",
-      "resolution_status": "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED",
-      "resolved": false,
-      "candidate_address_point_ids": [],
-      "candidate_addresses": []
+      "resolution_status": "EXPLICIT_LINKED_RANGE_ENDPOINTS_TO_CANONICAL_PARENT",
+      "resolved": true,
+      "property_id": "toronto-address-point:7929252",
+      "address_point_id": "7929252",
+      "address_id": "1525568",
+      "canonical_address": "10 BAY ST",
+      "range_endpoint_address_point_ids": [
+        "7929252",
+        "7929253"
+      ]
     },
     {
       "property_key": "toronto-geoid:7929398",
@@ -991,10 +998,16 @@
       "property_key": "toronto-address:c972c91ae7b1dc29",
       "input_address": "3197-3199 LAKE SHORE BLVD W",
       "input_legacy_geo_id": null,
-      "resolution_status": "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED",
-      "resolved": false,
-      "candidate_address_point_ids": [],
-      "candidate_addresses": []
+      "resolution_status": "EXPLICIT_LINKED_RANGE_ENDPOINTS_TO_CANONICAL_PARENT",
+      "resolved": true,
+      "property_id": "toronto-address-point:6735910",
+      "address_point_id": "6735910",
+      "address_id": "3006",
+      "canonical_address": "3197 LAKE SHORE BLVD W",
+      "range_endpoint_address_point_ids": [
+        "6735910",
+        "1013462"
+      ]
     },
     {
       "property_key": "toronto-geoid:30033035",

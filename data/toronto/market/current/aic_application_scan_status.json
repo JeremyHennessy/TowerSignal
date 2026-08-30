@@ -1,8 +1,8 @@
 {
   "schema_version": "toronto-aic-application-scan-status-1.0",
-  "generated_at": "2026-08-29T20:24:36.738769Z",
+  "generated_at": "2026-08-30T20:28:17.384771Z",
   "status": "APPLICATION_CATALOGUE_COMPLETE_DOCUMENT_TRANSPORT_BLOCKED",
-  "application_catalogue_records": 15866,
+  "application_catalogue_records": 15865,
   "document_scan_records": 0,
   "transport_report": "aic_transport_report.json"
 }

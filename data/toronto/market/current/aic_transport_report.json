@@ -1,8 +1,8 @@
 {
   "schema_version": "toronto-aic-access-1.0",
-  "generated_at": "2026-08-29T20:24:36.737916Z",
+  "generated_at": "2026-08-30T20:28:17.384042Z",
   "status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
-  "application_catalogue_records": 15866,
+  "application_catalogue_records": 15865,
   "catalogue_source": "City of Toronto AIC FeatureServer layer 60",
   "current_public_page": "https://www.toronto.ca/city-government/planning-development/application-details/",
   "current_read_apis": [
