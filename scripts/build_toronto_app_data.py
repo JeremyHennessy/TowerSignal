@@ -6,6 +6,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from toronto_app_sources import load_source_rows, normalize_source_link, valid_public_url
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -50,16 +52,21 @@ def main() -> None:
     aerial_payload = load(market / "aerial_candidates.json")
     aic_candidates = load(market / "aic_explicit_tower_candidates.json")
 
+    source_rows = load_source_rows(ROOT, load)
+
     links_by_property: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    source_catalog: dict[str, dict[str, Any]] = {}
     for link in links_payload.get("links") or []:
         if not isinstance(link, dict) or not link.get("property_id"):
             continue
-        links_by_property[str(link["property_id"])].append({
-            "source_key": str(link.get("source_key") or "unknown"),
-            "source_record_id": str(link.get("source_record_id") or ""),
-            "match_basis": str(link.get("match_basis") or ""),
-            "source_address": link.get("source_address"),
-        })
+        normalized_link = normalize_source_link(link, source_rows)
+        source_key = normalized_link["source_key"]
+        source_catalog[source_key] = {
+            "dataset_url": normalized_link.pop("dataset_url"),
+            "dataset_link_label": normalized_link.pop("dataset_link_label"),
+            "link_level": "RECORD_AND_DATASET" if normalized_link.get("record_url") else "DATASET_FALLBACK",
+        }
+        links_by_property[str(link["property_id"])].append(normalized_link)
 
     names = organization_names(graph)
     relationships_by_property: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -149,7 +156,7 @@ def main() -> None:
             )
 
     payload = {
-        "schema_version": "toronto-market-app-1.0",
+        "schema_version": "toronto-market-app-1.1",
         "generated_at": coverage.get("generated_at") or spine.get("generated_at"),
         "feature_status": "ISOLATED_BETA",
         "counts": {
@@ -162,10 +169,15 @@ def main() -> None:
             "aic_document_candidates": None if (coverage.get("aic_coverage") or {}).get("document_transport_blocked") else evidence_counts["AIC_DOCUMENT_CANDIDATE"],
             "aerial_review_candidates": evidence_counts["AERIAL_REVIEW_CANDIDATE"],
             "source_links": sum(len(value) for value in links_by_property.values()),
+            "record_level_source_links": sum(
+                1 for value in links_by_property.values() for link in value if link.get("record_url")
+            ),
+            "official_source_families": len(source_catalog),
             "relationship_edges": sum(len(value) for value in relationships_by_property.values()),
         },
         "true_market_coverage": {"status": "UNKNOWN_DENOMINATOR", "coverage_percent": None},
         "source_coverage": coverage.get("source_coverage") or coverage.get("source_identity_coverage") or {},
+        "source_catalog": dict(sorted(source_catalog.items())),
         "limitations": [
             "The total installed Toronto cooling-tower population is unknown; no market coverage percentage is claimed.",
             "AIC supporting-document access is blocked by the current reCAPTCHA-protected attachment transport.",
@@ -176,6 +188,15 @@ def main() -> None:
         "unresolved_poc": unresolved,
         "properties": sorted(properties, key=lambda item: (item["display_address"], item["property_id"])),
     }
+    for source_key, source in payload["source_catalog"].items():
+        if source.get("dataset_url") != valid_public_url(source.get("dataset_url")):
+            raise RuntimeError(f"Toronto app has an invalid official source URL for {source_key}")
+    for prop in payload["properties"]:
+        for link in prop["source_links"]:
+            if link["source_key"] not in payload["source_catalog"]:
+                raise RuntimeError(f"Toronto app source link has no catalogue entry: {link['source_key']}")
+            if link.get("record_url") and link["record_url"] != valid_public_url(link["record_url"]):
+                raise RuntimeError(f"Toronto app has an invalid record URL: {link['record_url']}")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(json.dumps(payload["counts"], indent=2))
