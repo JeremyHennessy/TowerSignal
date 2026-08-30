@@ -116,6 +116,39 @@ def parse_geometry(value: Any) -> tuple[float, float] | None:
     return (lon, lat) if -180 <= lon <= 180 and -90 <= lat <= 90 else None
 
 
+def address_point_root(record: dict[str, Any], by_id: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    current = record
+    seen: set[str] = set()
+    while clean_text(current.get("address_point_id_link")):
+        current_id = clean_text(current.get("address_point_id"))
+        if current_id in seen:
+            raise RuntimeError(f"Address Point link cycle detected at {current_id}")
+        seen.add(current_id)
+        linked = by_id.get(clean_text(current.get("address_point_id_link")))
+        if not linked:
+            break
+        current = linked
+    return current
+
+
+def linked_range_parent(value: Any, by_address: dict[str, list[dict[str, Any]]], by_id: dict[str, dict[str, Any]]) -> tuple[dict[str, Any] | None, list[str]]:
+    normalized = canonical_address(value)
+    match = re.match(r"^(\d+[A-Z]?)-(\d+[A-Z]?)\s+(.+)$", normalized)
+    if not match:
+        return None, []
+    endpoint_addresses = [f"{match.group(1)} {match.group(3)}", f"{match.group(2)} {match.group(3)}"]
+    endpoints = []
+    for address in endpoint_addresses:
+        candidates = by_address.get(address, [])
+        if len(candidates) != 1:
+            return None, [clean_text(item.get("address_point_id")) for item in endpoints]
+        endpoints.append(candidates[0])
+    roots = [address_point_root(item, by_id) for item in endpoints]
+    root_ids = {clean_text(item.get("address_point_id")) for item in roots}
+    endpoint_ids = [clean_text(item.get("address_point_id")) for item in endpoints]
+    return (roots[0], endpoint_ids) if len(root_ids) == 1 else (None, endpoint_ids)
+
+
 def load_address_points() -> tuple[dict[str, dict[str, Any]], dict[str, list[dict[str, Any]]], int]:
     raw = request_bytes(ADDRESS_POINTS_CSV, timeout=240, max_bytes=350_000_000)
     reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig", errors="replace")))
@@ -176,20 +209,50 @@ def main() -> None:
     with POC_CSV.open("r", encoding="utf-8-sig", newline="") as handle:
         poc = list(csv.DictReader(handle))
     existing_poc = {clean_text(k) for p in props for k in p.get("poc_property_keys", [])}
-    recovered = []
+    # Persist the resolution provenance across reruns.  The generated spine is an
+    # input to later scheduled rebuilds, so an idempotent rerun must not degrade
+    # an explicit City link resolution into a generic address match.
+    recovered: dict[str, dict[str, Any]] = {}
+    for prop in props:
+        for resolution in prop.get("poc_identity_resolutions") or []:
+            key = clean_text(resolution.get("property_key"))
+            basis = clean_text(resolution.get("identity_basis"))
+            if key and basis:
+                recovered[key] = {
+                    "status": basis,
+                    "range_endpoint_address_point_ids": resolution.get("range_endpoint_address_point_ids") or [],
+                }
     for row in poc:
         pkey = clean_text(row.get("property_key"))
         if pkey in existing_poc:
             continue
         canon = canonical_address(row.get("address"))
         candidates = ap_by_addr.get(canon, [])
-        if len(candidates) != 1:
+        municipal = candidates[0] if len(candidates) == 1 else None
+        recovery_status = "EXACT_UNIQUE_CIVIC_ADDRESS_AFTER_CANONICALIZER_FIX"
+        range_endpoint_ids: list[str] = []
+        if municipal is None:
+            municipal, range_endpoint_ids = linked_range_parent(row.get("address"), ap_by_addr, by_id)
+            recovery_status = "EXPLICIT_LINKED_RANGE_ENDPOINTS_TO_CANONICAL_PARENT"
+        if municipal is None:
             continue
-        municipal = candidates[0]
         pid = clean_text(municipal.get("address_point_id"))
-        if not pid or any(clean_text(p.get("address_point_id")) == pid for p in props):
+        if not pid:
             continue
         legacy = clean_text(row.get("geo_id"))
+        existing = next((p for p in props if clean_text(p.get("address_point_id")) == pid), None)
+        if existing:
+            existing["is_original_poc_property"] = True
+            existing["poc_property_keys"] = list(dict.fromkeys([*(existing.get("poc_property_keys") or []), pkey]))
+            existing["poc_tower_statuses"] = list(dict.fromkeys([*(existing.get("poc_tower_statuses") or []), *([clean_text(row.get("tower_status"))] if clean_text(row.get("tower_status")) else [])]))
+            existing["legacy_geo_ids"] = list(dict.fromkeys([*(existing.get("legacy_geo_ids") or []), *([legacy] if legacy else [])]))
+            existing["address_aliases"] = list(dict.fromkeys([*(existing.get("address_aliases") or []), clean_text(row.get("address"))]))
+            resolutions = existing.setdefault("poc_identity_resolutions", [])
+            if not any(clean_text(item.get("property_key")) == pkey for item in resolutions):
+                resolutions.append({"property_key": pkey, "identity_basis": recovery_status, "range_endpoint_address_point_ids": range_endpoint_ids})
+            existing_poc.add(pkey)
+            recovered[pkey] = {"status": recovery_status, "range_endpoint_address_point_ids": range_endpoint_ids}
+            continue
         prop = {
             "property_id": f"toronto-address-point:{pid}",
             "canonical_identifier_type": "CITY_OF_TORONTO_ADDRESS_POINT_ID",
@@ -214,14 +277,15 @@ def main() -> None:
             "poc_property_keys": [pkey],
             "poc_tower_statuses": [clean_text(row.get("tower_status"))] if clean_text(row.get("tower_status")) else [],
             "legacy_geo_ids": [legacy] if legacy else [],
-            "identity_basis": "EXACT_UNIQUE_CIVIC_ADDRESS_AFTER_STREET_NAME_CANONICALIZER_FIX",
+            "identity_basis": recovery_status,
             "identity_confidence": "DETERMINISTIC",
             "identity_contract_version": "toronto-address-point-1.1",
             "coordinate_basis": "CITY_ADDRESS_POINTS_4326_GEOMETRY_MULTIPOINT",
+            "poc_identity_resolutions": [{"property_key": pkey, "identity_basis": recovery_status, "range_endpoint_address_point_ids": range_endpoint_ids}],
         }
         props.append(prop)
         existing_poc.add(pkey)
-        recovered.append(pkey)
+        recovered[pkey] = {"status": recovery_status, "range_endpoint_address_point_ids": range_endpoint_ids}
 
     props.sort(key=lambda p: p["property_id"])
     property_by_addr: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -292,10 +356,10 @@ def main() -> None:
         prop = prop_by_poc.get(pkey)
         if prop:
             apid = clean_text(prop.get("address_point_id"))
-            if legacy and legacy == apid:
+            if pkey in recovered:
+                status = recovered[pkey]["status"]
+            elif legacy and legacy == apid:
                 status = "LEGACY_GEOID_MATCHED_CURRENT_ADDRESS_POINT_ID"
-            elif pkey in recovered:
-                status = "EXACT_UNIQUE_CIVIC_ADDRESS_AFTER_CANONICALIZER_FIX"
             else:
                 status = "EXACT_UNIQUE_CIVIC_ADDRESS_MATCH"
             rec = {
@@ -309,6 +373,8 @@ def main() -> None:
                 "address_id": prop.get("address_id"),
                 "canonical_address": prop.get("canonical_address"),
             }
+            if pkey in recovered and recovered[pkey]["range_endpoint_address_point_ids"]:
+                rec["range_endpoint_address_point_ids"] = recovered[pkey]["range_endpoint_address_point_ids"]
         else:
             canon = canonical_address(row.get("address"))
             candidates = ap_by_addr.get(canon, [])
@@ -340,6 +406,10 @@ def main() -> None:
     spine["identity_contract"]["version"] = "toronto-address-point-1.1"
     spine["properties"] = props
     spine["counts"]["canonical_properties_resolved"] = len(props)
+    # Keep the original summary fields synchronized with the authoritative
+    # 177-row reconciliation ledger.  Older snapshots exposed both names.
+    spine["counts"]["original_poc_resolved"] = resolved_count
+    spine["counts"]["original_poc_unresolved"] = 177 - resolved_count
     spine["counts"]["original_poc_reconciled_to_address_point_id"] = resolved_count
     spine["counts"]["original_poc_unreconciled"] = 177 - resolved_count
     spine["counts"]["expanded_properties_beyond_original_poc"] = sum(not p.get("is_original_poc_property") for p in props)
@@ -382,7 +452,8 @@ def main() -> None:
         "generated_at": utc_now(),
         "poc_resolved": resolved_count,
         "poc_unresolved": 177-resolved_count,
-        "recovered_poc_keys": recovered,
+        "recovered_poc_keys": sorted(recovered),
+        "recovered_poc_details": recovered,
         "canonical_properties": len(props),
         "properties_with_coordinates": spine["counts"]["properties_with_usable_coordinates"],
         "source_link_count": len(links),

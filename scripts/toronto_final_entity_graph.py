@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 
-from toronto_final_identity_cleanup import canonical_address
+from toronto_final_identity_cleanup import canonical_address, iter_records
 from toronto_market_common import clean_text, read_json, request_json, utc_now, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -92,6 +92,8 @@ def main() -> None:
     } for p in props}
     edges: dict[str, Any] = {}
     diagnostics: dict[str, Any] = {}
+    link_payload = read_json(MARKET / "property_source_links.json") or {}
+    links = [item for item in link_payload.get("links", []) if isinstance(item, dict)]
 
     # RentSafe explicit management-company source field.
     rentsafe = fetch_rentsafe()
@@ -122,6 +124,98 @@ def main() -> None:
         bps_matched += 1
         add_edge(nodes, edges, property_ids, row.get("organization") or row.get("Organization"), matches[0]["property_id"], "FACILITY_OPERATOR_OR_REPORTER_AT", "ontario_bps_energy_2024", "ORGANIZATION_FIELD_AT_EXACT_CURRENT_ADDRESS", "SOURCE_ROLE_NOT_OWNERSHIP", {"property_name": row.get("property_name") or row.get("Property Name"), "source_address": address})
     diagnostics["ontario_bps_energy_2024"] = {"source_rows": len(bps_rows), "exact_property_rows": bps_matched}
+
+    # ChemTRAC publishes a FACILITY_NAME, not an owner/operator field.  Preserve
+    # that narrower source role and aggregate repeated chemical/year rows into a
+    # single property/facility edge with the underlying observation count.
+    chem_payload = read_json(WAREHOUSE / "open_licensed/chemtrac_history.json") or {}
+    chem_rows = list(iter_records(chem_payload))
+    chem_groups: dict[tuple[str, str], dict[str, Any]] = {}
+    chem_bad_indices = 0
+    for link in links:
+        if link.get("source_key") != "chemtrac_history":
+            continue
+        idx = link.get("source_row_index")
+        if not isinstance(idx, int) or idx < 0 or idx >= len(chem_rows):
+            chem_bad_indices += 1
+            continue
+        row = chem_rows[idx]
+        name = clean_text(row.get("FACILITY_NAME"))
+        pid = clean_text(link.get("property_id"))
+        if not name or pid not in property_ids:
+            continue
+        group = chem_groups.setdefault((pid, name.upper()), {"name": name, "years": set(), "facility_ids": set(), "record_count": 0})
+        if row.get("_towersignal_reporting_year") not in (None, ""):
+            group["years"].add(str(row.get("_towersignal_reporting_year")))
+        if row.get("FACILITY_ID") not in (None, ""):
+            group["facility_ids"].add(str(row.get("FACILITY_ID")))
+        group["record_count"] += 1
+    for (pid, _), group in chem_groups.items():
+        add_edge(nodes, edges, property_ids, group["name"], pid, "CHEMTRAC_REPORTING_FACILITY_AT", "chemtrac_history", "EXPLICIT_FACILITY_NAME_ON_CHEMTRAC_RECORDS_AT_EXACT_CURRENT_ADDRESS", "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP_OR_OPERATOR", {
+            "facility_ids": sorted(group["facility_ids"]),
+            "reporting_years": sorted(group["years"]),
+            "source_observation_count": group["record_count"],
+        })
+    diagnostics["chemtrac_history_relationships"] = {"joined_source_rows": sum(group["record_count"] for group in chem_groups.values()), "property_facility_groups": len(chem_groups), "invalid_source_row_indices": chem_bad_indices, "role_limitation": "FACILITY_NAME is preserved as a reporting-facility role and is not relabelled owner or operator."}
+
+    # Business licences identify the licence client explicitly.  The client may
+    # differ from the building owner or operator, so retain LICENCE_HOLDER only.
+    licence_payload = read_json(WAREHOUSE / "business_licence_matches.json") or {}
+    licence_rows = list(iter_records(licence_payload))
+    licence_groups: dict[tuple[str, str], dict[str, Any]] = {}
+    licence_bad_indices = 0
+    for link in links:
+        if link.get("source_key") != "business_licence_matches_prior_poc":
+            continue
+        idx = link.get("source_row_index")
+        if not isinstance(idx, int) or idx < 0 or idx >= len(licence_rows):
+            licence_bad_indices += 1
+            continue
+        wrapper = licence_rows[idx]
+        row = wrapper.get("source_row") if isinstance(wrapper.get("source_row"), dict) else wrapper
+        name = clean_text(row.get("Client Name"))
+        pid = clean_text(link.get("property_id"))
+        if not name or pid not in property_ids:
+            continue
+        group = licence_groups.setdefault((pid, name.upper()), {"name": name, "licences": set(), "categories": set(), "record_count": 0})
+        if row.get("Licence No.") not in (None, ""):
+            group["licences"].add(str(row.get("Licence No.")))
+        if row.get("Category") not in (None, ""):
+            group["categories"].add(str(row.get("Category")))
+        group["record_count"] += 1
+    for (pid, _), group in licence_groups.items():
+        add_edge(nodes, edges, property_ids, group["name"], pid, "LICENCE_HOLDER_AT_PROPERTY", "business_licence_matches_prior_poc", "EXPLICIT_CLIENT_NAME_ON_MUNICIPAL_BUSINESS_LICENCE_AT_EXACT_CURRENT_ADDRESS", "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP", {
+            "licence_numbers": sorted(group["licences"]),
+            "categories": sorted(group["categories"]),
+            "source_observation_count": group["record_count"],
+        })
+    diagnostics["business_licence_relationships"] = {"joined_source_rows": sum(group["record_count"] for group in licence_groups.values()), "property_client_groups": len(licence_groups), "invalid_source_row_indices": licence_bad_indices, "role_limitation": "Client Name is preserved as licence holder and is not relabelled owner or operator."}
+
+    # The provincial compliance table contains an explicit Facility Owner field;
+    # only this source field is allowed to create ownership edges here.
+    env_payload = read_json(WAREHOUSE / "open_licensed/ontario_environmental_compliance_reports.json") or {}
+    env_rows = list(iter_records(env_payload))
+    env_owner_groups: dict[tuple[str, str], dict[str, Any]] = {}
+    env_bad_indices = 0
+    for link in links:
+        if link.get("source_key") != "ontario_environmental_compliance_reports":
+            continue
+        idx = link.get("source_row_index")
+        if not isinstance(idx, int) or idx < 0 or idx >= len(env_rows):
+            env_bad_indices += 1
+            continue
+        row = env_rows[idx]
+        name = clean_text(row.get("Facility Owner"))
+        pid = clean_text(link.get("property_id"))
+        if not name or pid not in property_ids:
+            continue
+        group = env_owner_groups.setdefault((pid, name.upper()), {"name": name, "sites": set(), "records": 0})
+        if row.get("Site Name") not in (None, ""):
+            group["sites"].add(str(row.get("Site Name")))
+        group["records"] += 1
+    for (pid, _), group in env_owner_groups.items():
+        add_edge(nodes, edges, property_ids, group["name"], pid, "OWNER_OF", "ontario_environmental_compliance_reports", "EXPLICIT_FACILITY_OWNER_FIELD_AT_EXACT_CURRENT_ADDRESS", "CONFIRMED_SOURCE_FIELD", {"site_names": sorted(group["sites"]), "source_observation_count": group["records"]})
+    diagnostics["environmental_compliance_relationships"] = {"joined_source_rows": sum(group["records"] for group in env_owner_groups.values()), "property_owner_groups": len(env_owner_groups), "invalid_source_row_indices": env_bad_indices}
 
     # Preserve already-reviewed deterministic POC award relationships, remapped by address.
     old = read_json(WAREHOUSE / "property_joins.json") or {}
@@ -169,6 +263,8 @@ def main() -> None:
             "ownership": "Only explicit OWNER-labelled source text may create OWNER_OF; manager/operator/reporter/supplier are never relabelled owner.",
             "aic": "AIC text-pattern role edges are review-required and are not treated as verified legal relationships until reviewed.",
             "construction_act": "No third-party publisher records ingested without compatible permission/licence.",
+            "chemtrac": "FACILITY_NAME creates only CHEMTRAC_REPORTING_FACILITY_AT; it never creates owner or operator status.",
+            "business_licence": "Client Name creates only LICENCE_HOLDER_AT_PROPERTY; it never creates owner or operator status.",
             "property_identity": "All property edges target the corrected unique City ADDRESS_POINT_ID spine by deterministic exact address or existing reviewed POC match.",
         },
         "diagnostics": diagnostics,
@@ -185,6 +281,8 @@ def main() -> None:
                 "properties_with_engineer_or_consultant": len(property_sets.get("ENGINEER_FOR", set()) | property_sets.get("MECHANICAL_ENGINEER_FOR", set()) | property_sets.get("CONSULTANT_FOR", set())),
                 "properties_with_contractor_or_successful_bidder": len(property_sets.get("CONTRACTOR_AT_PROPERTY", set()) | property_sets.get("MECHANICAL_CONTRACTOR_AT_PROPERTY", set()) | property_sets.get("SUCCESSFUL_BIDDER_AT_PROPERTY", set())),
                 "properties_with_facility_operator_or_reporter": len(property_sets.get("FACILITY_OPERATOR_OR_REPORTER_AT", set())),
+                "properties_with_chemtrac_reporting_facility": len(property_sets.get("CHEMTRAC_REPORTING_FACILITY_AT", set())),
+                "properties_with_licence_holder": len(property_sets.get("LICENCE_HOLDER_AT_PROPERTY", set())),
             },
         },
         "nodes": list(nodes.values()),

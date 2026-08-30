@@ -7,6 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from toronto_app_sources import load_source_rows, normalize_source_link
 from toronto_market_common import utc_now, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +28,14 @@ def sample(items: list[Any], count: int = 3) -> list[Any]:
     if len(items) <= count: return items
     positions = sorted({0, len(items)//2, len(items)-1})
     return [items[i] for i in positions[:count]]
+
+
+def projected_link_key(link: dict[str, Any]) -> tuple[Any, ...]:
+    return (
+        link.get("source_key"), link.get("source_address"), link.get("record_title"),
+        link.get("record_date"), link.get("record_status"), link.get("record_url"),
+        tuple((detail.get("label"), detail.get("value")) for detail in (link.get("record_details") or [])),
+    )
 
 
 def main() -> None:
@@ -84,10 +93,37 @@ def main() -> None:
     if isinstance(links.get("counts"),dict):
         assert int(links["counts"].get("total_source_links") or 0)==len(source_links)
 
+    def load_source(path: Path) -> dict[str, Any]:
+        return json.loads(path.read_text(encoding="utf-8"))
+    source_rows = load_source_rows(ROOT, load_source)
+    projected_by_source_property: dict[tuple[str, str], list[tuple[Any, ...]]] = defaultdict(list)
+    for link in source_links:
+        normalized = normalize_source_link(link, source_rows)
+        projected_by_source_property[(str(link.get("source_key")), str(link.get("property_id")))].append(projected_link_key(normalized))
+    projected_duplicate_excess: dict[str, int] = defaultdict(int)
+    for (source, _property_id), values in projected_by_source_property.items():
+        projected_duplicate_excess[source] += len(values) - len(set(values))
+    # AIC may publish distinct property-association rows for the same application
+    # and civic address. They remain preserved and are grouped only in the UI.
+    # Resource-level duplicates are forbidden for sources with one observation per
+    # annual/category record.
+    for source in ("chemtrac_history", "ontario_environmental_compliance_reports"):
+        assert projected_duplicate_excess.get(source, 0) == 0, f"duplicate normalized {source} property records"
+
     edges=graph.get("edges") or []; edge_ids=[]
     for edge in edges:
         edge_ids.append(edge.get("edge_id")); pid=edge.get("property_id") or edge.get("to_node"); assert pid in id_set
     assert len(edge_ids)==len(set(edge_ids))
+    # Source-role boundaries are part of the public evidence contract.
+    for edge in edges:
+        source = edge.get("source_key")
+        relationship = edge.get("relationship")
+        if source == "chemtrac_history":
+            assert relationship == "CHEMTRAC_REPORTING_FACILITY_AT"
+        if source == "business_licence_matches_prior_poc":
+            assert relationship == "LICENCE_HOLDER_AT_PROPERTY"
+        if relationship == "OWNER_OF":
+            assert source in {"ontario_environmental_compliance_reports", "toronto_aic_supporting_documents"}
 
     true_cov=coverage.get("true_cooling_tower_market_coverage") or {}
     assert true_cov.get("coverage_percent") is None and true_cov.get("status")=="UNKNOWN_DENOMINATOR"
@@ -125,6 +161,8 @@ def main() -> None:
         "representative_resolution_samples":{s:sample(v) for s,v in sorted(by_status.items())},
         "representative_historical_join_samples":{s:sample(v) for s,v in sorted(by_source.items())},
         "representative_relationship_samples":{s:sample(v) for s,v in sorted(by_rel.items())},
+        "projected_duplicate_link_excess_by_source":dict(sorted(projected_duplicate_excess.items())),
+        "duplicate_classification":{"toronto_aic_applications":"Distinct City property-association rows sharing an application and canonical civic address; retained and grouped in presentation."},
         "evidence_contract_checks":{"all_properties_current_address_point_namespace":True,"all_resolved_poc_refs_exist":True,"all_source_link_refs_exist":True,"all_entity_graph_property_refs_exist":True,"true_market_coverage_unknown_denominator":True,"aerial_scores_do_not_upgrade_tower_confirmation":True,"aic_blocker_not_misreported_as_zero_documents":aic_blocked},
     }
     write_json(MARKET/"qa_report.json",qa)

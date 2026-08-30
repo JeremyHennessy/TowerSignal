@@ -79,6 +79,18 @@ Signals include cooling tower, evaporative condenser, chiller, condenser water, 
 
 Raw AIC PDFs are not committed to Git. When document URLs become lawfully accessible, the parser separately counts parsed, scanned/image-only, encrypted, corrupt, oversized, non-PDF and HTTP-failed documents; text findings retain page-numbered excerpts. OCR remains an explicit gap.
 
+#### Free lawful alternatives evaluated
+
+`scripts/toronto_aic_free_alternatives.py` evaluates and persists the usable boundary without automating around reCAPTCHA:
+
+- The open-licensed Development Applications source provides the application catalogue, not the supporting-document attachments.
+- City Clerk Public Notices are open-licensed and expose durable notice pages and background notice artifacts. TowerSignal joins them to already resolved AIC properties only by exact normalized application number, indexes bounded mechanical-term excerpts, and labels them as public-notice context rather than AIC supporting documents or cooling-tower confirmation.
+- Active and cleared Building Permits are open-licensed, addressable enrichment sources, but are not mirrors of mechanical drawings, equipment schedules, energy studies, planning reports, or acoustic studies.
+- Council/committee planning reports can support targeted manual review, but no complete deterministic mirror of AIC attachments was identified.
+- The current AIC remains available for manual application review. Its automated attachment transport remains blocked by reCAPTCHA and is not bypassed.
+
+The measured path statuses and public-notice index are persisted in `aic_free_access_report.json` and `aic_open_document_alternatives.json`. Explicit cooling-tower findings in the unavailable AIC supporting-document corpus remain unknown, regardless of public-notice term counts.
+
 ### Construction Act certificates and notices
 
 All three websites designated by Ontario's current Construction Act regulation are `PERMISSION_REQUIRED` for automated TowerSignal ingestion under their publisher terms:
@@ -156,7 +168,7 @@ Raw AIC PDFs and aerial crops are processed as ephemeral/review artifacts and re
 
 `scripts/toronto_app_sources.py` joins every persisted property/source link back to its public-safe source row and emits bounded record context (title, date, status and source-specific fields). The app keeps two link levels distinct:
 
-- `RECORD_AND_DATASET`: a verified durable row-level page plus the official dataset page. Current persisted public-notice matches are the only source family with this level.
+- `RECORD_AND_DATASET`: a verified durable row-level page plus the official dataset page. Current persisted public-notice address/application matches are the only source family with this level.
 - `DATASET_FALLBACK`: the publisher does not expose a defensible durable row-level URL, so the app labels and opens the official dataset or search page instead.
 
 The adapter accepts HTTPS links only from the explicit Toronto/Ontario publisher allowlist. It rejects the legacy `secure.toronto.ca/AIC/index.do` route, which returned HTTP 403 during the corpus attempt. AIC application rows retain application number, type, status, milestone and description, but link to the current official AIC search rather than manufacturing a dead application URL.

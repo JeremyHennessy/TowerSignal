@@ -136,9 +136,67 @@ def year_from_resource(resource: dict[str, Any]) -> int | None:
     return max((int(year) for year in years), default=None)
 
 
+def resource_identifier(resource: dict[str, Any]) -> str:
+    return str(resource.get("id") or resource.get("resource_id") or "")
+
+
+def chemtrac_resource_key(resource: dict[str, Any]) -> tuple[int | None, str]:
+    name = re.sub(r"\.csv$", "", str(resource.get("name") or "").strip(), flags=re.IGNORECASE)
+    return year_from_resource(resource) or resource.get("year"), re.sub(r"\s+", " ", name).lower()
+
+
+def select_chemtrac_resources(resources: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Select one current variant for each logical annual ChemTRAC resource."""
+    grouped: dict[tuple[int | None, str], list[dict[str, Any]]] = {}
+    for resource in resources:
+        grouped.setdefault(chemtrac_resource_key(resource), []).append(resource)
+    selected: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
+    for key in sorted(grouped, key=lambda item: (item[0] or 0, item[1])):
+        variants = grouped[key]
+        variants.sort(key=lambda item: (
+            bool(item.get("last_modified")),
+            str(item.get("last_modified") or ""),
+            str(item.get("name") or "").lower().endswith(".csv"),
+            resource_identifier(item),
+        ))
+        selected.append(variants[-1])
+        excluded.extend(variants[:-1])
+    return selected, excluded
+
+
+def normalize_existing_chemtrac_history(path: Path) -> dict[str, Any]:
+    payload = read_json(path)
+    metadata = payload.get("metadata") or {}
+    resources = [item for item in (metadata.get("resources") or []) if isinstance(item, dict)]
+    selected, excluded = select_chemtrac_resources(resources)
+    selected_ids = {resource_identifier(item) for item in selected}
+    rows = [
+        row for row in (payload.get("rows") or [])
+        if isinstance(row, dict) and str(row.get("_towersignal_source_resource_id") or "") in selected_ids
+    ]
+    metadata["resources"] = selected
+    metadata["resource_count"] = len(selected)
+    metadata["row_count"] = len(rows)
+    metadata["excluded_duplicate_resource_variants"] = excluded
+    metadata["resource_selection_contract"] = "One current CSV resource per normalized annual ChemTRAC resource name; superseded equivalent variants are excluded."
+    payload["metadata"] = metadata
+    payload["rows"] = rows
+    write_json(path, payload)
+    return {"row_count": len(rows), "resource_count": len(selected), "excluded_resource_count": len(excluded)}
+
+
 def pull_chemtrac_history(output_dir: Path) -> dict[str, Any]:
     package = ckan("package_show", {"id": CHEMTRAC_PACKAGE})
     resources = [item for item in (package.get("resources") or []) if isinstance(item, dict)]
+    eligible = []
+    for resource in resources:
+        year = year_from_resource(resource)
+        name = str(resource.get("name") or "")
+        fmt = str(resource.get("format") or "").upper()
+        if year is not None and "chemtrac" in name.lower() and (resource.get("datastore_active") or fmt in {"CSV", "XLSX"}):
+            eligible.append(resource)
+    resources, excluded = select_chemtrac_resources(eligible)
     historical = []
     stats = []
     for resource in resources:
@@ -175,6 +233,11 @@ def pull_chemtrac_history(output_dir: Path) -> dict[str, Any]:
             "resource_count": len(stats),
             "row_count": len(historical),
             "resources": stats,
+            "excluded_duplicate_resource_variants": [
+                {"year": year_from_resource(item), "resource_id": resource_identifier(item), "name": item.get("name"), "format": item.get("format"), "last_modified": item.get("last_modified")}
+                for item in excluded
+            ],
+            "resource_selection_contract": "One current CSV resource per normalized annual ChemTRAC resource name; superseded equivalent variants are excluded.",
             "known_gap": "Toronto Open Data notes ChemTRAC data from 2019 through 2023 is unavailable due to COVID-19 related reporting interruptions.",
         },
         "rows": historical,
@@ -326,7 +389,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Pull Toronto historical ChemTRAC and Public Notices open data")
     parser.add_argument("--poc", type=Path, default=ROOT / "data/toronto/poc/current")
     parser.add_argument("--warehouse", type=Path, default=ROOT / "data/toronto/warehouse/current")
+    parser.add_argument("--normalize-existing", action="store_true", help="Remove already-ingested equivalent annual ChemTRAC resource variants without network access")
     args = parser.parse_args()
+    if args.normalize_existing:
+        result = normalize_existing_chemtrac_history(args.warehouse / "open_licensed" / "chemtrac_history.json")
+        print(json.dumps(result, indent=2))
+        return
     build(args.poc, args.warehouse)
 
 

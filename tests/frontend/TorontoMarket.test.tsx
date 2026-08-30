@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
-import { buildTorontoCsv, buildTorontoPropertySearchText, TorontoMarketPage } from '../../src/components/TorontoMarketPage'
+import { buildTorontoCsv, buildTorontoPropertySearchText, groupTorontoSourceLinks, propertyMatchesTorontoSourceFilters, TorontoMarketPage } from '../../src/components/TorontoMarketPage'
 
 vi.mock('../../src/components/TorontoMarketMap', () => ({ TorontoMarketMap: () => <div data-testid="toronto-map">Toronto map</div> }))
 vi.mock('../../src/data/api', () => ({ loadTorontoMarket: vi.fn().mockResolvedValue({
@@ -15,7 +15,7 @@ vi.mock('../../src/data/api', () => ({ loadTorontoMarket: vi.fn().mockResolvedVa
   },
   limitations: ['AIC document transport is blocked.'], unresolved_poc: [{ property_key: 'poc-2', input_address: '89 Humber College Blvd', resolution_status: 'NO_CURRENT_ADDRESS_POINT_MATCH', candidate_address_point_ids: [] }],
   properties: [
-    { property_id: 'toronto-address-point:100', address_point_id: '100', display_address: '10 Alpha St', municipality: 'Toronto', longitude: -79.38, latitude: 43.65, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: true, tower_evidence_status: 'CONFIRMED_DOCUMENTARY_TOWER', source_keys: ['chemtrac_history'], source_links: [{ source_key: 'chemtrac_history', source_record_id: 'chem:1', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: 'https://secure.toronto.ca/nm/api/individual/notice/123.do', record_link_label: 'Open public notice', record_title: 'Alpha facility', record_date: '2024', record_status: null, record_details: [{ label: 'Chemical', value: 'Nickel' }] }, { source_key: 'chemtrac_history', source_record_id: 'chem:2', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: '2023', record_status: null, record_details: [{ label: 'Chemical', value: 'Lead' }] }], relationships: [{ relationship: 'PROPERTY_MANAGER_OF', organization: 'Alpha Management', source_key: 'rentsafe', confidence: 'HIGH', basis: 'EXPLICIT_ROLE' }], aerial_review_rank: null, aerial_visual_similarity_score: null },
+    { property_id: 'toronto-address-point:100', address_point_id: '100', display_address: '10 Alpha St', municipality: 'Toronto', longitude: -79.38, latitude: 43.65, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: true, tower_evidence_status: 'CONFIRMED_DOCUMENTARY_TOWER', source_keys: ['chemtrac_history'], source_links: [{ source_key: 'chemtrac_history', source_record_id: 'chem:1', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: 'https://secure.toronto.ca/nm/api/individual/notice/123.do', record_link_label: 'Open public notice', record_title: 'Alpha facility', record_date: '2024', record_status: null, record_details: [{ label: 'Chemical', value: 'Nickel' }] }, { source_key: 'chemtrac_history', source_record_id: 'chem:2', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: '2023', record_status: null, record_details: [{ label: 'Chemical', value: 'Lead' }] }, ...Array.from({ length: 10 }, (_, index) => ({ source_key: 'chemtrac_history', source_record_id: `chem:extra-${index}`, match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: String(2012 + index), record_status: null, record_details: [{ label: 'Chemical', value: `Chemical ${index}` }] }))], relationships: [{ relationship: 'PROPERTY_MANAGER_OF', organization: 'Alpha Management', source_key: 'rentsafe', confidence: 'HIGH', basis: 'EXPLICIT_ROLE' }], aerial_review_rank: null, aerial_visual_similarity_score: null },
     { property_id: 'toronto-address-point:200', address_point_id: '200', display_address: '20 Beta Ave', municipality: 'Toronto', longitude: -79.4, latitude: 43.67, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: false, tower_evidence_status: 'AERIAL_REVIEW_CANDIDATE', source_keys: ['toronto_aic_applications'], source_links: [{ source_key: 'toronto_aic_applications', source_record_id: 'aic:1', match_basis: 'EXACT_ADDRESS', source_address: '20 Beta Ave', record_url: null, record_link_label: null, record_title: '24 100000 STE 01 OZ', record_date: '2024-01-01', record_status: 'Under review', record_details: [{ label: 'Application type', value: 'Rezoning' }] }], relationships: [], aerial_review_rank: 1, aerial_visual_similarity_score: 0.91 },
   ],
 }) }))
@@ -82,6 +82,26 @@ test('filters Toronto properties by actual organization role and POC scope', asy
   expect(screen.getByText('20 Beta Ave')).toBeInTheDocument()
 })
 
+test('filters by normalized source-specific fields', async () => {
+  const user = userEvent.setup()
+  render(<TorontoMarketPage />)
+  await user.click(await screen.findByText('Source-specific filters'))
+
+  await user.selectOptions(screen.getByLabelText('ChemTRAC chemical'), 'Nickel')
+  expect(screen.getByText('10 Alpha St')).toBeInTheDocument()
+  expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name: 'Clear source filters' }))
+  await user.type(screen.getByLabelText('AIC application'), '24 100000 STE 01 OZ')
+  expect(screen.queryByText('10 Alpha St')).not.toBeInTheDocument()
+  expect(screen.getByText('20 Beta Ave')).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name: 'Clear source filters' }))
+  await user.type(screen.getByLabelText('Company'), 'Alpha Management')
+  expect(screen.getByText('10 Alpha St')).toBeInTheDocument()
+  expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()
+})
+
 test('shows measured source coverage and the unresolved identity queue', async () => {
   const user = userEvent.setup()
   render(<TorontoMarketPage />)
@@ -106,11 +126,36 @@ test('renders normalized record links and labels dataset-only fallbacks honestly
   expect(within(detail).getByRole('link', { name: 'Open public notice ↗' })).toHaveAttribute('href', 'https://secure.toronto.ca/nm/api/individual/notice/123.do')
   expect(within(detail).getByRole('link', { name: 'Open official dataset ↗' })).toHaveAttribute('href', 'https://open.toronto.ca/dataset/chemical-tracking-chemtrac/')
   expect(within(detail).getAllByRole('link', { name: 'Open official dataset ↗' })).toHaveLength(1)
+  expect(within(detail).getByText('12 records · 2012–2024 · 12 reporting years')).toBeInTheDocument()
+  expect(within(detail).queryByText('Chemical 9')).not.toBeInTheDocument()
+  await user.click(within(detail).getByRole('button', { name: 'Show 2 more' }))
+  expect(within(detail).getByText('Chemical 9')).toBeInTheDocument()
 
   await user.click(within(detail).getByRole('button', { name: 'Close Toronto property detail' }))
   await user.click(screen.getByRole('button', { name: '20 Beta Ave' }))
   expect(screen.getByText(/No durable row-level URL is published/)).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'Open current AIC application search ↗' })).toHaveAttribute('href', 'https://www.toronto.ca/city-government/planning-development/application-details/')
+})
+
+test('groups source histories without dropping underlying records', () => {
+  const links = Array.from({ length: 3 }, (_, index) => ({ source_key: 'chemtrac_history', source_record_id: `chem:${index}`, match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: String(2022 + index), record_status: null, record_details: [] }))
+  const groups = groupTorontoSourceLinks(links)
+  expect(groups).toHaveLength(1)
+  expect(groups[0].links).toHaveLength(3)
+  expect(groups[0].yearSummary).toBe('2022–2024 · 3 reporting years')
+})
+
+test('matches health and environmental source filters without changing tower evidence', () => {
+  const property = {
+    property_id: 'toronto-address-point:300', address_point_id: '300', display_address: '30 Gamma Rd', municipality: 'Toronto', longitude: -79.3, latitude: 43.7, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: false, tower_evidence_status: 'NO_TOWER_ASSERTION' as const, source_keys: ['toronto_highrise_residential_health_hazards', 'ontario_environmental_compliance_reports'], source_links: [
+      { source_key: 'toronto_highrise_residential_health_hazards', source_record_id: 'health:1', match_basis: 'EXACT_ADDRESS', source_address: '30 Gamma Rd', record_url: null, record_link_label: null, record_title: 'CASE-1', record_date: '2025-01-01', record_status: 'Closed', record_details: [] },
+      { source_key: 'ontario_environmental_compliance_reports', source_record_id: 'environment:42', match_basis: 'EXACT_ADDRESS', source_address: '30 Gamma Rd', record_url: null, record_link_label: null, record_title: 'Gamma Plant', record_date: '2024-01-01', record_status: 'Assessment Underway', record_details: [{ label: 'Contaminant', value: 'Temperature' }] },
+    ], relationships: [], aerial_review_rank: null, aerial_visual_similarity_score: null,
+  }
+  const empty = { chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '' }
+  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, healthStatus: 'Closed' })).toBe(true)
+  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, environmentalRecord: 'environment:42' })).toBe(true)
+  expect(property.tower_evidence_status).toBe('NO_TOWER_ASSERTION')
 })
 
 test('builds a Toronto-specific CSV with scope and source-preserved roles', () => {

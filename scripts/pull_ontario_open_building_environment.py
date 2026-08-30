@@ -177,6 +177,35 @@ def resource_summary(resource: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def environmental_resource_key(resource: dict[str, Any]) -> tuple[int | None, str]:
+    return resource_year(resource), re.sub(r"\s+", " ", str(resource.get("name") or "").strip().lower())
+
+
+def select_preferred_environmental_resources(resources: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Choose one English tabular representation for each year/category."""
+    english = [
+        item for item in resources
+        if "french" not in str(item.get("name") or "").lower()
+        and not str(item.get("language") or "").lower().startswith("fr")
+        and "_fr." not in str(item.get("url") or "").lower()
+    ]
+    grouped: dict[tuple[int | None, str], list[dict[str, Any]]] = {}
+    for item in english:
+        grouped.setdefault(environmental_resource_key(item), []).append(item)
+    selected: list[dict[str, Any]] = []
+    excluded = [item for item in resources if item not in english]
+    for key in sorted(grouped, key=lambda item: (item[0] or 0, item[1])):
+        variants = grouped[key]
+        variants.sort(key=lambda item: (
+            str(item.get("format") or "").upper() == "XLSX",
+            str(item.get("last_modified") or ""),
+            str(item.get("id") or ""),
+        ))
+        selected.append(variants[-1])
+        excluded.extend(variants[:-1])
+    return selected, excluded
+
+
 def select_resources(package: dict[str, Any], mode: str) -> list[dict[str, Any]]:
     resources = [item for item in (package.get("resources") or []) if isinstance(item, dict)]
     if mode == "all_english_xlsx":
@@ -192,11 +221,33 @@ def select_resources(package: dict[str, Any], mode: str) -> list[dict[str, Any]]
             selected.append(item)
         return selected
     if mode == "all_tabular":
-        return [
+        tabular = [
             item for item in resources
             if str(item.get("format") or "").upper() in {"XLSX", "CSV"}
         ]
+        return select_preferred_environmental_resources(tabular)[0]
     raise RuntimeError(f"Unknown selection mode: {mode}")
+
+
+def normalize_existing_environmental_report(path: Path) -> dict[str, int]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    metadata = payload.get("metadata") or {}
+    resources = [item for item in (metadata.get("resources") or []) if isinstance(item, dict)]
+    selected, excluded = select_preferred_environmental_resources(resources)
+    selected_ids = {str(item.get("id") or "") for item in selected}
+    rows = [
+        row for row in (payload.get("toronto_rows") or [])
+        if isinstance(row, dict) and str(row.get("_towersignal_source_resource_id") or "") in selected_ids
+    ]
+    metadata["resources"] = selected
+    metadata["resource_count"] = len(selected)
+    metadata["toronto_row_count"] = len(rows)
+    metadata["excluded_duplicate_or_translation_resources"] = [resource_summary(item) for item in excluded]
+    metadata["resource_selection_contract"] = "One English XLSX resource per reporting year and compliance category; alternate formats and translations are excluded."
+    payload["metadata"] = metadata
+    payload["toronto_rows"] = rows
+    write_json(path, payload)
+    return {"toronto_row_count": len(rows), "resource_count": len(selected), "excluded_resource_count": len(excluded)}
 
 
 def parse_resource(resource: dict[str, Any]) -> list[dict[str, Any]]:
@@ -307,7 +358,12 @@ def build(output_dir: Path) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Pull Ontario open building/environment data for Toronto")
     parser.add_argument("--output", type=Path, default=ROOT / "data/toronto/warehouse/current")
+    parser.add_argument("--normalize-existing", action="store_true", help="Normalize the persisted environmental report without network access")
     args = parser.parse_args()
+    if args.normalize_existing:
+        result = normalize_existing_environmental_report(args.output / "open_licensed" / "ontario_environmental_compliance_reports.json")
+        print(json.dumps(result, indent=2))
+        return
     build(args.output)
 
 

@@ -108,7 +108,9 @@ def load_source_rows(root: Path, load_json: Any) -> dict[str, list[dict[str, Any
     loaded["business_licence_matches_prior_poc"] = [item.get("source_row") or {} for item in loaded["business_licence_matches_prior_poc"]]
 
     notices = load_json(files["toronto_public_notices_exact_prior_poc"])
-    loaded["toronto_public_notices_exact_prior_poc"] = _rows({"matches": notices.get("poc_matches") or []})
+    # Use the full planning-notice collection. Exact prior-POC links and newer
+    # application-number links both resolve by stable noticeId below.
+    loaded["toronto_public_notices_exact_prior_poc"] = _rows({"matches": notices.get("planning_notices") or []})
     return loaded
 
 
@@ -116,7 +118,9 @@ def _record_for_link(link: dict[str, Any], source_rows: dict[str, list[dict[str,
     key = str(link.get("source_key") or "")
     rows = source_rows.get(key) or []
     index = link.get("source_row_index")
-    if isinstance(index, int) and 0 <= index < len(rows):
+    # Public-notice links are resolved by stable noticeId because they originate
+    # from two independently ordered source subsets.
+    if key != "toronto_public_notices_exact_prior_poc" and isinstance(index, int) and 0 <= index < len(rows):
         return rows[index]
     suffix = str(link.get("source_record_id") or "").rsplit(":", 1)[-1]
     if key == "tobids_awarded_contracts_exact_document_address_prior_poc":

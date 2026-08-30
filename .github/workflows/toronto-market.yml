@@ -5,13 +5,17 @@ on:
   push:
     branches:
       - agent/toronto-market-20260828
+      - agent/toronto-data-usability-20260830
     paths:
       - scripts/toronto_market_common.py
       - scripts/toronto_market_core.py
+      - scripts/pull_toronto_history_notices.py
+      - scripts/pull_ontario_open_building_environment.py
       - scripts/toronto_aic_corpus.py
       - scripts/toronto_aerial_detector.py
       - scripts/toronto_aerial_recovery.py
       - scripts/toronto_aic_access_status.py
+      - scripts/toronto_aic_free_alternatives.py
       - scripts/toronto_identity_normalize.py
       - scripts/toronto_final_identity_cleanup.py
       - scripts/toronto_extend_source_links.py
@@ -50,10 +54,13 @@ jobs:
           python -m py_compile \
             scripts/toronto_market_common.py \
             scripts/toronto_market_core.py \
+            scripts/pull_toronto_history_notices.py \
+            scripts/pull_ontario_open_building_environment.py \
             scripts/toronto_aic_corpus.py \
             scripts/toronto_aerial_detector.py \
             scripts/toronto_aerial_recovery.py \
             scripts/toronto_aic_access_status.py \
+            scripts/toronto_aic_free_alternatives.py \
             scripts/toronto_identity_normalize.py \
             scripts/toronto_final_identity_cleanup.py \
             scripts/toronto_extend_source_links.py \
@@ -61,8 +68,14 @@ jobs:
             scripts/toronto_final_entity_graph.py \
             scripts/toronto_final_coverage.py \
             scripts/toronto_final_validate.py \
+            scripts/validate_toronto_source_actions.py \
             scripts/build_toronto_app_data.py \
             scripts/validate_toronto_market.py
+
+      - name: Refresh historical Toronto and Ontario source snapshots
+        run: |
+          python scripts/pull_toronto_history_notices.py
+          python scripts/pull_ontario_open_building_environment.py
 
       - name: Build canonical Address Point spine and official-source joins
         run: python scripts/toronto_market_core.py core
@@ -208,6 +221,7 @@ jobs:
           python scripts/toronto_identity_normalize.py
           python scripts/toronto_final_identity_cleanup.py
           python scripts/toronto_extend_source_links.py
+          python scripts/toronto_aic_free_alternatives.py
 
       - name: Rebuild final source-role relationships and measured coverage
         run: |
@@ -220,6 +234,9 @@ jobs:
 
       - name: Build feature-gated Toronto application payload
         run: python scripts/build_toronto_app_data.py
+
+      - name: Verify Toronto source actions
+        run: python scripts/validate_toronto_source_actions.py
 
       - name: Validate final public-safe outputs
         run: |
