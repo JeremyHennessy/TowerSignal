@@ -161,6 +161,8 @@ Raw AIC PDFs and aerial crops are processed as ephemeral/review artifacts and re
 
 The adapter accepts HTTPS links only from the explicit Toronto/Ontario publisher allowlist. It rejects the legacy `secure.toronto.ca/AIC/index.do` route, which returned HTTP 403 during the corpus attempt. AIC application rows retain application number, type, status, milestone and description, but link to the current official AIC search rather than manufacturing a dead application URL.
 
+`.github/workflows/toronto-app-payload-persist.yml` rebuilds and validates the public app payload on the isolated continuation branch, then commits only `public/data/toronto-market.json` when it changes. Its trigger excludes that generated path, so the bot output commit cannot start a persistence loop.
+
 Health, planning, environmental, procurement and aerial context remain separate from cooling-tower confirmation after app normalization.
 
 ## Production boundary
