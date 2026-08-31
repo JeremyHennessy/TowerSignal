@@ -1,0 +1,50 @@
+name: Toronto Record Actions Apply
+
+on:
+  push:
+    branches:
+      - agent/toronto-release-actions-20260831
+    paths:
+      - .github/workflows/toronto-record-actions-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-release-actions-20260831
+          fetch-depth: 0
+      - name: Wire verified record actions into source normalization
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('scripts/toronto_app_sources.py')
+          text = path.read_text(encoding='utf-8')
+          import_anchor = '''try:\n    from .toronto_source_identity import find_source_record\nexcept ImportError:\n    from toronto_source_identity import find_source_record\n'''
+          import_block = import_anchor + '''try:\n    from .toronto_record_actions import record_action_for_source\nexcept ImportError:\n    from toronto_record_actions import record_action_for_source\n'''
+          if 'toronto_record_actions import record_action_for_source' not in text:
+              if import_anchor not in text:
+                  raise SystemExit('record action import anchor changed')
+              text = text.replace(import_anchor, import_block, 1)
+          old = '''    return result\n'''
+          new = '''    action = record_action_for_source(key, row, source_rows, link)\n    record_url = valid_public_url(action.get("record_url"))\n    result["record_url"] = record_url\n    result["record_link_label"] = action.get("record_link_label") if record_url else None\n    return result\n'''
+          if new not in text:
+              pos = text.rfind(old)
+              if pos < 0:
+                  raise SystemExit('record action return anchor changed')
+              text = text[:pos] + new + text[pos + len(old):]
+          path.write_text(text, encoding='utf-8')
+      - name: Compile source action modules
+        run: python -m py_compile scripts/toronto_record_actions.py scripts/toronto_app_sources.py
+      - name: Commit code for test update
+        run: |
+          git config user.name "TowerSignal Release Bot"
+          git config user.email "towersignal-release@users.noreply.github.com"
+          git add scripts/toronto_app_sources.py
+          git commit -m "Toronto: expose verified record actions"
+          git push origin HEAD:agent/toronto-release-actions-20260831
