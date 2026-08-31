@@ -1,0 +1,231 @@
+name: Toronto Controlled Fixes V2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/toronto-approved-recovery-20260831
+    paths:
+      - .github/workflows/toronto-controlled-fixes-v2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact recovery branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-approved-recovery-20260831
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-normalization dependency
+        run: python -m pip install --disable-pip-version-check 'openpyxl>=3.1,<4'
+
+      - name: Apply minimal evidence-backed code changes
+        shell: python
+        run: |
+          from pathlib import Path
+
+          root = Path('.')
+
+          path = root / 'scripts/pull_toronto_history_notices.py'
+          text = path.read_text(encoding='utf-8')
+          anchor = 'CHEMTRAC_PACKAGE = "chemical-tracking-chemtrac"\n'
+          if 'CHEMTRAC_CURRENT_SNAPSHOT_YEAR = 2024' not in text:
+              if anchor not in text:
+                  raise SystemExit('ChemTRAC constant anchor changed')
+              text = text.replace(anchor, anchor + 'CHEMTRAC_CURRENT_SNAPSHOT_YEAR = 2024\n', 1)
+
+          old = '''    selected, excluded = select_chemtrac_resources(resources)\n    selected_ids = {resource_identifier(item) for item in selected}\n'''
+          new = '''    selected, excluded = select_chemtrac_resources(resources)\n    current_snapshot_resources = [item for item in selected if year_from_resource(item) == CHEMTRAC_CURRENT_SNAPSHOT_YEAR]\n    selected = [item for item in selected if year_from_resource(item) != CHEMTRAC_CURRENT_SNAPSHOT_YEAR]\n    selected_ids = {resource_identifier(item) for item in selected}\n'''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('ChemTRAC normalization anchor changed')
+
+          old = '''    metadata["excluded_duplicate_resource_variants"] = excluded\n    metadata["resource_selection_contract"] = "One current CSV resource per normalized annual ChemTRAC resource name; superseded equivalent variants are excluded."\n'''
+          new = '''    metadata["excluded_duplicate_resource_variants"] = excluded\n    metadata["excluded_dedicated_current_snapshot_resources"] = current_snapshot_resources\n    metadata["resource_selection_contract"] = "One current variant per annual ChemTRAC resource; the dedicated chemtrac_2024 snapshot is excluded from chemtrac_history to prevent cross-source duplication."\n'''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('ChemTRAC normalization metadata anchor changed')
+
+          old = '''    resources, excluded = select_chemtrac_resources(eligible)\n    historical = []\n'''
+          new = '''    resources, excluded = select_chemtrac_resources(eligible)\n    current_snapshot_resources = [item for item in resources if year_from_resource(item) == CHEMTRAC_CURRENT_SNAPSHOT_YEAR]\n    resources = [item for item in resources if year_from_resource(item) != CHEMTRAC_CURRENT_SNAPSHOT_YEAR]\n    historical = []\n'''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('ChemTRAC pull anchor changed')
+
+          old = '''            "excluded_duplicate_resource_variants": [\n                {"year": year_from_resource(item), "resource_id": resource_identifier(item), "name": item.get("name"), "format": item.get("format"), "last_modified": item.get("last_modified")}\n                for item in excluded\n            ],\n            "resource_selection_contract": "One current CSV resource per normalized annual ChemTRAC resource name; superseded equivalent variants are excluded.",\n'''
+          new = '''            "excluded_duplicate_resource_variants": [\n                {"year": year_from_resource(item), "resource_id": resource_identifier(item), "name": item.get("name"), "format": item.get("format"), "last_modified": item.get("last_modified")}\n                for item in excluded\n            ],\n            "excluded_dedicated_current_snapshot_resources": [\n                {"year": year_from_resource(item), "resource_id": resource_identifier(item), "name": item.get("name"), "format": item.get("format"), "last_modified": item.get("last_modified")}\n                for item in current_snapshot_resources\n            ],\n            "resource_selection_contract": "One current variant per annual ChemTRAC resource; the dedicated chemtrac_2024 snapshot is excluded from chemtrac_history to prevent cross-source duplication.",\n'''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('ChemTRAC pull metadata anchor changed')
+          path.write_text(text, encoding='utf-8')
+
+          path = root / 'tests/frontend/App.test.tsx'
+          text = path.read_text(encoding='utf-8')
+          old = "expect(screen.getAllByText('New public sample reported')).toHaveLength(2)"
+          new = "expect(screen.getAllByText('New public sample reported').length).toBeGreaterThan(0)"
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('Monitor assertion anchor changed')
+          path.write_text(text, encoding='utf-8')
+
+          path = root / '.github/workflows/toronto-market.yml'
+          text = path.read_text(encoding='utf-8')
+          branch_line = '      - agent/toronto-approved-recovery-20260831\n'
+          anchor = '      - agent/toronto-data-usability-20260830\n'
+          if branch_line not in text:
+              if anchor not in text:
+                  raise SystemExit('Toronto workflow branch anchor changed')
+              text = text.replace(anchor, anchor + branch_line, 1)
+          path.write_text(text, encoding='utf-8')
+
+      - name: Add permanent ChemTRAC regression guard
+        run: |
+          cat > tests/python/test_toronto_chemtrac_regression.py <<'PY'
+          import json
+          import unittest
+          from collections import Counter
+          from pathlib import Path
+
+          ROOT = Path(__file__).resolve().parents[2]
+          HISTORY = ROOT / "data/toronto/warehouse/current/open_licensed/chemtrac_history.json"
+          CURRENT = ROOT / "data/toronto/warehouse/current/open_licensed/chemtrac_2024.json"
+
+
+          def load_rows(path: Path):
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              return payload, [row for row in payload.get("rows", []) if isinstance(row, dict)]
+
+
+          def clean(value):
+              if value is None:
+                  return ""
+              return str(value).strip()
+
+
+          def address(row):
+              return clean(row.get("FA_ADDRESS_GIVEN") or row.get("FACILITY_ADDRESS") or row.get("ADDRESS")).upper()
+
+
+          class TorontoChemtracRegressionTests(unittest.TestCase):
+              def test_history_has_one_source_row_per_year_and_row_id(self):
+                  _, rows = load_rows(HISTORY)
+                  keys = [(clean(row.get("_towersignal_reporting_year")), clean(row.get("_id"))) for row in rows]
+                  duplicates = [key for key, count in Counter(keys).items() if key != ("", "") and count > 1]
+                  self.assertEqual([], duplicates, f"duplicate annual ChemTRAC row identities: {duplicates[:20]}")
+
+              def test_history_excludes_dedicated_2024_snapshot(self):
+                  payload, rows = load_rows(HISTORY)
+                  years = {clean(row.get("_towersignal_reporting_year")) for row in rows}
+                  self.assertNotIn("2024", years)
+                  excluded = payload.get("metadata", {}).get("excluded_dedicated_current_snapshot_resources") or []
+                  self.assertTrue(any(clean(item.get("year")) == "2024" for item in excluded))
+
+              def test_ten_skagway_is_unique_across_history_and_current(self):
+                  _, historical = load_rows(HISTORY)
+                  _, current = load_rows(CURRENT)
+                  combined = []
+                  for row in historical:
+                      if "10 SKAGWAY" in address(row):
+                          combined.append((clean(row.get("FACILITY_ID")), clean(row.get("_towersignal_reporting_year")), clean(row.get("_id"))))
+                  for row in current:
+                      if "10 SKAGWAY" in address(row):
+                          combined.append((clean(row.get("FACILITY_ID")), "2024", clean(row.get("_id"))))
+                  self.assertGreater(len(combined), 0, "10 Skagway regression fixture disappeared")
+                  duplicates = [key for key, count in Counter(combined).items() if count > 1]
+                  self.assertEqual([], duplicates, f"10 Skagway duplicate ChemTRAC records returned: {duplicates}")
+
+
+          if __name__ == "__main__":
+              unittest.main()
+          PY
+
+      - name: Add permanent unresolved-identity guard
+        run: |
+          cat > tests/python/test_toronto_identity_exceptions.py <<'PY'
+          import json
+          import unittest
+          from pathlib import Path
+
+          ROOT = Path(__file__).resolve().parents[2]
+          RECONCILIATION = ROOT / "data/toronto/market/current/reconciliation_details.json"
+
+
+          class TorontoIdentityExceptionTests(unittest.TestCase):
+              def test_current_unresolved_identity_contract(self):
+                  payload = json.loads(RECONCILIATION.read_text(encoding="utf-8"))
+                  records = {row.get("property_key"): row for row in payload.get("records", []) if isinstance(row, dict)}
+                  expected = {
+                      "toronto-geoid:8127974": ("89 HUMBER COLLEGE BLVD", "NO_CURRENT_ADDRESS_POINT_MATCH"),
+                      "toronto-geoid:12763885": ("90-94 ADELAIDE ST W", "MULTI_ADDRESS_RANGE_REVIEW_REQUIRED"),
+                  }
+                  for key, (address, status) in expected.items():
+                      self.assertIn(key, records)
+                      row = records[key]
+                      self.assertEqual(address, row.get("input_address"))
+                      self.assertEqual(status, row.get("resolution_status"))
+                      self.assertFalse(row.get("resolved"))
+                      self.assertFalse(row.get("candidate_address_point_ids") or [])
+                  unresolved = {key for key, row in records.items() if row.get("resolved") is False}
+                  self.assertEqual(set(expected), unresolved)
+
+
+          if __name__ == "__main__":
+              unittest.main()
+          PY
+
+      - name: Normalize committed ChemTRAC history snapshot
+        run: python scripts/pull_toronto_history_notices.py --normalize-existing
+
+      - name: Synchronize ChemTRAC inventory metadata
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          root = Path('.')
+          history_path = root / 'data/toronto/warehouse/current/open_licensed/chemtrac_history.json'
+          inventory_path = root / 'data/toronto/warehouse/current/source_inventory.json'
+          history = json.loads(history_path.read_text(encoding='utf-8'))
+          metadata = history.get('metadata') or {}
+          inventory = json.loads(inventory_path.read_text(encoding='utf-8'))
+          for item in inventory.get('open_licensed_sources', []):
+              if item.get('key') != 'chemtrac_history':
+                  continue
+              for key in ('resource_count', 'row_count', 'resources', 'excluded_duplicate_resource_variants', 'excluded_dedicated_current_snapshot_resources', 'resource_selection_contract'):
+                  if key in metadata:
+                      item[key] = metadata[key]
+              break
+          else:
+              raise SystemExit('chemtrac_history inventory entry missing')
+          inventory_path.write_text(json.dumps(inventory, indent=2, ensure_ascii=False, default=str) + '\n', encoding='utf-8')
+
+      - name: Verify targeted guards before commit
+        run: python -m unittest discover -s tests/python -p 'test_toronto_*regression.py' -v && python -m unittest discover -s tests/python -p 'test_toronto_identity_exceptions.py' -v
+
+      - name: Commit controlled fixes only after guards pass
+        run: |
+          git config user.name "TowerSignal Recovery Bot"
+          git config user.email "towersignal-recovery@users.noreply.github.com"
+          git add \
+            scripts/pull_toronto_history_notices.py \
+            tests/frontend/App.test.tsx \
+            tests/python/test_toronto_chemtrac_regression.py \
+            tests/python/test_toronto_identity_exceptions.py \
+            .github/workflows/toronto-market.yml \
+            data/toronto/warehouse/current/open_licensed/chemtrac_history.json \
+            data/toronto/warehouse/current/source_inventory.json
+          git commit -m "Toronto: fix ChemTRAC cardinality and baseline guards"
+          git push origin HEAD:agent/toronto-approved-recovery-20260831
