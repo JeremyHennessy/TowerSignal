@@ -24,14 +24,17 @@ jobs:
         run: |
           from pathlib import Path
 
+          dual_import_stable = '''try:\n    from .toronto_source_identity import stable_source_record_id\nexcept ImportError:\n    from toronto_source_identity import stable_source_record_id\n'''
+          dual_import_find = '''try:\n    from .toronto_source_identity import find_source_record\nexcept ImportError:\n    from toronto_source_identity import find_source_record\n'''
+
           # Core source joins.
           path = Path('scripts/toronto_market_core.py')
           text = path.read_text(encoding='utf-8')
           anchor = 'from toronto_market_common import (\n'
-          if 'from toronto_source_identity import stable_source_record_id\n' not in text:
+          if 'toronto_source_identity import stable_source_record_id' not in text:
               if anchor not in text:
                   raise SystemExit('core import anchor changed')
-              text = text.replace(anchor, 'from toronto_source_identity import stable_source_record_id\n' + anchor, 1)
+              text = text.replace(anchor, dual_import_stable + anchor, 1)
           old = '''                rid=next((r.get(k) for k in ("_id","OBJECTID","id","APPLICATION_NUMBER","FOLDERRSN") if r.get(k) not in (None,"")),None)\n                links.append({"property_id":p["property_id"],"source_key":source,"source_record_id":f"{source}:{rid if rid is not None else 'row'}:{i}","source_row_index":i,"match_basis":"EXACT_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE","source_address":a});mp.add(p["property_id"]);matched=True;break\n'''
           new = '''                source_record_id=stable_source_record_id(source,r)\n                links.append({"property_id":p["property_id"],"source_key":source,"source_record_id":source_record_id,"source_row_index":i,"match_basis":"EXACT_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE","source_address":a});mp.add(p["property_id"]);matched=True;break\n'''
           if old in text:
@@ -44,11 +47,10 @@ jobs:
           path = Path('scripts/toronto_extend_source_links.py')
           text = path.read_text(encoding='utf-8')
           anchor = 'from toronto_market_common import clean_text, read_json, utc_now, write_json\n'
-          import_line = 'from toronto_source_identity import stable_source_record_id\n'
-          if import_line not in text:
+          if 'toronto_source_identity import stable_source_record_id' not in text:
               if anchor not in text:
                   raise SystemExit('extended import anchor changed')
-              text = text.replace(anchor, anchor + import_line, 1)
+              text = text.replace(anchor, anchor + dual_import_stable, 1)
           old = '''                rid = next((rec.get(k) for k in ("_id", "OBJECTID", "id", "APPLICATION_NUMBER", "FOLDERRSN", "RSN", "document_number", "noticeId") if rec.get(k) not in (None, "")), None)\n                # Persisted record arrays can reuse local IDs across source\n                # partitions. Include the row index to retain a unique,\n                # reproducible source observation identity.\n                source_record_id = f"{source}:{rid}:{idx}" if rid is not None else f"{source}:row:{idx}"\n'''
           new = '''                # Row position is provenance only. Stable identity is publisher\n                # ID-based where possible and content-fingerprinted otherwise.\n                source_record_id = stable_source_record_id(source, rec)\n'''
           if old in text:
@@ -61,11 +63,10 @@ jobs:
           path = Path('scripts/toronto_app_sources.py')
           text = path.read_text(encoding='utf-8')
           anchor = 'from urllib.parse import urlparse\n'
-          import_line = 'from toronto_source_identity import find_source_record\n'
-          if import_line not in text:
+          if 'toronto_source_identity import find_source_record' not in text:
               if anchor not in text:
                   raise SystemExit('app import anchor changed')
-              text = text.replace(anchor, anchor + import_line, 1)
+              text = text.replace(anchor, anchor + dual_import_find, 1)
           start = text.index('def _record_for_link(')
           end = text.index('\n\ndef normalize_source_link', start)
           replacement = '''def _record_for_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:\n    key = str(link.get("source_key") or "")\n    rows = source_rows.get(key) or []\n    return find_source_record(key, str(link.get("source_record_id") or ""), rows)\n'''
