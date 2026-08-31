@@ -5,6 +5,10 @@ from datetime import datetime,timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
+try:
+    from .toronto_source_identity import stable_source_record_id
+except ImportError:
+    from toronto_source_identity import stable_source_record_id
 from toronto_market_common import (
     canonical_street_address, clean_text, get_value, iter_record_objects, read_json,
     record_property_addresses, request_bytes, request_json, utc_now, write_json
@@ -176,8 +180,8 @@ def join_sources(warehouse:Path,market:Path)->dict[str,Any]:
             for a in addrs:
                 p=byaddr.get(canonical_street_address(a))
                 if not p:continue
-                rid=next((r.get(k) for k in ("_id","OBJECTID","id","APPLICATION_NUMBER","FOLDERRSN") if r.get(k) not in (None,"")),None)
-                links.append({"property_id":p["property_id"],"source_key":source,"source_record_id":f"{source}:{rid if rid is not None else 'row'}:{i}","source_row_index":i,"match_basis":"EXACT_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE","source_address":a});mp.add(p["property_id"]);matched=True;break
+                source_record_id=stable_source_record_id(source,r)
+                links.append({"property_id":p["property_id"],"source_key":source,"source_record_id":source_record_id,"source_row_index":i,"match_basis":"EXACT_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE","source_address":a});mp.add(p["property_id"]);matched=True;break
             mr+=matched
         summaries[source]={"status":"JOINED","source_records":len(records),"records_with_property_address":rwa,"matched_records":mr,"unmatched_records":len(records)-mr,"matched_canonical_properties":len(mp),"earliest_year":min(years) if years else None,"latest_year":max(years) if years else None,"available_years":sorted(years),"distinct_organizations_or_reporters":len(organizations),"identity_limitation":None if rwa else "PUBLIC_SOURCE_HAS_NO_DETERMINISTIC_PROPERTY_ADDRESS_FIELD"}
     out={"schema_version":"toronto-market-property-links-0.2","generated_at":utc_now(),"join_contract":{"basis":"Exact canonical property-address equality to municipal Address Point spine","fuzzy_matching":False},"counts":{"canonical_properties":len(props),"total_source_links":len(links),"properties_with_any_new_link":len({l["property_id"] for l in links})},"sources":summaries,"links":links}; write_json(market/"property_source_links.json",out);return out

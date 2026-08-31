@@ -7,6 +7,10 @@ from typing import Any
 
 from toronto_final_identity_cleanup import canonical_address, iter_records, record_addresses
 from toronto_market_common import clean_text, read_json, utc_now, write_json
+try:
+    from .toronto_source_identity import stable_source_record_id
+except ImportError:
+    from toronto_source_identity import stable_source_record_id
 
 ROOT = Path(__file__).resolve().parents[1]
 MARKET = ROOT / "data" / "toronto" / "market" / "current"
@@ -64,11 +68,9 @@ def main() -> None:
                 if len(matches) != 1:
                     continue
                 prop = matches[0]
-                rid = next((rec.get(k) for k in ("_id", "OBJECTID", "id", "APPLICATION_NUMBER", "FOLDERRSN", "RSN", "document_number", "noticeId") if rec.get(k) not in (None, "")), None)
-                # Persisted record arrays can reuse local IDs across source
-                # partitions. Include the row index to retain a unique,
-                # reproducible source observation identity.
-                source_record_id = f"{source}:{rid}:{idx}" if rid is not None else f"{source}:row:{idx}"
+                # Row position is provenance only. Stable identity is publisher
+                # ID-based where possible and content-fingerprinted otherwise.
+                source_record_id = stable_source_record_id(source, rec)
                 key = (prop["property_id"], source, source_record_id)
                 if key not in existing:
                     links.append({

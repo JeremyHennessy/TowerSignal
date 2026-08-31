@@ -6,6 +6,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
+try:
+    from .toronto_source_identity import find_source_record
+except ImportError:
+    from toronto_source_identity import find_source_record
 
 
 OFFICIAL_DATASET_URLS = {
@@ -117,17 +121,7 @@ def load_source_rows(root: Path, load_json: Any) -> dict[str, list[dict[str, Any
 def _record_for_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
     key = str(link.get("source_key") or "")
     rows = source_rows.get(key) or []
-    index = link.get("source_row_index")
-    # Public-notice links are resolved by stable noticeId because they originate
-    # from two independently ordered source subsets.
-    if key != "toronto_public_notices_exact_prior_poc" and isinstance(index, int) and 0 <= index < len(rows):
-        return rows[index]
-    suffix = str(link.get("source_record_id") or "").rsplit(":", 1)[-1]
-    if key == "tobids_awarded_contracts_exact_document_address_prior_poc":
-        return next((row for row in rows if str(row.get("Document Number") or "") == suffix), {})
-    if key == "toronto_public_notices_exact_prior_poc":
-        return next((row for row in rows if str(row.get("noticeId") or "") == suffix), {})
-    return {}
+    return find_source_record(key, str(link.get("source_record_id") or ""), rows)
 
 
 def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
