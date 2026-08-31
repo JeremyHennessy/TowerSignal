@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Reproduce 10 Skagway ChemTRAC cardinality
+      - name: Reproduce 10 Skagway ChemTRAC cardinality and source resources
         shell: python
         run: |
           import json
@@ -40,9 +40,18 @@ jobs:
                           return [x for x in value if isinstance(x, dict)]
               return []
 
+          history = json.loads(files['chemtrac_history'].read_text(encoding='utf-8'))
+          print('=== HISTORY RESOURCE METADATA ===')
+          metadata = history.get('metadata') if isinstance(history, dict) else {}
+          resources = (metadata or {}).get('source_resources') or []
+          for resource in resources:
+              year = str(resource.get('reporting_year') or resource.get('year') or '')
+              if year in {'2015', '2016', '2024'}:
+                  print(json.dumps(resource, sort_keys=True))
+
           matched = []
           for source, path in files.items():
-              payload = json.loads(path.read_text(encoding='utf-8'))
+              payload = history if source == 'chemtrac_history' else json.loads(path.read_text(encoding='utf-8'))
               source_rows = rows(payload)
               for idx, row in enumerate(source_rows):
                   haystack = ' | '.join(str(v) for v in row.values() if v is not None).upper()
@@ -64,15 +73,18 @@ jobs:
           print('BY_SOURCE=' + json.dumps(by_source, sort_keys=True))
           signatures = defaultdict(list)
           for source, idx, signature, row in matched:
-              signatures[signature].append((source, idx, row.get('_id')))
+              signatures[signature].append((source, idx, row.get('_id'), row.get('_towersignal_resource_id')))
           duplicates = {sig: vals for sig, vals in signatures.items() if len(vals) > 1}
           print(f'DUPLICATE_SIGNATURES={len(duplicates)}')
           for signature, vals in sorted(duplicates.items(), key=lambda item: str(item[0])):
               print('--- DUPLICATE')
               print('SIGNATURE=' + repr(signature))
               print('ROWS=' + repr(vals))
-          for source, idx, signature, row in matched[:40]:
+
+          print('=== 2024 OVERLAP ROWS ===')
+          for source, idx, signature, row in matched:
+              if signature[1] != '2024':
+                  continue
               print('--- ROW')
-              print(f'SOURCE={source} INDEX={idx} _id={row.get("_id")} SIGNATURE={signature!r}')
-              print('FACILITY_NAME=' + str(row.get('FACILITY_NAME')))
-              print('ADDRESS=' + str(row.get('FACILITY_ADDRESS') or row.get('ADDRESS') or row.get('FACILITYADDRESS')))
+              print(f'SOURCE={source} INDEX={idx} _id={row.get("_id")} RESOURCE={row.get("_towersignal_resource_id")} SIGNATURE={signature!r}')
+              print(json.dumps(row, sort_keys=True))
