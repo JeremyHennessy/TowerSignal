@@ -1,0 +1,28 @@
+name: Toronto Release Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/toronto-preview-release-20260831-audit
+    paths:
+      - scripts/audit_toronto_source_semantics.py
+      - .github/workflows/toronto-release-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  source-semantics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit every persisted Toronto source link
+        run: python scripts/audit_toronto_source_semantics.py
+      - name: Upload semantic audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-source-semantic-audit
+          path: data/toronto/market/current/source_semantic_audit.json
+          retention-days: 30
