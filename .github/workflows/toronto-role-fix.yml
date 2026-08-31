@@ -1,0 +1,86 @@
+name: Toronto Role Accuracy Fix
+
+on:
+  push:
+    branches:
+      - agent/toronto-release-actions-20260831
+    paths:
+      - .github/workflows/toronto-role-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-release-actions-20260831
+          fetch-depth: 0
+      - name: Apply minimal relationship evidence corrections
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('scripts/toronto_final_entity_graph.py')
+          text = path.read_text(encoding='utf-8')
+
+          import_anchor = 'from toronto_market_common import clean_text, read_json, request_json, utc_now, write_json\n'
+          import_block = import_anchor + '''try:\n    from .toronto_source_identity import find_source_record\n    from .toronto_app_sources import load_source_rows\nexcept ImportError:\n    from toronto_source_identity import find_source_record\n    from toronto_app_sources import load_source_rows\n'''
+          if 'toronto_source_identity import find_source_record' not in text:
+              if import_anchor not in text:
+                  raise SystemExit('entity graph import anchor changed')
+              text = text.replace(import_anchor, import_block, 1)
+
+          old_rentsafe = '''    # RentSafe explicit management-company source field.\n    rentsafe = fetch_rentsafe()\n    rs_matched = 0\n    rs_ambiguous = 0\n    for row in rentsafe:\n        matches = by_addr.get(canonical_address(row.get("SITE_ADDRESS")), [])\n        if len(matches) > 1:\n            rs_ambiguous += 1\n            continue\n        if len(matches) != 1:\n            continue\n        rs_matched += 1\n        add_edge(nodes, edges, property_ids, row.get("PROP_MANAGEMENT_COMPANY_NAME"), matches[0]["property_id"], "PROPERTY_MANAGER_OF", "rentsafe_registration", "EXPLICIT_PROP_MANAGEMENT_COMPANY_NAME_AT_EXACT_CURRENT_ADDRESS", "CONFIRMED_SOURCE_FIELD", {"rsn": row.get("RSN"), "site_address": row.get("SITE_ADDRESS")})\n    diagnostics["rentsafe_registration"] = {"source_rows": len(rentsafe), "exact_property_rows": rs_matched, "ambiguous_rows_not_forced": rs_ambiguous}\n'''
+          new_rentsafe = '''    # RentSafe explicit management-company source field. Repeated source rows\n    # for the same manager/property are supporting observations, not distinct\n    # relationships; aggregate their evidence into one semantic edge.\n    rentsafe = fetch_rentsafe()\n    rs_matched = 0\n    rs_ambiguous = 0\n    rentsafe_groups: dict[tuple[str, str], dict[str, Any]] = {}\n    for row in rentsafe:\n        matches = by_addr.get(canonical_address(row.get("SITE_ADDRESS")), [])\n        if len(matches) > 1:\n            rs_ambiguous += 1\n            continue\n        if len(matches) != 1:\n            continue\n        name = clean_text(row.get("PROP_MANAGEMENT_COMPANY_NAME"))\n        if not name:\n            continue\n        rs_matched += 1\n        pid = matches[0]["property_id"]\n        group = rentsafe_groups.setdefault((pid, name.upper()), {"name": name, "rsns": set(), "site_addresses": set(), "record_count": 0})\n        if row.get("RSN") not in (None, ""):\n            group["rsns"].add(str(row.get("RSN")))\n        if row.get("SITE_ADDRESS") not in (None, ""):\n            group["site_addresses"].add(str(row.get("SITE_ADDRESS")))\n        group["record_count"] += 1\n    for (pid, _), group in rentsafe_groups.items():\n        add_edge(nodes, edges, property_ids, group["name"], pid, "PROPERTY_MANAGER_OF", "rentsafe_registration", "EXPLICIT_PROP_MANAGEMENT_COMPANY_NAME_AT_EXACT_CURRENT_ADDRESS", "CONFIRMED_SOURCE_FIELD", {"rsns": sorted(group["rsns"]), "site_addresses": sorted(group["site_addresses"]), "source_observation_count": group["record_count"]})\n    diagnostics["rentsafe_registration"] = {"source_rows": len(rentsafe), "exact_property_rows": rs_matched, "property_manager_groups": len(rentsafe_groups), "ambiguous_rows_not_forced": rs_ambiguous}\n'''
+          if old_rentsafe in text:
+              text = text.replace(old_rentsafe, new_rentsafe, 1)
+          elif new_rentsafe not in text:
+              raise SystemExit('RentSafe relationship anchor changed')
+
+          links_anchor = '''    links = [item for item in link_payload.get("links", []) if isinstance(item, dict)]\n'''
+          links_replacement = links_anchor + '''    source_rows = load_source_rows(ROOT, read_json)\n'''
+          if 'source_rows = load_source_rows(ROOT, read_json)' not in text:
+              if links_anchor not in text:
+                  raise SystemExit('source rows anchor changed')
+              text = text.replace(links_anchor, links_replacement, 1)
+
+          old_chem = '''    chem_payload = read_json(WAREHOUSE / "open_licensed/chemtrac_history.json") or {}\n    chem_rows = list(iter_records(chem_payload))\n    chem_groups: dict[tuple[str, str], dict[str, Any]] = {}\n    chem_bad_indices = 0\n    for link in links:\n        if link.get("source_key") != "chemtrac_history":\n            continue\n        idx = link.get("source_row_index")\n        if not isinstance(idx, int) or idx < 0 or idx >= len(chem_rows):\n            chem_bad_indices += 1\n            continue\n        row = chem_rows[idx]\n'''
+          new_chem = '''    chem_rows = source_rows.get("chemtrac_history") or []\n    chem_groups: dict[tuple[str, str], dict[str, Any]] = {}\n    chem_bad_identities = 0\n    for link in links:\n        if link.get("source_key") != "chemtrac_history":\n            continue\n        row = find_source_record("chemtrac_history", clean_text(link.get("source_record_id")), chem_rows)\n        if not row:\n            chem_bad_identities += 1\n            continue\n'''
+          if old_chem in text:
+              text = text.replace(old_chem, new_chem, 1)
+          elif new_chem not in text:
+              raise SystemExit('ChemTRAC relationship resolver anchor changed')
+          text = text.replace('"invalid_source_row_indices": chem_bad_indices', '"invalid_source_record_identities": chem_bad_identities')
+
+          old_lic = '''    licence_payload = read_json(WAREHOUSE / "business_licence_matches.json") or {}\n    licence_rows = list(iter_records(licence_payload))\n    licence_groups: dict[tuple[str, str], dict[str, Any]] = {}\n    licence_bad_indices = 0\n    for link in links:\n        if link.get("source_key") != "business_licence_matches_prior_poc":\n            continue\n        idx = link.get("source_row_index")\n        if not isinstance(idx, int) or idx < 0 or idx >= len(licence_rows):\n            licence_bad_indices += 1\n            continue\n        wrapper = licence_rows[idx]\n        row = wrapper.get("source_row") if isinstance(wrapper.get("source_row"), dict) else wrapper\n'''
+          new_lic = '''    licence_rows = source_rows.get("business_licence_matches_prior_poc") or []\n    licence_groups: dict[tuple[str, str], dict[str, Any]] = {}\n    licence_bad_identities = 0\n    for link in links:\n        if link.get("source_key") != "business_licence_matches_prior_poc":\n            continue\n        row = find_source_record("business_licence_matches_prior_poc", clean_text(link.get("source_record_id")), licence_rows)\n        if not row:\n            licence_bad_identities += 1\n            continue\n'''
+          if old_lic in text:
+              text = text.replace(old_lic, new_lic, 1)
+          elif new_lic not in text:
+              raise SystemExit('business licence relationship resolver anchor changed')
+          text = text.replace('"invalid_source_row_indices": licence_bad_indices', '"invalid_source_record_identities": licence_bad_identities')
+
+          old_env = '''    env_payload = read_json(WAREHOUSE / "open_licensed/ontario_environmental_compliance_reports.json") or {}\n    env_rows = list(iter_records(env_payload))\n    env_owner_groups: dict[tuple[str, str], dict[str, Any]] = {}\n    env_bad_indices = 0\n    for link in links:\n        if link.get("source_key") != "ontario_environmental_compliance_reports":\n            continue\n        idx = link.get("source_row_index")\n        if not isinstance(idx, int) or idx < 0 or idx >= len(env_rows):\n            env_bad_indices += 1\n            continue\n        row = env_rows[idx]\n'''
+          new_env = '''    env_rows = source_rows.get("ontario_environmental_compliance_reports") or []\n    env_owner_groups: dict[tuple[str, str], dict[str, Any]] = {}\n    env_bad_identities = 0\n    for link in links:\n        if link.get("source_key") != "ontario_environmental_compliance_reports":\n            continue\n        row = find_source_record("ontario_environmental_compliance_reports", clean_text(link.get("source_record_id")), env_rows)\n        if not row:\n            env_bad_identities += 1\n            continue\n'''
+          if old_env in text:
+              text = text.replace(old_env, new_env, 1)
+          elif new_env not in text:
+              raise SystemExit('environment relationship resolver anchor changed')
+          text = text.replace('"invalid_source_row_indices": env_bad_indices', '"invalid_source_record_identities": env_bad_identities')
+          path.write_text(text, encoding='utf-8')
+      - name: Compile relationship builder
+        run: python -m py_compile scripts/toronto_final_entity_graph.py
+      - name: Rebuild relationship graph and audit roles
+        run: |
+          python scripts/toronto_final_entity_graph.py
+          python scripts/audit_toronto_relationship_roles.py
+      - name: Commit verified relationship correction
+        run: |
+          git config user.name "TowerSignal Release Bot"
+          git config user.email "towersignal-release@users.noreply.github.com"
+          git add scripts/toronto_final_entity_graph.py
+          git commit -m "Toronto: dedupe relationship evidence and use stable source IDs"
+          git push origin HEAD:agent/toronto-release-actions-20260831
