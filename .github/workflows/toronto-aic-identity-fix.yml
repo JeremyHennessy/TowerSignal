@@ -1,0 +1,54 @@
+name: Toronto AIC Alternative Identity Fix
+
+on:
+  push:
+    branches:
+      - agent/toronto-release-actions-20260831
+    paths:
+      - .github/workflows/toronto-aic-identity-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-release-actions-20260831
+          fetch-depth: 0
+      - name: Replace row-index AIC resolution with durable identities
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('scripts/toronto_aic_free_alternatives.py')
+          text = path.read_text(encoding='utf-8')
+          anchor = 'from toronto_market_common import clean_text, read_json, utc_now, write_json\n'
+          imports = anchor + '''try:\n    from .toronto_source_identity import find_source_record, stable_source_record_id\nexcept ImportError:\n    from toronto_source_identity import find_source_record, stable_source_record_id\n'''
+          if 'toronto_source_identity import find_source_record' not in text:
+              if anchor not in text:
+                  raise SystemExit('AIC alternative import anchor changed')
+              text = text.replace(anchor, imports, 1)
+          old = '''        index = link.get("source_row_index")\n        if not isinstance(index, int) or index < 0 or index >= len(applications):\n            continue\n        row = applications[index]\n'''
+          new = '''        row = find_source_record("toronto_aic_applications", clean_text(link.get("source_record_id")), applications)\n        if not row:\n            continue\n'''
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('AIC link resolution anchor changed')
+          old = '        record_id = f"{SOURCE_KEY}:{notice_id}"\n'
+          new = '        record_id = stable_source_record_id(SOURCE_KEY, notice)\n'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('notice identity anchor changed')
+          path.write_text(text, encoding='utf-8')
+      - name: Compile corrected AIC alternative join
+        run: python -m py_compile scripts/toronto_aic_free_alternatives.py
+      - name: Commit correction
+        run: |
+          git config user.name "TowerSignal Release Bot"
+          git config user.email "towersignal-release@users.noreply.github.com"
+          git add scripts/toronto_aic_free_alternatives.py
+          git commit -m "Toronto: use stable IDs for AIC public-notice joins"
+          git push origin HEAD:agent/toronto-release-actions-20260831
