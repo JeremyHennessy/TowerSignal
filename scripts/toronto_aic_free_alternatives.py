@@ -9,6 +9,10 @@ from pathlib import Path
 from typing import Any
 
 from toronto_market_common import clean_text, read_json, utc_now, write_json
+try:
+    from .toronto_source_identity import find_source_record, stable_source_record_id
+except ImportError:
+    from toronto_source_identity import find_source_record, stable_source_record_id
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,10 +68,9 @@ def main() -> None:
     for link in links:
         if link.get("source_key") != "toronto_aic_applications":
             continue
-        index = link.get("source_row_index")
-        if not isinstance(index, int) or index < 0 or index >= len(applications):
+        row = find_source_record("toronto_aic_applications", clean_text(link.get("source_record_id")), applications)
+        if not row:
             continue
-        row = applications[index]
         number = normalize_application_number(row.get("APPLICATION_NUMBER"))
         pid = clean_text(link.get("property_id"))
         if number and pid:
@@ -97,7 +100,7 @@ def main() -> None:
             continue
         linked_notice_ids.add(notice_id)
         linked_property_ids.update(property_addresses)
-        record_id = f"{SOURCE_KEY}:{notice_id}"
+        record_id = stable_source_record_id(SOURCE_KEY, notice)
         for pid, addresses in property_addresses.items():
             key = (pid, SOURCE_KEY, record_id)
             if key in existing:
