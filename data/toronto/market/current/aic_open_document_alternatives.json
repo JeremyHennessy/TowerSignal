@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-aic-open-document-alternatives-1.0",
-  "generated_at": "2026-08-30T20:29:27.726466Z",
+  "generated_at": "2026-08-31T18:30:16.390317Z",
   "document_type": "CITY_CLERK_PUBLIC_NOTICE",
   "supporting_document_corpus": false,
   "records": [
@@ -46,31 +46,6 @@
       ],
       "notice_text_sha256": "6e87c39c7fe8fc3728cb27d9b906a89b2450e138a82d42a4d54b589934f7d260",
       "notice_text_chars": 1343,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7872",
-      "title": "Notice of Adoption of Official Plan Amendment 939 and Passing of Zoning By-law 1045-2026 - 78 Springhurst Avenue, 1 Close Avenue and 3 Close Avenue",
-      "notice_date_epoch_ms": 1786680000000,
-      "application_numbers": [
-        "26 143612 STE 04 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:784375",
-        "toronto-address-point:784376",
-        "toronto-address-point:870812"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7872.do",
-      "background_documents": [
-        {
-          "description": "Notice of Adoption of Official Plan Amendment 939 and Passing of Zoning By-law 1045-2026 - 78 Springhurst Avenue, 1 Close Avenue and 3 Close Avenue",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7865"
-        }
-      ],
-      "notice_text_sha256": "915f82a1afd287cbe7247b06887a2690bb8dda9145085f0c0ba6f2fe1b3a09f1",
-      "notice_text_chars": 4680,
       "matching_terms": {},
       "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
@@ -341,6 +316,31 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
+      "notice_id": "7872",
+      "title": "Notice of Adoption of Official Plan Amendment 939 and Passing of Zoning By-law 1045-2026 - 78 Springhurst Avenue, 1 Close Avenue and 3 Close Avenue",
+      "notice_date_epoch_ms": 1786680000000,
+      "application_numbers": [
+        "26 143612 STE 04 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:784375",
+        "toronto-address-point:784376",
+        "toronto-address-point:870812"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7872.do",
+      "background_documents": [
+        {
+          "description": "Notice of Adoption of Official Plan Amendment 939 and Passing of Zoning By-law 1045-2026 - 78 Springhurst Avenue, 1 Close Avenue and 3 Close Avenue",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7865"
+        }
+      ],
+      "notice_text_sha256": "915f82a1afd287cbe7247b06887a2690bb8dda9145085f0c0ba6f2fe1b3a09f1",
+      "notice_text_chars": 4680,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
       "notice_id": "7874",
       "title": "Notice of Adoption of Official Plan Amendment 969 and Passing of Zoning By-law 1260-2026 - 15, 19, 21, 23 and 25 Poyntz Avenue",
       "notice_date_epoch_ms": 1786680000000,
@@ -371,6 +371,29 @@
           "l Plan Amendment 969 and Zoning By-law 1260-2026 is to permit a 45-storey tall building (149.5 metres to the top of the mechanical penthouse), containing 499 residential dwelling units, including eight rental replacement units, 170 square metres of retail gros"
         ]
       },
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7859",
+      "title": "Notice of Passing of Zoning By-laws 1238-2026 and 1239-2026 - 3030 Markham Road",
+      "notice_date_epoch_ms": 1786593600000,
+      "application_numbers": [
+        "19 181636 ESC 23 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:2111682"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7859.do",
+      "background_documents": [
+        {
+          "description": "Notice of Passing of Zoning By-laws 1238-2026 and 1239-2026 - 3030 Markham Road",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7851"
+        }
+      ],
+      "notice_text_sha256": "bbbf5079f4d955e2e5c535e158b665870810368d91d45af49f88374d0d912a06",
+      "notice_text_chars": 3395,
+      "matching_terms": {},
+      "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
@@ -470,135 +493,6 @@
       ],
       "notice_text_sha256": "3155a2d0c0b3c39fa300e8e8a2a16a07375c00ea96127202012c4fda7673948e",
       "notice_text_chars": 3387,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7859",
-      "title": "Notice of Passing of Zoning By-laws 1238-2026 and 1239-2026 - 3030 Markham Road",
-      "notice_date_epoch_ms": 1786593600000,
-      "application_numbers": [
-        "19 181636 ESC 23 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:2111682"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7859.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-laws 1238-2026 and 1239-2026 - 3030 Markham Road",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7851"
-        }
-      ],
-      "notice_text_sha256": "bbbf5079f4d955e2e5c535e158b665870810368d91d45af49f88374d0d912a06",
-      "notice_text_chars": 3395,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7850",
-      "title": "Notice of Passing of Zoning By-law 1207-2026 - 1377 Sheppard Avenue West",
-      "notice_date_epoch_ms": 1786507200000,
-      "application_numbers": [
-        "24 232020 NNY 06 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:13972944"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7850.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 1207-2026 - 1377 Sheppard Avenue West",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7841"
-        }
-      ],
-      "notice_text_sha256": "1ef7bff3f05a2f96245ce51aeef6104c3eca0e5876411f50bc1a7674d71a3f8e",
-      "notice_text_chars": 4156,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7851",
-      "title": "Notice of Passing of Zoning By-law 991-2026 - 200 Gateway Boulevard",
-      "notice_date_epoch_ms": 1786507200000,
-      "application_numbers": [
-        "23 118816 NNY 16 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:519304"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7851.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 991-2026 - 200 Gateway Boulevard",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7842"
-        }
-      ],
-      "notice_text_sha256": "03e3d98547d795810fccfaee17f71f5db86f5d352213b536401792cc998c3fd1",
-      "notice_text_chars": 3576,
-      "matching_terms": {
-        "mechanical penthouse": 2
-      },
-      "relevant_excerpts": {
-        "mechanical penthouse": [
-          "e residential development at 200 Gateway Boulevard. The proposal includes a 48-storey (147.05 metres, plus 6 metres for mechanical penthouse) residential tower (Building A) with eight grade-related units integrated into a four-storey podium, and a 13-storey (4",
-          ") with eight grade-related units integrated into a four-storey podium, and a 13-storey (45.54 metres, plus 6 metres for mechanical penthouse) residential building (Building B) with accessory at-grade commercial uses. The existing 17-storey (51 metres) apartmen"
-        ]
-      },
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7852",
-      "title": "Notice of Passing of Zoning By-law 1001-2026 - 4129, 4137, and 4139 Lawrence Avenue East",
-      "notice_date_epoch_ms": 1786507200000,
-      "application_numbers": [
-        "26 132226 ESC 24 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:354562",
-        "toronto-address-point:354566"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7852.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 1001-2026 - 4129, 4137, and 4139 Lawrence Avenue East",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7843"
-        }
-      ],
-      "notice_text_sha256": "3b61c3bf6e10dcd1b1585218dd04b2834c6fb2c3ee4609cc50de8343f92d29a6",
-      "notice_text_chars": 3328,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7853",
-      "title": "Notice of Adoption of Official Plan Amendment 934 and Passing of Zoning By-law 1009-2026 - 605, 607, 609, 611, 613, 615 and 617 Lawrence Avenue West",
-      "notice_date_epoch_ms": 1786507200000,
-      "application_numbers": [
-        "25 189462 NNY 08 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:9234643",
-        "toronto-address-point:9234644",
-        "toronto-address-point:9234645",
-        "toronto-address-point:9234646",
-        "toronto-address-point:9234647",
-        "toronto-address-point:9234648",
-        "toronto-address-point:9234649"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7853.do",
-      "background_documents": [
-        {
-          "description": "Notice of Adoption of Official Plan Amendment 934 and Passing of Zoning By-law 1009-2026 - 605, 607, 609, 611, 613, 615 and 617 Lawrence Avenue West",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7844"
-        }
-      ],
-      "notice_text_sha256": "c45a453eb2630e3b700b26e1956defb7155fa44637f70c4c2ff1de17485340ce",
-      "notice_text_chars": 4815,
       "matching_terms": {},
       "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
@@ -711,24 +605,25 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
-      "notice_id": "7843",
-      "title": "Notice of Adoption of Official Plan Amendment 937 and Passing of Zoning Bylaw 992-2026 - 701 Fleet Street and 720 Lake Shore Boulevard West",
+      "notice_id": "7852",
+      "title": "Notice of Passing of Zoning By-law 1001-2026 - 4129, 4137, and 4139 Lawrence Avenue East",
       "notice_date_epoch_ms": 1786507200000,
       "application_numbers": [
-        "26 146061 STE 10 OZ"
+        "26 132226 ESC 24 OZ"
       ],
       "property_ids": [
-        "toronto-address-point:30089510"
+        "toronto-address-point:354562",
+        "toronto-address-point:354566"
       ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7843.do",
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7852.do",
       "background_documents": [
         {
-          "description": "Notice of Adoption of Official Plan Amendment 937 and Passing of Zoning Bylaw 992-2026 - 701 Fleet Street and 720 Lake Shore Boulevard West",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7834"
+          "description": "Notice of Passing of Zoning By-law 1001-2026 - 4129, 4137, and 4139 Lawrence Avenue East",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7843"
         }
       ],
-      "notice_text_sha256": "261b48f153254b5ab480e9049928d509538505ba94f3b0e12cc26c781b332807",
-      "notice_text_chars": 4966,
+      "notice_text_sha256": "3b61c3bf6e10dcd1b1585218dd04b2834c6fb2c3ee4609cc50de8343f92d29a6",
+      "notice_text_chars": 3328,
       "matching_terms": {},
       "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
@@ -762,6 +657,111 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
+      "notice_id": "7850",
+      "title": "Notice of Passing of Zoning By-law 1207-2026 - 1377 Sheppard Avenue West",
+      "notice_date_epoch_ms": 1786507200000,
+      "application_numbers": [
+        "24 232020 NNY 06 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:13972944"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7850.do",
+      "background_documents": [
+        {
+          "description": "Notice of Passing of Zoning By-law 1207-2026 - 1377 Sheppard Avenue West",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7841"
+        }
+      ],
+      "notice_text_sha256": "1ef7bff3f05a2f96245ce51aeef6104c3eca0e5876411f50bc1a7674d71a3f8e",
+      "notice_text_chars": 4156,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7851",
+      "title": "Notice of Passing of Zoning By-law 991-2026 - 200 Gateway Boulevard",
+      "notice_date_epoch_ms": 1786507200000,
+      "application_numbers": [
+        "23 118816 NNY 16 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:519304"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7851.do",
+      "background_documents": [
+        {
+          "description": "Notice of Passing of Zoning By-law 991-2026 - 200 Gateway Boulevard",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7842"
+        }
+      ],
+      "notice_text_sha256": "03e3d98547d795810fccfaee17f71f5db86f5d352213b536401792cc998c3fd1",
+      "notice_text_chars": 3576,
+      "matching_terms": {
+        "mechanical penthouse": 2
+      },
+      "relevant_excerpts": {
+        "mechanical penthouse": [
+          "e residential development at 200 Gateway Boulevard. The proposal includes a 48-storey (147.05 metres, plus 6 metres for mechanical penthouse) residential tower (Building A) with eight grade-related units integrated into a four-storey podium, and a 13-storey (4",
+          ") with eight grade-related units integrated into a four-storey podium, and a 13-storey (45.54 metres, plus 6 metres for mechanical penthouse) residential building (Building B) with accessory at-grade commercial uses. The existing 17-storey (51 metres) apartmen"
+        ]
+      },
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7853",
+      "title": "Notice of Adoption of Official Plan Amendment 934 and Passing of Zoning By-law 1009-2026 - 605, 607, 609, 611, 613, 615 and 617 Lawrence Avenue West",
+      "notice_date_epoch_ms": 1786507200000,
+      "application_numbers": [
+        "25 189462 NNY 08 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:9234643",
+        "toronto-address-point:9234644",
+        "toronto-address-point:9234645",
+        "toronto-address-point:9234646",
+        "toronto-address-point:9234647",
+        "toronto-address-point:9234648",
+        "toronto-address-point:9234649"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7853.do",
+      "background_documents": [
+        {
+          "description": "Notice of Adoption of Official Plan Amendment 934 and Passing of Zoning By-law 1009-2026 - 605, 607, 609, 611, 613, 615 and 617 Lawrence Avenue West",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7844"
+        }
+      ],
+      "notice_text_sha256": "c45a453eb2630e3b700b26e1956defb7155fa44637f70c4c2ff1de17485340ce",
+      "notice_text_chars": 4815,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7843",
+      "title": "Notice of Adoption of Official Plan Amendment 937 and Passing of Zoning Bylaw 992-2026 - 701 Fleet Street and 720 Lake Shore Boulevard West",
+      "notice_date_epoch_ms": 1786507200000,
+      "application_numbers": [
+        "26 146061 STE 10 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:30089510"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7843.do",
+      "background_documents": [
+        {
+          "description": "Notice of Adoption of Official Plan Amendment 937 and Passing of Zoning Bylaw 992-2026 - 701 Fleet Street and 720 Lake Shore Boulevard West",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7834"
+        }
+      ],
+      "notice_text_sha256": "261b48f153254b5ab480e9049928d509538505ba94f3b0e12cc26c781b332807",
+      "notice_text_chars": 4966,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
       "notice_id": "7830",
       "title": "Notice of Adoption of Official Plan Amendment 963 and Passing of Zoning By-law 1255-2026 - 537, 539, 541, 543, 545, 547 and 551 Eglington Avenue East and 59 and 61 Hoyle Avenue",
       "notice_date_epoch_ms": 1786420800000,
@@ -787,29 +787,6 @@
       ],
       "notice_text_sha256": "47dac4049428d883627ea4094f6ce2e32eece3ef1f1a22164ac5d4a307b2282a",
       "notice_text_chars": 5131,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7831",
-      "title": "Notice of Passing of Zoning By-law 1099-2026 - 70-86 Lynn Williams Street",
-      "notice_date_epoch_ms": 1786420800000,
-      "application_numbers": [
-        "23 216060 STE 10 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:14600148"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7831.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 1099-2026 - 70-86 Lynn Williams Street",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7822"
-        }
-      ],
-      "notice_text_sha256": "56df01f94b59ec0acae7871458c9c20ee576d84f422b9c7579647fc528d13954",
-      "notice_text_chars": 3336,
       "matching_terms": {},
       "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
@@ -915,26 +892,32 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
-      "notice_id": "7824",
-      "title": "Notice of Adoption of Official Plan Amendment 945 and Passing of Zoning By-law 1047-2026 - 5 Fairview Mall Drive",
+      "notice_id": "7825",
+      "title": "Notice of Passing of Zoning By-law 1060-2026 - 835-839 Yonge Street",
       "notice_date_epoch_ms": 1786420800000,
       "application_numbers": [
-        "22 203142 NNY 17 OZ"
+        "22 204662 STE 11 OZ"
       ],
       "property_ids": [
-        "toronto-address-point:514035"
+        "toronto-address-point:8680068"
       ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7824.do",
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7825.do",
       "background_documents": [
         {
-          "description": "Notice of Adoption of Official Plan Amendment 945 and Passing of Zoning By-law 1047-2026 - 5 Fairview Mall Drive",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7815"
+          "description": "Notice of Passing of Zoning By-law 1060-2026 - 835-839 Yonge Street",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7816"
         }
       ],
-      "notice_text_sha256": "7607293741e4d9a3afd67fd9ad26b496ad5587d2e9b098063cecf599f79ffd98",
-      "notice_text_chars": 4840,
-      "matching_terms": {},
-      "relevant_excerpts": {},
+      "notice_text_sha256": "8ca9f36bfc12d7c086b5cb248cf13c3aa8f124963f7182ec555a4dd6919d3656",
+      "notice_text_chars": 3650,
+      "matching_terms": {
+        "mechanical penthouse": 1
+      },
+      "relevant_excerpts": {
+        "mechanical penthouse": [
+          "ment to permit a mixed-use building with two tower elements of 49 and 41-storeys in height (up to 162 metres, excluding mechanical penthouses), containing 1,001 dwelling units and a minimum 750 square metres of non-residential gross floor area at 835-839 Yonge"
+        ]
+      },
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
@@ -991,35 +974,6 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
-      "notice_id": "7825",
-      "title": "Notice of Passing of Zoning By-law 1060-2026 - 835-839 Yonge Street",
-      "notice_date_epoch_ms": 1786420800000,
-      "application_numbers": [
-        "22 204662 STE 11 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:8680068"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7825.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 1060-2026 - 835-839 Yonge Street",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7816"
-        }
-      ],
-      "notice_text_sha256": "8ca9f36bfc12d7c086b5cb248cf13c3aa8f124963f7182ec555a4dd6919d3656",
-      "notice_text_chars": 3650,
-      "matching_terms": {
-        "mechanical penthouse": 1
-      },
-      "relevant_excerpts": {
-        "mechanical penthouse": [
-          "ment to permit a mixed-use building with two tower elements of 49 and 41-storeys in height (up to 162 metres, excluding mechanical penthouses), containing 1,001 dwelling units and a minimum 750 square metres of non-residential gross floor area at 835-839 Yonge"
-        ]
-      },
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
       "notice_id": "7829",
       "title": "Notice of Passing of Zoning By-law 1256-2026 - 1 Tudor Gate and 39, 41 and 43 Wilket Road",
       "notice_date_epoch_ms": 1786420800000,
@@ -1064,6 +1018,52 @@
       ],
       "notice_text_sha256": "101592dbda06cabf6ea703330de3b6b8b0a9e03b926103f35378328816574407",
       "notice_text_chars": 3494,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7824",
+      "title": "Notice of Adoption of Official Plan Amendment 945 and Passing of Zoning By-law 1047-2026 - 5 Fairview Mall Drive",
+      "notice_date_epoch_ms": 1786420800000,
+      "application_numbers": [
+        "22 203142 NNY 17 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:514035"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7824.do",
+      "background_documents": [
+        {
+          "description": "Notice of Adoption of Official Plan Amendment 945 and Passing of Zoning By-law 1047-2026 - 5 Fairview Mall Drive",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7815"
+        }
+      ],
+      "notice_text_sha256": "7607293741e4d9a3afd67fd9ad26b496ad5587d2e9b098063cecf599f79ffd98",
+      "notice_text_chars": 4840,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7831",
+      "title": "Notice of Passing of Zoning By-law 1099-2026 - 70-86 Lynn Williams Street",
+      "notice_date_epoch_ms": 1786420800000,
+      "application_numbers": [
+        "23 216060 STE 10 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:14600148"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7831.do",
+      "background_documents": [
+        {
+          "description": "Notice of Passing of Zoning By-law 1099-2026 - 70-86 Lynn Williams Street",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7822"
+        }
+      ],
+      "notice_text_sha256": "56df01f94b59ec0acae7871458c9c20ee576d84f422b9c7579647fc528d13954",
+      "notice_text_chars": 3336,
       "matching_terms": {},
       "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
@@ -1269,6 +1269,36 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
+      "notice_id": "7821",
+      "title": "Notice of Adoption of Official Plan Amendment 959 and Passing of Zoning By-law 1043-2026 - 2450 and 2452 Bayview Avenue",
+      "notice_date_epoch_ms": 1786334400000,
+      "application_numbers": [
+        "26 112878 NNY 15 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:487643",
+        "toronto-address-point:487644"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7821.do",
+      "background_documents": [
+        {
+          "description": "Notice of Adoption of Official Plan Amendment 959 and Passing of Zoning By-law 1043-2026 - 2450 and 2452 Bayview Avenue",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7812"
+        }
+      ],
+      "notice_text_sha256": "6a3157dbf503a5fdfdd60bc7a65ccb2155a51486db250286a0ec8612c22a5a3d",
+      "notice_text_chars": 4849,
+      "matching_terms": {
+        "mechanical penthouse": 1
+      },
+      "relevant_excerpts": {
+        "mechanical penthouse": [
+          "se and effect of Official Plan Amendment 959 and Zoning By-law 1043-2026 is to permit a seven-storey (22.81 metres plus mechanical penthouse and rooftop amenities) seniors residence building providing independent living, assisted living and memory care suites"
+        ]
+      },
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
       "notice_id": "7819",
       "title": "Notice of Passing of Zoning By-law 1205-2026 - 390, 394, 396 and 398 Spadina Road",
       "notice_date_epoch_ms": 1786334400000,
@@ -1296,36 +1326,6 @@
       "relevant_excerpts": {
         "mechanical penthouse": [
           "NING BY-LAW 1205-2026 The purpose and effect of Zoning By-law 1205-2026 is to permit a 49.2-metre (14-storeys excluding mechanical penthouse) mixed-use building including 584 square metres of non-residential uses and 54 residential units, with a total gross fl"
-        ]
-      },
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7821",
-      "title": "Notice of Adoption of Official Plan Amendment 959 and Passing of Zoning By-law 1043-2026 - 2450 and 2452 Bayview Avenue",
-      "notice_date_epoch_ms": 1786334400000,
-      "application_numbers": [
-        "26 112878 NNY 15 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:487643",
-        "toronto-address-point:487644"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7821.do",
-      "background_documents": [
-        {
-          "description": "Notice of Adoption of Official Plan Amendment 959 and Passing of Zoning By-law 1043-2026 - 2450 and 2452 Bayview Avenue",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7812"
-        }
-      ],
-      "notice_text_sha256": "6a3157dbf503a5fdfdd60bc7a65ccb2155a51486db250286a0ec8612c22a5a3d",
-      "notice_text_chars": 4849,
-      "matching_terms": {
-        "mechanical penthouse": 1
-      },
-      "relevant_excerpts": {
-        "mechanical penthouse": [
-          "se and effect of Official Plan Amendment 959 and Zoning By-law 1043-2026 is to permit a seven-storey (22.81 metres plus mechanical penthouse and rooftop amenities) seniors residence building providing independent living, assisted living and memory care suites"
         ]
       },
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
@@ -1417,52 +1417,6 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
-      "notice_id": "7806",
-      "title": "Notice of Passing of Zoning By-law 994-2026 - 27 Grosvenor Street and 26 Grenville Street",
-      "notice_date_epoch_ms": 1786075200000,
-      "application_numbers": [
-        "26 144414 STE 13 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:30114761"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7806.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 994-2026 - 27 Grosvenor Street and 26 Grenville Street",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7796"
-        }
-      ],
-      "notice_text_sha256": "96afa4146eb140423c8926562ad2e68f75e5ddce331bc437485130105b968f00",
-      "notice_text_chars": 3455,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7807",
-      "title": "Notice of Passing of Zoning By-law 1057-2026 - 500 Dundas Street East",
-      "notice_date_epoch_ms": 1786075200000,
-      "application_numbers": [
-        "26 122451 STE 13 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:30009862"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7807.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 1057-2026 - 500 Dundas Street East",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7797"
-        }
-      ],
-      "notice_text_sha256": "2def93c6e314fa7af2639bfc6a913ce9993c83318ec731363fd824564c600c3c",
-      "notice_text_chars": 3449,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
       "notice_id": "7808",
       "title": "Notice of Adoption of Official Plan Amendment 968 - 235 to 245 Yorkland Boulevard",
       "notice_date_epoch_ms": 1786075200000,
@@ -1482,6 +1436,35 @@
       ],
       "notice_text_sha256": "2b36d78eefb123eece90b822bf02d4b4cf397ebc9120b65fc663b16b673a74be",
       "notice_text_chars": 4006,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7809",
+      "title": "Notice of Passing of Zoning By-law 995-2026 - 329, 331, 333 and 335-337 Queen Street East and 135R, 139, 139R, 141, and 141R Berkeley Street.",
+      "notice_date_epoch_ms": 1786075200000,
+      "application_numbers": [
+        "25 258479 STE 13 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:8708860",
+        "toronto-address-point:8708861",
+        "toronto-address-point:8708862",
+        "toronto-address-point:8754570",
+        "toronto-address-point:8754571",
+        "toronto-address-point:8754573",
+        "toronto-address-point:8754574"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7809.do",
+      "background_documents": [
+        {
+          "description": "Notice of Passing of Zoning By-law 995-2026 - 329, 331, 333 and 335-337 Queen Street East and 135R, 139, 139R, 141, and 141R Berkeley Street.",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7799"
+        }
+      ],
+      "notice_text_sha256": "a7faa70632e9483342c09b378fa15eeebc4c1acb0091a56987ee4e246bcb7080",
+      "notice_text_chars": 3525,
       "matching_terms": {},
       "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
@@ -1585,30 +1568,47 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
-      "notice_id": "7809",
-      "title": "Notice of Passing of Zoning By-law 995-2026 - 329, 331, 333 and 335-337 Queen Street East and 135R, 139, 139R, 141, and 141R Berkeley Street.",
+      "notice_id": "7806",
+      "title": "Notice of Passing of Zoning By-law 994-2026 - 27 Grosvenor Street and 26 Grenville Street",
       "notice_date_epoch_ms": 1786075200000,
       "application_numbers": [
-        "25 258479 STE 13 OZ"
+        "26 144414 STE 13 OZ"
       ],
       "property_ids": [
-        "toronto-address-point:8708860",
-        "toronto-address-point:8708861",
-        "toronto-address-point:8708862",
-        "toronto-address-point:8754570",
-        "toronto-address-point:8754571",
-        "toronto-address-point:8754573",
-        "toronto-address-point:8754574"
+        "toronto-address-point:30114761"
       ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7809.do",
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7806.do",
       "background_documents": [
         {
-          "description": "Notice of Passing of Zoning By-law 995-2026 - 329, 331, 333 and 335-337 Queen Street East and 135R, 139, 139R, 141, and 141R Berkeley Street.",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7799"
+          "description": "Notice of Passing of Zoning By-law 994-2026 - 27 Grosvenor Street and 26 Grenville Street",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7796"
         }
       ],
-      "notice_text_sha256": "a7faa70632e9483342c09b378fa15eeebc4c1acb0091a56987ee4e246bcb7080",
-      "notice_text_chars": 3525,
+      "notice_text_sha256": "96afa4146eb140423c8926562ad2e68f75e5ddce331bc437485130105b968f00",
+      "notice_text_chars": 3455,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7807",
+      "title": "Notice of Passing of Zoning By-law 1057-2026 - 500 Dundas Street East",
+      "notice_date_epoch_ms": 1786075200000,
+      "application_numbers": [
+        "26 122451 STE 13 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:30009862"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7807.do",
+      "background_documents": [
+        {
+          "description": "Notice of Passing of Zoning By-law 1057-2026 - 500 Dundas Street East",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7797"
+        }
+      ],
+      "notice_text_sha256": "2def93c6e314fa7af2639bfc6a913ce9993c83318ec731363fd824564c600c3c",
+      "notice_text_chars": 3449,
       "matching_terms": {},
       "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
@@ -1712,37 +1712,32 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
-      "notice_id": "7795",
-      "title": "Notice of Adoption of Official Plan Amendment 927 and Passing of Zoning By-law 1003-2026 - 1875, 1877, 1881, 1883, 1885, 1887, 1889, 1893, 1897 and 1901 Eglinton Avenue West, 137 Kirknewton Road and 156 Dynevor Road",
+      "notice_id": "7790",
+      "title": "Notice of Passing of Zoning By-law 1050-2026 - 137-149 Church Street and 18-20 Dalhousie Street",
       "notice_date_epoch_ms": 1785988800000,
       "application_numbers": [
-        "24 204279 STE 09 OZ"
+        "26 129094 STE 13 OZ"
       ],
       "property_ids": [
-        "toronto-address-point:10630427",
-        "toronto-address-point:10630428",
-        "toronto-address-point:65784",
-        "toronto-address-point:8237572",
-        "toronto-address-point:8432085",
-        "toronto-address-point:8432087",
-        "toronto-address-point:8432088",
-        "toronto-address-point:8432090",
-        "toronto-address-point:8432210",
-        "toronto-address-point:8432211",
-        "toronto-address-point:8432212",
-        "toronto-address-point:8432219"
+        "toronto-address-point:7642494"
       ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7795.do",
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7790.do",
       "background_documents": [
         {
-          "description": "Notice of Adoption of Official Plan Amendment 927 and Passing of Zoning By-law 1003-2026 - 1875, 1877, 1881, 1883, 1885, 1887, 1889, 1893, 1897 and 1901 Eglinton Avenue West, 137 Kirknewton Road and 156 Dynevor Road",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7784"
+          "description": "Notice of Passing of Zoning By-law 1050-2026 - 137-149 Church Street and 18-20 Dalhousie Street",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7779"
         }
       ],
-      "notice_text_sha256": "6021a6022faa475690aa5954775c2dd996ab96640061c2b1185cc7798a0d7b6e",
-      "notice_text_chars": 4912,
-      "matching_terms": {},
-      "relevant_excerpts": {},
+      "notice_text_sha256": "dbd672976690e78c949de4e3305bb5fd71a76870b1ddee5af6260929d413b111",
+      "notice_text_chars": 3397,
+      "matching_terms": {
+        "mechanical penthouse": 1
+      },
+      "relevant_excerpts": {
+        "mechanical penthouse": [
+          "ing By-law 1246-2022 to permit an increase in height from 54 storeys (175 metres) to 61 storeys (201.5 metres including mechanical penthouse) and reduce the setback from the south property line to the tower from 10 to 6.5 metres. Further information may be obt"
+        ]
+      },
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
@@ -1808,64 +1803,6 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
-      "notice_id": "7790",
-      "title": "Notice of Passing of Zoning By-law 1050-2026 - 137-149 Church Street and 18-20 Dalhousie Street",
-      "notice_date_epoch_ms": 1785988800000,
-      "application_numbers": [
-        "26 129094 STE 13 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:7642494"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7790.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 1050-2026 - 137-149 Church Street and 18-20 Dalhousie Street",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7779"
-        }
-      ],
-      "notice_text_sha256": "dbd672976690e78c949de4e3305bb5fd71a76870b1ddee5af6260929d413b111",
-      "notice_text_chars": 3397,
-      "matching_terms": {
-        "mechanical penthouse": 1
-      },
-      "relevant_excerpts": {
-        "mechanical penthouse": [
-          "ing By-law 1246-2022 to permit an increase in height from 54 storeys (175 metres) to 61 storeys (201.5 metres including mechanical penthouse) and reduce the setback from the south property line to the tower from 10 to 6.5 metres. Further information may be obt"
-        ]
-      },
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
-      "notice_id": "7789",
-      "title": "Notice of Passing of Zoning By-law 1016-2026 - 1020 McNicoll Avenue",
-      "notice_date_epoch_ms": 1785988800000,
-      "application_numbers": [
-        "26 127597 ESC 22 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:9311782"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7789.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 1016-2026 - 1020 McNicoll Avenue",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7778"
-        }
-      ],
-      "notice_text_sha256": "3792e8190aca5ce5079f958cd985865c071da1a0e399a15a9ce6d3c5647b9d0c",
-      "notice_text_chars": 3358,
-      "matching_terms": {
-        "mechanical penthouse": 1
-      },
-      "relevant_excerpts": {
-        "mechanical penthouse": [
-          "16-2026 The purpose and effect of Zoning By-law 1016-2026 is to permit a nine-storey (or 38.81 metres, inclusive of the mechanical penthouse) long-term care building with approximately 512 beds and 2,395 square metres of non-residential floor space. A total of"
-        ]
-      },
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
       "notice_id": "7796",
       "title": "Notice of Passing of Zoning By-law 1002-2026 - 1913-1951 Yonge Street, 17-21 Millwood Road, and 22 Davisville Avenue",
       "notice_date_epoch_ms": 1785988800000,
@@ -1918,6 +1855,69 @@
       "notice_text_chars": 5867,
       "matching_terms": {},
       "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7795",
+      "title": "Notice of Adoption of Official Plan Amendment 927 and Passing of Zoning By-law 1003-2026 - 1875, 1877, 1881, 1883, 1885, 1887, 1889, 1893, 1897 and 1901 Eglinton Avenue West, 137 Kirknewton Road and 156 Dynevor Road",
+      "notice_date_epoch_ms": 1785988800000,
+      "application_numbers": [
+        "24 204279 STE 09 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:10630427",
+        "toronto-address-point:10630428",
+        "toronto-address-point:65784",
+        "toronto-address-point:8237572",
+        "toronto-address-point:8432085",
+        "toronto-address-point:8432087",
+        "toronto-address-point:8432088",
+        "toronto-address-point:8432090",
+        "toronto-address-point:8432210",
+        "toronto-address-point:8432211",
+        "toronto-address-point:8432212",
+        "toronto-address-point:8432219"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7795.do",
+      "background_documents": [
+        {
+          "description": "Notice of Adoption of Official Plan Amendment 927 and Passing of Zoning By-law 1003-2026 - 1875, 1877, 1881, 1883, 1885, 1887, 1889, 1893, 1897 and 1901 Eglinton Avenue West, 137 Kirknewton Road and 156 Dynevor Road",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7784"
+        }
+      ],
+      "notice_text_sha256": "6021a6022faa475690aa5954775c2dd996ab96640061c2b1185cc7798a0d7b6e",
+      "notice_text_chars": 4912,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7789",
+      "title": "Notice of Passing of Zoning By-law 1016-2026 - 1020 McNicoll Avenue",
+      "notice_date_epoch_ms": 1785988800000,
+      "application_numbers": [
+        "26 127597 ESC 22 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:9311782"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7789.do",
+      "background_documents": [
+        {
+          "description": "Notice of Passing of Zoning By-law 1016-2026 - 1020 McNicoll Avenue",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7778"
+        }
+      ],
+      "notice_text_sha256": "3792e8190aca5ce5079f958cd985865c071da1a0e399a15a9ce6d3c5647b9d0c",
+      "notice_text_chars": 3358,
+      "matching_terms": {
+        "mechanical penthouse": 1
+      },
+      "relevant_excerpts": {
+        "mechanical penthouse": [
+          "16-2026 The purpose and effect of Zoning By-law 1016-2026 is to permit a nine-storey (or 38.81 metres, inclusive of the mechanical penthouse) long-term care building with approximately 512 beds and 2,395 square metres of non-residential floor space. A total of"
+        ]
+      },
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
@@ -2475,29 +2475,6 @@
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
     },
     {
-      "notice_id": "7680",
-      "title": "Notice of Passing of Zoning By-law 698-2026 - 235 Wicksteed Avenue",
-      "notice_date_epoch_ms": 1783483200000,
-      "application_numbers": [
-        "25 198242 NNY 15 OZ"
-      ],
-      "property_ids": [
-        "toronto-address-point:8864906"
-      ],
-      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7680.do",
-      "background_documents": [
-        {
-          "description": "Notice of Passing of Zoning By-law 698-2026 - 235 Wicksteed Avenue",
-          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7670"
-        }
-      ],
-      "notice_text_sha256": "c885f39d54f3ece3487610999dbd0d898581394791cd06db083daa5596d00aea",
-      "notice_text_chars": 3260,
-      "matching_terms": {},
-      "relevant_excerpts": {},
-      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
-    },
-    {
       "notice_id": "7676",
       "title": "Notice of Passing of Zoning By-laws 626-2026 and 627-2026 - 291 Lake Shore Boulevard East, 2 Small Street And 200 Queens Quay East",
       "notice_date_epoch_ms": 1783483200000,
@@ -2517,6 +2494,29 @@
       ],
       "notice_text_sha256": "5b7d75f252056b34cd86828b7e28787dd667fb1d20a2f6890a1c2cb804c90039",
       "notice_text_chars": 3826,
+      "matching_terms": {},
+      "relevant_excerpts": {},
+      "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"
+    },
+    {
+      "notice_id": "7680",
+      "title": "Notice of Passing of Zoning By-law 698-2026 - 235 Wicksteed Avenue",
+      "notice_date_epoch_ms": 1783483200000,
+      "application_numbers": [
+        "25 198242 NNY 15 OZ"
+      ],
+      "property_ids": [
+        "toronto-address-point:8864906"
+      ],
+      "record_url": "https://secure.toronto.ca/nm/api/individual/notice/7680.do",
+      "background_documents": [
+        {
+          "description": "Notice of Passing of Zoning By-law 698-2026 - 235 Wicksteed Avenue",
+          "url": "https://secure.toronto.ca/nm/api/individual/fileSpace.do?f=7670"
+        }
+      ],
+      "notice_text_sha256": "c885f39d54f3ece3487610999dbd0d898581394791cd06db083daa5596d00aea",
+      "notice_text_chars": 3260,
       "matching_terms": {},
       "relevant_excerpts": {},
       "evidence_class": "PUBLIC_NOTICE_CONTEXT_NOT_AIC_SUPPORTING_DOCUMENT"

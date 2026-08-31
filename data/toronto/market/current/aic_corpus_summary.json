@@ -1,8 +1,8 @@
 {
   "schema_version": "toronto-aic-corpus-summary-1.0",
-  "generated_at": "2026-08-30T20:28:17.384443Z",
+  "generated_at": "2026-08-31T18:28:36.948871Z",
   "status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
-  "applications_total_source": 15865,
+  "applications_total_source": 15864,
   "unique_applications_scanned": 0,
   "applications_in_shards": 0,
   "application_pages_fetched": 0,

@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-coverage-1.2",
-  "generated_at": "2026-08-30T20:29:29.379104Z",
+  "generated_at": "2026-08-31T18:30:18.281748Z",
   "coverage_contract": {
     "meaning": "Measured source, reconciliation, document-access, relationship and screening coverage only.",
     "true_market_denominator": "No validated total installed Toronto cooling-tower population has been established from public data.",
@@ -21,10 +21,10 @@
     }
   },
   "expanded_property_universe": {
-    "canonical_address_point_properties": 13066,
+    "canonical_address_point_properties": 13065,
     "original_poc_properties_present_in_spine": 171,
-    "expanded_properties_beyond_original_poc": 12895,
-    "properties_with_usable_coordinates": 13066,
+    "expanded_properties_beyond_original_poc": 12894,
+    "properties_with_usable_coordinates": 13065,
     "unresolved_candidate_addresses": 2330
   },
   "documentary_tower_evidence": {
@@ -41,15 +41,15 @@
   "source_coverage": {
     "chemtrac_history": {
       "status": "JOINED",
-      "source_records": 18982,
-      "records_with_property_address": 18972,
-      "matched_records": 14545,
-      "matched_canonical_properties": 1973,
+      "source_records": 17705,
+      "records_with_property_address": 17695,
+      "matched_records": 13572,
+      "matched_canonical_properties": 1954,
       "ambiguous_address_rows_not_forced": 0,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.15100260217358027,
-      "source_record_match_fraction": 0.7662522389632284,
-      "unmatched_source_records": 4437
+      "candidate_universe_property_link_fraction": 0.14955989284347493,
+      "source_record_match_fraction": 0.7665631177633437,
+      "unmatched_source_records": 4133
     },
     "ontario_ewrb_large_buildings": {
       "status": "JOINED",
@@ -71,32 +71,32 @@
       "matched_canonical_properties": 2,
       "ambiguous_address_rows_not_forced": 0,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.00015306903413439462,
+      "candidate_universe_property_link_fraction": 0.00015308075009567548,
       "source_record_match_fraction": 0.07142857142857142,
       "unmatched_source_records": 26
     },
     "toronto_highrise_residential_health_hazards": {
       "status": "JOINED",
-      "source_records": 1256,
-      "records_with_property_address": 1256,
-      "matched_records": 1016,
-      "matched_canonical_properties": 683,
+      "source_records": 1257,
+      "records_with_property_address": 1257,
+      "matched_records": 1017,
+      "matched_canonical_properties": 684,
       "ambiguous_address_rows_not_forced": 0,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.05227307515689576,
-      "source_record_match_fraction": 0.8089171974522293,
+      "candidate_universe_property_link_fraction": 0.05235361653272101,
+      "source_record_match_fraction": 0.8090692124105012,
       "unmatched_source_records": 240
     },
     "toronto_aic_applications": {
       "status": "JOINED",
-      "source_records": 15865,
-      "records_with_property_address": 15865,
-      "matched_records": 11226,
-      "matched_canonical_properties": 7212,
+      "source_records": 15864,
+      "records_with_property_address": 15864,
+      "matched_records": 11225,
+      "matched_canonical_properties": 7211,
       "ambiguous_address_rows_not_forced": 5,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.551966937088627,
-      "source_record_match_fraction": 0.7075953356445005,
+      "candidate_universe_property_link_fraction": 0.5519326444699579,
+      "source_record_match_fraction": 0.707576903681291,
       "unmatched_source_records": 4639
     },
     "development_pipeline": {
@@ -108,7 +108,7 @@
       "ambiguous_address_rows_not_forced": 1,
       "links_added": 1780,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.130338282565437,
+      "candidate_universe_property_link_fraction": 0.13034825870646766,
       "source_record_match_fraction": 0.7382828701783493,
       "unmatched_source_records": 631
     },
@@ -121,7 +121,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 5288,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.23098117250880146,
+      "candidate_universe_property_link_fraction": 0.23099885189437427,
       "source_record_match_fraction": 0.8458093410108766,
       "unmatched_source_records": 964
     },
@@ -147,7 +147,7 @@
       "ambiguous_address_rows_not_forced": 1,
       "links_added": 179,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.012934333384356345,
+      "candidate_universe_property_link_fraction": 0.012935323383084577,
       "source_record_match_fraction": 0.6605166051660517,
       "unmatched_source_records": 92
     },
@@ -160,7 +160,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 85,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.006199295882442982,
+      "candidate_universe_property_link_fraction": 0.006199770378874856,
       "source_record_match_fraction": 0.85,
       "unmatched_source_records": 15
     },
@@ -186,7 +186,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 973,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.039415276289606616,
+      "candidate_universe_property_link_fraction": 0.039418293149636435,
       "source_record_match_fraction": 0.7619420516836335,
       "unmatched_source_records": 304
     },
@@ -199,7 +199,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 1452,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.006735037501913363,
+      "candidate_universe_property_link_fraction": 0.00673555300420972,
       "source_record_match_fraction": 0.8601895734597157,
       "unmatched_source_records": 236
     },
@@ -212,7 +212,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 1,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 7.653451706719731e-05,
+      "candidate_universe_property_link_fraction": 7.654037504783774e-05,
       "source_record_match_fraction": 1.0,
       "unmatched_source_records": 0
     },
@@ -222,7 +222,7 @@
       "matched_canonical_properties": 3,
       "links_added": 5,
       "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text.",
-      "candidate_universe_property_link_fraction": 0.00022960355120159193
+      "candidate_universe_property_link_fraction": 0.0002296211251435132
     },
     "capital_project_pipeline_exact_document_address_prior_poc": {
       "status": "JOINED_FROM_PREVIOUSLY_VALIDATED_POC_DOCUMENT_MATCHES",
@@ -244,14 +244,14 @@
       "property_links": 2815,
       "links_added_by_application_number": 2808,
       "identity_limitation": "Only exact public-notice application numbers already joined through the deterministic AIC property spine are linked; no text/address fuzzy match is used.",
-      "candidate_universe_property_link_fraction": 0.11219960202051125,
+      "candidate_universe_property_link_fraction": 0.11220818982013012,
       "source_record_match_fraction": 0.739501312335958,
       "unmatched_source_records": 397
     }
   },
   "aic_coverage": {
     "status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
-    "application_catalogue_records": 15865,
+    "application_catalogue_records": 15864,
     "document_transport_blocked": true,
     "unique_applications_scanned": 0,
     "applications_in_shards": 0,
@@ -271,16 +271,16 @@
     "transport_note": "Current City attachment APIs require browser-generated reCAPTCHA; bulk document extraction was not bypassed."
   },
   "relationship_coverage": {
-    "edge_count": 6023,
+    "edge_count": 5976,
     "relationship_counts": {
-      "CHEMTRAC_REPORTING_FACILITY_AT": 2312,
+      "CHEMTRAC_REPORTING_FACILITY_AT": 2265,
       "LICENCE_HOLDER_AT_PROPERTY": 1092,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2612,
       "SUCCESSFUL_BIDDER_AT_PROPERTY": 5
     },
     "properties_by_relationship": {
-      "CHEMTRAC_REPORTING_FACILITY_AT": 1973,
+      "CHEMTRAC_REPORTING_FACILITY_AT": 1954,
       "LICENCE_HOLDER_AT_PROPERTY": 88,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2603,
@@ -292,7 +292,7 @@
       "properties_with_engineer_or_consultant": 0,
       "properties_with_contractor_or_successful_bidder": 3,
       "properties_with_facility_operator_or_reporter": 0,
-      "properties_with_chemtrac_reporting_facility": 1973,
+      "properties_with_chemtrac_reporting_facility": 1954,
       "properties_with_licence_holder": 88
     },
     "construction_act_statuses": {
@@ -303,7 +303,7 @@
   },
   "aerial_screening": {
     "status": "WEAK_LABEL_MODEL_FIT",
-    "canonical_properties_with_coordinates": 13066,
+    "canonical_properties_with_coordinates": 13065,
     "requested_positive_properties": 46,
     "requested_weak_controls": 92,
     "usable_training_images": 138,
@@ -312,7 +312,7 @@
     "persisted_candidate_records": 1200,
     "weak_label_validation": {
       "folds": 5,
-      "roc_auc_vs_weak_labels": 0.5099243856332704,
+      "roc_auc_vs_weak_labels": 0.5094517958412098,
       "balanced_accuracy_at_0_5_vs_weak_labels": 0.532608695652174,
       "warning": "These are discrimination metrics against weak documentary labels, not validated cooling-tower detection accuracy."
     },

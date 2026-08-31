@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-final-identity-cleanup-1.0",
-  "generated_at": "2026-08-30T20:29:24.665142Z",
+  "generated_at": "2026-08-31T18:30:12.512385Z",
   "poc_resolved": 175,
   "poc_unresolved": 2,
   "recovered_poc_keys": [
@@ -28,16 +28,16 @@
       ]
     }
   },
-  "canonical_properties": 13066,
-  "properties_with_coordinates": 13066,
-  "source_link_count": 26789,
+  "canonical_properties": 13065,
+  "properties_with_coordinates": 13065,
+  "source_link_count": 25816,
   "source_summaries": {
     "chemtrac_history": {
       "status": "JOINED",
-      "source_records": 18982,
-      "records_with_property_address": 18972,
-      "matched_records": 14545,
-      "matched_canonical_properties": 1973,
+      "source_records": 17705,
+      "records_with_property_address": 17695,
+      "matched_records": 13572,
+      "matched_canonical_properties": 1954,
       "ambiguous_address_rows_not_forced": 0,
       "identity_limitation": null
     },
@@ -61,19 +61,19 @@
     },
     "toronto_highrise_residential_health_hazards": {
       "status": "JOINED",
-      "source_records": 1256,
-      "records_with_property_address": 1256,
-      "matched_records": 1016,
-      "matched_canonical_properties": 683,
+      "source_records": 1257,
+      "records_with_property_address": 1257,
+      "matched_records": 1017,
+      "matched_canonical_properties": 684,
       "ambiguous_address_rows_not_forced": 0,
       "identity_limitation": null
     },
     "toronto_aic_applications": {
       "status": "JOINED",
-      "source_records": 15865,
-      "records_with_property_address": 15865,
-      "matched_records": 11226,
-      "matched_canonical_properties": 7212,
+      "source_records": 15864,
+      "records_with_property_address": 15864,
+      "matched_records": 11225,
+      "matched_canonical_properties": 7211,
       "ambiguous_address_rows_not_forced": 5,
       "identity_limitation": null
     }

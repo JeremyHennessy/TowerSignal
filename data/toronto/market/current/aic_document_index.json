@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-aic-document-index-1.0",
-  "generated_at": "2026-08-30T20:28:17.384637Z",
+  "generated_at": "2026-08-31T18:28:36.949098Z",
   "status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
   "documents": [],
   "warning": "Zero parsed AIC documents is not evidence that applications have no supporting documents."

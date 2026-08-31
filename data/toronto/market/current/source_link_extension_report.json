@@ -1,8 +1,8 @@
 {
   "schema_version": "toronto-source-link-extension-1.0",
-  "generated_at": "2026-08-30T20:29:26.649939Z",
-  "total_links_after_extension": 36559,
-  "properties_with_any_link": 12474,
+  "generated_at": "2026-08-31T18:30:15.042149Z",
+  "total_links_after_extension": 35586,
+  "properties_with_any_link": 12473,
   "structured_extensions": {
     "development_pipeline": {
       "status": "JOINED",
