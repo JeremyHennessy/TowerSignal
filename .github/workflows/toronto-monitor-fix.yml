@@ -28,15 +28,8 @@ jobs:
           from pathlib import Path
           path = Path('tests/frontend/App.test.tsx')
           text = path.read_text(encoding='utf-8')
-          old = """  await user.click(screen.getByRole('button', { name:'Monitor' }))
-  expect(screen.getByRole('heading', { name:'Monitor workspace', level:1 })).toBeInTheDocument()
-  expect(screen.getAllByText('New public sample reported').length).toBeGreaterThan(0)
-"""
-          new = """  await user.click(screen.getByRole('button', { name:'Monitor' }))
-  expect(screen.getByRole('heading', { name:'Monitor workspace', level:1 })).toBeInTheDocument()
-  await user.selectOptions(screen.getByLabelText('Time range'), '0')
-  expect(screen.getAllByText('New public sample reported')).toHaveLength(2)
-"""
+          old = "  expect(screen.getAllByText('New public sample reported').length).toBeGreaterThan(0)"
+          new = "  await user.selectOptions(screen.getByLabelText('Time range'), '0')\n  expect(screen.getAllByText('New public sample reported')).toHaveLength(2)"
           if old not in text:
               raise SystemExit('Monitor test anchor changed')
           path.write_text(text.replace(old, new, 1), encoding='utf-8')
