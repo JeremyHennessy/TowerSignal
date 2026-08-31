@@ -6,8 +6,10 @@ on:
     branches:
       - agent/toronto-market-20260828
       - agent/toronto-data-usability-20260830
+      - agent/toronto-preview-release-20260831-audit
     paths:
       - scripts/toronto_market_common.py
+      - scripts/toronto_source_identity.py
       - scripts/toronto_market_core.py
       - scripts/pull_toronto_history_notices.py
       - scripts/pull_ontario_open_building_environment.py
@@ -53,6 +55,7 @@ jobs:
         run: |
           python -m py_compile \
             scripts/toronto_market_common.py \
+            scripts/toronto_source_identity.py \
             scripts/toronto_market_core.py \
             scripts/pull_toronto_history_notices.py \
             scripts/pull_ontario_open_building_environment.py \
@@ -106,6 +109,7 @@ jobs:
             data/toronto/warehouse/current/open_licensed/ontario_ewrb_large_buildings.json
             data/toronto/warehouse/current/open_licensed/ontario_environmental_compliance_reports.json
             data/toronto/warehouse/current/open_licensed/toronto_public_notices.json
+            data/toronto/warehouse/current/source_inventory.json
           retention-days: 30
 
   aic-corpus:
@@ -213,7 +217,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: toronto-normalized-warehouse
-          path: data/toronto/warehouse/current/open_licensed
+          path: data/toronto/warehouse/current
 
       - name: Restore all AIC shards
         uses: actions/download-artifact@v4
@@ -284,14 +288,23 @@ jobs:
       - name: Remove artifact-only working files before Git persistence
         run: rm -rf data/toronto/market/current/work
 
-      - name: Persist successful Toronto market snapshot
+      - name: Persist successful Toronto market and exact source snapshots
         run: |
-          if [ -z "$(git status --porcelain -- data/toronto/market/current public/data/toronto-market.json)" ]; then
-            echo "Toronto market snapshot unchanged."
+          PERSIST_PATHS=(
+            data/toronto/market/current
+            public/data/toronto-market.json
+            data/toronto/warehouse/current/open_licensed/chemtrac_history.json
+            data/toronto/warehouse/current/open_licensed/ontario_ewrb_large_buildings.json
+            data/toronto/warehouse/current/open_licensed/ontario_environmental_compliance_reports.json
+            data/toronto/warehouse/current/open_licensed/toronto_public_notices.json
+            data/toronto/warehouse/current/source_inventory.json
+          )
+          if [ -z "$(git status --porcelain -- "${PERSIST_PATHS[@]}")" ]; then
+            echo "Toronto market and source snapshots unchanged."
             exit 0
           fi
           git config user.name "TowerSignal Toronto Market Bot"
           git config user.email "towersignal-market@users.noreply.github.com"
-          git add data/toronto/market/current public/data/toronto-market.json
-          git commit -m "Toronto market: persist validated snapshot and app payload"
+          git add "${PERSIST_PATHS[@]}"
+          git commit -m "Toronto market: persist validated snapshot and exact sources"
           git push origin "HEAD:${GITHUB_REF_NAME}"
