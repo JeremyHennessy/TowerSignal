@@ -17,6 +17,7 @@ from openpyxl import load_workbook
 ROOT = Path(__file__).resolve().parents[1]
 TORONTO_CKAN = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action"
 CHEMTRAC_PACKAGE = "chemical-tracking-chemtrac"
+CHEMTRAC_CURRENT_SNAPSHOT_YEAR = 2024
 NOTICES_URL = "https://secure.toronto.ca/nm/notices.json"
 USER_AGENT = "TowerSignal-Toronto-Warehouse/0.1 (+https://github.com/JeremyHennessy/TowerSignal)"
 TORONTO_LICENSE = "Open Government Licence - Toronto"
@@ -170,6 +171,8 @@ def normalize_existing_chemtrac_history(path: Path) -> dict[str, Any]:
     metadata = payload.get("metadata") or {}
     resources = [item for item in (metadata.get("resources") or []) if isinstance(item, dict)]
     selected, excluded = select_chemtrac_resources(resources)
+    current_snapshot_resources = [item for item in selected if year_from_resource(item) == CHEMTRAC_CURRENT_SNAPSHOT_YEAR]
+    selected = [item for item in selected if year_from_resource(item) != CHEMTRAC_CURRENT_SNAPSHOT_YEAR]
     selected_ids = {resource_identifier(item) for item in selected}
     rows = [
         row for row in (payload.get("rows") or [])
@@ -179,7 +182,8 @@ def normalize_existing_chemtrac_history(path: Path) -> dict[str, Any]:
     metadata["resource_count"] = len(selected)
     metadata["row_count"] = len(rows)
     metadata["excluded_duplicate_resource_variants"] = excluded
-    metadata["resource_selection_contract"] = "One current CSV resource per normalized annual ChemTRAC resource name; superseded equivalent variants are excluded."
+    metadata["excluded_dedicated_current_snapshot_resources"] = current_snapshot_resources
+    metadata["resource_selection_contract"] = "One current variant per annual ChemTRAC resource; the dedicated chemtrac_2024 snapshot is excluded from chemtrac_history to prevent cross-source duplication."
     payload["metadata"] = metadata
     payload["rows"] = rows
     write_json(path, payload)
@@ -197,6 +201,8 @@ def pull_chemtrac_history(output_dir: Path) -> dict[str, Any]:
         if year is not None and "chemtrac" in name.lower() and (resource.get("datastore_active") or fmt in {"CSV", "XLSX"}):
             eligible.append(resource)
     resources, excluded = select_chemtrac_resources(eligible)
+    current_snapshot_resources = [item for item in resources if year_from_resource(item) == CHEMTRAC_CURRENT_SNAPSHOT_YEAR]
+    resources = [item for item in resources if year_from_resource(item) != CHEMTRAC_CURRENT_SNAPSHOT_YEAR]
     historical = []
     stats = []
     for resource in resources:
@@ -237,7 +243,11 @@ def pull_chemtrac_history(output_dir: Path) -> dict[str, Any]:
                 {"year": year_from_resource(item), "resource_id": resource_identifier(item), "name": item.get("name"), "format": item.get("format"), "last_modified": item.get("last_modified")}
                 for item in excluded
             ],
-            "resource_selection_contract": "One current CSV resource per normalized annual ChemTRAC resource name; superseded equivalent variants are excluded.",
+            "excluded_dedicated_current_snapshot_resources": [
+                {"year": year_from_resource(item), "resource_id": resource_identifier(item), "name": item.get("name"), "format": item.get("format"), "last_modified": item.get("last_modified")}
+                for item in current_snapshot_resources
+            ],
+            "resource_selection_contract": "One current variant per annual ChemTRAC resource; the dedicated chemtrac_2024 snapshot is excluded from chemtrac_history to prevent cross-source duplication.",
             "known_gap": "Toronto Open Data notes ChemTRAC data from 2019 through 2023 is unavailable due to COVID-19 related reporting interruptions.",
         },
         "rows": historical,

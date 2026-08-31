@@ -1663,17 +1663,9 @@
       "title": "Chemical Tracking (ChemTrac)",
       "portal_url": "https://open.toronto.ca/dataset/chemical-tracking-chemtrac/",
       "license": "Open Government Licence - Toronto",
-      "resource_count": 20,
-      "row_count": 37964,
+      "resource_count": 9,
+      "row_count": 17705,
       "resources": [
-        {
-          "year": 2010,
-          "resource_id": "2c937a48-ace8-4b2a-be43-a7f9c9b5c791",
-          "name": "Chemtrac Data 2010",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 803
-        },
         {
           "year": 2010,
           "resource_id": "19800c1a-6784-48b3-8b90-922a91871ad6",
@@ -1681,14 +1673,6 @@
           "format": "CSV",
           "last_modified": "2026-02-20T18:45:33.999324",
           "row_count": 803
-        },
-        {
-          "year": 2011,
-          "resource_id": "240beb92-003b-4b1c-b6eb-284695bf0170",
-          "name": "Chemtrac Data 2011",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 1645
         },
         {
           "year": 2011,
@@ -1700,27 +1684,11 @@
         },
         {
           "year": 2012,
-          "resource_id": "32e5a508-b52f-43b2-84ce-808757d11962",
-          "name": "Chemtrac Data 2012",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 2584
-        },
-        {
-          "year": 2012,
           "resource_id": "4dcdbb55-6c81-4380-a623-7449268d586a",
           "name": "Chemtrac Data 2012.csv",
           "format": "CSV",
           "last_modified": "2026-02-20T18:45:20.630862",
           "row_count": 2584
-        },
-        {
-          "year": 2013,
-          "resource_id": "c2c7e858-2dbc-4313-b3bf-152b3851d93e",
-          "name": "Chemtrac Data 2013",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 2517
         },
         {
           "year": 2013,
@@ -1732,27 +1700,11 @@
         },
         {
           "year": 2014,
-          "resource_id": "2beee9d8-e32d-4ad2-b337-4df9df4444d0",
-          "name": "Chemtrac Data 2014",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 2221
-        },
-        {
-          "year": 2014,
           "resource_id": "725f4585-93bb-4cc0-94fc-a76b8cd0c3a1",
           "name": "Chemtrac Data 2014.csv",
           "format": "CSV",
           "last_modified": "2026-02-20T18:45:06.513257",
           "row_count": 2221
-        },
-        {
-          "year": 2015,
-          "resource_id": "19498a6d-9768-47c2-be97-9173fb15d927",
-          "name": "Chemtrac Data 2015",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 2021
         },
         {
           "year": 2015,
@@ -1764,27 +1716,11 @@
         },
         {
           "year": 2016,
-          "resource_id": "5bf7d7d2-d57e-478f-9f03-d8027a1e836a",
-          "name": "Chemtrac Data 2016",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 1985
-        },
-        {
-          "year": 2016,
           "resource_id": "39e53e4c-8a29-4fd4-876e-7584a0b9a131",
           "name": "Chemtrac Data 2016.csv",
           "format": "CSV",
           "last_modified": "2026-02-20T18:44:51.181313",
           "row_count": 1985
-        },
-        {
-          "year": 2017,
-          "resource_id": "82b6b099-4f19-407b-946c-fdad94b65607",
-          "name": "Chemtrac Data 2017",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 1987
         },
         {
           "year": 2017,
@@ -1796,18 +1732,85 @@
         },
         {
           "year": 2018,
-          "resource_id": "8550465e-1222-43f6-b9cd-1ddd3ad70b92",
-          "name": "Chemtrac Data 2018",
-          "format": "CSV",
-          "last_modified": null,
-          "row_count": 1942
-        },
-        {
-          "year": 2018,
           "resource_id": "e789e297-1bf5-4847-8341-16fe894e9975",
           "name": "Chemtrac Data 2018.csv",
           "format": "CSV",
           "last_modified": "2026-02-20T18:44:37.175438",
+          "row_count": 1942
+        }
+      ],
+      "known_gap": "Toronto Open Data notes ChemTRAC data from 2019 through 2023 is unavailable due to COVID-19 related reporting interruptions.",
+      "excluded_duplicate_resource_variants": [
+        {
+          "year": 2010,
+          "resource_id": "2c937a48-ace8-4b2a-be43-a7f9c9b5c791",
+          "name": "Chemtrac Data 2010",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 803
+        },
+        {
+          "year": 2011,
+          "resource_id": "240beb92-003b-4b1c-b6eb-284695bf0170",
+          "name": "Chemtrac Data 2011",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 1645
+        },
+        {
+          "year": 2012,
+          "resource_id": "32e5a508-b52f-43b2-84ce-808757d11962",
+          "name": "Chemtrac Data 2012",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 2584
+        },
+        {
+          "year": 2013,
+          "resource_id": "c2c7e858-2dbc-4313-b3bf-152b3851d93e",
+          "name": "Chemtrac Data 2013",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 2517
+        },
+        {
+          "year": 2014,
+          "resource_id": "2beee9d8-e32d-4ad2-b337-4df9df4444d0",
+          "name": "Chemtrac Data 2014",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 2221
+        },
+        {
+          "year": 2015,
+          "resource_id": "19498a6d-9768-47c2-be97-9173fb15d927",
+          "name": "Chemtrac Data 2015",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 2021
+        },
+        {
+          "year": 2016,
+          "resource_id": "5bf7d7d2-d57e-478f-9f03-d8027a1e836a",
+          "name": "Chemtrac Data 2016",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 1985
+        },
+        {
+          "year": 2017,
+          "resource_id": "82b6b099-4f19-407b-946c-fdad94b65607",
+          "name": "Chemtrac Data 2017",
+          "format": "CSV",
+          "last_modified": null,
+          "row_count": 1987
+        },
+        {
+          "year": 2018,
+          "resource_id": "8550465e-1222-43f6-b9cd-1ddd3ad70b92",
+          "name": "Chemtrac Data 2018",
+          "format": "CSV",
+          "last_modified": null,
           "row_count": 1942
         },
         {
@@ -1817,7 +1820,9 @@
           "format": "CSV",
           "last_modified": null,
           "row_count": 1277
-        },
+        }
+      ],
+      "excluded_dedicated_current_snapshot_resources": [
         {
           "year": 2024,
           "resource_id": "718a66a4-7895-4151-977a-925bdc22ad69",
@@ -1827,7 +1832,7 @@
           "row_count": 1277
         }
       ],
-      "known_gap": "Toronto Open Data notes ChemTRAC data from 2019 through 2023 is unavailable due to COVID-19 related reporting interruptions."
+      "resource_selection_contract": "One current variant per annual ChemTRAC resource; the dedicated chemtrac_2024 snapshot is excluded from chemtrac_history to prevent cross-source duplication."
     },
     {
       "key": "toronto_public_notices",
