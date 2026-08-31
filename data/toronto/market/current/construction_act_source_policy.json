@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-construction-act-source-policy-1.0",
-  "generated_at": "2026-08-31T18:30:16.529100Z",
+  "generated_at": "2026-08-31T19:28:29.770128Z",
   "decision": "PERMISSION_REQUIRED_FOR_AUTOMATED_BULK_INGESTION",
   "legal_context": {
     "ontario_publication_rule": "Current Ontario Construction Act regulation designates construction trade news websites for publication of statutory certificates/notices.",

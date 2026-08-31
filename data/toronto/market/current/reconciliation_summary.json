@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-reconciliation-summary-1.1",
-  "generated_at": "2026-08-31T18:30:12.511946Z",
+  "generated_at": "2026-08-31T19:28:25.731965Z",
   "identity_contract": {
     "canonical_id": "toronto-address-point:<ADDRESS_POINT_ID>",
     "canonical_identifier_type": "City of Toronto One Address Repository ADDRESS_POINT_ID",

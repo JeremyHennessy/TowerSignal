@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-coverage-1.2",
-  "generated_at": "2026-08-31T18:30:18.281748Z",
+  "generated_at": "2026-08-31T19:28:31.201640Z",
   "coverage_contract": {
     "meaning": "Measured source, reconciliation, document-access, relationship and screening coverage only.",
     "true_market_denominator": "No validated total installed Toronto cooling-tower population has been established from public data.",
@@ -312,7 +312,7 @@
     "persisted_candidate_records": 1200,
     "weak_label_validation": {
       "folds": 5,
-      "roc_auc_vs_weak_labels": 0.5094517958412098,
+      "roc_auc_vs_weak_labels": 0.5099243856332704,
       "balanced_accuracy_at_0_5_vs_weak_labels": 0.532608695652174,
       "warning": "These are discrimination metrics against weak documentary labels, not validated cooling-tower detection accuracy."
     },

@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-08-31T18:30:35.430569Z",
+  "generated_at": "2026-08-31T19:55:22.137622Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
   "json_files_validated": 24,
   "counts": {
@@ -103,7 +103,7 @@
     "311_matches_prior_poc": [
       {
         "property_id": "toronto-address-point:4153974",
-        "source_record_id": "311_matches_prior_poc:row:0",
+        "source_record_id": "311_matches_prior_poc:sha256:4011d565d35a457f0d2dd713",
         "source_address": "10 GUILDWOOD PKWY",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -111,19 +111,19 @@
     "affordable_housing_pipeline": [
       {
         "property_id": "toronto-address-point:10222988",
-        "source_record_id": "affordable_housing_pipeline:239:238",
+        "source_record_id": "affordable_housing_pipeline:id:239",
         "source_address": "57 Spadina Avenue",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:6303087",
-        "source_record_id": "affordable_housing_pipeline:149:148",
+        "source_record_id": "affordable_housing_pipeline:id:149",
         "source_address": "21 Windermere Ave",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:9947936",
-        "source_record_id": "affordable_housing_pipeline:104:103",
+        "source_record_id": "affordable_housing_pipeline:id:104",
         "source_address": "349 George Street",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -131,19 +131,19 @@
     "apartment_building_evaluation": [
       {
         "property_id": "toronto-address-point:1000361",
-        "source_record_id": "apartment_building_evaluation:3257:3256",
+        "source_record_id": "apartment_building_evaluation:id:3257",
         "source_address": "618 EVANS AVE",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:57091",
-        "source_record_id": "apartment_building_evaluation:4410:4409",
+        "source_record_id": "apartment_building_evaluation:id:4410",
         "source_address": "19 DENISON RD E",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:9980236",
-        "source_record_id": "apartment_building_evaluation:6228:6227",
+        "source_record_id": "apartment_building_evaluation:id:6228",
         "source_address": "540 SHERBOURNE ST",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -151,19 +151,19 @@
     "business_licence_matches_prior_poc": [
       {
         "property_id": "toronto-address-point:1008107",
-        "source_record_id": "business_licence_matches_prior_poc:row:1180",
+        "source_record_id": "business_licence_matches_prior_poc:sha256:0603fe027410ff917cb64489",
         "source_address": "101 HUMBER COLLEGE BLVD",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:7792268",
-        "source_record_id": "business_licence_matches_prior_poc:row:492",
+        "source_record_id": "business_licence_matches_prior_poc:sha256:979e87370f02326b0ab29032",
         "source_address": "595 BAY ST",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:987965",
-        "source_record_id": "business_licence_matches_prior_poc:row:1066",
+        "source_record_id": "business_licence_matches_prior_poc:sha256:ccc40be9442aef60dc33615e",
         "source_address": "60 BIRMINGHAM ST",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -171,19 +171,19 @@
     "chemtrac_2024": [
       {
         "property_id": "toronto-address-point:1000257",
-        "source_record_id": "chemtrac_2024:474:473",
+        "source_record_id": "chemtrac_2024:id:474",
         "source_address": "365 Evans Avenue",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:395227",
-        "source_record_id": "chemtrac_2024:65:64",
+        "source_record_id": "chemtrac_2024:id:65",
         "source_address": "15 Wallsend Drive",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:996700",
-        "source_record_id": "chemtrac_2024:384:383",
+        "source_record_id": "chemtrac_2024:id:384",
         "source_address": "235 Dixon Rd",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -211,19 +211,19 @@
     "development_pipeline": [
       {
         "property_id": "toronto-address-point:1000253",
-        "source_record_id": "development_pipeline:1400:1399",
+        "source_record_id": "development_pipeline:id:1400",
         "source_address": "350 EVANS AVE",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:509132",
-        "source_record_id": "development_pipeline:2231:2230",
+        "source_record_id": "development_pipeline:id:2231",
         "source_address": "172 DREWRY AVE",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:9980743",
-        "source_record_id": "development_pipeline:1439:1438",
+        "source_record_id": "development_pipeline:id:1439",
         "source_address": "1151 WESTON RD",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -245,19 +245,19 @@
     "renewable_energy_installations": [
       {
         "property_id": "toronto-address-point:1007854",
-        "source_record_id": "renewable_energy_installations:73:72",
+        "source_record_id": "renewable_energy_installations:id:73",
         "source_address": "259 Horner Ave",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:523759",
-        "source_record_id": "renewable_energy_installations:45:44",
+        "source_record_id": "renewable_energy_installations:id:45",
         "source_address": "165 Grenoble Dr",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:996452",
-        "source_record_id": "renewable_energy_installations:18:17",
+        "source_record_id": "renewable_energy_installations:id:18",
         "source_address": "150 Disco Rd",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -400,14 +400,14 @@
     "LICENCE_HOLDER_AT_PROPERTY": [
       {
         "property_id": "toronto-address-point:1008107",
-        "from_node": "org:20398a00574e6ad2dd5a",
+        "from_node": "org:5e4123e27607e2ecb0bb",
         "source_key": "business_licence_matches_prior_poc",
         "basis": "EXPLICIT_CLIENT_NAME_ON_MUNICIPAL_BUSINESS_LICENCE_AT_EXACT_CURRENT_ADDRESS",
         "confidence": "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP",
         "evidence": {
           "licence_numbers": [
-            "B71-3846506",
-            "B71-3846508"
+            "B71-3247281",
+            "B71-3247284"
           ],
           "categories": [
             "EATING OR DRINKING ESTABLISHMENT"
@@ -417,16 +417,16 @@
       },
       {
         "property_id": "toronto-address-point:7792268",
-        "from_node": "org:c9214268ba792a212231",
+        "from_node": "org:2394288d3b702fe9739a",
         "source_key": "business_licence_matches_prior_poc",
         "basis": "EXPLICIT_CLIENT_NAME_ON_MUNICIPAL_BUSINESS_LICENCE_AT_EXACT_CURRENT_ADDRESS",
         "confidence": "CONFIRMED_SOURCE_FIELD_NOT_OWNERSHIP",
         "evidence": {
           "licence_numbers": [
-            "B50-4190201"
+            "B71-3959689"
           ],
           "categories": [
-            "TAKE-OUT OR RETAIL FOOD ESTABLISHMENT"
+            "EATING OR DRINKING ESTABLISHMENT"
           ],
           "source_observation_count": 1
         }
@@ -554,7 +554,7 @@
     "311_matches_prior_poc": 0,
     "affordable_housing_pipeline": 0,
     "apartment_building_evaluation": 0,
-    "business_licence_matches_prior_poc": 0,
+    "business_licence_matches_prior_poc": 1364,
     "chemtrac_2024": 0,
     "chemtrac_history": 0,
     "development_pipeline": 0,

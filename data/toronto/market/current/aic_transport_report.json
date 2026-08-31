@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-aic-access-1.0",
-  "generated_at": "2026-08-31T18:28:36.948425Z",
+  "generated_at": "2026-08-31T19:26:58.802870Z",
   "status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
   "application_catalogue_records": 15864,
   "catalogue_source": "City of Toronto AIC FeatureServer layer 60",

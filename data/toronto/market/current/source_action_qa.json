@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-source-action-qa-1.0",
-  "generated_at": "2026-08-31T18:30:29.721009Z",
+  "generated_at": "2026-08-31T19:46:15.370336Z",
   "status": "PASSED",
   "counts": {
     "source_families": 13,
@@ -24,7 +24,7 @@
       "representative_source_record": {
         "property_id": "toronto-address-point:4153974",
         "display_address": "10 Guildwood Pkwy",
-        "source_record_id": "311_matches_prior_poc:row:0"
+        "source_record_id": "311_matches_prior_poc:sha256:4011d565d35a457f0d2dd713"
       },
       "fallback_message_required": true
     },
@@ -41,7 +41,7 @@
       "representative_source_record": {
         "property_id": "toronto-address-point:784375",
         "display_address": "1 Close Ave",
-        "source_record_id": "affordable_housing_pipeline:128:127"
+        "source_record_id": "affordable_housing_pipeline:id:128"
       },
       "fallback_message_required": true
     },
@@ -58,7 +58,7 @@
       "representative_source_record": {
         "property_id": "toronto-address-point:302304",
         "display_address": "1 Antrim Cres",
-        "source_record_id": "apartment_building_evaluation:385:384"
+        "source_record_id": "apartment_building_evaluation:id:385"
       },
       "fallback_message_required": true
     },
@@ -75,7 +75,7 @@
       "representative_source_record": {
         "property_id": "toronto-address-point:6666985",
         "display_address": "1 Church St",
-        "source_record_id": "business_licence_matches_prior_poc:row:1532"
+        "source_record_id": "business_licence_matches_prior_poc:sha256:8418342a2319095be8d7d02c"
       },
       "fallback_message_required": true
     },
@@ -92,7 +92,7 @@
       "representative_source_record": {
         "property_id": "toronto-address-point:12221834",
         "display_address": "1 Carlingview Dr",
-        "source_record_id": "chemtrac_2024:377:376"
+        "source_record_id": "chemtrac_2024:id:377"
       },
       "fallback_message_required": true
     },
@@ -126,7 +126,7 @@
       "representative_source_record": {
         "property_id": "toronto-address-point:981849",
         "display_address": "1 Adriatic Rd",
-        "source_record_id": "development_pipeline:1071:1070"
+        "source_record_id": "development_pipeline:id:1071"
       },
       "fallback_message_required": true
     },
@@ -160,7 +160,7 @@
       "representative_source_record": {
         "property_id": "toronto-address-point:9340585",
         "display_address": "1 Transfer Pl",
-        "source_record_id": "renewable_energy_installations:62:61"
+        "source_record_id": "renewable_energy_installations:id:62"
       },
       "fallback_message_required": true
     },
