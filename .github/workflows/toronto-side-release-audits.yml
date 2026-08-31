@@ -1,0 +1,35 @@
+name: Toronto Side Release Audits
+
+on:
+  push:
+    branches:
+      - agent/toronto-release-actions-20260831
+    paths:
+      - scripts/audit_toronto_relationship_roles.py
+      - scripts/audit_toronto_aic_access.py
+      - tests/python/test_toronto_app_sources.py
+      - .github/workflows/toronto-side-release-audits.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run record-action unit contracts
+        run: python -m unittest tests.python.test_toronto_app_sources -v
+      - name: Audit relationship role semantics
+        run: python scripts/audit_toronto_relationship_roles.py
+      - name: Run targeted AIC access/document audit
+        run: python scripts/audit_toronto_aic_access.py
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-side-release-audits
+          path: |
+            data/toronto/market/current/relationship_role_audit.json
+            data/toronto/market/current/aic_targeted_access_audit.json
+          retention-days: 30
