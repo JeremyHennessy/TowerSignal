@@ -12,8 +12,6 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from openpyxl import load_workbook
-
 ROOT = Path(__file__).resolve().parents[1]
 CKAN = "https://data.ontario.ca/api/3/action"
 USER_AGENT = "TowerSignal-Toronto-Warehouse/0.1 (+https://github.com/JeremyHennessy/TowerSignal)"
@@ -111,6 +109,8 @@ def sheet_rows(sheet) -> list[dict[str, Any]]:
 
 
 def xlsx_rows(data: bytes) -> list[dict[str, Any]]:
+    from openpyxl import load_workbook
+
     workbook = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
     rows: list[dict[str, Any]] = []
     for sheet in workbook.worksheets:
