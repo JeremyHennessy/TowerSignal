@@ -8,6 +8,7 @@ on:
     paths:
       - scripts/audit_toronto_source_semantics.py
       - scripts/audit_toronto_public_notice_cardinality.py
+      - scripts/audit_toronto_source_row_resolution.py
       - scripts/discover_toronto_record_actions.py
       - .github/workflows/toronto-release-audit.yml
 
@@ -24,6 +25,8 @@ jobs:
         run: python scripts/audit_toronto_source_semantics.py
       - name: Prove Public Notice one-to-many cardinality
         run: python scripts/audit_toronto_public_notice_cardinality.py
+      - name: Audit durable source-row resolution
+        run: python scripts/audit_toronto_source_row_resolution.py
       - name: Discover stable source-record identifiers
         run: python scripts/discover_toronto_record_actions.py
       - name: Upload release audit reports
@@ -33,5 +36,6 @@ jobs:
           path: |
             data/toronto/market/current/source_semantic_audit.json
             data/toronto/market/current/public_notice_cardinality_audit.json
+            data/toronto/market/current/source_row_resolution_audit.json
             data/toronto/market/current/record_action_discovery.json
           retention-days: 30
