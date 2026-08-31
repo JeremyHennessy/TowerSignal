@@ -21,6 +21,12 @@ function currentHashOrHome(): string {
   return window.location.hash || '#/home'
 }
 
+function forceTorontoPreviewRoute(): void {
+  const raw = window.location.hash.replace(/^#\/?/, '').split('?')[0]
+  if (raw.startsWith('toronto')) return
+  window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/toronto`)
+}
+
 export function AuthGate() {
   const [user, setUser] = useState<WorkflowUser | null>(null)
   const [checking, setChecking] = useState(true)
@@ -86,7 +92,10 @@ export function AuthGate() {
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
   }
 
-  if (TORONTO_PREVIEW && window.location.hash.replace(/^#\/?/, '').startsWith('toronto')) return <App />
+  if (TORONTO_PREVIEW) {
+    forceTorontoPreviewRoute()
+    return <App />
+  }
   if (checking) return <main className="auth-check-page"><div className="auth-check-card"><span className="auth-brand-mark">TS</span><h1>TowerSignal</h1><p>Verifying authenticated workspace…</p></div></main>
 
   if (!user) return <AuthLandingPage initialError={sessionError} onSignIn={signIn} onSignUp={signUp} />
