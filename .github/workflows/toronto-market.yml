@@ -6,7 +6,6 @@ on:
     branches:
       - agent/toronto-market-20260828
       - agent/toronto-data-usability-20260830
-      - agent/toronto-approved-recovery-20260831
     paths:
       - scripts/toronto_market_common.py
       - scripts/toronto_market_core.py
