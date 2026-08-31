@@ -10,6 +10,10 @@ try:
     from .toronto_source_identity import find_source_record
 except ImportError:
     from toronto_source_identity import find_source_record
+try:
+    from .toronto_record_actions import record_action_for_source
+except ImportError:
+    from toronto_record_actions import record_action_for_source
 
 
 OFFICIAL_DATASET_URLS = {
@@ -203,4 +207,8 @@ def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict
             ("Planning applications", ", ".join(str(value).strip() for value in (row.get("planningApplicationNumbers") or []) if value)),
             ("Topics", ", ".join(str(value).strip() for value in (row.get("topics") or []) if value)),
         ))
+    action = record_action_for_source(key, row, source_rows, link)
+    record_url = valid_public_url(action.get("record_url"))
+    result["record_url"] = record_url
+    result["record_link_label"] = action.get("record_link_label") if record_url else None
     return result
