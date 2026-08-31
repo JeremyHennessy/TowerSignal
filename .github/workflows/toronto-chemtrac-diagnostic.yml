@@ -43,7 +43,7 @@ jobs:
           history = json.loads(files['chemtrac_history'].read_text(encoding='utf-8'))
           print('=== HISTORY RESOURCE METADATA ===')
           metadata = history.get('metadata') if isinstance(history, dict) else {}
-          resources = (metadata or {}).get('source_resources') or []
+          resources = (metadata or {}).get('resources') or []
           for resource in resources:
               year = str(resource.get('reporting_year') or resource.get('year') or '')
               if year in {'2015', '2016', '2024'}:
@@ -73,7 +73,7 @@ jobs:
           print('BY_SOURCE=' + json.dumps(by_source, sort_keys=True))
           signatures = defaultdict(list)
           for source, idx, signature, row in matched:
-              signatures[signature].append((source, idx, row.get('_id'), row.get('_towersignal_resource_id')))
+              signatures[signature].append((source, idx, row.get('_id'), row.get('_towersignal_source_resource_id')))
           duplicates = {sig: vals for sig, vals in signatures.items() if len(vals) > 1}
           print(f'DUPLICATE_SIGNATURES={len(duplicates)}')
           for signature, vals in sorted(duplicates.items(), key=lambda item: str(item[0])):
@@ -86,5 +86,5 @@ jobs:
               if signature[1] != '2024':
                   continue
               print('--- ROW')
-              print(f'SOURCE={source} INDEX={idx} _id={row.get("_id")} RESOURCE={row.get("_towersignal_resource_id")} SIGNATURE={signature!r}')
+              print(f'SOURCE={source} INDEX={idx} _id={row.get("_id")} RESOURCE={row.get("_towersignal_source_resource_id")} SIGNATURE={signature!r}')
               print(json.dumps(row, sort_keys=True))
