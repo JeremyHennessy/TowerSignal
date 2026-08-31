@@ -12,8 +12,6 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from openpyxl import load_workbook
-
 ROOT = Path(__file__).resolve().parents[1]
 TORONTO_CKAN = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action"
 CHEMTRAC_PACKAGE = "chemical-tracking-chemtrac"
@@ -110,6 +108,8 @@ def tabular_rows(resource: dict[str, Any]) -> list[dict[str, Any]]:
     if fmt == "CSV" or url.lower().endswith(".csv"):
         return [dict(row) for row in csv.DictReader(io.StringIO(data.decode("utf-8-sig", errors="replace")))]
     if fmt in {"XLSX", "XLS"} or url.lower().endswith(".xlsx"):
+        from openpyxl import load_workbook
+
         workbook = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
         output: list[dict[str, Any]] = []
         for sheet in workbook.worksheets:
