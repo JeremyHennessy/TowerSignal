@@ -1,0 +1,105 @@
+name: Toronto Record Actions Apply
+
+on:
+  push:
+    branches:
+      - agent/toronto-preview-release-20260831-audit
+    paths:
+      - .github/workflows/toronto-record-actions-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-preview-release-20260831-audit
+          fetch-depth: 0
+
+      - name: Apply proven record-action adapters
+        shell: python
+        run: |
+          from pathlib import Path
+
+          sources = Path('scripts/toronto_app_sources.py')
+          text = sources.read_text(encoding='utf-8')
+          text = text.replace('from urllib.parse import urlparse\n', 'from urllib.parse import urlencode, urlparse\n', 1)
+
+          helper_anchor = '''def details(*items: tuple[str, Any]) -> list[dict[str, str]]:\n    output = []\n    for label, value in items:\n        normalized = text(value)\n        if normalized:\n            output.append({"label": label, "value": normalized})\n    return output\n\n\n'''
+          helper_replacement = helper_anchor + '''def aic_record_url(row: dict[str, Any]) -> str | None:\n    folder_rsn = text(row.get("FOLDERRSN"), 80)\n    property_rsn = text(row.get("PROPERTYRSN") or row.get("MAINPROPERTYRSN"), 80)\n    if not folder_rsn or not property_rsn:\n        return None\n    query = urlencode({"id": folder_rsn, "pid": property_rsn})\n    return valid_public_url(f"https://www.toronto.ca/city-government/planning-development/application-details/?{query}")\n\n\ndef rentsafe_record_url(row: dict[str, Any]) -> str | None:\n    rsn = text(row.get("RSN") or row.get("rsn"), 80)\n    if not rsn:\n        return None\n    query = urlencode({"id": rsn})\n    return valid_public_url(\n        "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/"\n        "housing-property-standards/apartment-building-standards/audits-evaluations/"\n        f"rentsafeto-building-evaluation-report/?{query}"\n    )\n\n\n'''
+          if 'def aic_record_url(' not in text:
+              if helper_anchor not in text:
+                  raise SystemExit('source helper anchor changed')
+              text = text.replace(helper_anchor, helper_replacement, 1)
+
+          old_apartment = '''    elif key == "apartment_building_evaluation":\n        result.update(record_title=text(row.get("PROPERTY TYPE") or "Apartment building evaluation"), record_date=date_value(row.get("EVALUATION COMPLETED ON")), record_details=details(\n            ("Evaluation score", row.get("CURRENT BUILDING EVAL SCORE")), ("Storeys", row.get("CONFIRMED STOREYS")),\n            ("Units", row.get("CONFIRMED UNITS")), ("Year built", row.get("YEAR BUILT")),\n        ))\n'''
+          new_apartment = '''    elif key == "apartment_building_evaluation":\n        record_url = rentsafe_record_url(row)\n        result.update(record_url=record_url, record_link_label="Open official RentSafeTO building report" if record_url else None, record_title=text(row.get("PROPERTY TYPE") or "Apartment building evaluation"), record_date=date_value(row.get("EVALUATION COMPLETED ON")), record_details=details(\n            ("Evaluation score", row.get("CURRENT BUILDING EVAL SCORE")), ("Storeys", row.get("CONFIRMED STOREYS")),\n            ("Units", row.get("CONFIRMED UNITS")), ("Year built", row.get("YEAR BUILT")),\n        ))\n'''
+          if old_apartment in text:
+              text = text.replace(old_apartment, new_apartment, 1)
+          elif new_apartment not in text:
+              raise SystemExit('apartment adapter anchor changed')
+
+          old_aic = '''    elif key == "toronto_aic_applications":\n        result.update(dataset_link_label="Open current AIC application search", record_title=text(row.get("APPLICATION_NUMBER") or row.get("REFERENCEFILE")), record_date=date_value(row.get("SUBMIT_DATE")), record_status=text(row.get("STATUS_DESC") or row.get("STATUS_GROUP")), record_details=details(\n            ("Application type", row.get("FOLDERTYPE_DESC") or row.get("APPLICATION_TYPE")),\n            ("Latest milestone", row.get("LATEST_MILESTONE")), ("Description", row.get("FOLDERDESCRIPTION")),\n        ))\n'''
+          new_aic = '''    elif key == "toronto_aic_applications":\n        record_url = aic_record_url(row)\n        result.update(dataset_link_label="Open current AIC application search", record_url=record_url, record_link_label="Open official AIC application details" if record_url else None, record_title=text(row.get("APPLICATION_NUMBER") or row.get("REFERENCEFILE")), record_date=date_value(row.get("SUBMIT_DATE")), record_status=text(row.get("STATUS_DESC") or row.get("STATUS_GROUP")), record_details=details(\n            ("Application type", row.get("FOLDERTYPE_DESC") or row.get("APPLICATION_TYPE")),\n            ("Latest milestone", row.get("LATEST_MILESTONE")), ("Description", row.get("FOLDERDESCRIPTION")),\n        ))\n'''
+          if old_aic in text:
+              text = text.replace(old_aic, new_aic, 1)
+          elif new_aic not in text:
+              raise SystemExit('AIC adapter anchor changed')
+          sources.write_text(text, encoding='utf-8')
+
+          build = Path('scripts/build_toronto_app_data.py')
+          text = build.read_text(encoding='utf-8')
+          old_catalog = '''        source_catalog[source_key] = {\n            "dataset_url": normalized_link.pop("dataset_url"),\n            "dataset_link_label": normalized_link.pop("dataset_link_label"),\n            "link_level": "RECORD_AND_DATASET" if normalized_link.get("record_url") else "DATASET_FALLBACK",\n        }\n'''
+          new_catalog = '''        dataset_url = normalized_link.pop("dataset_url")\n        dataset_link_label = normalized_link.pop("dataset_link_label")\n        link_level = "RECORD_AND_DATASET" if normalized_link.get("record_url") else "DATASET_FALLBACK"\n        existing_source = source_catalog.get(source_key)\n        if existing_source:\n            if existing_source.get("dataset_url") != dataset_url or existing_source.get("dataset_link_label") != dataset_link_label:\n                raise RuntimeError(f"Toronto source catalogue metadata drift for {source_key}")\n            if link_level == "RECORD_AND_DATASET":\n                existing_source["link_level"] = "RECORD_AND_DATASET"\n        else:\n            source_catalog[source_key] = {\n                "dataset_url": dataset_url,\n                "dataset_link_label": dataset_link_label,\n                "link_level": link_level,\n            }\n'''
+          if old_catalog in text:
+              text = text.replace(old_catalog, new_catalog, 1)
+          elif new_catalog not in text:
+              raise SystemExit('source catalogue aggregation anchor changed')
+          build.write_text(text, encoding='utf-8')
+
+          tests = Path('tests/python/test_toronto_app_sources.py')
+          text = tests.read_text(encoding='utf-8')
+          text = text.replace('    def test_aic_uses_current_search_and_never_constructs_a_record_url(self) -> None:\n', '    def test_aic_uses_current_record_detail_surface(self) -> None:\n', 1)
+          text = text.replace('                    "AIC_ENCRYPTED_VALUE": "legacy-value",\n', '                    "AIC_ENCRYPTED_VALUE": "legacy-value",\n                    "FOLDERRSN": 5813710,\n                    "PROPERTYRSN": 949121,\n', 1)
+          text = text.replace('        self.assertIsNone(link["record_url"])\n        self.assertEqual(link["dataset_url"], "https://www.toronto.ca/city-government/planning-development/application-details/")\n        self.assertEqual(link["dataset_link_label"], "Open current AIC application search")\n        self.assertEqual(link["record_title"], "24 100000 STE 01 OZ")\n', '        self.assertEqual(link["record_url"], "https://www.toronto.ca/city-government/planning-development/application-details/?id=5813710&pid=949121")\n        self.assertEqual(link["record_link_label"], "Open official AIC application details")\n        self.assertEqual(link["dataset_url"], "https://www.toronto.ca/city-government/planning-development/application-details/")\n        self.assertEqual(link["dataset_link_label"], "Open current AIC application search")\n        self.assertEqual(link["record_title"], "24 100000 STE 01 OZ")\n', 1)
+
+          public_notice_marker = '    def test_public_notice_uses_dataset_fallback_and_normalized_context(self) -> None:\n'
+          rentsafe_test = '''    def test_rentsafe_building_evaluation_uses_official_record_page(self) -> None:\n        link = normalize_source_link(\n            {\n                "source_key": "apartment_building_evaluation",\n                "source_record_id": "apartment_building_evaluation:1:0",\n                "source_row_index": 0,\n                "match_basis": "EXACT_ADDRESS",\n                "source_address": "500 DAWES RD",\n            },\n            {\n                "apartment_building_evaluation": [{\n                    "RSN": 4153692,\n                    "PROPERTY TYPE": "PRIVATE",\n                    "CURRENT BUILDING EVAL SCORE": 47,\n                }]\n            },\n        )\n        self.assertEqual(link["record_url"], "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4153692")\n        self.assertEqual(link["record_link_label"], "Open official RentSafeTO building report")\n\n'''
+          if 'test_rentsafe_building_evaluation_uses_official_record_page' not in text:
+              if public_notice_marker not in text:
+                  raise SystemExit('public notice test marker changed')
+              text = text.replace(public_notice_marker, rentsafe_test + public_notice_marker, 1)
+          tests.write_text(text, encoding='utf-8')
+
+      - name: Verify source adapter tests
+        run: python -m unittest tests.python.test_toronto_app_sources -v
+
+      - name: Rebuild Toronto public payload
+        run: python scripts/build_toronto_app_data.py
+
+      - name: Strictly validate dataset and record actions
+        run: python scripts/validate_toronto_source_actions.py --strict --record-sample-size 5
+
+      - name: Re-run semantic and payload validation
+        run: |
+          python scripts/audit_toronto_source_semantics.py
+          python scripts/audit_toronto_public_notice_cardinality.py
+          python scripts/audit_toronto_source_row_resolution.py
+          python scripts/validate_toronto_market.py
+
+      - name: Commit only after all gates pass
+        run: |
+          git config user.name "TowerSignal Release Bot"
+          git config user.email "towersignal-release@users.noreply.github.com"
+          git add \
+            scripts/toronto_app_sources.py \
+            scripts/build_toronto_app_data.py \
+            tests/python/test_toronto_app_sources.py \
+            public/data/toronto-market.json \
+            data/toronto/market/current/source_action_qa.json
+          git commit -m "Toronto app: add verified record-level source actions"
+          git push origin HEAD:agent/toronto-preview-release-20260831-audit
