@@ -1,0 +1,95 @@
+name: Toronto Record Action Probe
+
+on:
+  push:
+    branches:
+      - agent/toronto-preview-release-20260831-audit
+    paths:
+      - .github/workflows/toronto-record-action-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe official record-detail surfaces from real persisted rows
+        shell: python
+        run: |
+          import json
+          import urllib.parse
+          import urllib.request
+          import urllib.error
+          from pathlib import Path
+
+          UA = 'TowerSignal-Toronto-Record-Probe/1.0 (+https://github.com/JeremyHennessy/TowerSignal)'
+
+          def rows(path, keys):
+              payload = json.loads(Path(path).read_text(encoding='utf-8'))
+              for key in keys:
+                  value = payload.get(key)
+                  if isinstance(value, list):
+                      return [x for x in value if isinstance(x, dict)]
+              return []
+
+          def check(url):
+              request = urllib.request.Request(url, headers={'User-Agent': UA})
+              try:
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      body = response.read(4096)
+                      return {'input': url, 'final': response.geturl(), 'status': response.status, 'bytes': len(body), 'ok': 200 <= response.status < 400}
+              except urllib.error.HTTPError as exc:
+                  return {'input': url, 'final': exc.geturl(), 'status': exc.code, 'ok': False}
+              except Exception as exc:
+                  return {'input': url, 'status': None, 'ok': False, 'error': f'{type(exc).__name__}: {exc}'}
+
+          results = {}
+
+          notices = rows('data/toronto/warehouse/current/open_licensed/toronto_public_notices.json', ('planning_notices',))
+          notice_urls = []
+          for row in notices:
+              notice_id = row.get('noticeId')
+              if notice_id not in (None, ''):
+                  notice_urls.append(f'https://secure.toronto.ca/nm/api/individual/notice/{notice_id}.do')
+              if len(notice_urls) >= 5:
+                  break
+          results['public_notice'] = [check(url) for url in notice_urls]
+
+          apps = rows('data/toronto/market/current/open_licensed/toronto_aic_applications.json', ('applications',))
+          aic_urls = []
+          for row in apps:
+              folder = row.get('FOLDERRSN')
+              prop = row.get('PROPERTYRSN') or row.get('MAINPROPERTYRSN')
+              if folder in (None, '') or prop in (None, ''):
+                  continue
+              query = urllib.parse.urlencode({'id': str(folder), 'pid': str(prop)})
+              aic_urls.append('https://www.toronto.ca/city-government/planning-development/application-details/?' + query)
+              if len(aic_urls) >= 5:
+                  break
+          results['aic'] = [check(url) for url in aic_urls]
+
+          apartments = rows('data/toronto/warehouse/current/open_licensed/apartment_building_evaluation.json', ('records','rows','toronto_rows'))
+          rentsafe_urls = []
+          for row in apartments:
+              rsn = row.get('RSN') or row.get('rsn')
+              if rsn in (None, ''):
+                  continue
+              query = urllib.parse.urlencode({'id': str(rsn)})
+              rentsafe_urls.append('https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?' + query)
+              if len(rentsafe_urls) >= 5:
+                  break
+          results['rentsafe'] = [check(url) for url in rentsafe_urls]
+
+          print(json.dumps(results, indent=2))
+          Path('record-action-probe.json').write_text(json.dumps(results, indent=2) + '\n', encoding='utf-8')
+          for family, family_results in results.items():
+              print(f'{family}: {sum(item.get("ok") is True for item in family_results)}/{len(family_results)} reachable')
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: toronto-record-action-probe
+          path: record-action-probe.json
+          retention-days: 30
