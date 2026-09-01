@@ -61,11 +61,21 @@ def main() -> None:
             continue
         normalized_link = normalize_source_link(link, source_rows)
         source_key = normalized_link["source_key"]
-        source_catalog[source_key] = {
-            "dataset_url": normalized_link.pop("dataset_url"),
-            "dataset_link_label": normalized_link.pop("dataset_link_label"),
-            "link_level": "RECORD_AND_DATASET" if normalized_link.get("record_url") else "DATASET_FALLBACK",
-        }
+        dataset_url = normalized_link.pop("dataset_url")
+        dataset_link_label = normalized_link.pop("dataset_link_label")
+        link_level = "RECORD_AND_DATASET" if normalized_link.get("record_url") else "DATASET_FALLBACK"
+        existing_source = source_catalog.get(source_key)
+        if existing_source:
+            if existing_source.get("dataset_url") != dataset_url or existing_source.get("dataset_link_label") != dataset_link_label:
+                raise RuntimeError(f"Toronto source catalogue metadata drift for {source_key}")
+            if link_level == "RECORD_AND_DATASET":
+                existing_source["link_level"] = "RECORD_AND_DATASET"
+        else:
+            source_catalog[source_key] = {
+                "dataset_url": dataset_url,
+                "dataset_link_label": dataset_link_label,
+                "link_level": link_level,
+            }
         links_by_property[str(link["property_id"])].append(normalized_link)
 
     names = organization_names(graph)

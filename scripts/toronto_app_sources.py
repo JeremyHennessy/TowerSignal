@@ -5,7 +5,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 try:
     from .toronto_source_identity import find_source_record
 except ImportError:
@@ -81,6 +81,27 @@ def details(*items: tuple[str, Any]) -> list[dict[str, str]]:
     return output
 
 
+def aic_record_url(row: dict[str, Any]) -> str | None:
+    folder_rsn = text(row.get("FOLDERRSN"), 80)
+    property_rsn = text(row.get("PROPERTYRSN") or row.get("MAINPROPERTYRSN"), 80)
+    if not folder_rsn or not property_rsn:
+        return None
+    query = urlencode({"id": folder_rsn, "pid": property_rsn})
+    return valid_public_url(f"https://www.toronto.ca/city-government/planning-development/application-details/?{query}")
+
+
+def rentsafe_record_url(row: dict[str, Any]) -> str | None:
+    rsn = text(row.get("RSN") or row.get("rsn"), 80)
+    if not rsn:
+        return None
+    query = urlencode({"id": rsn})
+    return valid_public_url(
+        "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/"
+        "housing-property-standards/apartment-building-standards/audits-evaluations/"
+        f"rentsafeto-building-evaluation-report/?{query}"
+    )
+
+
 def _rows(payload: dict[str, Any]) -> list[dict[str, Any]]:
     for key in ("rows", "records", "applications", "toronto_rows", "matches"):
         values = payload.get(key)
@@ -148,7 +169,8 @@ def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict
             ("Industry", row.get("NAICS_CODE_6_DESC_ENG")), ("Air release", row.get("REL_AIR")),
         ))
     elif key == "apartment_building_evaluation":
-        result.update(record_title=text(row.get("PROPERTY TYPE") or "Apartment building evaluation"), record_date=date_value(row.get("EVALUATION COMPLETED ON")), record_details=details(
+        record_url = rentsafe_record_url(row)
+        result.update(record_url=record_url, record_link_label="Open official RentSafeTO building report" if record_url else None, record_title=text(row.get("PROPERTY TYPE") or "Apartment building evaluation"), record_date=date_value(row.get("EVALUATION COMPLETED ON")), record_details=details(
             ("Evaluation score", row.get("CURRENT BUILDING EVAL SCORE")), ("Storeys", row.get("CONFIRMED STOREYS")),
             ("Units", row.get("CONFIRMED UNITS")), ("Year built", row.get("YEAR BUILT")),
         ))
@@ -173,7 +195,8 @@ def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict
             ("Finding", row.get("violation")), ("Last updated", date_value(row.get("last_updated_date"))),
         ))
     elif key == "toronto_aic_applications":
-        result.update(dataset_link_label="Open current AIC application search", record_title=text(row.get("APPLICATION_NUMBER") or row.get("REFERENCEFILE")), record_date=date_value(row.get("SUBMIT_DATE")), record_status=text(row.get("STATUS_DESC") or row.get("STATUS_GROUP")), record_details=details(
+        record_url = aic_record_url(row)
+        result.update(dataset_link_label="Open current AIC application search", record_url=record_url, record_link_label="Open official AIC application details" if record_url else None, record_title=text(row.get("APPLICATION_NUMBER") or row.get("REFERENCEFILE")), record_date=date_value(row.get("SUBMIT_DATE")), record_status=text(row.get("STATUS_DESC") or row.get("STATUS_GROUP")), record_details=details(
             ("Application type", row.get("FOLDERTYPE_DESC") or row.get("APPLICATION_TYPE")),
             ("Latest milestone", row.get("LATEST_MILESTONE")), ("Description", row.get("FOLDERDESCRIPTION")),
         ))

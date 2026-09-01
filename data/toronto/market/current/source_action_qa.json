@@ -1,13 +1,13 @@
 {
   "schema_version": "toronto-source-action-qa-1.0",
-  "generated_at": "2026-08-31T19:46:15.370336Z",
+  "generated_at": "2026-09-01T01:06:44.626314Z",
   "status": "PASSED",
   "counts": {
     "source_families": 13,
     "unique_dataset_actions": 12,
-    "unique_record_actions": 0,
-    "checked_record_action_sample": 0,
-    "checked_unique_urls": 12,
+    "unique_record_actions": 14238,
+    "checked_record_action_sample": 10,
+    "checked_unique_urls": 22,
     "failures": 0
   },
   "sources": {
@@ -46,21 +46,47 @@
       "fallback_message_required": true
     },
     "apartment_building_evaluation": {
-      "link_level": "DATASET_FALLBACK",
+      "link_level": "RECORD_AND_DATASET",
       "dataset_action": {
         "url": "https://open.toronto.ca/dataset/apartment-building-evaluation/",
         "http_status": 200,
         "status": "REACHABLE"
       },
-      "record_actions": [],
-      "available_unique_record_actions": 0,
-      "checked_record_action_sample": 0,
+      "record_actions": [
+        {
+          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4152554",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4153628",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4154483",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4155355",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=5754760",
+          "http_status": 200,
+          "status": "REACHABLE"
+        }
+      ],
+      "available_unique_record_actions": 3020,
+      "checked_record_action_sample": 5,
       "representative_source_record": {
         "property_id": "toronto-address-point:302304",
         "display_address": "1 Antrim Cres",
         "source_record_id": "apartment_building_evaluation:id:385"
       },
-      "fallback_message_required": true
+      "fallback_message_required": false
     },
     "business_licence_matches_prior_poc": {
       "link_level": "DATASET_FALLBACK",
@@ -182,21 +208,47 @@
       "fallback_message_required": true
     },
     "toronto_aic_applications": {
-      "link_level": "DATASET_FALLBACK",
+      "link_level": "RECORD_AND_DATASET",
       "dataset_action": {
         "url": "https://www.toronto.ca/city-government/planning-development/application-details/",
         "http_status": 200,
         "status": "REACHABLE"
       },
-      "record_actions": [],
-      "available_unique_record_actions": 0,
-      "checked_record_action_sample": 0,
+      "record_actions": [
+        {
+          "url": "https://www.toronto.ca/city-government/planning-development/application-details/?id=1084676&pid=509776",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.toronto.ca/city-government/planning-development/application-details/?id=4570793&pid=642108",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.toronto.ca/city-government/planning-development/application-details/?id=5041378&pid=366301",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.toronto.ca/city-government/planning-development/application-details/?id=5550769&pid=948962",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.toronto.ca/city-government/planning-development/application-details/?id=9668&pid=704156",
+          "http_status": 200,
+          "status": "REACHABLE"
+        }
+      ],
+      "available_unique_record_actions": 11218,
+      "checked_record_action_sample": 5,
       "representative_source_record": {
         "property_id": "toronto-address-point:8260405",
         "display_address": "1 1/2 Birchmount Rd",
         "source_record_id": "toronto_aic_applications:14202:14201"
       },
-      "fallback_message_required": true
+      "fallback_message_required": false
     },
     "toronto_highrise_residential_health_hazards": {
       "link_level": "DATASET_FALLBACK",
