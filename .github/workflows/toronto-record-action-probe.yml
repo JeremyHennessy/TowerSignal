@@ -23,6 +23,7 @@ jobs:
           import urllib.parse
           import urllib.request
           import urllib.error
+          from collections import defaultdict
           from pathlib import Path
 
           UA = 'TowerSignal-Toronto-Record-Probe/1.0 (+https://github.com/JeremyHennessy/TowerSignal)'
@@ -46,6 +47,14 @@ jobs:
               except Exception as exc:
                   return {'input': url, 'status': None, 'ok': False, 'error': f'{type(exc).__name__}: {exc}'}
 
+          def aic_url(row):
+              folder = row.get('FOLDERRSN')
+              prop = row.get('PROPERTYRSN') or row.get('MAINPROPERTYRSN')
+              if folder in (None, '') or prop in (None, ''):
+                  return None
+              query = urllib.parse.urlencode({'id': str(folder), 'pid': str(prop)})
+              return 'https://www.toronto.ca/city-government/planning-development/application-details/?' + query
+
           results = {}
 
           notices = rows('data/toronto/warehouse/current/open_licensed/toronto_public_notices.json', ('planning_notices',))
@@ -59,17 +68,35 @@ jobs:
           results['public_notice'] = [check(url) for url in notice_urls]
 
           apps = rows('data/toronto/market/current/open_licensed/toronto_aic_applications.json', ('applications',))
-          aic_urls = []
-          for row in apps:
-              folder = row.get('FOLDERRSN')
-              prop = row.get('PROPERTYRSN') or row.get('MAINPROPERTYRSN')
-              if folder in (None, '') or prop in (None, ''):
-                  continue
-              query = urllib.parse.urlencode({'id': str(folder), 'pid': str(prop)})
-              aic_urls.append('https://www.toronto.ca/city-government/planning-development/application-details/?' + query)
-              if len(aic_urls) >= 5:
-                  break
+          aic_urls = [url for row in apps if (url := aic_url(row))][:5]
           results['aic'] = [check(url) for url in aic_urls]
+
+          by_application = defaultdict(list)
+          for row in apps:
+              number = str(row.get('APPLICATION_NUMBER') or row.get('REFERENCEFILE') or '').strip().upper()
+              if number:
+                  by_application[number].append(row)
+          development = rows('data/toronto/warehouse/current/open_licensed/development_pipeline.json', ('records','rows','toronto_rows'))
+          development_urls = []
+          exact_unique_matches = 0
+          ambiguous_matches = 0
+          for row in development:
+              number = str(row.get('Application Number') or row.get('APPLICATION_NUMBER') or '').strip().upper()
+              matches = by_application.get(number, []) if number else []
+              if len(matches) == 1:
+                  exact_unique_matches += 1
+                  url = aic_url(matches[0])
+                  if url and len(development_urls) < 5:
+                      development_urls.append(url)
+              elif len(matches) > 1:
+                  ambiguous_matches += 1
+          results['development_pipeline_to_aic'] = [check(url) for url in development_urls]
+          results['development_pipeline_mapping'] = {
+              'source_rows': len(development),
+              'exact_unique_application_matches': exact_unique_matches,
+              'ambiguous_application_matches': ambiguous_matches,
+              'sample_urls': len(development_urls),
+          }
 
           apartments = rows('data/toronto/warehouse/current/open_licensed/apartment_building_evaluation.json', ('records','rows','toronto_rows'))
           rentsafe_urls = []
@@ -85,7 +112,8 @@ jobs:
 
           print(json.dumps(results, indent=2))
           Path('record-action-probe.json').write_text(json.dumps(results, indent=2) + '\n', encoding='utf-8')
-          for family, family_results in results.items():
+          for family in ('public_notice','aic','development_pipeline_to_aic','rentsafe'):
+              family_results = results[family]
               print(f'{family}: {sum(item.get("ok") is True for item in family_results)}/{len(family_results)} reachable')
 
       - uses: actions/upload-artifact@v4
