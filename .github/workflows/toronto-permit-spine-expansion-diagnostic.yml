@@ -1,0 +1,37 @@
+name: Toronto Permit Spine Expansion Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-permit-spine-expansion-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile spine diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_permit_spine_expansion.py
+
+      - name: Measure permit-driven Address Point expansion
+        run: PYTHONPATH=scripts python scripts/diagnose_toronto_permit_spine_expansion.py --output toronto-permit-spine-expansion.json
+
+      - name: Upload spine expansion report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-permit-spine-expansion
+          path: toronto-permit-spine-expansion.json
+          retention-days: 7
