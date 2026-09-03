@@ -23,6 +23,25 @@ class TorontoSourceIdentityRegressionTests(unittest.TestCase):
         self.assertEqual(record_id, f"{source}:id:82")
         self.assertIs(find_source_record(source, record_id, [source_row]), source_row)
 
+    def test_311_identity_uses_nested_publisher_row(self) -> None:
+        source = "311_matches_prior_poc"
+        source_row = {
+            "Creation Date": "2026-06-20 18:44:06.0000000",
+            "Intersection Street 1": "10 Guildwood Pkwy",
+            "Service Request Type": "Moving Motor Vehicle Noise",
+        }
+        wrapper = {
+            "canonical_address": "10 GUILDWOOD PKWY",
+            "property_keys": ["toronto-geoid:4153974"],
+            "tower_statuses": ["CONFIRMED"],
+            "source_member": "SR2026.csv",
+            "source_row": source_row,
+        }
+
+        record_id = stable_source_record_id(source, wrapper)
+        self.assertTrue(record_id.startswith(f"{source}:sha256:"))
+        self.assertIs(find_source_record(source, record_id, [source_row]), source_row)
+
     def test_renewable_identity_does_not_cross_match_other_id_fields(self) -> None:
         source = "renewable_energy_installations"
         first = {
