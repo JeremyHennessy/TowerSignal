@@ -1,0 +1,144 @@
+name: Toronto TDSB Mechanical Renewal Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-mechanical-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-tdsb-mechanical-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Scan all TDSB FCI pages for mechanical renewals
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          import re
+          from collections import Counter, defaultdict
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+
+          from build_toronto_poc import (
+              discover_tdsb_school_ids,
+              extract_address,
+              extract_priority,
+              extract_school_name,
+              fetch_tdsb_school_fci,
+          )
+
+          patterns = {
+              'cooling_tower': re.compile(r'\bcooling\s+towers?\b', re.I),
+              'evaporative_condenser': re.compile(r'\bevaporative\s+condensers?\b', re.I),
+              'chiller': re.compile(r'\bchillers?\b', re.I),
+              'boiler': re.compile(r'\bboilers?\b', re.I),
+              'condenser_water': re.compile(r'\bcondenser\s+water\b', re.I),
+              'cooling_water': re.compile(r'\bcooling\s+water\b', re.I),
+              'water_treatment': re.compile(r'\bwater\s+treatment\b', re.I),
+              'chemical_feed': re.compile(r'\bchemical\s+feed\b', re.I),
+              'legionella': re.compile(r'\blegionella\w*\b', re.I),
+              'hvac': re.compile(r'\bHVAC\b|\bheating,?\s+ventilation\s+and\s+air\s+conditioning\b', re.I),
+          }
+
+          school_ids, discovery_counts = discover_tdsb_school_ids()
+          failures = []
+          school_matches = {}
+          signal_school_counts = Counter()
+          signal_row_counts = Counter()
+          priority_counts = defaultdict(Counter)
+          total_matching_rows = 0
+          cooling_tower_schools = set()
+          non_tower_mechanical_schools = set()
+
+          with ThreadPoolExecutor(max_workers=12) as executor:
+              futures = {executor.submit(fetch_tdsb_school_fci, school_id): school_id for school_id in school_ids}
+              for future in as_completed(futures):
+                  school_id = futures[future]
+                  try:
+                      _, parser = future.result()
+                  except Exception as exc:
+                      failures.append({'school_id': school_id, 'error': f'{type(exc).__name__}: {exc}'[:500]})
+                      continue
+
+                  rows = parser.rows or parser.visible_text.splitlines()
+                  retained = []
+                  seen = set()
+                  for raw in rows:
+                      row = re.sub(r'\s+', ' ', str(raw or '')).strip()
+                      if not row:
+                          continue
+                      matched_signals = [key for key, pattern in patterns.items() if pattern.search(row)]
+                      if not matched_signals:
+                          continue
+                      fingerprint = row.lower()
+                      if fingerprint in seen:
+                          continue
+                      seen.add(fingerprint)
+                      priority = extract_priority(row)
+                      retained.append({'signals': matched_signals, 'priority': priority, 'text': row})
+                      total_matching_rows += 1
+                      for signal in matched_signals:
+                          signal_row_counts[signal] += 1
+                          if priority:
+                              priority_counts[signal][priority] += 1
+
+                  if not retained:
+                      continue
+                  school_signals = sorted({signal for item in retained for signal in item['signals']})
+                  for signal in school_signals:
+                      signal_school_counts[signal] += 1
+                  if 'cooling_tower' in school_signals:
+                      cooling_tower_schools.add(school_id)
+                  if any(signal != 'cooling_tower' for signal in school_signals):
+                      non_tower_mechanical_schools.add(school_id)
+                  school_matches[school_id] = {
+                      'school_id': school_id,
+                      'school_name': extract_school_name(parser, school_id),
+                      'address': extract_address(parser.visible_text),
+                      'signals': school_signals,
+                      'rows': retained,
+                  }
+
+          failure_rate = len(failures) / len(school_ids) if school_ids else 1.0
+          if failure_rate > 0.10:
+              raise SystemExit(f'TDSB failure rate too high: {failure_rate:.1%}')
+
+          only_non_tower = sorted(set(school_matches) - cooling_tower_schools, key=int)
+          report = {
+              'schema_version': 'toronto-tdsb-mechanical-diagnostic-1.0',
+              'status': 'PASSED_DIAGNOSTIC',
+              'scope': 'Read-only scan of all discovered TDSB School FCI pages. Cooling-tower wording remains explicit tower evidence; all other mechanical terms are supporting/renewal context only.',
+              'discovery_counts_by_page': discovery_counts,
+              'unique_school_ids_discovered': len(school_ids),
+              'school_pages_failed': len(failures),
+              'school_page_failure_rate': round(failure_rate, 6),
+              'schools_with_any_target_mechanical_row': len(school_matches),
+              'cooling_tower_schools': len(cooling_tower_schools),
+              'schools_with_target_mechanical_rows_but_no_cooling_tower': len(only_non_tower),
+              'total_unique_matching_rows': total_matching_rows,
+              'signal_school_counts': dict(sorted(signal_school_counts.items())),
+              'signal_row_counts': dict(sorted(signal_row_counts.items())),
+              'signal_priority_counts': {key: dict(sorted(value.items())) for key, value in sorted(priority_counts.items())},
+              'non_tower_school_sample': [school_matches[school_id] for school_id in only_non_tower[:50]],
+              'cooling_tower_school_sample': [school_matches[school_id] for school_id in sorted(cooling_tower_schools, key=int)[:30]],
+              'fetch_failures': failures,
+          }
+          print(json.dumps({key: value for key, value in report.items() if key not in {'non_tower_school_sample','cooling_tower_school_sample','fetch_failures'}}, indent=2, ensure_ascii=False))
+          for item in report['non_tower_school_sample'][:20]:
+              print('NON_TOWER_SCHOOL=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+          for item in report['cooling_tower_school_sample']:
+              print('COOLING_TOWER_SCHOOL=', json.dumps(item, ensure_ascii=False, sort_keys=True))
