@@ -1,0 +1,187 @@
+name: Toronto Release Integrity Repair
+
+on:
+  push:
+    branches:
+      - agent/toronto-release-integrity-20260903
+    paths:
+      - .github/workflows/toronto-release-integrity-repair.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: toronto-release-integrity-repair
+  cancel-in-progress: false
+
+jobs:
+  repair-verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact candidate input
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Prove approved-equivalent UI source is unchanged
+        run: |
+          CHANGED="$(git diff --name-only 26846872b0884f47579b0475d8f19c85763929f6...${GITHUB_SHA} -- src)"
+          if [ -n "$CHANGED" ]; then
+            echo "Unexpected UI/runtime source changes since recovered approved-equivalent baseline:"
+            echo "$CHANGED"
+            exit 1
+          fi
+
+      - name: Compile identity and audit tooling
+        run: |
+          python -m py_compile \
+            scripts/toronto_source_identity.py \
+            scripts/repair_toronto_source_link_identities.py \
+            scripts/audit_toronto_source_semantics.py \
+            scripts/audit_toronto_public_notice_cardinality.py \
+            scripts/audit_toronto_source_row_resolution.py \
+            scripts/build_toronto_app_data.py \
+            scripts/validate_toronto_source_actions.py \
+            scripts/validate_toronto_market.py
+
+      - name: Run source-identity regressions before data repair
+        run: |
+          python -m unittest \
+            tests.python.test_toronto_source_identity_regression \
+            tests.python.test_toronto_app_sources \
+            tests.python.test_toronto_chemtrac_regression \
+            tests.python.test_toronto_identity_exceptions -v
+
+      - name: Repair only proven source-record identity defects
+        run: python scripts/repair_toronto_source_link_identities.py
+
+      - name: Rebuild Toronto public payload
+        run: python scripts/build_toronto_app_data.py
+
+      - name: Strictly validate dataset and record actions
+        run: python scripts/validate_toronto_source_actions.py --strict --record-sample-size 5
+
+      - name: Strict semantic source-link audit
+        run: python scripts/audit_toronto_source_semantics.py --strict
+
+      - name: Prove public-notice cardinality contract
+        run: python scripts/audit_toronto_public_notice_cardinality.py
+
+      - name: Prove stable source-row resolution
+        run: python scripts/audit_toronto_source_row_resolution.py --strict
+
+      - name: Validate Toronto market and evidence contract
+        run: |
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+
+      - name: Lint and typecheck frontend
+        run: |
+          npm run lint
+          npm run typecheck
+
+      - name: Run Toronto frontend suite
+        env:
+          VITE_ENABLE_TORONTO: 'true'
+          VITE_TORONTO_PREVIEW: 'true'
+        run: npm exec vitest run -- tests/frontend/TorontoMarket.test.tsx
+
+      - name: Build isolated candidate Pages artifact
+        env:
+          VITE_ENABLE_TORONTO: 'true'
+          VITE_TORONTO_PREVIEW: 'true'
+        run: npm exec vite build -- --base=/ --outDir=dist-candidate
+
+      - name: Build recovered approved-equivalent UI with identical candidate data
+        run: |
+          git worktree add --detach /tmp/toronto-approved 26846872b0884f47579b0475d8f19c85763929f6
+          cp public/data/toronto-market.json /tmp/toronto-approved/public/data/toronto-market.json
+          cd /tmp/toronto-approved
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true "$GITHUB_WORKSPACE/node_modules/.bin/vite" build --base=/ --outDir=/tmp/toronto-approved-dist
+
+      - name: Install Chromium for deterministic screenshot comparison
+        run: npm exec playwright install --with-deps chromium
+
+      - name: Compare approved-equivalent and candidate screenshots
+        run: node scripts/verify_toronto_visual_regression.mjs /tmp/toronto-approved-dist dist-candidate artifacts/toronto-visual-regression
+
+      - name: Upload visual regression evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-release-visual-regression-${{ github.run_id }}
+          path: artifacts/toronto-visual-regression/
+          retention-days: 30
+
+      - name: Persist machine-readable release-integrity evidence
+        shell: python
+        run: |
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path('.')
+          market = root / 'data/toronto/market/current'
+          def load(name):
+              return json.loads((market / name).read_text(encoding='utf-8'))
+
+          evidence = {
+              'schema_version': 'toronto-release-integrity-evidence-1.0',
+              'generated_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+              'validated_input_sha': os.environ['GITHUB_SHA'],
+              'approved_sha_requested_but_unrecovered': '12db907ab7dd6e5a6dfb32b2b05163cdd595459a',
+              'deployed_baseline_sha': 'fa0899b7db87d9e421ad0408a5e6d1cd2f7acd60',
+              'recovered_approved_equivalent_sha': '26846872b0884f47579b0475d8f19c85763929f6',
+              'audit_start_sha': 'd751bb99ec21626d910d4ccd10dac2c2cf9dfd0c',
+              'source_identity_repair': load('source_identity_repair_report.json'),
+              'source_action_qa': load('source_action_qa.json'),
+              'source_semantic_audit': load('source_semantic_audit.json'),
+              'public_notice_cardinality': load('public_notice_cardinality_audit.json'),
+              'source_row_resolution': load('source_row_resolution_audit.json'),
+              'ui_regression_contract': {
+                  'baseline': '26846872b0884f47579b0475d8f19c85763929f6',
+                  'data_basis': 'candidate public/data/toronto-market.json copied into both builds',
+                  'desktop_pixel_match': True,
+                  'iphone_pixel_match': True,
+                  'prospect_entry_pixel_match': True,
+              },
+          }
+          path = root / 'data/toronto/release/release-integrity-evidence.json'
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+
+      - name: Commit only the verified repair and evidence
+        run: |
+          git config user.name "TowerSignal Release Bot"
+          git config user.email "towersignal-release@users.noreply.github.com"
+          git add \
+            data/toronto/market/current/property_source_links.json \
+            data/toronto/market/current/source_identity_repair_report.json \
+            data/toronto/market/current/source_action_qa.json \
+            data/toronto/market/current/source_semantic_audit.json \
+            data/toronto/market/current/public_notice_cardinality_audit.json \
+            data/toronto/market/current/source_row_resolution_audit.json \
+            data/toronto/release/release-integrity-evidence.json \
+            public/data/toronto-market.json
+          if [ -z "$(git status --porcelain -- data/toronto/market/current data/toronto/release public/data/toronto-market.json)" ]; then
+            echo "No generated repair changes to persist."
+            exit 0
+          fi
+          git commit -m "Toronto release: persist strict source-identity repair evidence"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "PERSISTED_SHA=$(git rev-parse HEAD)"
