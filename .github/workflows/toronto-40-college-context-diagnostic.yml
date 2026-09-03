@@ -1,0 +1,65 @@
+name: Toronto 40 College Context Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tobids-post-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-40-college-context-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Inspect persisted property source and relationship context
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          from scripts.toronto_app_sources import load_source_rows, normalize_source_link
+
+          root = Path('.')
+          market = root / 'data/toronto/market/current'
+          pid = 'toronto-address-point:7762664'
+          spine = json.loads((market / 'property_spine.json').read_text(encoding='utf-8'))
+          links_payload = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
+          graph = json.loads((market / 'entity_graph.json').read_text(encoding='utf-8'))
+          prop = next((item for item in spine.get('properties', []) if item.get('property_id') == pid), None)
+          if not prop:
+              raise SystemExit('40 College property not found')
+
+          def load_json(path):
+              if not path.exists():
+                  return {}
+              return json.loads(path.read_text(encoding='utf-8'))
+
+          source_rows = load_source_rows(root, load_json)
+          links = [item for item in links_payload.get('links', []) if item.get('property_id') == pid]
+          normalized = [normalize_source_link(item, source_rows) for item in links]
+          nodes = {item.get('node_id'): item for item in graph.get('nodes', []) if isinstance(item, dict)}
+          relationships = []
+          for edge in graph.get('edges', []):
+              if not isinstance(edge, dict) or edge.get('property_id') != pid:
+                  continue
+              relationships.append({
+                  'relationship': edge.get('relationship'),
+                  'source_key': edge.get('source_key'),
+                  'confidence': edge.get('confidence'),
+                  'basis': edge.get('basis'),
+                  'organization': (nodes.get(edge.get('from_node')) or {}).get('name'),
+                  'evidence': edge.get('evidence'),
+              })
+          print('PROPERTY=', json.dumps(prop, ensure_ascii=False, sort_keys=True))
+          print('SOURCE_LINK_COUNT=', len(links))
+          for item in normalized:
+              print('SOURCE=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+          print('RELATIONSHIP_COUNT=', len(relationships))
+          for item in relationships:
+              print('RELATIONSHIP=', json.dumps(item, ensure_ascii=False, sort_keys=True))
