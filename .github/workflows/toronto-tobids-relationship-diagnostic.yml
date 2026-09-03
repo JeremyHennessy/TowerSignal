@@ -1,0 +1,43 @@
+name: Toronto TOBids Relationship Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tobids-relationship-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-tobids-relationship-diagnostic.yml
+      - scripts/diagnose_toronto_tobids_relationships.py
+      - tests/python/test_toronto_tobids_relationship_diagnostic.py
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_tobids_relationships.py
+
+      - name: Run diagnostic regressions
+        run: PYTHONPATH=.:scripts python -m unittest tests.python.test_toronto_tobids_relationship_diagnostic -v
+
+      - name: Measure exact TOBids property-supplier opportunity
+        run: python scripts/diagnose_toronto_tobids_relationships.py --output tobids-relationship-diagnostic.json
+
+      - name: Upload diagnostic report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-tobids-relationship-diagnostic
+          path: tobids-relationship-diagnostic.json
+          if-no-files-found: error
+          retention-days: 7
