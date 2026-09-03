@@ -1,0 +1,37 @@
+name: Toronto Cooling Tower Permit Lifecycle Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-cooling-tower-permit-lifecycle-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile lifecycle diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_cooling_tower_permit_lifecycle.py
+
+      - name: Classify explicit cooling-tower permit lifecycle
+        run: python scripts/diagnose_toronto_cooling_tower_permit_lifecycle.py --output toronto-cooling-tower-permit-lifecycle.json
+
+      - name: Upload lifecycle report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-cooling-tower-permit-lifecycle
+          path: toronto-cooling-tower-permit-lifecycle.json
+          retention-days: 7
