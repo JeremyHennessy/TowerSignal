@@ -1,0 +1,37 @@
+name: Toronto Building Permit Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-building-permit-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_building_permits.py
+
+      - name: Measure live building-permit opportunity
+        run: python scripts/diagnose_toronto_building_permits.py --output toronto-building-permit-diagnostic.json
+
+      - name: Upload diagnostic report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-building-permit-diagnostic
+          path: toronto-building-permit-diagnostic.json
+          retention-days: 7
