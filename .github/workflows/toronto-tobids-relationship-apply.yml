@@ -53,52 +53,36 @@ jobs:
                   raise SystemExit('TOBids source-identity import anchor changed')
               text = text.replace(old_import, new_import, 1)
 
-          old_existing = '''    existing_identities = {
-        (clean_text(item.get("property_id")), clean_text(item.get("source_record_id")))
-        for item in existing_source_links
-    }
-    existing_row_keys = {
-        (clean_text(item.get("property_id")), item.get("source_row_index"))
-        for item in existing_source_links
-        if isinstance(item.get("source_row_index"), int)
-    }
-'''
-          new_existing = '''    existing_publisher_identities: set[tuple[str, str]] = set()
-    unresolved_legacy_links: list[dict[str, Any]] = []
-    for link in existing_source_links:
-        pid = clean_text(link.get("property_id"))
-        resolved = find_source_record(SOURCE_LINK_KEY, clean_text(link.get("source_record_id")), rows)
-        if not resolved:
-            unresolved_legacy_links.append(link)
-            continue
-        existing_publisher_identities.add((pid, stable_source_record_id(SOURCE_LINK_KEY, resolved)))
-    if unresolved_legacy_links:
-        raise RuntimeError(f"TOBids legacy source links failed publisher-row resolution: {unresolved_legacy_links[:5]}")
-'''
-          if new_existing not in text:
-              if old_existing not in text:
-                  raise SystemExit('TOBids existing-provenance block anchor changed')
-              text = text.replace(old_existing, new_existing, 1)
+          existing_marker = '    existing_publisher_identities: set[tuple[str, str]] = set()'
+          if existing_marker not in text:
+              start = text.index('    existing_identities = {')
+              end = text.index('\n\n    new_links:', start)
+              replacement = (
+                  '    existing_publisher_identities: set[tuple[str, str]] = set()\n'
+                  '    unresolved_legacy_links: list[dict[str, Any]] = []\n'
+                  '    for link in existing_source_links:\n'
+                  '        pid = clean_text(link.get("property_id"))\n'
+                  '        resolved = find_source_record(SOURCE_LINK_KEY, clean_text(link.get("source_record_id")), rows)\n'
+                  '        if not resolved:\n'
+                  '            unresolved_legacy_links.append(link)\n'
+                  '            continue\n'
+                  '        existing_publisher_identities.add((pid, stable_source_record_id(SOURCE_LINK_KEY, resolved)))\n'
+                  '    if unresolved_legacy_links:\n'
+                  '        raise RuntimeError(f"TOBids legacy source links failed publisher-row resolution: {unresolved_legacy_links[:5]}")\n'
+              )
+              text = text[:start] + replacement + text[end:]
 
-          old_loop = '''        id_key = (pid, source_record_id)
-        row_key = (pid, idx)
-        id_exists = id_key in existing_identities
-        row_exists = row_key in existing_row_keys
-        if id_exists != row_exists:
-            raise RuntimeError(f"TOBids existing provenance mismatch at row {idx}: stable_id={id_exists}, row_index={row_exists}")
-        if id_exists:
-            existing_exact_rows += 1
-            continue
-'''
-          new_loop = '''        publisher_key = (pid, source_record_id)
-        if publisher_key in existing_publisher_identities:
-            existing_exact_rows += 1
-            continue
-'''
-          if new_loop not in text:
-              if old_loop not in text:
-                  raise SystemExit('TOBids exact-row overlap block anchor changed')
-              text = text.replace(old_loop, new_loop, 1)
+          loop_marker = '        publisher_key = (pid, source_record_id)'
+          if loop_marker not in text:
+              start = text.index('        id_key = (pid, source_record_id)')
+              end = text.index('        new_links.append({', start)
+              replacement = (
+                  '        publisher_key = (pid, source_record_id)\n'
+                  '        if publisher_key in existing_publisher_identities:\n'
+                  '            existing_exact_rows += 1\n'
+                  '            continue\n'
+              )
+              text = text[:start] + replacement + text[end:]
 
           path.write_text(text, encoding='utf-8')
 
