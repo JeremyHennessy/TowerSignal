@@ -1,0 +1,37 @@
+name: Toronto Building Permit Scope Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-building-permit-scope-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile scope diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_building_permit_scope.py
+
+      - name: Measure original POC versus expanded-universe coverage
+        run: PYTHONPATH=scripts python scripts/diagnose_toronto_building_permit_scope.py --output toronto-building-permit-scope.json
+
+      - name: Upload scope report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-building-permit-scope
+          path: toronto-building-permit-scope.json
+          retention-days: 7
