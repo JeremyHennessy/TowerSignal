@@ -1,0 +1,34 @@
+{
+  "schema_version": "toronto-source-identity-repair-1.1",
+  "generated_at": "2026-09-03T14:12:54.611333Z",
+  "status": "PASSED",
+  "root_cause": {
+    "wrapped_match_sources": "311 and business-licence durable IDs were generated from outer matches[] wrappers but app resolution uses nested source_row publisher records.",
+    "renewable_energy": "Generic id lookup matched any ID-like field instead of the ordered field contract used to generate the durable ID, producing cross-field collisions."
+  },
+  "sources": {
+    "311_matches_prior_poc": {
+      "links": 1,
+      "index_address_match": 1,
+      "stable_identity_unresolved_before": 1,
+      "record_ids_rewritten": 1,
+      "stable_identity_resolved_after": 1
+    },
+    "business_licence_matches_prior_poc": {
+      "links": 1452,
+      "index_address_match": 1452,
+      "stable_identity_unresolved_before": 1452,
+      "record_ids_rewritten": 1452,
+      "stable_identity_resolved_after": 1452
+    },
+    "renewable_energy_installations": {
+      "links": 85,
+      "index_address_match": 85,
+      "stable_identity_resolved_before": 85,
+      "record_ids_unchanged": 85,
+      "stable_identity_resolved_after": 85,
+      "legacy_cross_field_id_collision": 4
+    }
+  },
+  "failures": []
+}

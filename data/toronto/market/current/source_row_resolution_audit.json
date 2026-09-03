@@ -1,0 +1,54 @@
+{
+  "schema_version": "toronto-source-row-resolution-audit-1.1",
+  "source_links": 38394,
+  "status": "PASSED",
+  "sources": {
+    "311_matches_prior_poc": {
+      "index_address_match": 1,
+      "stable_id_address_match": 1
+    },
+    "affordable_housing_pipeline": {
+      "index_address_match": 179,
+      "stable_id_address_match": 179
+    },
+    "apartment_building_evaluation": {
+      "index_address_match": 5288,
+      "stable_id_address_match": 5288
+    },
+    "business_licence_matches_prior_poc": {
+      "index_address_match": 1452,
+      "stable_id_address_match": 1452
+    },
+    "chemtrac_2024": {
+      "index_address_match": 973,
+      "stable_id_address_match": 973
+    },
+    "chemtrac_history": {
+      "index_address_match": 13572,
+      "stable_id_address_match": 13572
+    },
+    "development_pipeline": {
+      "index_address_match": 1780,
+      "stable_id_address_match": 1780
+    },
+    "ontario_environmental_compliance_reports": {
+      "index_address_match": 2,
+      "stable_id_address_match": 2
+    },
+    "renewable_energy_installations": {
+      "index_address_match": 85,
+      "stable_id_address_match": 85
+    },
+    "toronto_aic_applications": {
+      "index_address_match": 11225,
+      "stable_id_address_match": 11225
+    },
+    "toronto_highrise_residential_health_hazards": {
+      "index_address_match": 1017,
+      "stable_id_address_match": 1017
+    }
+  },
+  "hard_failures": {},
+  "index_address_mismatches": 0,
+  "samples": []
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "toronto-public-notice-cardinality-audit-1.0",
+  "generated_at": "2026-09-03T14:27:30.216106Z",
+  "status": "PASSED",
+  "counts": {
+    "unique_notice_records": 1127,
+    "multi_property_notice_records": 508,
+    "max_properties_per_notice": 18,
+    "validated_direct_address_links": 7,
+    "validated_application_membership_links": 2808,
+    "invalid_links": 0,
+    "unknown_match_contract_links": 0
+  },
+  "contract": {
+    "direct_address": "Property link is valid only when the normalized link source_address is explicitly present in the notice addressList.",
+    "application_membership": "Property link is valid only when the notice planningApplicationNumbers contains an application number whose deterministic AIC source link resolves to that same property."
+  },
+  "invalid": [],
+  "unknown_match_contract": []
+}
