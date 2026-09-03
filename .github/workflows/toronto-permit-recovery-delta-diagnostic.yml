@@ -1,0 +1,37 @@
+name: Toronto Permit Recovery Delta Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-permit-recovery-delta-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile delta diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_permit_recovery_delta.py
+
+      - name: Measure net recovery delta
+        run: PYTHONPATH=scripts python scripts/diagnose_toronto_permit_recovery_delta.py --output toronto-permit-recovery-delta.json
+
+      - name: Upload delta report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-permit-recovery-delta
+          path: toronto-permit-recovery-delta.json
+          retention-days: 7
