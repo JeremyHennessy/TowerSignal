@@ -17,6 +17,9 @@ const sourceLabels: Record<string, string> = {
   toronto_aic_applications: 'Toronto AIC applications',
   toronto_highrise_residential_health_hazards: 'Highrise residential health hazards',
   ontario_environmental_compliance_reports: 'Ontario environmental compliance',
+  ontario_bps_energy_2024: 'Ontario BPS energy 2024',
+  tobids_awarded_contracts: 'TOBids awarded contracts',
+  rentsafe_registration: 'RentSafe registration',
   apartment_building_evaluation: 'Apartment building evaluations',
   development_pipeline: 'Development pipeline',
   affordable_housing_pipeline: 'Affordable housing pipeline',
@@ -48,7 +51,7 @@ export function buildTorontoPropertySearchText(property: TorontoProperty): strin
       link.record_status,
       ...link.record_details.flatMap(detail => [detail.label, detail.value]),
     ]),
-    ...property.relationships.flatMap(item => [item.organization, item.relationship, item.source_key]),
+    ...property.relationships.flatMap(item => [item.organization, item.relationship, item.source_key, ...(item.evidence ?? []).flatMap(detail => [detail.label, detail.value])]),
   ].filter(Boolean).join(' ').toLowerCase()
 }
 
@@ -154,7 +157,7 @@ function PropertyDetail({ property, sourceCatalog, onClose }: { property: Toront
         {group.links.length > 10 && <button className="toronto-history-more" onClick={() => setVisibleBySource(current => ({ ...current, [group.sourceKey]: visibleCount >= group.links.length ? 10 : Math.min(visibleCount + 10, group.links.length) }))}>{visibleCount >= group.links.length ? 'Show first 10' : `Show ${Math.min(10, group.links.length - visibleCount)} more`}</button>}
       </details>
     })}</div> : <p>No joined enrichment record beyond the municipal property spine.</p>}</section>
-    <section className="toronto-detail-section"><h3>Organizations and roles <span>{property.relationships.length}</span></h3>{property.relationships.length ? <div className="toronto-source-list">{property.relationships.map((relationship, index) => <article key={`${relationship.relationship}:${relationship.organization}:${index}`}><strong>{relationship.organization}</strong><span>{humanize(relationship.relationship)}</span><small>{sourceLabel(relationship.source_key)} · {humanize(relationship.confidence)} · {humanize(relationship.basis)}</small></article>)}</div> : <p>No defensible organization relationship is currently attached.</p>}</section>
+    <section className="toronto-detail-section"><h3>Organizations and roles <span>{property.relationships.length}</span></h3>{property.relationships.length ? <div className="toronto-source-list">{property.relationships.map((relationship, index) => <article key={`${relationship.relationship}:${relationship.organization}:${index}`}><strong>{relationship.organization}</strong><span>{humanize(relationship.relationship)}</span>{(relationship.evidence ?? []).length > 0 && <dl className="toronto-source-details">{(relationship.evidence ?? []).map(item => <div key={`${item.label}:${item.value}`}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>}<small>{sourceLabel(relationship.source_key)} · {humanize(relationship.confidence)} · {humanize(relationship.basis)}</small></article>)}</div> : <p>No defensible organization relationship is currently attached.</p>}</section>
   </aside>
 }
 

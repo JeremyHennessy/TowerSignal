@@ -30,6 +30,7 @@ export interface TorontoRelationship {
   source_key: string
   confidence: string
   basis: string
+  evidence?: { label: string; value: string }[]
 }
 
 export interface TorontoProperty {

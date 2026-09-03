@@ -15,7 +15,7 @@ vi.mock('../../src/data/api', () => ({ loadTorontoMarket: vi.fn().mockResolvedVa
   },
   limitations: ['AIC document transport is blocked.'], unresolved_poc: [{ property_key: 'poc-2', input_address: '89 Humber College Blvd', resolution_status: 'NO_CURRENT_ADDRESS_POINT_MATCH', candidate_address_point_ids: [] }],
   properties: [
-    { property_id: 'toronto-address-point:100', address_point_id: '100', display_address: '10 Alpha St', municipality: 'Toronto', longitude: -79.38, latitude: 43.65, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: true, tower_evidence_status: 'CONFIRMED_DOCUMENTARY_TOWER', source_keys: ['chemtrac_history'], source_links: [{ source_key: 'chemtrac_history', source_record_id: 'chem:1', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: 'https://secure.toronto.ca/nm/api/individual/notice/123.do', record_link_label: 'Open public notice', record_title: 'Alpha facility', record_date: '2024', record_status: null, record_details: [{ label: 'Chemical', value: 'Nickel' }] }, { source_key: 'chemtrac_history', source_record_id: 'chem:2', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: '2023', record_status: null, record_details: [{ label: 'Chemical', value: 'Lead' }] }, ...Array.from({ length: 10 }, (_, index) => ({ source_key: 'chemtrac_history', source_record_id: `chem:extra-${index}`, match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: String(2012 + index), record_status: null, record_details: [{ label: 'Chemical', value: `Chemical ${index}` }] }))], relationships: [{ relationship: 'PROPERTY_MANAGER_OF', organization: 'Alpha Management', source_key: 'rentsafe', confidence: 'HIGH', basis: 'EXPLICIT_ROLE' }], aerial_review_rank: null, aerial_visual_similarity_score: null },
+    { property_id: 'toronto-address-point:100', address_point_id: '100', display_address: '10 Alpha St', municipality: 'Toronto', longitude: -79.38, latitude: 43.65, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: true, tower_evidence_status: 'CONFIRMED_DOCUMENTARY_TOWER', source_keys: ['chemtrac_history'], source_links: [{ source_key: 'chemtrac_history', source_record_id: 'chem:1', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: 'https://secure.toronto.ca/nm/api/individual/notice/123.do', record_link_label: 'Open public notice', record_title: 'Alpha facility', record_date: '2024', record_status: null, record_details: [{ label: 'Chemical', value: 'Nickel' }] }, { source_key: 'chemtrac_history', source_record_id: 'chem:2', match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: '2023', record_status: null, record_details: [{ label: 'Chemical', value: 'Lead' }] }, ...Array.from({ length: 10 }, (_, index) => ({ source_key: 'chemtrac_history', source_record_id: `chem:extra-${index}`, match_basis: 'EXACT_ADDRESS', source_address: '10 Alpha St', record_url: null, record_link_label: null, record_title: 'Alpha facility', record_date: String(2012 + index), record_status: null, record_details: [{ label: 'Chemical', value: `Chemical ${index}` }] }))], relationships: [{ relationship: 'PROPERTY_MANAGER_OF', organization: 'Alpha Management', source_key: 'rentsafe_registration', confidence: 'HIGH', basis: 'EXPLICIT_ROLE', evidence: [{ label: 'RentSafe RSN', value: 'RSN-ALPHA' }, { label: 'Site address', value: '10 Alpha St' }] }], aerial_review_rank: null, aerial_visual_similarity_score: null },
     { property_id: 'toronto-address-point:200', address_point_id: '200', display_address: '20 Beta Ave', municipality: 'Toronto', longitude: -79.4, latitude: 43.67, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: false, tower_evidence_status: 'AERIAL_REVIEW_CANDIDATE', source_keys: ['toronto_aic_applications'], source_links: [{ source_key: 'toronto_aic_applications', source_record_id: 'aic:1', match_basis: 'EXACT_ADDRESS', source_address: '20 Beta Ave', record_url: null, record_link_label: null, record_title: '24 100000 STE 01 OZ', record_date: '2024-01-01', record_status: 'Under review', record_details: [{ label: 'Application type', value: 'Rezoning' }] }], relationships: [], aerial_review_rank: 1, aerial_visual_similarity_score: 0.91 },
   ],
 }) }))
@@ -63,6 +63,11 @@ test('searches normalized source evidence and organization identities', async ()
 
   await user.clear(search)
   await user.type(search, 'Alpha Management')
+  expect(screen.getByText('10 Alpha St')).toBeInTheDocument()
+  expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()
+
+  await user.clear(search)
+  await user.type(search, 'RSN-ALPHA')
   expect(screen.getByText('10 Alpha St')).toBeInTheDocument()
   expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()
 })
@@ -123,6 +128,8 @@ test('renders normalized record links and labels dataset-only fallbacks honestly
   await user.click(await screen.findByRole('button', { name: '10 Alpha St' }))
   const detail = screen.getByRole('complementary', { name: 'Toronto property detail' })
   expect(within(detail).getByText('Nickel')).toBeInTheDocument()
+  expect(within(detail).getByText('RSN-ALPHA')).toBeInTheDocument()
+  expect(within(detail).getByText('RentSafe RSN')).toBeInTheDocument()
   expect(within(detail).getByRole('link', { name: 'Open public notice ↗' })).toHaveAttribute('href', 'https://secure.toronto.ca/nm/api/individual/notice/123.do')
   expect(within(detail).getByRole('link', { name: 'Open official dataset ↗' })).toHaveAttribute('href', 'https://open.toronto.ca/dataset/chemical-tracking-chemtrac/')
   expect(within(detail).getAllByRole('link', { name: 'Open official dataset ↗' })).toHaveLength(1)

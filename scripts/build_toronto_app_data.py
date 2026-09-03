@@ -37,6 +37,51 @@ def candidate_property_ids(payload: dict[str, Any]) -> set[str]:
     }
 
 
+RELATIONSHIP_EVIDENCE_LABELS = {
+    "document_number": "Document number",
+    "award_date": "Award date",
+    "award": "Award",
+    "property_name": "Property name",
+    "source_address": "Source address",
+    "rsn": "RentSafe RSN",
+    "site_address": "Site address",
+    "facility_ids": "Facility IDs",
+    "reporting_years": "Reporting years",
+    "source_observation_count": "Source observations",
+    "licence_numbers": "Licence numbers",
+    "categories": "Categories",
+    "site_names": "Site names",
+    "application_number": "Application number",
+    "document_url": "Document URL",
+    "document_sha256": "Document SHA-256",
+}
+
+RELATIONSHIP_EVIDENCE_ORDER = {key: index for index, key in enumerate(RELATIONSHIP_EVIDENCE_LABELS)}
+
+
+def normalize_relationship_evidence(edge: dict[str, Any]) -> list[dict[str, str]]:
+    evidence = edge.get("evidence")
+    if not isinstance(evidence, dict):
+        return []
+    details: list[dict[str, str]] = []
+    for key in sorted(evidence, key=lambda item: (RELATIONSHIP_EVIDENCE_ORDER.get(str(item), 999), str(item))):
+        raw = evidence.get(key)
+        if isinstance(raw, (list, tuple, set)):
+            parts = [str(value).strip() for value in raw if value not in (None, "") and str(value).strip()]
+            value = ", ".join(parts)
+        elif isinstance(raw, (str, int, float, bool)):
+            value = str(raw).strip()
+        else:
+            continue
+        if not value:
+            continue
+        label = RELATIONSHIP_EVIDENCE_LABELS.get(str(key), str(key).replace("_", " ").strip().capitalize())
+        details.append({"label": label, "value": value[:1000]})
+        if len(details) >= 12:
+            break
+    return details
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--market", type=Path, default=ROOT / "data/toronto/market/current")
@@ -89,6 +134,7 @@ def main() -> None:
             "source_key": str(edge.get("source_key") or "unknown"),
             "confidence": str(edge.get("confidence") or "UNKNOWN"),
             "basis": str(edge.get("basis") or ""),
+            "evidence": normalize_relationship_evidence(edge),
         })
 
     aerial_by_property: dict[str, dict[str, Any]] = {}
@@ -166,7 +212,7 @@ def main() -> None:
             )
 
     payload = {
-        "schema_version": "toronto-market-app-1.1",
+        "schema_version": "toronto-market-app-1.2",
         "generated_at": coverage.get("generated_at") or spine.get("generated_at"),
         "feature_status": "ISOLATED_BETA",
         "counts": {
