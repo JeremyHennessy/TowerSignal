@@ -1,0 +1,198 @@
+name: Toronto Targeted Building Permit Apply
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-apply-20260903
+    paths:
+      - .github/workflows/toronto-building-permit-apply.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: toronto-building-permit-apply
+  cancel-in-progress: false
+
+jobs:
+  apply-verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout exact integrated Toronto baseline
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-building-permit-apply-20260903
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Wire permit families into existing source contracts
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path_name: str, old: str, new: str) -> None:
+              path = Path(path_name)
+              text = path.read_text(encoding='utf-8')
+              if new in text:
+                  return
+              if old not in text:
+                  raise SystemExit(f'Patch anchor changed: {path_name}: {old!r}')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_once('scripts/pull_toronto_targeted_building_permits.py', 'root.get("lon") if root else None', 'root.get("longitude") if root else None')
+          replace_once('scripts/pull_toronto_targeted_building_permits.py', 'root.get("lat") if root else None', 'root.get("latitude") if root else None')
+
+          identity_anchor = '    for key in ("_id", "OBJECTID", "id", "APPLICATION_NUMBER", "FOLDERRSN", "RSN", "document_number", "noticeId"):\n'
+          identity_insert = '    if source in {"toronto_building_permits_active_targeted", "toronto_building_permits_cleared_targeted_since_2017"}:\n        permit_num = clean(record.get("PERMIT_NUM"))\n        revision_num = clean(record.get("REVISION_NUM")) or "00"\n        if permit_num:\n            return f"{source}:id:{permit_num}:revision:{revision_num}"\n\n' + identity_anchor
+          replace_once('scripts/toronto_source_identity.py', identity_anchor, identity_insert)
+
+          url_anchor = '    "toronto_highrise_residential_health_hazards": "https://open.toronto.ca/dataset/residential-health-hazards/",\n'
+          url_insert = url_anchor + '    "toronto_building_permits_active_targeted": "https://open.toronto.ca/dataset/building-permits-active-permits/",\n    "toronto_building_permits_cleared_targeted_since_2017": "https://open.toronto.ca/dataset/building-permits-cleared-permits/",\n'
+          replace_once('scripts/toronto_app_sources.py', url_anchor, url_insert)
+
+          file_anchor = '        "toronto_highrise_residential_health_hazards": market / "open_licensed/toronto_highrise_residential_health_hazards.json",\n'
+          file_insert = file_anchor + '        "toronto_building_permits_active_targeted": warehouse / "open_licensed/toronto_building_permits_active_targeted.json",\n        "toronto_building_permits_cleared_targeted_since_2017": warehouse / "open_licensed/toronto_building_permits_cleared_targeted_since_2017.json",\n'
+          replace_once('scripts/toronto_app_sources.py', file_anchor, file_insert)
+
+          permit_anchor = '    elif key == "toronto_public_notices_exact_prior_poc":\n'
+          permit_block = '    elif key in {"toronto_building_permits_active_targeted", "toronto_building_permits_cleared_targeted_since_2017"}:\n        permit_num = text(row.get("PERMIT_NUM"), 100)\n        revision_num = text(row.get("REVISION_NUM"), 40) or "00"\n        record_title = f"{permit_num} · revision {revision_num}" if permit_num else text(row.get("_towersignal_permit_identity"))\n        is_cleared = key == "toronto_building_permits_cleared_targeted_since_2017"\n        record_date = date_value((row.get("COMPLETED_DATE") if is_cleared else row.get("ISSUED_DATE")) or row.get("ISSUED_DATE") or row.get("APPLICATION_DATE"))\n        signals = ", ".join(str(value).replace("_", " ") for value in (row.get("_towersignal_signals") or []))\n        lifecycle_reasons = ", ".join(str(value).replace("_", " ") for value in (row.get("_towersignal_cooling_tower_lifecycle_reasons") or []))\n        result.update(record_title=record_title, record_date=record_date, record_status=text(row.get("STATUS")), record_details=details(\n            ("Source lifecycle", row.get("_towersignal_source_lifecycle")), ("Permit type", row.get("PERMIT_TYPE")),\n            ("Structure type", row.get("STRUCTURE_TYPE")), ("Work", row.get("WORK")),\n            ("Description", row.get("DESCRIPTION")), ("Estimated construction cost", row.get("EST_CONST_COST")),\n            ("Current use", row.get("CURRENT_USE")), ("Proposed use", row.get("PROPOSED_USE")),\n            ("Builder name (publisher field)", row.get("BUILDER_NAME")), ("Mechanical signals", signals),\n            ("Cooling tower lifecycle", row.get("_towersignal_cooling_tower_lifecycle")),\n            ("Cooling tower lifecycle reasons", lifecycle_reasons),\n            ("Cooling tower current interpretation", row.get("_towersignal_cooling_tower_current_interpretation")),\n        ))\n' + permit_anchor
+          replace_once('scripts/toronto_app_sources.py', permit_anchor, permit_block)
+
+          address_anchor = '    "ontario_bps_energy_2024": ("Address",),\n'
+          address_insert = address_anchor + '    "toronto_building_permits_active_targeted": ("_towersignal_source_address",),\n    "toronto_building_permits_cleared_targeted_since_2017": ("_towersignal_source_address",),\n'
+          replace_once('scripts/audit_toronto_source_row_resolution.py', address_anchor, address_insert)
+
+          label_anchor = "  toronto_highrise_residential_health_hazards: 'Highrise residential health hazards',\n"
+          label_insert = label_anchor + "  toronto_building_permits_active_targeted: 'Toronto active building permits',\n  toronto_building_permits_cleared_targeted_since_2017: 'Toronto cleared building permits',\n"
+          replace_once('src/components/TorontoMarketPage.tsx', label_anchor, label_insert)
+
+          Path('tests/python/test_toronto_building_permit_sources.py').write_text('''from __future__ import annotations\n\nimport unittest\n\nfrom scripts.toronto_app_sources import OFFICIAL_DATASET_URLS, normalize_source_link\nfrom scripts.toronto_source_identity import find_source_record, stable_source_record_id\n\n\nclass TorontoBuildingPermitSourceTests(unittest.TestCase):\n    def row(self) -> dict:\n        return {\n            "PERMIT_NUM": "24 123456 BLD 00 BA",\n            "REVISION_NUM": "01",\n            "STATUS": "Permit Issued",\n            "ISSUED_DATE": "2026-08-01T00:00:00",\n            "PERMIT_TYPE": "Mechanical",\n            "STRUCTURE_TYPE": "Office",\n            "WORK": "HVAC",\n            "DESCRIPTION": "Replace existing rooftop chiller and cooling tower",\n            "EST_CONST_COST": "125000",\n            "BUILDER_NAME": "Example Builder",\n            "_towersignal_source_lifecycle": "ACTIVE",\n            "_towersignal_source_address": "100 Example St",\n            "_towersignal_signals": ["chiller", "cooling_tower"],\n            "_towersignal_cooling_tower_lifecycle": "REPLACE_COOLING_TOWER",\n            "_towersignal_cooling_tower_lifecycle_reasons": ["EXPLICIT_EXISTING_TOWER", "REPLACEMENT_LANGUAGE"],\n            "_towersignal_cooling_tower_current_interpretation": "ACTIVE_EXISTING_AND_REPLACEMENT_TOWER_SIGNAL",\n        }\n\n    def test_permit_identity_uses_complete_permit_and_revision(self) -> None:\n        source = "toronto_building_permits_active_targeted"\n        row = self.row()\n        record_id = stable_source_record_id(source, row)\n        self.assertEqual(record_id, f"{source}:id:24 123456 BLD 00 BA:revision:01")\n        self.assertEqual(find_source_record(source, record_id, [row]), row)\n\n    def test_app_projection_keeps_builder_as_source_detail_only(self) -> None:\n        source = "toronto_building_permits_active_targeted"\n        row = self.row()\n        record_id = stable_source_record_id(source, row)\n        normalized = normalize_source_link({\n            "source_key": source,\n            "source_record_id": record_id,\n            "source_row_index": 0,\n            "match_basis": "EXACT_UNIQUE_CIVIC_ADDRESS_TO_CURRENT_ADDRESS_POINT_ROOT",\n            "source_address": "100 Example St",\n        }, {source: [row]})\n        self.assertEqual(normalized["record_title"], "24 123456 BLD 00 BA · revision 01")\n        self.assertEqual(normalized["record_status"], "Permit Issued")\n        self.assertIn({"label": "Builder name (publisher field)", "value": "Example Builder"}, normalized["record_details"])\n        self.assertIn({"label": "Cooling tower lifecycle", "value": "REPLACE_COOLING_TOWER"}, normalized["record_details"])\n        self.assertIsNone(normalized["record_url"])\n        self.assertIn(source, OFFICIAL_DATASET_URLS)\n\n\nif __name__ == "__main__":\n    unittest.main()\n''', encoding='utf-8')
+
+          Path('tests/python/test_toronto_building_permit_apply.py').write_text('''from __future__ import annotations\n\nimport json\nimport unittest\nfrom pathlib import Path\n\nROOT = Path(__file__).resolve().parents[2]\nMARKET = ROOT / "data/toronto/market/current"\nWAREHOUSE = ROOT / "data/toronto/warehouse/current/open_licensed"\nPERMIT_SOURCES = {\n    "toronto_building_permits_active_targeted": ("toronto_building_permits_active_targeted.json", 573, 540),\n    "toronto_building_permits_cleared_targeted_since_2017": ("toronto_building_permits_cleared_targeted_since_2017.json", 721, 704),\n}\n\n\nclass TorontoBuildingPermitApplyTests(unittest.TestCase):\n    def test_persisted_permit_apply_contract(self) -> None:\n        report = json.loads((MARKET / "building_permit_apply_report.json").read_text(encoding="utf-8"))\n        spine = json.loads((MARKET / "property_spine.json").read_text(encoding="utf-8"))\n        links = json.loads((MARKET / "property_source_links.json").read_text(encoding="utf-8"))\n        graph = json.loads((MARKET / "entity_graph.json").read_text(encoding="utf-8"))\n        self.assertEqual(report["status"], "PASSED")\n        self.assertEqual(report["metrics"]["new_properties"], 306)\n        self.assertEqual(report["metrics"]["final_properties"], 13371)\n        self.assertEqual(report["metrics"]["new_source_links"], 1244)\n        self.assertEqual(report["metrics"]["final_source_links"], 40012)\n        self.assertEqual(report["metrics"]["unresolved_rows_not_forced"], 50)\n        self.assertEqual(len(spine["properties"]), 13371)\n        new_ids = set(report["new_property_ids"])\n        self.assertEqual(len(new_ids), 306)\n        for prop in spine["properties"]:\n            if prop.get("property_id") in new_ids:\n                self.assertFalse(prop.get("is_original_poc_property"))\n                self.assertEqual(prop.get("poc_tower_statuses") or [], [])\n        permit_edges = [edge for edge in graph.get("edges", []) if edge.get("source_key") in PERMIT_SOURCES]\n        self.assertEqual(permit_edges, [])\n        self.assertEqual(len(graph.get("edges", [])), 6343)\n        permit_links = [link for link in links.get("links", []) if link.get("source_key") in PERMIT_SOURCES]\n        self.assertEqual(len(permit_links), 1244)\n\n    def test_snapshots_and_link_counts_match(self) -> None:\n        links = json.loads((MARKET / "property_source_links.json").read_text(encoding="utf-8"))\n        for source, (filename, rows_expected, links_expected) in PERMIT_SOURCES.items():\n            snapshot = json.loads((WAREHOUSE / filename).read_text(encoding="utf-8"))\n            self.assertEqual(len(snapshot.get("rows", [])), rows_expected)\n            self.assertEqual(sum(link.get("source_key") == source for link in links.get("links", [])), links_expected)\n\n\nif __name__ == "__main__":\n    unittest.main()\n''', encoding='utf-8')
+
+      - name: Compile permit implementation and source plumbing
+        run: |
+          python -m py_compile \
+            scripts/pull_toronto_targeted_building_permits.py \
+            scripts/apply_toronto_targeted_building_permits.py \
+            scripts/toronto_source_identity.py \
+            scripts/toronto_app_sources.py \
+            scripts/audit_toronto_source_row_resolution.py
+
+      - name: Pull targeted permit sources exactly once
+        run: python scripts/pull_toronto_targeted_building_permits.py
+
+      - name: Run permit and identity regressions before apply
+        run: |
+          PYTHONPATH=.:scripts python -m unittest \
+            tests.python.test_toronto_building_permit_sources \
+            tests.python.test_toronto_tobids_legacy_provenance \
+            tests.python.test_toronto_source_identity_regression \
+            tests.python.test_toronto_chemtrac_regression \
+            tests.python.test_toronto_identity_exceptions -v
+
+      - name: Apply resolved permits and append current Address Point properties
+        run: python scripts/apply_toronto_targeted_building_permits.py
+
+      - name: Recompute coverage and public Toronto payload
+        run: |
+          python scripts/toronto_final_coverage.py
+          python scripts/build_toronto_app_data.py
+
+      - name: Validate public source actions in strict mode
+        run: python scripts/validate_toronto_source_actions.py --strict --record-sample-size 5
+
+      - name: Audit source semantics cardinality and stable row resolution
+        run: |
+          python scripts/audit_toronto_source_semantics.py --strict
+          python scripts/audit_toronto_public_notice_cardinality.py
+          python scripts/audit_toronto_source_row_resolution.py --strict
+
+      - name: Validate final Toronto market and permit evidence contract
+        run: |
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+          PYTHONPATH=.:scripts python -m unittest tests.python.test_toronto_building_permit_apply -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          market = Path('data/toronto/market/current')
+          report = json.loads((market / 'building_permit_apply_report.json').read_text(encoding='utf-8'))
+          payload = json.loads(Path('public/data/toronto-market.json').read_text(encoding='utf-8'))
+          graph = json.loads((market / 'entity_graph.json').read_text(encoding='utf-8'))
+          permit_sources = {'toronto_building_permits_active_targeted', 'toronto_building_permits_cleared_targeted_since_2017'}
+          assert report['status'] == 'PASSED'
+          assert report['metrics']['new_properties'] == 306
+          assert report['metrics']['final_properties'] == 13371
+          assert report['metrics']['new_source_links'] == 1244
+          assert report['metrics']['final_source_links'] == 40012
+          assert report['metrics']['unresolved_rows_not_forced'] == 50
+          assert report['metrics']['source_families'] == 16
+          assert payload['counts']['canonical_properties'] == 13371
+          assert payload['counts']['source_links'] == 40012
+          assert payload['counts']['official_source_families'] == 16
+          assert payload['counts']['relationship_edges'] == 6343
+          assert payload['counts']['documentary_confirmed_properties'] == 47
+          new_ids = set(report['new_property_ids'])
+          app_new = [prop for prop in payload['properties'] if prop['property_id'] in new_ids]
+          assert len(app_new) == 306
+          assert all(prop['tower_evidence_status'] == 'NO_TOWER_ASSERTION' for prop in app_new)
+          assert not [edge for edge in graph.get('edges', []) if edge.get('source_key') in permit_sources]
+          print(json.dumps({'status': 'TORONTO_PERMIT_CONTRACT_PASSED', 'counts': payload['counts']}, indent=2))
+          PY
+
+      - name: Verify frontend behavior and production build
+        env:
+          VITE_ENABLE_TORONTO: 'true'
+          VITE_TORONTO_PREVIEW: 'true'
+        run: |
+          npm run lint
+          npm run typecheck
+          npm exec vitest run -- tests/frontend/TorontoMarket.test.tsx
+          npm exec vite build -- --base=/ --outDir=dist-permit-candidate
+          test -z "$(git diff d3ce671a8311f8ecd7cbb3769cb328d9db55e53d -- src/styles)" || { echo 'Permit phase modified approved styles'; git diff d3ce671a8311f8ecd7cbb3769cb328d9db55e53d -- src/styles; exit 1; }
+
+      - name: Persist verified targeted permit expansion
+        run: |
+          git config user.name "TowerSignal Permit Bot"
+          git config user.email "towersignal-permits@users.noreply.github.com"
+          git add \
+            scripts/pull_toronto_targeted_building_permits.py \
+            scripts/apply_toronto_targeted_building_permits.py \
+            scripts/toronto_source_identity.py \
+            scripts/toronto_app_sources.py \
+            scripts/audit_toronto_source_row_resolution.py \
+            src/components/TorontoMarketPage.tsx \
+            tests/python/test_toronto_building_permit_sources.py \
+            tests/python/test_toronto_building_permit_apply.py \
+            data/toronto/warehouse/current/open_licensed/toronto_building_permits_active_targeted.json \
+            data/toronto/warehouse/current/open_licensed/toronto_building_permits_cleared_targeted_since_2017.json \
+            data/toronto/market/current/property_spine.json \
+            data/toronto/market/current/property_source_links.json \
+            data/toronto/market/current/entity_graph.json \
+            data/toronto/market/current/coverage_report.json \
+            data/toronto/market/current/building_permit_apply_report.json \
+            data/toronto/market/current/source_action_qa.json \
+            data/toronto/market/current/source_semantic_audit.json \
+            data/toronto/market/current/public_notice_cardinality_audit.json \
+            data/toronto/market/current/source_row_resolution_audit.json \
+            data/toronto/market/current/qa_report.json \
+            public/data/toronto-market.json
+          git diff --cached --quiet && { echo "No verified permit changes to persist"; exit 1; }
+          git commit -m "Toronto: add targeted building permit intelligence"
+          git push origin HEAD:agent/toronto-building-permit-apply-20260903
+          echo "TORONTO_PERMIT_SHA=$(git rev-parse HEAD)"
