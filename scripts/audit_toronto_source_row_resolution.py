@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 from collections import Counter
 from pathlib import Path
@@ -41,32 +42,6 @@ def canonical(value: Any) -> str:
     return canonical_street_address(value) or ""
 
 
-def stable_id_from_link(link: dict[str, Any]) -> str | None:
-    source = clean(link.get("source_key"))
-    rid = clean(link.get("source_record_id"))
-    prefix = f"{source}:"
-    if not rid.startswith(prefix):
-        return None
-    tail = rid[len(prefix):]
-    if ":" not in tail:
-        return tail or None
-    stable, _index = tail.rsplit(":", 1)
-    if stable in {"", "row"}:
-        return None
-    return stable
-
-
-def stable_row(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
-    source = clean(link.get("source_key"))
-    stable_id = stable_id_from_link(link)
-    if not stable_id:
-        return {}
-    for row in source_rows.get(source, []):
-        if clean(row.get("_id")) == stable_id:
-            return row
-    return {}
-
-
 def address_matches(link: dict[str, Any], row: dict[str, Any]) -> bool | None:
     source = clean(link.get("source_key"))
     fields = ADDRESS_FIELDS.get(source)
@@ -80,38 +55,42 @@ def address_matches(link: dict[str, Any], row: dict[str, Any]) -> bool | None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Audit Toronto stable source-row resolution and row-index provenance")
+    parser.add_argument("--strict", action="store_true")
+    args = parser.parse_args()
+
     links = [x for x in (load(MARKET / "property_source_links.json").get("links") or []) if isinstance(x, dict)]
     rows = load_source_rows(ROOT, load)
     stats: dict[str, Counter] = {}
     samples: list[dict[str, Any]] = []
-    stable_recovers = 0
-    unresolved_stable_ids = 0
 
     for link in links:
         source = clean(link.get("source_key"))
         if source not in ADDRESS_FIELDS:
             continue
         counter = stats.setdefault(source, Counter())
-        index_row = _record_for_link(link, rows)
-        index_match = address_matches(link, index_row)
+        source_rows = rows.get(source) or []
+
+        index = link.get("source_row_index")
+        indexed_row = source_rows[index] if isinstance(index, int) and 0 <= index < len(source_rows) else {}
+        index_match = address_matches(link, indexed_row) if indexed_row else None
         if index_match is True:
             counter["index_address_match"] += 1
-            continue
-        if index_match is None:
-            counter["not_comparable"] += 1
-            continue
-        counter["index_address_mismatch"] += 1
-        recovered = stable_row(link, rows)
-        stable_match = address_matches(link, recovered) if recovered else None
-        if stable_match is True:
-            counter["stable_id_recovers"] += 1
-            stable_recovers += 1
-        elif stable_id_from_link(link):
-            counter["stable_id_not_resolved_or_mismatch"] += 1
-            unresolved_stable_ids += 1
+        elif index_match is False:
+            counter["index_address_mismatch"] += 1
         else:
-            counter["no_stable_id_available"] += 1
-        if len(samples) < 100:
+            counter["index_not_comparable"] += 1
+
+        resolved_row = _record_for_link(link, rows)
+        resolved_match = address_matches(link, resolved_row) if resolved_row else None
+        if resolved_match is True:
+            counter["stable_id_address_match"] += 1
+        elif resolved_row and resolved_match is False:
+            counter["stable_id_address_mismatch"] += 1
+        else:
+            counter["stable_id_unresolved"] += 1
+
+        if (index_match is False or resolved_match is not True) and len(samples) < 100:
             fields = ADDRESS_FIELDS[source]
             samples.append({
                 "source_key": source,
@@ -119,22 +98,30 @@ def main() -> None:
                 "source_record_id": link.get("source_record_id"),
                 "source_row_index": link.get("source_row_index"),
                 "expected_source_address": link.get("source_address"),
-                "index_row_addresses": {field: index_row.get(field) for field in fields} if index_row else {},
-                "stable_id": stable_id_from_link(link),
-                "stable_row_addresses": {field: recovered.get(field) for field in fields} if recovered else {},
+                "indexed_row_addresses": {field: indexed_row.get(field) for field in fields} if indexed_row else {},
+                "resolved_row_addresses": {field: resolved_row.get(field) for field in fields} if resolved_row else {},
             })
 
+    hard_failures = {
+        "stable_id_unresolved": sum(counter["stable_id_unresolved"] for counter in stats.values()),
+        "stable_id_address_mismatch": sum(counter["stable_id_address_mismatch"] for counter in stats.values()),
+    }
+    hard_failures = {key: value for key, value in hard_failures.items() if value}
+    index_mismatches = sum(counter["index_address_mismatch"] for counter in stats.values())
+
     output = {
-        "schema_version": "toronto-source-row-resolution-audit-1.0",
+        "schema_version": "toronto-source-row-resolution-audit-1.1",
         "source_links": len(links),
+        "status": "FAILED" if hard_failures else "PASSED_WITH_INDEX_PROVENANCE_DRIFT" if index_mismatches else "PASSED",
         "sources": {source: dict(counter) for source, counter in sorted(stats.items())},
-        "total_index_address_mismatches": sum(c["index_address_mismatch"] for c in stats.values()),
-        "stable_id_recovers": stable_recovers,
-        "stable_id_not_resolved_or_mismatch": unresolved_stable_ids,
+        "hard_failures": hard_failures,
+        "index_address_mismatches": index_mismatches,
         "samples": samples,
     }
     REPORT.write_text(json.dumps(output, indent=2, ensure_ascii=False, default=str) + "\n", encoding="utf-8")
     print(json.dumps({key: value for key, value in output.items() if key != "samples"}, indent=2))
+    if args.strict and hard_failures:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
