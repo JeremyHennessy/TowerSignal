@@ -111,6 +111,7 @@ jobs:
         run: |
           git worktree add --detach /tmp/toronto-approved 26846872b0884f47579b0475d8f19c85763929f6
           cp public/data/toronto-market.json /tmp/toronto-approved/public/data/toronto-market.json
+          ln -s "$GITHUB_WORKSPACE/node_modules" /tmp/toronto-approved/node_modules
           cd /tmp/toronto-approved
           VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true "$GITHUB_WORKSPACE/node_modules/.bin/vite" build --base=/ --outDir=/tmp/toronto-approved-dist
 
