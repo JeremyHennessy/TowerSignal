@@ -14,6 +14,7 @@ MARKET = ROOT / "data/toronto/market/current"
 REPORT = MARKET / "source_row_resolution_audit.json"
 
 ADDRESS_FIELDS = {
+    "311_matches_prior_poc": ("Intersection Street 1", "Intersection Street 2"),
     "affordable_housing_pipeline": ("Anchor Address", "Addresses"),
     "apartment_building_evaluation": ("SITE ADDRESS",),
     "business_licence_matches_prior_poc": ("Licence Address Line 1",),
