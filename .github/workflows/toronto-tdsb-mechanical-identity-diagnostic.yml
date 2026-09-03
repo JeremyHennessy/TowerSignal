@@ -1,0 +1,196 @@
+name: Toronto TDSB Mechanical Identity Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-mechanical-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-tdsb-mechanical-identity-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Scan renewal rows and resolve literal school Address fields
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          import re
+          from collections import Counter, defaultdict
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+
+          from build_toronto_poc import (
+              TDSB_SCHOOL_URL,
+              discover_tdsb_school_ids,
+              extract_priority,
+              fetch_tdsb_school_fci,
+              parse_html_page,
+              request_bytes,
+          )
+          from toronto_final_identity_cleanup import address_point_root, canonical_address, load_address_points
+          from toronto_market_common import clean_text
+
+          patterns = {
+              'cooling_tower': re.compile(r'\bcooling\s+towers?\b', re.I),
+              'evaporative_condenser': re.compile(r'\bevaporative\s+condensers?\b', re.I),
+              'chiller': re.compile(r'\bchillers?\b', re.I),
+              'boiler': re.compile(r'\bboilers?\b', re.I),
+              'condenser_water': re.compile(r'\bcondenser\s+water\b', re.I),
+              'cooling_water': re.compile(r'\bcooling\s+water\b', re.I),
+              'water_treatment': re.compile(r'\bwater\s+treatment\b', re.I),
+              'chemical_feed': re.compile(r'\bchemical\s+feed\b', re.I),
+              'legionella': re.compile(r'\blegionella\w*\b', re.I),
+              'hvac': re.compile(r'\bHVAC\b|\bheating,?\s+ventilation\s+and\s+air\s+conditioning\b', re.I),
+          }
+
+          def literal_school_identity(school_id):
+              parser = parse_html_page(request_bytes(TDSB_SCHOOL_URL.format(school_id=school_id), timeout=45, retries=3))
+              text = parser.visible_text
+              name_match = re.search(r'(?mi)^([^\n]{2,180})\s*\(GR\.', text)
+              address_match = re.search(r'(?mi)^Address:\s*([^\n]{3,220})$', text)
+              return (
+                  name_match.group(1).strip() if name_match else None,
+                  address_match.group(1).strip() if address_match else None,
+              )
+
+          def fetch_school(school_id):
+              _, fci = fetch_tdsb_school_fci(school_id)
+              name, address = literal_school_identity(school_id)
+              return fci, name, address
+
+          school_ids, discovery_counts = discover_tdsb_school_ids()
+          renewal_schools = {}
+          failures = []
+          with ThreadPoolExecutor(max_workers=12) as executor:
+              futures = {executor.submit(fetch_school, school_id): school_id for school_id in school_ids}
+              for future in as_completed(futures):
+                  school_id = futures[future]
+                  try:
+                      parser, school_name, school_address = future.result()
+                  except Exception as exc:
+                      failures.append({'school_id': school_id, 'error': f'{type(exc).__name__}: {exc}'[:500]})
+                      continue
+                  retained = []
+                  seen = set()
+                  for raw in parser.rows:
+                      row = re.sub(r'\s+', ' ', str(raw or '')).strip()
+                      if not row or not re.search(r'\bRenewal\b', row, re.I):
+                          continue
+                      signals = [key for key, pattern in patterns.items() if pattern.search(row)]
+                      if not signals:
+                          continue
+                      fingerprint = row.lower()
+                      if fingerprint in seen:
+                          continue
+                      seen.add(fingerprint)
+                      retained.append({'signals': signals, 'priority': extract_priority(row), 'text': row})
+                  if retained:
+                      renewal_schools[school_id] = {
+                          'school_id': school_id,
+                          'school_name': school_name,
+                          'published_address': school_address,
+                          'canonical_published_address': canonical_address(school_address),
+                          'signals': sorted({signal for item in retained for signal in item['signals']}),
+                          'rows': retained,
+                      }
+
+          if len(failures) / len(school_ids) > 0.10:
+              raise SystemExit(f'TDSB fetch failure rate too high: {len(failures)}/{len(school_ids)}')
+          if len(renewal_schools) != 352:
+              raise SystemExit(f'TDSB actual-renewal school count drift: expected 352, found {len(renewal_schools)}')
+
+          by_id, by_address, scanned = load_address_points()
+          resolution_counts = Counter()
+          resolved = []
+          unresolved = []
+          ambiguous = []
+          missing_literal_address = []
+          resolved_roots = set()
+          signal_resolved_schools = defaultdict(set)
+
+          for school_id, item in sorted(renewal_schools.items(), key=lambda pair: int(pair[0])):
+              address = item['canonical_published_address']
+              if not address:
+                  resolution_counts['MISSING_LITERAL_TDSB_ADDRESS'] += 1
+                  missing_literal_address.append(item)
+                  continue
+              candidates = by_address.get(address, [])
+              roots = {}
+              for candidate in candidates:
+                  root = address_point_root(candidate, by_id)
+                  root_id = clean_text(root.get('address_point_id'))
+                  if root_id:
+                      roots[root_id] = root
+              if len(roots) == 1:
+                  root_id, root = next(iter(roots.items()))
+                  resolution_counts['EXACT_LITERAL_TDSB_CIVIC_ADDRESS_TO_UNIQUE_CURRENT_ROOT'] += 1
+                  resolved_roots.add(root_id)
+                  for signal in item['signals']:
+                      signal_resolved_schools[signal].add(school_id)
+                  resolved.append({
+                      **item,
+                      'property_id': f'toronto-address-point:{root_id}',
+                      'address_point_id': root_id,
+                      'current_address': root.get('address'),
+                      'longitude': root.get('longitude'),
+                      'latitude': root.get('latitude'),
+                      'resolution_basis': 'EXACT_LITERAL_TDSB_CIVIC_ADDRESS_TO_UNIQUE_CURRENT_ROOT',
+                  })
+              elif len(roots) > 1:
+                  resolution_counts['AMBIGUOUS_CURRENT_ROOTS_NOT_FORCED'] += 1
+                  ambiguous.append({**item, 'candidate_root_address_point_ids': sorted(roots)})
+              else:
+                  resolution_counts['NO_EXACT_CURRENT_ADDRESS_POINT_ROOT'] += 1
+                  unresolved.append(item)
+
+          current_spine = json.loads(open('data/toronto/market/current/property_spine.json', encoding='utf-8').read())
+          current_apids = {clean_text(prop.get('address_point_id')) for prop in current_spine.get('properties', []) if isinstance(prop, dict) and clean_text(prop.get('address_point_id'))}
+          new_roots = resolved_roots - current_apids
+          existing_roots = resolved_roots & current_apids
+          cooling_resolved = {item['school_id'] for item in resolved if 'cooling_tower' in item['signals']}
+
+          report = {
+              'schema_version': 'toronto-tdsb-mechanical-identity-diagnostic-1.0',
+              'status': 'PASSED_DIAGNOSTIC',
+              'scope': 'Read-only. Uses only actual FCI table rows containing Renewal and the literal Address: field on the official TDSB school-detail page. Joins only exact civic address to a unique current City Address Point root; no fuzzy recovery.',
+              'school_ids_discovered': len(school_ids),
+              'fetch_failures': len(failures),
+              'renewal_schools': len(renewal_schools),
+              'address_point_rows_scanned': scanned,
+              'resolution_counts': dict(sorted(resolution_counts.items())),
+              'resolved_schools': len(resolved),
+              'resolved_property_roots': len(resolved_roots),
+              'existing_spine_property_roots': len(existing_roots),
+              'new_property_roots': len(new_roots),
+              'cooling_tower_schools_resolved': len(cooling_resolved),
+              'signal_resolved_school_counts': {key: len(value) for key, value in sorted(signal_resolved_schools.items())},
+              'unresolved_count': len(unresolved),
+              'ambiguous_count': len(ambiguous),
+              'missing_literal_address_count': len(missing_literal_address),
+              'new_property_root_ids': sorted(new_roots, key=lambda value: int(value)),
+              'resolved_sample': resolved[:40],
+              'unresolved': unresolved,
+              'ambiguous': ambiguous,
+              'missing_literal_address': missing_literal_address,
+          }
+          print(json.dumps({key: value for key, value in report.items() if key not in {'resolved_sample','unresolved','ambiguous','missing_literal_address'}}, indent=2, ensure_ascii=False))
+          for item in unresolved[:30]:
+              print('UNRESOLVED_TDSB=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+          for item in ambiguous[:20]:
+              print('AMBIGUOUS_TDSB=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+          for item in missing_literal_address[:20]:
+              print('MISSING_ADDRESS_TDSB=', json.dumps(item, ensure_ascii=False, sort_keys=True))
