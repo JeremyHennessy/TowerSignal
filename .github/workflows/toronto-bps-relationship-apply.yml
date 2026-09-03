@@ -1,0 +1,167 @@
+name: Toronto BPS Relationship Apply
+
+on:
+  push:
+    branches:
+      - agent/toronto-relationship-intelligence-20260903
+    paths:
+      - .github/workflows/toronto-bps-relationship-apply.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: toronto-bps-relationship-apply
+  cancel-in-progress: false
+
+jobs:
+  apply-verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact relationship branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-relationship-intelligence-20260903
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Wire persisted BPS candidate rows into existing contracts
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path_name, old, new):
+              path = Path(path_name)
+              text = path.read_text(encoding='utf-8')
+              if new in text:
+                  return
+              if old not in text:
+                  raise SystemExit(f'Patch anchor changed: {path_name}: {old!r}')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_once(
+              'scripts/toronto_final_identity_cleanup.py',
+              'for name in ("records", "rows", "toronto_rows", "features", "applications", "matches", "properties", "notices"):',
+              'for name in ("records", "rows", "toronto_rows", "toronto_candidates", "features", "applications", "matches", "properties", "notices"):')
+
+          replace_once(
+              'scripts/toronto_final_entity_graph.py',
+              'bps_rows = bps_payload.get("records") or bps_payload.get("toronto_rows") or []',
+              'bps_rows = bps_payload.get("toronto_candidates") or bps_payload.get("records") or bps_payload.get("toronto_rows") or []')
+
+          replace_once(
+              'scripts/toronto_app_sources.py',
+              '    "ontario_environmental_compliance_reports": "https://data.ontario.ca/dataset/environmental-compliance-reports",\n',
+              '    "ontario_environmental_compliance_reports": "https://data.ontario.ca/dataset/environmental-compliance-reports",\n    "ontario_bps_energy_2024": "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector",\n')
+          replace_once(
+              'scripts/toronto_app_sources.py',
+              'for key in ("rows", "records", "applications", "toronto_rows", "matches"):',
+              'for key in ("rows", "records", "applications", "toronto_rows", "toronto_candidates", "matches"):')
+          replace_once(
+              'scripts/toronto_app_sources.py',
+              '        "ontario_environmental_compliance_reports": warehouse / "open_licensed/ontario_environmental_compliance_reports.json",\n',
+              '        "ontario_environmental_compliance_reports": warehouse / "open_licensed/ontario_environmental_compliance_reports.json",\n        "ontario_bps_energy_2024": warehouse / "open_licensed/ontario_bps_energy_2024.json",\n')
+          replace_once(
+              'scripts/toronto_app_sources.py',
+              '    elif key == "ontario_environmental_compliance_reports":\n        result.update(record_title=text(row.get("Site Name")), record_date=date_value(row.get("Exceedance Start Date")), record_status=text(row.get("Ministry Action")), record_details=details(\n            ("Facility owner", row.get("Facility Owner")), ("Report year", row.get("_towersignal_source_year")),\n            ("Contaminant", row.get("Contaminant")), ("Exceedance type", row.get("Type of Exceedance") or row.get(" Type of Exceedance")),\n        ))\n',
+              '    elif key == "ontario_environmental_compliance_reports":\n        result.update(record_title=text(row.get("Site Name")), record_date=date_value(row.get("Exceedance Start Date")), record_status=text(row.get("Ministry Action")), record_details=details(\n            ("Facility owner", row.get("Facility Owner")), ("Report year", row.get("_towersignal_source_year")),\n            ("Contaminant", row.get("Contaminant")), ("Exceedance type", row.get("Type of Exceedance") or row.get(" Type of Exceedance")),\n        ))\n    elif key == "ontario_bps_energy_2024":\n        result.update(record_title=text(row.get("Property Name") or "Ontario BPS energy report"), record_date=date_value(row.get("Year Ending") or row.get("Report Submission Date")), record_status="Published BPS energy report", record_details=details(\n            ("Organization", row.get("Organization")), ("Sector", row.get("Sector")),\n            ("Subsector", row.get("Subsector")), ("Property type", row.get("Primary Property Type - Self Selected")),\n            ("Reporting year", row.get("Year")),\n        ))\n')
+
+          replace_once(
+              'scripts/audit_toronto_source_row_resolution.py',
+              '    "ontario_environmental_compliance_reports": ("Site Address",),\n',
+              '    "ontario_environmental_compliance_reports": ("Site Address",),\n    "ontario_bps_energy_2024": ("Address",),\n')
+
+          replace_once(
+              'scripts/toronto_final_validate.py',
+              '        if source == "business_licence_matches_prior_poc":\n            assert relationship == "LICENCE_HOLDER_AT_PROPERTY"\n',
+              '        if source == "business_licence_matches_prior_poc":\n            assert relationship == "LICENCE_HOLDER_AT_PROPERTY"\n        if source == "ontario_bps_energy_2024":\n            assert relationship == "FACILITY_OPERATOR_OR_REPORTER_AT"\n')
+
+          Path('tests/python/test_toronto_bps_app_sources.py').write_text('''import unittest\n\nfrom scripts.toronto_app_sources import _rows, normalize_source_link\nfrom scripts.toronto_source_identity import stable_source_record_id\n\n\nclass TorontoBpsAppSourceTests(unittest.TestCase):\n    def test_rows_recognizes_persisted_toronto_candidates(self) -> None:\n        row = {"Address": "30 Bond St", "Organization": "Unity Health Toronto"}\n        self.assertEqual(_rows({"toronto_candidates": [row]}), [row])\n\n    def test_bps_source_is_dataset_fallback_with_narrow_role_context(self) -> None:\n        source = "ontario_bps_energy_2024"\n        row = {\n            "Year": 2024,\n            "Organization": "Unity Health Toronto",\n            "Property Name": "St. Michael's Hospital",\n            "Sector": "Public Hospital",\n            "Subsector": "Chronic",\n            "Address": "30 Bond St.",\n            "Year Ending": "2024-12-31T00:00:00",\n            "Primary Property Type - Self Selected": "Hospital (General Medical & Surgical)",\n        }\n        record_id = stable_source_record_id(source, row)\n        normalized = normalize_source_link(\n            {\n                "source_key": source,\n                "source_record_id": record_id,\n                "source_row_index": 0,\n                "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",\n                "source_address": "30 Bond St.",\n            },\n            {source: [row]},\n        )\n        self.assertEqual(normalized["record_title"], "St. Michael's Hospital")\n        self.assertEqual(normalized["record_status"], "Published BPS energy report")\n        self.assertIsNone(normalized["record_url"])\n        self.assertEqual(normalized["dataset_url"], "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector")\n        self.assertIn({"label": "Organization", "value": "Unity Health Toronto"}, normalized["record_details"])\n\n\nif __name__ == "__main__":\n    unittest.main()\n''', encoding='utf-8')
+
+      - name: Compile bounded BPS implementation
+        run: |
+          python -m py_compile \
+            scripts/toronto_final_identity_cleanup.py \
+            scripts/toronto_final_entity_graph.py \
+            scripts/toronto_app_sources.py \
+            scripts/audit_toronto_source_row_resolution.py \
+            scripts/toronto_final_validate.py \
+            scripts/apply_toronto_bps_relationships.py
+
+      - name: Run BPS and source-identity regressions
+        run: |
+          python -m unittest \
+            tests.python.test_toronto_bps_relationship_opportunity \
+            tests.python.test_toronto_bps_app_sources \
+            tests.python.test_toronto_source_identity_regression \
+            tests.python.test_toronto_chemtrac_regression \
+            tests.python.test_toronto_identity_exceptions -v
+
+      - name: Apply only BPS source links and operator-reporter edges
+        run: python scripts/apply_toronto_bps_relationships.py
+
+      - name: Recompute coverage and Toronto public payload without source refresh
+        run: |
+          python scripts/toronto_final_coverage.py
+          python scripts/build_toronto_app_data.py
+
+      - name: Validate source actions in strict mode
+        run: python scripts/validate_toronto_source_actions.py --strict --record-sample-size 5
+
+      - name: Audit semantics and row resolution in strict mode
+        run: |
+          python scripts/audit_toronto_source_semantics.py --strict
+          python scripts/audit_toronto_public_notice_cardinality.py
+          python scripts/audit_toronto_source_row_resolution.py --strict
+
+      - name: Validate final market and relationship role boundaries
+        run: |
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+
+      - name: Verify frontend and production build
+        run: |
+          npm run lint
+          npm run typecheck
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vitest run -- tests/frontend/TorontoMarket.test.tsx
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vite build -- --base=/ --outDir=dist-bps-relationship
+
+      - name: Persist verified BPS relationship expansion
+        run: |
+          git config user.name "TowerSignal Relationship Bot"
+          git config user.email "towersignal-relationships@users.noreply.github.com"
+          git add \
+            scripts/toronto_final_identity_cleanup.py \
+            scripts/toronto_final_entity_graph.py \
+            scripts/toronto_app_sources.py \
+            scripts/audit_toronto_source_row_resolution.py \
+            scripts/toronto_final_validate.py \
+            scripts/apply_toronto_bps_relationships.py \
+            tests/python/test_toronto_bps_relationship_opportunity.py \
+            tests/python/test_toronto_bps_app_sources.py \
+            data/toronto/market/current/property_source_links.json \
+            data/toronto/market/current/entity_graph.json \
+            data/toronto/market/current/coverage_report.json \
+            data/toronto/market/current/bps_relationship_apply_report.json \
+            data/toronto/market/current/source_action_qa.json \
+            data/toronto/market/current/source_semantic_audit.json \
+            data/toronto/market/current/public_notice_cardinality_audit.json \
+            data/toronto/market/current/source_row_resolution_audit.json \
+            data/toronto/market/current/qa_report.json \
+            public/data/toronto-market.json
+          git commit -m "Toronto: add exact BPS operator-reporter relationships"
+          git push origin HEAD:agent/toronto-relationship-intelligence-20260903
+          echo "BPS_RELATIONSHIP_SHA=$(git rev-parse HEAD)"
