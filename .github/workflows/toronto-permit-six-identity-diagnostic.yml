@@ -1,0 +1,89 @@
+name: Toronto Permit Six Identity Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-permit-six-identity-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Inspect current Address Point neighborhoods and roots
+        shell: python
+        run: |
+          import csv
+          import io
+          import json
+          import urllib.request
+
+          url = "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/64d4e54b-738f-4cd9-a9e7-8050fac8a52f/download/address-points-4326.csv"
+          req = urllib.request.Request(url, headers={"User-Agent": "TowerSignal-Permit-Six-Identity-Diagnostic/1.0"})
+          with urllib.request.urlopen(req, timeout=180) as response:
+              raw = response.read()
+          rows = list(csv.DictReader(io.StringIO(raw.decode("utf-8-sig", errors="replace"))))
+          by_id = {str(row.get("ADDRESS_POINT_ID") or "").strip(): row for row in rows if str(row.get("ADDRESS_POINT_ID") or "").strip()}
+
+          def root(row):
+              current = row
+              seen = set()
+              while str(current.get("ADDRESS_POINT_ID_LINK") or "").strip():
+                  cid = str(current.get("ADDRESS_POINT_ID") or "").strip()
+                  if cid in seen:
+                      break
+                  seen.add(cid)
+                  linked = by_id.get(str(current.get("ADDRESS_POINT_ID_LINK") or "").strip())
+                  if not linked:
+                      break
+                  current = linked
+              return current
+
+          targets = [
+              ("Humber College Blvd", 80, 110),
+              ("Adelaide St W", 88, 96),
+              ("Progress Ave", 930, 950),
+              ("King St W", 1538, 1542),
+          ]
+          fields = [
+              "ADDRESS_POINT_ID", "ADDRESS_POINT_ID_LINK", "ADDRESS_ID", "ADDRESS_ID_LINK",
+              "ADDRESS_NUMBER", "LO_NUM", "LO_NUM_SUF", "HI_NUM", "HI_NUM_SUF",
+              "LINEAR_NAME_FULL", "ADDRESS_FULL", "PLACE_NAME", "PLACE_NAME_ALL",
+              "ADDRESS_STATUS", "GENERAL_USE", "MUNICIPALITY_NAME", "WARD_NAME", "geometry",
+          ]
+          found = []
+          for row in rows:
+              street = str(row.get("LINEAR_NAME_FULL") or "").strip().lower()
+              number_raw = str(row.get("LO_NUM") or row.get("ADDRESS_NUMBER") or "").strip()
+              try:
+                  number = int(number_raw)
+              except ValueError:
+                  continue
+              for wanted_street, lo, hi in targets:
+                  if street == wanted_street.lower() and lo <= number <= hi:
+                      r = root(row)
+                      found.append({
+                          "target_street": wanted_street,
+                          "row": {field: row.get(field) for field in fields},
+                          "root": {field: r.get(field) for field in fields},
+                      })
+                      break
+
+          print("NEIGHBOR_COUNT=", len(found))
+          for item in found:
+              print("NEIGHBOR=", json.dumps(item, ensure_ascii=False, sort_keys=True))
+
+          for legacy in ("8127974", "12763885", "13503977", "8166345"):
+              row = by_id.get(legacy)
+              print("LEGACY_CURRENT_ID=", legacy, json.dumps({field: row.get(field) for field in fields}, ensure_ascii=False, sort_keys=True) if row else "NOT_CURRENT")
+              if row:
+                  r = root(row)
+                  print("LEGACY_ROOT=", legacy, json.dumps({field: r.get(field) for field in fields}, ensure_ascii=False, sort_keys=True))
