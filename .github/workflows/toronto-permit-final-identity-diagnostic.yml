@@ -1,0 +1,37 @@
+name: Toronto Permit Final Identity Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-permit-final-identity-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile final identity diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_permit_final_identity.py
+
+      - name: Resolve every targeted permit to current Address Point root
+        run: PYTHONPATH=scripts python scripts/diagnose_toronto_permit_final_identity.py --output toronto-permit-final-identity.json
+
+      - name: Upload final identity report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-permit-final-identity
+          path: toronto-permit-final-identity.json
+          retention-days: 7
