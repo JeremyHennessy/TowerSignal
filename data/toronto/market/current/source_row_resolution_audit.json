@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-source-row-resolution-audit-1.1",
-  "source_links": 40012,
+  "source_links": 40059,
   "status": "PASSED",
   "sources": {
     "311_matches_prior_poc": {
@@ -48,12 +48,12 @@
       "stable_id_address_match": 11225
     },
     "toronto_building_permits_active_targeted": {
-      "index_address_match": 540,
-      "stable_id_address_match": 540
+      "index_address_match": 572,
+      "stable_id_address_match": 572
     },
     "toronto_building_permits_cleared_targeted_since_2017": {
-      "index_address_match": 704,
-      "stable_id_address_match": 704
+      "index_address_match": 719,
+      "stable_id_address_match": 719
     },
     "toronto_highrise_residential_health_hazards": {
       "index_address_match": 1017,

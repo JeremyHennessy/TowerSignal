@@ -1,0 +1,830 @@
+{
+  "schema_version": "toronto-building-permit-recovery-1.0",
+  "generated_at": "2026-09-03T21:32:20.011251Z",
+  "status": "PASSED",
+  "strict_baseline_sha": "101c6808b22bb5ce69a16697f97df95424ad0e2c",
+  "contract": "Adds only the 47 permit rows in the static deterministic recovery manifest to their proven current Address Point roots. Existing strict-baseline properties are immutable; nine new City root properties are appended. The three remaining permit identities stay unresolved. No permit organization relationship or tower-evidence promotion occurs.",
+  "baseline": {
+    "properties": 13371,
+    "source_links": 40012,
+    "permit_links": 1244,
+    "relationship_edges": 6343
+  },
+  "metrics": {
+    "recovered_rows": 47,
+    "new_properties": 9,
+    "remaining_unresolved_rows": 3,
+    "final_properties": 13380,
+    "final_source_links": 40059,
+    "final_permit_links": 1291,
+    "final_permit_linked_properties": 700,
+    "relationship_edges_before_and_after": 6343,
+    "linked_source_families": 16,
+    "source_summary_entries": 19
+  },
+  "recovery_basis_counts": {
+    "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION": 3,
+    "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT": 13,
+    "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID": 3,
+    "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 28
+  },
+  "source_recovery_counts": {
+    "toronto_building_permits_active_targeted": {
+      "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT": 6,
+      "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID": 3,
+      "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 23
+    },
+    "toronto_building_permits_cleared_targeted_since_2017": {
+      "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION": 3,
+      "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT": 7,
+      "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 5
+    }
+  },
+  "recovered_records": [
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "04 139788 HVA::00",
+      "address_point_id": "14199964",
+      "property_id": "toronto-address-point:14199964",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "1204 Queen St W",
+      "source_record_id": "toronto_building_permits_active_targeted:id:04 139788 HVA:revision:00",
+      "source_row_index": 12,
+      "source_address": "1204-1214 QUEEN ST W",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "HVAC - Renovations to exisitng building (to include 2, 3, 4, 5,th floors and basement boiler and electrical room).  existing and proposed- Hotel - Interior Alterations"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "04 139788 HVA::01",
+      "address_point_id": "14199964",
+      "property_id": "toronto-address-point:14199964",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "1204 Queen St W",
+      "source_record_id": "toronto_building_permits_active_targeted:id:04 139788 HVA:revision:01",
+      "source_row_index": 13,
+      "source_address": "1204-1214 QUEEN ST W",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revision Issued",
+      "description": "Revisions as per BLD # 04 154113Please contact new Mech Eng assigned ( see people folder)HVAC - Renovations to exisitng building (to include 2, 3, 4, 5,th floors and basement boiler and electrical room).  existing and proposed- Hotel - Interior Alterations"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "08 109575 HVA::00",
+      "address_point_id": "6735910",
+      "property_id": "toronto-address-point:6735910",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "3197 Lake Shore Blvd W",
+      "source_record_id": "toronto_building_permits_active_targeted:id:08 109575 HVA:revision:00",
+      "source_row_index": 61,
+      "source_address": "3197-3199 LAKE SHORE BLVD W",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "HVAC - removal of exsting chiller tower with structural work to roof"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "08 217276 MSA::00",
+      "address_point_id": "1366609",
+      "property_id": "toronto-address-point:1366609",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "65A Humbercrest Blvd",
+      "source_record_id": "toronto_building_permits_active_targeted:id:08 217276 MSA:revision:00",
+      "source_row_index": 67,
+      "source_address": "65 A HUMBERCREST BLVD",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "New boiler, radiant floor heating basement and main floor and 2 new radiatiors and relocate 1 radiator"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "10 123759 BLD::00",
+      "address_point_id": "7929252",
+      "property_id": "toronto-address-point:7929252",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "10 Bay St",
+      "source_record_id": "toronto_building_permits_active_targeted:id:10 123759 BLD:revision:00",
+      "source_row_index": 83,
+      "source_address": "10-20 BAY ST",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "Permit for interior alterations to mechanical room of existing office building - permit to enclose mechanical space / chiller room.  10 Bay St floor 18 and 20 Bay St floor 25."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "13 227048 MSA::00",
+      "address_point_id": "7641279",
+      "property_id": "toronto-address-point:7641279",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "785 Brown's Line",
+      "source_record_id": "toronto_building_permits_active_targeted:id:13 227048 MSA:revision:00",
+      "source_row_index": 161,
+      "source_address": "785 BROWNS LINE",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Boiler replacement."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "15 170244 MSA::00",
+      "address_point_id": "14672496",
+      "property_id": "toronto-address-point:14672496",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "58 Waterton Rd",
+      "source_record_id": "toronto_building_permits_active_targeted:id:15 170244 MSA:revision:00",
+      "source_row_index": 198,
+      "source_address": "58-78 WATERTON RD",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "boiler plant & make up air replacement"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215023 MSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215023 MSA:revision:00",
+      "source_row_index": 278,
+      "source_address": "22 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 5. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215033 MSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215033 MSA:revision:00",
+      "source_row_index": 279,
+      "source_address": "110 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 4. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215039 MSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215039 MSA:revision:00",
+      "source_row_index": 280,
+      "source_address": "116 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 3. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215046 MSA::00",
+      "address_point_id": "9178006",
+      "property_id": "toronto-address-point:9178006",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "15 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215046 MSA:revision:00",
+      "source_row_index": 281,
+      "source_address": "112 A JOHN GARLAND BLVD",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 8. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215049 MSA::00",
+      "address_point_id": "9178006",
+      "property_id": "toronto-address-point:9178006",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "15 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215049 MSA:revision:00",
+      "source_row_index": 282,
+      "source_address": "123 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 10. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215055 MSA::00",
+      "address_point_id": "9178006",
+      "property_id": "toronto-address-point:9178006",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "15 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215055 MSA:revision:00",
+      "source_row_index": 283,
+      "source_address": "131 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 9 , 131A Jamestown Crescent."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215061 MSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215061 MSA:revision:00",
+      "source_row_index": 284,
+      "source_address": "204 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 2."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215066 MSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215066 MSA:revision:00",
+      "source_row_index": 285,
+      "source_address": "262 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 1."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 215069 MSA::00",
+      "address_point_id": "9178006",
+      "property_id": "toronto-address-point:9178006",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "15 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215069 MSA:revision:00",
+      "source_row_index": 286,
+      "source_address": "67 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 6."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222088 PSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222088 PSA:revision:00",
+      "source_row_index": 288,
+      "source_address": "22 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 5. (Refer to 18 215023 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222112 PSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222112 PSA:revision:00",
+      "source_row_index": 289,
+      "source_address": "110 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 4. (Refer to 18 215033 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222127 PSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222127 PSA:revision:00",
+      "source_row_index": 290,
+      "source_address": "116 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 3. (Refer to 18 215039 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222132 PSA::00",
+      "address_point_id": "9178006",
+      "property_id": "toronto-address-point:9178006",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "15 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222132 PSA:revision:00",
+      "source_row_index": 291,
+      "source_address": "112 A JOHN GARLAND BLVD",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 8. (Refer to 18 215046 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222140 PSA::00",
+      "address_point_id": "9178006",
+      "property_id": "toronto-address-point:9178006",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "15 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222140 PSA:revision:00",
+      "source_row_index": 292,
+      "source_address": "123 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 10. (Refer to 18 215049 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222160 PSA::00",
+      "address_point_id": "9178006",
+      "property_id": "toronto-address-point:9178006",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "15 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222160 PSA:revision:00",
+      "source_row_index": 293,
+      "source_address": "131 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 9. (Refer to 18 215055 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222171 PSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222171 PSA:revision:00",
+      "source_row_index": 294,
+      "source_address": "204 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 2. (Refer to 18 215061 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222178 PSA::00",
+      "address_point_id": "30041822",
+      "property_id": "toronto-address-point:30041822",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "20 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222178 PSA:revision:00",
+      "source_row_index": 295,
+      "source_address": "262 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 1. (Refer to 18 215066 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "18 222180 PSA::00",
+      "address_point_id": "9178006",
+      "property_id": "toronto-address-point:9178006",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "15 Jamestown Cres",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222180 PSA:revision:00",
+      "source_row_index": 296,
+      "source_address": "67 A JAMESTOWN CRES",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 6. (Refer to 18 215069 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "19 137298 BLD::00",
+      "address_point_id": "74152",
+      "property_id": "toronto-address-point:74152",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "14 St Mark's Rd",
+      "source_record_id": "toronto_building_permits_active_targeted:id:19 137298 BLD:revision:00",
+      "source_row_index": 316,
+      "source_address": "14 ST MARKS RD",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposed ceiling replacement to an existing boiler room within an existing elementry school."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "20 169130 BLD::00",
+      "address_point_id": "8105939",
+      "property_id": "toronto-address-point:8105939",
+      "recovery_basis": "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID",
+      "resolved_address": "16 Ursula Franklin St",
+      "source_record_id": "toronto_building_permits_active_targeted:id:20 169130 BLD:revision:00",
+      "source_row_index": 355,
+      "source_address": "16 RUSSELL ST",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "Chiller & Heating Water Systems Upgrade and New Rooftop Mechanical Enclosure to the Existing UofT, Undergraduate Wing. "
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "20 169130 HVA::00",
+      "address_point_id": "8105939",
+      "property_id": "toronto-address-point:8105939",
+      "recovery_basis": "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID",
+      "resolved_address": "16 Ursula Franklin St",
+      "source_record_id": "toronto_building_permits_active_targeted:id:20 169130 HVA:revision:00",
+      "source_row_index": 356,
+      "source_address": "16 RUSSELL ST",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "HVAC - Chiller and heating water systems upgrade"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "20 169130 PLB::00",
+      "address_point_id": "8105939",
+      "property_id": "toronto-address-point:8105939",
+      "recovery_basis": "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID",
+      "resolved_address": "16 Ursula Franklin St",
+      "source_record_id": "toronto_building_permits_active_targeted:id:20 169130 PLB:revision:00",
+      "source_row_index": 357,
+      "source_address": "16 RUSSELL ST",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "Plumbing  - Chiller and heating water systems upgrade"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "21 251512 MSA::00",
+      "address_point_id": "10133194",
+      "property_id": "toronto-address-point:10133194",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "900 Queen's Plate Dr",
+      "source_record_id": "toronto_building_permits_active_targeted:id:21 251512 MSA:revision:00",
+      "source_row_index": 406,
+      "source_address": "900 QUEENS PLATE DR",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Permit Issued",
+      "description": "Boiler and associated pumps replacement "
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "24 251485 MSA::00",
+      "address_point_id": "30122301",
+      "property_id": "toronto-address-point:30122301",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "500 Old Finch Ave",
+      "source_record_id": "toronto_building_permits_active_targeted:id:24 251485 MSA:revision:00",
+      "source_row_index": 501,
+      "source_address": "361 A OLD FINCH AVE",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Permit Issued",
+      "description": "Replace existing gas-fire AHU with same capacity Hydronic AHU, adding boiler system for new AHU"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "25 175841 MSA::00",
+      "address_point_id": "14199668",
+      "property_id": "toronto-address-point:14199668",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "130 St George St",
+      "source_record_id": "toronto_building_permits_active_targeted:id:25 175841 MSA:revision:00",
+      "source_row_index": 530,
+      "source_address": "130-140 ST GEORGE ST",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Permit Issued",
+      "description": "Proposed replacement of existing shell and tube heat exchanger located in sub-basement with two (2) new brazed plate heat exchangers. Installation of new electric steam boiler in sub-basement for AHU humidification, with existing steam generator remaining as backup."
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "08 109575 BLD::00",
+      "address_point_id": "6735910",
+      "property_id": "toronto-address-point:6735910",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "3197 Lake Shore Blvd W",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:08 109575 BLD:revision:00",
+      "source_row_index": 63,
+      "source_address": "3197-3199 LAKE SHORE BLVD W",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Closed - Dormant",
+      "description": "removal of exsting chiller tower with structural work to roof"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "10 123759 HVA::00",
+      "address_point_id": "7929252",
+      "property_id": "toronto-address-point:7929252",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "10 Bay St",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:10 123759 HVA:revision:00",
+      "source_row_index": 99,
+      "source_address": "10-20 BAY ST",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Closed",
+      "description": "HVAC - Permit for interior alterations to mechanical room of existing office building - permit to enclose mechanical space / chiller room.  10 Bay St floor 18 and 20 Bay St floor 25."
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "13 178071 MSA::00",
+      "address_point_id": "70772",
+      "property_id": "toronto-address-point:70772",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "235 Queen's Dr",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:13 178071 MSA:revision:00",
+      "source_row_index": 143,
+      "source_address": "235 QUEENS DR",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Proposal to remove and replace the existing boiler and associated HVAC within an existing (2) storey detached single family dwelling."
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "16 221967 MSA::00",
+      "address_point_id": "2920372",
+      "property_id": "toronto-address-point:2920372",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "17 McCormack St",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:16 221967 MSA:revision:00",
+      "source_row_index": 259,
+      "source_address": "17 MC CORMACK ST",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Stand alone mechanical permit to replace the boiler in an existing apartment building."
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "17 260422 BLD::00",
+      "address_point_id": "14605377",
+      "property_id": "toronto-address-point:14605377",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "35 Vanley Cres",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 BLD:revision:00",
+      "source_row_index": 336,
+      "source_address": "35-75 VANLEY CRES",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "17 260422 BLD::01",
+      "address_point_id": "14605377",
+      "property_id": "toronto-address-point:14605377",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "35 Vanley Cres",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 BLD:revision:01",
+      "source_row_index": 337,
+      "source_address": "35-75 VANLEY CRES",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "Revision to the original permit 17 - 260422 we have relocated the fire hydrant that was proposed in the original submission. Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "17 260422 HVA::00",
+      "address_point_id": "14605377",
+      "property_id": "toronto-address-point:14605377",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "35 Vanley Cres",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 HVA:revision:00",
+      "source_row_index": 338,
+      "source_address": "35-75 VANLEY CRES",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "HVAC - Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "17 260422 PLB::00",
+      "address_point_id": "14605377",
+      "property_id": "toronto-address-point:14605377",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "35 Vanley Cres",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 PLB:revision:00",
+      "source_row_index": 339,
+      "source_address": "35-75 VANLEY CRES",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "Plumbing  - Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "17 260422 STS::00",
+      "address_point_id": "14605377",
+      "property_id": "toronto-address-point:14605377",
+      "recovery_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "resolved_address": "35 Vanley Cres",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 STS:revision:00",
+      "source_row_index": 340,
+      "source_address": "35-75 VANLEY CRES",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "Drain - Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "20 185362 BLD::00",
+      "address_point_id": "8166345",
+      "property_id": "toronto-address-point:8166345",
+      "recovery_basis": "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION",
+      "resolved_address": "1540A King St W",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 185362 BLD:revision:00",
+      "source_row_index": 498,
+      "source_address": "1540 KING ST W",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Interior alterations to create new unit in basement, basement underpinning and add new boiler,"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "20 185362 HVA::00",
+      "address_point_id": "8166345",
+      "property_id": "toronto-address-point:8166345",
+      "recovery_basis": "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION",
+      "resolved_address": "1540A King St W",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 185362 HVA:revision:00",
+      "source_row_index": 499,
+      "source_address": "1540 KING ST W",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "HVAC - Interior alterations to create new unit in basement, basement underpinning and add new boiler"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "20 185362 PLB::00",
+      "address_point_id": "8166345",
+      "property_id": "toronto-address-point:8166345",
+      "recovery_basis": "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION",
+      "resolved_address": "1540A King St W",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 185362 PLB:revision:00",
+      "source_row_index": 500,
+      "source_address": "1540 KING ST W",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Plumbing  - Interior alterations to create new unit in basement, basement underpinning and add new boiler"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "21 173062 BLD::00",
+      "address_point_id": "30014412",
+      "property_id": "toronto-address-point:30014412",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "240 McCaul St",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:21 173062 BLD:revision:00",
+      "source_row_index": 550,
+      "source_address": "240 MC CAUL ST",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "DEMOLITION OF EXISTING BOILER FLUES, CONSTRUCTION OF AREAWAY FOR NEW FLUE ROUTING, AND INSTALLTION OF NEW BOILER FLUES (INCLUDING RECONFIGURATION OF EXTERIOR GLAZING AND MASONRY REPLACEMENT)"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "21 173062 HVA::00",
+      "address_point_id": "30014412",
+      "property_id": "toronto-address-point:30014412",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "240 McCaul St",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:21 173062 HVA:revision:00",
+      "source_row_index": 551,
+      "source_address": "240 MC CAUL ST",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "HVAC - DEMOLITION OF EXISTING BOILER FLUES, CONSTRUCTION OF AREAWAY FOR NEW FLUE ROUTING, AND INSTALLTION OF NEW BOILER FLUES (INCLUDING RECONFIGURATION OF EXTERIOR GLAZING AND MASONRY REPLACEMENT)"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "21 173062 PLB::00",
+      "address_point_id": "30014412",
+      "property_id": "toronto-address-point:30014412",
+      "recovery_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "resolved_address": "240 McCaul St",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:21 173062 PLB:revision:00",
+      "source_row_index": 552,
+      "source_address": "240 MC CAUL ST",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Plumbing  - DEMOLITION OF EXISTING BOILER FLUES, CONSTRUCTION OF AREAWAY FOR NEW FLUE ROUTING, AND INSTALLTION OF NEW BOILER FLUES (INCLUDING RECONFIGURATION OF EXTERIOR GLAZING AND MASONRY REPLACEMENT)"
+    }
+  ],
+  "new_property_ids": [
+    "toronto-address-point:10133194",
+    "toronto-address-point:1366609",
+    "toronto-address-point:14199964",
+    "toronto-address-point:2920372",
+    "toronto-address-point:30014412",
+    "toronto-address-point:70772",
+    "toronto-address-point:74152",
+    "toronto-address-point:7641279",
+    "toronto-address-point:8166345"
+  ],
+  "remaining_unresolved": [
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "permit_identity": "12 148282 BLD::00",
+      "reason": "NO_CURRENT_ADDRESS_POINT_IDENTITY"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "17 139058 MSA::00",
+      "reason": "NO_CURRENT_ADDRESS_POINT_IDENTITY"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "permit_identity": "16 146056 MSA::00",
+      "reason": "NO_CURRENT_ADDRESS_POINT_IDENTITY"
+    }
+  ],
+  "evidence_runs": {
+    "combined_recovery_delta": 33803836443,
+    "suffix_recovery": 33803553508,
+    "root_metadata": 33807800368
+  }
+}

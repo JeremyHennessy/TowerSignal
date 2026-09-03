@@ -1,15 +1,15 @@
 {
   "schema_version": "toronto-market-property-links-1.2",
-  "generated_at": "2026-09-03T20:29:36.269301Z",
+  "generated_at": "2026-09-03T21:32:19.408531Z",
   "join_contract": {
     "basis": "Exact corrected civic-address canonical equality to unique City ADDRESS_POINT_ID property",
     "fuzzy_matching": false,
     "ambiguous_addresses": "NOT_FORCED"
   },
   "counts": {
-    "canonical_properties": 13371,
-    "total_source_links": 40012,
-    "properties_with_any_new_link": 12848,
+    "canonical_properties": 13380,
+    "total_source_links": 40059,
+    "properties_with_any_new_link": 12860,
     "source_family_count": 19
   },
   "sources": {
@@ -183,44 +183,62 @@
       "identity_limitation": "Only exact public-notice application numbers already joined through the deterministic AIC property spine are linked; no text/address fuzzy match is used."
     },
     "toronto_building_permits_active_targeted": {
-      "status": "JOINED",
+      "status": "JOINED_WITH_DETERMINISTIC_RECOVERY",
       "source_records": 573,
       "records_with_property_address": 573,
-      "matched_records": 540,
-      "matched_canonical_properties": 327,
-      "unresolved_rows_not_forced": 33,
+      "matched_records": 572,
+      "matched_canonical_properties": 339,
+      "unresolved_rows_not_forced": 1,
       "geo_id_address_conflict_rows": 27,
       "resolution_basis_counts": {
         "EXACT_UNIQUE_CIVIC_ADDRESS_TO_CURRENT_ADDRESS_POINT_ROOT": 37,
-        "NO_CURRENT_ADDRESS_POINT_IDENTITY": 33,
+        "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT": 6,
+        "NO_CURRENT_ADDRESS_POINT_IDENTITY": 1,
+        "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID": 3,
         "PERMIT_GEO_ID_LINKED_TO_ROOT_SOURCE_ADDRESS_MATCHES_CHILD": 51,
-        "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS": 452
+        "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS": 452,
+        "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 23
       },
       "identity_contract": "PERMIT_NUM plus REVISION_NUM",
       "source_lifecycle": "ACTIVE",
       "tower_status_policy": "Permit records are source evidence only in this apply; no TowerSignal tower_evidence_status is automatically promoted.",
       "builder_role_policy": "BUILDER_NAME is retained as a raw source field only; no contractor relationship is inferred.",
-      "identity_limitation": null
+      "identity_limitation": null,
+      "recovered_rows": 32,
+      "recovery_basis_counts": {
+        "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT": 6,
+        "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID": 3,
+        "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 23
+      }
     },
     "toronto_building_permits_cleared_targeted_since_2017": {
-      "status": "JOINED",
+      "status": "JOINED_WITH_DETERMINISTIC_RECOVERY",
       "source_records": 721,
       "records_with_property_address": 721,
-      "matched_records": 704,
-      "matched_canonical_properties": 429,
-      "unresolved_rows_not_forced": 17,
+      "matched_records": 719,
+      "matched_canonical_properties": 436,
+      "unresolved_rows_not_forced": 2,
       "geo_id_address_conflict_rows": 9,
       "resolution_basis_counts": {
+        "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION": 3,
         "EXACT_UNIQUE_CIVIC_ADDRESS_TO_CURRENT_ADDRESS_POINT_ROOT": 29,
-        "NO_CURRENT_ADDRESS_POINT_IDENTITY": 17,
+        "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT": 7,
+        "NO_CURRENT_ADDRESS_POINT_IDENTITY": 2,
         "PERMIT_GEO_ID_LINKED_TO_ROOT_SOURCE_ADDRESS_MATCHES_CHILD": 59,
-        "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS": 616
+        "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS": 616,
+        "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 5
       },
       "identity_contract": "PERMIT_NUM plus REVISION_NUM",
       "source_lifecycle": "CLEARED_SINCE_2017",
       "tower_status_policy": "Permit records are source evidence only in this apply; no TowerSignal tower_evidence_status is automatically promoted.",
       "builder_role_policy": "BUILDER_NAME is retained as a raw source field only; no contractor relationship is inferred.",
-      "identity_limitation": null
+      "identity_limitation": null,
+      "recovered_rows": 15,
+      "recovery_basis_counts": {
+        "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION": 3,
+        "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT": 7,
+        "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 5
+      }
     }
   },
   "links": [
@@ -6889,6 +6907,14 @@
       "source_row_index": 12723,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "78 CRESCENT RD"
+    },
+    {
+      "property_id": "toronto-address-point:10133194",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:21 251512 MSA:revision:00",
+      "source_row_index": 406,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "900 QUEENS PLATE DR"
     },
     {
       "property_id": "toronto-address-point:10133201",
@@ -53866,6 +53892,14 @@
       "source_address": "42 Aldwych Ave"
     },
     {
+      "property_id": "toronto-address-point:1366609",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:08 217276 MSA:revision:00",
+      "source_row_index": 67,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "65 A HUMBERCREST BLVD"
+    },
+    {
       "property_id": "toronto-address-point:1367733",
       "source_key": "chemtrac_history",
       "source_record_id": "chemtrac_history:2021:9569",
@@ -64049,6 +64083,14 @@
       "source_address": "130 ST GEORGE ST"
     },
     {
+      "property_id": "toronto-address-point:14199668",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:25 175841 MSA:revision:00",
+      "source_row_index": 530,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "130-140 ST GEORGE ST"
+    },
+    {
       "property_id": "toronto-address-point:14199763",
       "source_key": "apartment_building_evaluation",
       "source_record_id": "apartment_building_evaluation:id:1114",
@@ -64244,6 +64286,22 @@
       "source_row_index": 2581,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "7 O'HARA AVE"
+    },
+    {
+      "property_id": "toronto-address-point:14199964",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:04 139788 HVA:revision:00",
+      "source_row_index": 12,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "1204-1214 QUEEN ST W"
+    },
+    {
+      "property_id": "toronto-address-point:14199964",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:04 139788 HVA:revision:01",
+      "source_row_index": 13,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "1204-1214 QUEEN ST W"
     },
     {
       "property_id": "toronto-address-point:14199967",
@@ -67977,6 +68035,46 @@
       "source_address": "35 Vanley Cres"
     },
     {
+      "property_id": "toronto-address-point:14605377",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 BLD:revision:00",
+      "source_row_index": 336,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "35-75 VANLEY CRES"
+    },
+    {
+      "property_id": "toronto-address-point:14605377",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 BLD:revision:01",
+      "source_row_index": 337,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "35-75 VANLEY CRES"
+    },
+    {
+      "property_id": "toronto-address-point:14605377",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 HVA:revision:00",
+      "source_row_index": 338,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "35-75 VANLEY CRES"
+    },
+    {
+      "property_id": "toronto-address-point:14605377",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 PLB:revision:00",
+      "source_row_index": 339,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "35-75 VANLEY CRES"
+    },
+    {
+      "property_id": "toronto-address-point:14605377",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 260422 STS:revision:00",
+      "source_row_index": 340,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "35-75 VANLEY CRES"
+    },
+    {
       "property_id": "toronto-address-point:14606297",
       "source_key": "development_pipeline",
       "source_record_id": "development_pipeline:id:839",
@@ -69353,6 +69451,14 @@
       "source_row_index": 4540,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "58 WATERTON RD"
+    },
+    {
+      "property_id": "toronto-address-point:14672496",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:15 170244 MSA:revision:00",
+      "source_row_index": 198,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "58-78 WATERTON RD"
     },
     {
       "property_id": "toronto-address-point:14672496",
@@ -84981,6 +85087,14 @@
       "source_address": "26 NORWOOD RD"
     },
     {
+      "property_id": "toronto-address-point:2920372",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:16 221967 MSA:revision:00",
+      "source_row_index": 259,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "17 MC CORMACK ST"
+    },
+    {
       "property_id": "toronto-address-point:2920409",
       "source_key": "toronto_building_permits_active_targeted",
       "source_record_id": "toronto_building_permits_active_targeted:id:24 130118 BLD:revision:00",
@@ -86352,6 +86466,30 @@
       "source_row_index": 1903,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "4665 STEELES AVE E"
+    },
+    {
+      "property_id": "toronto-address-point:30014412",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:21 173062 BLD:revision:00",
+      "source_row_index": 550,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "240 MC CAUL ST"
+    },
+    {
+      "property_id": "toronto-address-point:30014412",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:21 173062 HVA:revision:00",
+      "source_row_index": 551,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "240 MC CAUL ST"
+    },
+    {
+      "property_id": "toronto-address-point:30014412",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:21 173062 PLB:revision:00",
+      "source_row_index": 552,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "240 MC CAUL ST"
     },
     {
       "property_id": "toronto-address-point:30015075",
@@ -90374,6 +90512,86 @@
       "source_row_index": 512,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "80 BELL ESTATE RD"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215023 MSA:revision:00",
+      "source_row_index": 278,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "22 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215033 MSA:revision:00",
+      "source_row_index": 279,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "110 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215039 MSA:revision:00",
+      "source_row_index": 280,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "116 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215061 MSA:revision:00",
+      "source_row_index": 284,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "204 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215066 MSA:revision:00",
+      "source_row_index": 285,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "262 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222088 PSA:revision:00",
+      "source_row_index": 288,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "22 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222112 PSA:revision:00",
+      "source_row_index": 289,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "110 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222127 PSA:revision:00",
+      "source_row_index": 290,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "116 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222171 PSA:revision:00",
+      "source_row_index": 294,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "204 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:30041822",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222178 PSA:revision:00",
+      "source_row_index": 295,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "262 A JAMESTOWN CRES"
     },
     {
       "property_id": "toronto-address-point:30042076",
@@ -99611,6 +99829,14 @@
       "source_row_index": 11585,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "500 OLD FINCH AVE"
+    },
+    {
+      "property_id": "toronto-address-point:30122301",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:24 251485 MSA:revision:00",
+      "source_row_index": 501,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "361 A OLD FINCH AVE"
     },
     {
       "property_id": "toronto-address-point:30122322",
@@ -193369,6 +193595,22 @@
       "source_address": "3197 LAKE SHORE BLVD W"
     },
     {
+      "property_id": "toronto-address-point:6735910",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:08 109575 HVA:revision:00",
+      "source_row_index": 61,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "3197-3199 LAKE SHORE BLVD W"
+    },
+    {
+      "property_id": "toronto-address-point:6735910",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:08 109575 BLD:revision:00",
+      "source_row_index": 63,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "3197-3199 LAKE SHORE BLVD W"
+    },
+    {
       "property_id": "toronto-address-point:67410",
       "source_key": "toronto_aic_applications",
       "source_record_id": "toronto_aic_applications:11461:11460",
@@ -198867,6 +199109,14 @@
       "source_row_index": 1230,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "15 KING ST"
+    },
+    {
+      "property_id": "toronto-address-point:70772",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:13 178071 MSA:revision:00",
+      "source_row_index": 143,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "235 QUEENS DR"
     },
     {
       "property_id": "toronto-address-point:70792",
@@ -206842,6 +207092,14 @@
       "source_address": "75 Horner Ave"
     },
     {
+      "property_id": "toronto-address-point:74152",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:19 137298 BLD:revision:00",
+      "source_row_index": 316,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "14 ST MARKS RD"
+    },
+    {
       "property_id": "toronto-address-point:7423555",
       "source_key": "apartment_building_evaluation",
       "source_record_id": "apartment_building_evaluation:id:1998",
@@ -213185,6 +213443,14 @@
       "source_row_index": 5140,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "124 FORTIETH ST"
+    },
+    {
+      "property_id": "toronto-address-point:7641279",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:13 227048 MSA:revision:00",
+      "source_row_index": 161,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "785 BROWNS LINE"
     },
     {
       "property_id": "toronto-address-point:7641439",
@@ -232303,6 +232569,22 @@
       "source_address": "70 DELISLE AVE"
     },
     {
+      "property_id": "toronto-address-point:7929252",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:10 123759 BLD:revision:00",
+      "source_row_index": 83,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "10-20 BAY ST"
+    },
+    {
+      "property_id": "toronto-address-point:7929252",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:10 123759 HVA:revision:00",
+      "source_row_index": 99,
+      "match_basis": "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT",
+      "source_address": "10-20 BAY ST"
+    },
+    {
       "property_id": "toronto-address-point:7929255",
       "source_key": "development_pipeline",
       "source_record_id": "development_pipeline:id:1374",
@@ -245784,6 +246066,30 @@
       "source_address": "64 SCHELL AVE"
     },
     {
+      "property_id": "toronto-address-point:8105939",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:20 169130 BLD:revision:00",
+      "source_row_index": 355,
+      "match_basis": "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID",
+      "source_address": "16 RUSSELL ST"
+    },
+    {
+      "property_id": "toronto-address-point:8105939",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:20 169130 HVA:revision:00",
+      "source_row_index": 356,
+      "match_basis": "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID",
+      "source_address": "16 RUSSELL ST"
+    },
+    {
+      "property_id": "toronto-address-point:8105939",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:20 169130 PLB:revision:00",
+      "source_row_index": 357,
+      "match_basis": "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID",
+      "source_address": "16 RUSSELL ST"
+    },
+    {
       "property_id": "toronto-address-point:8105943",
       "source_key": "toronto_building_permits_active_targeted",
       "source_record_id": "toronto_building_permits_active_targeted:id:24 233023 BLD:revision:00",
@@ -248997,6 +249303,30 @@
       "source_row_index": 11643,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "1536 KING ST W"
+    },
+    {
+      "property_id": "toronto-address-point:8166345",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 185362 BLD:revision:00",
+      "source_row_index": 498,
+      "match_basis": "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION",
+      "source_address": "1540 KING ST W"
+    },
+    {
+      "property_id": "toronto-address-point:8166345",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 185362 HVA:revision:00",
+      "source_row_index": 499,
+      "match_basis": "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION",
+      "source_address": "1540 KING ST W"
+    },
+    {
+      "property_id": "toronto-address-point:8166345",
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 185362 PLB:revision:00",
+      "source_row_index": 500,
+      "match_basis": "CURRENT_GEO_ID_BASE_NUMBER_STREET_UNIQUE_ROOT_SUFFIX_OMISSION",
+      "source_address": "1540 KING ST W"
     },
     {
       "property_id": "toronto-address-point:8166363",
@@ -296725,10 +297055,74 @@
     {
       "property_id": "toronto-address-point:9178006",
       "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215046 MSA:revision:00",
+      "source_row_index": 281,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "112 A JOHN GARLAND BLVD"
+    },
+    {
+      "property_id": "toronto-address-point:9178006",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215049 MSA:revision:00",
+      "source_row_index": 282,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "123 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:9178006",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215055 MSA:revision:00",
+      "source_row_index": 283,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "131 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:9178006",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 215069 MSA:revision:00",
+      "source_row_index": 286,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "67 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:9178006",
+      "source_key": "toronto_building_permits_active_targeted",
       "source_record_id": "toronto_building_permits_active_targeted:id:18 215075 MSA:revision:00",
       "source_row_index": 287,
       "match_basis": "PERMIT_GEO_ID_LINKED_TO_ROOT_SOURCE_ADDRESS_MATCHES_CHILD",
       "source_address": "60 JOHN GARLAND BLVD"
+    },
+    {
+      "property_id": "toronto-address-point:9178006",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222132 PSA:revision:00",
+      "source_row_index": 291,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "112 A JOHN GARLAND BLVD"
+    },
+    {
+      "property_id": "toronto-address-point:9178006",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222140 PSA:revision:00",
+      "source_row_index": 292,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "123 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:9178006",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222160 PSA:revision:00",
+      "source_row_index": 293,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "131 A JAMESTOWN CRES"
+    },
+    {
+      "property_id": "toronto-address-point:9178006",
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_record_id": "toronto_building_permits_active_targeted:id:18 222180 PSA:revision:00",
+      "source_row_index": 296,
+      "match_basis": "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD",
+      "source_address": "67 A JAMESTOWN CRES"
     },
     {
       "property_id": "toronto-address-point:9178006",

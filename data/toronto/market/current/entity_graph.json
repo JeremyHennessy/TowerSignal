@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-entity-graph-1.0",
-  "generated_at": "2026-09-03T20:29:36.617997Z",
+  "generated_at": "2026-09-03T21:32:19.777995Z",
   "relationship_contract": {
     "ownership": "Only explicit OWNER-labelled source text may create OWNER_OF; manager/operator/reporter/supplier are never relabelled owner.",
     "aic": "AIC text-pattern role edges are review-required and are not treated as verified legal relationships until reviewed.",
@@ -69,11 +69,18 @@
       "unresolved_rows_not_forced": 17,
       "role_limitation": "Permit source adds property/source evidence only. BUILDER_NAME is not promoted to an organization relationship.",
       "tower_status_limitation": "Permit source does not automatically change tower_evidence_status in this apply."
+    },
+    "building_permit_deterministic_recovery": {
+      "recovered_rows": 47,
+      "new_properties": 9,
+      "remaining_unresolved_rows": 3,
+      "relationship_edges_added": 0,
+      "tower_status_promotions": 0
     }
   },
   "counts": {
-    "nodes": 17481,
-    "property_nodes": 13371,
+    "nodes": 17490,
+    "property_nodes": 13380,
     "organization_nodes": 4110,
     "edges": 6343,
     "relationships": {
@@ -100878,6 +100885,60 @@
       "node_type": "PROPERTY",
       "address": "142 Evelyn Cres",
       "address_point_id": "7986689"
+    },
+    {
+      "node_id": "toronto-address-point:70772",
+      "node_type": "PROPERTY",
+      "address": "235 Queen's Dr",
+      "address_point_id": "70772"
+    },
+    {
+      "node_id": "toronto-address-point:74152",
+      "node_type": "PROPERTY",
+      "address": "14 St Mark's Rd",
+      "address_point_id": "74152"
+    },
+    {
+      "node_id": "toronto-address-point:1366609",
+      "node_type": "PROPERTY",
+      "address": "65A Humbercrest Blvd",
+      "address_point_id": "1366609"
+    },
+    {
+      "node_id": "toronto-address-point:2920372",
+      "node_type": "PROPERTY",
+      "address": "17 McCormack St",
+      "address_point_id": "2920372"
+    },
+    {
+      "node_id": "toronto-address-point:7641279",
+      "node_type": "PROPERTY",
+      "address": "785 Brown's Line",
+      "address_point_id": "7641279"
+    },
+    {
+      "node_id": "toronto-address-point:8166345",
+      "node_type": "PROPERTY",
+      "address": "1540A King St W",
+      "address_point_id": "8166345"
+    },
+    {
+      "node_id": "toronto-address-point:10133194",
+      "node_type": "PROPERTY",
+      "address": "900 Queen's Plate Dr",
+      "address_point_id": "10133194"
+    },
+    {
+      "node_id": "toronto-address-point:14199964",
+      "node_type": "PROPERTY",
+      "address": "1204 Queen St W",
+      "address_point_id": "14199964"
+    },
+    {
+      "node_id": "toronto-address-point:30014412",
+      "node_type": "PROPERTY",
+      "address": "240 McCaul St",
+      "address_point_id": "30014412"
     }
   ],
   "edges": [

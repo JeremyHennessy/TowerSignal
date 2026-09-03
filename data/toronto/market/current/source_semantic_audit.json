@@ -1,13 +1,13 @@
 {
   "schema_version": "toronto-source-semantic-audit-1.0",
-  "generated_at": "2026-09-03T20:55:39.678992Z",
+  "generated_at": "2026-09-03T21:57:03.064471Z",
   "status": "PASSED_WITH_CARDINALITY_REVIEW",
   "counts": {
-    "source_links": 40012,
+    "source_links": 40059,
     "source_families": 16,
-    "canonical_properties": 13371,
-    "unique_property_source_record_identities": 40012,
-    "unique_source_records_across_families": 38324,
+    "canonical_properties": 13380,
+    "unique_property_source_record_identities": 40059,
+    "unique_source_records_across_families": 38371,
     "record_specific_actions": 14238
   },
   "findings": {
@@ -169,10 +169,10 @@
       "dataset_url": "https://www.toronto.ca/city-government/planning-development/application-details/"
     },
     "toronto_building_permits_active_targeted": {
-      "links": 540,
-      "unique_source_records": 540,
-      "unique_properties": 327,
-      "coverage_expected_properties": 327,
+      "links": 572,
+      "unique_source_records": 572,
+      "unique_properties": 339,
+      "coverage_expected_properties": 339,
       "coverage_property_count_matches": true,
       "max_links_per_property": 22,
       "max_properties_per_source_record": 1,
@@ -181,10 +181,10 @@
       "dataset_url": "https://open.toronto.ca/dataset/building-permits-active-permits/"
     },
     "toronto_building_permits_cleared_targeted_since_2017": {
-      "links": 704,
-      "unique_source_records": 704,
-      "unique_properties": 429,
-      "coverage_expected_properties": 429,
+      "links": 719,
+      "unique_source_records": 719,
+      "unique_properties": 436,
+      "coverage_expected_properties": 436,
       "coverage_property_count_matches": true,
       "max_links_per_property": 16,
       "max_properties_per_source_record": 1,

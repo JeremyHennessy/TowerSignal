@@ -1,14 +1,14 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-09-03T21:15:34.712603Z",
+  "generated_at": "2026-09-03T22:17:09.258799Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
-  "json_files_validated": 31,
+  "json_files_validated": 33,
   "counts": {
-    "canonical_properties": 13371,
+    "canonical_properties": 13380,
     "poc_reconciliation_rows": 177,
     "poc_resolved": 175,
     "poc_unresolved": 2,
-    "source_links": 40012,
+    "source_links": 40059,
     "entity_edges": 6343,
     "aic_application_catalogue": 15864,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
@@ -330,9 +330,9 @@
         "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
       },
       {
-        "property_id": "toronto-address-point:3569436",
-        "source_record_id": "toronto_building_permits_active_targeted:id:19 111480 MSA:revision:00",
-        "source_address": "7 BISHOP AVE",
+        "property_id": "toronto-address-point:35503",
+        "source_record_id": "toronto_building_permits_active_targeted:id:26 170248 MSA:revision:00",
+        "source_address": "49 THORNCLIFFE PARK DR",
         "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
       },
       {
@@ -350,9 +350,9 @@
         "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
       },
       {
-        "property_id": "toronto-address-point:541690",
-        "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 229372 HVA:revision:01",
-        "source_address": "57 MCKEE AVE",
+        "property_id": "toronto-address-point:53390",
+        "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 180929 HVA:revision:01",
+        "source_address": "59 BOYD AVE",
         "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
       },
       {
