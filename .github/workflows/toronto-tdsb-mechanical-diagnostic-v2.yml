@@ -1,0 +1,155 @@
+name: Toronto TDSB Mechanical Renewal Diagnostic V2
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-mechanical-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-tdsb-mechanical-diagnostic-v2.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Scan only actual TDSB renewal rows and resolve school identity
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          import re
+          from collections import Counter, defaultdict
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+
+          from build_toronto_poc import (
+              TDSB_SCHOOL_URL,
+              discover_tdsb_school_ids,
+              extract_address,
+              extract_priority,
+              fetch_tdsb_school_fci,
+              parse_html_page,
+              request_bytes,
+          )
+
+          patterns = {
+              'cooling_tower': re.compile(r'\bcooling\s+towers?\b', re.I),
+              'evaporative_condenser': re.compile(r'\bevaporative\s+condensers?\b', re.I),
+              'chiller': re.compile(r'\bchillers?\b', re.I),
+              'boiler': re.compile(r'\bboilers?\b', re.I),
+              'condenser_water': re.compile(r'\bcondenser\s+water\b', re.I),
+              'cooling_water': re.compile(r'\bcooling\s+water\b', re.I),
+              'water_treatment': re.compile(r'\bwater\s+treatment\b', re.I),
+              'chemical_feed': re.compile(r'\bchemical\s+feed\b', re.I),
+              'legionella': re.compile(r'\blegionella\w*\b', re.I),
+              'hvac': re.compile(r'\bHVAC\b|\bheating,?\s+ventilation\s+and\s+air\s+conditioning\b', re.I),
+          }
+
+          def fetch_school_identity(school_id):
+              parser = parse_html_page(request_bytes(TDSB_SCHOOL_URL.format(school_id=school_id), timeout=45, retries=3))
+              text = parser.visible_text
+              name_match = re.search(r'(?m)^([^\n]{2,140})\s*\(GR\.', text)
+              name = name_match.group(1).strip() if name_match else None
+              address = extract_address(text)
+              return name, address
+
+          def fetch_school(school_id):
+              _, fci = fetch_tdsb_school_fci(school_id)
+              name, address = fetch_school_identity(school_id)
+              return fci, name, address
+
+          school_ids, discovery_counts = discover_tdsb_school_ids()
+          failures = []
+          school_matches = {}
+          signal_school_counts = Counter()
+          signal_row_counts = Counter()
+          priority_counts = defaultdict(Counter)
+
+          with ThreadPoolExecutor(max_workers=12) as executor:
+              futures = {executor.submit(fetch_school, school_id): school_id for school_id in school_ids}
+              for future in as_completed(futures):
+                  school_id = futures[future]
+                  try:
+                      parser, school_name, school_address = future.result()
+                  except Exception as exc:
+                      failures.append({'school_id': school_id, 'error': f'{type(exc).__name__}: {exc}'[:500]})
+                      continue
+
+                  retained = []
+                  seen = set()
+                  for raw in parser.rows:
+                      row = re.sub(r'\s+', ' ', str(raw or '')).strip()
+                      # Actual RNB table lines include Renewal. This excludes the
+                      # generic priority legend that mentions boilers on every page.
+                      if not row or not re.search(r'\bRenewal\b', row, re.I):
+                          continue
+                      matched_signals = [key for key, pattern in patterns.items() if pattern.search(row)]
+                      if not matched_signals:
+                          continue
+                      fingerprint = row.lower()
+                      if fingerprint in seen:
+                          continue
+                      seen.add(fingerprint)
+                      priority = extract_priority(row)
+                      retained.append({'signals': matched_signals, 'priority': priority, 'text': row})
+                      for signal in matched_signals:
+                          signal_row_counts[signal] += 1
+                          if priority:
+                              priority_counts[signal][priority] += 1
+
+                  if not retained:
+                      continue
+                  school_signals = sorted({signal for item in retained for signal in item['signals']})
+                  for signal in school_signals:
+                      signal_school_counts[signal] += 1
+                  school_matches[school_id] = {
+                      'school_id': school_id,
+                      'school_name': school_name,
+                      'address': school_address,
+                      'signals': school_signals,
+                      'rows': retained,
+                  }
+
+          failure_rate = len(failures) / len(school_ids) if school_ids else 1.0
+          if failure_rate > 0.10:
+              raise SystemExit(f'TDSB failure rate too high: {failure_rate:.1%}')
+
+          cooling = {sid for sid, item in school_matches.items() if 'cooling_tower' in item['signals']}
+          non_tower = sorted(set(school_matches) - cooling, key=int)
+          missing_identity = [item for item in school_matches.values() if not item.get('school_name') or not item.get('address')]
+          report = {
+              'schema_version': 'toronto-tdsb-mechanical-diagnostic-1.1',
+              'status': 'PASSED_DIAGNOSTIC',
+              'scope': 'Read-only. Only actual RNB table rows containing Renewal are retained. Cooling-tower wording is explicit tower evidence; all other mechanical terms remain supporting renewal context.',
+              'discovery_counts_by_page': discovery_counts,
+              'unique_school_ids_discovered': len(school_ids),
+              'school_pages_failed': len(failures),
+              'school_page_failure_rate': round(failure_rate, 6),
+              'schools_with_actual_target_mechanical_renewals': len(school_matches),
+              'cooling_tower_schools': len(cooling),
+              'schools_with_actual_target_mechanical_renewals_but_no_cooling_tower': len(non_tower),
+              'actual_matching_rows': sum(len(item['rows']) for item in school_matches.values()),
+              'signal_school_counts': dict(sorted(signal_school_counts.items())),
+              'signal_row_counts': dict(sorted(signal_row_counts.items())),
+              'signal_priority_counts': {key: dict(sorted(value.items())) for key, value in sorted(priority_counts.items())},
+              'matched_schools_missing_name_or_address': len(missing_identity),
+              'non_tower_school_sample': [school_matches[sid] for sid in non_tower[:40]],
+              'cooling_tower_school_sample': [school_matches[sid] for sid in sorted(cooling, key=int)],
+              'fetch_failures': failures,
+          }
+          print(json.dumps({key: value for key, value in report.items() if key not in {'non_tower_school_sample','cooling_tower_school_sample','fetch_failures'}}, indent=2, ensure_ascii=False))
+          for item in report['non_tower_school_sample'][:20]:
+              print('NON_TOWER_SCHOOL=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+          for item in report['cooling_tower_school_sample']:
+              print('COOLING_TOWER_SCHOOL=', json.dumps(item, ensure_ascii=False, sort_keys=True))
