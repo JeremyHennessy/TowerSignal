@@ -1,0 +1,128 @@
+name: Toronto Capital Project Pipeline Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-capital-project-pipeline-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-capital-project-pipeline-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Inspect live Capital Project Pipeline
+        shell: python
+        run: |
+          import csv
+          import io
+          import json
+          import urllib.parse
+          import urllib.request
+          from collections import Counter
+
+          USER_AGENT = 'TowerSignal-Capital-Project-Pipeline-Diagnostic/1.0'
+          PACKAGE_URL = 'https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/package_show?id=capital-project-pipeline'
+
+          def request_json(url):
+              req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
+              with urllib.request.urlopen(req, timeout=120) as response:
+                  return json.loads(response.read().decode('utf-8'))
+
+          package = request_json(PACKAGE_URL)
+          if package.get('success') is not True:
+              raise SystemExit('Capital Project Pipeline package_show failed')
+          result = package.get('result') or {}
+          resources = [r for r in result.get('resources', []) if isinstance(r, dict)]
+          print('PACKAGE=', json.dumps({
+              'id': result.get('id'),
+              'name': result.get('name'),
+              'title': result.get('title'),
+              'license_title': result.get('license_title'),
+              'metadata_modified': result.get('metadata_modified'),
+              'resources': [
+                  {k: r.get(k) for k in ('id','name','format','datastore_active','url','last_modified')}
+                  for r in resources
+              ],
+          }, ensure_ascii=False))
+
+          rows = []
+          selected = None
+          datastore = next((r for r in resources if r.get('datastore_active')), None)
+          if datastore:
+              selected = datastore
+              resource_id = datastore['id']
+              first = request_json('https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?' + urllib.parse.urlencode({'resource_id': resource_id, 'limit': 1000, 'offset': 0}))
+              data = first.get('result') or {}
+              total = int(data.get('total') or 0)
+              rows.extend([r for r in data.get('records', []) if isinstance(r, dict)])
+              offset = len(rows)
+              while offset < total:
+                  page = request_json('https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search?' + urllib.parse.urlencode({'resource_id': resource_id, 'limit': 1000, 'offset': offset}))
+                  batch = [r for r in (page.get('result') or {}).get('records', []) if isinstance(r, dict)]
+                  if not batch:
+                      break
+                  rows.extend(batch)
+                  offset += len(batch)
+              if len(rows) != total:
+                  raise SystemExit(f'Datastore pagination incomplete: {len(rows)} != {total}')
+          else:
+              csv_resource = next((r for r in resources if str(r.get('format') or '').upper() == 'CSV'), None)
+              if not csv_resource:
+                  raise SystemExit('No datastore or CSV resource found')
+              selected = csv_resource
+              req = urllib.request.Request(csv_resource['url'], headers={'User-Agent': USER_AGENT})
+              with urllib.request.urlopen(req, timeout=120) as response:
+                  raw = response.read()
+              rows = list(csv.DictReader(io.StringIO(raw.decode('utf-8-sig', errors='replace'))))
+
+          fields = sorted({str(k) for row in rows for k in row.keys()})
+          print('SELECTED_RESOURCE=', json.dumps({k: selected.get(k) for k in ('id','name','format','datastore_active','url')}, ensure_ascii=False))
+          print('ROW_COUNT=', len(rows))
+          print('FIELDS=', json.dumps(fields, ensure_ascii=False))
+
+          terms = {
+              'cooling_tower': ('cooling tower', 'cooling towers'),
+              'chiller': ('chiller', 'chillers'),
+              'boiler': ('boiler', 'boilers'),
+              'hvac': ('hvac', 'h.v.a.c'),
+              'mechanical': ('mechanical',),
+              'water_treatment': ('water treatment',),
+              'legionella': ('legionella',),
+              'building': ('building', 'buildings'),
+              'facility': ('facility', 'facilities'),
+              'pumping_station': ('pumping station', 'pump station'),
+          }
+          matches = {key: [] for key in terms}
+          for row in rows:
+              haystack = ' '.join(str(v or '') for v in row.values()).lower()
+              for key, needles in terms.items():
+                  if any(needle in haystack for needle in needles):
+                      matches[key].append(row)
+
+          summary = {key: len(value) for key, value in matches.items()}
+          print('KEYWORD_MATCH_COUNTS=', json.dumps(summary, sort_keys=True))
+          for key in ('cooling_tower','chiller','boiler','hvac','mechanical','water_treatment','legionella'):
+              for row in matches[key][:20]:
+                  print(f'MATCH_{key.upper()}=', json.dumps(row, ensure_ascii=False, sort_keys=True))
+
+          # Identify fields that may support deterministic property/project joins.
+          identity_like = [f for f in fields if any(token in f.lower() for token in ('address','location','site','facility','project','ward','intersection','asset','contract','solicitation'))]
+          print('IDENTITY_LIKE_FIELDS=', json.dumps(identity_like, ensure_ascii=False))
+
+          # Report categorical fields conservatively for small-cardinality columns.
+          category_summary = {}
+          for field in fields:
+              values = [str(row.get(field) or '').strip() for row in rows]
+              nonempty = [v for v in values if v]
+              unique = sorted(set(nonempty))
+              if 0 < len(unique) <= 25:
+                  category_summary[field] = {'nonempty': len(nonempty), 'unique': unique}
+          print('SMALL_CARDINALITY_FIELDS=', json.dumps(category_summary, ensure_ascii=False, sort_keys=True))
