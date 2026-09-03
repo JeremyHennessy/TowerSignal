@@ -1,0 +1,37 @@
+name: Toronto Building Permit Targeted Diagnostic V2
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-building-permit-targeted-v2.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile targeted diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_building_permit_targeted_v2.py
+
+      - name: Measure targeted permit corpus and deterministic joins
+        run: python scripts/diagnose_toronto_building_permit_targeted_v2.py --output toronto-building-permit-targeted-v2.json
+
+      - name: Upload targeted permit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-building-permit-targeted-v2
+          path: toronto-building-permit-targeted-v2.json
+          retention-days: 7
