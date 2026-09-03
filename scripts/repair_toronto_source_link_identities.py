@@ -15,9 +15,11 @@ LINKS_PATH = MARKET / "property_source_links.json"
 REPORT_PATH = MARKET / "source_identity_repair_report.json"
 
 TARGET_ADDRESS_FIELDS = {
+    "311_matches_prior_poc": ("Intersection Street 1", "Intersection Street 2"),
     "business_licence_matches_prior_poc": ("Licence Address Line 1",),
     "renewable_energy_installations": ("CLIENT_ADDRESS", "ADDRESS_FULL"),
 }
+WRAPPED_SOURCES = ("311_matches_prior_poc", "business_licence_matches_prior_poc")
 GENERIC_ID_FIELDS = ("_id", "OBJECTID", "id", "APPLICATION_NUMBER", "FOLDERRSN", "RSN", "document_number", "noticeId")
 
 
@@ -139,12 +141,17 @@ def main() -> None:
     if duplicate_identities:
         failures.append({"reason": "EXACT_DUPLICATE_IDENTITIES", "count": len(duplicate_identities), "sample": duplicate_identities[:20]})
 
-    business = stats["business_licence_matches_prior_poc"]
+    expected_counts = {
+        "311_matches_prior_poc": 1,
+        "business_licence_matches_prior_poc": 1452,
+        "renewable_energy_installations": 85,
+    }
+    for source, expected in expected_counts.items():
+        actual = stats[source]["links"]
+        if actual != expected:
+            failures.append({"reason": "SOURCE_LINK_COUNT_DRIFT", "source_key": source, "expected": expected, "actual": actual})
+
     renewable = stats["renewable_energy_installations"]
-    if business["links"] != 1452:
-        failures.append({"reason": "BUSINESS_LINK_COUNT_DRIFT", "expected": 1452, "actual": business["links"]})
-    if renewable["links"] != 85:
-        failures.append({"reason": "RENEWABLE_LINK_COUNT_DRIFT", "expected": 85, "actual": renewable["links"]})
     if renewable["legacy_cross_field_id_collision"] != 4:
         failures.append({
             "reason": "RENEWABLE_COLLISION_COUNT_DRIFT",
@@ -152,22 +159,25 @@ def main() -> None:
             "actual": renewable["legacy_cross_field_id_collision"],
         })
 
-    already_repaired = business["record_ids_rewritten"] == 0 and business["stable_identity_resolved_before"] == business["links"]
-    first_repair = business["record_ids_rewritten"] == business["links"] and business["stable_identity_unresolved_before"] == business["links"]
-    if not (already_repaired or first_repair):
-        failures.append({
-            "reason": "BUSINESS_REPAIR_NOT_ATOMIC",
-            "rewritten": business["record_ids_rewritten"],
-            "resolved_before": business["stable_identity_resolved_before"],
-            "unresolved_before": business["stable_identity_unresolved_before"],
-        })
+    for source in WRAPPED_SOURCES:
+        counter = stats[source]
+        already_repaired = counter["record_ids_rewritten"] == 0 and counter["stable_identity_resolved_before"] == counter["links"]
+        first_repair = counter["record_ids_rewritten"] == counter["links"] and counter["stable_identity_unresolved_before"] == counter["links"]
+        if not (already_repaired or first_repair):
+            failures.append({
+                "reason": "WRAPPED_SOURCE_REPAIR_NOT_ATOMIC",
+                "source_key": source,
+                "rewritten": counter["record_ids_rewritten"],
+                "resolved_before": counter["stable_identity_resolved_before"],
+                "unresolved_before": counter["stable_identity_unresolved_before"],
+            })
 
     report = {
-        "schema_version": "toronto-source-identity-repair-1.0",
+        "schema_version": "toronto-source-identity-repair-1.1",
         "generated_at": utc_now(),
         "status": "FAILED" if failures else "PASSED",
         "root_cause": {
-            "business_licences": "Durable IDs were generated from outer matches[] wrappers but app resolution uses nested source_row publisher records.",
+            "wrapped_match_sources": "311 and business-licence durable IDs were generated from outer matches[] wrappers but app resolution uses nested source_row publisher records.",
             "renewable_energy": "Generic id lookup matched any ID-like field instead of the ordered field contract used to generate the durable ID, producing cross-field collisions.",
         },
         "sources": {source: dict(counter) for source, counter in stats.items()},
@@ -182,7 +192,9 @@ def main() -> None:
     payload["source_identity_repair"] = {
         "schema_version": report["schema_version"],
         "status": report["status"],
-        "business_record_ids_rewritten": business["record_ids_rewritten"],
+        "wrapped_record_ids_rewritten": {
+            source: stats[source]["record_ids_rewritten"] for source in WRAPPED_SOURCES
+        },
         "renewable_legacy_cross_field_collisions": renewable["legacy_cross_field_id_collision"],
     }
     LINKS_PATH.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
