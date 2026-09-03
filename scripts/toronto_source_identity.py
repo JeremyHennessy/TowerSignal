@@ -5,7 +5,10 @@ import json
 from typing import Any
 
 
-BUSINESS_LICENCE_SOURCE = "business_licence_matches_prior_poc"
+WRAPPED_SOURCE_ROWS = {
+    "311_matches_prior_poc",
+    "business_licence_matches_prior_poc",
+}
 
 
 def clean(value: Any) -> str:
@@ -21,11 +24,11 @@ def row_fingerprint(record: dict[str, Any]) -> str:
 def identity_record(source: str, record: dict[str, Any]) -> dict[str, Any]:
     """Return the actual publisher row used for source-record identity.
 
-    The persisted business-licence snapshot stores matched rows inside an outer
-    TowerSignal match wrapper. That wrapper contains property-linking metadata
-    and must never participate in the durable publisher-row identity.
+    The persisted 311 and business-licence snapshots store matched rows inside
+    outer TowerSignal match wrappers. Wrapper property-linking metadata must not
+    participate in durable publisher-row identity.
     """
-    if source == BUSINESS_LICENCE_SOURCE and isinstance(record.get("source_row"), dict):
+    if source in WRAPPED_SOURCE_ROWS and isinstance(record.get("source_row"), dict):
         return record["source_row"]
     return record
 
@@ -76,8 +79,7 @@ def find_source_record(source: str, source_record_id: str, rows: list[dict[str, 
     if tail.startswith("id:"):
         # Resolve using the same ordered publisher-ID contract that generated
         # the identifier. Matching against any ID-like field can select the
-        # wrong row when, for example, a datastore _id equals another row's
-        # OBJECTID/ID value.
+        # wrong row when a datastore _id equals another row's OBJECTID/ID.
         return next((row for row in rows if stable_source_record_id(source, row) == record_id), {})
 
     if tail.startswith("sha256:"):
