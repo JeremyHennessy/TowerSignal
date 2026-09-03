@@ -1,0 +1,77 @@
+name: Toronto Permit Recovery Root Metadata Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-recovery-20260903
+    paths:
+      - .github/workflows/toronto-permit-recovery-root-metadata-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout recovery branch
+        uses: actions/checkout@v4
+
+      - name: Capture only the nine already-proven current Address Point roots
+        shell: python
+        run: |
+          import csv
+          import io
+          import json
+          import urllib.request
+
+          expected = {
+              '10133194': "900 Queen's Plate Dr",
+              '1366609': '65A Humbercrest Blvd',
+              '14199964': '1204 Queen St W',
+              '2920372': '17 McCormack St',
+              '30014412': '240 McCaul St',
+              '70772': "235 Queen's Dr",
+              '74152': "14 St Mark's Rd",
+              '7641279': "785 Brown's Line",
+              '8166345': '1540A King St W',
+          }
+          url = 'https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/abedd8bc-e3dd-4d45-8e69-79165a76e4fa/resource/64d4e54b-738f-4cd9-a9e7-8050fac8a52f/download/address-points-4326.csv'
+          req = urllib.request.Request(url, headers={'User-Agent': 'TowerSignal-Recovery-Root-Metadata/1.0'})
+          with urllib.request.urlopen(req, timeout=180) as response:
+              raw = response.read()
+          found = {}
+          for row in csv.DictReader(io.StringIO(raw.decode('utf-8-sig', errors='replace'))):
+              apid = str(row.get('ADDRESS_POINT_ID') or '').strip()
+              if apid not in expected:
+                  continue
+              if str(row.get('ADDRESS_FULL') or '').strip() != expected[apid]:
+                  raise SystemExit(f'Address Point drift for {apid}: expected {expected[apid]!r}, found {row.get("ADDRESS_FULL")!r}')
+              geometry = json.loads(row.get('geometry') or '{}')
+              coords = geometry.get('coordinates')
+              while isinstance(coords, list) and len(coords) == 1 and isinstance(coords[0], list):
+                  coords = coords[0]
+              if not isinstance(coords, list) or len(coords) < 2:
+                  raise SystemExit(f'Missing coordinates for {apid}')
+              found[apid] = {
+                  'address_point_id': apid,
+                  'address_id': str(row.get('ADDRESS_ID') or '').strip() or None,
+                  'address_string_id': str(row.get('ADDRESS_STRING_ID') or '').strip() or None,
+                  'centreline_id': str(row.get('CENTRELINE_ID') or '').strip() or None,
+                  'address_point_id_link': str(row.get('ADDRESS_POINT_ID_LINK') or '').strip() or None,
+                  'address_id_link': str(row.get('ADDRESS_ID_LINK') or '').strip() or None,
+                  'address': str(row.get('ADDRESS_FULL') or '').strip(),
+                  'place_name': str(row.get('PLACE_NAME') or '').strip() or None,
+                  'municipality': str(row.get('MUNICIPALITY') or '').strip() or None,
+                  'municipality_name': str(row.get('MUNICIPALITY_NAME') or '').strip() or None,
+                  'longitude': float(coords[0]),
+                  'latitude': float(coords[1]),
+                  'address_status': str(row.get('ADDRESS_STATUS') or '').strip() or None,
+                  'ward': str(row.get('WARD') or '').strip() or None,
+                  'ward_name': str(row.get('WARD_NAME') or '').strip() or None,
+              }
+          if set(found) != set(expected):
+              raise SystemExit(f'Missing proven roots: {sorted(set(expected) - set(found))}')
+          print('RECOVERY_ROOT_COUNT=', len(found))
+          print('RECOVERY_ROOT_MANIFEST=', json.dumps(dict(sorted(found.items())), ensure_ascii=False, sort_keys=True))
