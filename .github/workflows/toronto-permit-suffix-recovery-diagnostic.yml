@@ -1,0 +1,37 @@
+name: Toronto Permit Suffix Recovery Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-permit-suffix-recovery-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile suffix diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_permit_suffix_recovery.py
+
+      - name: Measure omitted-suffix recoveries
+        run: PYTHONPATH=scripts python scripts/diagnose_toronto_permit_suffix_recovery.py --output toronto-permit-suffix-recovery.json
+
+      - name: Upload suffix recovery report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-permit-suffix-recovery
+          path: toronto-permit-suffix-recovery.json
+          retention-days: 7
