@@ -89,6 +89,15 @@ jobs:
               '        if source == "business_licence_matches_prior_poc":\n            assert relationship == "LICENCE_HOLDER_AT_PROPERTY"\n',
               '        if source == "business_licence_matches_prior_poc":\n            assert relationship == "LICENCE_HOLDER_AT_PROPERTY"\n        if source == "ontario_bps_energy_2024":\n            assert relationship == "FACILITY_OPERATOR_OR_REPORTER_AT"\n')
 
+          replace_once(
+              'scripts/validate_toronto_source_actions.py',
+              'from toronto_app_sources import valid_public_url',
+              'from toronto_app_sources import OFFICIAL_DATASET_URLS, valid_public_url')
+          replace_once(
+              'scripts/validate_toronto_source_actions.py',
+              '    if len(catalogue) != 13:\n        raise RuntimeError(f"Expected 13 Toronto source families, found {len(catalogue)}")\n',
+              '    expected_sources = set(OFFICIAL_DATASET_URLS)\n    actual_sources = set(catalogue)\n    if actual_sources != expected_sources:\n        missing = sorted(expected_sources - actual_sources)\n        unexpected = sorted(actual_sources - expected_sources)\n        raise RuntimeError(f"Toronto source catalogue mismatch: missing={missing}, unexpected={unexpected}")\n')
+
           Path('tests/python/test_toronto_bps_app_sources.py').write_text('''import unittest\n\nfrom scripts.toronto_app_sources import _rows, normalize_source_link\nfrom scripts.toronto_source_identity import stable_source_record_id\n\n\nclass TorontoBpsAppSourceTests(unittest.TestCase):\n    def test_rows_recognizes_persisted_toronto_candidates(self) -> None:\n        row = {"Address": "30 Bond St", "Organization": "Unity Health Toronto"}\n        self.assertEqual(_rows({"toronto_candidates": [row]}), [row])\n\n    def test_bps_source_is_dataset_fallback_with_narrow_role_context(self) -> None:\n        source = "ontario_bps_energy_2024"\n        row = {\n            "Year": 2024,\n            "Organization": "Unity Health Toronto",\n            "Property Name": "St. Michael's Hospital",\n            "Sector": "Public Hospital",\n            "Subsector": "Chronic",\n            "Address": "30 Bond St.",\n            "Year Ending": "2024-12-31T00:00:00",\n            "Primary Property Type - Self Selected": "Hospital (General Medical & Surgical)",\n        }\n        record_id = stable_source_record_id(source, row)\n        normalized = normalize_source_link(\n            {\n                "source_key": source,\n                "source_record_id": record_id,\n                "source_row_index": 0,\n                "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",\n                "source_address": "30 Bond St.",\n            },\n            {source: [row]},\n        )\n        self.assertEqual(normalized["record_title"], "St. Michael's Hospital")\n        self.assertEqual(normalized["record_status"], "Published BPS energy report")\n        self.assertIsNone(normalized["record_url"])\n        self.assertEqual(normalized["dataset_url"], "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector")\n        self.assertIn({"label": "Organization", "value": "Unity Health Toronto"}, normalized["record_details"])\n\n\nif __name__ == "__main__":\n    unittest.main()\n''', encoding='utf-8')
 
       - name: Compile bounded BPS implementation
@@ -99,6 +108,7 @@ jobs:
             scripts/toronto_app_sources.py \
             scripts/audit_toronto_source_row_resolution.py \
             scripts/toronto_final_validate.py \
+            scripts/validate_toronto_source_actions.py \
             scripts/apply_toronto_bps_relationships.py
 
       - name: Run BPS and source-identity regressions
@@ -149,6 +159,7 @@ jobs:
             scripts/toronto_app_sources.py \
             scripts/audit_toronto_source_row_resolution.py \
             scripts/toronto_final_validate.py \
+            scripts/validate_toronto_source_actions.py \
             scripts/apply_toronto_bps_relationships.py \
             tests/python/test_toronto_bps_relationship_opportunity.py \
             tests/python/test_toronto_bps_app_sources.py \
