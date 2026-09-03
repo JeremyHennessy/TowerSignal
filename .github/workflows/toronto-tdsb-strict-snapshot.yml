@@ -1,0 +1,156 @@
+name: Toronto TDSB Strict Mechanical Snapshot
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-strict-snapshot-20260903
+    paths:
+      - .github/workflows/toronto-tdsb-strict-snapshot.yml
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout strict permit baseline
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Capture exact TDSB renewal snapshot and Address Point joins
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          import re
+          from collections import Counter, defaultdict
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+          from pathlib import Path
+
+          from build_toronto_poc import TDSB_SCHOOL_URL, discover_tdsb_school_ids, extract_priority, fetch_tdsb_school_fci, parse_html_page, request_bytes
+          from toronto_final_identity_cleanup import address_point_root, canonical_address, load_address_points
+          from toronto_market_common import clean_text
+
+          patterns = {
+              'cooling_tower': re.compile(r'\bcooling\s+towers?\b', re.I),
+              'evaporative_condenser': re.compile(r'\bevaporative\s+condensers?\b', re.I),
+              'chiller': re.compile(r'\bchillers?\b', re.I),
+              'boiler': re.compile(r'\bboilers?\b', re.I),
+              'condenser_water': re.compile(r'\bcondenser\s+water\b', re.I),
+              'cooling_water': re.compile(r'\bcooling\s+water\b', re.I),
+              'water_treatment': re.compile(r'\bwater\s+treatment\b', re.I),
+              'chemical_feed': re.compile(r'\bchemical\s+feed\b', re.I),
+              'legionella': re.compile(r'\blegionella\w*\b', re.I),
+              'hvac': re.compile(r'\bHVAC\b|\bheating,?\s+ventilation\s+and\s+air\s+conditioning\b', re.I),
+          }
+
+          def identity(school_id):
+              parser = parse_html_page(request_bytes(TDSB_SCHOOL_URL.format(school_id=school_id), timeout=45, retries=3))
+              text = parser.visible_text
+              name_match = re.search(r'(?mi)^([^\n]{2,180})\s*\(GR\.', text)
+              address_match = re.search(r'(?mi)^Address:\s*([^\n]{3,220})$', text)
+              return name_match.group(1).strip() if name_match else None, address_match.group(1).strip() if address_match else None
+
+          def fetch(school_id):
+              _, fci = fetch_tdsb_school_fci(school_id)
+              name, address = identity(school_id)
+              return fci, name, address
+
+          school_ids, discovery_counts = discover_tdsb_school_ids()
+          schools, failures = {}, []
+          with ThreadPoolExecutor(max_workers=12) as executor:
+              futures = {executor.submit(fetch, sid): sid for sid in school_ids}
+              for future in as_completed(futures):
+                  sid = futures[future]
+                  try:
+                      parser, name, address = future.result()
+                  except Exception as exc:
+                      failures.append({'school_id': sid, 'error': f'{type(exc).__name__}: {exc}'[:500]})
+                      continue
+                  retained, seen = [], set()
+                  for raw in parser.rows:
+                      text = re.sub(r'\s+', ' ', str(raw or '')).strip()
+                      if not text or not re.search(r'\bRenewal\b', text, re.I):
+                          continue
+                      signals = [key for key, pattern in patterns.items() if pattern.search(text)]
+                      if not signals or text.lower() in seen:
+                          continue
+                      seen.add(text.lower())
+                      retained.append({'signals': signals, 'priority': extract_priority(text), 'text': text})
+                  if retained:
+                      schools[sid] = {'school_id': sid, 'school_name': name, 'published_address': address, 'signals': sorted({s for row in retained for s in row['signals']}), 'rows': retained}
+
+          if len(failures) / len(school_ids) > 0.10:
+              raise SystemExit(f'TDSB failure rate too high: {len(failures)}/{len(school_ids)}')
+          if len(schools) != 352:
+              raise SystemExit(f'TDSB renewal count drift: expected 352, found {len(schools)}')
+
+          by_id, by_address, scanned = load_address_points()
+          strict_spine = json.loads(Path('data/toronto/market/current/property_spine.json').read_text(encoding='utf-8'))
+          strict_apids = {clean_text(p.get('address_point_id')) for p in strict_spine.get('properties', []) if isinstance(p, dict) and clean_text(p.get('address_point_id'))}
+          resolution = Counter()
+          resolved, unresolved, ambiguous = [], [], []
+          signal_counts = defaultdict(set)
+          roots = set()
+
+          for sid, item in sorted(schools.items(), key=lambda pair: int(pair[0])):
+              address = canonical_address(item.get('published_address'))
+              candidates = by_address.get(address, []) if address else []
+              unique_roots = {}
+              for candidate in candidates:
+                  root = address_point_root(candidate, by_id)
+                  root_id = clean_text(root.get('address_point_id'))
+                  if root_id:
+                      unique_roots[root_id] = root
+              if len(unique_roots) == 1:
+                  root_id, root = next(iter(unique_roots.items()))
+                  resolution['EXACT_LITERAL_TDSB_CIVIC_ADDRESS_TO_UNIQUE_CURRENT_ROOT'] += 1
+                  roots.add(root_id)
+                  for signal in item['signals']:
+                      signal_counts[signal].add(sid)
+                  resolved.append({**item, 'property_id': f'toronto-address-point:{root_id}', 'address_point_id': root_id, 'current_address': root.get('address'), 'longitude': root.get('longitude'), 'latitude': root.get('latitude'), 'already_in_strict_permit_spine': root_id in strict_apids, 'resolution_basis': 'EXACT_LITERAL_TDSB_CIVIC_ADDRESS_TO_UNIQUE_CURRENT_ROOT'})
+              elif len(unique_roots) > 1:
+                  resolution['AMBIGUOUS_CURRENT_ROOTS_NOT_FORCED'] += 1
+                  ambiguous.append({**item, 'candidate_root_address_point_ids': sorted(unique_roots)})
+              else:
+                  resolution['NO_EXACT_CURRENT_ADDRESS_POINT_ROOT'] += 1
+                  unresolved.append(item)
+
+          new_roots = roots - strict_apids
+          report = {
+              'schema_version': 'toronto-tdsb-mechanical-strict-snapshot-1.0',
+              'status': 'PASSED_DIAGNOSTIC',
+              'strict_baseline_sha': '101c6808b22bb5ce69a16697f97df95424ad0e2c',
+              'contract': 'Actual official TDSB RNB rows containing Renewal; literal school Address field; exact civic address to unique current City Address Point root only. Non-tower mechanical rows are supporting/renewal context only.',
+              'discovery_counts_by_page': discovery_counts,
+              'school_ids_discovered': len(school_ids),
+              'fetch_failures': failures,
+              'renewal_schools': len(schools),
+              'address_point_rows_scanned': scanned,
+              'resolution_counts': dict(sorted(resolution.items())),
+              'resolved_schools': len(resolved),
+              'resolved_property_roots': len(roots),
+              'existing_strict_spine_roots': len(roots & strict_apids),
+              'new_roots_vs_strict_permit_spine': len(new_roots),
+              'signal_resolved_school_counts': {key: len(value) for key, value in sorted(signal_counts.items())},
+              'new_property_root_ids': sorted(new_roots, key=lambda value: int(value)),
+              'resolved': resolved,
+              'unresolved': unresolved,
+              'ambiguous': ambiguous,
+          }
+          Path('toronto-tdsb-strict-snapshot.json').write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+          print(json.dumps({key: value for key, value in report.items() if key not in {'resolved','unresolved','ambiguous','fetch_failures','new_property_root_ids'}}, indent=2, ensure_ascii=False))
+
+      - name: Upload strict TDSB snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-tdsb-strict-snapshot
+          path: toronto-tdsb-strict-snapshot.json
+          retention-days: 14
