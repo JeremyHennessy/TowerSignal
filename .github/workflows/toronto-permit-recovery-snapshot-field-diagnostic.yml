@@ -1,0 +1,55 @@
+name: Toronto Permit Recovery Snapshot Field Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-building-permit-recovery-20260903
+    paths:
+      - .github/workflows/toronto-permit-recovery-snapshot-field-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout recovery branch
+        uses: actions/checkout@v4
+
+      - name: Inspect persisted unresolved rows for coordinate and identity fields
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          targets = {
+              '19 137298 BLD::00','08 217276 MSA::00','21 251512 MSA::00','13 227048 MSA::00',
+              '04 139788 HVA::00','04 139788 HVA::01','21 173062 BLD::00','21 173062 HVA::00',
+              '21 173062 PLB::00','16 221967 MSA::00','13 178071 MSA::00','20 185362 HVA::00',
+              '20 185362 PLB::00','20 185362 BLD::00'
+          }
+          paths = [
+              Path('data/toronto/warehouse/current/open_licensed/toronto_building_permits_active_targeted.json'),
+              Path('data/toronto/warehouse/current/open_licensed/toronto_building_permits_cleared_targeted_since_2017.json'),
+          ]
+          found = []
+          all_fields = set()
+          for path in paths:
+              payload = json.loads(path.read_text(encoding='utf-8'))
+              for row in payload.get('rows', []):
+                  identity = str(row.get('_towersignal_permit_identity') or '')
+                  if identity not in targets:
+                      continue
+                  all_fields.update(row.keys())
+                  found.append({
+                      'snapshot': path.name,
+                      'permit_identity': identity,
+                      'fields': row,
+                  })
+          print('TARGET_COUNT=', len(targets))
+          print('FOUND_COUNT=', len(found))
+          print('ALL_FIELDS=', json.dumps(sorted(all_fields), ensure_ascii=False))
+          for item in found:
+              print('TARGET_ROW=', json.dumps(item, ensure_ascii=False, sort_keys=True))
