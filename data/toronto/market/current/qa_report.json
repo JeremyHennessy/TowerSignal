@@ -1,14 +1,14 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-09-03T19:03:22.558477Z",
+  "generated_at": "2026-09-03T21:15:34.712603Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
-  "json_files_validated": 30,
+  "json_files_validated": 31,
   "counts": {
-    "canonical_properties": 13065,
+    "canonical_properties": 13371,
     "poc_reconciliation_rows": 177,
     "poc_resolved": 175,
     "poc_unresolved": 2,
-    "source_links": 38768,
+    "source_links": 40012,
     "entity_edges": 6343,
     "aic_application_catalogue": 15864,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
@@ -322,6 +322,46 @@
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
     ],
+    "toronto_building_permits_active_targeted": [
+      {
+        "property_id": "toronto-address-point:1001674",
+        "source_record_id": "toronto_building_permits_active_targeted:id:22 103763 PSA:revision:00",
+        "source_address": "11 FONTENAY CRT",
+        "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
+      },
+      {
+        "property_id": "toronto-address-point:3569436",
+        "source_record_id": "toronto_building_permits_active_targeted:id:19 111480 MSA:revision:00",
+        "source_address": "7 BISHOP AVE",
+        "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
+      },
+      {
+        "property_id": "toronto-address-point:9962786",
+        "source_record_id": "toronto_building_permits_active_targeted:id:19 167055 DEM:revision:00",
+        "source_address": "2200 ISLINGTON AVE",
+        "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
+      }
+    ],
+    "toronto_building_permits_cleared_targeted_since_2017": [
+      {
+        "property_id": "toronto-address-point:10011100",
+        "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 199320 MSA:revision:00",
+        "source_address": "30 DEE AVE",
+        "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
+      },
+      {
+        "property_id": "toronto-address-point:541690",
+        "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:20 229372 HVA:revision:01",
+        "source_address": "57 MCKEE AVE",
+        "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
+      },
+      {
+        "property_id": "toronto-address-point:9980224",
+        "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:15 216081 HVA:revision:01",
+        "source_address": "1912 QUEEN ST E",
+        "match_basis": "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS"
+      }
+    ],
     "toronto_highrise_residential_health_hazards": [
       {
         "property_id": "toronto-address-point:1000365",
@@ -622,6 +662,8 @@
     "renewable_energy_installations": 0,
     "tobids_awarded_contracts_exact_document_address_prior_poc": 0,
     "toronto_aic_applications": 0,
+    "toronto_building_permits_active_targeted": 0,
+    "toronto_building_permits_cleared_targeted_since_2017": 0,
     "toronto_highrise_residential_health_hazards": 0,
     "toronto_public_notices_exact_prior_poc": 0
   },

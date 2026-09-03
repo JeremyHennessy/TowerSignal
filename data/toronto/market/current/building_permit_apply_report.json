@@ -1,0 +1,1112 @@
+{
+  "schema_version": "toronto-targeted-building-permit-apply-1.0",
+  "generated_at": "2026-09-03T20:29:36.776947Z",
+  "status": "PASSED",
+  "contract": "Only targeted permit revisions resolved to a current Toronto Address Point root are linked. Existing 13,065 property objects are immutable; 306 new root properties are appended. Ambiguous/missing identities are withheld. No permit organization relationship or automatic tower-status promotion occurs.",
+  "baseline": {
+    "properties": 13065,
+    "source_links": 38768,
+    "relationship_edges": 6343
+  },
+  "metrics": {
+    "new_properties": 306,
+    "final_properties": 13371,
+    "new_source_links": 1244,
+    "final_source_links": 40012,
+    "unresolved_rows_not_forced": 50,
+    "relationship_edges_before_and_after": 6343,
+    "source_summary_entries": 19,
+    "linked_source_families": 16
+  },
+  "sources": {
+    "toronto_building_permits_active_targeted": {
+      "source_rows": 573,
+      "resolved_rows": 540,
+      "unresolved_rows": 33,
+      "resolved_properties": 327,
+      "new_properties": 131,
+      "geo_id_address_conflict_rows": 27,
+      "resolution_basis_counts": {
+        "EXACT_UNIQUE_CIVIC_ADDRESS_TO_CURRENT_ADDRESS_POINT_ROOT": 37,
+        "NO_CURRENT_ADDRESS_POINT_IDENTITY": 33,
+        "PERMIT_GEO_ID_LINKED_TO_ROOT_SOURCE_ADDRESS_MATCHES_CHILD": 51,
+        "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS": 452
+      }
+    },
+    "toronto_building_permits_cleared_targeted_since_2017": {
+      "source_rows": 721,
+      "resolved_rows": 704,
+      "unresolved_rows": 17,
+      "resolved_properties": 429,
+      "new_properties": 193,
+      "geo_id_address_conflict_rows": 9,
+      "resolution_basis_counts": {
+        "EXACT_UNIQUE_CIVIC_ADDRESS_TO_CURRENT_ADDRESS_POINT_ROOT": 29,
+        "NO_CURRENT_ADDRESS_POINT_IDENTITY": 17,
+        "PERMIT_GEO_ID_LINKED_TO_ROOT_SOURCE_ADDRESS_MATCHES_CHILD": 59,
+        "PERMIT_GEO_ID_TO_CURRENT_ADDRESS_POINT_ROOT_WITH_EXACT_CIVIC_ADDRESS": 616
+      }
+    }
+  },
+  "unresolved_records": [
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 12,
+      "permit_identity": "04 139788 HVA::00",
+      "permit_num": "04 139788 HVA",
+      "revision_num": "00",
+      "source_address": "1204-1214 QUEEN ST W",
+      "permit_geo_id": "7553270",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "HVAC - Renovations to exisitng building (to include 2, 3, 4, 5,th floors and basement boiler and electrical room).  existing and proposed- Hotel - Interior Alterations"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 13,
+      "permit_identity": "04 139788 HVA::01",
+      "permit_num": "04 139788 HVA",
+      "revision_num": "01",
+      "source_address": "1204-1214 QUEEN ST W",
+      "permit_geo_id": "7553270",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revision Issued",
+      "description": "Revisions as per BLD # 04 154113Please contact new Mech Eng assigned ( see people folder)HVAC - Renovations to exisitng building (to include 2, 3, 4, 5,th floors and basement boiler and electrical room).  existing and proposed- Hotel - Interior Alterations"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 61,
+      "permit_identity": "08 109575 HVA::00",
+      "permit_num": "08 109575 HVA",
+      "revision_num": "00",
+      "source_address": "3197-3199 LAKE SHORE BLVD W",
+      "permit_geo_id": null,
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "HVAC - removal of exsting chiller tower with structural work to roof"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 67,
+      "permit_identity": "08 217276 MSA::00",
+      "permit_num": "08 217276 MSA",
+      "revision_num": "00",
+      "source_address": "65 A HUMBERCREST BLVD",
+      "permit_geo_id": "1366609",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "New boiler, radiant floor heating basement and main floor and 2 new radiatiors and relocate 1 radiator"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 83,
+      "permit_identity": "10 123759 BLD::00",
+      "permit_num": "10 123759 BLD",
+      "revision_num": "00",
+      "source_address": "10-20 BAY ST",
+      "permit_geo_id": "14188741",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "Permit for interior alterations to mechanical room of existing office building - permit to enclose mechanical space / chiller room.  10 Bay St floor 18 and 20 Bay St floor 25."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 122,
+      "permit_identity": "12 148282 BLD::00",
+      "permit_num": "12 148282 BLD",
+      "revision_num": "00",
+      "source_address": "89 HUMBER COLLEGE BLVD",
+      "permit_geo_id": "8127974",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "cooling_tower",
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "Interior alterations to penthouse level, to provide new enlarged door and new exhaust fan louver, to replace an existing Chiller and 2 Cooling Towers to Etobicoke General Hospital's Medical Office Building."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 161,
+      "permit_identity": "13 227048 MSA::00",
+      "permit_num": "13 227048 MSA",
+      "revision_num": "00",
+      "source_address": "785 BROWNS LINE",
+      "permit_geo_id": "7641279",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Boiler replacement."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 198,
+      "permit_identity": "15 170244 MSA::00",
+      "permit_num": "15 170244 MSA",
+      "revision_num": "00",
+      "source_address": "58-78 WATERTON RD",
+      "permit_geo_id": "1042618",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "boiler plant & make up air replacement"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 278,
+      "permit_identity": "18 215023 MSA::00",
+      "permit_num": "18 215023 MSA",
+      "revision_num": "00",
+      "source_address": "22 A JAMESTOWN CRES",
+      "permit_geo_id": "30041824",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 5. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 279,
+      "permit_identity": "18 215033 MSA::00",
+      "permit_num": "18 215033 MSA",
+      "revision_num": "00",
+      "source_address": "110 A JAMESTOWN CRES",
+      "permit_geo_id": "30041869",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 4. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 280,
+      "permit_identity": "18 215039 MSA::00",
+      "permit_num": "18 215039 MSA",
+      "revision_num": "00",
+      "source_address": "116 A JAMESTOWN CRES",
+      "permit_geo_id": "30041875",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 3. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 281,
+      "permit_identity": "18 215046 MSA::00",
+      "permit_num": "18 215046 MSA",
+      "revision_num": "00",
+      "source_address": "112 A JOHN GARLAND BLVD",
+      "permit_geo_id": "30044414",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 8. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 282,
+      "permit_identity": "18 215049 MSA::00",
+      "permit_num": "18 215049 MSA",
+      "revision_num": "00",
+      "source_address": "123 A JAMESTOWN CRES",
+      "permit_geo_id": "30041758",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 10. (Refer to for plumbing scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 283,
+      "permit_identity": "18 215055 MSA::00",
+      "permit_num": "18 215055 MSA",
+      "revision_num": "00",
+      "source_address": "131 A JAMESTOWN CRES",
+      "permit_geo_id": "30041768",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 9 , 131A Jamestown Crescent."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 284,
+      "permit_identity": "18 215061 MSA::00",
+      "permit_num": "18 215061 MSA",
+      "revision_num": "00",
+      "source_address": "204 A JAMESTOWN CRES",
+      "permit_geo_id": "30041925",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 2."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 285,
+      "permit_identity": "18 215066 MSA::00",
+      "permit_num": "18 215066 MSA",
+      "revision_num": "00",
+      "source_address": "262 A JAMESTOWN CRES",
+      "permit_geo_id": "30042043",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 1."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 286,
+      "permit_identity": "18 215069 MSA::00",
+      "permit_num": "18 215069 MSA",
+      "revision_num": "00",
+      "source_address": "67 A JAMESTOWN CRES",
+      "permit_geo_id": "30044358",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace heating boilers in existing townhouse complex boiler room No. 6."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 288,
+      "permit_identity": "18 222088 PSA::00",
+      "permit_num": "18 222088 PSA",
+      "revision_num": "00",
+      "source_address": "22 A JAMESTOWN CRES",
+      "permit_geo_id": "30041824",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 5. (Refer to 18 215023 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 289,
+      "permit_identity": "18 222112 PSA::00",
+      "permit_num": "18 222112 PSA",
+      "revision_num": "00",
+      "source_address": "110 A JAMESTOWN CRES",
+      "permit_geo_id": "30041869",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 4. (Refer to 18 215033 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 290,
+      "permit_identity": "18 222127 PSA::00",
+      "permit_num": "18 222127 PSA",
+      "revision_num": "00",
+      "source_address": "116 A JAMESTOWN CRES",
+      "permit_geo_id": "30041875",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 3. (Refer to 18 215039 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 291,
+      "permit_identity": "18 222132 PSA::00",
+      "permit_num": "18 222132 PSA",
+      "revision_num": "00",
+      "source_address": "112 A JOHN GARLAND BLVD",
+      "permit_geo_id": "30044414",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 8. (Refer to 18 215046 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 292,
+      "permit_identity": "18 222140 PSA::00",
+      "permit_num": "18 222140 PSA",
+      "revision_num": "00",
+      "source_address": "123 A JAMESTOWN CRES",
+      "permit_geo_id": "30041758",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 10. (Refer to 18 215049 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 293,
+      "permit_identity": "18 222160 PSA::00",
+      "permit_num": "18 222160 PSA",
+      "revision_num": "00",
+      "source_address": "131 A JAMESTOWN CRES",
+      "permit_geo_id": "30041768",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 9. (Refer to 18 215055 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 294,
+      "permit_identity": "18 222171 PSA::00",
+      "permit_num": "18 222171 PSA",
+      "revision_num": "00",
+      "source_address": "204 A JAMESTOWN CRES",
+      "permit_geo_id": "30041925",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Revocation Pending",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 2. (Refer to 18 215061 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 295,
+      "permit_identity": "18 222178 PSA::00",
+      "permit_num": "18 222178 PSA",
+      "revision_num": "00",
+      "source_address": "262 A JAMESTOWN CRES",
+      "permit_geo_id": "30042043",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 1. (Refer to 18 215066 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 296,
+      "permit_identity": "18 222180 PSA::00",
+      "permit_num": "18 222180 PSA",
+      "revision_num": "00",
+      "source_address": "67 A JAMESTOWN CRES",
+      "permit_geo_id": "30044358",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposal to replace replace domestic water heaters in existing townhouse complex boiler room No. 6. (Refer to 18 215069 MSA 00 MS for mechanical scope)"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 316,
+      "permit_identity": "19 137298 BLD::00",
+      "permit_num": "19 137298 BLD",
+      "revision_num": "00",
+      "source_address": "14 ST MARKS RD",
+      "permit_geo_id": "74152",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Inspection",
+      "description": "Proposed ceiling replacement to an existing boiler room within an existing elementry school."
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 355,
+      "permit_identity": "20 169130 BLD::00",
+      "permit_num": "20 169130 BLD",
+      "revision_num": "00",
+      "source_address": "16 RUSSELL ST",
+      "permit_geo_id": "8105939",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "Chiller & Heating Water Systems Upgrade and New Rooftop Mechanical Enclosure to the Existing UofT, Undergraduate Wing. "
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 356,
+      "permit_identity": "20 169130 HVA::00",
+      "permit_num": "20 169130 HVA",
+      "revision_num": "00",
+      "source_address": "16 RUSSELL ST",
+      "permit_geo_id": "8105939",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "HVAC - Chiller and heating water systems upgrade"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 357,
+      "permit_identity": "20 169130 PLB::00",
+      "permit_num": "20 169130 PLB",
+      "revision_num": "00",
+      "source_address": "16 RUSSELL ST",
+      "permit_geo_id": "8105939",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Inspection",
+      "description": "Plumbing  - Chiller and heating water systems upgrade"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 406,
+      "permit_identity": "21 251512 MSA::00",
+      "permit_num": "21 251512 MSA",
+      "revision_num": "00",
+      "source_address": "900 QUEENS PLATE DR",
+      "permit_geo_id": "10133194",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Permit Issued",
+      "description": "Boiler and associated pumps replacement "
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 501,
+      "permit_identity": "24 251485 MSA::00",
+      "permit_num": "24 251485 MSA",
+      "revision_num": "00",
+      "source_address": "361 A OLD FINCH AVE",
+      "permit_geo_id": "9602774",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Permit Issued",
+      "description": "Replace existing gas-fire AHU with same capacity Hydronic AHU, adding boiler system for new AHU"
+    },
+    {
+      "source_key": "toronto_building_permits_active_targeted",
+      "source_row_index": 530,
+      "permit_identity": "25 175841 MSA::00",
+      "permit_num": "25 175841 MSA",
+      "revision_num": "00",
+      "source_address": "130-140 ST GEORGE ST",
+      "permit_geo_id": "873392",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Permit Issued",
+      "description": "Proposed replacement of existing shell and tube heat exchanger located in sub-basement with two (2) new brazed plate heat exchangers. Installation of new electric steam boiler in sub-basement for AHU humidification, with existing steam generator remaining as backup."
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 63,
+      "permit_identity": "08 109575 BLD::00",
+      "permit_num": "08 109575 BLD",
+      "revision_num": "00",
+      "source_address": "3197-3199 LAKE SHORE BLVD W",
+      "permit_geo_id": null,
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Closed - Dormant",
+      "description": "removal of exsting chiller tower with structural work to roof"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 99,
+      "permit_identity": "10 123759 HVA::00",
+      "permit_num": "10 123759 HVA",
+      "revision_num": "00",
+      "source_address": "10-20 BAY ST",
+      "permit_geo_id": "14188741",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Closed",
+      "description": "HVAC - Permit for interior alterations to mechanical room of existing office building - permit to enclose mechanical space / chiller room.  10 Bay St floor 18 and 20 Bay St floor 25."
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 143,
+      "permit_identity": "13 178071 MSA::00",
+      "permit_num": "13 178071 MSA",
+      "revision_num": "00",
+      "source_address": "235 QUEENS DR",
+      "permit_geo_id": "70772",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Proposal to remove and replace the existing boiler and associated HVAC within an existing (2) storey detached single family dwelling."
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 235,
+      "permit_identity": "16 146056 MSA::00",
+      "permit_num": "16 146056 MSA",
+      "revision_num": "00",
+      "source_address": "939 PROGRESS AVE",
+      "permit_geo_id": "13503977",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Proposal to replace boiler, \"Centenniel College\""
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 259,
+      "permit_identity": "16 221967 MSA::00",
+      "permit_num": "16 221967 MSA",
+      "revision_num": "00",
+      "source_address": "17 MC CORMACK ST",
+      "permit_geo_id": "2920372",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Stand alone mechanical permit to replace the boiler in an existing apartment building."
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 298,
+      "permit_identity": "17 139058 MSA::00",
+      "permit_num": "17 139058 MSA",
+      "revision_num": "00",
+      "source_address": "90-94 ADELAIDE ST W",
+      "permit_geo_id": "12763885",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "chiller"
+      ],
+      "status": "Closed",
+      "description": "Remove existing chiller in install new chiller on the existing concrete house keeping pad c/w new spring isolators, provide new butterfly valves and reconnect chilled water piping, re-insulate existing and new exterior chilled water piping"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 336,
+      "permit_identity": "17 260422 BLD::00",
+      "permit_num": "17 260422 BLD",
+      "revision_num": "00",
+      "source_address": "35-75 VANLEY CRES",
+      "permit_geo_id": "14606205",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 337,
+      "permit_identity": "17 260422 BLD::01",
+      "permit_num": "17 260422 BLD",
+      "revision_num": "01",
+      "source_address": "35-75 VANLEY CRES",
+      "permit_geo_id": "14606205",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "Revision to the original permit 17 - 260422 we have relocated the fire hydrant that was proposed in the original submission. Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 338,
+      "permit_identity": "17 260422 HVA::00",
+      "permit_num": "17 260422 HVA",
+      "revision_num": "00",
+      "source_address": "35-75 VANLEY CRES",
+      "permit_geo_id": "14606205",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "HVAC - Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 339,
+      "permit_identity": "17 260422 PLB::00",
+      "permit_num": "17 260422 PLB",
+      "revision_num": "00",
+      "source_address": "35-75 VANLEY CRES",
+      "permit_geo_id": "14606205",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "Plumbing  - Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 340,
+      "permit_identity": "17 260422 STS::00",
+      "permit_num": "17 260422 STS",
+      "revision_num": "00",
+      "source_address": "35-75 VANLEY CRES",
+      "permit_geo_id": "14606205",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "water_treatment"
+      ],
+      "status": "Closed",
+      "description": "Drain - Proposal to construct a new waste water treatment plant. "
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 498,
+      "permit_identity": "20 185362 BLD::00",
+      "permit_num": "20 185362 BLD",
+      "revision_num": "00",
+      "source_address": "1540 KING ST W",
+      "permit_geo_id": "8166345",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Interior alterations to create new unit in basement, basement underpinning and add new boiler,"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 499,
+      "permit_identity": "20 185362 HVA::00",
+      "permit_num": "20 185362 HVA",
+      "revision_num": "00",
+      "source_address": "1540 KING ST W",
+      "permit_geo_id": "8166345",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "HVAC - Interior alterations to create new unit in basement, basement underpinning and add new boiler"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 500,
+      "permit_identity": "20 185362 PLB::00",
+      "permit_num": "20 185362 PLB",
+      "revision_num": "00",
+      "source_address": "1540 KING ST W",
+      "permit_geo_id": "8166345",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Plumbing  - Interior alterations to create new unit in basement, basement underpinning and add new boiler"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 550,
+      "permit_identity": "21 173062 BLD::00",
+      "permit_num": "21 173062 BLD",
+      "revision_num": "00",
+      "source_address": "240 MC CAUL ST",
+      "permit_geo_id": "30014412",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "DEMOLITION OF EXISTING BOILER FLUES, CONSTRUCTION OF AREAWAY FOR NEW FLUE ROUTING, AND INSTALLTION OF NEW BOILER FLUES (INCLUDING RECONFIGURATION OF EXTERIOR GLAZING AND MASONRY REPLACEMENT)"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 551,
+      "permit_identity": "21 173062 HVA::00",
+      "permit_num": "21 173062 HVA",
+      "revision_num": "00",
+      "source_address": "240 MC CAUL ST",
+      "permit_geo_id": "30014412",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "HVAC - DEMOLITION OF EXISTING BOILER FLUES, CONSTRUCTION OF AREAWAY FOR NEW FLUE ROUTING, AND INSTALLTION OF NEW BOILER FLUES (INCLUDING RECONFIGURATION OF EXTERIOR GLAZING AND MASONRY REPLACEMENT)"
+    },
+    {
+      "source_key": "toronto_building_permits_cleared_targeted_since_2017",
+      "source_row_index": 552,
+      "permit_identity": "21 173062 PLB::00",
+      "permit_num": "21 173062 PLB",
+      "revision_num": "00",
+      "source_address": "240 MC CAUL ST",
+      "permit_geo_id": "30014412",
+      "resolution_status": "NO_CURRENT_ADDRESS_POINT_IDENTITY",
+      "signals": [
+        "boiler"
+      ],
+      "status": "Closed",
+      "description": "Plumbing  - DEMOLITION OF EXISTING BOILER FLUES, CONSTRUCTION OF AREAWAY FOR NEW FLUE ROUTING, AND INSTALLTION OF NEW BOILER FLUES (INCLUDING RECONFIGURATION OF EXTERIOR GLAZING AND MASONRY REPLACEMENT)"
+    }
+  ],
+  "new_property_ids": [
+    "toronto-address-point:1001674",
+    "toronto-address-point:10035381",
+    "toronto-address-point:1007052",
+    "toronto-address-point:1012252",
+    "toronto-address-point:10144702",
+    "toronto-address-point:10145181",
+    "toronto-address-point:10155302",
+    "toronto-address-point:10223466",
+    "toronto-address-point:1027151",
+    "toronto-address-point:1027220",
+    "toronto-address-point:1027221",
+    "toronto-address-point:1028097",
+    "toronto-address-point:1037664",
+    "toronto-address-point:10430800",
+    "toronto-address-point:1043818",
+    "toronto-address-point:10476732",
+    "toronto-address-point:10476742",
+    "toronto-address-point:10493739",
+    "toronto-address-point:10513559",
+    "toronto-address-point:10526991",
+    "toronto-address-point:10553712",
+    "toronto-address-point:10598280",
+    "toronto-address-point:10610788",
+    "toronto-address-point:10663240",
+    "toronto-address-point:10663988",
+    "toronto-address-point:10758852",
+    "toronto-address-point:10800592",
+    "toronto-address-point:10800655",
+    "toronto-address-point:10872692",
+    "toronto-address-point:10924027",
+    "toronto-address-point:10985943",
+    "toronto-address-point:11048131",
+    "toronto-address-point:11129908",
+    "toronto-address-point:11186804",
+    "toronto-address-point:11272991",
+    "toronto-address-point:11415003",
+    "toronto-address-point:11485094",
+    "toronto-address-point:11485200",
+    "toronto-address-point:11631522",
+    "toronto-address-point:12387700",
+    "toronto-address-point:12789760",
+    "toronto-address-point:13410308",
+    "toronto-address-point:13969962",
+    "toronto-address-point:13970076",
+    "toronto-address-point:13970096",
+    "toronto-address-point:13977429",
+    "toronto-address-point:14073190",
+    "toronto-address-point:14130890",
+    "toronto-address-point:14190386",
+    "toronto-address-point:14190387",
+    "toronto-address-point:14190392",
+    "toronto-address-point:14198652",
+    "toronto-address-point:14199325",
+    "toronto-address-point:14200140",
+    "toronto-address-point:14200350",
+    "toronto-address-point:14228998",
+    "toronto-address-point:14238932",
+    "toronto-address-point:14245877",
+    "toronto-address-point:14617899",
+    "toronto-address-point:14617959",
+    "toronto-address-point:14659988",
+    "toronto-address-point:16678",
+    "toronto-address-point:17275",
+    "toronto-address-point:20034803",
+    "toronto-address-point:20040003",
+    "toronto-address-point:20062393",
+    "toronto-address-point:20236423",
+    "toronto-address-point:2216338",
+    "toronto-address-point:23775",
+    "toronto-address-point:24727",
+    "toronto-address-point:24971",
+    "toronto-address-point:25042",
+    "toronto-address-point:2565760",
+    "toronto-address-point:2591629",
+    "toronto-address-point:25989",
+    "toronto-address-point:2652805",
+    "toronto-address-point:28192",
+    "toronto-address-point:2893765",
+    "toronto-address-point:29007",
+    "toronto-address-point:2904780",
+    "toronto-address-point:2920409",
+    "toronto-address-point:30011025",
+    "toronto-address-point:30011026",
+    "toronto-address-point:30015075",
+    "toronto-address-point:30017988",
+    "toronto-address-point:30036199",
+    "toronto-address-point:30065754",
+    "toronto-address-point:30074744",
+    "toronto-address-point:30079238",
+    "toronto-address-point:301973",
+    "toronto-address-point:302103",
+    "toronto-address-point:304933",
+    "toronto-address-point:3065750",
+    "toronto-address-point:307506",
+    "toronto-address-point:31225",
+    "toronto-address-point:322971",
+    "toronto-address-point:325848",
+    "toronto-address-point:33993",
+    "toronto-address-point:354399",
+    "toronto-address-point:354403",
+    "toronto-address-point:366471",
+    "toronto-address-point:372850",
+    "toronto-address-point:379397",
+    "toronto-address-point:3829413",
+    "toronto-address-point:3841953",
+    "toronto-address-point:385409",
+    "toronto-address-point:3897841",
+    "toronto-address-point:3948802",
+    "toronto-address-point:3950925",
+    "toronto-address-point:397600",
+    "toronto-address-point:4023462",
+    "toronto-address-point:4153878",
+    "toronto-address-point:4504004",
+    "toronto-address-point:4709515",
+    "toronto-address-point:4889826",
+    "toronto-address-point:5016348",
+    "toronto-address-point:502996",
+    "toronto-address-point:504810",
+    "toronto-address-point:507987",
+    "toronto-address-point:509514",
+    "toronto-address-point:509553",
+    "toronto-address-point:50999",
+    "toronto-address-point:518696",
+    "toronto-address-point:52007",
+    "toronto-address-point:53088",
+    "toronto-address-point:53099",
+    "toronto-address-point:53390",
+    "toronto-address-point:541690",
+    "toronto-address-point:547961",
+    "toronto-address-point:549302",
+    "toronto-address-point:55227",
+    "toronto-address-point:5524295",
+    "toronto-address-point:565269",
+    "toronto-address-point:5674872",
+    "toronto-address-point:574324",
+    "toronto-address-point:575920",
+    "toronto-address-point:5945239",
+    "toronto-address-point:6039420",
+    "toronto-address-point:6052171",
+    "toronto-address-point:61165",
+    "toronto-address-point:6345348",
+    "toronto-address-point:6349937",
+    "toronto-address-point:6362872",
+    "toronto-address-point:6375116",
+    "toronto-address-point:6375122",
+    "toronto-address-point:6387861",
+    "toronto-address-point:63957",
+    "toronto-address-point:64557",
+    "toronto-address-point:64864",
+    "toronto-address-point:6522577",
+    "toronto-address-point:6733591",
+    "toronto-address-point:67883",
+    "toronto-address-point:6814671",
+    "toronto-address-point:6924848",
+    "toronto-address-point:69387",
+    "toronto-address-point:7155041",
+    "toronto-address-point:71617",
+    "toronto-address-point:7273250",
+    "toronto-address-point:7424876",
+    "toronto-address-point:7439386",
+    "toronto-address-point:75217",
+    "toronto-address-point:7553379",
+    "toronto-address-point:7576446",
+    "toronto-address-point:7632663",
+    "toronto-address-point:7632755",
+    "toronto-address-point:7648415",
+    "toronto-address-point:7649800",
+    "toronto-address-point:7650149",
+    "toronto-address-point:7669081",
+    "toronto-address-point:7683834",
+    "toronto-address-point:770542",
+    "toronto-address-point:772683",
+    "toronto-address-point:773913",
+    "toronto-address-point:7753962",
+    "toronto-address-point:7754014",
+    "toronto-address-point:7762664",
+    "toronto-address-point:7762982",
+    "toronto-address-point:7796279",
+    "toronto-address-point:7808378",
+    "toronto-address-point:7808522",
+    "toronto-address-point:7846919",
+    "toronto-address-point:785035",
+    "toronto-address-point:785502",
+    "toronto-address-point:7862588",
+    "toronto-address-point:787216",
+    "toronto-address-point:792931",
+    "toronto-address-point:793012",
+    "toronto-address-point:7930123",
+    "toronto-address-point:7930462",
+    "toronto-address-point:793806",
+    "toronto-address-point:7939938",
+    "toronto-address-point:7949906",
+    "toronto-address-point:7955654",
+    "toronto-address-point:7955834",
+    "toronto-address-point:7963632",
+    "toronto-address-point:7963652",
+    "toronto-address-point:7973753",
+    "toronto-address-point:7973823",
+    "toronto-address-point:7974424",
+    "toronto-address-point:797489",
+    "toronto-address-point:7986012",
+    "toronto-address-point:7986689",
+    "toronto-address-point:7994513",
+    "toronto-address-point:8006985",
+    "toronto-address-point:8015586",
+    "toronto-address-point:801600",
+    "toronto-address-point:8030476",
+    "toronto-address-point:803200",
+    "toronto-address-point:803276",
+    "toronto-address-point:803398",
+    "toronto-address-point:803650",
+    "toronto-address-point:807027",
+    "toronto-address-point:808286",
+    "toronto-address-point:8087211",
+    "toronto-address-point:8105826",
+    "toronto-address-point:8105943",
+    "toronto-address-point:8106296",
+    "toronto-address-point:8106307",
+    "toronto-address-point:8106457",
+    "toronto-address-point:811757",
+    "toronto-address-point:813180",
+    "toronto-address-point:813617",
+    "toronto-address-point:813824",
+    "toronto-address-point:8168665",
+    "toronto-address-point:818904",
+    "toronto-address-point:820614",
+    "toronto-address-point:823057",
+    "toronto-address-point:823058",
+    "toronto-address-point:823059",
+    "toronto-address-point:823661",
+    "toronto-address-point:8237433",
+    "toronto-address-point:8237434",
+    "toronto-address-point:823848",
+    "toronto-address-point:825367",
+    "toronto-address-point:826229",
+    "toronto-address-point:828221",
+    "toronto-address-point:8292444",
+    "toronto-address-point:8322683",
+    "toronto-address-point:832465",
+    "toronto-address-point:832935",
+    "toronto-address-point:833839",
+    "toronto-address-point:834310",
+    "toronto-address-point:8344716",
+    "toronto-address-point:834715",
+    "toronto-address-point:8351169",
+    "toronto-address-point:8351189",
+    "toronto-address-point:839069",
+    "toronto-address-point:8392356",
+    "toronto-address-point:8392715",
+    "toronto-address-point:8393591",
+    "toronto-address-point:839707",
+    "toronto-address-point:845456",
+    "toronto-address-point:848192",
+    "toronto-address-point:8492324",
+    "toronto-address-point:853146",
+    "toronto-address-point:854153",
+    "toronto-address-point:8566465",
+    "toronto-address-point:856771",
+    "toronto-address-point:8594394",
+    "toronto-address-point:860694",
+    "toronto-address-point:861339",
+    "toronto-address-point:862549",
+    "toronto-address-point:866576",
+    "toronto-address-point:866581",
+    "toronto-address-point:8676778",
+    "toronto-address-point:8676901",
+    "toronto-address-point:8677236",
+    "toronto-address-point:8677262",
+    "toronto-address-point:8680353",
+    "toronto-address-point:868535",
+    "toronto-address-point:868906",
+    "toronto-address-point:869064",
+    "toronto-address-point:870542",
+    "toronto-address-point:871419",
+    "toronto-address-point:8741044",
+    "toronto-address-point:874744",
+    "toronto-address-point:875765",
+    "toronto-address-point:8791075",
+    "toronto-address-point:879379",
+    "toronto-address-point:8855434",
+    "toronto-address-point:887309",
+    "toronto-address-point:8896576",
+    "toronto-address-point:8985713",
+    "toronto-address-point:9011164",
+    "toronto-address-point:9178006",
+    "toronto-address-point:9217083",
+    "toronto-address-point:9278754",
+    "toronto-address-point:9340479",
+    "toronto-address-point:9344875",
+    "toronto-address-point:9345075",
+    "toronto-address-point:9392935",
+    "toronto-address-point:9445900",
+    "toronto-address-point:9445937",
+    "toronto-address-point:9467497",
+    "toronto-address-point:9531492",
+    "toronto-address-point:9655400",
+    "toronto-address-point:9667341",
+    "toronto-address-point:9694440",
+    "toronto-address-point:9780648",
+    "toronto-address-point:9796757",
+    "toronto-address-point:987876",
+    "toronto-address-point:988327",
+    "toronto-address-point:988910",
+    "toronto-address-point:9909785",
+    "toronto-address-point:992851",
+    "toronto-address-point:9980224"
+  ]
+}

@@ -48,6 +48,12 @@ def stable_source_record_id(source: str, record: dict[str, Any]) -> str:
         if resource_id and row_id:
             return f"{source}:resource:{resource_id}:id:{row_id}"
 
+    if source in {"toronto_building_permits_active_targeted", "toronto_building_permits_cleared_targeted_since_2017"}:
+        permit_num = clean(record.get("PERMIT_NUM"))
+        revision_num = clean(record.get("REVISION_NUM")) or "00"
+        if permit_num:
+            return f"{source}:id:{permit_num}:revision:{revision_num}"
+
     for key in ("_id", "OBJECTID", "id", "APPLICATION_NUMBER", "FOLDERRSN", "RSN", "document_number", "noticeId"):
         value = clean(record.get(key))
         if value:

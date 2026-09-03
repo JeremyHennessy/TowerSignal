@@ -26,6 +26,8 @@ OFFICIAL_DATASET_URLS = {
     "tobids_awarded_contracts_exact_document_address_prior_poc": "https://open.toronto.ca/dataset/tobids-awarded-contracts/",
     "toronto_aic_applications": "https://www.toronto.ca/city-government/planning-development/application-details/",
     "toronto_highrise_residential_health_hazards": "https://open.toronto.ca/dataset/residential-health-hazards/",
+    "toronto_building_permits_active_targeted": "https://open.toronto.ca/dataset/building-permits-active-permits/",
+    "toronto_building_permits_cleared_targeted_since_2017": "https://open.toronto.ca/dataset/building-permits-cleared-permits/",
     "toronto_public_notices_exact_prior_poc": "https://open.toronto.ca/dataset/public-notices/",
 }
 
@@ -128,6 +130,8 @@ def load_source_rows(root: Path, load_json: Any) -> dict[str, list[dict[str, Any
         "tobids_awarded_contracts_exact_document_address_prior_poc": warehouse / "open_licensed/tobids_awarded_contracts.json",
         "toronto_aic_applications": market / "open_licensed/toronto_aic_applications.json",
         "toronto_highrise_residential_health_hazards": market / "open_licensed/toronto_highrise_residential_health_hazards.json",
+        "toronto_building_permits_active_targeted": warehouse / "open_licensed/toronto_building_permits_active_targeted.json",
+        "toronto_building_permits_cleared_targeted_since_2017": warehouse / "open_licensed/toronto_building_permits_cleared_targeted_since_2017.json",
         "toronto_public_notices_exact_prior_poc": warehouse / "open_licensed/toronto_public_notices.json",
     }
     loaded = {key: _rows(load_json(path)) for key, path in files.items()}
@@ -226,6 +230,24 @@ def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict
         result.update(record_title=text(row.get("Document Number")), record_date=date_value(row.get("Award Authority Obtained Date")), record_status="Awarded", record_details=details(
             ("Successful supplier", row.get("Successful Supplier")), ("Award", row.get("Award")),
             ("Division", row.get("Division")), ("Scope", row.get("Solicitation Document Description")),
+        ))
+    elif key in {"toronto_building_permits_active_targeted", "toronto_building_permits_cleared_targeted_since_2017"}:
+        permit_num = text(row.get("PERMIT_NUM"), 100)
+        revision_num = text(row.get("REVISION_NUM"), 40) or "00"
+        record_title = f"{permit_num} · revision {revision_num}" if permit_num else text(row.get("_towersignal_permit_identity"))
+        is_cleared = key == "toronto_building_permits_cleared_targeted_since_2017"
+        record_date = date_value((row.get("COMPLETED_DATE") if is_cleared else row.get("ISSUED_DATE")) or row.get("ISSUED_DATE") or row.get("APPLICATION_DATE"))
+        signals = ", ".join(str(value).replace("_", " ") for value in (row.get("_towersignal_signals") or []))
+        lifecycle_reasons = ", ".join(str(value).replace("_", " ") for value in (row.get("_towersignal_cooling_tower_lifecycle_reasons") or []))
+        result.update(record_title=record_title, record_date=record_date, record_status=text(row.get("STATUS")), record_details=details(
+            ("Source lifecycle", row.get("_towersignal_source_lifecycle")), ("Permit type", row.get("PERMIT_TYPE")),
+            ("Structure type", row.get("STRUCTURE_TYPE")), ("Work", row.get("WORK")),
+            ("Description", row.get("DESCRIPTION")), ("Estimated construction cost", row.get("EST_CONST_COST")),
+            ("Current use", row.get("CURRENT_USE")), ("Proposed use", row.get("PROPOSED_USE")),
+            ("Builder name (publisher field)", row.get("BUILDER_NAME")), ("Mechanical signals", signals),
+            ("Cooling tower lifecycle", row.get("_towersignal_cooling_tower_lifecycle")),
+            ("Cooling tower lifecycle reasons", lifecycle_reasons),
+            ("Cooling tower current interpretation", row.get("_towersignal_cooling_tower_current_interpretation")),
         ))
     elif key == "toronto_public_notices_exact_prior_poc":
         notice_id = row.get("noticeId")

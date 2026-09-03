@@ -1,13 +1,13 @@
 {
   "schema_version": "toronto-source-action-qa-1.0",
-  "generated_at": "2026-09-03T18:34:01.713020Z",
+  "generated_at": "2026-09-03T20:39:01.024868Z",
   "status": "PASSED",
   "counts": {
-    "source_families": 14,
-    "unique_dataset_actions": 13,
+    "source_families": 16,
+    "unique_dataset_actions": 15,
     "unique_record_actions": 14238,
     "checked_record_action_sample": 10,
-    "checked_unique_urls": 23,
+    "checked_unique_urls": 25,
     "failures": 0
   },
   "sources": {
@@ -266,6 +266,40 @@
         "source_record_id": "toronto_aic_applications:14202:14201"
       },
       "fallback_message_required": false
+    },
+    "toronto_building_permits_active_targeted": {
+      "link_level": "DATASET_FALLBACK",
+      "dataset_action": {
+        "url": "https://open.toronto.ca/dataset/building-permits-active-permits/",
+        "http_status": 200,
+        "status": "REACHABLE"
+      },
+      "record_actions": [],
+      "available_unique_record_actions": 0,
+      "checked_record_action_sample": 0,
+      "representative_source_record": {
+        "property_id": "toronto-address-point:10663925",
+        "display_address": "1 Austin Ter",
+        "source_record_id": "toronto_building_permits_active_targeted:id:16 114715 BLD:revision:01"
+      },
+      "fallback_message_required": true
+    },
+    "toronto_building_permits_cleared_targeted_since_2017": {
+      "link_level": "DATASET_FALLBACK",
+      "dataset_action": {
+        "url": "https://open.toronto.ca/dataset/building-permits-cleared-permits/",
+        "http_status": 200,
+        "status": "REACHABLE"
+      },
+      "record_actions": [],
+      "available_unique_record_actions": 0,
+      "checked_record_action_sample": 0,
+      "representative_source_record": {
+        "property_id": "toronto-address-point:3842043",
+        "display_address": "1 Brimley Rd",
+        "source_record_id": "toronto_building_permits_cleared_targeted_since_2017:id:17 118456 FSU:revision:00"
+      },
+      "fallback_message_required": true
     },
     "toronto_highrise_residential_health_hazards": {
       "link_level": "DATASET_FALLBACK",

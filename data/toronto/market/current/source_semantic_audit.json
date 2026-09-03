@@ -1,13 +1,13 @@
 {
   "schema_version": "toronto-source-semantic-audit-1.0",
-  "generated_at": "2026-09-03T18:47:09.725655Z",
+  "generated_at": "2026-09-03T20:55:39.678992Z",
   "status": "PASSED_WITH_CARDINALITY_REVIEW",
   "counts": {
-    "source_links": 38768,
-    "source_families": 14,
-    "canonical_properties": 13065,
-    "unique_property_source_record_identities": 38768,
-    "unique_source_records_across_families": 37080,
+    "source_links": 40012,
+    "source_families": 16,
+    "canonical_properties": 13371,
+    "unique_property_source_record_identities": 40012,
+    "unique_source_records_across_families": 38324,
     "record_specific_actions": 14238
   },
   "findings": {
@@ -167,6 +167,30 @@
       "multi_property_source_record_count": 0,
       "record_action_count": 11218,
       "dataset_url": "https://www.toronto.ca/city-government/planning-development/application-details/"
+    },
+    "toronto_building_permits_active_targeted": {
+      "links": 540,
+      "unique_source_records": 540,
+      "unique_properties": 327,
+      "coverage_expected_properties": 327,
+      "coverage_property_count_matches": true,
+      "max_links_per_property": 22,
+      "max_properties_per_source_record": 1,
+      "multi_property_source_record_count": 0,
+      "record_action_count": 0,
+      "dataset_url": "https://open.toronto.ca/dataset/building-permits-active-permits/"
+    },
+    "toronto_building_permits_cleared_targeted_since_2017": {
+      "links": 704,
+      "unique_source_records": 704,
+      "unique_properties": 429,
+      "coverage_expected_properties": 429,
+      "coverage_property_count_matches": true,
+      "max_links_per_property": 16,
+      "max_properties_per_source_record": 1,
+      "multi_property_source_record_count": 0,
+      "record_action_count": 0,
+      "dataset_url": "https://open.toronto.ca/dataset/building-permits-cleared-permits/"
     },
     "toronto_highrise_residential_health_hazards": {
       "links": 1017,

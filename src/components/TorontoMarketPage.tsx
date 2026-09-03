@@ -16,6 +16,8 @@ const sourceLabels: Record<string, string> = {
   chemtrac_2024: 'ChemTRAC 2024',
   toronto_aic_applications: 'Toronto AIC applications',
   toronto_highrise_residential_health_hazards: 'Highrise residential health hazards',
+  toronto_building_permits_active_targeted: 'Toronto active building permits',
+  toronto_building_permits_cleared_targeted_since_2017: 'Toronto cleared building permits',
   ontario_environmental_compliance_reports: 'Ontario environmental compliance',
   ontario_bps_energy_2024: 'Ontario BPS energy 2024',
   tobids_awarded_contracts: 'TOBids awarded contracts',

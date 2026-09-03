@@ -248,8 +248,8 @@ def enrich_row(row: dict[str, Any], source_lifecycle: str, root: dict[str, Any] 
         "_towersignal_root_address_point_id": root.get("address_point_id") if root else None,
         "_towersignal_root_address_id": root.get("address_id") if root else None,
         "_towersignal_root_address": root.get("address") if root else None,
-        "_towersignal_root_longitude": root.get("lon") if root else None,
-        "_towersignal_root_latitude": root.get("lat") if root else None,
+        "_towersignal_root_longitude": root.get("longitude") if root else None,
+        "_towersignal_root_latitude": root.get("latitude") if root else None,
         "_towersignal_root_status": root.get("status") if root else None,
     })
     if "cooling_tower" in signals:

@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-entity-graph-1.0",
-  "generated_at": "2026-09-03T18:27:03.006136Z",
+  "generated_at": "2026-09-03T20:29:36.617997Z",
   "relationship_contract": {
     "ownership": "Only explicit OWNER-labelled source text may create OWNER_OF; manager/operator/reporter/supplier are never relabelled owner.",
     "aic": "AIC text-pattern role edges are review-required and are not treated as verified legal relationships until reviewed.",
@@ -51,11 +51,29 @@
     "toronto_aic_supporting_documents": {
       "role_candidates_seen": 0,
       "deduplicated_role_edges_added": 0
+    },
+    "toronto_building_permits_active_targeted": {
+      "source_rows": 573,
+      "linked_rows": 540,
+      "linked_properties": 327,
+      "new_properties": 131,
+      "unresolved_rows_not_forced": 33,
+      "role_limitation": "Permit source adds property/source evidence only. BUILDER_NAME is not promoted to an organization relationship.",
+      "tower_status_limitation": "Permit source does not automatically change tower_evidence_status in this apply."
+    },
+    "toronto_building_permits_cleared_targeted_since_2017": {
+      "source_rows": 721,
+      "linked_rows": 704,
+      "linked_properties": 429,
+      "new_properties": 193,
+      "unresolved_rows_not_forced": 17,
+      "role_limitation": "Permit source adds property/source evidence only. BUILDER_NAME is not promoted to an organization relationship.",
+      "tower_status_limitation": "Permit source does not automatically change tower_evidence_status in this apply."
     }
   },
   "counts": {
-    "nodes": 17175,
-    "property_nodes": 13065,
+    "nodes": 17481,
+    "property_nodes": 13371,
     "organization_nodes": 4110,
     "edges": 6343,
     "relationships": {
@@ -99024,6 +99042,1842 @@
       "node_id": "org:0babf042b89e7cad8d22",
       "node_type": "ORGANIZATION",
       "name": "KUDLAK-BAIRD 1982 LIMITED"
+    },
+    {
+      "node_id": "toronto-address-point:13977429",
+      "node_type": "PROPERTY",
+      "address": "259 Jane St",
+      "address_point_id": "13977429"
+    },
+    {
+      "node_id": "toronto-address-point:14200140",
+      "node_type": "PROPERTY",
+      "address": "12 Bright St",
+      "address_point_id": "14200140"
+    },
+    {
+      "node_id": "toronto-address-point:803650",
+      "node_type": "PROPERTY",
+      "address": "237 Evelyn Ave",
+      "address_point_id": "803650"
+    },
+    {
+      "node_id": "toronto-address-point:808286",
+      "node_type": "PROPERTY",
+      "address": "160 Gerrard St E",
+      "address_point_id": "808286"
+    },
+    {
+      "node_id": "toronto-address-point:61165",
+      "node_type": "PROPERTY",
+      "address": "5 Glenora Ave",
+      "address_point_id": "61165"
+    },
+    {
+      "node_id": "toronto-address-point:6733591",
+      "node_type": "PROPERTY",
+      "address": "580 Rathburn Rd",
+      "address_point_id": "6733591"
+    },
+    {
+      "node_id": "toronto-address-point:33993",
+      "node_type": "PROPERTY",
+      "address": "44 Sharron Dr",
+      "address_point_id": "33993"
+    },
+    {
+      "node_id": "toronto-address-point:8791075",
+      "node_type": "PROPERTY",
+      "address": "39 Caledonia Rd",
+      "address_point_id": "8791075"
+    },
+    {
+      "node_id": "toronto-address-point:875765",
+      "node_type": "PROPERTY",
+      "address": "16 Sunnybrook Rd",
+      "address_point_id": "875765"
+    },
+    {
+      "node_id": "toronto-address-point:807027",
+      "node_type": "PROPERTY",
+      "address": "250 Gainsborough Rd",
+      "address_point_id": "807027"
+    },
+    {
+      "node_id": "toronto-address-point:1027151",
+      "node_type": "PROPERTY",
+      "address": "720 Renforth Dr",
+      "address_point_id": "1027151"
+    },
+    {
+      "node_id": "toronto-address-point:509514",
+      "node_type": "PROPERTY",
+      "address": "20 Dubray Ave",
+      "address_point_id": "509514"
+    },
+    {
+      "node_id": "toronto-address-point:7155041",
+      "node_type": "PROPERTY",
+      "address": "4922 Yonge St",
+      "address_point_id": "7155041"
+    },
+    {
+      "node_id": "toronto-address-point:1027220",
+      "node_type": "PROPERTY",
+      "address": "81 Resources Rd",
+      "address_point_id": "1027220"
+    },
+    {
+      "node_id": "toronto-address-point:811757",
+      "node_type": "PROPERTY",
+      "address": "45 Glen Stewart Cres",
+      "address_point_id": "811757"
+    },
+    {
+      "node_id": "toronto-address-point:14130890",
+      "node_type": "PROPERTY",
+      "address": "381 Front St W",
+      "address_point_id": "14130890"
+    },
+    {
+      "node_id": "toronto-address-point:9344875",
+      "node_type": "PROPERTY",
+      "address": "100 Emmett Ave",
+      "address_point_id": "9344875"
+    },
+    {
+      "node_id": "toronto-address-point:9445900",
+      "node_type": "PROPERTY",
+      "address": "35 Ormskirk Ave",
+      "address_point_id": "9445900"
+    },
+    {
+      "node_id": "toronto-address-point:10985943",
+      "node_type": "PROPERTY",
+      "address": "925 Albion Rd",
+      "address_point_id": "10985943"
+    },
+    {
+      "node_id": "toronto-address-point:853146",
+      "node_type": "PROPERTY",
+      "address": "14 Pembroke St",
+      "address_point_id": "853146"
+    },
+    {
+      "node_id": "toronto-address-point:772683",
+      "node_type": "PROPERTY",
+      "address": "250 Bloor St E",
+      "address_point_id": "772683"
+    },
+    {
+      "node_id": "toronto-address-point:870542",
+      "node_type": "PROPERTY",
+      "address": "1100 Spadina Rd",
+      "address_point_id": "870542"
+    },
+    {
+      "node_id": "toronto-address-point:14198652",
+      "node_type": "PROPERTY",
+      "address": "183 Bathurst St",
+      "address_point_id": "14198652"
+    },
+    {
+      "node_id": "toronto-address-point:5016348",
+      "node_type": "PROPERTY",
+      "address": "21 Trojan Gt",
+      "address_point_id": "5016348"
+    },
+    {
+      "node_id": "toronto-address-point:7994513",
+      "node_type": "PROPERTY",
+      "address": "336 Howland Ave",
+      "address_point_id": "7994513"
+    },
+    {
+      "node_id": "toronto-address-point:14190392",
+      "node_type": "PROPERTY",
+      "address": "14-18 Tandridge Cres",
+      "address_point_id": "14190392"
+    },
+    {
+      "node_id": "toronto-address-point:869064",
+      "node_type": "PROPERTY",
+      "address": "153 Sorauren Ave",
+      "address_point_id": "869064"
+    },
+    {
+      "node_id": "toronto-address-point:1007052",
+      "node_type": "PROPERTY",
+      "address": "76 High St",
+      "address_point_id": "1007052"
+    },
+    {
+      "node_id": "toronto-address-point:7669081",
+      "node_type": "PROPERTY",
+      "address": "24 Graystone Gdns",
+      "address_point_id": "7669081"
+    },
+    {
+      "node_id": "toronto-address-point:14199325",
+      "node_type": "PROPERTY",
+      "address": "330 Keele St",
+      "address_point_id": "14199325"
+    },
+    {
+      "node_id": "toronto-address-point:366471",
+      "node_type": "PROPERTY",
+      "address": "101 Murison Blvd",
+      "address_point_id": "366471"
+    },
+    {
+      "node_id": "toronto-address-point:861339",
+      "node_type": "PROPERTY",
+      "address": "31 Rosedale Rd",
+      "address_point_id": "861339"
+    },
+    {
+      "node_id": "toronto-address-point:8106307",
+      "node_type": "PROPERTY",
+      "address": "22 Dunedin Dr",
+      "address_point_id": "8106307"
+    },
+    {
+      "node_id": "toronto-address-point:820614",
+      "node_type": "PROPERTY",
+      "address": "39 Highcroft Rd",
+      "address_point_id": "820614"
+    },
+    {
+      "node_id": "toronto-address-point:502996",
+      "node_type": "PROPERTY",
+      "address": "116 Cornelius Pkwy",
+      "address_point_id": "502996"
+    },
+    {
+      "node_id": "toronto-address-point:9340479",
+      "node_type": "PROPERTY",
+      "address": "54 Great Oak Dr",
+      "address_point_id": "9340479"
+    },
+    {
+      "node_id": "toronto-address-point:6052171",
+      "node_type": "PROPERTY",
+      "address": "2194 Kipling Ave",
+      "address_point_id": "6052171"
+    },
+    {
+      "node_id": "toronto-address-point:13970076",
+      "node_type": "PROPERTY",
+      "address": "335 Driftwood Ave",
+      "address_point_id": "13970076"
+    },
+    {
+      "node_id": "toronto-address-point:10924027",
+      "node_type": "PROPERTY",
+      "address": "57 Woodside Ave",
+      "address_point_id": "10924027"
+    },
+    {
+      "node_id": "toronto-address-point:3065750",
+      "node_type": "PROPERTY",
+      "address": "70 University Ave",
+      "address_point_id": "3065750"
+    },
+    {
+      "node_id": "toronto-address-point:67883",
+      "node_type": "PROPERTY",
+      "address": "155 Marlee Ave",
+      "address_point_id": "67883"
+    },
+    {
+      "node_id": "toronto-address-point:14190387",
+      "node_type": "PROPERTY",
+      "address": "9-15 Arbor Dell Rd",
+      "address_point_id": "14190387"
+    },
+    {
+      "node_id": "toronto-address-point:565269",
+      "node_type": "PROPERTY",
+      "address": "1121 Steeles Ave W",
+      "address_point_id": "565269"
+    },
+    {
+      "node_id": "toronto-address-point:9445937",
+      "node_type": "PROPERTY",
+      "address": "26 Grenadier Hts",
+      "address_point_id": "9445937"
+    },
+    {
+      "node_id": "toronto-address-point:3829413",
+      "node_type": "PROPERTY",
+      "address": "674 Victoria Park Ave",
+      "address_point_id": "3829413"
+    },
+    {
+      "node_id": "toronto-address-point:4889826",
+      "node_type": "PROPERTY",
+      "address": "46 Modern Rd",
+      "address_point_id": "4889826"
+    },
+    {
+      "node_id": "toronto-address-point:2591629",
+      "node_type": "PROPERTY",
+      "address": "76 Pembroke St",
+      "address_point_id": "2591629"
+    },
+    {
+      "node_id": "toronto-address-point:1027221",
+      "node_type": "PROPERTY",
+      "address": "125 Resources Rd",
+      "address_point_id": "1027221"
+    },
+    {
+      "node_id": "toronto-address-point:7930123",
+      "node_type": "PROPERTY",
+      "address": "82 Spadina Ave",
+      "address_point_id": "7930123"
+    },
+    {
+      "node_id": "toronto-address-point:1012252",
+      "node_type": "PROPERTY",
+      "address": "15 La Rose Ave",
+      "address_point_id": "1012252"
+    },
+    {
+      "node_id": "toronto-address-point:372850",
+      "node_type": "PROPERTY",
+      "address": "85 Pharmacy Ave",
+      "address_point_id": "372850"
+    },
+    {
+      "node_id": "toronto-address-point:834715",
+      "node_type": "PROPERTY",
+      "address": "298 Lonsdale Rd",
+      "address_point_id": "834715"
+    },
+    {
+      "node_id": "toronto-address-point:5674872",
+      "node_type": "PROPERTY",
+      "address": "432 Horner Ave",
+      "address_point_id": "5674872"
+    },
+    {
+      "node_id": "toronto-address-point:8292444",
+      "node_type": "PROPERTY",
+      "address": "67 Mulock Ave",
+      "address_point_id": "8292444"
+    },
+    {
+      "node_id": "toronto-address-point:4023462",
+      "node_type": "PROPERTY",
+      "address": "350 Lonsdale Rd",
+      "address_point_id": "4023462"
+    },
+    {
+      "node_id": "toronto-address-point:30065754",
+      "node_type": "PROPERTY",
+      "address": "325 Indian Line",
+      "address_point_id": "30065754"
+    },
+    {
+      "node_id": "toronto-address-point:16678",
+      "node_type": "PROPERTY",
+      "address": "279 Airdrie Rd",
+      "address_point_id": "16678"
+    },
+    {
+      "node_id": "toronto-address-point:7753962",
+      "node_type": "PROPERTY",
+      "address": "80 Charles St E",
+      "address_point_id": "7753962"
+    },
+    {
+      "node_id": "toronto-address-point:9531492",
+      "node_type": "PROPERTY",
+      "address": "3220 Bayview Ave",
+      "address_point_id": "9531492"
+    },
+    {
+      "node_id": "toronto-address-point:6924848",
+      "node_type": "PROPERTY",
+      "address": "693 Bathurst St",
+      "address_point_id": "6924848"
+    },
+    {
+      "node_id": "toronto-address-point:13969962",
+      "node_type": "PROPERTY",
+      "address": "259 Queens Quay W",
+      "address_point_id": "13969962"
+    },
+    {
+      "node_id": "toronto-address-point:6349937",
+      "node_type": "PROPERTY",
+      "address": "393 University Ave",
+      "address_point_id": "6349937"
+    },
+    {
+      "node_id": "toronto-address-point:7986012",
+      "node_type": "PROPERTY",
+      "address": "371 Sunnyside Ave",
+      "address_point_id": "7986012"
+    },
+    {
+      "node_id": "toronto-address-point:24727",
+      "node_type": "PROPERTY",
+      "address": "7 Glenburn Ave",
+      "address_point_id": "24727"
+    },
+    {
+      "node_id": "toronto-address-point:354403",
+      "node_type": "PROPERTY",
+      "address": "2920 Lawrence Ave E",
+      "address_point_id": "354403"
+    },
+    {
+      "node_id": "toronto-address-point:785502",
+      "node_type": "PROPERTY",
+      "address": "795 College St",
+      "address_point_id": "785502"
+    },
+    {
+      "node_id": "toronto-address-point:14200350",
+      "node_type": "PROPERTY",
+      "address": "83 Christie St",
+      "address_point_id": "14200350"
+    },
+    {
+      "node_id": "toronto-address-point:7632755",
+      "node_type": "PROPERTY",
+      "address": "2 Budgell Ter",
+      "address_point_id": "7632755"
+    },
+    {
+      "node_id": "toronto-address-point:6345348",
+      "node_type": "PROPERTY",
+      "address": "57 Queen's Park Cres E",
+      "address_point_id": "6345348"
+    },
+    {
+      "node_id": "toronto-address-point:30015075",
+      "node_type": "PROPERTY",
+      "address": "123 Whitfield Ave",
+      "address_point_id": "30015075"
+    },
+    {
+      "node_id": "toronto-address-point:2652805",
+      "node_type": "PROPERTY",
+      "address": "3306 Kingston Rd",
+      "address_point_id": "2652805"
+    },
+    {
+      "node_id": "toronto-address-point:11272991",
+      "node_type": "PROPERTY",
+      "address": "1 Queen St E",
+      "address_point_id": "11272991"
+    },
+    {
+      "node_id": "toronto-address-point:10145181",
+      "node_type": "PROPERTY",
+      "address": "20 Beverly Hills Dr",
+      "address_point_id": "10145181"
+    },
+    {
+      "node_id": "toronto-address-point:9694440",
+      "node_type": "PROPERTY",
+      "address": "97 Railside Rd",
+      "address_point_id": "9694440"
+    },
+    {
+      "node_id": "toronto-address-point:30036199",
+      "node_type": "PROPERTY",
+      "address": "461 Adelaide St W",
+      "address_point_id": "30036199"
+    },
+    {
+      "node_id": "toronto-address-point:7553379",
+      "node_type": "PROPERTY",
+      "address": "7 Fraser Ave",
+      "address_point_id": "7553379"
+    },
+    {
+      "node_id": "toronto-address-point:354399",
+      "node_type": "PROPERTY",
+      "address": "2871 Lawrence Ave E",
+      "address_point_id": "354399"
+    },
+    {
+      "node_id": "toronto-address-point:379397",
+      "node_type": "PROPERTY",
+      "address": "34 Robertsfield Cres",
+      "address_point_id": "379397"
+    },
+    {
+      "node_id": "toronto-address-point:20236423",
+      "node_type": "PROPERTY",
+      "address": "18 Brownlow Ave",
+      "address_point_id": "20236423"
+    },
+    {
+      "node_id": "toronto-address-point:304933",
+      "node_type": "PROPERTY",
+      "address": "149 Bathgate Dr",
+      "address_point_id": "304933"
+    },
+    {
+      "node_id": "toronto-address-point:9178006",
+      "node_type": "PROPERTY",
+      "address": "15 Jamestown Cres",
+      "address_point_id": "9178006"
+    },
+    {
+      "node_id": "toronto-address-point:868535",
+      "node_type": "PROPERTY",
+      "address": "97 Simpson Ave",
+      "address_point_id": "868535"
+    },
+    {
+      "node_id": "toronto-address-point:8106296",
+      "node_type": "PROPERTY",
+      "address": "53 Dunedin Dr",
+      "address_point_id": "8106296"
+    },
+    {
+      "node_id": "toronto-address-point:6522577",
+      "node_type": "PROPERTY",
+      "address": "675 Ontario St",
+      "address_point_id": "6522577"
+    },
+    {
+      "node_id": "toronto-address-point:14190386",
+      "node_type": "PROPERTY",
+      "address": "1-8 Arbor Dell Rd",
+      "address_point_id": "14190386"
+    },
+    {
+      "node_id": "toronto-address-point:8392356",
+      "node_type": "PROPERTY",
+      "address": "51 Larchmount Ave",
+      "address_point_id": "8392356"
+    },
+    {
+      "node_id": "toronto-address-point:6039420",
+      "node_type": "PROPERTY",
+      "address": "3757 Bathurst St",
+      "address_point_id": "6039420"
+    },
+    {
+      "node_id": "toronto-address-point:10800655",
+      "node_type": "PROPERTY",
+      "address": "204 Howard Park Ave",
+      "address_point_id": "10800655"
+    },
+    {
+      "node_id": "toronto-address-point:307506",
+      "node_type": "PROPERTY",
+      "address": "146 Bertrand Ave",
+      "address_point_id": "307506"
+    },
+    {
+      "node_id": "toronto-address-point:14617899",
+      "node_type": "PROPERTY",
+      "address": "2191 Yonge St",
+      "address_point_id": "14617899"
+    },
+    {
+      "node_id": "toronto-address-point:803200",
+      "node_type": "PROPERTY",
+      "address": "543 Euclid Ave",
+      "address_point_id": "803200"
+    },
+    {
+      "node_id": "toronto-address-point:10513559",
+      "node_type": "PROPERTY",
+      "address": "65 Tromley Dr",
+      "address_point_id": "10513559"
+    },
+    {
+      "node_id": "toronto-address-point:30017988",
+      "node_type": "PROPERTY",
+      "address": "165 Legion Rd N",
+      "address_point_id": "30017988"
+    },
+    {
+      "node_id": "toronto-address-point:1037664",
+      "node_type": "PROPERTY",
+      "address": "315 The Westway",
+      "address_point_id": "1037664"
+    },
+    {
+      "node_id": "toronto-address-point:10223466",
+      "node_type": "PROPERTY",
+      "address": "401 Queens Quay W",
+      "address_point_id": "10223466"
+    },
+    {
+      "node_id": "toronto-address-point:9796757",
+      "node_type": "PROPERTY",
+      "address": "184 Galloway Rd",
+      "address_point_id": "9796757"
+    },
+    {
+      "node_id": "toronto-address-point:8676778",
+      "node_type": "PROPERTY",
+      "address": "11 King St W",
+      "address_point_id": "8676778"
+    },
+    {
+      "node_id": "toronto-address-point:7930462",
+      "node_type": "PROPERTY",
+      "address": "217 Richmond St W",
+      "address_point_id": "7930462"
+    },
+    {
+      "node_id": "toronto-address-point:30074744",
+      "node_type": "PROPERTY",
+      "address": "33 Shore Breeze Dr",
+      "address_point_id": "30074744"
+    },
+    {
+      "node_id": "toronto-address-point:866581",
+      "node_type": "PROPERTY",
+      "address": "343 Shaw St",
+      "address_point_id": "866581"
+    },
+    {
+      "node_id": "toronto-address-point:20062393",
+      "node_type": "PROPERTY",
+      "address": "21 Grand Magazine St",
+      "address_point_id": "20062393"
+    },
+    {
+      "node_id": "toronto-address-point:874744",
+      "node_type": "PROPERTY",
+      "address": "100 Strathallan Blvd",
+      "address_point_id": "874744"
+    },
+    {
+      "node_id": "toronto-address-point:301973",
+      "node_type": "PROPERTY",
+      "address": "12 Andrew Ave",
+      "address_point_id": "301973"
+    },
+    {
+      "node_id": "toronto-address-point:1001674",
+      "node_type": "PROPERTY",
+      "address": "11 Fontenay Crt",
+      "address_point_id": "1001674"
+    },
+    {
+      "node_id": "toronto-address-point:8006985",
+      "node_type": "PROPERTY",
+      "address": "112 Indian Rd",
+      "address_point_id": "8006985"
+    },
+    {
+      "node_id": "toronto-address-point:13410308",
+      "node_type": "PROPERTY",
+      "address": "74 Orchard Park Blvd",
+      "address_point_id": "13410308"
+    },
+    {
+      "node_id": "toronto-address-point:8492324",
+      "node_type": "PROPERTY",
+      "address": "2694 Eglinton Ave W",
+      "address_point_id": "8492324"
+    },
+    {
+      "node_id": "toronto-address-point:770542",
+      "node_type": "PROPERTY",
+      "address": "225 Belsize Dr",
+      "address_point_id": "770542"
+    },
+    {
+      "node_id": "toronto-address-point:813180",
+      "node_type": "PROPERTY",
+      "address": "120 Glenlake Ave",
+      "address_point_id": "813180"
+    },
+    {
+      "node_id": "toronto-address-point:862549",
+      "node_type": "PROPERTY",
+      "address": "46 Rowntree Ave",
+      "address_point_id": "862549"
+    },
+    {
+      "node_id": "toronto-address-point:13970096",
+      "node_type": "PROPERTY",
+      "address": "249 Queens Quay W",
+      "address_point_id": "13970096"
+    },
+    {
+      "node_id": "toronto-address-point:10144702",
+      "node_type": "PROPERTY",
+      "address": "66 Lawrence Ave E",
+      "address_point_id": "10144702"
+    },
+    {
+      "node_id": "toronto-address-point:2920409",
+      "node_type": "PROPERTY",
+      "address": "43 Algoma St",
+      "address_point_id": "2920409"
+    },
+    {
+      "node_id": "toronto-address-point:14238932",
+      "node_type": "PROPERTY",
+      "address": "8 Covington Rd",
+      "address_point_id": "14238932"
+    },
+    {
+      "node_id": "toronto-address-point:9780648",
+      "node_type": "PROPERTY",
+      "address": "122 Margueretta St",
+      "address_point_id": "9780648"
+    },
+    {
+      "node_id": "toronto-address-point:63957",
+      "node_type": "PROPERTY",
+      "address": "168 Humewood Dr",
+      "address_point_id": "63957"
+    },
+    {
+      "node_id": "toronto-address-point:10610788",
+      "node_type": "PROPERTY",
+      "address": "24 Montrose Ave",
+      "address_point_id": "10610788"
+    },
+    {
+      "node_id": "toronto-address-point:8105943",
+      "node_type": "PROPERTY",
+      "address": "17 Ursula Franklin St",
+      "address_point_id": "8105943"
+    },
+    {
+      "node_id": "toronto-address-point:50999",
+      "node_type": "PROPERTY",
+      "address": "246 Atlas Ave",
+      "address_point_id": "50999"
+    },
+    {
+      "node_id": "toronto-address-point:71617",
+      "node_type": "PROPERTY",
+      "address": "228 Robina Ave",
+      "address_point_id": "71617"
+    },
+    {
+      "node_id": "toronto-address-point:12789760",
+      "node_type": "PROPERTY",
+      "address": "38 Orfus Rd",
+      "address_point_id": "12789760"
+    },
+    {
+      "node_id": "toronto-address-point:2565760",
+      "node_type": "PROPERTY",
+      "address": "1 Hanson St",
+      "address_point_id": "2565760"
+    },
+    {
+      "node_id": "toronto-address-point:8030476",
+      "node_type": "PROPERTY",
+      "address": "387 Quebec Ave",
+      "address_point_id": "8030476"
+    },
+    {
+      "node_id": "toronto-address-point:10493739",
+      "node_type": "PROPERTY",
+      "address": "39 Ann Arbour Rd",
+      "address_point_id": "10493739"
+    },
+    {
+      "node_id": "toronto-address-point:801600",
+      "node_type": "PROPERTY",
+      "address": "253 Elm Rd",
+      "address_point_id": "801600"
+    },
+    {
+      "node_id": "toronto-address-point:11485094",
+      "node_type": "PROPERTY",
+      "address": "16 Concorde Pl",
+      "address_point_id": "11485094"
+    },
+    {
+      "node_id": "toronto-address-point:9217083",
+      "node_type": "PROPERTY",
+      "address": "90 Belfield Rd",
+      "address_point_id": "9217083"
+    },
+    {
+      "node_id": "toronto-address-point:8677236",
+      "node_type": "PROPERTY",
+      "address": "113 Yonge St",
+      "address_point_id": "8677236"
+    },
+    {
+      "node_id": "toronto-address-point:7273250",
+      "node_type": "PROPERTY",
+      "address": "335 Lonsdale Rd",
+      "address_point_id": "7273250"
+    },
+    {
+      "node_id": "toronto-address-point:773913",
+      "node_type": "PROPERTY",
+      "address": "137 Bond St",
+      "address_point_id": "773913"
+    },
+    {
+      "node_id": "toronto-address-point:3948802",
+      "node_type": "PROPERTY",
+      "address": "299 Queen St W",
+      "address_point_id": "3948802"
+    },
+    {
+      "node_id": "toronto-address-point:7683834",
+      "node_type": "PROPERTY",
+      "address": "216 Carlton St",
+      "address_point_id": "7683834"
+    },
+    {
+      "node_id": "toronto-address-point:8237433",
+      "node_type": "PROPERTY",
+      "address": "2 Wineva Ave",
+      "address_point_id": "8237433"
+    },
+    {
+      "node_id": "toronto-address-point:8237434",
+      "node_type": "PROPERTY",
+      "address": "6 Wineva Ave",
+      "address_point_id": "8237434"
+    },
+    {
+      "node_id": "toronto-address-point:823057",
+      "node_type": "PROPERTY",
+      "address": "1 Hubbard Blvd",
+      "address_point_id": "823057"
+    },
+    {
+      "node_id": "toronto-address-point:823058",
+      "node_type": "PROPERTY",
+      "address": "5 Hubbard Blvd",
+      "address_point_id": "823058"
+    },
+    {
+      "node_id": "toronto-address-point:823059",
+      "node_type": "PROPERTY",
+      "address": "9 Hubbard Blvd",
+      "address_point_id": "823059"
+    },
+    {
+      "node_id": "toronto-address-point:839069",
+      "node_type": "PROPERTY",
+      "address": "129 Marion St",
+      "address_point_id": "839069"
+    },
+    {
+      "node_id": "toronto-address-point:14228998",
+      "node_type": "PROPERTY",
+      "address": "247 Glendonwynne Rd",
+      "address_point_id": "14228998"
+    },
+    {
+      "node_id": "toronto-address-point:7648415",
+      "node_type": "PROPERTY",
+      "address": "27 Bingham Ave",
+      "address_point_id": "7648415"
+    },
+    {
+      "node_id": "toronto-address-point:10800592",
+      "node_type": "PROPERTY",
+      "address": "10 Boustead Ave",
+      "address_point_id": "10800592"
+    },
+    {
+      "node_id": "toronto-address-point:69387",
+      "node_type": "PROPERTY",
+      "address": "1 Northwestern Ave",
+      "address_point_id": "69387"
+    },
+    {
+      "node_id": "toronto-address-point:7846919",
+      "node_type": "PROPERTY",
+      "address": "175 Memorial Park Ave",
+      "address_point_id": "7846919"
+    },
+    {
+      "node_id": "toronto-address-point:8015586",
+      "node_type": "PROPERTY",
+      "address": "7 Southview Ave",
+      "address_point_id": "8015586"
+    },
+    {
+      "node_id": "toronto-address-point:518696",
+      "node_type": "PROPERTY",
+      "address": "3 Gade Dr",
+      "address_point_id": "518696"
+    },
+    {
+      "node_id": "toronto-address-point:10663988",
+      "node_type": "PROPERTY",
+      "address": "30 Government Rd",
+      "address_point_id": "10663988"
+    },
+    {
+      "node_id": "toronto-address-point:8566465",
+      "node_type": "PROPERTY",
+      "address": "25 Maitland St",
+      "address_point_id": "8566465"
+    },
+    {
+      "node_id": "toronto-address-point:9345075",
+      "node_type": "PROPERTY",
+      "address": "140 La Rose Ave",
+      "address_point_id": "9345075"
+    },
+    {
+      "node_id": "toronto-address-point:988327",
+      "node_type": "PROPERTY",
+      "address": "3014-3020 Bloor St W",
+      "address_point_id": "988327"
+    },
+    {
+      "node_id": "toronto-address-point:25042",
+      "node_type": "PROPERTY",
+      "address": "147 Glenvale Blvd",
+      "address_point_id": "25042"
+    },
+    {
+      "node_id": "toronto-address-point:509553",
+      "node_type": "PROPERTY",
+      "address": "12 Duckworth St",
+      "address_point_id": "509553"
+    },
+    {
+      "node_id": "toronto-address-point:4709515",
+      "node_type": "PROPERTY",
+      "address": "225 The Donway W",
+      "address_point_id": "4709515"
+    },
+    {
+      "node_id": "toronto-address-point:14073190",
+      "node_type": "PROPERTY",
+      "address": "1081 Progress Ave",
+      "address_point_id": "14073190"
+    },
+    {
+      "node_id": "toronto-address-point:828221",
+      "node_type": "PROPERTY",
+      "address": "150 King St W",
+      "address_point_id": "828221"
+    },
+    {
+      "node_id": "toronto-address-point:7762664",
+      "node_type": "PROPERTY",
+      "address": "40 College St",
+      "address_point_id": "7762664"
+    },
+    {
+      "node_id": "toronto-address-point:6375122",
+      "node_type": "PROPERTY",
+      "address": "22 Connable Dr",
+      "address_point_id": "6375122"
+    },
+    {
+      "node_id": "toronto-address-point:6375116",
+      "node_type": "PROPERTY",
+      "address": "10 Connable Dr",
+      "address_point_id": "6375116"
+    },
+    {
+      "node_id": "toronto-address-point:507987",
+      "node_type": "PROPERTY",
+      "address": "770 Don Mills Rd",
+      "address_point_id": "507987"
+    },
+    {
+      "node_id": "toronto-address-point:839707",
+      "node_type": "PROPERTY",
+      "address": "700 Markham St",
+      "address_point_id": "839707"
+    },
+    {
+      "node_id": "toronto-address-point:10872692",
+      "node_type": "PROPERTY",
+      "address": "25 Alberta Ave",
+      "address_point_id": "10872692"
+    },
+    {
+      "node_id": "toronto-address-point:9667341",
+      "node_type": "PROPERTY",
+      "address": "57 Redwater Dr",
+      "address_point_id": "9667341"
+    },
+    {
+      "node_id": "toronto-address-point:6814671",
+      "node_type": "PROPERTY",
+      "address": "1755 Lake Shore Blvd W",
+      "address_point_id": "6814671"
+    },
+    {
+      "node_id": "toronto-address-point:8985713",
+      "node_type": "PROPERTY",
+      "address": "4 Gwendolen Cres",
+      "address_point_id": "8985713"
+    },
+    {
+      "node_id": "toronto-address-point:24971",
+      "node_type": "PROPERTY",
+      "address": "71 Glenvale Blvd",
+      "address_point_id": "24971"
+    },
+    {
+      "node_id": "toronto-address-point:3950925",
+      "node_type": "PROPERTY",
+      "address": "427 Craven Rd",
+      "address_point_id": "3950925"
+    },
+    {
+      "node_id": "toronto-address-point:547961",
+      "node_type": "PROPERTY",
+      "address": "98 Otter Cres",
+      "address_point_id": "547961"
+    },
+    {
+      "node_id": "toronto-address-point:7424876",
+      "node_type": "PROPERTY",
+      "address": "73 Birchview Cres",
+      "address_point_id": "7424876"
+    },
+    {
+      "node_id": "toronto-address-point:64864",
+      "node_type": "PROPERTY",
+      "address": "159 Kane Ave",
+      "address_point_id": "64864"
+    },
+    {
+      "node_id": "toronto-address-point:792931",
+      "node_type": "PROPERTY",
+      "address": "168 Deloraine Ave",
+      "address_point_id": "792931"
+    },
+    {
+      "node_id": "toronto-address-point:385409",
+      "node_type": "PROPERTY",
+      "address": "4002 Sheppard Ave E",
+      "address_point_id": "385409"
+    },
+    {
+      "node_id": "toronto-address-point:574324",
+      "node_type": "PROPERTY",
+      "address": "3265 Weston Rd",
+      "address_point_id": "574324"
+    },
+    {
+      "node_id": "toronto-address-point:14659988",
+      "node_type": "PROPERTY",
+      "address": "2 Queen St E",
+      "address_point_id": "14659988"
+    },
+    {
+      "node_id": "toronto-address-point:803276",
+      "node_type": "PROPERTY",
+      "address": "661 Euclid Ave",
+      "address_point_id": "803276"
+    },
+    {
+      "node_id": "toronto-address-point:9467497",
+      "node_type": "PROPERTY",
+      "address": "230 Humbercrest Blvd",
+      "address_point_id": "9467497"
+    },
+    {
+      "node_id": "toronto-address-point:9278754",
+      "node_type": "PROPERTY",
+      "address": "1351 Bayview Ave",
+      "address_point_id": "9278754"
+    },
+    {
+      "node_id": "toronto-address-point:10155302",
+      "node_type": "PROPERTY",
+      "address": "147 Heath St E",
+      "address_point_id": "10155302"
+    },
+    {
+      "node_id": "toronto-address-point:7808378",
+      "node_type": "PROPERTY",
+      "address": "17 Coxwell Blvd",
+      "address_point_id": "7808378"
+    },
+    {
+      "node_id": "toronto-address-point:834310",
+      "node_type": "PROPERTY",
+      "address": "782 Logan Ave",
+      "address_point_id": "834310"
+    },
+    {
+      "node_id": "toronto-address-point:10035381",
+      "node_type": "PROPERTY",
+      "address": "40 Clancy Dr",
+      "address_point_id": "10035381"
+    },
+    {
+      "node_id": "toronto-address-point:53099",
+      "node_type": "PROPERTY",
+      "address": "291 Boon Ave",
+      "address_point_id": "53099"
+    },
+    {
+      "node_id": "toronto-address-point:5524295",
+      "node_type": "PROPERTY",
+      "address": "409 Markland Dr",
+      "address_point_id": "5524295"
+    },
+    {
+      "node_id": "toronto-address-point:832465",
+      "node_type": "PROPERTY",
+      "address": "1 Le May Rd",
+      "address_point_id": "832465"
+    },
+    {
+      "node_id": "toronto-address-point:575920",
+      "node_type": "PROPERTY",
+      "address": "285 Wilmington Ave",
+      "address_point_id": "575920"
+    },
+    {
+      "node_id": "toronto-address-point:7955654",
+      "node_type": "PROPERTY",
+      "address": "129 Mount Pleasant Rd",
+      "address_point_id": "7955654"
+    },
+    {
+      "node_id": "toronto-address-point:10598280",
+      "node_type": "PROPERTY",
+      "address": "250 Front St W",
+      "address_point_id": "10598280"
+    },
+    {
+      "node_id": "toronto-address-point:302103",
+      "node_type": "PROPERTY",
+      "address": "5 Anndale Rd",
+      "address_point_id": "302103"
+    },
+    {
+      "node_id": "toronto-address-point:2216338",
+      "node_type": "PROPERTY",
+      "address": "91 Ashburnham Rd",
+      "address_point_id": "2216338"
+    },
+    {
+      "node_id": "toronto-address-point:9980224",
+      "node_type": "PROPERTY",
+      "address": "1912 Queen St E",
+      "address_point_id": "9980224"
+    },
+    {
+      "node_id": "toronto-address-point:11631522",
+      "node_type": "PROPERTY",
+      "address": "25 St Clair Ave E",
+      "address_point_id": "11631522"
+    },
+    {
+      "node_id": "toronto-address-point:1043818",
+      "node_type": "PROPERTY",
+      "address": "30 Westroyal Rd",
+      "address_point_id": "1043818"
+    },
+    {
+      "node_id": "toronto-address-point:10476742",
+      "node_type": "PROPERTY",
+      "address": "573 Queen St W",
+      "address_point_id": "10476742"
+    },
+    {
+      "node_id": "toronto-address-point:14617959",
+      "node_type": "PROPERTY",
+      "address": "3 Navy Wharf Crt",
+      "address_point_id": "14617959"
+    },
+    {
+      "node_id": "toronto-address-point:20040003",
+      "node_type": "PROPERTY",
+      "address": "154 Purcell Sq",
+      "address_point_id": "20040003"
+    },
+    {
+      "node_id": "toronto-address-point:871419",
+      "node_type": "PROPERTY",
+      "address": "95 St Clair Ave W",
+      "address_point_id": "871419"
+    },
+    {
+      "node_id": "toronto-address-point:7862588",
+      "node_type": "PROPERTY",
+      "address": "3800 Yonge St",
+      "address_point_id": "7862588"
+    },
+    {
+      "node_id": "toronto-address-point:75217",
+      "node_type": "PROPERTY",
+      "address": "83 Vaughan Rd",
+      "address_point_id": "75217"
+    },
+    {
+      "node_id": "toronto-address-point:6362872",
+      "node_type": "PROPERTY",
+      "address": "179 Spadina Rd",
+      "address_point_id": "6362872"
+    },
+    {
+      "node_id": "toronto-address-point:7439386",
+      "node_type": "PROPERTY",
+      "address": "12 Queen Elizabeth Blvd",
+      "address_point_id": "7439386"
+    },
+    {
+      "node_id": "toronto-address-point:14245877",
+      "node_type": "PROPERTY",
+      "address": "4331 Lawrence Ave E",
+      "address_point_id": "14245877"
+    },
+    {
+      "node_id": "toronto-address-point:860694",
+      "node_type": "PROPERTY",
+      "address": "20 Ronan Ave",
+      "address_point_id": "860694"
+    },
+    {
+      "node_id": "toronto-address-point:10526991",
+      "node_type": "PROPERTY",
+      "address": "58 Gladstone Ave",
+      "address_point_id": "10526991"
+    },
+    {
+      "node_id": "toronto-address-point:4504004",
+      "node_type": "PROPERTY",
+      "address": "561 Birchmount Rd",
+      "address_point_id": "4504004"
+    },
+    {
+      "node_id": "toronto-address-point:988910",
+      "node_type": "PROPERTY",
+      "address": "7 Botfield Ave",
+      "address_point_id": "988910"
+    },
+    {
+      "node_id": "toronto-address-point:823661",
+      "node_type": "PROPERTY",
+      "address": "619 Huron St",
+      "address_point_id": "823661"
+    },
+    {
+      "node_id": "toronto-address-point:7796279",
+      "node_type": "PROPERTY",
+      "address": "281 Dundas St W",
+      "address_point_id": "7796279"
+    },
+    {
+      "node_id": "toronto-address-point:2904780",
+      "node_type": "PROPERTY",
+      "address": "10 Romana Dr",
+      "address_point_id": "2904780"
+    },
+    {
+      "node_id": "toronto-address-point:826229",
+      "node_type": "PROPERTY",
+      "address": "343 Jones Ave",
+      "address_point_id": "826229"
+    },
+    {
+      "node_id": "toronto-address-point:10476732",
+      "node_type": "PROPERTY",
+      "address": "490 Queen St W",
+      "address_point_id": "10476732"
+    },
+    {
+      "node_id": "toronto-address-point:10663240",
+      "node_type": "PROPERTY",
+      "address": "1 Scarlettwood Crt",
+      "address_point_id": "10663240"
+    },
+    {
+      "node_id": "toronto-address-point:53390",
+      "node_type": "PROPERTY",
+      "address": "59 Boyd Ave",
+      "address_point_id": "53390"
+    },
+    {
+      "node_id": "toronto-address-point:987876",
+      "node_type": "PROPERTY",
+      "address": "12 Birchview Blvd",
+      "address_point_id": "987876"
+    },
+    {
+      "node_id": "toronto-address-point:9392935",
+      "node_type": "PROPERTY",
+      "address": "45 Airdrie Rd",
+      "address_point_id": "9392935"
+    },
+    {
+      "node_id": "toronto-address-point:11415003",
+      "node_type": "PROPERTY",
+      "address": "111 Moatfield Dr",
+      "address_point_id": "11415003"
+    },
+    {
+      "node_id": "toronto-address-point:8676901",
+      "node_type": "PROPERTY",
+      "address": "151 Yonge St",
+      "address_point_id": "8676901"
+    },
+    {
+      "node_id": "toronto-address-point:8741044",
+      "node_type": "PROPERTY",
+      "address": "16 Upton Rd",
+      "address_point_id": "8741044"
+    },
+    {
+      "node_id": "toronto-address-point:7963632",
+      "node_type": "PROPERTY",
+      "address": "372 Armadale Ave",
+      "address_point_id": "7963632"
+    },
+    {
+      "node_id": "toronto-address-point:11129908",
+      "node_type": "PROPERTY",
+      "address": "423 Vaughan Rd",
+      "address_point_id": "11129908"
+    },
+    {
+      "node_id": "toronto-address-point:879379",
+      "node_type": "PROPERTY",
+      "address": "48 Waller Ave",
+      "address_point_id": "879379"
+    },
+    {
+      "node_id": "toronto-address-point:845456",
+      "node_type": "PROPERTY",
+      "address": "61 Muir Ave",
+      "address_point_id": "845456"
+    },
+    {
+      "node_id": "toronto-address-point:823848",
+      "node_type": "PROPERTY",
+      "address": "163 Indian Grv",
+      "address_point_id": "823848"
+    },
+    {
+      "node_id": "toronto-address-point:793806",
+      "node_type": "PROPERTY",
+      "address": "128 Douglas Ave",
+      "address_point_id": "793806"
+    },
+    {
+      "node_id": "toronto-address-point:397600",
+      "node_type": "PROPERTY",
+      "address": "6 White Birch Rd",
+      "address_point_id": "397600"
+    },
+    {
+      "node_id": "toronto-address-point:7974424",
+      "node_type": "PROPERTY",
+      "address": "526 Huron St",
+      "address_point_id": "7974424"
+    },
+    {
+      "node_id": "toronto-address-point:8351169",
+      "node_type": "PROPERTY",
+      "address": "56 The Esplanade",
+      "address_point_id": "8351169"
+    },
+    {
+      "node_id": "toronto-address-point:7963652",
+      "node_type": "PROPERTY",
+      "address": "393 Armadale Ave",
+      "address_point_id": "7963652"
+    },
+    {
+      "node_id": "toronto-address-point:813824",
+      "node_type": "PROPERTY",
+      "address": "119 Glenview Ave",
+      "address_point_id": "813824"
+    },
+    {
+      "node_id": "toronto-address-point:8680353",
+      "node_type": "PROPERTY",
+      "address": "1261 Lansdowne Ave",
+      "address_point_id": "8680353"
+    },
+    {
+      "node_id": "toronto-address-point:9655400",
+      "node_type": "PROPERTY",
+      "address": "1566 Bloor St W",
+      "address_point_id": "9655400"
+    },
+    {
+      "node_id": "toronto-address-point:11048131",
+      "node_type": "PROPERTY",
+      "address": "157 Gamble Ave",
+      "address_point_id": "11048131"
+    },
+    {
+      "node_id": "toronto-address-point:8393591",
+      "node_type": "PROPERTY",
+      "address": "193 Beatrice St",
+      "address_point_id": "8393591"
+    },
+    {
+      "node_id": "toronto-address-point:992851",
+      "node_type": "PROPERTY",
+      "address": "70 Chartwell Rd",
+      "address_point_id": "992851"
+    },
+    {
+      "node_id": "toronto-address-point:55227",
+      "node_type": "PROPERTY",
+      "address": "250 Chambers Ave",
+      "address_point_id": "55227"
+    },
+    {
+      "node_id": "toronto-address-point:23775",
+      "node_type": "PROPERTY",
+      "address": "101 Furnival Rd",
+      "address_point_id": "23775"
+    },
+    {
+      "node_id": "toronto-address-point:4153878",
+      "node_type": "PROPERTY",
+      "address": "15 Sherwood Ave",
+      "address_point_id": "4153878"
+    },
+    {
+      "node_id": "toronto-address-point:11485200",
+      "node_type": "PROPERTY",
+      "address": "5650 Yonge St",
+      "address_point_id": "11485200"
+    },
+    {
+      "node_id": "toronto-address-point:7808522",
+      "node_type": "PROPERTY",
+      "address": "34 Wanless Ave",
+      "address_point_id": "7808522"
+    },
+    {
+      "node_id": "toronto-address-point:832935",
+      "node_type": "PROPERTY",
+      "address": "241 Leslie St",
+      "address_point_id": "832935"
+    },
+    {
+      "node_id": "toronto-address-point:9011164",
+      "node_type": "PROPERTY",
+      "address": "2949 Bathurst St",
+      "address_point_id": "9011164"
+    },
+    {
+      "node_id": "toronto-address-point:8896576",
+      "node_type": "PROPERTY",
+      "address": "108 Parkview Hill Cres",
+      "address_point_id": "8896576"
+    },
+    {
+      "node_id": "toronto-address-point:7754014",
+      "node_type": "PROPERTY",
+      "address": "2 Strathgowan Cres",
+      "address_point_id": "7754014"
+    },
+    {
+      "node_id": "toronto-address-point:322971",
+      "node_type": "PROPERTY",
+      "address": "255 Coronation Dr",
+      "address_point_id": "322971"
+    },
+    {
+      "node_id": "toronto-address-point:7949906",
+      "node_type": "PROPERTY",
+      "address": "312 Douglas Dr",
+      "address_point_id": "7949906"
+    },
+    {
+      "node_id": "toronto-address-point:9909785",
+      "node_type": "PROPERTY",
+      "address": "81 St Mary St",
+      "address_point_id": "9909785"
+    },
+    {
+      "node_id": "toronto-address-point:7955834",
+      "node_type": "PROPERTY",
+      "address": "47 Maple Ave",
+      "address_point_id": "7955834"
+    },
+    {
+      "node_id": "toronto-address-point:30079238",
+      "node_type": "PROPERTY",
+      "address": "1483 Birchmount Rd",
+      "address_point_id": "30079238"
+    },
+    {
+      "node_id": "toronto-address-point:8855434",
+      "node_type": "PROPERTY",
+      "address": "1950 Bathurst St",
+      "address_point_id": "8855434"
+    },
+    {
+      "node_id": "toronto-address-point:833839",
+      "node_type": "PROPERTY",
+      "address": "225 Lisgar St",
+      "address_point_id": "833839"
+    },
+    {
+      "node_id": "toronto-address-point:12387700",
+      "node_type": "PROPERTY",
+      "address": "120 Carlton St",
+      "address_point_id": "12387700"
+    },
+    {
+      "node_id": "toronto-address-point:8351189",
+      "node_type": "PROPERTY",
+      "address": "95 Queens Quay E",
+      "address_point_id": "8351189"
+    },
+    {
+      "node_id": "toronto-address-point:541690",
+      "node_type": "PROPERTY",
+      "address": "57 McKee Ave",
+      "address_point_id": "541690"
+    },
+    {
+      "node_id": "toronto-address-point:856771",
+      "node_type": "PROPERTY",
+      "address": "790 Queen St W",
+      "address_point_id": "856771"
+    },
+    {
+      "node_id": "toronto-address-point:53088",
+      "node_type": "PROPERTY",
+      "address": "276 Boon Ave",
+      "address_point_id": "53088"
+    },
+    {
+      "node_id": "toronto-address-point:30011025",
+      "node_type": "PROPERTY",
+      "address": "275 King St E",
+      "address_point_id": "30011025"
+    },
+    {
+      "node_id": "toronto-address-point:787216",
+      "node_type": "PROPERTY",
+      "address": "47 Cowan Ave",
+      "address_point_id": "787216"
+    },
+    {
+      "node_id": "toronto-address-point:8594394",
+      "node_type": "PROPERTY",
+      "address": "5555 Keele St",
+      "address_point_id": "8594394"
+    },
+    {
+      "node_id": "toronto-address-point:8322683",
+      "node_type": "PROPERTY",
+      "address": "901 Dixon Rd",
+      "address_point_id": "8322683"
+    },
+    {
+      "node_id": "toronto-address-point:7650149",
+      "node_type": "PROPERTY",
+      "address": "216 Seaton St",
+      "address_point_id": "7650149"
+    },
+    {
+      "node_id": "toronto-address-point:325848",
+      "node_type": "PROPERTY",
+      "address": "1454 Danforth Rd",
+      "address_point_id": "325848"
+    },
+    {
+      "node_id": "toronto-address-point:7576446",
+      "node_type": "PROPERTY",
+      "address": "315 Euclid Ave",
+      "address_point_id": "7576446"
+    },
+    {
+      "node_id": "toronto-address-point:803398",
+      "node_type": "PROPERTY",
+      "address": "805 Euclid Ave",
+      "address_point_id": "803398"
+    },
+    {
+      "node_id": "toronto-address-point:6387861",
+      "node_type": "PROPERTY",
+      "address": "951 Carlaw Ave",
+      "address_point_id": "6387861"
+    },
+    {
+      "node_id": "toronto-address-point:5945239",
+      "node_type": "PROPERTY",
+      "address": "197 Osler St",
+      "address_point_id": "5945239"
+    },
+    {
+      "node_id": "toronto-address-point:8168665",
+      "node_type": "PROPERTY",
+      "address": "501 Eglinton Ave W",
+      "address_point_id": "8168665"
+    },
+    {
+      "node_id": "toronto-address-point:52007",
+      "node_type": "PROPERTY",
+      "address": "77 Belgravia Ave",
+      "address_point_id": "52007"
+    },
+    {
+      "node_id": "toronto-address-point:8344716",
+      "node_type": "PROPERTY",
+      "address": "123 Chaplin Cres",
+      "address_point_id": "8344716"
+    },
+    {
+      "node_id": "toronto-address-point:2893765",
+      "node_type": "PROPERTY",
+      "address": "647 Glencairn Ave",
+      "address_point_id": "2893765"
+    },
+    {
+      "node_id": "toronto-address-point:866576",
+      "node_type": "PROPERTY",
+      "address": "338 Shaw St",
+      "address_point_id": "866576"
+    },
+    {
+      "node_id": "toronto-address-point:785035",
+      "node_type": "PROPERTY",
+      "address": "43 Colgate Ave",
+      "address_point_id": "785035"
+    },
+    {
+      "node_id": "toronto-address-point:30011026",
+      "node_type": "PROPERTY",
+      "address": "138 Princess St",
+      "address_point_id": "30011026"
+    },
+    {
+      "node_id": "toronto-address-point:7973823",
+      "node_type": "PROPERTY",
+      "address": "32 Victoria St",
+      "address_point_id": "7973823"
+    },
+    {
+      "node_id": "toronto-address-point:8677262",
+      "node_type": "PROPERTY",
+      "address": "100 Yonge St",
+      "address_point_id": "8677262"
+    },
+    {
+      "node_id": "toronto-address-point:7973753",
+      "node_type": "PROPERTY",
+      "address": "132 Queens Ave",
+      "address_point_id": "7973753"
+    },
+    {
+      "node_id": "toronto-address-point:7649800",
+      "node_type": "PROPERTY",
+      "address": "310 Dundas St E",
+      "address_point_id": "7649800"
+    },
+    {
+      "node_id": "toronto-address-point:793012",
+      "node_type": "PROPERTY",
+      "address": "316 Deloraine Ave",
+      "address_point_id": "793012"
+    },
+    {
+      "node_id": "toronto-address-point:28192",
+      "node_type": "PROPERTY",
+      "address": "21 Machockie Rd",
+      "address_point_id": "28192"
+    },
+    {
+      "node_id": "toronto-address-point:549302",
+      "node_type": "PROPERTY",
+      "address": "226 Park Home Ave",
+      "address_point_id": "549302"
+    },
+    {
+      "node_id": "toronto-address-point:10430800",
+      "node_type": "PROPERTY",
+      "address": "183 Beech Ave",
+      "address_point_id": "10430800"
+    },
+    {
+      "node_id": "toronto-address-point:887309",
+      "node_type": "PROPERTY",
+      "address": "210 Yarmouth Rd",
+      "address_point_id": "887309"
+    },
+    {
+      "node_id": "toronto-address-point:797489",
+      "node_type": "PROPERTY",
+      "address": "2946 Dundas St W",
+      "address_point_id": "797489"
+    },
+    {
+      "node_id": "toronto-address-point:504810",
+      "node_type": "PROPERTY",
+      "address": "285 Cummer Ave",
+      "address_point_id": "504810"
+    },
+    {
+      "node_id": "toronto-address-point:31225",
+      "node_type": "PROPERTY",
+      "address": "937 Pape Ave",
+      "address_point_id": "31225"
+    },
+    {
+      "node_id": "toronto-address-point:1028097",
+      "node_type": "PROPERTY",
+      "address": "67 Rivercove Dr",
+      "address_point_id": "1028097"
+    },
+    {
+      "node_id": "toronto-address-point:813617",
+      "node_type": "PROPERTY",
+      "address": "138 Glenrose Ave",
+      "address_point_id": "813617"
+    },
+    {
+      "node_id": "toronto-address-point:20034803",
+      "node_type": "PROPERTY",
+      "address": "1695 Queen St E",
+      "address_point_id": "20034803"
+    },
+    {
+      "node_id": "toronto-address-point:11186804",
+      "node_type": "PROPERTY",
+      "address": "62 Parkdale Rd",
+      "address_point_id": "11186804"
+    },
+    {
+      "node_id": "toronto-address-point:818904",
+      "node_type": "PROPERTY",
+      "address": "309 Heath St E",
+      "address_point_id": "818904"
+    },
+    {
+      "node_id": "toronto-address-point:7939938",
+      "node_type": "PROPERTY",
+      "address": "85 Cannon Rd",
+      "address_point_id": "7939938"
+    },
+    {
+      "node_id": "toronto-address-point:8087211",
+      "node_type": "PROPERTY",
+      "address": "330 Bay St",
+      "address_point_id": "8087211"
+    },
+    {
+      "node_id": "toronto-address-point:848192",
+      "node_type": "PROPERTY",
+      "address": "254 Old Orchard Grv",
+      "address_point_id": "848192"
+    },
+    {
+      "node_id": "toronto-address-point:7632663",
+      "node_type": "PROPERTY",
+      "address": "174 Windermere Ave",
+      "address_point_id": "7632663"
+    },
+    {
+      "node_id": "toronto-address-point:7762982",
+      "node_type": "PROPERTY",
+      "address": "58 Bedford Park Ave",
+      "address_point_id": "7762982"
+    },
+    {
+      "node_id": "toronto-address-point:868906",
+      "node_type": "PROPERTY",
+      "address": "57 Somerset Ave",
+      "address_point_id": "868906"
+    },
+    {
+      "node_id": "toronto-address-point:17275",
+      "node_type": "PROPERTY",
+      "address": "57 Barker Ave",
+      "address_point_id": "17275"
+    },
+    {
+      "node_id": "toronto-address-point:64557",
+      "node_type": "PROPERTY",
+      "address": "105 John St",
+      "address_point_id": "64557"
+    },
+    {
+      "node_id": "toronto-address-point:25989",
+      "node_type": "PROPERTY",
+      "address": "444 Heath St E",
+      "address_point_id": "25989"
+    },
+    {
+      "node_id": "toronto-address-point:29007",
+      "node_type": "PROPERTY",
+      "address": "17 Midburn Ave",
+      "address_point_id": "29007"
+    },
+    {
+      "node_id": "toronto-address-point:8106457",
+      "node_type": "PROPERTY",
+      "address": "202 Robert St",
+      "address_point_id": "8106457"
+    },
+    {
+      "node_id": "toronto-address-point:3841953",
+      "node_type": "PROPERTY",
+      "address": "17 Dingwall Ave",
+      "address_point_id": "3841953"
+    },
+    {
+      "node_id": "toronto-address-point:825367",
+      "node_type": "PROPERTY",
+      "address": "79 Jackman Ave",
+      "address_point_id": "825367"
+    },
+    {
+      "node_id": "toronto-address-point:10758852",
+      "node_type": "PROPERTY",
+      "address": "4595 Dundas St W",
+      "address_point_id": "10758852"
+    },
+    {
+      "node_id": "toronto-address-point:10553712",
+      "node_type": "PROPERTY",
+      "address": "634 Runnymede Rd",
+      "address_point_id": "10553712"
+    },
+    {
+      "node_id": "toronto-address-point:3897841",
+      "node_type": "PROPERTY",
+      "address": "90 Orchard Park Blvd",
+      "address_point_id": "3897841"
+    },
+    {
+      "node_id": "toronto-address-point:8392715",
+      "node_type": "PROPERTY",
+      "address": "541 Dovercourt Rd",
+      "address_point_id": "8392715"
+    },
+    {
+      "node_id": "toronto-address-point:8105826",
+      "node_type": "PROPERTY",
+      "address": "124 Baldwin St",
+      "address_point_id": "8105826"
+    },
+    {
+      "node_id": "toronto-address-point:854153",
+      "node_type": "PROPERTY",
+      "address": "71 Pine Crest Rd",
+      "address_point_id": "854153"
+    },
+    {
+      "node_id": "toronto-address-point:7986689",
+      "node_type": "PROPERTY",
+      "address": "142 Evelyn Cres",
+      "address_point_id": "7986689"
     }
   ],
   "edges": [
