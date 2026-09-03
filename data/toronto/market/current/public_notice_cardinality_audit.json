@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-public-notice-cardinality-audit-1.0",
-  "generated_at": "2026-09-03T16:40:40.053137Z",
+  "generated_at": "2026-09-03T18:50:05.883841Z",
   "status": "PASSED",
   "counts": {
     "unique_notice_records": 1127,

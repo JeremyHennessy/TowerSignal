@@ -1,0 +1,168 @@
+{
+  "schema_version": "toronto-tobids-relationship-apply-1.0",
+  "generated_at": "2026-09-03T18:27:03.141683Z",
+  "status": "PASSED",
+  "source_link_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+  "graph_source_key": "tobids_awarded_contracts",
+  "match_contract": "A solicitation row is promotable only when one exact normalized full civic-address phrase maps to one current Toronto Address Point property. Rows matching multiple current properties are withheld.",
+  "relationship_contract": "Successful Supplier creates SUCCESSFUL_BIDDER_AT_PROPERTY only. Mechanical, contractor-specialty, engineering, consulting, operator, and ownership roles are not inferred.",
+  "metrics": {
+    "source_rows": 7670,
+    "rows_with_description": 1521,
+    "exact_rows": 15,
+    "ambiguous_rows_not_forced": 5,
+    "existing_exact_rows": 3,
+    "new_links": 12,
+    "final_source_links": 17,
+    "final_source_properties": 13,
+    "new_relationship_edges": 12,
+    "final_successful_bidder_edges": 17,
+    "final_successful_bidder_properties": 13
+  },
+  "ambiguous_rows": [
+    {
+      "source_row_index": 6955,
+      "document_number": "5078202940",
+      "successful_supplier": "GOVAN BROWN & ASSOCIATES LTD.",
+      "matched_properties": [
+        "toronto-address-point:14610812",
+        "toronto-address-point:795716"
+      ]
+    },
+    {
+      "source_row_index": 6956,
+      "document_number": "5078202940",
+      "successful_supplier": "1568796 ONTARIO INC, O/A RENOKREW",
+      "matched_properties": [
+        "toronto-address-point:14610812",
+        "toronto-address-point:795716"
+      ]
+    },
+    {
+      "source_row_index": 6957,
+      "document_number": "5078202940",
+      "successful_supplier": "SKYGRID CONSTRUCTION INC.",
+      "matched_properties": [
+        "toronto-address-point:14610812",
+        "toronto-address-point:795716"
+      ]
+    },
+    {
+      "source_row_index": 7375,
+      "document_number": "5237479908",
+      "successful_supplier": "1568796 ONTARIO INC, O/A RENOKREW",
+      "matched_properties": [
+        "toronto-address-point:10635938",
+        "toronto-address-point:54498",
+        "toronto-address-point:561940",
+        "toronto-address-point:576363"
+      ]
+    },
+    {
+      "source_row_index": 7376,
+      "document_number": "5237479908",
+      "successful_supplier": "GOVAN BROWN & ASSOCIATES LIMITED",
+      "matched_properties": [
+        "toronto-address-point:10635938",
+        "toronto-address-point:54498",
+        "toronto-address-point:561940",
+        "toronto-address-point:576363"
+      ]
+    }
+  ],
+  "new_relationships": [
+    {
+      "source_row_index": 6,
+      "property_id": "toronto-address-point:337821",
+      "display_address": "31 Glen Watford Dr",
+      "successful_supplier": "PETER T. MITCHES & ASSOCIATES LIMITED",
+      "document_number": "4951580548"
+    },
+    {
+      "source_row_index": 5977,
+      "property_id": "toronto-address-point:8327662",
+      "display_address": "120 Disco Rd",
+      "successful_supplier": "LCD Mechanical Inc.",
+      "document_number": "3999125314"
+    },
+    {
+      "source_row_index": 6317,
+      "property_id": "toronto-address-point:2215148",
+      "display_address": "201 Copperfield Rd",
+      "successful_supplier": "Nachurs Alpine Solutions Inc.",
+      "document_number": "3687223488"
+    },
+    {
+      "source_row_index": 6464,
+      "property_id": "toronto-address-point:376306",
+      "display_address": "330 Progress Ave",
+      "successful_supplier": "AG REAT CONSTRUCTION CO LTD",
+      "document_number": "3887078310"
+    },
+    {
+      "source_row_index": 6479,
+      "property_id": "toronto-address-point:14121075",
+      "display_address": "50 Ingram Dr",
+      "successful_supplier": "FOUR SEASONS SITE DEVELOPMENT LTD",
+      "document_number": "4433961094"
+    },
+    {
+      "source_row_index": 6760,
+      "property_id": "toronto-address-point:376306",
+      "display_address": "330 Progress Ave",
+      "successful_supplier": "POMERLEAU INC.",
+      "document_number": "4502108451"
+    },
+    {
+      "source_row_index": 6762,
+      "property_id": "toronto-address-point:8353663",
+      "display_address": "400 Commissioners St",
+      "successful_supplier": "STRUCT-CON CONSTRUCTION LTD",
+      "document_number": "4619099831"
+    },
+    {
+      "source_row_index": 6787,
+      "property_id": "toronto-address-point:825934",
+      "display_address": "55 John St",
+      "successful_supplier": "ROSSCLAIR CONTRACTORS INC",
+      "document_number": "4630461632"
+    },
+    {
+      "source_row_index": 6887,
+      "property_id": "toronto-address-point:8648700",
+      "display_address": "2299 Dundas St W",
+      "successful_supplier": "ROSSCLAIR CONTRACTORS INC",
+      "document_number": "4146032905"
+    },
+    {
+      "source_row_index": 7075,
+      "property_id": "toronto-address-point:825934",
+      "display_address": "55 John St",
+      "successful_supplier": "RITESTART LIMITED",
+      "document_number": "4685977601"
+    },
+    {
+      "source_row_index": 7167,
+      "property_id": "toronto-address-point:872957",
+      "display_address": "14 St Clements Ave",
+      "successful_supplier": "PEGAH CONSTRUCTION LTD",
+      "document_number": "4790896092"
+    },
+    {
+      "source_row_index": 7390,
+      "property_id": "toronto-address-point:14605377",
+      "display_address": "35 Vanley Cres",
+      "successful_supplier": "KUDLAK-BAIRD 1982 LIMITED",
+      "document_number": "4890584788"
+    }
+  ],
+  "graph_chain_coverage": {
+    "properties_with_owner": 2,
+    "properties_with_property_manager": 2603,
+    "properties_with_engineer_or_consultant": 0,
+    "properties_with_contractor_or_successful_bidder": 13,
+    "properties_with_facility_operator_or_reporter": 275,
+    "properties_with_chemtrac_reporting_facility": 1954,
+    "properties_with_licence_holder": 88
+  }
+}

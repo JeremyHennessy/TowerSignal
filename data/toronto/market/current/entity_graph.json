@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-entity-graph-1.0",
-  "generated_at": "2026-09-03T16:24:20.788515Z",
+  "generated_at": "2026-09-03T18:27:03.006136Z",
   "relationship_contract": {
     "ownership": "Only explicit OWNER-labelled source text may create OWNER_OF; manager/operator/reporter/supplier are never relabelled owner.",
     "aic": "AIC text-pattern role edges are review-required and are not treated as verified legal relationships until reviewed.",
@@ -41,8 +41,12 @@
       "invalid_source_row_indices": 0
     },
     "tobids_awarded_contracts": {
-      "deterministic_property_award_rows": 5,
-      "scope_note": "Uses previously persisted exact POC property/document matches; does not infer an address from arbitrary award text in this pass."
+      "source_rows": 7670,
+      "rows_with_solicitation_description": 1521,
+      "exact_single_current_property_rows": 15,
+      "ambiguous_multi_property_rows_not_forced": 5,
+      "new_citywide_exact_property_supplier_pairs": 12,
+      "role_limitation": "Successful Supplier is retained only as SUCCESSFUL_BIDDER_AT_PROPERTY. No contractor specialty, engineer, consultant, operator, or ownership role is inferred."
     },
     "toronto_aic_supporting_documents": {
       "role_candidates_seen": 0,
@@ -50,17 +54,17 @@
     }
   },
   "counts": {
-    "nodes": 17164,
+    "nodes": 17175,
     "property_nodes": 13065,
-    "organization_nodes": 4099,
-    "edges": 6331,
+    "organization_nodes": 4110,
+    "edges": 6343,
     "relationships": {
       "CHEMTRAC_REPORTING_FACILITY_AT": 2265,
       "FACILITY_OPERATOR_OR_REPORTER_AT": 355,
       "LICENCE_HOLDER_AT_PROPERTY": 1092,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2612,
-      "SUCCESSFUL_BIDDER_AT_PROPERTY": 5
+      "SUCCESSFUL_BIDDER_AT_PROPERTY": 17
     },
     "properties_by_relationship": {
       "CHEMTRAC_REPORTING_FACILITY_AT": 1954,
@@ -68,13 +72,13 @@
       "LICENCE_HOLDER_AT_PROPERTY": 88,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2603,
-      "SUCCESSFUL_BIDDER_AT_PROPERTY": 3
+      "SUCCESSFUL_BIDDER_AT_PROPERTY": 13
     },
     "chain_coverage": {
       "properties_with_owner": 2,
       "properties_with_property_manager": 2603,
       "properties_with_engineer_or_consultant": 0,
-      "properties_with_contractor_or_successful_bidder": 3,
+      "properties_with_contractor_or_successful_bidder": 13,
       "properties_with_facility_operator_or_reporter": 275,
       "properties_with_chemtrac_reporting_facility": 1954,
       "properties_with_licence_holder": 88
@@ -98965,6 +98969,61 @@
       "node_id": "org:27f7cb5c55a9c60b93f9",
       "node_type": "ORGANIZATION",
       "name": "University of Toronto at Scarborough"
+    },
+    {
+      "node_id": "org:9c1673670e9218f497fe",
+      "node_type": "ORGANIZATION",
+      "name": "PETER T. MITCHES & ASSOCIATES LIMITED"
+    },
+    {
+      "node_id": "org:409b5bc9740d3d23472c",
+      "node_type": "ORGANIZATION",
+      "name": "LCD Mechanical Inc."
+    },
+    {
+      "node_id": "org:b82196dc3dc8d28f0012",
+      "node_type": "ORGANIZATION",
+      "name": "Nachurs Alpine Solutions Inc."
+    },
+    {
+      "node_id": "org:f3711e612a8b19d780fa",
+      "node_type": "ORGANIZATION",
+      "name": "AG REAT CONSTRUCTION CO LTD"
+    },
+    {
+      "node_id": "org:400cb08c8fd038b81038",
+      "node_type": "ORGANIZATION",
+      "name": "FOUR SEASONS SITE DEVELOPMENT LTD"
+    },
+    {
+      "node_id": "org:a7368fe6bddeaf03f7ae",
+      "node_type": "ORGANIZATION",
+      "name": "POMERLEAU INC."
+    },
+    {
+      "node_id": "org:d7d6fecc2bc59621efc0",
+      "node_type": "ORGANIZATION",
+      "name": "STRUCT-CON CONSTRUCTION LTD"
+    },
+    {
+      "node_id": "org:31a40e61cf08f7a7cb8f",
+      "node_type": "ORGANIZATION",
+      "name": "ROSSCLAIR CONTRACTORS INC"
+    },
+    {
+      "node_id": "org:359459bbd10417a4ea25",
+      "node_type": "ORGANIZATION",
+      "name": "RITESTART LIMITED"
+    },
+    {
+      "node_id": "org:998a85800276846a33aa",
+      "node_type": "ORGANIZATION",
+      "name": "PEGAH CONSTRUCTION LTD"
+    },
+    {
+      "node_id": "org:0babf042b89e7cad8d22",
+      "node_type": "ORGANIZATION",
+      "name": "KUDLAK-BAIRD 1982 LIMITED"
     }
   ],
   "edges": [
@@ -210653,6 +210712,210 @@
       "evidence": {
         "property_name": "St. Lawrence Market North [NEW]",
         "source_address": "92 Front St E."
+      }
+    },
+    {
+      "edge_id": "edge:ba9dfb0ff51d8740fab7",
+      "from_node": "org:9c1673670e9218f497fe",
+      "to_node": "toronto-address-point:337821",
+      "property_id": "toronto-address-point:337821",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4951580548",
+        "award_date": "2025-08-20",
+        "award": "402500",
+        "source_row_index": 6,
+        "source_address": "31 Glen Watford Dr"
+      }
+    },
+    {
+      "edge_id": "edge:dfe6d9bbdb8f279e4488",
+      "from_node": "org:409b5bc9740d3d23472c",
+      "to_node": "toronto-address-point:8327662",
+      "property_id": "toronto-address-point:8327662",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "3999125314",
+        "award_date": "2023-09-20",
+        "award": "717424.96",
+        "source_row_index": 5977,
+        "source_address": "120 Disco Rd"
+      }
+    },
+    {
+      "edge_id": "edge:3e3b336bc1eb95fc10f7",
+      "from_node": "org:b82196dc3dc8d28f0012",
+      "to_node": "toronto-address-point:2215148",
+      "property_id": "toronto-address-point:2215148",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "3687223488",
+        "award_date": "2022-12-23",
+        "award": "639700.00",
+        "source_row_index": 6317,
+        "source_address": "201 Copperfield Rd"
+      }
+    },
+    {
+      "edge_id": "edge:ff936e09b2892e9a33cd",
+      "from_node": "org:f3711e612a8b19d780fa",
+      "to_node": "toronto-address-point:376306",
+      "property_id": "toronto-address-point:376306",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "3887078310",
+        "award_date": "2023-07-24",
+        "award": "439620.00",
+        "source_row_index": 6464,
+        "source_address": "330 Progress Ave"
+      }
+    },
+    {
+      "edge_id": "edge:122f1443a6e68ec349e0",
+      "from_node": "org:400cb08c8fd038b81038",
+      "to_node": "toronto-address-point:14121075",
+      "property_id": "toronto-address-point:14121075",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4433961094",
+        "award_date": "2024-07-05",
+        "award": "763212",
+        "source_row_index": 6479,
+        "source_address": "50 Ingram Dr"
+      }
+    },
+    {
+      "edge_id": "edge:41670fa125b982e785f2",
+      "from_node": "org:a7368fe6bddeaf03f7ae",
+      "to_node": "toronto-address-point:376306",
+      "property_id": "toronto-address-point:376306",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4502108451",
+        "award_date": "2025-06-06",
+        "award": "96152712.30",
+        "source_row_index": 6760,
+        "source_address": "330 Progress Ave"
+      }
+    },
+    {
+      "edge_id": "edge:6ed1564c86819486bcf6",
+      "from_node": "org:d7d6fecc2bc59621efc0",
+      "to_node": "toronto-address-point:8353663",
+      "property_id": "toronto-address-point:8353663",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4619099831",
+        "award_date": "2024-12-24",
+        "award": "1547133.66",
+        "source_row_index": 6762,
+        "source_address": "400 Commissioners St"
+      }
+    },
+    {
+      "edge_id": "edge:2433f2fa2601cbac4ab7",
+      "from_node": "org:31a40e61cf08f7a7cb8f",
+      "to_node": "toronto-address-point:825934",
+      "property_id": "toronto-address-point:825934",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4630461632",
+        "award_date": "2025-01-30",
+        "award": "1712592.00",
+        "source_row_index": 6787,
+        "source_address": "55 John St"
+      }
+    },
+    {
+      "edge_id": "edge:d260e04f1b5c88f70aaf",
+      "from_node": "org:31a40e61cf08f7a7cb8f",
+      "to_node": "toronto-address-point:8648700",
+      "property_id": "toronto-address-point:8648700",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4146032905",
+        "award_date": "2024-04-03",
+        "award": "15,356,110.92",
+        "source_row_index": 6887,
+        "source_address": "2299 Dundas St W"
+      }
+    },
+    {
+      "edge_id": "edge:17fe80d517346b454aca",
+      "from_node": "org:359459bbd10417a4ea25",
+      "to_node": "toronto-address-point:825934",
+      "property_id": "toronto-address-point:825934",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4685977601",
+        "award_date": "2024-10-22",
+        "award": "6287900.00",
+        "source_row_index": 7075,
+        "source_address": "55 John St"
+      }
+    },
+    {
+      "edge_id": "edge:077fb05e7bb2a1b76b9d",
+      "from_node": "org:998a85800276846a33aa",
+      "to_node": "toronto-address-point:872957",
+      "property_id": "toronto-address-point:872957",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4790896092",
+        "award_date": "2025-02-24",
+        "award": "5474020.73",
+        "source_row_index": 7167,
+        "source_address": "14 St Clements Ave"
+      }
+    },
+    {
+      "edge_id": "edge:83e44e0f7160a2f73aba",
+      "from_node": "org:0babf042b89e7cad8d22",
+      "to_node": "toronto-address-point:14605377",
+      "property_id": "toronto-address-point:14605377",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "4890584788",
+        "award_date": "2025-05-21",
+        "award": "1525570.80",
+        "source_row_index": 7390,
+        "source_address": "35 Vanley Cres"
       }
     }
   ]

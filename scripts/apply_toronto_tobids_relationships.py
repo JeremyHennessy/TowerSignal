@@ -10,7 +10,7 @@ from typing import Any
 
 from toronto_final_identity_cleanup import canonical_address
 from toronto_market_common import clean_text, read_json, utc_now, write_json
-from toronto_source_identity import stable_source_record_id
+from toronto_source_identity import find_source_record, stable_source_record_id
 
 ROOT = Path(__file__).resolve().parents[1]
 MARKET = ROOT / "data/toronto/market/current"
@@ -200,15 +200,18 @@ def main() -> None:
     links_payload = read_json(MARKET / "property_source_links.json") or {}
     links = [item for item in links_payload.get("links", []) if isinstance(item, dict)]
     existing_source_links = [item for item in links if clean_text(item.get("source_key")) == SOURCE_LINK_KEY]
-    existing_identities = {
-        (clean_text(item.get("property_id")), clean_text(item.get("source_record_id")))
-        for item in existing_source_links
-    }
-    existing_row_keys = {
-        (clean_text(item.get("property_id")), item.get("source_row_index"))
-        for item in existing_source_links
-        if isinstance(item.get("source_row_index"), int)
-    }
+    existing_publisher_identities: set[tuple[str, str]] = set()
+    unresolved_legacy_links: list[dict[str, Any]] = []
+    for link in existing_source_links:
+        pid = clean_text(link.get("property_id"))
+        resolved = find_source_record(SOURCE_LINK_KEY, clean_text(link.get("source_record_id")), rows)
+        if not resolved:
+            unresolved_legacy_links.append(link)
+            continue
+        existing_publisher_identities.add((pid, stable_source_record_id(SOURCE_LINK_KEY, resolved)))
+    if unresolved_legacy_links:
+        raise RuntimeError(f"TOBids legacy source links failed publisher-row resolution: {unresolved_legacy_links[:5]}")
+
 
     new_links: list[dict[str, Any]] = []
     existing_exact_rows = 0
@@ -217,13 +220,8 @@ def main() -> None:
         pid = item["property_id"]
         idx = item["source_row_index"]
         source_record_id = stable_source_record_id(SOURCE_LINK_KEY, row)
-        id_key = (pid, source_record_id)
-        row_key = (pid, idx)
-        id_exists = id_key in existing_identities
-        row_exists = row_key in existing_row_keys
-        if id_exists != row_exists:
-            raise RuntimeError(f"TOBids existing provenance mismatch at row {idx}: stable_id={id_exists}, row_index={row_exists}")
-        if id_exists:
+        publisher_key = (pid, source_record_id)
+        if publisher_key in existing_publisher_identities:
             existing_exact_rows += 1
             continue
         new_links.append({

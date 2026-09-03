@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-property-links-1.2",
-  "generated_at": "2026-09-03T16:24:20.433043Z",
+  "generated_at": "2026-09-03T18:27:02.617255Z",
   "join_contract": {
     "basis": "Exact corrected civic-address canonical equality to unique City ADDRESS_POINT_ID property",
     "fuzzy_matching": false,
@@ -8,7 +8,7 @@
   },
   "counts": {
     "canonical_properties": 13065,
-    "total_source_links": 38756,
+    "total_source_links": 38768,
     "properties_with_any_new_link": 12501,
     "source_family_count": 17
   },
@@ -150,11 +150,17 @@
       "identity_limitation": null
     },
     "tobids_awarded_contracts_exact_document_address_prior_poc": {
-      "status": "JOINED_FROM_PREVIOUSLY_VALIDATED_POC_DOCUMENT_MATCHES",
-      "matched_records": 5,
-      "matched_canonical_properties": 3,
+      "status": "JOINED",
+      "matched_records": 17,
+      "matched_canonical_properties": 13,
       "links_added": 5,
-      "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text."
+      "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text.",
+      "source_records": 7670,
+      "records_with_solicitation_description": 1521,
+      "ambiguous_multi_property_rows_not_forced": 5,
+      "ambiguous_property_addresses_not_used": 2,
+      "links_added_in_citywide_exact_description_pass": 12,
+      "role_semantics": "Successful Supplier supports SUCCESSFUL_BIDDER_AT_PROPERTY only. Mechanical, contractor-specialty, engineering, ownership, and consulting roles are not inferred from category or keywords."
     },
     "capital_project_pipeline_exact_document_address_prior_poc": {
       "status": "JOINED_FROM_PREVIOUSLY_VALIDATED_POC_DOCUMENT_MATCHES",
@@ -56880,6 +56886,14 @@
       "source_address": "50 INGRAM DR"
     },
     {
+      "property_id": "toronto-address-point:14121075",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6480",
+      "source_row_index": 6479,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "50 Ingram Dr"
+    },
+    {
       "property_id": "toronto-address-point:14121091",
       "source_key": "chemtrac_history",
       "source_record_id": "chemtrac_history:1292:3739",
@@ -65505,6 +65519,14 @@
       "source_row_index": 1607,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "35 VANLEY CRES"
+    },
+    {
+      "property_id": "toronto-address-point:14605377",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:7391",
+      "source_row_index": 7390,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "35 Vanley Cres"
     },
     {
       "property_id": "toronto-address-point:14606297",
@@ -74592,6 +74614,14 @@
       "source_record_id": "renewable_energy_installations:id:98",
       "source_row_index": 97,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
+      "source_address": "201 Copperfield Rd"
+    },
+    {
+      "property_id": "toronto-address-point:2215148",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6318",
+      "source_row_index": 6317,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
       "source_address": "201 Copperfield Rd"
     },
     {
@@ -113303,6 +113333,14 @@
       "source_address": "31 Glen Watford Dr"
     },
     {
+      "property_id": "toronto-address-point:337821",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:7",
+      "source_row_index": 6,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "31 Glen Watford Dr"
+    },
+    {
       "property_id": "toronto-address-point:3386403",
       "source_key": "toronto_aic_applications",
       "source_record_id": "toronto_aic_applications:1651:1650",
@@ -124312,6 +124350,22 @@
       "source_row_index": 1303,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "330 PROGRESS AVE"
+    },
+    {
+      "property_id": "toronto-address-point:376306",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6465",
+      "source_row_index": 6464,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "330 Progress Ave"
+    },
+    {
+      "property_id": "toronto-address-point:376306",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6761",
+      "source_row_index": 6760,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "330 Progress Ave"
     },
     {
       "property_id": "toronto-address-point:376306",
@@ -246062,6 +246116,22 @@
     },
     {
       "property_id": "toronto-address-point:825934",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6788",
+      "source_row_index": 6787,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "55 John St"
+    },
+    {
+      "property_id": "toronto-address-point:825934",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:7076",
+      "source_row_index": 7075,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "55 John St"
+    },
+    {
+      "property_id": "toronto-address-point:825934",
       "source_key": "toronto_aic_applications",
       "source_record_id": "toronto_aic_applications:12875:12874",
       "source_row_index": 12874,
@@ -250420,6 +250490,14 @@
       "source_address": "120 Disco Rd"
     },
     {
+      "property_id": "toronto-address-point:8327662",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:5978",
+      "source_row_index": 5977,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "120 Disco Rd"
+    },
+    {
       "property_id": "toronto-address-point:832988",
       "source_key": "development_pipeline",
       "source_record_id": "development_pipeline:id:11",
@@ -251996,6 +252074,14 @@
       "source_row_index": 1605,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "400 COMMISSIONERS ST"
+    },
+    {
+      "property_id": "toronto-address-point:8353663",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6763",
+      "source_row_index": 6762,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "400 Commissioners St"
     },
     {
       "property_id": "toronto-address-point:8353725",
@@ -267537,6 +267623,14 @@
       "source_address": "2299 DUNDAS ST W"
     },
     {
+      "property_id": "toronto-address-point:8648700",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6888",
+      "source_row_index": 6887,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "2299 Dundas St W"
+    },
+    {
       "property_id": "toronto-address-point:8648707",
       "source_key": "toronto_aic_applications",
       "source_record_id": "toronto_aic_applications:2589:2588",
@@ -273479,6 +273573,14 @@
       "source_row_index": 1001,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "14 ST CLEMENTS AVE"
+    },
+    {
+      "property_id": "toronto-address-point:872957",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:7168",
+      "source_row_index": 7167,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "14 St Clements Ave"
     },
     {
       "property_id": "toronto-address-point:872957",

@@ -1,15 +1,15 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-09-03T16:50:02.407494Z",
+  "generated_at": "2026-09-03T19:03:22.558477Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
-  "json_files_validated": 29,
+  "json_files_validated": 30,
   "counts": {
     "canonical_properties": 13065,
     "poc_reconciliation_rows": 177,
     "poc_resolved": 175,
     "poc_unresolved": 2,
-    "source_links": 38756,
-    "entity_edges": 6331,
+    "source_links": 38768,
+    "entity_edges": 6343,
     "aic_application_catalogue": 15864,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
     "aic_documents_parsed": null,
@@ -284,22 +284,22 @@
     ],
     "tobids_awarded_contracts_exact_document_address_prior_poc": [
       {
-        "property_id": "toronto-address-point:3841975",
-        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:5065962940",
-        "source_address": "5100 YONGE ST",
-        "match_basis": "PREVIOUSLY_VALIDATED_EXACT_PROPERTY_ADDRESS_TOKEN_IN_DOCUMENT_TEXT_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+        "property_id": "toronto-address-point:14121075",
+        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6480",
+        "source_address": "50 Ingram Dr",
+        "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY"
       },
       {
-        "property_id": "toronto-address-point:856375",
-        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:4823171082",
-        "source_address": "100 QUEEN ST W",
-        "match_basis": "PREVIOUSLY_VALIDATED_EXACT_PROPERTY_ADDRESS_TOKEN_IN_DOCUMENT_TEXT_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+        "property_id": "toronto-address-point:825934",
+        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6788",
+        "source_address": "55 John St",
+        "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY"
       },
       {
-        "property_id": "toronto-address-point:856375",
-        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:5440016362",
-        "source_address": "100 QUEEN ST W",
-        "match_basis": "PREVIOUSLY_VALIDATED_EXACT_PROPERTY_ADDRESS_TOKEN_IN_DOCUMENT_TEXT_REMAPPED_TO_CURRENT_ADDRESS_POINT"
+        "property_id": "toronto-address-point:872957",
+        "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:7168",
+        "source_address": "14 St Clements Ave",
+        "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY"
       }
     ],
     "toronto_aic_applications": [
@@ -580,27 +580,31 @@
         }
       },
       {
-        "property_id": "toronto-address-point:856375",
-        "from_node": "org:dcf85243b5424725b762",
+        "property_id": "toronto-address-point:376306",
+        "from_node": "org:f3711e612a8b19d780fa",
         "source_key": "tobids_awarded_contracts",
-        "basis": "SUCCESSFUL_SUPPLIER_IN_EXACT_PROPERTY_AWARD_MATCH",
-        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+        "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
         "evidence": {
-          "document_number": "5165763442",
-          "award_date": "2025-06-13",
-          "award": "1119344.00"
+          "document_number": "3887078310",
+          "award_date": "2023-07-24",
+          "award": "439620.00",
+          "source_row_index": 6464,
+          "source_address": "330 Progress Ave"
         }
       },
       {
-        "property_id": "toronto-address-point:3841975",
-        "from_node": "org:18f67f5479e7f7ba34ba",
+        "property_id": "toronto-address-point:14605377",
+        "from_node": "org:0babf042b89e7cad8d22",
         "source_key": "tobids_awarded_contracts",
-        "basis": "SUCCESSFUL_SUPPLIER_IN_EXACT_PROPERTY_AWARD_MATCH",
-        "confidence": "CONFIRMED_SOURCE_FIELD",
+        "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+        "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
         "evidence": {
-          "document_number": "5065962940",
-          "award_date": null,
-          "award": "None"
+          "document_number": "4890584788",
+          "award_date": "2025-05-21",
+          "award": "1525570.80",
+          "source_row_index": 7390,
+          "source_address": "35 Vanley Cres"
         }
       }
     ]
