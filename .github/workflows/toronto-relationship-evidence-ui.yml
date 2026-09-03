@@ -1,0 +1,173 @@
+name: Toronto Relationship Evidence UI
+
+on:
+  push:
+    branches:
+      - agent/toronto-relationship-evidence-ui-20260903
+    paths:
+      - .github/workflows/toronto-relationship-evidence-ui.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: toronto-relationship-evidence-ui
+  cancel-in-progress: false
+
+jobs:
+  apply-verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact relationship baseline
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-relationship-evidence-ui-20260903
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Apply bounded relationship-evidence projection and rendering
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path_name: str, old: str, new: str) -> None:
+              path = Path(path_name)
+              text = path.read_text(encoding='utf-8')
+              if new in text:
+                  return
+              if old not in text:
+                  raise SystemExit(f'Patch anchor changed: {path_name}: {old!r}')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          build = Path('scripts/build_toronto_app_data.py')
+          text = build.read_text(encoding='utf-8')
+          helper_marker = 'def normalize_relationship_evidence(edge: dict[str, Any]) -> list[dict[str, str]]:'
+          if helper_marker not in text:
+              anchor = '\n\ndef main() -> None:\n'
+              if anchor not in text:
+                  raise SystemExit('build_toronto_app_data main anchor changed')
+              helper = '''\n\nRELATIONSHIP_EVIDENCE_LABELS = {\n    "document_number": "Document number",\n    "award_date": "Award date",\n    "award": "Award",\n    "property_name": "Property name",\n    "source_address": "Source address",\n    "rsn": "RentSafe RSN",\n    "site_address": "Site address",\n    "facility_ids": "Facility IDs",\n    "reporting_years": "Reporting years",\n    "source_observation_count": "Source observations",\n    "licence_numbers": "Licence numbers",\n    "categories": "Categories",\n    "site_names": "Site names",\n    "application_number": "Application number",\n    "document_url": "Document URL",\n    "document_sha256": "Document SHA-256",\n}\n\nRELATIONSHIP_EVIDENCE_ORDER = {key: index for index, key in enumerate(RELATIONSHIP_EVIDENCE_LABELS)}\n\n\ndef normalize_relationship_evidence(edge: dict[str, Any]) -> list[dict[str, str]]:\n    evidence = edge.get("evidence")\n    if not isinstance(evidence, dict):\n        return []\n    details: list[dict[str, str]] = []\n    for key in sorted(evidence, key=lambda item: (RELATIONSHIP_EVIDENCE_ORDER.get(str(item), 999), str(item))):\n        raw = evidence.get(key)\n        if isinstance(raw, (list, tuple, set)):\n            parts = [str(value).strip() for value in raw if value not in (None, "") and str(value).strip()]\n            value = ", ".join(parts)\n        elif isinstance(raw, (str, int, float, bool)):\n            value = str(raw).strip()\n        else:\n            continue\n        if not value:\n            continue\n        label = RELATIONSHIP_EVIDENCE_LABELS.get(str(key), str(key).replace("_", " ").strip().capitalize())\n        details.append({"label": label, "value": value[:1000]})\n        if len(details) >= 12:\n            break\n    return details\n'''
+              text = text.replace(anchor, helper + anchor, 1)
+              build.write_text(text, encoding='utf-8')
+
+          replace_once(
+              'scripts/build_toronto_app_data.py',
+              '            "basis": str(edge.get("basis") or ""),\n        })',
+              '            "basis": str(edge.get("basis") or ""),\n            "evidence": normalize_relationship_evidence(edge),\n        })',
+          )
+          replace_once(
+              'scripts/build_toronto_app_data.py',
+              '        "schema_version": "toronto-market-app-1.1",',
+              '        "schema_version": "toronto-market-app-1.2",',
+          )
+
+          replace_once(
+              'src/types/toronto.ts',
+              '  basis: string\n}',
+              '  basis: string\n  evidence?: { label: string; value: string }[]\n}',
+          )
+
+          replace_once(
+              'src/components/TorontoMarketPage.tsx',
+              "  ontario_environmental_compliance_reports: 'Ontario environmental compliance',\n",
+              "  ontario_environmental_compliance_reports: 'Ontario environmental compliance',\n  ontario_bps_energy_2024: 'Ontario BPS energy 2024',\n  tobids_awarded_contracts: 'TOBids awarded contracts',\n  rentsafe_registration: 'RentSafe registration',\n",
+          )
+          replace_once(
+              'src/components/TorontoMarketPage.tsx',
+              '    ...property.relationships.flatMap(item => [item.organization, item.relationship, item.source_key]),',
+              '    ...property.relationships.flatMap(item => [item.organization, item.relationship, item.source_key, ...(item.evidence ?? []).flatMap(detail => [detail.label, detail.value])]),',
+          )
+          old_card = '<article key={`${relationship.relationship}:${relationship.organization}:${index}`}><strong>{relationship.organization}</strong><span>{humanize(relationship.relationship)}</span><small>{sourceLabel(relationship.source_key)} · {humanize(relationship.confidence)} · {humanize(relationship.basis)}</small></article>'
+          new_card = '<article key={`${relationship.relationship}:${relationship.organization}:${index}`}><strong>{relationship.organization}</strong><span>{humanize(relationship.relationship)}</span>{(relationship.evidence ?? []).length > 0 && <dl className="toronto-source-details">{(relationship.evidence ?? []).map(item => <div key={`${item.label}:${item.value}`}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>}<small>{sourceLabel(relationship.source_key)} · {humanize(relationship.confidence)} · {humanize(relationship.basis)}</small></article>'
+          replace_once('src/components/TorontoMarketPage.tsx', old_card, new_card)
+
+          replace_once(
+              'tests/frontend/TorontoMarket.test.tsx',
+              "relationships: [{ relationship: 'PROPERTY_MANAGER_OF', organization: 'Alpha Management', source_key: 'rentsafe', confidence: 'HIGH', basis: 'EXPLICIT_ROLE' }]",
+              "relationships: [{ relationship: 'PROPERTY_MANAGER_OF', organization: 'Alpha Management', source_key: 'rentsafe_registration', confidence: 'HIGH', basis: 'EXPLICIT_ROLE', evidence: [{ label: 'RentSafe RSN', value: 'RSN-ALPHA' }, { label: 'Site address', value: '10 Alpha St' }] }]",
+          )
+          replace_once(
+              'tests/frontend/TorontoMarket.test.tsx',
+              "  await user.type(search, 'Alpha Management')\n  expect(screen.getByText('10 Alpha St')).toBeInTheDocument()\n  expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()\n})",
+              "  await user.type(search, 'Alpha Management')\n  expect(screen.getByText('10 Alpha St')).toBeInTheDocument()\n  expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()\n\n  await user.clear(search)\n  await user.type(search, 'RSN-ALPHA')\n  expect(screen.getByText('10 Alpha St')).toBeInTheDocument()\n  expect(screen.queryByText('20 Beta Ave')).not.toBeInTheDocument()\n})",
+          )
+          replace_once(
+              'tests/frontend/TorontoMarket.test.tsx',
+              "  expect(within(detail).getByText('Nickel')).toBeInTheDocument()\n",
+              "  expect(within(detail).getByText('Nickel')).toBeInTheDocument()\n  expect(within(detail).getByText('RSN-ALPHA')).toBeInTheDocument()\n  expect(within(detail).getByText('RentSafe RSN')).toBeInTheDocument()\n",
+          )
+
+          Path('tests/python/test_toronto_relationship_evidence.py').write_text('''import unittest\n\nfrom scripts.build_toronto_app_data import normalize_relationship_evidence\n\n\nclass TorontoRelationshipEvidenceTests(unittest.TestCase):\n    def test_projects_scalar_and_list_evidence_without_nested_inference(self) -> None:\n        details = normalize_relationship_evidence({\n            "evidence": {\n                "document_number": "4951580548",\n                "award": "12345.00",\n                "facility_ids": ["A", "B"],\n                "source_observation_count": 4,\n                "nested": {"do_not": "project"},\n                "empty": "",\n            }\n        })\n        self.assertIn({"label": "Document number", "value": "4951580548"}, details)\n        self.assertIn({"label": "Award", "value": "12345.00"}, details)\n        self.assertIn({"label": "Facility IDs", "value": "A, B"}, details)\n        self.assertIn({"label": "Source observations", "value": "4"}, details)\n        self.assertFalse(any(item["label"] == "Nested" for item in details))\n\n    def test_missing_evidence_is_an_empty_list(self) -> None:\n        self.assertEqual(normalize_relationship_evidence({}), [])\n\n\nif __name__ == "__main__":\n    unittest.main()\n''', encoding='utf-8')
+
+      - name: Compile and test relationship evidence projection
+        run: |
+          python -m py_compile scripts/build_toronto_app_data.py
+          PYTHONPATH=.:scripts python -m unittest tests.python.test_toronto_relationship_evidence -v
+          python scripts/build_toronto_app_data.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('public/data/toronto-market.json').read_text(encoding='utf-8'))
+          relationships = [relationship for prop in payload['properties'] for relationship in prop.get('relationships', [])]
+          assert relationships and all('evidence' in relationship for relationship in relationships)
+          tobids = [relationship for relationship in relationships if relationship.get('source_key') == 'tobids_awarded_contracts']
+          bps = [relationship for relationship in relationships if relationship.get('source_key') == 'ontario_bps_energy_2024']
+          assert tobids and any(any(item.get('label') == 'Document number' for item in relationship.get('evidence', [])) for relationship in tobids)
+          assert bps and any(any(item.get('label') == 'Property name' for item in relationship.get('evidence', [])) for relationship in bps)
+          print(json.dumps({'schema_version': payload['schema_version'], 'relationships': len(relationships), 'tobids_relationships': len(tobids), 'bps_relationships': len(bps)}, indent=2))
+          PY
+
+      - name: Re-run Toronto evidence contract
+        run: |
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+
+      - name: Verify frontend behavior and production build
+        env:
+          VITE_ENABLE_TORONTO: 'true'
+          VITE_TORONTO_PREVIEW: 'true'
+        run: |
+          npm run lint
+          npm run typecheck
+          npm exec vitest run -- tests/frontend/TorontoMarket.test.tsx
+          npm exec vite build -- --base=/ --outDir=dist-rel-candidate
+
+      - name: Verify approved entry surfaces are pixel-identical
+        env:
+          VITE_ENABLE_TORONTO: 'true'
+          VITE_TORONTO_PREVIEW: 'true'
+        run: |
+          git worktree add ../toronto-rel-baseline 19bb1c5f52d84d53bf987d1059c6bcc84e9e3929
+          ln -s "$GITHUB_WORKSPACE/node_modules" ../toronto-rel-baseline/node_modules
+          (cd ../toronto-rel-baseline && "$GITHUB_WORKSPACE/node_modules/.bin/vite" build --base=/ --outDir="$GITHUB_WORKSPACE/dist-rel-baseline")
+          npm exec playwright install chromium
+          node scripts/verify_toronto_visual_regression.mjs dist-rel-baseline dist-rel-candidate artifacts/toronto-relationship-evidence-visual
+
+      - name: Persist verified relationship-evidence app update
+        run: |
+          git config user.name "TowerSignal App Bot"
+          git config user.email "towersignal-app@users.noreply.github.com"
+          git add \
+            scripts/build_toronto_app_data.py \
+            src/types/toronto.ts \
+            src/components/TorontoMarketPage.tsx \
+            tests/frontend/TorontoMarket.test.tsx \
+            tests/python/test_toronto_relationship_evidence.py \
+            public/data/toronto-market.json
+          git diff --cached --quiet && { echo "No relationship-evidence changes to persist"; exit 1; }
+          git commit -m "Toronto: expose relationship evidence in property details"
+          git push origin HEAD:agent/toronto-relationship-evidence-ui-20260903
+          echo "RELATIONSHIP_EVIDENCE_UI_SHA=$(git rev-parse HEAD)"
