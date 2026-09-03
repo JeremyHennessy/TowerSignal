@@ -1,0 +1,39 @@
+name: Toronto TOBids Existing Provenance Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tobids-relationship-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-tobids-existing-provenance-diagnostic.yml
+      - scripts/diagnose_toronto_tobids_existing_provenance.py
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile provenance diagnostic
+        run: python -m py_compile scripts/diagnose_toronto_tobids_existing_provenance.py
+
+      - name: Inspect existing TOBids provenance
+        run: PYTHONPATH=scripts python scripts/diagnose_toronto_tobids_existing_provenance.py --output tobids-existing-provenance.json
+
+      - name: Upload provenance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-tobids-existing-provenance
+          path: tobids-existing-provenance.json
+          if-no-files-found: error
+          retention-days: 7
