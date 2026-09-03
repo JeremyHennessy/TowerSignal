@@ -147,9 +147,9 @@ def _record_for_link(link: dict[str, Any], source_rows: dict[str, list[dict[str,
     return find_source_record(key, str(link.get("source_record_id") or ""), rows)
 
 
-def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]], resolved_row: dict[str, Any] | None = None) -> dict[str, Any]:
     key = str(link.get("source_key") or "unknown")
-    row = _record_for_link(link, source_rows)
+    row = resolved_row if resolved_row is not None else _record_for_link(link, source_rows)
     result: dict[str, Any] = {
         "source_key": key,
         "source_record_id": str(link.get("source_record_id") or ""),

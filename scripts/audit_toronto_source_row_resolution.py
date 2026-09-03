@@ -56,6 +56,32 @@ def address_matches(link: dict[str, Any], row: dict[str, Any]) -> bool | None:
     return expected in observed
 
 
+def build_unique_record_indexes(source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, dict[str, dict[str, Any]]]:
+    """Index only unique stable IDs; ambiguous IDs retain legacy fallback behavior."""
+    from toronto_source_identity import stable_source_record_id
+    indexes: dict[str, dict[str, dict[str, Any]]] = {}
+    for source, rows in source_rows.items():
+        unique: dict[str, dict[str, Any]] = {}
+        duplicates: set[str] = set()
+        for row in rows:
+            record_id = stable_source_record_id(source, row)
+            if record_id in unique:
+                duplicates.add(record_id)
+            else:
+                unique[record_id] = row
+        for record_id in duplicates:
+            unique.pop(record_id, None)
+        indexes[source] = unique
+    return indexes
+
+
+def indexed_record_for_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]], indexes: dict[str, dict[str, dict[str, Any]]]) -> dict[str, Any]:
+    source = str(link.get("source_key") or "").strip()
+    record_id = str(link.get("source_record_id") or "").strip()
+    indexed = indexes.get(source, {}).get(record_id)
+    return indexed if indexed is not None else _record_for_link(link, source_rows)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Audit Toronto stable source-row resolution and row-index provenance")
     parser.add_argument("--strict", action="store_true")
@@ -63,6 +89,7 @@ def main() -> None:
 
     links = [x for x in (load(MARKET / "property_source_links.json").get("links") or []) if isinstance(x, dict)]
     rows = load_source_rows(ROOT, load)
+    source_record_indexes = build_unique_record_indexes(rows)
     stats: dict[str, Counter] = {}
     samples: list[dict[str, Any]] = []
 
@@ -83,7 +110,7 @@ def main() -> None:
         else:
             counter["index_not_comparable"] += 1
 
-        resolved_row = _record_for_link(link, rows)
+        resolved_row = indexed_record_for_link(link, rows, source_record_indexes)
         resolved_match = address_matches(link, resolved_row) if resolved_row else None
         if resolved_match is True:
             counter["stable_id_address_match"] += 1
