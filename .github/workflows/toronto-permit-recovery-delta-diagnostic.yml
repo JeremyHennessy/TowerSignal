@@ -6,6 +6,9 @@ on:
       - agent/toronto-building-permit-diagnostic-20260903
     paths:
       - .github/workflows/toronto-permit-recovery-delta-diagnostic.yml
+      - scripts/diagnose_toronto_permit_recovery_delta.py
+      - scripts/diagnose_toronto_permit_identity_recovery.py
+      - scripts/diagnose_toronto_permit_suffix_recovery.py
 
 permissions:
   contents: read
