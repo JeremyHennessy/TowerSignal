@@ -1,0 +1,115 @@
+name: Toronto Permit Source Filters
+
+on:
+  push:
+    branches:
+      - agent/toronto-permit-filters-20260903
+    paths:
+      - .github/workflows/toronto-permit-filters.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact strict permit baseline
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-permit-filters-20260903
+          fetch-depth: 0
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Apply bounded permit filter logic and tests
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path_name: str, old: str, new: str) -> None:
+              path = Path(path_name)
+              text = path.read_text(encoding='utf-8')
+              if new in text:
+                  return
+              if old not in text:
+                  raise SystemExit(f'Patch anchor changed: {path_name}: {old!r}')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          path = 'src/components/TorontoMarketPage.tsx'
+          replace_once(path,
+              "  environmentalRecord: string\n  company: string\n}",
+              "  environmentalRecord: string\n  company: string\n  permitSignal: string\n  permitStatus: string\n  permitLifecycle: string\n  permitInterpretation: string\n}")
+
+          helper_anchor = "function sourceDetailValue(link: TorontoSourceLink, label: string): string {\n  return link.record_details.find(detail => detail.label === label)?.value ?? ''\n}\n"
+          helper_insert = helper_anchor + "\nconst permitSourceKeys = new Set(['toronto_building_permits_active_targeted', 'toronto_building_permits_cleared_targeted_since_2017'])\n\nfunction permitSignalValues(link: TorontoSourceLink): string[] {\n  return sourceDetailValue(link, 'Mechanical signals').split(',').map(value => value.trim()).filter(Boolean)\n}\n"
+          replace_once(path, helper_anchor, helper_insert)
+
+          filter_anchor = "  const environmental = property.source_links.filter(link => link.source_key === 'ontario_environmental_compliance_reports')\n"
+          filter_insert = filter_anchor + "  const permits = property.source_links.filter(link => permitSourceKeys.has(link.source_key))\n"
+          replace_once(path, filter_anchor, filter_insert)
+          replace_once(path,
+              "  if (filters.environmentalRecord && !environmental.some(link => [link.source_record_id, link.record_title, ...link.record_details.map(detail => detail.value)].join(' ').toLowerCase().includes(filters.environmentalRecord.toLowerCase()))) return false\n",
+              "  if (filters.environmentalRecord && !environmental.some(link => [link.source_record_id, link.record_title, ...link.record_details.map(detail => detail.value)].join(' ').toLowerCase().includes(filters.environmentalRecord.toLowerCase()))) return false\n  if (filters.permitSignal && !permits.some(link => permitSignalValues(link).includes(filters.permitSignal))) return false\n  if (filters.permitStatus && !permits.some(link => link.record_status === filters.permitStatus)) return false\n  if (filters.permitLifecycle && !permits.some(link => sourceDetailValue(link, 'Cooling tower lifecycle') === filters.permitLifecycle)) return false\n  if (filters.permitInterpretation && !permits.some(link => sourceDetailValue(link, 'Cooling tower current interpretation') === filters.permitInterpretation)) return false\n")
+
+          replace_once(path,
+              "  const [sourceFilters, setSourceFilters] = useState<TorontoSourceFilters>({ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '' })",
+              "  const [sourceFilters, setSourceFilters] = useState<TorontoSourceFilters>({ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '', permitSignal: '', permitStatus: '', permitLifecycle: '', permitInterpretation: '' })")
+
+          replace_once(path,
+              "    if (!payload) return { chemicals: [], reportingYears: [], aicStatuses: [], healthStatuses: [] }\n    const links = payload.properties.flatMap(property => property.source_links)\n    const chemtrac = links.filter(link => link.source_key === 'chemtrac_history' || link.source_key === 'chemtrac_2024')\n    return {\n      chemicals: [...new Set(chemtrac.map(link => sourceDetailValue(link, 'Chemical')).filter(Boolean))].sort(),\n      reportingYears: [...new Set(chemtrac.map(link => link.record_date?.match(/^\\d{4}/)?.[0]).filter((year): year is string => Boolean(year)))].sort().reverse(),\n      aicStatuses: [...new Set(links.filter(link => link.source_key === 'toronto_aic_applications').map(link => link.record_status).filter((status): status is string => Boolean(status)))].sort(),\n      healthStatuses: [...new Set(links.filter(link => link.source_key === 'toronto_highrise_residential_health_hazards').map(link => link.record_status).filter((status): status is string => Boolean(status)))].sort(),\n    }",
+              "    if (!payload) return { chemicals: [], reportingYears: [], aicStatuses: [], healthStatuses: [], permitSignals: [], permitStatuses: [], permitLifecycles: [], permitInterpretations: [] }\n    const links = payload.properties.flatMap(property => property.source_links)\n    const chemtrac = links.filter(link => link.source_key === 'chemtrac_history' || link.source_key === 'chemtrac_2024')\n    const permits = links.filter(link => permitSourceKeys.has(link.source_key))\n    return {\n      chemicals: [...new Set(chemtrac.map(link => sourceDetailValue(link, 'Chemical')).filter(Boolean))].sort(),\n      reportingYears: [...new Set(chemtrac.map(link => link.record_date?.match(/^\\d{4}/)?.[0]).filter((year): year is string => Boolean(year)))].sort().reverse(),\n      aicStatuses: [...new Set(links.filter(link => link.source_key === 'toronto_aic_applications').map(link => link.record_status).filter((status): status is string => Boolean(status)))].sort(),\n      healthStatuses: [...new Set(links.filter(link => link.source_key === 'toronto_highrise_residential_health_hazards').map(link => link.record_status).filter((status): status is string => Boolean(status)))].sort(),\n      permitSignals: [...new Set(permits.flatMap(permitSignalValues))].sort(),\n      permitStatuses: [...new Set(permits.map(link => link.record_status).filter((status): status is string => Boolean(status)))].sort(),\n      permitLifecycles: [...new Set(permits.map(link => sourceDetailValue(link, 'Cooling tower lifecycle')).filter(Boolean))].sort(),\n      permitInterpretations: [...new Set(permits.map(link => sourceDetailValue(link, 'Cooling tower current interpretation')).filter(Boolean))].sort(),\n    }")
+
+          company_anchor = "      <label><span>Company</span><input value={sourceFilters.company} onChange={event => setSourceFilters(current => ({ ...current, company: event.target.value }))} placeholder=\"Company or organization\" /></label>\n"
+          company_insert = company_anchor + "      <label><span>Permit signal</span><select value={sourceFilters.permitSignal} onChange={event => setSourceFilters(current => ({ ...current, permitSignal: event.target.value }))}><option value=\"\">All permit signals</option>{sourceFilterOptions.permitSignals.map(value => <option key={value} value={value}>{humanize(value)}</option>)}</select></label>\n      <label><span>Permit status</span><select value={sourceFilters.permitStatus} onChange={event => setSourceFilters(current => ({ ...current, permitStatus: event.target.value }))}><option value=\"\">All permit statuses</option>{sourceFilterOptions.permitStatuses.map(value => <option key={value} value={value}>{value}</option>)}</select></label>\n      <label><span>Cooling tower lifecycle</span><select value={sourceFilters.permitLifecycle} onChange={event => setSourceFilters(current => ({ ...current, permitLifecycle: event.target.value }))}><option value=\"\">All cooling tower lifecycle states</option>{sourceFilterOptions.permitLifecycles.map(value => <option key={value} value={value}>{humanize(value)}</option>)}</select></label>\n      <label><span>Cooling tower interpretation</span><select value={sourceFilters.permitInterpretation} onChange={event => setSourceFilters(current => ({ ...current, permitInterpretation: event.target.value }))}><option value=\"\">All current interpretations</option>{sourceFilterOptions.permitInterpretations.map(value => <option key={value} value={value}>{humanize(value)}</option>)}</select></label>\n"
+          replace_once(path, company_anchor, company_insert)
+          replace_once(path,
+              "      <button onClick={() => setSourceFilters({ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '' })}>Clear source filters</button>",
+              "      <button onClick={() => setSourceFilters({ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '', permitSignal: '', permitStatus: '', permitLifecycle: '', permitInterpretation: '' })}>Clear source filters</button>")
+
+          test_path = Path('tests/frontend/TorontoMarket.test.tsx')
+          test_text = test_path.read_text(encoding='utf-8')
+          test_text = test_text.replace("{ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '' }", "{ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '', permitSignal: '', permitStatus: '', permitLifecycle: '', permitInterpretation: '' }")
+          test_anchor = "test('builds a Toronto-specific CSV with scope and source-preserved roles', () => {"
+          permit_test = '''test('filters permit records by signal status lifecycle and current interpretation without promoting tower evidence', () => {\n  const property = {\n    property_id: 'toronto-address-point:400', address_point_id: '400', display_address: '40 College St', municipality: 'Toronto', longitude: -79.38, latitude: 43.66, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: false, tower_evidence_status: 'NO_TOWER_ASSERTION' as const, source_keys: ['toronto_building_permits_active_targeted'], source_links: [\n      { source_key: 'toronto_building_permits_active_targeted', source_record_id: 'permit:1', match_basis: 'EXACT_ADDRESS', source_address: '40 College St', record_url: null, record_link_label: null, record_title: '26 100000 MSA · revision 00', record_date: '2026-08-01', record_status: 'Permit Issued', record_details: [\n        { label: 'Mechanical signals', value: 'chiller, cooling tower' },\n        { label: 'Cooling tower lifecycle', value: 'REPLACE_COOLING_TOWER' },\n        { label: 'Cooling tower current interpretation', value: 'ACTIVE_EXISTING_AND_REPLACEMENT_TOWER_SIGNAL' },\n      ] },\n    ], relationships: [], aerial_review_rank: null, aerial_visual_similarity_score: null,\n  }\n  const empty = { chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '', permitSignal: '', permitStatus: '', permitLifecycle: '', permitInterpretation: '' }\n  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitSignal: 'cooling tower' })).toBe(true)\n  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitSignal: 'boiler' })).toBe(false)\n  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitStatus: 'Permit Issued' })).toBe(true)\n  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitLifecycle: 'REPLACE_COOLING_TOWER' })).toBe(true)\n  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitInterpretation: 'ACTIVE_EXISTING_AND_REPLACEMENT_TOWER_SIGNAL' })).toBe(true)\n  expect(property.tower_evidence_status).toBe('NO_TOWER_ASSERTION')\n})\n\n'''
+          if permit_test not in test_text:
+              if test_anchor not in test_text:
+                  raise SystemExit('Frontend test anchor changed')
+              test_text = test_text.replace(test_anchor, permit_test + test_anchor, 1)
+          test_path.write_text(test_text, encoding='utf-8')
+
+      - name: Verify permit filter logic
+        run: |
+          npm run lint
+          npm run typecheck
+          npm exec vitest run -- tests/frontend/TorontoMarket.test.tsx
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vite build -- --base=/ --outDir=dist-permit-filter-candidate
+          test -z "$(git diff 101c6808b22bb5ce69a16697f97df95424ad0e2c -- src/styles)" || { echo 'Permit filter branch modified approved styles'; git diff 101c6808b22bb5ce69a16697f97df95424ad0e2c -- src/styles; exit 1; }
+
+      - name: Verify closed entry surfaces are pixel-identical
+        env:
+          VITE_ENABLE_TORONTO: 'true'
+          VITE_TORONTO_PREVIEW: 'true'
+        run: |
+          git worktree add ../toronto-filter-baseline 101c6808b22bb5ce69a16697f97df95424ad0e2c
+          ln -s "$GITHUB_WORKSPACE/node_modules" ../toronto-filter-baseline/node_modules
+          (cd ../toronto-filter-baseline && "$GITHUB_WORKSPACE/node_modules/.bin/vite" build --base=/ --outDir="$GITHUB_WORKSPACE/dist-permit-filter-baseline")
+          npm exec playwright install chromium
+          node scripts/verify_toronto_visual_regression.mjs dist-permit-filter-baseline dist-permit-filter-candidate artifacts/toronto-permit-filter-visual
+
+      - name: Persist isolated permit filter update
+        run: |
+          git config user.name "TowerSignal UI Bot"
+          git config user.email "towersignal-ui@users.noreply.github.com"
+          git add src/components/TorontoMarketPage.tsx tests/frontend/TorontoMarket.test.tsx
+          git diff --cached --quiet && { echo 'No permit filter changes to persist'; exit 1; }
+          git commit -m "Toronto: add permit-specific source filters"
+          git push origin HEAD:agent/toronto-permit-filters-20260903
+          echo "TORONTO_PERMIT_FILTER_SHA=$(git rev-parse HEAD)"
