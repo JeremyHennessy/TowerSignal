@@ -1,0 +1,111 @@
+name: Toronto TOBids Post-Permit Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tobids-post-permit-diagnostic-20260903
+    paths:
+      - .github/workflows/toronto-tobids-post-permit-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout strict permit baseline
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Trace exact TOBids candidates against persisted links and edges
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          from apply_toronto_tobids_relationships import (
+              GRAPH_SOURCE_KEY,
+              RELATIONSHIP,
+              SOURCE_LINK_KEY,
+              candidate_rows,
+              normalized_org,
+          )
+          from toronto_source_identity import find_source_record, stable_source_record_id
+
+          root = Path('.')
+          market = root / 'data/toronto/market/current'
+          spine = json.loads((market / 'property_spine.json').read_text(encoding='utf-8'))
+          links_payload = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
+          graph = json.loads((market / 'entity_graph.json').read_text(encoding='utf-8'))
+          tobids = json.loads((root / 'data/toronto/warehouse/current/open_licensed/tobids_awarded_contracts.json').read_text(encoding='utf-8'))
+          properties = [item for item in spine.get('properties', []) if isinstance(item, dict)]
+          rows = [item for item in tobids.get('rows', []) if isinstance(item, dict)]
+
+          exact, ambiguous, ambiguous_property_addresses = candidate_rows(properties, rows)
+          existing_links = [item for item in links_payload.get('links', []) if isinstance(item, dict) and item.get('source_key') == SOURCE_LINK_KEY]
+          existing_link_keys = set()
+          for link in existing_links:
+              resolved = find_source_record(SOURCE_LINK_KEY, str(link.get('source_record_id') or ''), rows)
+              if not resolved:
+                  raise SystemExit(f'Unresolved existing TOBids link: {link}')
+              existing_link_keys.add((str(link.get('property_id') or ''), stable_source_record_id(SOURCE_LINK_KEY, resolved)))
+
+          nodes = {str(node.get('node_id') or ''): node for node in graph.get('nodes', []) if isinstance(node, dict)}
+          existing_edge_pairs = set()
+          for edge in graph.get('edges', []):
+              if not isinstance(edge, dict) or edge.get('source_key') != GRAPH_SOURCE_KEY or edge.get('relationship') != RELATIONSHIP:
+                  continue
+              node = nodes.get(str(edge.get('from_node') or ''), {})
+              existing_edge_pairs.add((str(edge.get('property_id') or edge.get('to_node') or ''), normalized_org(node.get('name'))))
+
+          details = []
+          new_link_candidates = []
+          new_edge_candidates = []
+          for item in exact:
+              row = item['row']
+              pid = item['property_id']
+              rid = stable_source_record_id(SOURCE_LINK_KEY, row)
+              supplier = str(item.get('successful_supplier') or '').strip()
+              link_exists = (pid, rid) in existing_link_keys
+              edge_exists = (pid, normalized_org(supplier)) in existing_edge_pairs
+              detail = {
+                  'source_row_index': item['source_row_index'],
+                  'property_id': pid,
+                  'display_address': item['display_address'],
+                  'document_number': row.get('Document Number'),
+                  'successful_supplier': supplier,
+                  'award': row.get('Award'),
+                  'award_date': row.get('Award Authority Obtained Date'),
+                  'division': row.get('Division'),
+                  'description': row.get('Solicitation Document Description'),
+                  'source_record_id': rid,
+                  'link_exists': link_exists,
+                  'bidder_edge_exists': edge_exists,
+              }
+              details.append(detail)
+              if not link_exists:
+                  new_link_candidates.append(detail)
+              if not edge_exists:
+                  new_edge_candidates.append(detail)
+
+          print('PROPERTY_COUNT=', len(properties))
+          print('EXACT_COUNT=', len(exact))
+          print('AMBIGUOUS_COUNT=', len(ambiguous))
+          print('AMBIGUOUS_PROPERTY_ADDRESSES=', ambiguous_property_addresses)
+          print('EXISTING_TOBIDS_LINKS=', len(existing_links))
+          print('EXISTING_BIDDER_EDGES=', len(existing_edge_pairs))
+          print('NEW_LINK_CANDIDATES=', len(new_link_candidates))
+          print('NEW_EDGE_CANDIDATES=', len(new_edge_candidates))
+          for item in new_link_candidates:
+              print('NEW_TOBIDS_LINK=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+          for item in new_edge_candidates:
+              print('NEW_TOBIDS_EDGE=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+          print('ALL_EXACT=', json.dumps(details, ensure_ascii=False, sort_keys=True))
