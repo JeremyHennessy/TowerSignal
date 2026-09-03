@@ -19,15 +19,19 @@ class TorontoTobidsLegacyProvenanceTests(unittest.TestCase):
         tobids = json.loads(TOBIDS.read_text(encoding="utf-8"))
         properties = [item for item in spine.get("properties", []) if isinstance(item, dict)]
         rows = [item for item in tobids.get("rows", []) if isinstance(item, dict)]
-        existing = [
+        all_tobids_links = [
             item for item in links_payload.get("links", [])
             if isinstance(item, dict) and item.get("source_key") == SOURCE_LINK_KEY
         ]
-        self.assertEqual(len(existing), 5)
+        legacy = [item for item in all_tobids_links if item.get("source_row_index") is None]
+        citywide = [item for item in all_tobids_links if isinstance(item.get("source_row_index"), int)]
+        self.assertEqual(len(all_tobids_links), 17)
+        self.assertEqual(len(legacy), 5)
+        self.assertEqual(len(citywide), 12)
 
         publisher_keys: set[tuple[str, str]] = set()
         legacy_documents: set[str] = set()
-        for link in existing:
+        for link in legacy:
             resolved = find_source_record(SOURCE_LINK_KEY, str(link.get("source_record_id") or ""), rows)
             self.assertTrue(resolved, msg=f"legacy link did not resolve: {link}")
             publisher_keys.add((str(link.get("property_id") or ""), stable_source_record_id(SOURCE_LINK_KEY, resolved)))
