@@ -19,6 +19,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Inspect persisted property source and relationship context
+        env:
+          PYTHONPATH: .
         shell: python
         run: |
           import json
