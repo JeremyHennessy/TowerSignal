@@ -1,15 +1,15 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-08-31T19:55:22.137622Z",
+  "generated_at": "2026-09-03T16:50:02.407494Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
-  "json_files_validated": 24,
+  "json_files_validated": 29,
   "counts": {
     "canonical_properties": 13065,
     "poc_reconciliation_rows": 177,
     "poc_resolved": 175,
     "poc_unresolved": 2,
-    "source_links": 38394,
-    "entity_edges": 5976,
+    "source_links": 38756,
+    "entity_edges": 6331,
     "aic_application_catalogue": 15864,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
     "aic_documents_parsed": null,
@@ -103,7 +103,7 @@
     "311_matches_prior_poc": [
       {
         "property_id": "toronto-address-point:4153974",
-        "source_record_id": "311_matches_prior_poc:sha256:4011d565d35a457f0d2dd713",
+        "source_record_id": "311_matches_prior_poc:sha256:c743bd1dc67e6820798f6752",
         "source_address": "10 GUILDWOOD PKWY",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -151,19 +151,19 @@
     "business_licence_matches_prior_poc": [
       {
         "property_id": "toronto-address-point:1008107",
-        "source_record_id": "business_licence_matches_prior_poc:sha256:0603fe027410ff917cb64489",
+        "source_record_id": "business_licence_matches_prior_poc:id:105984",
         "source_address": "101 HUMBER COLLEGE BLVD",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:7792268",
-        "source_record_id": "business_licence_matches_prior_poc:sha256:979e87370f02326b0ab29032",
+        "source_record_id": "business_licence_matches_prior_poc:id:4807",
         "source_address": "595 BAY ST",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
         "property_id": "toronto-address-point:987965",
-        "source_record_id": "business_licence_matches_prior_poc:sha256:ccc40be9442aef60dc33615e",
+        "source_record_id": "business_licence_matches_prior_poc:id:80220",
         "source_address": "60 BIRMINGHAM ST",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
@@ -225,6 +225,26 @@
         "property_id": "toronto-address-point:9980743",
         "source_record_id": "development_pipeline:id:1439",
         "source_address": "1151 WESTON RD",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "ontario_bps_energy_2024": [
+      {
+        "property_id": "toronto-address-point:1000268",
+        "source_record_id": "ontario_bps_energy_2024:sha256:5b03ec62bcf7f81eca92091f",
+        "source_address": "400 EVANS AVE",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:396133",
+        "source_record_id": "ontario_bps_energy_2024:sha256:c8ba70d731b7d6a8ecf5f072",
+        "source_address": "2900 Warden Ave",
+        "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      },
+      {
+        "property_id": "toronto-address-point:998713",
+        "source_record_id": "ontario_bps_energy_2024:sha256:1995007e06bc8b8b815db2b1",
+        "source_address": "4200 EGLINTON AVE W",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       }
     ],
@@ -397,6 +417,41 @@
         }
       }
     ],
+    "FACILITY_OPERATOR_OR_REPORTER_AT": [
+      {
+        "property_id": "toronto-address-point:7792696",
+        "from_node": "org:3613233fd63858812ad2",
+        "source_key": "ontario_bps_energy_2024",
+        "basis": "ORGANIZATION_FIELD_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "SOURCE_ROLE_NOT_OWNERSHIP",
+        "evidence": {
+          "property_name": "The Hospital for Sick Children - Annex",
+          "source_address": "555 University Ave"
+        }
+      },
+      {
+        "property_id": "toronto-address-point:10250060",
+        "from_node": "org:4d58ebe1a881d7c4d549",
+        "source_key": "ontario_bps_energy_2024",
+        "basis": "ORGANIZATION_FIELD_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "SOURCE_ROLE_NOT_OWNERSHIP",
+        "evidence": {
+          "property_name": "High Park Zoo",
+          "source_address": "1873 Bloor St. W"
+        }
+      },
+      {
+        "property_id": "toronto-address-point:14651265",
+        "from_node": "org:4d58ebe1a881d7c4d549",
+        "source_key": "ontario_bps_energy_2024",
+        "basis": "ORGANIZATION_FIELD_AT_EXACT_CURRENT_ADDRESS",
+        "confidence": "SOURCE_ROLE_NOT_OWNERSHIP",
+        "evidence": {
+          "property_name": "St. Lawrence Market North [NEW]",
+          "source_address": "92 Front St E."
+        }
+      }
+    ],
     "LICENCE_HOLDER_AT_PROPERTY": [
       {
         "property_id": "toronto-address-point:1008107",
@@ -554,14 +609,15 @@
     "311_matches_prior_poc": 0,
     "affordable_housing_pipeline": 0,
     "apartment_building_evaluation": 0,
-    "business_licence_matches_prior_poc": 1364,
+    "business_licence_matches_prior_poc": 0,
     "chemtrac_2024": 0,
     "chemtrac_history": 0,
     "development_pipeline": 0,
+    "ontario_bps_energy_2024": 2,
     "ontario_environmental_compliance_reports": 0,
     "renewable_energy_installations": 0,
     "tobids_awarded_contracts_exact_document_address_prior_poc": 0,
-    "toronto_aic_applications": 58,
+    "toronto_aic_applications": 0,
     "toronto_highrise_residential_health_hazards": 0,
     "toronto_public_notices_exact_prior_poc": 0
   },

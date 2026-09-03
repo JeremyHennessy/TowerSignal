@@ -22,6 +22,7 @@ ADDRESS_FIELDS = {
     "chemtrac_history": ("FA_ADDRESS_GIVEN",),
     "development_pipeline": ("Address",),
     "ontario_environmental_compliance_reports": ("Site Address",),
+    "ontario_bps_energy_2024": ("Address",),
     "renewable_energy_installations": ("CLIENT_ADDRESS", "ADDRESS_FULL"),
     "toronto_aic_applications": ("FULL_ADDRESS",),
     "toronto_highrise_residential_health_hazards": ("address",),

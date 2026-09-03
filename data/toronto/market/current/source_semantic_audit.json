@@ -1,13 +1,13 @@
 {
   "schema_version": "toronto-source-semantic-audit-1.0",
-  "generated_at": "2026-09-03T14:25:38.661917Z",
+  "generated_at": "2026-09-03T16:38:35.070933Z",
   "status": "PASSED_WITH_CARDINALITY_REVIEW",
   "counts": {
-    "source_links": 38394,
-    "source_families": 13,
+    "source_links": 38756,
+    "source_families": 14,
     "canonical_properties": 13065,
-    "unique_property_source_record_identities": 38394,
-    "unique_source_records_across_families": 36706,
+    "unique_property_source_record_identities": 38756,
+    "unique_source_records_across_families": 37068,
     "record_specific_actions": 14238
   },
   "findings": {
@@ -107,6 +107,18 @@
       "multi_property_source_record_count": 0,
       "record_action_count": 0,
       "dataset_url": "https://open.toronto.ca/dataset/development-pipeline/"
+    },
+    "ontario_bps_energy_2024": {
+      "links": 362,
+      "unique_source_records": 362,
+      "unique_properties": 275,
+      "coverage_expected_properties": 275,
+      "coverage_property_count_matches": true,
+      "max_links_per_property": 21,
+      "max_properties_per_source_record": 1,
+      "multi_property_source_record_count": 0,
+      "record_action_count": 0,
+      "dataset_url": "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector"
     },
     "ontario_environmental_compliance_reports": {
       "links": 2,

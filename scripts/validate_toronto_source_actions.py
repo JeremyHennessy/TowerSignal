@@ -9,7 +9,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from toronto_app_sources import valid_public_url
+from toronto_app_sources import OFFICIAL_DATASET_URLS, valid_public_url
 
 ROOT = Path(__file__).resolve().parents[1]
 PAYLOAD = ROOT / "public/data/toronto-market.json"
@@ -46,8 +46,12 @@ def main() -> None:
     payload = json.loads(PAYLOAD.read_text(encoding="utf-8"))
     catalogue = payload.get("source_catalog") or {}
     properties = payload.get("properties") or []
-    if len(catalogue) != 13:
-        raise RuntimeError(f"Expected 13 Toronto source families, found {len(catalogue)}")
+    expected_sources = set(OFFICIAL_DATASET_URLS)
+    actual_sources = set(catalogue)
+    if actual_sources != expected_sources:
+        missing = sorted(expected_sources - actual_sources)
+        unexpected = sorted(actual_sources - expected_sources)
+        raise RuntimeError(f"Toronto source catalogue mismatch: missing={missing}, unexpected={unexpected}")
 
     record_actions: dict[str, list[str]] = {}
     representative_records: dict[str, dict[str, Any]] = {}

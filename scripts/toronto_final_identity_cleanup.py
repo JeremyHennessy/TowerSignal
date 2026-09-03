@@ -70,7 +70,7 @@ def iter_records(payload: Any) -> Iterable[dict[str, Any]]:
         for item in payload:
             yield from iter_records(item)
     elif isinstance(payload, dict):
-        for name in ("records", "rows", "toronto_rows", "features", "applications", "matches", "properties", "notices"):
+        for name in ("records", "rows", "toronto_rows", "toronto_candidates", "features", "applications", "matches", "properties", "notices"):
             value = payload.get(name)
             if isinstance(value, list):
                 for item in value:

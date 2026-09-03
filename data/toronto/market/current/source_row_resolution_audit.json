@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-source-row-resolution-audit-1.1",
-  "source_links": 38394,
+  "source_links": 38756,
   "status": "PASSED",
   "sources": {
     "311_matches_prior_poc": {
@@ -30,6 +30,10 @@
     "development_pipeline": {
       "index_address_match": 1780,
       "stable_id_address_match": 1780
+    },
+    "ontario_bps_energy_2024": {
+      "index_address_match": 362,
+      "stable_id_address_match": 362
     },
     "ontario_environmental_compliance_reports": {
       "index_address_match": 2,

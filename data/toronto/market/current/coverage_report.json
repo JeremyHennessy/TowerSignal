@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-coverage-1.2",
-  "generated_at": "2026-08-31T19:28:31.201640Z",
+  "generated_at": "2026-09-03T16:24:21.445353Z",
   "coverage_contract": {
     "meaning": "Measured source, reconciliation, document-access, relationship and screening coverage only.",
     "true_market_denominator": "No validated total installed Toronto cooling-tower population has been established from public data.",
@@ -127,16 +127,17 @@
     },
     "ontario_bps_energy_2024": {
       "status": "JOINED",
-      "source_records": 0,
-      "records_with_property_address": 0,
-      "matched_records": 0,
-      "matched_canonical_properties": 0,
+      "source_records": 1863,
+      "records_with_property_address": 1863,
+      "matched_records": 362,
+      "matched_canonical_properties": 275,
       "ambiguous_address_rows_not_forced": 0,
-      "links_added": 0,
-      "identity_limitation": "NO_DETERMINISTIC_PROPERTY_ADDRESS_EXTRACTED_FROM_PERSISTED_SOURCE_FILE",
-      "candidate_universe_property_link_fraction": 0.0,
-      "source_record_match_fraction": null,
-      "unmatched_source_records": 0
+      "links_added": 362,
+      "identity_limitation": null,
+      "role_semantics": "Organization is retained only as FACILITY_OPERATOR_OR_REPORTER_AT; this source does not establish ownership.",
+      "candidate_universe_property_link_fraction": 0.02104860313815538,
+      "source_record_match_fraction": 0.19431025228126678,
+      "unmatched_source_records": 1501
     },
     "affordable_housing_pipeline": {
       "status": "JOINED",
@@ -271,9 +272,10 @@
     "transport_note": "Current City attachment APIs require browser-generated reCAPTCHA; bulk document extraction was not bypassed."
   },
   "relationship_coverage": {
-    "edge_count": 5976,
+    "edge_count": 6331,
     "relationship_counts": {
       "CHEMTRAC_REPORTING_FACILITY_AT": 2265,
+      "FACILITY_OPERATOR_OR_REPORTER_AT": 355,
       "LICENCE_HOLDER_AT_PROPERTY": 1092,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2612,
@@ -281,6 +283,7 @@
     },
     "properties_by_relationship": {
       "CHEMTRAC_REPORTING_FACILITY_AT": 1954,
+      "FACILITY_OPERATOR_OR_REPORTER_AT": 275,
       "LICENCE_HOLDER_AT_PROPERTY": 88,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2603,
@@ -291,7 +294,7 @@
       "properties_with_property_manager": 2603,
       "properties_with_engineer_or_consultant": 0,
       "properties_with_contractor_or_successful_bidder": 3,
-      "properties_with_facility_operator_or_reporter": 0,
+      "properties_with_facility_operator_or_reporter": 275,
       "properties_with_chemtrac_reporting_facility": 1954,
       "properties_with_licence_holder": 88
     },

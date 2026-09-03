@@ -21,6 +21,7 @@ OFFICIAL_DATASET_URLS = {
     "chemtrac_history": "https://open.toronto.ca/dataset/chemical-tracking-chemtrac/",
     "development_pipeline": "https://open.toronto.ca/dataset/development-pipeline/",
     "ontario_environmental_compliance_reports": "https://data.ontario.ca/dataset/environmental-compliance-reports",
+    "ontario_bps_energy_2024": "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector",
     "renewable_energy_installations": "https://open.toronto.ca/dataset/renewable-energy-installations/",
     "tobids_awarded_contracts_exact_document_address_prior_poc": "https://open.toronto.ca/dataset/tobids-awarded-contracts/",
     "toronto_aic_applications": "https://www.toronto.ca/city-government/planning-development/application-details/",
@@ -103,7 +104,7 @@ def rentsafe_record_url(row: dict[str, Any]) -> str | None:
 
 
 def _rows(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    for key in ("rows", "records", "applications", "toronto_rows", "matches"):
+    for key in ("rows", "records", "applications", "toronto_rows", "toronto_candidates", "matches"):
         values = payload.get(key)
         if isinstance(values, list):
             return [item for item in values if isinstance(item, dict)]
@@ -122,6 +123,7 @@ def load_source_rows(root: Path, load_json: Any) -> dict[str, list[dict[str, Any
         "chemtrac_history": warehouse / "open_licensed/chemtrac_history.json",
         "development_pipeline": warehouse / "open_licensed/development_pipeline.json",
         "ontario_environmental_compliance_reports": warehouse / "open_licensed/ontario_environmental_compliance_reports.json",
+        "ontario_bps_energy_2024": warehouse / "open_licensed/ontario_bps_energy_2024.json",
         "renewable_energy_installations": warehouse / "open_licensed/renewable_energy_installations.json",
         "tobids_awarded_contracts_exact_document_address_prior_poc": warehouse / "open_licensed/tobids_awarded_contracts.json",
         "toronto_aic_applications": market / "open_licensed/toronto_aic_applications.json",
@@ -204,6 +206,12 @@ def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict
         result.update(record_title=text(row.get("Site Name")), record_date=date_value(row.get("Exceedance Start Date")), record_status=text(row.get("Ministry Action")), record_details=details(
             ("Facility owner", row.get("Facility Owner")), ("Report year", row.get("_towersignal_source_year")),
             ("Contaminant", row.get("Contaminant")), ("Exceedance type", row.get("Type of Exceedance") or row.get(" Type of Exceedance")),
+        ))
+    elif key == "ontario_bps_energy_2024":
+        result.update(record_title=text(row.get("Property Name") or "Ontario BPS energy report"), record_date=date_value(row.get("Year Ending") or row.get("Report Submission Date")), record_status="Published BPS energy report", record_details=details(
+            ("Organization", row.get("Organization")), ("Sector", row.get("Sector")),
+            ("Subsector", row.get("Subsector")), ("Property type", row.get("Primary Property Type - Self Selected")),
+            ("Reporting year", row.get("Year")),
         ))
     elif key == "business_licence_matches_prior_poc":
         result.update(record_title=text(row.get("Operating Name") or row.get("Client Name")), record_date=date_value(row.get("Issued")), record_status="Cancelled" if text(row.get("Cancel Date")) else "Published licence record", record_details=details(

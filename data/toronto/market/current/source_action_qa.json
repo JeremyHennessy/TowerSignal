@@ -1,13 +1,13 @@
 {
   "schema_version": "toronto-source-action-qa-1.0",
-  "generated_at": "2026-09-03T14:17:08.626758Z",
+  "generated_at": "2026-09-03T16:29:16.464522Z",
   "status": "PASSED",
   "counts": {
-    "source_families": 13,
-    "unique_dataset_actions": 12,
+    "source_families": 14,
+    "unique_dataset_actions": 13,
     "unique_record_actions": 14238,
     "checked_record_action_sample": 10,
-    "checked_unique_urls": 22,
+    "checked_unique_urls": 23,
     "failures": 0
   },
   "sources": {
@@ -153,6 +153,23 @@
         "property_id": "toronto-address-point:981849",
         "display_address": "1 Adriatic Rd",
         "source_record_id": "development_pipeline:id:1071"
+      },
+      "fallback_message_required": true
+    },
+    "ontario_bps_energy_2024": {
+      "link_level": "DATASET_FALLBACK",
+      "dataset_action": {
+        "url": "https://data.ontario.ca/dataset/energy-use-and-greenhouse-gas-emissions-for-the-broader-public-sector",
+        "http_status": 200,
+        "status": "REACHABLE"
+      },
+      "record_actions": [],
+      "available_unique_record_actions": 0,
+      "checked_record_action_sample": 0,
+      "representative_source_record": {
+        "property_id": "toronto-address-point:14258203",
+        "display_address": "1 Centre Island Pk",
+        "source_record_id": "ontario_bps_energy_2024:sha256:13f119db772bd8e81a4e724b"
       },
       "fallback_message_required": true
     },

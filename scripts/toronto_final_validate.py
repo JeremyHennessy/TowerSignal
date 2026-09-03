@@ -122,6 +122,8 @@ def main() -> None:
             assert relationship == "CHEMTRAC_REPORTING_FACILITY_AT"
         if source == "business_licence_matches_prior_poc":
             assert relationship == "LICENCE_HOLDER_AT_PROPERTY"
+        if source == "ontario_bps_energy_2024":
+            assert relationship == "FACILITY_OPERATOR_OR_REPORTER_AT"
         if relationship == "OWNER_OF":
             assert source in {"ontario_environmental_compliance_reports", "toronto_aic_supporting_documents"}
 

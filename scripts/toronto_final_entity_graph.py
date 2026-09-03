@@ -112,7 +112,7 @@ def main() -> None:
 
     # Full BPS file: organization is operator/reporter, explicitly not ownership.
     bps_payload = read_json(WAREHOUSE / "open_licensed/ontario_bps_energy_2024.json") or {}
-    bps_rows = bps_payload.get("records") or bps_payload.get("toronto_rows") or []
+    bps_rows = bps_payload.get("toronto_candidates") or bps_payload.get("records") or bps_payload.get("toronto_rows") or []
     bps_matched = 0
     for row in bps_rows:
         if not isinstance(row, dict):
