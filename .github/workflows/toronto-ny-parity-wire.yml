@@ -21,6 +21,16 @@ jobs:
           ref: agent/toronto-ny-parity-20260904
           fetch-depth: 0
 
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Wire parity shell and clean TypeScript
         run: |
           python - <<'PY'
@@ -52,13 +62,13 @@ jobs:
           PY
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Frontend quality gate
         run: |
           npm run lint
           npm run typecheck
-          npm run test -- --run tests/frontend/TorontoMarket.test.tsx
+          npm run test -- tests/frontend/TorontoMarket.test.tsx
           VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm run build
 
       - name: Preserve Toronto evidence boundary
