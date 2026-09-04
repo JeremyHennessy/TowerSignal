@@ -4,6 +4,9 @@ import { ShareButton } from './ShareButton'
 
 export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'toronto' | 'opportunities' | 'companies' | 'portfolios' | 'workflow' | 'source-health' | 'account'
 
+const TORONTO_PREVIEW = import.meta.env.VITE_TORONTO_PREVIEW === 'true'
+const NEW_YORK_APP_URL = 'https://jeremyhennessy.github.io/TowerSignal/'
+
 const navigation: Array<{ mode: WorkspaceMode; label: string }> = [
   { mode: 'prospect', label: 'Prospect' },
   { mode: 'monitor', label: 'Monitor' },
@@ -67,6 +70,16 @@ export function TopNavigation({
     event.preventDefault()
     onSearchSubmit()
   }
+
+  if (TORONTO_PREVIEW) return <header className="reference-top-nav">
+    <style>{'.toronto-filters > *{min-width:0}.toronto-filters input,.toronto-filters select{width:100%;min-width:0;box-sizing:border-box}'}</style>
+    <button className="reference-brand" onClick={() => onNavigate('toronto')} aria-label="TowerSignal Toronto home"><span className="reference-brand-mark"><TowerSignalMark /></span><strong>TowerSignal</strong></button>
+    <nav aria-label="TowerSignal Toronto workspace"><button className="active" onClick={() => onNavigate('toronto')}>Toronto Market</button></nav>
+    <div className="reference-nav-tools">
+      <ShareButton label="Share" className="global-share-button" />
+      <a className="share-button global-share-button" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }} aria-label="Open New York app" href={NEW_YORK_APP_URL} target="_blank" rel="noreferrer">New York ↗</a>
+    </div>
+  </header>
 
   return <header className="reference-top-nav">
     <button className="reference-brand" onClick={() => goPortal('#/home')} aria-label="TowerSignal home"><span className="reference-brand-mark"><TowerSignalMark /></span><strong>TowerSignal</strong></button>

@@ -1,6 +1,6 @@
 import type { WorkflowAccountPatch, WorkflowSavedView, WorkflowUser, WorkflowWatchlist } from '../types/workflow'
 
-export const workflowRuntimeEnabled = import.meta.env.MODE !== 'test'
+export const workflowRuntimeEnabled = import.meta.env.MODE !== 'test' && import.meta.env.VITE_TORONTO_PREVIEW !== 'true'
 
 const loadRemote = () => import('./remoteClient')
 
