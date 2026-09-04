@@ -7,7 +7,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from towersignal.nys_lsli_detail import parse_detail  # noqa: E402
+from towersignal.nys_lsli_detail import (  # noqa: E402
+    _explicit_detail_404,
+    _unavailable_detail,
+    parse_detail,
+)
 from towersignal.nys_public_water import NysPublicWaterSourceError  # noqa: E402
 
 
@@ -67,6 +71,7 @@ class NysLsliDetailTests(unittest.TestCase):
             source_url="https://www.health.ny.gov/environmental/water/drinking/service_line/NY7003493.htm",
             expected_pws_id="NY7003493",
         )
+        self.assertEqual(result["detail_status"], "PARSED")
         self.assertEqual(result["inventory"]["total_service_lines"], 100)
         self.assertEqual(result["inventory"]["lead_service_lines"], 10)
         self.assertEqual(result["owner_or_operator_form_contact"]["name"], "Jane Operator")
@@ -109,6 +114,30 @@ class NysLsliDetailTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(NysPublicWaterSourceError, "required inventory"):
             parse_detail(broken, source_url="https://example.test/NY7003493.htm")
+
+    def test_only_explicit_fetch_404_is_treated_as_unavailable_detail(self) -> None:
+        explicit = NysPublicWaterSourceError(
+            "Failed to retrieve NYSDOH page after fallback/retries: "
+            "https://www.health.ny.gov/environmental/water/drinking/service_line/NY0117224.htm: "
+            "HTTP Error 404: Not Found"
+        )
+        self.assertTrue(_explicit_detail_404(explicit))
+        self.assertFalse(_explicit_detail_404(NysPublicWaterSourceError("Required table not found")))
+
+    def test_unavailable_detail_retains_index_identity_and_no_inventory(self) -> None:
+        exc = NysPublicWaterSourceError("HTTP Error 404: Not Found")
+        row = _unavailable_detail(
+            {
+                "pws_id": "NY0117224",
+                "pws_name": "Example Indexed System",
+                "county": "Example",
+                "detail_url": "https://www.health.ny.gov/environmental/water/drinking/service_line/NY0117224.htm",
+            },
+            exc,
+        )
+        self.assertEqual(row["detail_status"], "DETAIL_UNAVAILABLE_404")
+        self.assertEqual(row["pws_id"], "NY0117224")
+        self.assertNotIn("inventory", row)
 
 
 if __name__ == "__main__":
