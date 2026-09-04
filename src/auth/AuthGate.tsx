@@ -47,6 +47,7 @@ export function AuthGate() {
   }, [])
 
   useEffect(() => {
+    if (TORONTO_PREVIEW) return
     void refreshSession()
     const onFocus = () => { void refreshSession() }
     window.addEventListener('focus', onFocus)
