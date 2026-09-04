@@ -1,0 +1,78 @@
+name: Verify NYCHA water contract cache
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/nycha-water-cache.yml'
+      - 'scripts/towersignal/checkbook_nycha.py'
+      - 'scripts/towersignal/checkbook.py'
+      - 'scripts/towersignal/checkbook_recent.py'
+      - 'scripts/towersignal/procurement.py'
+      - 'scripts/build_nycha_water_cache.py'
+      - 'scripts/validate_nycha_water_cache.py'
+      - 'tests/python/test_checkbook_nycha.py'
+      - 'docs/BUILD017F_NYCHA_WATER_CONTRACTS.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-nycha-water-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build bounded NYCHA release-line cache
+        run: python scripts/build_nycha_water_cache.py --output nycha-water/cache.json --fiscal-year-count 5 --page-size 5000
+      - name: Validate exact pagination, granularity and evidence boundaries
+        run: python scripts/validate_nycha_water_cache.py --cache nycha-water/cache.json --max-age-days 1 --require-production-volume
+      - name: Run NYCHA adapter tests
+        run: python -m unittest tests.python.test_checkbook_nycha -v
+      - name: Upload verified NYCHA water cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-nycha-water-cache
+          path: nycha-water/cache.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified NYCHA water cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-nycha-water-cache
+          path: .verified-nycha-water
+      - name: Revalidate downloaded cache
+        run: python scripts/validate_nycha_water_cache.py --cache .verified-nycha-water/cache.json --max-age-days 1 --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
