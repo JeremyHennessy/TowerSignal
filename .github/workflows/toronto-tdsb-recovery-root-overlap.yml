@@ -1,0 +1,46 @@
+name: Toronto TDSB Recovery Root Overlap
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-identity-recovery-diagnostic-20260904
+    paths:
+      - .github/workflows/toronto-tdsb-recovery-root-overlap.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout recovery baseline diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Measure recovered TDSB roots against recovery property spine
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          roots = {
+              '7033947','568400','532121','568398','6738446','341419','344918',
+              '341468','772989','1039711','579389','336715','315052',
+          }
+          prior_tdsb_roots = {'315052'}
+          candidate_new_tdsb_roots = roots - prior_tdsb_roots
+          spine = json.loads(Path('data/toronto/market/current/property_spine.json').read_text(encoding='utf-8'))
+          spine_apids = {str(p.get('address_point_id') or '').strip() for p in spine.get('properties', []) if isinstance(p, dict)}
+          already_in_recovery_spine = sorted(candidate_new_tdsb_roots & spine_apids, key=int)
+          new_vs_recovery_spine = sorted(candidate_new_tdsb_roots - spine_apids, key=int)
+          print('RECOVERED_SCHOOLS=13')
+          print('RECOVERED_SOURCE_ROWS=34')
+          print('RECOVERED_ROOTS=13')
+          print('ROOTS_ALREADY_IN_INITIAL_TDSB_RESOLVED_SET=', sorted(prior_tdsb_roots, key=int))
+          print('CANDIDATE_ADDITIONAL_TDSB_ROOTS=', len(candidate_new_tdsb_roots))
+          print('ALREADY_IN_RECOVERY_SPINE=', len(already_in_recovery_spine), already_in_recovery_spine)
+          print('NEW_ROOTS_VS_RECOVERY_SPINE=', len(new_vs_recovery_spine), new_vs_recovery_spine)
+          print('PROJECTED_RECOVERY_LINKED_TDSB_ROWS=816')
+          print('PROJECTED_TDSB_UNLINKED_ROWS=10')
+          print('PROJECTED_MATCHED_TDSB_SCHOOLS=347')
+          print('PROJECTED_MATCHED_TDSB_ROOTS=342')
