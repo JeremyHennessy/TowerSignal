@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { TorontoHistoryEvent, TorontoHistoryPayload } from '../types/torontoHistory'
+import '../styles/toronto-monitor.css'
 
 const base = import.meta.env.BASE_URL
 
