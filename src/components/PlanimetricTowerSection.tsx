@@ -8,6 +8,7 @@ const PLANIMETRIC_SOURCE_URL = 'https://data.cityofnewyork.us/City-Government/NY
 const BUILDING_SOURCE_URL = 'https://data.cityofnewyork.us/City-Government/BUILDING/5zhs-2jue'
 const ORTHO_SOURCE_URL = 'https://gis.ny.gov/2022-orthoimagery'
 const ORTHO_TILE_URL = 'https://orthos.its.ny.gov/arcgis/rest/services/wms/2022/MapServer/tile/{z}/{y}/{x}'
+const COLLAPSE_TOWER_DETAILS_AT = 12
 
 function featureLabel(index: number) {
   return `Mapped tower footprint ${index + 1}`
@@ -92,11 +93,11 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
       }
       const layer = L.geoJSON(geoJsonFeature, {
         style: {
-          color: '#111827',
+          color: '#f59e0b',
           weight: 3,
           opacity: 1,
           fillColor: '#f59e0b',
-          fillOpacity: 0.48,
+          fillOpacity: 0.38,
         },
       }).addTo(map)
       layer.bindTooltip(featureLabel(index))
@@ -111,6 +112,18 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
       map.remove()
     }
   }, [buildingFootprints, features, hasRoofMapContext])
+
+  const featureCards = features?.map((feature, index) => <article className="planimetric-feature" key={feature.global_id}>
+    <div className="planimetric-feature-head"><strong>{featureLabel(index)}</strong><span>BIN {feature.bin}</span></div>
+    <dl className="identity-grid">
+      <div><dt>Global ID</dt><dd className="mono planimetric-id">{feature.global_id}</dd></div>
+      <div><dt>Source ID</dt><dd>{feature.source_id ?? '—'}</dd></div>
+      <div><dt>Feature code</dt><dd>{feature.feature_code ?? '—'}</dd></div>
+      <div><dt>Sub-feature code</dt><dd>{feature.sub_feature_code ?? '—'}</dd></div>
+      <div><dt>Source status</dt><dd>{feature.status ?? '—'}</dd></div>
+      <div><dt>Observation imagery</dt><dd>{feature.imagery_year}</dd></div>
+    </dl>
+  </article>)
 
   return <section className="planimetric-section">
     <h3>Physical tower location</h3>
@@ -133,19 +146,10 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
     {featureCount === 0 ? <>
       <div className="empty-inline">No NYC Planimetric cooling-tower feature was exact-matched to this system's published BIN.</div>
       <p className="microcopy">A missing 2022 Planimetric feature is not evidence that the registered cooling tower does not physically exist. Where a current building footprint is available, the aerial roof context remains visible for field verification.</p>
-    </> : <div className="planimetric-feature-list">
-      {features?.map((feature, index) => <article className="planimetric-feature" key={feature.global_id}>
-        <div className="planimetric-feature-head"><strong>{featureLabel(index)}</strong><span>BIN {feature.bin}</span></div>
-        <dl className="identity-grid">
-          <div><dt>Global ID</dt><dd className="mono planimetric-id">{feature.global_id}</dd></div>
-          <div><dt>Source ID</dt><dd>{feature.source_id ?? '—'}</dd></div>
-          <div><dt>Feature code</dt><dd>{feature.feature_code ?? '—'}</dd></div>
-          <div><dt>Sub-feature code</dt><dd>{feature.sub_feature_code ?? '—'}</dd></div>
-          <div><dt>Source status</dt><dd>{feature.status ?? '—'}</dd></div>
-          <div><dt>Observation imagery</dt><dd>{feature.imagery_year}</dd></div>
-        </dl>
-      </article>)}
-    </div>}
+    </> : featureCount > COLLAPSE_TOWER_DETAILS_AT ? <details className="roof-tower-details">
+      <summary>Tower feature evidence · {featureCount} mapped footprints</summary>
+      <div className="planimetric-feature-list">{featureCards}</div>
+    </details> : <div className="planimetric-feature-list">{featureCards}</div>}
 
     {footprintCount > 0 && <details className="roof-building-details">
       <summary>Building footprint context · {footprintCount} exact-BIN feature{footprintCount === 1 ? '' : 's'}</summary>
