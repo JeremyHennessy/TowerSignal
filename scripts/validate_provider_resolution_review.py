@@ -18,7 +18,7 @@ def validate(path: Path, *, require_production_volume: bool) -> dict:
         raise RuntimeError("Alias candidate summary mismatch")
     if int(summary.get("dec_name_match_count") or 0) != len(dec_matches):
         raise RuntimeError("DEC name-match summary mismatch")
-    if int(summary.get("merge_applied_count") or -1) != 0:
+    if int(summary.get("merge_applied_count", -1)) != 0:
         raise RuntimeError("Provider-resolution review unexpectedly applied a merge")
 
     ids: set[str] = set()
