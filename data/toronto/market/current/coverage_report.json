@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-coverage-1.2",
-  "generated_at": "2026-09-03T21:32:20.342744Z",
+  "generated_at": "2026-09-04T15:33:28.953775Z",
   "coverage_contract": {
     "meaning": "Measured source, reconciliation, document-access, relationship and screening coverage only.",
     "true_market_denominator": "No validated total installed Toronto cooling-tower population has been established from public data.",
@@ -219,19 +219,19 @@
     },
     "tobids_awarded_contracts_exact_document_address_prior_poc": {
       "status": "JOINED",
-      "matched_records": 17,
-      "matched_canonical_properties": 13,
+      "matched_records": 18,
+      "matched_canonical_properties": 14,
       "links_added": 5,
       "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text.",
       "source_records": 7670,
       "records_with_solicitation_description": 1521,
       "ambiguous_multi_property_rows_not_forced": 5,
       "ambiguous_property_addresses_not_used": 2,
-      "links_added_in_citywide_exact_description_pass": 12,
+      "links_added_in_citywide_exact_description_pass": 1,
       "role_semantics": "Successful Supplier supports SUCCESSFUL_BIDDER_AT_PROPERTY only. Mechanical, contractor-specialty, engineering, ownership, and consulting roles are not inferred from category or keywords.",
-      "candidate_universe_property_link_fraction": 0.0009715994020926756,
-      "source_record_match_fraction": 0.002216427640156454,
-      "unmatched_source_records": 7653
+      "candidate_universe_property_link_fraction": 0.0010463378176382662,
+      "source_record_match_fraction": 0.002346805736636245,
+      "unmatched_source_records": 7652
     },
     "capital_project_pipeline_exact_document_address_prior_poc": {
       "status": "JOINED_FROM_PREVIOUSLY_VALIDATED_POC_DOCUMENT_MATCHES",
@@ -344,14 +344,14 @@
     "transport_note": "Current City attachment APIs require browser-generated reCAPTCHA; bulk document extraction was not bypassed."
   },
   "relationship_coverage": {
-    "edge_count": 6343,
+    "edge_count": 6344,
     "relationship_counts": {
       "CHEMTRAC_REPORTING_FACILITY_AT": 2265,
       "FACILITY_OPERATOR_OR_REPORTER_AT": 355,
       "LICENCE_HOLDER_AT_PROPERTY": 1092,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2612,
-      "SUCCESSFUL_BIDDER_AT_PROPERTY": 17
+      "SUCCESSFUL_BIDDER_AT_PROPERTY": 18
     },
     "properties_by_relationship": {
       "CHEMTRAC_REPORTING_FACILITY_AT": 1954,
@@ -359,13 +359,13 @@
       "LICENCE_HOLDER_AT_PROPERTY": 88,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2603,
-      "SUCCESSFUL_BIDDER_AT_PROPERTY": 13
+      "SUCCESSFUL_BIDDER_AT_PROPERTY": 14
     },
     "chain_coverage": {
       "properties_with_owner": 2,
       "properties_with_property_manager": 2603,
       "properties_with_engineer_or_consultant": 0,
-      "properties_with_contractor_or_successful_bidder": 13,
+      "properties_with_contractor_or_successful_bidder": 14,
       "properties_with_facility_operator_or_reporter": 275,
       "properties_with_chemtrac_reporting_facility": 1954,
       "properties_with_licence_holder": 88

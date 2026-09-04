@@ -53,7 +53,9 @@ class TorontoBuildingPermitRecoveryTests(unittest.TestCase):
             self.assertEqual(prop["identity_basis"], "TARGETED_BUILDING_PERMIT_DETERMINISTIC_RECOVERY_TO_CURRENT_ADDRESS_POINT_ROOT")
         permit_edges = [edge for edge in graph.get("edges", []) if edge.get("source_key") in PERMIT_SOURCES]
         self.assertEqual(permit_edges, [])
-        self.assertEqual(len(graph.get("edges", [])), 6343)
+        new_property_edges = [edge for edge in graph.get("edges", []) if edge.get("property_id") in new_ids]
+        self.assertEqual(new_property_edges, [])
+        self.assertEqual(len(graph.get("edges", [])), 6344)
 
     def test_recovery_links_are_exactly_the_manifest_rows(self) -> None:
         report = json.loads((MARKET / "building_permit_recovery_report.json").read_text(encoding="utf-8"))

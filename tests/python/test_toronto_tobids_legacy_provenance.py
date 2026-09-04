@@ -25,9 +25,9 @@ class TorontoTobidsLegacyProvenanceTests(unittest.TestCase):
         ]
         legacy = [item for item in all_tobids_links if item.get("source_row_index") is None]
         citywide = [item for item in all_tobids_links if isinstance(item.get("source_row_index"), int)]
-        self.assertEqual(len(all_tobids_links), 17)
+        self.assertEqual(len(all_tobids_links), 18)
         self.assertEqual(len(legacy), 5)
-        self.assertEqual(len(citywide), 12)
+        self.assertEqual(len(citywide), 13)
 
         publisher_keys: set[tuple[str, str]] = set()
         legacy_documents: set[str] = set()
@@ -38,7 +38,7 @@ class TorontoTobidsLegacyProvenanceTests(unittest.TestCase):
             legacy_documents.add(str(resolved.get("Document Number") or ""))
 
         exact, ambiguous, _ = candidate_rows(properties, rows)
-        self.assertEqual(len(exact), 15)
+        self.assertEqual(len(exact), 16)
         self.assertEqual(len(ambiguous), 5)
         overlaps = [
             item for item in exact

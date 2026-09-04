@@ -1,13 +1,13 @@
 {
   "schema_version": "toronto-source-semantic-audit-1.0",
-  "generated_at": "2026-09-03T21:57:03.064471Z",
+  "generated_at": "2026-09-04T15:56:17.834051Z",
   "status": "PASSED_WITH_CARDINALITY_REVIEW",
   "counts": {
-    "source_links": 40059,
+    "source_links": 40060,
     "source_families": 16,
     "canonical_properties": 13380,
-    "unique_property_source_record_identities": 40059,
-    "unique_source_records_across_families": 38371,
+    "unique_property_source_record_identities": 40060,
+    "unique_source_records_across_families": 38372,
     "record_specific_actions": 14238
   },
   "findings": {
@@ -145,10 +145,10 @@
       "dataset_url": "https://open.toronto.ca/dataset/renewable-energy-installations/"
     },
     "tobids_awarded_contracts_exact_document_address_prior_poc": {
-      "links": 17,
-      "unique_source_records": 17,
-      "unique_properties": 13,
-      "coverage_expected_properties": 13,
+      "links": 18,
+      "unique_source_records": 18,
+      "unique_properties": 14,
+      "coverage_expected_properties": 14,
       "coverage_property_count_matches": true,
       "max_links_per_property": 3,
       "max_properties_per_source_record": 1,

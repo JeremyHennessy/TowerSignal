@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-entity-graph-1.0",
-  "generated_at": "2026-09-03T21:32:19.777995Z",
+  "generated_at": "2026-09-04T15:33:28.557079Z",
   "relationship_contract": {
     "ownership": "Only explicit OWNER-labelled source text may create OWNER_OF; manager/operator/reporter/supplier are never relabelled owner.",
     "aic": "AIC text-pattern role edges are review-required and are not treated as verified legal relationships until reviewed.",
@@ -43,9 +43,9 @@
     "tobids_awarded_contracts": {
       "source_rows": 7670,
       "rows_with_solicitation_description": 1521,
-      "exact_single_current_property_rows": 15,
+      "exact_single_current_property_rows": 16,
       "ambiguous_multi_property_rows_not_forced": 5,
-      "new_citywide_exact_property_supplier_pairs": 12,
+      "new_citywide_exact_property_supplier_pairs": 1,
       "role_limitation": "Successful Supplier is retained only as SUCCESSFUL_BIDDER_AT_PROPERTY. No contractor specialty, engineer, consultant, operator, or ownership role is inferred."
     },
     "toronto_aic_supporting_documents": {
@@ -79,17 +79,17 @@
     }
   },
   "counts": {
-    "nodes": 17490,
+    "nodes": 17491,
     "property_nodes": 13380,
-    "organization_nodes": 4110,
-    "edges": 6343,
+    "organization_nodes": 4111,
+    "edges": 6344,
     "relationships": {
       "CHEMTRAC_REPORTING_FACILITY_AT": 2265,
       "FACILITY_OPERATOR_OR_REPORTER_AT": 355,
       "LICENCE_HOLDER_AT_PROPERTY": 1092,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2612,
-      "SUCCESSFUL_BIDDER_AT_PROPERTY": 17
+      "SUCCESSFUL_BIDDER_AT_PROPERTY": 18
     },
     "properties_by_relationship": {
       "CHEMTRAC_REPORTING_FACILITY_AT": 1954,
@@ -97,13 +97,13 @@
       "LICENCE_HOLDER_AT_PROPERTY": 88,
       "OWNER_OF": 2,
       "PROPERTY_MANAGER_OF": 2603,
-      "SUCCESSFUL_BIDDER_AT_PROPERTY": 13
+      "SUCCESSFUL_BIDDER_AT_PROPERTY": 14
     },
     "chain_coverage": {
       "properties_with_owner": 2,
       "properties_with_property_manager": 2603,
       "properties_with_engineer_or_consultant": 0,
-      "properties_with_contractor_or_successful_bidder": 13,
+      "properties_with_contractor_or_successful_bidder": 14,
       "properties_with_facility_operator_or_reporter": 275,
       "properties_with_chemtrac_reporting_facility": 1954,
       "properties_with_licence_holder": 88
@@ -100939,6 +100939,11 @@
       "node_type": "PROPERTY",
       "address": "240 McCaul St",
       "address_point_id": "30014412"
+    },
+    {
+      "node_id": "org:f2ec2958d5532e272ad3",
+      "node_type": "ORGANIZATION",
+      "name": "1246175 Ontario Limited o/a Active Mechanical Services"
     }
   ],
   "edges": [
@@ -212831,6 +212836,23 @@
         "award": "1525570.80",
         "source_row_index": 7390,
         "source_address": "35 Vanley Cres"
+      }
+    },
+    {
+      "edge_id": "edge:2a974d3dc9cc09337ac8",
+      "from_node": "org:f2ec2958d5532e272ad3",
+      "to_node": "toronto-address-point:7762664",
+      "property_id": "toronto-address-point:7762664",
+      "relationship": "SUCCESSFUL_BIDDER_AT_PROPERTY",
+      "source_key": "tobids_awarded_contracts",
+      "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
+      "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
+      "evidence": {
+        "document_number": "3704322859",
+        "award_date": "2023-03-06",
+        "award": "3414610.10",
+        "source_row_index": 6851,
+        "source_address": "40 College St"
       }
     }
   ]

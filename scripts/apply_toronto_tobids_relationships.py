@@ -20,15 +20,15 @@ GRAPH_SOURCE_KEY = "tobids_awarded_contracts"
 RELATIONSHIP = "SUCCESSFUL_BIDDER_AT_PROPERTY"
 EXPECTED_SOURCE_ROWS = 7670
 EXPECTED_ROWS_WITH_DESCRIPTION = 1521
-EXPECTED_EXACT_ROWS = 15
+EXPECTED_EXACT_ROWS = 16
 EXPECTED_AMBIGUOUS_ROWS = 5
-EXPECTED_EXISTING_EXACT_ROWS = 3
-EXPECTED_NEW_LINKS = 12
-EXPECTED_FINAL_SOURCE_LINKS = 17
-EXPECTED_FINAL_PROPERTIES = 13
-EXPECTED_NEW_EDGES = 12
-EXPECTED_FINAL_BIDDER_EDGES = 17
-EXPECTED_FINAL_BIDDER_PROPERTIES = 13
+EXPECTED_EXISTING_EXACT_ROWS = 15
+EXPECTED_NEW_LINKS = 1
+EXPECTED_FINAL_SOURCE_LINKS = 18
+EXPECTED_FINAL_PROPERTIES = 14
+EXPECTED_NEW_EDGES = 1
+EXPECTED_FINAL_BIDDER_EDGES = 18
+EXPECTED_FINAL_BIDDER_PROPERTIES = 14
 
 SUFFIX_MAP = {
     "ST": "STREET", "STREET": "STREET",
@@ -180,8 +180,8 @@ def recompute_graph_counts(graph: dict[str, Any]) -> None:
 def main() -> None:
     spine = read_json(MARKET / "property_spine.json") or {}
     properties = [item for item in spine.get("properties", []) if isinstance(item, dict)]
-    if len(properties) != 13065:
-        raise RuntimeError(f"Toronto property spine drift: expected 13065, found {len(properties)}")
+    if len(properties) != 13380:
+        raise RuntimeError(f"Toronto property spine drift: expected 13380, found {len(properties)}")
 
     tobids = read_json(WAREHOUSE / "open_licensed/tobids_awarded_contracts.json") or {}
     rows = [item for item in tobids.get("rows", []) if isinstance(item, dict)]

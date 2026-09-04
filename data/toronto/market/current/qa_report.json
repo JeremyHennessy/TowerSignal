@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-09-03T22:17:09.258799Z",
+  "generated_at": "2026-09-04T16:07:44.993138Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
   "json_files_validated": 33,
   "counts": {
@@ -8,8 +8,8 @@
     "poc_reconciliation_rows": 177,
     "poc_resolved": 175,
     "poc_unresolved": 2,
-    "source_links": 40059,
-    "entity_edges": 6343,
+    "source_links": 40060,
+    "entity_edges": 6344,
     "aic_application_catalogue": 15864,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
     "aic_documents_parsed": null,
@@ -620,31 +620,31 @@
         }
       },
       {
-        "property_id": "toronto-address-point:376306",
-        "from_node": "org:f3711e612a8b19d780fa",
+        "property_id": "toronto-address-point:14121075",
+        "from_node": "org:400cb08c8fd038b81038",
         "source_key": "tobids_awarded_contracts",
         "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
         "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
         "evidence": {
-          "document_number": "3887078310",
-          "award_date": "2023-07-24",
-          "award": "439620.00",
-          "source_row_index": 6464,
-          "source_address": "330 Progress Ave"
+          "document_number": "4433961094",
+          "award_date": "2024-07-05",
+          "award": "763212",
+          "source_row_index": 6479,
+          "source_address": "50 Ingram Dr"
         }
       },
       {
-        "property_id": "toronto-address-point:14605377",
-        "from_node": "org:0babf042b89e7cad8d22",
+        "property_id": "toronto-address-point:7762664",
+        "from_node": "org:f2ec2958d5532e272ad3",
         "source_key": "tobids_awarded_contracts",
         "basis": "EXPLICIT_SUCCESSFUL_SUPPLIER_AND_EXACT_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION",
         "confidence": "CONFIRMED_SOURCE_FIELD_AND_EXACT_ADDRESS_TEXT",
         "evidence": {
-          "document_number": "4890584788",
-          "award_date": "2025-05-21",
-          "award": "1525570.80",
-          "source_row_index": 7390,
-          "source_address": "35 Vanley Cres"
+          "document_number": "3704322859",
+          "award_date": "2023-03-06",
+          "award": "3414610.10",
+          "source_row_index": 6851,
+          "source_address": "40 College St"
         }
       }
     ]

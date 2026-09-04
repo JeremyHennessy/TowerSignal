@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-property-links-1.2",
-  "generated_at": "2026-09-03T21:32:19.408531Z",
+  "generated_at": "2026-09-04T15:33:28.263192Z",
   "join_contract": {
     "basis": "Exact corrected civic-address canonical equality to unique City ADDRESS_POINT_ID property",
     "fuzzy_matching": false,
@@ -8,7 +8,7 @@
   },
   "counts": {
     "canonical_properties": 13380,
-    "total_source_links": 40059,
+    "total_source_links": 40060,
     "properties_with_any_new_link": 12860,
     "source_family_count": 19
   },
@@ -151,15 +151,15 @@
     },
     "tobids_awarded_contracts_exact_document_address_prior_poc": {
       "status": "JOINED",
-      "matched_records": 17,
-      "matched_canonical_properties": 13,
+      "matched_records": 18,
+      "matched_canonical_properties": 14,
       "links_added": 5,
       "scope_limitation": "This retains only the earlier exact POC document-address matches; it does not claim a citywide document-address extraction from all award/capital text.",
       "source_records": 7670,
       "records_with_solicitation_description": 1521,
       "ambiguous_multi_property_rows_not_forced": 5,
       "ambiguous_property_addresses_not_used": 2,
-      "links_added_in_citywide_exact_description_pass": 12,
+      "links_added_in_citywide_exact_description_pass": 1,
       "role_semantics": "Successful Supplier supports SUCCESSFUL_BIDDER_AT_PROPERTY only. Mechanical, contractor-specialty, engineering, ownership, and consulting roles are not inferred from category or keywords."
     },
     "capital_project_pipeline_exact_document_address_prior_poc": {
@@ -224198,6 +224198,14 @@
       "source_row_index": 7549,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "47 BROADVIEW AVE"
+    },
+    {
+      "property_id": "toronto-address-point:7762664",
+      "source_key": "tobids_awarded_contracts_exact_document_address_prior_poc",
+      "source_record_id": "tobids_awarded_contracts_exact_document_address_prior_poc:id:6852",
+      "source_row_index": 6851,
+      "match_basis": "EXACT_NORMALIZED_CIVIC_ADDRESS_PHRASE_IN_SOLICITATION_DESCRIPTION_TO_UNIQUE_CURRENT_ADDRESS_POINT_PROPERTY",
+      "source_address": "40 College St"
     },
     {
       "property_id": "toronto-address-point:7762664",
