@@ -1,0 +1,76 @@
+name: Verify Open Book NY water contract cache
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/openbook-water-cache.yml'
+      - 'scripts/towersignal/openbook_water.py'
+      - 'scripts/towersignal/procurement.py'
+      - 'scripts/build_openbook_water_cache.py'
+      - 'scripts/validate_openbook_water_cache.py'
+      - 'tests/python/test_openbook_water.py'
+      - 'docs/BUILD017E_OPENBOOK_WATER_CONTRACTS.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-openbook-water-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build full Open Book transaction export and water-contract cache
+        run: python scripts/build_openbook_water_cache.py --output openbook-water/cache.json
+      - name: Validate source volume, transaction reconciliation and evidence boundaries
+        run: python scripts/validate_openbook_water_cache.py --cache openbook-water/cache.json --max-age-days 1 --require-production-volume
+      - name: Run Open Book water unit tests
+        run: python -m unittest tests.python.test_openbook_water -v
+      - name: Upload verified Open Book water cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-openbook-water-cache
+          path: openbook-water/cache.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified Open Book water cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-openbook-water-cache
+          path: .verified-openbook-water
+      - name: Revalidate downloaded cache
+        run: python scripts/validate_openbook_water_cache.py --cache .verified-openbook-water/cache.json --max-age-days 1 --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
