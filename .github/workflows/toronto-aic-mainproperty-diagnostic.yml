@@ -1,0 +1,135 @@
+name: Toronto AIC Property Identifier Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-aic-mainproperty-recovery-20260904
+    paths:
+      - .github/workflows/toronto-aic-mainproperty-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-aic-mainproperty-recovery-20260904
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Measure exact City property-identifier propagation
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python - <<'PY'
+          import json
+          from collections import defaultdict, Counter
+          from pathlib import Path
+          from toronto_source_identity import stable_source_record_id
+
+          market = Path('data/toronto/market/current')
+          payload = json.loads((market / 'open_licensed/toronto_aic_applications.json').read_text(encoding='utf-8'))
+          rows = [r for r in payload.get('applications', []) if isinstance(r, dict)]
+          links_payload = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
+          links = [l for l in links_payload.get('links', []) if isinstance(l, dict) and l.get('source_key') == 'toronto_aic_applications']
+          by_source_id = {l.get('source_record_id'): l.get('property_id') for l in links if l.get('source_record_id') and l.get('property_id')}
+
+          main_to_properties = defaultdict(set)
+          propertyrsn_to_properties = defaultdict(set)
+          linked_rows = 0
+          for row in rows:
+              sid = stable_source_record_id('toronto_aic_applications', row)
+              pid = by_source_id.get(sid)
+              if not pid:
+                  continue
+              linked_rows += 1
+              main = str(row.get('MAINPROPERTYRSN') or '').strip()
+              prop = str(row.get('PROPERTYRSN') or '').strip()
+              if main:
+                  main_to_properties[main].add(pid)
+              if prop:
+                  propertyrsn_to_properties[prop].add(pid)
+
+          candidates = []
+          ambiguous_identifier_rows = []
+          no_identifier_rows = 0
+          already_linked = 0
+          basis_counts = Counter()
+          property_ids = set()
+          for index, row in enumerate(rows):
+              sid = stable_source_record_id('toronto_aic_applications', row)
+              if sid in by_source_id:
+                  already_linked += 1
+                  continue
+              main = str(row.get('MAINPROPERTYRSN') or '').strip()
+              prop = str(row.get('PROPERTYRSN') or '').strip()
+              main_matches = main_to_properties.get(main, set()) if main else set()
+              prop_matches = propertyrsn_to_properties.get(prop, set()) if prop else set()
+              usable = []
+              basis = []
+              if len(main_matches) == 1:
+                  usable.append(next(iter(main_matches)))
+                  basis.append('UNIQUE_MAINPROPERTYRSN_FROM_EXACT_ADDRESS_LINKED_AIC')
+              if len(prop_matches) == 1:
+                  usable.append(next(iter(prop_matches)))
+                  basis.append('UNIQUE_PROPERTYRSN_FROM_EXACT_ADDRESS_LINKED_AIC')
+              if not main and not prop:
+                  no_identifier_rows += 1
+              if usable and len(set(usable)) == 1:
+                  pid = usable[0]
+                  combined_basis = '+'.join(basis)
+                  basis_counts[combined_basis] += 1
+                  property_ids.add(pid)
+                  candidates.append({
+                      'source_row_index': index,
+                      'source_record_id': sid,
+                      'property_id': pid,
+                      'application_number': row.get('APPLICATION_NUMBER') or row.get('REFERENCEFILE'),
+                      'full_address': row.get('FULL_ADDRESS'),
+                      'PROPERTYRSN': prop or None,
+                      'MAINPROPERTYRSN': main or None,
+                      'basis': combined_basis,
+                  })
+              elif usable or len(main_matches) > 1 or len(prop_matches) > 1:
+                  ambiguous_identifier_rows.append({
+                      'source_row_index': index,
+                      'application_number': row.get('APPLICATION_NUMBER') or row.get('REFERENCEFILE'),
+                      'full_address': row.get('FULL_ADDRESS'),
+                      'PROPERTYRSN': prop or None,
+                      'MAINPROPERTYRSN': main or None,
+                      'main_property_matches': sorted(main_matches),
+                      'propertyrsn_matches': sorted(prop_matches),
+                  })
+
+          report = {
+              'source_records': len(rows),
+              'existing_linked_rows_recomputed': linked_rows,
+              'existing_source_links': len(links),
+              'unlinked_rows': len(rows) - already_linked,
+              'unique_mainproperty_identifiers_from_linked_rows': sum(len(v) == 1 for v in main_to_properties.values()),
+              'ambiguous_mainproperty_identifiers': sum(len(v) > 1 for v in main_to_properties.values()),
+              'unique_propertyrsn_identifiers_from_linked_rows': sum(len(v) == 1 for v in propertyrsn_to_properties.values()),
+              'ambiguous_propertyrsn_identifiers': sum(len(v) > 1 for v in propertyrsn_to_properties.values()),
+              'deterministically_recoverable_unlinked_rows': len(candidates),
+              'recoverable_canonical_properties': len(property_ids),
+              'recovery_basis_counts': dict(basis_counts),
+              'ambiguous_identifier_rows_not_forced': len(ambiguous_identifier_rows),
+              'unlinked_rows_without_city_property_identifier': no_identifier_rows,
+              'sample_candidates': candidates[:25],
+              'sample_ambiguous': ambiguous_identifier_rows[:25],
+              'contract': 'A City property identifier may propagate identity only when that identifier is already observed on one or more exactly-address-linked AIC rows and maps to exactly one canonical Toronto property. Conflicting or multi-property identifiers are withheld. No tower or relationship assertion is created.',
+          }
+          Path('/tmp/aic-mainproperty-diagnostic.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+          print(json.dumps(report, indent=2))
+          assert report['existing_linked_rows_recomputed'] == 11225, report
+          assert report['deterministically_recoverable_unlinked_rows'] >= 0
+          PY
+      - name: Upload diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: toronto-aic-mainproperty-diagnostic
+          path: /tmp/aic-mainproperty-diagnostic.json
