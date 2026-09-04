@@ -50,6 +50,8 @@ export function HomePage({ user }: { user: WorkflowUser }) {
         <button onClick={() => go('#/prospect')}>Prospect</button>
         <button onClick={() => go('#/monitor')}>Monitor</button>
         <button onClick={() => go('#/map')}>Map</button>
+        <button onClick={() => go('#/nys')}>NYS Market</button>
+        <button onClick={() => go('#/nys-changes')}>NYS Changes</button>
         <button onClick={() => go('#/opportunities')}>Opportunities</button>
         <button onClick={() => go('#/companies')}>Companies</button>
         <button onClick={() => go('#/portfolios')}>Portfolios</button>
