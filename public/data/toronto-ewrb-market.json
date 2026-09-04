@@ -1,0 +1,805 @@
+{
+  "schema_version": "toronto-ewrb-market-1.0",
+  "scope": "TORONTO_AGGREGATE_ONLY",
+  "source_key": "ontario_ewrb_large_buildings",
+  "title": "Energy and water usage of large buildings in Ontario",
+  "catalogue_url": "https://data.ontario.ca/dataset/energy-and-water-usage-of-large-buildings-in-ontario",
+  "license": "Open Government Licence – Ontario",
+  "retrieved_at": "2026-08-31T19:22:02.043742Z",
+  "reporting_years": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "latest_reporting_year": 2024,
+  "toronto_reporting_rows": 11595,
+  "annual": [
+    {
+      "year": 2018,
+      "reporting_rows": 253,
+      "unique_ewrb_ids": 253,
+      "data_quality_check_yes_rows": 178,
+      "data_quality_check_yes_percent": 70.4,
+      "energy_star_numeric_score_rows": 129,
+      "published_energy_star_certification_value_rows": 7,
+      "top_property_types": [
+        {
+          "property_type": "Office",
+          "rows": 130
+        },
+        {
+          "property_type": "Multifamily Housing",
+          "rows": 40
+        },
+        {
+          "property_type": "Enclosed Mall",
+          "rows": 14
+        },
+        {
+          "property_type": "Other",
+          "rows": 12
+        },
+        {
+          "property_type": "Hotel",
+          "rows": 10
+        },
+        {
+          "property_type": "Strip Mall",
+          "rows": 8
+        },
+        {
+          "property_type": "Mixed Use Property",
+          "rows": 8
+        },
+        {
+          "property_type": "Distribution Center",
+          "rows": 6
+        },
+        {
+          "property_type": "Manufacturing/Industrial Plant",
+          "rows": 5
+        },
+        {
+          "property_type": "Retail Store",
+          "rows": 5
+        }
+      ],
+      "top_postal_fsa": [
+        {
+          "fsa": "M5J",
+          "rows": 25
+        },
+        {
+          "fsa": "M5H",
+          "rows": 19
+        },
+        {
+          "fsa": "M5G",
+          "rows": 18
+        },
+        {
+          "fsa": "M5V",
+          "rows": 17
+        },
+        {
+          "fsa": "M2N",
+          "rows": 15
+        },
+        {
+          "fsa": "M4W",
+          "rows": 11
+        },
+        {
+          "fsa": "M9W",
+          "rows": 9
+        },
+        {
+          "fsa": "M9C",
+          "rows": 8
+        },
+        {
+          "fsa": "M5C",
+          "rows": 8
+        },
+        {
+          "fsa": "M6A",
+          "rows": 7
+        }
+      ]
+    },
+    {
+      "year": 2019,
+      "reporting_rows": 1328,
+      "unique_ewrb_ids": 1328,
+      "data_quality_check_yes_rows": 784,
+      "data_quality_check_yes_percent": 59.0,
+      "energy_star_numeric_score_rows": 300,
+      "published_energy_star_certification_value_rows": 22,
+      "top_property_types": [
+        {
+          "property_type": "Multifamily Housing",
+          "rows": 852
+        },
+        {
+          "property_type": "Office",
+          "rows": 218
+        },
+        {
+          "property_type": "Other - Lodging/Residential",
+          "rows": 36
+        },
+        {
+          "property_type": "Manufacturing/Industrial Plant",
+          "rows": 32
+        },
+        {
+          "property_type": "Retail Store",
+          "rows": 25
+        },
+        {
+          "property_type": "Senior Care Community",
+          "rows": 24
+        },
+        {
+          "property_type": "Other",
+          "rows": 21
+        },
+        {
+          "property_type": "Strip Mall",
+          "rows": 21
+        },
+        {
+          "property_type": "Enclosed Mall",
+          "rows": 16
+        },
+        {
+          "property_type": "Hotel",
+          "rows": 14
+        }
+      ],
+      "top_postal_fsa": [
+        {
+          "fsa": "M5V",
+          "rows": 68
+        },
+        {
+          "fsa": "M2N",
+          "rows": 64
+        },
+        {
+          "fsa": "M5J",
+          "rows": 44
+        },
+        {
+          "fsa": "M5H",
+          "rows": 34
+        },
+        {
+          "fsa": "M3C",
+          "rows": 32
+        },
+        {
+          "fsa": "M9C",
+          "rows": 32
+        },
+        {
+          "fsa": "M5A",
+          "rows": 29
+        },
+        {
+          "fsa": "M2R",
+          "rows": 29
+        },
+        {
+          "fsa": "M2J",
+          "rows": 29
+        },
+        {
+          "fsa": "M4Y",
+          "rows": 28
+        }
+      ]
+    },
+    {
+      "year": 2020,
+      "reporting_rows": 1430,
+      "unique_ewrb_ids": 1430,
+      "data_quality_check_yes_rows": 964,
+      "data_quality_check_yes_percent": 67.4,
+      "energy_star_numeric_score_rows": 335,
+      "published_energy_star_certification_value_rows": 27,
+      "top_property_types": [
+        {
+          "property_type": "Multifamily Housing",
+          "rows": 930
+        },
+        {
+          "property_type": "Office",
+          "rows": 215
+        },
+        {
+          "property_type": "Manufacturing/Industrial Plant",
+          "rows": 38
+        },
+        {
+          "property_type": "Other - Lodging/Residential",
+          "rows": 36
+        },
+        {
+          "property_type": "Retail Store",
+          "rows": 32
+        },
+        {
+          "property_type": "Non-Refrigerated Warehouse",
+          "rows": 25
+        },
+        {
+          "property_type": "Strip Mall",
+          "rows": 23
+        },
+        {
+          "property_type": "Other",
+          "rows": 22
+        },
+        {
+          "property_type": "Enclosed Mall",
+          "rows": 15
+        },
+        {
+          "property_type": "Distribution Center",
+          "rows": 14
+        }
+      ],
+      "top_postal_fsa": [
+        {
+          "fsa": "M5V",
+          "rows": 70
+        },
+        {
+          "fsa": "M2N",
+          "rows": 62
+        },
+        {
+          "fsa": "M5J",
+          "rows": 43
+        },
+        {
+          "fsa": "M5H",
+          "rows": 36
+        },
+        {
+          "fsa": "M9W",
+          "rows": 34
+        },
+        {
+          "fsa": "M2J",
+          "rows": 33
+        },
+        {
+          "fsa": "M9C",
+          "rows": 33
+        },
+        {
+          "fsa": "M4Y",
+          "rows": 31
+        },
+        {
+          "fsa": "M3C",
+          "rows": 31
+        },
+        {
+          "fsa": "M5A",
+          "rows": 29
+        }
+      ]
+    },
+    {
+      "year": 2021,
+      "reporting_rows": 1415,
+      "unique_ewrb_ids": 1415,
+      "data_quality_check_yes_rows": 854,
+      "data_quality_check_yes_percent": 60.4,
+      "energy_star_numeric_score_rows": 1118,
+      "published_energy_star_certification_value_rows": 29,
+      "top_property_types": [
+        {
+          "property_type": "Multifamily Housing",
+          "rows": 889
+        },
+        {
+          "property_type": "Office",
+          "rows": 213
+        },
+        {
+          "property_type": "Manufacturing/Industrial Plant",
+          "rows": 33
+        },
+        {
+          "property_type": "Other - Lodging/Residential",
+          "rows": 33
+        },
+        {
+          "property_type": "Retail Store",
+          "rows": 31
+        },
+        {
+          "property_type": "Other",
+          "rows": 30
+        },
+        {
+          "property_type": "Non-Refrigerated Warehouse",
+          "rows": 30
+        },
+        {
+          "property_type": "Strip Mall",
+          "rows": 23
+        },
+        {
+          "property_type": "Enclosed Mall",
+          "rows": 16
+        },
+        {
+          "property_type": "Bureau",
+          "rows": 13
+        }
+      ],
+      "top_postal_fsa": [
+        {
+          "fsa": "M5V",
+          "rows": 64
+        },
+        {
+          "fsa": "M2N",
+          "rows": 64
+        },
+        {
+          "fsa": "M2J",
+          "rows": 46
+        },
+        {
+          "fsa": "M5J",
+          "rows": 42
+        },
+        {
+          "fsa": "M5H",
+          "rows": 35
+        },
+        {
+          "fsa": "M4S",
+          "rows": 32
+        },
+        {
+          "fsa": "M5A",
+          "rows": 31
+        },
+        {
+          "fsa": "M4Y",
+          "rows": 30
+        },
+        {
+          "fsa": "M3C",
+          "rows": 29
+        },
+        {
+          "fsa": "M4P",
+          "rows": 28
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "reporting_rows": 2445,
+      "unique_ewrb_ids": 2445,
+      "data_quality_check_yes_rows": 1292,
+      "data_quality_check_yes_percent": 52.8,
+      "energy_star_numeric_score_rows": 1887,
+      "published_energy_star_certification_value_rows": 36,
+      "top_property_types": [
+        {
+          "property_type": "Multifamily Housing",
+          "rows": 1571
+        },
+        {
+          "property_type": "Office",
+          "rows": 382
+        },
+        {
+          "property_type": "Other",
+          "rows": 78
+        },
+        {
+          "property_type": "Non-Refrigerated Warehouse",
+          "rows": 67
+        },
+        {
+          "property_type": "Manufacturing/Industrial Plant",
+          "rows": 67
+        },
+        {
+          "property_type": "Strip Mall",
+          "rows": 46
+        },
+        {
+          "property_type": "Retail Store",
+          "rows": 41
+        },
+        {
+          "property_type": "Distribution Center",
+          "rows": 36
+        },
+        {
+          "property_type": "Enclosed Mall",
+          "rows": 19
+        },
+        {
+          "property_type": "Mixed Use Property",
+          "rows": 17
+        }
+      ],
+      "top_postal_fsa": [
+        {
+          "fsa": "M5V",
+          "rows": 121
+        },
+        {
+          "fsa": "M2N",
+          "rows": 85
+        },
+        {
+          "fsa": "M9W",
+          "rows": 82
+        },
+        {
+          "fsa": "M2J",
+          "rows": 63
+        },
+        {
+          "fsa": "M6K",
+          "rows": 61
+        },
+        {
+          "fsa": "M4Y",
+          "rows": 59
+        },
+        {
+          "fsa": "M5A",
+          "rows": 55
+        },
+        {
+          "fsa": "M3C",
+          "rows": 52
+        },
+        {
+          "fsa": "M4V",
+          "rows": 51
+        },
+        {
+          "fsa": "M5J",
+          "rows": 49
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "reporting_rows": 2265,
+      "unique_ewrb_ids": 2265,
+      "data_quality_check_yes_rows": 1185,
+      "data_quality_check_yes_percent": 52.3,
+      "energy_star_numeric_score_rows": 1737,
+      "published_energy_star_certification_value_rows": 43,
+      "top_property_types": [
+        {
+          "property_type": "Multifamily Housing",
+          "rows": 1488
+        },
+        {
+          "property_type": "Office",
+          "rows": 347
+        },
+        {
+          "property_type": "Other",
+          "rows": 49
+        },
+        {
+          "property_type": "Non-Refrigerated Warehouse",
+          "rows": 49
+        },
+        {
+          "property_type": "Manufacturing/Industrial Plant",
+          "rows": 45
+        },
+        {
+          "property_type": "Mixed Use Property",
+          "rows": 44
+        },
+        {
+          "property_type": "Retail Store",
+          "rows": 41
+        },
+        {
+          "property_type": "Strip Mall",
+          "rows": 32
+        },
+        {
+          "property_type": "Distribution Center",
+          "rows": 29
+        },
+        {
+          "property_type": "Enclosed Mall",
+          "rows": 28
+        }
+      ],
+      "top_postal_fsa": [
+        {
+          "fsa": "M5V",
+          "rows": 115
+        },
+        {
+          "fsa": "M2N",
+          "rows": 80
+        },
+        {
+          "fsa": "M2J",
+          "rows": 68
+        },
+        {
+          "fsa": "M6K",
+          "rows": 65
+        },
+        {
+          "fsa": "M4Y",
+          "rows": 65
+        },
+        {
+          "fsa": "M9W",
+          "rows": 65
+        },
+        {
+          "fsa": "M5A",
+          "rows": 55
+        },
+        {
+          "fsa": "M5J",
+          "rows": 53
+        },
+        {
+          "fsa": "M5H",
+          "rows": 44
+        },
+        {
+          "fsa": "M4V",
+          "rows": 43
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "reporting_rows": 2459,
+      "unique_ewrb_ids": 2459,
+      "data_quality_check_yes_rows": 1227,
+      "data_quality_check_yes_percent": 49.9,
+      "energy_star_numeric_score_rows": 1867,
+      "published_energy_star_certification_value_rows": 45,
+      "top_property_types": [
+        {
+          "property_type": "Multifamily Housing",
+          "rows": 1616
+        },
+        {
+          "property_type": "Office",
+          "rows": 354
+        },
+        {
+          "property_type": "Manufacturing/Industrial Plant",
+          "rows": 75
+        },
+        {
+          "property_type": "Other",
+          "rows": 72
+        },
+        {
+          "property_type": "Non-Refrigerated Warehouse",
+          "rows": 53
+        },
+        {
+          "property_type": "Distribution Center",
+          "rows": 45
+        },
+        {
+          "property_type": "Retail Store",
+          "rows": 41
+        },
+        {
+          "property_type": "Strip Mall",
+          "rows": 32
+        },
+        {
+          "property_type": "Self-Storage Facility",
+          "rows": 23
+        },
+        {
+          "property_type": "Other - Lodging/Residential",
+          "rows": 21
+        }
+      ],
+      "top_postal_fsa": [
+        {
+          "fsa": "M5V",
+          "rows": 121
+        },
+        {
+          "fsa": "M2N",
+          "rows": 91
+        },
+        {
+          "fsa": "M9W",
+          "rows": 78
+        },
+        {
+          "fsa": "M2J",
+          "rows": 70
+        },
+        {
+          "fsa": "M5A",
+          "rows": 60
+        },
+        {
+          "fsa": "M6K",
+          "rows": 58
+        },
+        {
+          "fsa": "M4Y",
+          "rows": 57
+        },
+        {
+          "fsa": "M4V",
+          "rows": 52
+        },
+        {
+          "fsa": "M3C",
+          "rows": 49
+        },
+        {
+          "fsa": "M5J",
+          "rows": 48
+        }
+      ]
+    }
+  ],
+  "overall_top_property_types": [
+    {
+      "property_type": "Multifamily Housing",
+      "rows": 7386
+    },
+    {
+      "property_type": "Office",
+      "rows": 1859
+    },
+    {
+      "property_type": "Manufacturing/Industrial Plant",
+      "rows": 295
+    },
+    {
+      "property_type": "Other",
+      "rows": 284
+    },
+    {
+      "property_type": "Non-Refrigerated Warehouse",
+      "rows": 239
+    },
+    {
+      "property_type": "Retail Store",
+      "rows": 216
+    },
+    {
+      "property_type": "Strip Mall",
+      "rows": 185
+    },
+    {
+      "property_type": "Other - Lodging/Residential",
+      "rows": 170
+    },
+    {
+      "property_type": "Distribution Center",
+      "rows": 154
+    },
+    {
+      "property_type": "Enclosed Mall",
+      "rows": 123
+    },
+    {
+      "property_type": "Mixed Use Property",
+      "rows": 118
+    },
+    {
+      "property_type": "Self-Storage Facility",
+      "rows": 67
+    },
+    {
+      "property_type": "Other - Mall",
+      "rows": 66
+    },
+    {
+      "property_type": "Senior Living Community",
+      "rows": 64
+    },
+    {
+      "property_type": "Hotel",
+      "rows": 62
+    }
+  ],
+  "overall_top_postal_fsa": [
+    {
+      "fsa": "M5V",
+      "rows": 576
+    },
+    {
+      "fsa": "M2N",
+      "rows": 461
+    },
+    {
+      "fsa": "M9W",
+      "rows": 318
+    },
+    {
+      "fsa": "M2J",
+      "rows": 313
+    },
+    {
+      "fsa": "M5J",
+      "rows": 304
+    },
+    {
+      "fsa": "M4Y",
+      "rows": 271
+    },
+    {
+      "fsa": "M5A",
+      "rows": 264
+    },
+    {
+      "fsa": "M5H",
+      "rows": 260
+    },
+    {
+      "fsa": "M6K",
+      "rows": 242
+    },
+    {
+      "fsa": "M3C",
+      "rows": 239
+    },
+    {
+      "fsa": "M4V",
+      "rows": 230
+    },
+    {
+      "fsa": "M9C",
+      "rows": 212
+    },
+    {
+      "fsa": "M4S",
+      "rows": 209
+    },
+    {
+      "fsa": "M5R",
+      "rows": 195
+    },
+    {
+      "fsa": "M4P",
+      "rows": 184
+    }
+  ],
+  "identity_contract": {
+    "property_level_links": 0,
+    "reason": "The public Ontario EWRB disclosure does not include civic street address or assessment roll number. EWRB ID, city, and postal FSA are not sufficient to create a deterministic TowerSignal property identity.",
+    "allowed_use": "Aggregate Toronto market benchmarking only until an independent lawful address-bearing bridge is available.",
+    "tower_evidence_effect": "NONE",
+    "relationship_effect": "NONE"
+  },
+  "absence": "No row is not evidence that a property/facility has no relevant equipment, activity, or compliance history."
+}
