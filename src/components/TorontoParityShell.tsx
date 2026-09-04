@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { loadTorontoMarket } from '../data/api'
 import type { TorontoMarketPayload, TorontoProperty, TorontoSourceLink } from '../types/toronto'
+import { TorontoBenchmarkingPage } from './TorontoBenchmarkingPage'
 
-type TorontoWorkspace = 'market' | 'prospects' | 'opportunities' | 'companies' | 'portfolios' | 'watchlist' | 'sources'
+type TorontoWorkspace = 'market' | 'benchmarking' | 'prospects' | 'opportunities' | 'companies' | 'portfolios' | 'watchlist' | 'sources'
 
 type ProspectRow = {
   property: TorontoProperty
@@ -192,6 +193,7 @@ function openInMarket(property: TorontoProperty, setView: (view: TorontoWorkspac
 function TorontoWorkspaceTabs({ view, onChange, watchCount }: { view: TorontoWorkspace; onChange: (view: TorontoWorkspace) => void; watchCount: number }) {
   const items: { value: TorontoWorkspace; label: string }[] = [
     { value: 'market', label: 'Market' },
+    { value: 'benchmarking', label: 'Benchmarking' },
     { value: 'prospects', label: 'Prospects' },
     { value: 'opportunities', label: 'Opportunities' },
     { value: 'companies', label: 'Companies' },
@@ -234,7 +236,7 @@ export function TorontoParityShell({ explorer }: { explorer: ReactNode }) {
   })
 
   useEffect(() => {
-    if (view === 'market' || payload || error) return
+    if (view === 'market' || view === 'benchmarking' || payload || error) return
     loadTorontoMarket().then(setPayload).catch(reason => setError(reason instanceof Error ? reason.message : 'Unable to load Toronto market data'))
   }, [view, payload, error])
 
@@ -282,8 +284,9 @@ export function TorontoParityShell({ explorer }: { explorer: ReactNode }) {
   return <div className="toronto-parity-shell">
     <TorontoWorkspaceTabs view={view} onChange={changeView} watchCount={watchedIds.size} />
     {view === 'market' ? explorer : <>
-      {error && <section className="product-page toronto-page"><div className="reference-empty-state"><strong>Toronto commercial workspace unavailable.</strong><span>{error}</span></div></section>}
-      {!error && !payload && <section className="product-page toronto-page"><div className="portal-loading">Loading Toronto commercial intelligence…</div></section>}
+      {view === 'benchmarking' && <TorontoBenchmarkingPage />}
+      {error && view !== 'benchmarking' && <section className="product-page toronto-page"><div className="reference-empty-state"><strong>Toronto commercial workspace unavailable.</strong><span>{error}</span></div></section>}
+      {view !== 'benchmarking' && !error && !payload && <section className="product-page toronto-page"><div className="portal-loading">Loading Toronto commercial intelligence…</div></section>}
       {payload && view === 'prospects' && <section className="product-page toronto-page toronto-parity-page">
         <div className="product-page-heading"><div><span className="page-kicker">Toronto · commercial intelligence</span><h1>Prospect workspace</h1><p>Rank source-backed Toronto properties for commercial attention using documentary tower evidence, project timing, joined source depth and identified organizations. This attention index is not a regulatory or compliance score.</p></div></div>
         <div className="reference-metric-grid toronto-parity-metrics"><article><span className="reference-metric-icon urgent">↗</span><div><small>High attention</small><strong>{prospects.filter(row => row.attention >= 65).length.toLocaleString()}</strong><span>Commercial rank 65+</span></div></article><article><span className="reference-metric-icon success">◎</span><div><small>Confirmed towers</small><strong>{payload.counts.documentary_confirmed_properties.toLocaleString()}</strong><span>Documentary evidence only</span></div></article><article><span className="reference-metric-icon warning">⌁</span><div><small>Mechanical permit signals</small><strong>{prospects.filter(row => hasMechanicalPermit(row.property)).length.toLocaleString()}</strong><span>Permit text signal</span></div></article><article><span className="reference-metric-icon">↔</span><div><small>Relationship-ready</small><strong>{prospects.filter(row => row.property.relationships.length > 0).length.toLocaleString()}</strong><span>At least one source-backed role</span></div></article><article><span className="reference-metric-icon">⌂</span><div><small>Canonical universe</small><strong>{payload.counts.canonical_properties.toLocaleString()}</strong><span>Deterministic address-point spine</span></div></article></div>
