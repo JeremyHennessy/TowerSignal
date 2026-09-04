@@ -1,0 +1,174 @@
+name: Toronto TOBids Post-Recovery Apply
+
+on:
+  push:
+    branches:
+      - agent/toronto-tobids-post-recovery-apply-20260904
+    paths:
+      - .github/workflows/toronto-tobids-post-recovery-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact recovery-based TOBids branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-tobids-post-recovery-apply-20260904
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Update only verified post-recovery TOBids cardinality contracts
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path_name: str, old: str, new: str) -> None:
+              path = Path(path_name)
+              text = path.read_text(encoding='utf-8')
+              if old not in text:
+                  raise SystemExit(f'Patch anchor changed: {path_name}: {old!r}')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          script = 'scripts/apply_toronto_tobids_relationships.py'
+          for old, new in [
+              ('EXPECTED_EXACT_ROWS = 15', 'EXPECTED_EXACT_ROWS = 16'),
+              ('EXPECTED_EXISTING_EXACT_ROWS = 3', 'EXPECTED_EXISTING_EXACT_ROWS = 15'),
+              ('EXPECTED_NEW_LINKS = 12', 'EXPECTED_NEW_LINKS = 1'),
+              ('EXPECTED_FINAL_SOURCE_LINKS = 17', 'EXPECTED_FINAL_SOURCE_LINKS = 18'),
+              ('EXPECTED_FINAL_PROPERTIES = 13', 'EXPECTED_FINAL_PROPERTIES = 14'),
+              ('EXPECTED_NEW_EDGES = 12', 'EXPECTED_NEW_EDGES = 1'),
+              ('EXPECTED_FINAL_BIDDER_EDGES = 17', 'EXPECTED_FINAL_BIDDER_EDGES = 18'),
+              ('EXPECTED_FINAL_BIDDER_PROPERTIES = 13', 'EXPECTED_FINAL_BIDDER_PROPERTIES = 14'),
+              ('    if len(properties) != 13065:\n        raise RuntimeError(f"Toronto property spine drift: expected 13065, found {len(properties)}")',
+               '    if len(properties) != 13380:\n        raise RuntimeError(f"Toronto property spine drift: expected 13380, found {len(properties)}")'),
+          ]:
+              replace_once(script, old, new)
+
+          legacy = 'tests/python/test_toronto_tobids_legacy_provenance.py'
+          for old, new in [
+              ('self.assertEqual(len(all_tobids_links), 17)', 'self.assertEqual(len(all_tobids_links), 18)'),
+              ('self.assertEqual(len(citywide), 12)', 'self.assertEqual(len(citywide), 13)'),
+              ('self.assertEqual(len(exact), 15)', 'self.assertEqual(len(exact), 16)'),
+          ]:
+              replace_once(legacy, old, new)
+
+      - name: Apply exactly one newly exposed TOBids link and bidder edge
+        env:
+          PYTHONPATH: scripts
+        run: python scripts/apply_toronto_tobids_relationships.py
+
+      - name: Rebuild coverage and public Toronto payload
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python scripts/toronto_final_coverage.py
+          python scripts/build_toronto_app_data.py
+
+      - name: Validate exact 40 College TOBids contract
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          market = Path('data/toronto/market/current')
+          links = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
+          graph = json.loads((market / 'entity_graph.json').read_text(encoding='utf-8'))
+          report = json.loads((market / 'tobids_relationship_apply_report.json').read_text(encoding='utf-8'))
+          app = json.loads(Path('public/data/toronto-market.json').read_text(encoding='utf-8'))
+          m = report['metrics']
+          assert m['exact_rows'] == 16, m
+          assert m['ambiguous_rows_not_forced'] == 5, m
+          assert m['existing_exact_rows'] == 15, m
+          assert m['new_links'] == 1, m
+          assert m['final_source_links'] == 18, m
+          assert m['final_source_properties'] == 14, m
+          assert m['new_relationship_edges'] == 1, m
+          assert m['final_successful_bidder_edges'] == 18, m
+          assert m['final_successful_bidder_properties'] == 14, m
+          assert report['new_relationships'] == [{
+              'source_row_index': 6851,
+              'property_id': 'toronto-address-point:7762664',
+              'display_address': '40 College St',
+              'successful_supplier': '1246175 Ontario Limited o/a Active Mechanical Services',
+              'document_number': '3704322859',
+          }], report['new_relationships']
+          source_links = [x for x in links['links'] if x.get('source_key') == 'tobids_awarded_contracts_exact_document_address_prior_poc']
+          assert len(source_links) == 18
+          forty = [x for x in source_links if x.get('property_id') == 'toronto-address-point:7762664' and x.get('source_record_id') == 'tobids_awarded_contracts_exact_document_address_prior_poc:id:6852']
+          assert len(forty) == 1, forty
+          bidder_edges = [x for x in graph['edges'] if x.get('source_key') == 'tobids_awarded_contracts' and x.get('relationship') == 'SUCCESSFUL_BIDDER_AT_PROPERTY']
+          assert len(bidder_edges) == 18
+          forty_edges = [x for x in bidder_edges if x.get('property_id') == 'toronto-address-point:7762664' and (x.get('evidence') or {}).get('document_number') == '3704322859']
+          assert len(forty_edges) == 1, forty_edges
+          assert not any(x.get('source_key') == 'tobids_awarded_contracts' and x.get('relationship') != 'SUCCESSFUL_BIDDER_AT_PROPERTY' for x in graph['edges'])
+          assert app['counts']['canonical_properties'] == 13380, app['counts']
+          assert app['counts']['source_links'] == 40060, app['counts']
+          assert app['counts']['relationship_edges'] == 6344, app['counts']
+          assert app['counts']['documentary_confirmed_properties'] == 47, app['counts']
+          print('POST_RECOVERY_TOBIDS_CONTRACT=PASSED')
+          PY
+          python -m unittest tests.python.test_toronto_tobids_relationship_apply tests.python.test_toronto_tobids_legacy_provenance -v
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+
+      - name: Validate official source actions
+        env:
+          PYTHONPATH: scripts
+        run: python scripts/validate_toronto_source_actions.py --strict --record-sample-size 3
+
+      - name: Audit source semantics and stable row resolution
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python scripts/audit_toronto_source_semantics.py --strict
+          python scripts/audit_toronto_source_row_resolution.py --strict
+
+      - name: Run full regression suite and frontend build
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python -m unittest discover -s tests/python -p 'test_*.py' -v
+          npm run lint
+          npm run typecheck
+          npm test -- --run
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vite build -- --base=/ --outDir=dist-tobids-post-recovery
+          test -z "$(git diff a060e56d6ddf3f801df1960aaec09da4ddd31ae6 -- src)" || { echo 'TOBids data correction modified frontend source'; git diff a060e56d6ddf3f801df1960aaec09da4ddd31ae6 -- src; exit 1; }
+
+      - name: Persist verified TOBids correction
+        run: |
+          git config user.name "TowerSignal Toronto Data Bot"
+          git config user.email "towersignal-toronto@users.noreply.github.com"
+          git add \
+            scripts/apply_toronto_tobids_relationships.py \
+            tests/python/test_toronto_tobids_legacy_provenance.py \
+            data/toronto/market/current/property_source_links.json \
+            data/toronto/market/current/entity_graph.json \
+            data/toronto/market/current/tobids_relationship_apply_report.json \
+            data/toronto/market/current/coverage_report.json \
+            data/toronto/market/current/source_action_qa.json \
+            data/toronto/market/current/source_semantic_audit.json \
+            data/toronto/market/current/source_row_resolution_audit.json \
+            data/toronto/market/current/qa_report.json \
+            public/data/toronto-market.json
+          git diff --cached --quiet && { echo 'No verified TOBids correction to persist'; exit 1; }
+          git commit -m "Toronto: link 40 College BAS award after permit expansion"
+          git push origin HEAD:agent/toronto-tobids-post-recovery-apply-20260904
+          echo "TORONTO_TOBIDS_POST_RECOVERY_SHA=$(git rev-parse HEAD)"
