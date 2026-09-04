@@ -49,19 +49,19 @@ jobs:
                   'bin': row.get('bin'),
                   'address': row.get('address'),
                   'tower_count': int(row.get('planimetric_building_tower_count') or 0),
-                  'footprint_match': bool(row.get('building_footprint_match')),
+                  'footprint_match': bool(row.get('building_footprint_bin_match')),
                   'footprint_count': int(row.get('building_footprint_count') or 0),
               })
 
           add('demo-example', by_id.get('2000015564'))
-          add('single-tower', next((r for r in systems if int(r.get('planimetric_building_tower_count') or 0) == 1 and r.get('building_footprint_match')), None))
-          multi = max((r for r in systems if r.get('building_footprint_match')), key=lambda r: int(r.get('planimetric_building_tower_count') or 0), default=None)
+          add('single-tower', next((r for r in systems if int(r.get('planimetric_building_tower_count') or 0) == 1 and r.get('building_footprint_bin_match')), None))
+          multi = max((r for r in systems if r.get('building_footprint_bin_match')), key=lambda r: int(r.get('planimetric_building_tower_count') or 0), default=None)
           add('multi-tower', multi)
 
           bin_counts = Counter(r.get('bin') for r in systems if r.get('bin'))
-          shared = next((r for r in systems if r.get('bin') and bin_counts[r['bin']] > 1 and int(r.get('planimetric_building_tower_count') or 0) > 0 and r.get('building_footprint_match')), None)
+          shared = next((r for r in systems if r.get('bin') and bin_counts[r['bin']] > 1 and int(r.get('planimetric_building_tower_count') or 0) > 0 and r.get('building_footprint_bin_match')), None)
           add('multi-system-building', shared)
-          add('no-2022-tower-polygon', next((r for r in systems if int(r.get('planimetric_building_tower_count') or 0) == 0 and r.get('building_footprint_match')), None))
+          add('no-2022-tower-polygon', next((r for r in systems if int(r.get('planimetric_building_tower_count') or 0) == 0 and r.get('building_footprint_bin_match')), None))
 
           if len(selected) < 4:
               raise RuntimeError(f'Could not select enough representative cases: {selected}')
@@ -81,7 +81,6 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs'
-          import path from 'node:path'
           import { chromium } from '@playwright/test'
 
           const out = 'artifacts/roof-map-qa'
