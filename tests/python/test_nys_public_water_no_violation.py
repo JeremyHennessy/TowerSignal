@@ -30,6 +30,28 @@ class NysPublicWaterNoViolationTests(unittest.TestCase):
                 source_url="https://example.test/broken_county_compliance_report.htm",
             )
 
+    def test_duplicate_looking_source_rows_receive_distinct_stable_ids(self) -> None:
+        row = {
+            "violation_id": "old-id",
+            "calendar_year": 2025,
+            "pws_id": "NY1400411",
+            "pws_name": "ANGOLA VILLAGE",
+            "system_type": "C-Community water system",
+            "violation_type": "4G - LSL REPORTING-INITIAL",
+            "contaminants": None,
+            "months_covered": "October 2024 to August 2025",
+            "status": "No longer in violation",
+            "source_url": "https://example.test/erie_county_compliance_report.htm",
+        }
+        result = build_cache._rekey_violation_rows(
+            [row, dict(row)],
+            source_url="https://example.test/erie_county_compliance_report.htm",
+        )
+        self.assertEqual(len(result), 2)
+        self.assertNotEqual(result[0]["violation_id"], result[1]["violation_id"])
+        self.assertEqual(result[0]["source_row_ordinal"], 0)
+        self.assertEqual(result[1]["source_row_ordinal"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
