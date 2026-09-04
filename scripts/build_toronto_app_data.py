@@ -6,7 +6,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from toronto_app_sources import load_source_rows, normalize_source_link, valid_public_url
+from toronto_app_sources import _record_for_link, load_source_rows, normalize_source_link, valid_public_url
+from toronto_source_identity import stable_source_record_id
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +19,30 @@ def load(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise RuntimeError(f"Expected JSON object: {path}")
     return payload
+
+
+def build_unique_record_indexes(source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, dict[str, dict[str, Any]]]:
+    indexes: dict[str, dict[str, dict[str, Any]]] = {}
+    for source, rows in source_rows.items():
+        unique: dict[str, dict[str, Any]] = {}
+        duplicates: set[str] = set()
+        for row in rows:
+            record_id = stable_source_record_id(source, row)
+            if record_id in unique:
+                duplicates.add(record_id)
+            else:
+                unique[record_id] = row
+        for record_id in duplicates:
+            unique.pop(record_id, None)
+        indexes[source] = unique
+    return indexes
+
+
+def indexed_record_for_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]], indexes: dict[str, dict[str, dict[str, Any]]]) -> dict[str, Any]:
+    source = str(link.get("source_key") or "").strip()
+    record_id = str(link.get("source_record_id") or "").strip()
+    indexed = indexes.get(source, {}).get(record_id)
+    return indexed if indexed is not None else _record_for_link(link, source_rows)
 
 
 def organization_names(graph: dict[str, Any]) -> dict[str, str]:
@@ -98,13 +123,15 @@ def main() -> None:
     aic_candidates = load(market / "aic_explicit_tower_candidates.json")
 
     source_rows = load_source_rows(ROOT, load)
+    source_record_indexes = build_unique_record_indexes(source_rows)
 
     links_by_property: dict[str, list[dict[str, Any]]] = defaultdict(list)
     source_catalog: dict[str, dict[str, Any]] = {}
     for link in links_payload.get("links") or []:
         if not isinstance(link, dict) or not link.get("property_id"):
             continue
-        normalized_link = normalize_source_link(link, source_rows)
+        resolved_row = indexed_record_for_link(link, source_rows, source_record_indexes)
+        normalized_link = normalize_source_link(link, source_rows, resolved_row)
         source_key = normalized_link["source_key"]
         dataset_url = normalized_link.pop("dataset_url")
         dataset_link_label = normalized_link.pop("dataset_link_label")
