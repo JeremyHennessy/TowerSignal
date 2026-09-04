@@ -25,6 +25,7 @@ ADDRESS_FIELDS = {
     "ontario_bps_energy_2024": ("Address",),
     "toronto_building_permits_active_targeted": ("_towersignal_source_address",),
     "toronto_building_permits_cleared_targeted_since_2017": ("_towersignal_source_address",),
+    "tdsb_facility_condition_renewal": ("_towersignal_source_address",),
     "renewable_energy_installations": ("CLIENT_ADDRESS", "ADDRESS_FULL"),
     "toronto_aic_applications": ("FULL_ADDRESS",),
     "toronto_highrise_residential_health_hazards": ("address",),

@@ -1,14 +1,14 @@
 {
   "schema_version": "toronto-source-semantic-audit-1.0",
-  "generated_at": "2026-09-03T21:57:03.064471Z",
+  "generated_at": "2026-09-04T16:32:34.634348Z",
   "status": "PASSED_WITH_CARDINALITY_REVIEW",
   "counts": {
-    "source_links": 40059,
-    "source_families": 16,
-    "canonical_properties": 13380,
-    "unique_property_source_record_identities": 40059,
-    "unique_source_records_across_families": 38371,
-    "record_specific_actions": 14238
+    "source_links": 40841,
+    "source_families": 17,
+    "canonical_properties": 13669,
+    "unique_property_source_record_identities": 40841,
+    "unique_source_records_across_families": 39153,
+    "record_specific_actions": 14572
   },
   "findings": {
     "exact_duplicate_link_identities": 0,
@@ -143,6 +143,18 @@
       "multi_property_source_record_count": 0,
       "record_action_count": 0,
       "dataset_url": "https://open.toronto.ca/dataset/renewable-energy-installations/"
+    },
+    "tdsb_facility_condition_renewal": {
+      "links": 782,
+      "unique_source_records": 782,
+      "unique_properties": 330,
+      "coverage_expected_properties": 330,
+      "coverage_property_count_matches": true,
+      "max_links_per_property": 9,
+      "max_properties_per_source_record": 1,
+      "multi_property_source_record_count": 0,
+      "record_action_count": 334,
+      "dataset_url": "https://www.tdsb.on.ca/Community/Planning/School-Facilities/Facility-Condition-Index"
     },
     "tobids_awarded_contracts_exact_document_address_prior_poc": {
       "links": 17,

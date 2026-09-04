@@ -1,14 +1,14 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-09-03T22:17:09.258799Z",
+  "generated_at": "2026-09-04T16:50:10.935169Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
-  "json_files_validated": 33,
+  "json_files_validated": 34,
   "counts": {
-    "canonical_properties": 13380,
+    "canonical_properties": 13669,
     "poc_reconciliation_rows": 177,
     "poc_resolved": 175,
     "poc_unresolved": 2,
-    "source_links": 40059,
+    "source_links": 40841,
     "entity_edges": 6343,
     "aic_application_catalogue": 15864,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
@@ -280,6 +280,26 @@
         "source_record_id": "renewable_energy_installations:id:18",
         "source_address": "150 Disco Rd",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
+      }
+    ],
+    "tdsb_facility_condition_renewal": [
+      {
+        "property_id": "toronto-address-point:10010732",
+        "source_record_id": "tdsb_facility_condition_renewal:id:school:2042:sha256:7c9695bfd465a13649e4",
+        "source_address": "50 Hadrian Dr",
+        "match_basis": "EXACT_LITERAL_TDSB_CIVIC_ADDRESS_TO_UNIQUE_CURRENT_ROOT"
+      },
+      {
+        "property_id": "toronto-address-point:390705",
+        "source_record_id": "tdsb_facility_condition_renewal:id:school:4446:sha256:6e10337a88f9c57fd1eb",
+        "source_address": "150 Tapscott Rd",
+        "match_basis": "EXACT_LITERAL_TDSB_CIVIC_ADDRESS_TO_UNIQUE_CURRENT_ROOT"
+      },
+      {
+        "property_id": "toronto-address-point:9980628",
+        "source_record_id": "tdsb_facility_condition_renewal:id:school:2831:sha256:6e10337a88f9c57fd1eb",
+        "source_address": "40 McArthur St",
+        "match_basis": "EXACT_LITERAL_TDSB_CIVIC_ADDRESS_TO_UNIQUE_CURRENT_ROOT"
       }
     ],
     "tobids_awarded_contracts_exact_document_address_prior_poc": [
@@ -660,6 +680,7 @@
     "ontario_bps_energy_2024": 2,
     "ontario_environmental_compliance_reports": 0,
     "renewable_energy_installations": 0,
+    "tdsb_facility_condition_renewal": 0,
     "tobids_awarded_contracts_exact_document_address_prior_poc": 0,
     "toronto_aic_applications": 0,
     "toronto_building_permits_active_targeted": 0,

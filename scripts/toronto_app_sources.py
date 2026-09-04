@@ -28,6 +28,7 @@ OFFICIAL_DATASET_URLS = {
     "toronto_highrise_residential_health_hazards": "https://open.toronto.ca/dataset/residential-health-hazards/",
     "toronto_building_permits_active_targeted": "https://open.toronto.ca/dataset/building-permits-active-permits/",
     "toronto_building_permits_cleared_targeted_since_2017": "https://open.toronto.ca/dataset/building-permits-cleared-permits/",
+    "tdsb_facility_condition_renewal": "https://www.tdsb.on.ca/Community/Planning/School-Facilities/Facility-Condition-Index",
     "toronto_public_notices_exact_prior_poc": "https://open.toronto.ca/dataset/public-notices/",
 }
 
@@ -36,6 +37,7 @@ ALLOWED_HOSTS = {
     "open.toronto.ca",
     "secure.toronto.ca",
     "www.toronto.ca",
+    "www.tdsb.on.ca",
 }
 
 
@@ -132,6 +134,7 @@ def load_source_rows(root: Path, load_json: Any) -> dict[str, list[dict[str, Any
         "toronto_highrise_residential_health_hazards": market / "open_licensed/toronto_highrise_residential_health_hazards.json",
         "toronto_building_permits_active_targeted": warehouse / "open_licensed/toronto_building_permits_active_targeted.json",
         "toronto_building_permits_cleared_targeted_since_2017": warehouse / "open_licensed/toronto_building_permits_cleared_targeted_since_2017.json",
+        "tdsb_facility_condition_renewal": warehouse / "open_licensed/tdsb_facility_condition_renewal.json",
         "toronto_public_notices_exact_prior_poc": warehouse / "open_licensed/toronto_public_notices.json",
     }
     loaded = {key: _rows(load_json(path)) for key, path in files.items()}
@@ -249,6 +252,25 @@ def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict
             ("Cooling tower lifecycle reasons", lifecycle_reasons),
             ("Cooling tower current interpretation", row.get("_towersignal_cooling_tower_current_interpretation")),
         ))
+    elif key == "tdsb_facility_condition_renewal":
+        record_url = valid_public_url(row.get("school_page_url"))
+        signals = ", ".join(str(value).replace("_", " ") for value in (row.get("signals") or []))
+        priority = text(row.get("priority"))
+        result.update(
+            dataset_link_label="Open TDSB facility condition source",
+            record_url=record_url,
+            record_link_label="Open official TDSB facility condition page" if record_url else None,
+            record_title=text(row.get("school_name")),
+            record_date=None,
+            record_status=f"{priority.title()} priority renewal" if priority else "Published renewal evidence",
+            record_details=details(
+                ("School number", row.get("school_id")),
+                ("Published school address", row.get("published_address")),
+                ("Renewal priority", row.get("priority")),
+                ("Mechanical signals", signals),
+                ("Renewal scope", row.get("renewal_text")),
+            ),
+        )
     elif key == "toronto_public_notices_exact_prior_poc":
         notice_id = row.get("noticeId")
         result.update(dataset_link_label="Search official public-notices dataset", record_url=None, record_link_label=None, record_title=text(row.get("title")), record_date=date_value(row.get("noticeDate")), record_details=details(

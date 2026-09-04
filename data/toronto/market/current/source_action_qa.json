@@ -1,12 +1,12 @@
 {
   "schema_version": "toronto-source-action-qa-1.0",
-  "generated_at": "2026-09-03T21:40:42.566893Z",
+  "generated_at": "2026-09-04T16:15:19.701430Z",
   "status": "PASSED",
   "counts": {
-    "source_families": 16,
-    "unique_dataset_actions": 15,
-    "unique_record_actions": 14238,
-    "checked_record_action_sample": 10,
+    "source_families": 17,
+    "unique_dataset_actions": 16,
+    "unique_record_actions": 14572,
+    "checked_record_action_sample": 9,
     "checked_unique_urls": 25,
     "failures": 0
   },
@@ -59,17 +59,7 @@
           "status": "REACHABLE"
         },
         {
-          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4153628",
-          "http_status": 200,
-          "status": "REACHABLE"
-        },
-        {
           "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4154483",
-          "http_status": 200,
-          "status": "REACHABLE"
-        },
-        {
-          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4155355",
           "http_status": 200,
           "status": "REACHABLE"
         },
@@ -80,7 +70,7 @@
         }
       ],
       "available_unique_record_actions": 3020,
-      "checked_record_action_sample": 5,
+      "checked_record_action_sample": 3,
       "representative_source_record": {
         "property_id": "toronto-address-point:302304",
         "display_address": "1 Antrim Cres",
@@ -207,6 +197,39 @@
       },
       "fallback_message_required": true
     },
+    "tdsb_facility_condition_renewal": {
+      "link_level": "RECORD_AND_DATASET",
+      "dataset_action": {
+        "url": "https://www.tdsb.on.ca/Community/Planning/School-Facilities/Facility-Condition-Index",
+        "http_status": 200,
+        "status": "REACHABLE"
+      },
+      "record_actions": [
+        {
+          "url": "https://www.tdsb.on.ca/Find-your/Schools/School-FCI/schno/1118",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.tdsb.on.ca/Find-your/Schools/School-FCI/schno/4356",
+          "http_status": 200,
+          "status": "REACHABLE"
+        },
+        {
+          "url": "https://www.tdsb.on.ca/Find-your/Schools/School-FCI/schno/6988",
+          "http_status": 200,
+          "status": "REACHABLE"
+        }
+      ],
+      "available_unique_record_actions": 334,
+      "checked_record_action_sample": 3,
+      "representative_source_record": {
+        "property_id": "toronto-address-point:2565760",
+        "display_address": "1 Hanson St",
+        "source_record_id": "tdsb_facility_condition_renewal:id:school:5535:sha256:3cfc2d46ec6644544ea0"
+      },
+      "fallback_message_required": false
+    },
     "tobids_awarded_contracts_exact_document_address_prior_poc": {
       "link_level": "DATASET_FALLBACK",
       "dataset_action": {
@@ -238,17 +261,7 @@
           "status": "REACHABLE"
         },
         {
-          "url": "https://www.toronto.ca/city-government/planning-development/application-details/?id=4570793&pid=642108",
-          "http_status": 200,
-          "status": "REACHABLE"
-        },
-        {
           "url": "https://www.toronto.ca/city-government/planning-development/application-details/?id=5041378&pid=366301",
-          "http_status": 200,
-          "status": "REACHABLE"
-        },
-        {
-          "url": "https://www.toronto.ca/city-government/planning-development/application-details/?id=5550769&pid=948962",
           "http_status": 200,
           "status": "REACHABLE"
         },
@@ -259,7 +272,7 @@
         }
       ],
       "available_unique_record_actions": 11218,
-      "checked_record_action_sample": 5,
+      "checked_record_action_sample": 3,
       "representative_source_record": {
         "property_id": "toronto-address-point:8260405",
         "display_address": "1 1/2 Birchmount Rd",
