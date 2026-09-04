@@ -13,5 +13,6 @@ import './styles/product-redesign-fixes.css'
 import './styles/product-redesign-final.css'
 import './styles/auth-gate.css'
 import './styles/toronto.css'
+import './styles/toronto-parity.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AuthGate /></React.StrictMode>)

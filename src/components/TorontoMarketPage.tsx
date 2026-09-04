@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { loadTorontoMarket } from '../data/api'
 import type { TorontoMarketPayload, TorontoProperty, TorontoSourceCatalogItem, TorontoSourceLink, TorontoTowerEvidenceStatus } from '../types/toronto'
 import { TorontoMarketMap } from './TorontoMarketMap'
+import { TorontoParityShell } from './TorontoParityShell'
 
 const evidenceLabels: Record<TorontoTowerEvidenceStatus, string> = {
   CONFIRMED_DOCUMENTARY_TOWER: 'Confirmed documentary tower',
@@ -178,7 +179,7 @@ function PropertyDetail({ property, sourceCatalog, onClose }: { property: Toront
   </aside>
 }
 
-export function TorontoMarketPage() {
+function TorontoMarketExplorer() {
   const [payload, setPayload] = useState<TorontoMarketPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -284,4 +285,8 @@ export function TorontoMarketPage() {
     <details className="toronto-limitations"><summary>Known data limitations</summary><ul>{payload.limitations.map(item => <li key={item}>{item}</li>)}</ul>{payload.unresolved_poc.length > 0 && <div><strong>Unresolved original POC addresses</strong><ul>{payload.unresolved_poc.map(item => <li key={item.property_key}>{item.input_address || item.property_key} — {item.resolution_status.replaceAll('_', ' ').toLowerCase()}</li>)}</ul></div>}</details>
     {selected && <PropertyDetail property={selected} sourceCatalog={payload.source_catalog} onClose={closeProperty} />}
   </section>
+}
+
+export function TorontoMarketPage() {
+  return <TorontoParityShell explorer={<TorontoMarketExplorer />} />
 }
