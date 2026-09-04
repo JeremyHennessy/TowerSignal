@@ -54,12 +54,16 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
     dob_systems = sum(1 for row in systems if int(row.get("dob_activity_count") or 0) > 0)
     hpd_contact_systems = sum(1 for row in systems if int(row.get("hpd_contact_count") or 0) > 0)
     hpd_registration_systems = int(summary.get("systems_with_hpd_registration") or 0)
+    planimetric_systems = sum(1 for row in systems if bool(row.get("planimetric_bin_match")))
+    building_footprint_systems = sum(1 for row in systems if bool(row.get("building_footprint_bin_match")))
 
     reg = sources.get("y4fw-iqfr", {})
     insp = sources.get("f9wb-g8mb", {})
     oath = sources.get("jz4z-kudi", {})
     dob = sources.get("w9ak-ipjd", {})
-    pluto = next((value for key, value in sources.items() if key not in {"y4fw-iqfr", "f9wb-g8mb", "jz4z-kudi", "w9ak-ipjd", "tesw-yqqr", "feu5-w2e2"} and "PLUTO" in str(value.get("name", "")).upper()), {})
+    planimetric = sources.get("x748-37q7", {})
+    building_footprints = sources.get("5zhs-2jue", {})
+    pluto = next((value for key, value in sources.items() if key not in {"y4fw-iqfr", "f9wb-g8mb", "jz4z-kudi", "w9ak-ipjd", "tesw-yqqr", "feu5-w2e2", "x748-37q7", "5zhs-2jue"} and "PLUTO" in str(value.get("name", "")).upper()), {})
     hpd_reg = sources.get("tesw-yqqr", {})
     hpd_contacts = sources.get("feu5-w2e2", {})
 
@@ -71,6 +75,40 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
         health_entry(source_key="dob_now_jobs", dataset_id=str(dob.get("dataset_id") or "w9ak-ipjd"), name=str(dob.get("name") or "DOB NOW: Build – Job Application Filings"), entity_unit="BBLs with DOB NOW job filings", retrieved_record_count=int(dob.get("source_record_count") or 0), requested_entity_count=int(metadata.get("dob_requested_bbl_count") or 0), normalized_entity_count=int(metadata.get("dob_matched_bbl_count") or 0), matched_entity_count=int(metadata.get("dob_matched_bbl_count") or 0), attached_entity_count=dob_systems, displayed_entity_count=dob_systems, previous_coverage_percentage=previous_coverage("dob_now_jobs"), coverage_note="Coverage is exact BBL job-filing coverage. A missing DOB NOW match means no matching DOB NOW job filing was returned; it is not evidence that no construction or mechanical work ever occurred."),
         health_entry(source_key="hpd_registrations", dataset_id=str(hpd_reg.get("dataset_id") or "tesw-yqqr"), name=str(hpd_reg.get("name") or "NYC HPD Multiple Dwelling Registrations"), entity_unit="BBLs", retrieved_record_count=int(hpd_reg.get("source_record_count") or 0), requested_entity_count=int(metadata.get("hpd_requested_bbl_count") or 0), normalized_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), matched_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), attached_entity_count=hpd_registration_systems, displayed_entity_count=hpd_registration_systems, previous_coverage_percentage=previous_coverage("hpd_registrations"), coverage_note="Coverage is exact BBL registration match coverage. HPD registration applies only to qualifying properties, so low absolute coverage is not itself a failure."),
         health_entry(source_key="hpd_contacts", dataset_id=str(hpd_contacts.get("dataset_id") or "feu5-w2e2"), name=str(hpd_contacts.get("name") or "NYC HPD Registration Contacts"), entity_unit="matched HPD registration BBLs", retrieved_record_count=int(hpd_contacts.get("source_record_count") or 0), requested_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), normalized_entity_count=int(metadata.get("hpd_matched_contact_bbl_count") or 0), matched_entity_count=int(metadata.get("hpd_matched_contact_bbl_count") or 0), attached_entity_count=hpd_contact_systems, displayed_entity_count=hpd_contact_systems, previous_coverage_percentage=previous_coverage("hpd_contacts"), coverage_note="Coverage is the share of exact-matched HPD registration BBLs with public contact rows."),
+        health_entry(
+            source_key="planimetric_cooling_towers",
+            dataset_id=str(planimetric.get("dataset_id") or "x748-37q7"),
+            name=str(planimetric.get("name") or "NYC Planimetric Database: Cooling Towers"),
+            entity_unit="current cooling-tower BINs with mapped physical tower features",
+            retrieved_record_count=int(metadata.get("planimetric_matched_feature_count") or 0),
+            requested_entity_count=int(metadata.get("planimetric_requested_bin_count") or 0),
+            normalized_entity_count=int(metadata.get("planimetric_matched_bin_count") or 0),
+            matched_entity_count=int(metadata.get("planimetric_matched_bin_count") or 0),
+            attached_entity_count=planimetric_systems,
+            displayed_entity_count=planimetric_systems,
+            previous_coverage_percentage=previous_coverage("planimetric_cooling_towers"),
+            coverage_note=(
+                "Coverage is the share of current registry BINs with at least one exact-BIN 2022 aerial-derived Planimetric cooling-tower feature. "
+                "A missing physical match is not evidence that a registered tower does not exist, and a building-level physical feature is not a one-to-one System ID identity claim."
+            ),
+        ),
+        health_entry(
+            source_key="building_footprints",
+            dataset_id=str(building_footprints.get("dataset_id") or "5zhs-2jue"),
+            name=str(building_footprints.get("name") or "BUILDING"),
+            entity_unit="current cooling-tower BINs with current NYC building footprints",
+            retrieved_record_count=int(metadata.get("building_footprint_matched_feature_count") or 0),
+            requested_entity_count=int(metadata.get("building_footprint_requested_bin_count") or 0),
+            normalized_entity_count=int(metadata.get("building_footprint_matched_bin_count") or 0),
+            matched_entity_count=int(metadata.get("building_footprint_matched_bin_count") or 0),
+            attached_entity_count=building_footprint_systems,
+            displayed_entity_count=building_footprint_systems,
+            previous_coverage_percentage=previous_coverage("building_footprints"),
+            coverage_note=(
+                "Coverage is exact BIN attachment of the current NYC OTI building-footprint layer. "
+                "The footprint is used as roof/building context and does not change cooling-tower identity, compliance status, or Priority Score."
+            ),
+        ),
         health_entry(
             source_key="nys_registry",
             dataset_id=str(nys_source.get("dataset_id") or "24a4-muw7"),

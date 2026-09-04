@@ -57,6 +57,16 @@ export interface Metadata {
   hpd_requested_bbl_count?: number
   hpd_matched_registration_bbl_count?: number
   hpd_matched_contact_bbl_count?: number
+  planimetric_requested_bin_count?: number
+  planimetric_matched_bin_count?: number
+  planimetric_matched_feature_count?: number
+  planimetric_match_basis?: 'BIN_EXACT'
+  planimetric_feature_identity_basis?: 'GLOBALID'
+  planimetric_imagery_year?: number
+  building_footprint_requested_bin_count?: number
+  building_footprint_matched_bin_count?: number
+  building_footprint_matched_feature_count?: number
+  building_footprint_match_basis?: 'BIN_EXACT'
   rules_version: string
   priority_model_version: string
 }
@@ -102,6 +112,10 @@ export interface SystemSummary {
   dob_mechanical_or_boiler_count?: number
   latest_dob_activity_date?: string | null
   hpd_contact_count?: number
+  planimetric_bin_match?: boolean
+  planimetric_building_tower_count?: number
+  building_footprint_bin_match?: boolean
+  building_footprint_count?: number
 }
 
 export interface SystemsPayload {
@@ -119,6 +133,8 @@ export interface SystemsPayload {
     systems_with_explicit_cooling_tower_dob_activity?: number
     systems_with_hpd_registration?: number
     systems_with_hpd_contacts?: number
+    systems_with_planimetric_bin_match?: number
+    systems_with_building_footprint_match?: number
   }
   systems: SystemSummary[]
 }
@@ -247,6 +263,45 @@ export interface HpdRegistrationContext {
   source: 'NYC_HPD_MULTIPLE_DWELLING_REGISTRATION'
 }
 
+export type PlanimetricGeometry =
+  | { type: 'Polygon'; coordinates: number[][][] }
+  | { type: 'MultiPolygon'; coordinates: number[][][][] }
+
+export interface PlanimetricBuildingTowerFeature {
+  source_id: string | null
+  global_id: string
+  bin: string
+  feature_code: string | null
+  sub_feature_code: string | null
+  status: string | null
+  geometry: PlanimetricGeometry
+  source: 'NYC_OTI_PLANIMETRICS_COOLING_TOWERS'
+  match_basis: 'BIN_EXACT'
+  feature_identity_basis: 'GLOBALID'
+  imagery_year: 2022
+}
+
+export interface BuildingFootprintFeature {
+  bin: string
+  name: string | null
+  doitt_id: string | null
+  object_id: string | null
+  shape_area: number | null
+  base_bbl: string | null
+  mappluto_bbl: string | null
+  construction_year: number | null
+  feature_code: string | null
+  geometry_source: string | null
+  ground_elevation_ft: number | null
+  height_roof_ft: number | null
+  last_edited_date: string | null
+  last_status_type: string | null
+  geometry: PlanimetricGeometry
+  source: 'NYC_OTI_BUILDING_FOOTPRINTS'
+  match_basis: 'BIN_EXACT'
+  feature_identity_basis: 'DOITT_ID' | 'OBJECTID'
+}
+
 export interface HistoricalProfile {
   registration_date: string | null
   registration_age_days: number | null
@@ -286,6 +341,8 @@ export interface SystemDetail {
   building_context?: BuildingContext | null
   dob_activity_history?: DobActivity[]
   hpd_registration?: HpdRegistrationContext | null
+  planimetric_building_tower_features?: PlanimetricBuildingTowerFeature[]
+  building_footprints?: BuildingFootprintFeature[]
   sample_history: {
     source_raw: string
     dates: string[]
