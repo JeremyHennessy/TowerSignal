@@ -8,11 +8,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from towersignal.openbook_water import build_payload  # noqa: E402
+from towersignal import openbook_water  # noqa: E402
+from towersignal.openbook_water_guard import classify_water_contract  # noqa: E402
 
 
 def build(output: Path) -> dict:
-    payload = build_payload()
+    # Apply the source-specific context guard at the build boundary without
+    # altering the shared TowerSignal procurement classifier.
+    openbook_water.classify_water_contract = classify_water_contract
+    payload = openbook_water.build_payload()
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     return payload
