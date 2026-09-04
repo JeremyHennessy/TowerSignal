@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal import PRIORITY_MODEL_VERSION, SCHEMA_VERSION  # noqa: E402
+from towersignal.building_footprints import fetch_building_footprints_by_bin  # noqa: E402
 from towersignal.dob_activity import fetch_dob_activity_by_bbl, summarize_dob_activity  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.historical import build_historical_profile  # noqa: E402
@@ -59,6 +60,7 @@ def build(output_dir: Path) -> dict:
     dob_by_bbl, dob_meta = fetch_dob_activity_by_bbl(bbl_values)
     hpd_by_bbl, hpd_meta = fetch_hpd_contacts_by_bbl(bbl_values)
     planimetric_by_bin, planimetric_meta = fetch_planimetric_towers_by_bin(bin_values)
+    building_footprints_by_bin, building_footprint_meta = fetch_building_footprints_by_bin(bin_values)
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [
@@ -138,6 +140,16 @@ def build(output_dir: Path) -> dict:
             "url": planimetric_meta["url"],
             "matched_record_count": planimetric_meta["matched_feature_count"],
         },
+        {
+            "dataset_id": building_footprint_meta["dataset_id"],
+            "name": building_footprint_meta["name"],
+            "retrieved_at": building_footprint_meta["retrieved_at"],
+            "source_record_count": building_footprint_meta["source_record_count"],
+            "source_query_scope": building_footprint_meta["source_query_scope"],
+            "source_last_updated_at": building_footprint_meta["source_last_updated_at"],
+            "url": building_footprint_meta["url"],
+            "matched_record_count": building_footprint_meta["matched_feature_count"],
+        },
     ]
     metadata = {
         "generated_at": generated_at,
@@ -165,7 +177,12 @@ def build(output_dir: Path) -> dict:
         "planimetric_matched_bin_count": planimetric_meta["matched_bin_count"],
         "planimetric_matched_feature_count": planimetric_meta["matched_feature_count"],
         "planimetric_match_basis": planimetric_meta["match_basis"],
+        "planimetric_feature_identity_basis": planimetric_meta["feature_identity_basis"],
         "planimetric_imagery_year": planimetric_meta["imagery_year"],
+        "building_footprint_requested_bin_count": building_footprint_meta["requested_bin_count"],
+        "building_footprint_matched_bin_count": building_footprint_meta["matched_bin_count"],
+        "building_footprint_matched_feature_count": building_footprint_meta["matched_feature_count"],
+        "building_footprint_match_basis": building_footprint_meta["match_basis"],
         "rules_version": rules["rules_version"],
         "priority_model_version": PRIORITY_MODEL_VERSION,
     }
@@ -188,6 +205,7 @@ def build(output_dir: Path) -> dict:
     systems_with_hpd_registration = 0
     systems_with_hpd_contacts = 0
     systems_with_planimetric_bin_match = 0
+    systems_with_building_footprint_match = 0
 
     for system in systems:
         inspections = inspections_by_system.get(system["system_id"], [])
@@ -202,6 +220,7 @@ def build(output_dir: Path) -> dict:
         dob_summary = summarize_dob_activity(dob_activity, snapshot_date)
         hpd_registration = hpd_by_bbl.get(bbl_key) if bbl_key else None
         planimetric_building_tower_features = planimetric_by_bin.get(bin_key, []) if bin_key else []
+        building_footprints = building_footprints_by_bin.get(bin_key, []) if bin_key else []
         if building_context:
             systems_with_pluto_context += 1
         if dob_summary["activity_count"]:
@@ -217,6 +236,8 @@ def build(output_dir: Path) -> dict:
             systems_with_hpd_contacts += 1
         if planimetric_building_tower_features:
             systems_with_planimetric_bin_match += 1
+        if building_footprints:
+            systems_with_building_footprint_match += 1
         signal_state = build_signals(system, inspections, rules, snapshot_date)
         scoring = priority_score(system, signal_state)
         signals = signal_state["signals"]
@@ -286,6 +307,8 @@ def build(output_dir: Path) -> dict:
             "hpd_contact_count": hpd_contact_count,
             "planimetric_bin_match": bool(planimetric_building_tower_features),
             "planimetric_building_tower_count": len(planimetric_building_tower_features),
+            "building_footprint_bin_match": bool(building_footprints),
+            "building_footprint_count": len(building_footprints),
         }
         summary_rows.append(row)
 
@@ -311,6 +334,7 @@ def build(output_dir: Path) -> dict:
             "dob_activity_history": dob_activity,
             "hpd_registration": hpd_registration,
             "planimetric_building_tower_features": planimetric_building_tower_features,
+            "building_footprints": building_footprints,
             "sample_history": {
                 "source_raw": system["sampledates_raw"],
                 "dates": system["sample_dates"],
@@ -345,6 +369,7 @@ def build(output_dir: Path) -> dict:
             "systems_with_hpd_registration": systems_with_hpd_registration,
             "systems_with_hpd_contacts": systems_with_hpd_contacts,
             "systems_with_planimetric_bin_match": systems_with_planimetric_bin_match,
+            "systems_with_building_footprint_match": systems_with_building_footprint_match,
         },
         "systems": summary_rows,
     }
@@ -358,6 +383,7 @@ def build(output_dir: Path) -> dict:
     print(f"DOB NOW exact BBL matches: {dob_meta['matched_bbl_count']:,}/{dob_meta['requested_bbl_count']:,}; {dob_meta['matched_filing_count']:,} job filings")
     print(f"HPD exact BBL registrations: {hpd_meta['matched_registration_bbl_count']:,}/{hpd_meta['requested_bbl_count']:,}; contacts on {hpd_meta['matched_contact_bbl_count']:,} BBLs")
     print(f"Planimetric exact BIN matches: {planimetric_meta['matched_bin_count']:,}/{planimetric_meta['requested_bin_count']:,}; {planimetric_meta['matched_feature_count']:,} physical tower features")
+    print(f"Building-footprint exact BIN matches: {building_footprint_meta['matched_bin_count']:,}/{building_footprint_meta['requested_bin_count']:,}; {building_footprint_meta['matched_feature_count']:,} footprint features")
     print(f"Generated {len(summary_rows):,} systems at {generated_at}")
     return payload
 
