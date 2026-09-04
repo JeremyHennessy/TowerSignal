@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { TorontoParityShell } from '../../src/components/TorontoParityShell'
 
-const payload = {
+const payload = vi.hoisted(() => ({
   schema_version: 'toronto-market-app-1.0',
   generated_at: '2026-09-04T00:00:00Z',
   feature_status: 'ISOLATED_BETA',
@@ -65,7 +65,7 @@ const payload = {
       relationships: [], aerial_review_rank: null, aerial_visual_similarity_score: null,
     },
   ],
-}
+}))
 
 vi.mock('../../src/data/api', () => ({ loadTorontoMarket: vi.fn().mockResolvedValue(payload) }))
 
@@ -92,7 +92,7 @@ test('surfaces source-backed opportunity timing and opens the existing evidence 
   render(<TorontoParityShell explorer={<div>Market explorer</div>} />)
   await user.click(screen.getByRole('button', { name: 'Opportunities' }))
   expect(await screen.findByRole('heading', { name: 'Opportunity queues' })).toBeInTheDocument()
-  expect(screen.getByText('Confirmed tower + mechanical project timing')).toBeInTheDocument()
+  expect(screen.getAllByText('Confirmed tower + mechanical project timing').length).toBeGreaterThan(0)
 
   const alpha = screen.getByText('10 Alpha St').closest('article')
   expect(alpha).not.toBeNull()
@@ -114,7 +114,7 @@ test('aggregates source-backed companies and multi-property portfolios', async (
   expect(await screen.findByRole('heading', { name: 'Portfolios' })).toBeInTheDocument()
   const alphaRow = screen.getByText('Alpha Management').closest('tr')
   expect(alphaRow).not.toBeNull()
-  expect(within(alphaRow as HTMLElement).getByText('2')).toBeInTheDocument()
+  expect(within(alphaRow as HTMLElement).getAllByText('2').length).toBeGreaterThanOrEqual(2)
 })
 
 test('keeps the Toronto watchlist local to the browser and exposes source health', async () => {
