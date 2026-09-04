@@ -1,0 +1,78 @@
+name: Toronto TDSB Preapply Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-mechanical-apply-20260904
+    paths:
+      - .github/workflows/toronto-tdsb-preapply-diagnostic.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout recovery baseline branch
+        uses: actions/checkout@v4
+
+      - name: Download strict TDSB snapshot artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-tdsb-strict-snapshot
+          path: /tmp/tdsb-snapshot
+          github-token: ${{ github.token }}
+          repository: JeremyHennessy/TowerSignal
+          run-id: 33810060526
+
+      - name: Inspect overlap with current market evidence
+        shell: python
+        run: |
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          market = Path('data/toronto/market/current')
+          snapshot = json.loads(Path('/tmp/tdsb-snapshot/toronto-tdsb-strict-snapshot.json').read_text(encoding='utf-8'))
+          spine = json.loads((market / 'property_spine.json').read_text(encoding='utf-8'))
+          links_payload = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
+          app = json.loads(Path('public/data/toronto-market.json').read_text(encoding='utf-8'))
+
+          existing_sources = sorted(key for key in (links_payload.get('sources') or {}) if 'tdsb' in key.lower())
+          existing_links = [x for x in links_payload.get('links', []) if isinstance(x, dict) and 'tdsb' in str(x.get('source_key') or '').lower()]
+          current_props = {str(x.get('property_id') or ''): x for x in spine.get('properties', []) if isinstance(x, dict)}
+          app_props = {str(x.get('property_id') or ''): x for x in app.get('properties', []) if isinstance(x, dict)}
+
+          resolved = [x for x in snapshot.get('resolved', []) if isinstance(x, dict)]
+          tower_schools = [x for x in resolved if 'cooling_tower' in (x.get('signals') or [])]
+          existing_root_rows = [x for x in resolved if str(x.get('property_id') or '') in current_props]
+          new_root_rows = [x for x in resolved if str(x.get('property_id') or '') not in current_props]
+          tower_statuses = Counter((app_props.get(str(x.get('property_id') or '')) or {}).get('tower_evidence_status') or 'MISSING_PROPERTY' for x in tower_schools)
+
+          print('EXISTING_TDSB_SOURCE_KEYS=', json.dumps(existing_sources))
+          print('EXISTING_TDSB_LINKS=', len(existing_links))
+          print('SNAPSHOT_RESOLVED_SCHOOLS=', len(resolved))
+          print('SNAPSHOT_UNIQUE_ROOTS=', len({x.get('property_id') for x in resolved}))
+          print('EXISTING_ROOT_ROWS=', len(existing_root_rows))
+          print('NEW_ROOT_ROWS=', len(new_root_rows))
+          print('EXPLICIT_COOLING_TOWER_SCHOOLS=', len(tower_schools))
+          print('TOWER_STATUS_COUNTS=', json.dumps(dict(sorted(tower_statuses.items())), sort_keys=True))
+          for item in tower_schools:
+              pid = str(item.get('property_id') or '')
+              prop = app_props.get(pid) or {}
+              print('TOWER_SCHOOL=', json.dumps({
+                  'school_id': item.get('school_id'),
+                  'school_name': item.get('school_name'),
+                  'published_address': item.get('published_address'),
+                  'property_id': pid,
+                  'already_in_spine': pid in current_props,
+                  'tower_evidence_status': prop.get('tower_evidence_status'),
+                  'existing_source_keys': prop.get('source_keys'),
+                  'rows': item.get('rows'),
+              }, ensure_ascii=False, sort_keys=True))
+
+          if len(resolved) != 334 or len({x.get('property_id') for x in resolved}) != 330:
+              raise SystemExit('Strict TDSB snapshot contract drift')
