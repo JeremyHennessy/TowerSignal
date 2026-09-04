@@ -1,0 +1,93 @@
+name: Toronto Final Validator Indexed Parity
+
+on:
+  push:
+    branches:
+      - agent/toronto-final-validator-index-20260904
+    paths:
+      - .github/workflows/toronto-final-validator-index-parity.yml
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout indexed-builder baseline
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-final-validator-index-20260904
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Preserve current green QA report
+        run: cp data/toronto/market/current/qa_report.json /tmp/qa-reference.json
+
+      - name: Apply indexed validator lookup only
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('scripts/toronto_final_validate.py')
+          text = path.read_text(encoding='utf-8')
+          text = text.replace(
+              'from toronto_app_sources import load_source_rows, normalize_source_link\n',
+              'from toronto_app_sources import load_source_rows, normalize_source_link\nfrom build_toronto_app_data import build_unique_record_indexes, indexed_record_for_link\n',
+              1,
+          )
+          text = text.replace(
+              '    source_rows = load_source_rows(ROOT, load_source)\n    projected_by_source_property:',
+              '    source_rows = load_source_rows(ROOT, load_source)\n    source_record_indexes = build_unique_record_indexes(source_rows)\n    projected_by_source_property:',
+              1,
+          )
+          text = text.replace(
+              '        normalized = normalize_source_link(link, source_rows)\n',
+              '        resolved_row = indexed_record_for_link(link, source_rows, source_record_indexes)\n        normalized = normalize_source_link(link, source_rows, resolved_row)\n',
+              1,
+          )
+          path.write_text(text, encoding='utf-8')
+
+          Path('tests/python/test_toronto_final_validator_index.py').write_text('''from __future__ import annotations\n\nimport unittest\n\nfrom scripts.build_toronto_app_data import build_unique_record_indexes, indexed_record_for_link\nfrom scripts.toronto_app_sources import normalize_source_link\n\n\nclass TorontoFinalValidatorIndexTests(unittest.TestCase):\n    def test_indexed_row_projection_matches_default_normalization(self) -> None:\n        source = "chemtrac_2024"\n        row = {"_id": 42, "FACILITY_NAME": "Example", "FACILITY_ID": "F-1", "CHEMICAL_NAME": "Nickel", "FA_ADDRESS_GIVEN": "10 Example St"}\n        rows = {source: [row]}\n        link = {"source_key": source, "source_record_id": f"{source}:id:42", "source_row_index": 0, "match_basis": "EXACT", "source_address": "10 Example St"}\n        indexes = build_unique_record_indexes(rows)\n        resolved = indexed_record_for_link(link, rows, indexes)\n        self.assertEqual(normalize_source_link(link, rows), normalize_source_link(link, rows, resolved))\n\n\nif __name__ == "__main__":\n    unittest.main()\n''', encoding='utf-8')
+
+      - name: Compile and unit-test indexed validator
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python -m py_compile scripts/toronto_final_validate.py
+          python -m unittest tests.python.test_toronto_final_validator_index -v
+
+      - name: Run indexed final validator
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          /usr/bin/time -f 'TORONTO_INDEXED_FINAL_VALIDATE_SECONDS=%e' -o /tmp/final-validator.time python scripts/toronto_final_validate.py
+          cat /tmp/final-validator.time
+
+      - name: Require QA semantic parity
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          before = json.loads(Path('/tmp/qa-reference.json').read_text(encoding='utf-8'))
+          after = json.loads(Path('data/toronto/market/current/qa_report.json').read_text(encoding='utf-8'))
+          before.pop('generated_at', None)
+          after.pop('generated_at', None)
+          if before != after:
+              raise SystemExit('Indexed final validator changed QA semantics')
+          print('TORONTO_FINAL_VALIDATOR_QA_PARITY=PASSED')
+
+      - name: Restore QA and persist only validator performance path
+        run: |
+          cp /tmp/qa-reference.json data/toronto/market/current/qa_report.json
+          git config user.name "TowerSignal Validation Bot"
+          git config user.email "towersignal-validation@users.noreply.github.com"
+          git add scripts/toronto_final_validate.py tests/python/test_toronto_final_validator_index.py
+          git diff --cached --quiet && { echo 'No validator index change to persist'; exit 1; }
+          git commit -m "Toronto: index stable source rows in final validator"
+          git push origin HEAD:agent/toronto-final-validator-index-20260904
+          echo "TORONTO_FINAL_VALIDATOR_INDEX_SHA=$(git rev-parse HEAD)"
