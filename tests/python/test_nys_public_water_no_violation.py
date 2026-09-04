@@ -52,6 +52,17 @@ class NysPublicWaterNoViolationTests(unittest.TestCase):
         self.assertEqual(result[0]["source_row_ordinal"], 0)
         self.assertEqual(result[1]["source_row_ordinal"], 1)
 
+    def test_authoritative_operator_source_is_statewide_not_new_york_county(self) -> None:
+        original = build_cache.nys_public_water.CERTIFIED_OPERATORS_URL
+        try:
+            build_cache.configure_authoritative_sources()
+            url = build_cache.nys_public_water.CERTIFIED_OPERATORS_URL
+            self.assertEqual(url, build_cache.STATEWIDE_CERTIFIED_OPERATORS_URL)
+            self.assertTrue(url.endswith("/statewide_certified_operators.htm"))
+            self.assertNotIn("/new_york_certified_operators.htm", url)
+        finally:
+            build_cache.nys_public_water.CERTIFIED_OPERATORS_URL = original
+
 
 if __name__ == "__main__":
     unittest.main()
