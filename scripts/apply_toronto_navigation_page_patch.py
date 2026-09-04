@@ -36,6 +36,12 @@ if old not in text:
 text = text.replace(old, new, 1)
 path.write_text(text, encoding='utf-8')
 
+unified_path = Path('src/components/TorontoUnifiedWorkspace.tsx')
+unified = unified_path.read_text(encoding='utf-8')
+unified = unified.replace("function PropertyActions({ row, watched, onOpen, onCopyLead, onToggleWatch }: { row: ProspectRow; watched: boolean; onOpen: () => void; onCopyLead: () => void; onToggleWatch: () => void }) {", "function PropertyActions({ watched, onOpen, onCopyLead, onToggleWatch }: { watched: boolean; onOpen: () => void; onCopyLead: () => void; onToggleWatch: () => void }) {", 1)
+unified = unified.replace("<PropertyActions row={row}", "<PropertyActions")
+unified_path.write_text(unified, encoding='utf-8')
+
 css_path = Path('src/styles/toronto-parity.css')
 css = css_path.read_text(encoding='utf-8')
 addition = '''
