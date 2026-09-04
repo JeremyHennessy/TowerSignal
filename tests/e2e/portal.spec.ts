@@ -15,7 +15,7 @@ test('authenticated Home and Account pages are linkable and signout returns to t
 
   await page.getByRole('button', { name: 'Sign out', exact: true }).click()
   await expect(page.getByRole('heading', { name: /Find the buildings that need you next/i })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Log in', exact: true })).toHaveAttribute('href', '#/login')
+  await expect(page.getByRole('link', { name: 'Log in', exact: true }).first()).toHaveAttribute('href', '#/login')
 
   await page.goto('./#/prospect', { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })).toBeVisible()
