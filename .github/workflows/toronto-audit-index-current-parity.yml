@@ -35,8 +35,8 @@ jobs:
       - name: Apply previously verified audit-only optimization
         run: |
           git cherry-pick --no-commit 6d3c62195dc59b6b92b3403dd53be51f100dd937
-          git diff --name-only
-          test "$(git diff --name-only | sort | tr '\n' ' ')" = "scripts/audit_toronto_source_row_resolution.py scripts/audit_toronto_source_semantics.py scripts/toronto_app_sources.py tests/python/test_toronto_audit_index_normalization.py "
+          git diff --cached --name-only
+          test "$(git diff --cached --name-only | sort | tr '\n' ' ')" = "scripts/audit_toronto_source_row_resolution.py scripts/audit_toronto_source_semantics.py scripts/toronto_app_sources.py tests/python/test_toronto_audit_index_normalization.py "
 
       - name: Compile and unit-test optimized path
         run: |
