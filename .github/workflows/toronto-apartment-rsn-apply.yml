@@ -1,0 +1,132 @@
+name: Toronto Apartment Evaluation RSN Apply
+
+on:
+  push:
+    branches:
+      - agent/toronto-apartment-identity-diagnostic-20260904
+    paths:
+      - .github/workflows/toronto-apartment-rsn-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-verify-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout exact apartment recovery branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-apartment-identity-diagnostic-20260904
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Apply exact shared RentSafe RSN recovery
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python -m py_compile scripts/apply_toronto_apartment_evaluation_rsn.py
+          python scripts/apply_toronto_apartment_evaluation_rsn.py
+
+      - name: Rebuild Toronto coverage and app payload
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python scripts/toronto_final_coverage.py
+          python scripts/build_toronto_app_data.py
+
+      - name: Verify bounded apartment recovery contract
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python -m unittest tests.python.test_toronto_apartment_evaluation_rsn -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          market = Path('data/toronto/market/current')
+          app = json.loads(Path('public/data/toronto-market.json').read_text(encoding='utf-8'))
+          report = json.loads((market / 'apartment_evaluation_rsn_recovery_report.json').read_text(encoding='utf-8'))
+          links = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
+          graph = json.loads((market / 'entity_graph.json').read_text(encoding='utf-8'))
+          spine = json.loads((market / 'property_spine.json').read_text(encoding='utf-8'))
+          metrics = report['metrics']
+          assert metrics['recovered_rows'] == 26, metrics
+          assert metrics['recovered_properties'] == 14, metrics
+          assert metrics['linked_rsn_conflicts'] == 0, metrics
+          assert metrics['rentsafe_ambiguous_rsn'] == 0, metrics
+          assert metrics['property_spine_changes'] == 0, metrics
+          assert metrics['relationship_edge_changes'] == 0, metrics
+          assert metrics['tower_status_promotions'] == 0, metrics
+          assert len(spine['properties']) == 13380
+          assert len(links['links']) == 40086
+          assert len(graph['edges']) == 6344
+          assert app['counts']['canonical_properties'] == 13380, app['counts']
+          assert app['counts']['source_links'] == 40086, app['counts']
+          assert app['counts']['relationship_edges'] == 6344, app['counts']
+          assert app['counts']['documentary_confirmed_properties'] == 47, app['counts']
+          source = app['source_coverage']['apartment_building_evaluation']
+          assert source['source_records'] == 6252, source
+          assert source['matched_records'] == 5314, source
+          assert source['unmatched_source_records'] == 938, source
+          print('TORONTO_APARTMENT_RSN_CONTRACT=PASSED')
+          PY
+
+      - name: Run strict Toronto source and evidence audits
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python scripts/validate_toronto_source_actions.py --strict --record-sample-size 5
+          python scripts/audit_toronto_source_semantics.py --strict
+          python scripts/audit_toronto_source_row_resolution.py --strict
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+          python -m unittest tests.python.test_toronto_apartment_evaluation_rsn -v
+
+      - name: Run complete repository regression and production build
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python -m unittest discover -s tests/python -p 'test_*.py' -v
+          npm run lint
+          npm run typecheck
+          npm test -- --run
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vite build -- --base=/ --outDir=dist-apartment-rsn
+
+      - name: Prove protected Toronto structures did not change
+        run: |
+          git diff --exit-code 53d8928bc1a6461c17bda23f480da7ea97955b46 -- data/toronto/market/current/property_spine.json
+          git diff --exit-code 53d8928bc1a6461c17bda23f480da7ea97955b46 -- data/toronto/market/current/entity_graph.json
+
+      - name: Persist verified apartment RSN recovery
+        run: |
+          git config user.name "TowerSignal Toronto Data Bot"
+          git config user.email "towersignal-toronto@users.noreply.github.com"
+          git rm .github/workflows/toronto-apartment-rsn-apply.yml .github/workflows/toronto-apartment-identity-diagnostic.yml
+          git add \
+            scripts/apply_toronto_apartment_evaluation_rsn.py \
+            tests/python/test_toronto_apartment_evaluation_rsn.py \
+            data/toronto/market/current/property_source_links.json \
+            data/toronto/market/current/apartment_evaluation_rsn_recovery_report.json \
+            data/toronto/market/current/coverage_report.json \
+            data/toronto/market/current/source_action_qa.json \
+            data/toronto/market/current/source_semantic_audit.json \
+            data/toronto/market/current/source_row_resolution_audit.json \
+            data/toronto/market/current/qa_report.json \
+            public/data/toronto-market.json
+          git diff --cached --quiet && { echo 'No verified apartment RSN outputs to persist'; exit 1; }
+          git commit -m "Toronto: recover apartment evaluations through exact RentSafe RSN"
+          git push origin HEAD:agent/toronto-apartment-identity-diagnostic-20260904
+          echo "TORONTO_APARTMENT_RSN_SHA=$(git rev-parse HEAD)"
