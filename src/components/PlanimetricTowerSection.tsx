@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Feature, MultiPolygon, Polygon } from 'geojson'
-import type { PlanimetricBuildingTowerFeature, SystemDetail } from '../types/data'
+import type { SystemDetail } from '../types/data'
 
 const SOURCE_URL = 'https://data.cityofnewyork.us/City-Government/NYC-Planimetric-Database-Cooling-Towers/x748-37q7'
 
