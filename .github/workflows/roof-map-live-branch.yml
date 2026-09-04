@@ -44,7 +44,9 @@ jobs:
       - name: Build live NYC payload with roof-map context
         run: python scripts/build_data.py --output public/data
       - name: Independently verify generated NYC payload
-        run: python scripts/verify_live_data.py --systems public/data/systems.json --details public/data/details --output artifacts/generated-live-verification.json --sample-size 5
+        run: |
+          mkdir -p artifacts
+          python scripts/verify_live_data.py --systems public/data/systems.json --details public/data/details --output artifacts/generated-live-verification.json --sample-size 5
       - name: Build NYS payload required by source-health gate
         run: python scripts/build_nys_data.py --output public/data
       - name: Validate source-health attachment and coverage
