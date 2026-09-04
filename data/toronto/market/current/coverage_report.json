@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-coverage-1.2",
-  "generated_at": "2026-09-04T15:33:28.953775Z",
+  "generated_at": "2026-09-04T16:23:21.218757Z",
   "coverage_contract": {
     "meaning": "Measured source, reconciliation, document-access, relationship and screening coverage only.",
     "true_market_denominator": "No validated total installed Toronto cooling-tower population has been established from public data.",
@@ -113,17 +113,23 @@
       "unmatched_source_records": 631
     },
     "apartment_building_evaluation": {
-      "status": "JOINED",
+      "status": "JOINED_EXACT_ADDRESS_PLUS_SHARED_RENTSAFE_RSN",
       "source_records": 6252,
       "records_with_property_address": 6252,
-      "matched_records": 5288,
-      "matched_canonical_properties": 3018,
+      "matched_records": 5314,
+      "matched_canonical_properties": 3029,
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 5288,
-      "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.22556053811659194,
-      "source_record_match_fraction": 0.8458093410108766,
-      "unmatched_source_records": 964
+      "identity_limitation": "Exact civic-address links remain primary. An additional evaluation row is joined only when its publisher RSN maps through a source-backed RentSafe relationship to exactly one canonical property; no fuzzy address matching is used.",
+      "unmatched_source_records": 938,
+      "unmatched_records": 938,
+      "links_added_by_rentsafe_rsn": 26,
+      "rentsafe_rsn_recovery_properties": 14,
+      "rentsafe_linked_row_agreements": 4509,
+      "rentsafe_linked_row_conflicts": 0,
+      "role_semantics": "Apartment evaluation records add property condition/evaluation context only and create no organization role or tower assertion.",
+      "candidate_universe_property_link_fraction": 0.2263826606875934,
+      "source_record_match_fraction": 0.8499680102367243
     },
     "ontario_bps_energy_2024": {
       "status": "JOINED",

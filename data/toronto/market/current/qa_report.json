@@ -1,14 +1,14 @@
 {
   "schema_version": "toronto-final-qa-1.2",
-  "generated_at": "2026-09-04T16:07:44.993138Z",
+  "generated_at": "2026-09-04T16:45:24.561524Z",
   "status": "STRUCTURAL_VALIDATION_PASSED",
-  "json_files_validated": 33,
+  "json_files_validated": 34,
   "counts": {
     "canonical_properties": 13380,
     "poc_reconciliation_rows": 177,
     "poc_resolved": 175,
     "poc_unresolved": 2,
-    "source_links": 40060,
+    "source_links": 40086,
     "entity_edges": 6344,
     "aic_application_catalogue": 15864,
     "aic_document_transport_status": "BLOCKED_EXTERNAL_ACCESS_CONTROL",
@@ -136,9 +136,9 @@
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {
-        "property_id": "toronto-address-point:57091",
-        "source_record_id": "apartment_building_evaluation:id:4410",
-        "source_address": "19 DENISON RD E",
+        "property_id": "toronto-address-point:57080",
+        "source_record_id": "apartment_building_evaluation:id:4408",
+        "source_address": "30 DENARDA ST",
         "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE"
       },
       {

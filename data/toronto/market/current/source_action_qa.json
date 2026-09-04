@@ -1,11 +1,11 @@
 {
   "schema_version": "toronto-source-action-qa-1.0",
-  "generated_at": "2026-09-04T15:44:50.004875Z",
+  "generated_at": "2026-09-04T16:28:09.880811Z",
   "status": "PASSED",
   "counts": {
     "source_families": 16,
     "unique_dataset_actions": 15,
-    "unique_record_actions": 14238,
+    "unique_record_actions": 14254,
     "checked_record_action_sample": 10,
     "checked_unique_urls": 25,
     "failures": 0
@@ -59,17 +59,17 @@
           "status": "REACHABLE"
         },
         {
-          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4153628",
+          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4153633",
           "http_status": 200,
           "status": "REACHABLE"
         },
         {
-          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4154483",
+          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4154490",
           "http_status": 200,
           "status": "REACHABLE"
         },
         {
-          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4155355",
+          "url": "https://www.toronto.ca/community-people/housing-shelter/rental-housing-rights-information/housing-property-standards/apartment-building-standards/audits-evaluations/rentsafeto-building-evaluation-report/?id=4155364",
           "http_status": 200,
           "status": "REACHABLE"
         },
@@ -79,7 +79,7 @@
           "status": "REACHABLE"
         }
       ],
-      "available_unique_record_actions": 3020,
+      "available_unique_record_actions": 3036,
       "checked_record_action_sample": 5,
       "representative_source_record": {
         "property_id": "toronto-address-point:302304",

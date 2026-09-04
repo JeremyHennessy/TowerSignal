@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-property-links-1.2",
-  "generated_at": "2026-09-04T15:33:28.263192Z",
+  "generated_at": "2026-09-04T16:23:20.692803Z",
   "join_contract": {
     "basis": "Exact corrected civic-address canonical equality to unique City ADDRESS_POINT_ID property",
     "fuzzy_matching": false,
@@ -8,8 +8,8 @@
   },
   "counts": {
     "canonical_properties": 13380,
-    "total_source_links": 40060,
-    "properties_with_any_new_link": 12860,
+    "total_source_links": 40086,
+    "properties_with_any_new_link": 12868,
     "source_family_count": 19
   },
   "sources": {
@@ -69,14 +69,21 @@
       "identity_limitation": null
     },
     "apartment_building_evaluation": {
-      "status": "JOINED",
+      "status": "JOINED_EXACT_ADDRESS_PLUS_SHARED_RENTSAFE_RSN",
       "source_records": 6252,
       "records_with_property_address": 6252,
-      "matched_records": 5288,
-      "matched_canonical_properties": 3018,
+      "matched_records": 5314,
+      "matched_canonical_properties": 3029,
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 5288,
-      "identity_limitation": null
+      "identity_limitation": "Exact civic-address links remain primary. An additional evaluation row is joined only when its publisher RSN maps through a source-backed RentSafe relationship to exactly one canonical property; no fuzzy address matching is used.",
+      "unmatched_source_records": 938,
+      "unmatched_records": 938,
+      "links_added_by_rentsafe_rsn": 26,
+      "rentsafe_rsn_recovery_properties": 14,
+      "rentsafe_linked_row_agreements": 4509,
+      "rentsafe_linked_row_conflicts": 0,
+      "role_semantics": "Apartment evaluation records add property condition/evaluation context only and create no organization role or tower assertion."
     },
     "ontario_bps_energy_2024": {
       "status": "JOINED",
@@ -33331,6 +33338,22 @@
       "source_address": "34 WALMER RD"
     },
     {
+      "property_id": "toronto-address-point:10759059",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:5952",
+      "source_row_index": 5951,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "6-10 WALMER RD"
+    },
+    {
+      "property_id": "toronto-address-point:10759059",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:5953",
+      "source_row_index": 5952,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "6-10 WALMER RD"
+    },
+    {
       "property_id": "toronto-address-point:10759112",
       "source_key": "toronto_highrise_residential_health_hazards",
       "source_record_id": "toronto_highrise_residential_health_hazards:425:424",
@@ -61094,6 +61117,30 @@
       "source_address": "1565 BAYVIEW AVE"
     },
     {
+      "property_id": "toronto-address-point:14188550",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4528",
+      "source_row_index": 4527,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "85 THORNCLIFFE PARK DR"
+    },
+    {
+      "property_id": "toronto-address-point:14188550",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4529",
+      "source_row_index": 4528,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "85 THORNCLIFFE PARK DR"
+    },
+    {
+      "property_id": "toronto-address-point:14188550",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4530",
+      "source_row_index": 4529,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "95 THORNCLIFFE PARK DR"
+    },
+    {
       "property_id": "toronto-address-point:14188557",
       "source_key": "apartment_building_evaluation",
       "source_record_id": "apartment_building_evaluation:id:1742",
@@ -61896,6 +61943,22 @@
       "source_address": "5-15 BROOKBANKS DR"
     },
     {
+      "property_id": "toronto-address-point:14189265",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4686",
+      "source_row_index": 4685,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "8 ROANOKE RD"
+    },
+    {
+      "property_id": "toronto-address-point:14189265",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4687",
+      "source_row_index": 4686,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "8 ROANOKE RD"
+    },
+    {
       "property_id": "toronto-address-point:14189383",
       "source_key": "toronto_highrise_residential_health_hazards",
       "source_record_id": "toronto_highrise_residential_health_hazards:525:524",
@@ -62592,6 +62655,22 @@
       "source_address": "2010-2012 BATHURST ST"
     },
     {
+      "property_id": "toronto-address-point:14190509",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:1648",
+      "source_row_index": 1647,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "2085 ISLINGTON AVE"
+    },
+    {
+      "property_id": "toronto-address-point:14190509",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:1649",
+      "source_row_index": 1648,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "2101 ISLINGTON AVE"
+    },
+    {
       "property_id": "toronto-address-point:14190515",
       "source_key": "development_pipeline",
       "source_record_id": "development_pipeline:id:1251",
@@ -62806,6 +62885,22 @@
       "source_row_index": 195,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "3392 KINGSTON RD"
+    },
+    {
+      "property_id": "toronto-address-point:14190726",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4224",
+      "source_row_index": 4223,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "3181 EGLINTON AVE E"
+    },
+    {
+      "property_id": "toronto-address-point:14190726",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4225",
+      "source_row_index": 4224,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "3181 EGLINTON AVE E"
     },
     {
       "property_id": "toronto-address-point:14190726",
@@ -65529,6 +65624,14 @@
       "source_row_index": 1172,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "101 KENDLETON DR"
+    },
+    {
+      "property_id": "toronto-address-point:14230931",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:1174",
+      "source_row_index": 1173,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "121 KENDLETON DR"
     },
     {
       "property_id": "toronto-address-point:14231689",
@@ -73822,6 +73925,22 @@
       "source_row_index": 2338,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "740 MIDLAND AVE"
+    },
+    {
+      "property_id": "toronto-address-point:20101157",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:2340",
+      "source_row_index": 2339,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "746 MIDLAND AVE"
+    },
+    {
+      "property_id": "toronto-address-point:20101157",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:2341",
+      "source_row_index": 2340,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "746 MIDLAND AVE"
     },
     {
       "property_id": "toronto-address-point:20101811",
@@ -102242,6 +102361,14 @@
     },
     {
       "property_id": "toronto-address-point:30135362",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4847",
+      "source_row_index": 4846,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "18 TRETTI WAY - WARD 06"
+    },
+    {
+      "property_id": "toronto-address-point:30135362",
       "source_key": "toronto_aic_applications",
       "source_record_id": "toronto_aic_applications:3331:3330",
       "source_row_index": 3330,
@@ -130225,6 +130352,22 @@
       "source_address": "3012 QUEEN ST E"
     },
     {
+      "property_id": "toronto-address-point:376933",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:5759",
+      "source_row_index": 5758,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "3015 D QUEEN ST E"
+    },
+    {
+      "property_id": "toronto-address-point:376933",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:5760",
+      "source_row_index": 5759,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "3015 D QUEEN ST E"
+    },
+    {
       "property_id": "toronto-address-point:377094",
       "source_key": "toronto_aic_applications",
       "source_record_id": "toronto_aic_applications:14931:14930",
@@ -138059,6 +138202,22 @@
       "source_row_index": 94,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "1675 Danforth Ave"
+    },
+    {
+      "property_id": "toronto-address-point:4228715",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:3979",
+      "source_row_index": 3978,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "695 COXWELL AVE"
+    },
+    {
+      "property_id": "toronto-address-point:4228715",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:3980",
+      "source_row_index": 3979,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "695 COXWELL AVE"
     },
     {
       "property_id": "toronto-address-point:4228715",
@@ -173523,6 +173682,22 @@
       "source_address": "101 ROBERTA DR"
     },
     {
+      "property_id": "toronto-address-point:556872",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4693",
+      "source_row_index": 4692,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "7 ROCHEFORT"
+    },
+    {
+      "property_id": "toronto-address-point:556872",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:4694",
+      "source_row_index": 4693,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "7 ROCHEFORT"
+    },
+    {
       "property_id": "toronto-address-point:556910",
       "source_key": "toronto_aic_applications",
       "source_record_id": "toronto_aic_applications:7380:7379",
@@ -193499,6 +193674,14 @@
       "source_address": "78 HOLLY ST"
     },
     {
+      "property_id": "toronto-address-point:6706102",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:3486",
+      "source_row_index": 3485,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "40 SOUDAN AVE"
+    },
+    {
       "property_id": "toronto-address-point:6710178",
       "source_key": "toronto_highrise_residential_health_hazards",
       "source_record_id": "toronto_highrise_residential_health_hazards:995:994",
@@ -208502,6 +208685,22 @@
       "source_row_index": 1415,
       "match_basis": "EXACT_CORRECTED_CANONICAL_PROPERTY_ADDRESS_TO_ADDRESS_POINT_SPINE",
       "source_address": "72 DYNAMIC DR"
+    },
+    {
+      "property_id": "toronto-address-point:7553194",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:777",
+      "source_row_index": 776,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "10 BEACONSFIELD AVE"
+    },
+    {
+      "property_id": "toronto-address-point:7553194",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:778",
+      "source_row_index": 777,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "10 BEACONSFIELD AVE"
     },
     {
       "property_id": "toronto-address-point:75532",
@@ -275541,6 +275740,22 @@
       "source_record_id": "toronto_public_notices_exact_prior_poc:5982",
       "match_basis": "EXACT_NORMALIZED_PUBLIC_NOTICE_APPLICATION_NUMBER_TO_DETERMINISTIC_AIC_PROPERTY_LINK",
       "source_address": "1410 EGLINTON AVE W"
+    },
+    {
+      "property_id": "toronto-address-point:8608515",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:3692",
+      "source_row_index": 3691,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "33 FLAMBOROUGH DR - BLDG A"
+    },
+    {
+      "property_id": "toronto-address-point:8608515",
+      "source_key": "apartment_building_evaluation",
+      "source_record_id": "apartment_building_evaluation:id:3693",
+      "source_row_index": 3692,
+      "match_basis": "EXACT_SHARED_RENTSAFE_RSN_TO_SOURCE_BACKED_CANONICAL_PROPERTY",
+      "source_address": "33 FLAMBOROUGH DR - BLDG A"
     },
     {
       "property_id": "toronto-address-point:8608515",

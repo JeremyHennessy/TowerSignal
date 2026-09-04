@@ -1,0 +1,288 @@
+{
+  "schema_version": "toronto-apartment-evaluation-rsn-recovery-1.0",
+  "generated_at": "2026-09-04T16:23:20.978219Z",
+  "status": "PASSED",
+  "source_key": "apartment_building_evaluation",
+  "match_contract": "Unlinked apartment-evaluation rows are promoted only when the publisher RSN is present on a source-backed RentSafe relationship that maps to exactly one canonical Toronto property. Existing linked evaluation rows with a RentSafe RSN must show zero property conflicts.",
+  "semantic_contract": "Adds source evidence only. No property identity, tower evidence, ownership, manager, operator, contractor, engineer, or other organization role is created or changed.",
+  "metrics": {
+    "source_records": 6252,
+    "baseline_source_links": 5288,
+    "baseline_total_links": 40060,
+    "baseline_properties": 13380,
+    "baseline_graph_edges": 6344,
+    "linked_rsn_agreements": 4509,
+    "linked_rsn_conflicts": 0,
+    "rentsafe_ambiguous_rsn": 0,
+    "recovered_rows": 26,
+    "recovered_properties": 14,
+    "final_source_links": 5314,
+    "final_total_links": 40086,
+    "remaining_unmatched_rows": 938,
+    "property_spine_changes": 0,
+    "relationship_edge_changes": 0,
+    "tower_status_promotions": 0
+  },
+  "recoveries": [
+    {
+      "source_row_index": 776,
+      "source_record_id": "apartment_building_evaluation:id:777",
+      "property_id": "toronto-address-point:7553194",
+      "rsn": "4153145",
+      "site_address": "10 BEACONSFIELD AVE",
+      "year_evaluated": 2023,
+      "evaluation_completed_on": "2023-11-13",
+      "current_building_eval_score": "90"
+    },
+    {
+      "source_row_index": 777,
+      "source_record_id": "apartment_building_evaluation:id:778",
+      "property_id": "toronto-address-point:7553194",
+      "rsn": "4153145",
+      "site_address": "10 BEACONSFIELD AVE",
+      "year_evaluated": 2025,
+      "evaluation_completed_on": "2025-07-11",
+      "current_building_eval_score": "91"
+    },
+    {
+      "source_row_index": 1173,
+      "source_record_id": "apartment_building_evaluation:id:1174",
+      "property_id": "toronto-address-point:14230931",
+      "rsn": "4156208",
+      "site_address": "121 KENDLETON DR",
+      "year_evaluated": 2024,
+      "evaluation_completed_on": "2024-09-13",
+      "current_building_eval_score": "86"
+    },
+    {
+      "source_row_index": 1647,
+      "source_record_id": "apartment_building_evaluation:id:1648",
+      "property_id": "toronto-address-point:14190509",
+      "rsn": "4155358",
+      "site_address": "2085 ISLINGTON AVE",
+      "year_evaluated": 2024,
+      "evaluation_completed_on": "2024-08-28",
+      "current_building_eval_score": "78"
+    },
+    {
+      "source_row_index": 1648,
+      "source_record_id": "apartment_building_evaluation:id:1649",
+      "property_id": "toronto-address-point:14190509",
+      "rsn": "4155918",
+      "site_address": "2101 ISLINGTON AVE",
+      "year_evaluated": 2024,
+      "evaluation_completed_on": "2024-07-05",
+      "current_building_eval_score": "83"
+    },
+    {
+      "source_row_index": 2339,
+      "source_record_id": "apartment_building_evaluation:id:2340",
+      "property_id": "toronto-address-point:20101157",
+      "rsn": "4155890",
+      "site_address": "746 MIDLAND AVE",
+      "year_evaluated": 2023,
+      "evaluation_completed_on": "2023-10-19",
+      "current_building_eval_score": "96"
+    },
+    {
+      "source_row_index": 2340,
+      "source_record_id": "apartment_building_evaluation:id:2341",
+      "property_id": "toronto-address-point:20101157",
+      "rsn": "4155890",
+      "site_address": "746 MIDLAND AVE",
+      "year_evaluated": 2025,
+      "evaluation_completed_on": "2025-09-03",
+      "current_building_eval_score": "95"
+    },
+    {
+      "source_row_index": 3485,
+      "source_record_id": "apartment_building_evaluation:id:3486",
+      "property_id": "toronto-address-point:6706102",
+      "rsn": "4233372",
+      "site_address": "40 SOUDAN AVE",
+      "year_evaluated": 2024,
+      "evaluation_completed_on": "2024-08-13",
+      "current_building_eval_score": "94"
+    },
+    {
+      "source_row_index": 3691,
+      "source_record_id": "apartment_building_evaluation:id:3692",
+      "property_id": "toronto-address-point:8608515",
+      "rsn": "4155845",
+      "site_address": "33 FLAMBOROUGH DR - BLDG A",
+      "year_evaluated": 2024,
+      "evaluation_completed_on": "2024-09-12",
+      "current_building_eval_score": "96"
+    },
+    {
+      "source_row_index": 3692,
+      "source_record_id": "apartment_building_evaluation:id:3693",
+      "property_id": "toronto-address-point:8608515",
+      "rsn": "4155845",
+      "site_address": "33 FLAMBOROUGH DR - BLDG A",
+      "year_evaluated": 2026,
+      "evaluation_completed_on": "2026-07-28",
+      "current_building_eval_score": "98"
+    },
+    {
+      "source_row_index": 3978,
+      "source_record_id": "apartment_building_evaluation:id:3979",
+      "property_id": "toronto-address-point:4228715",
+      "rsn": "4155614",
+      "site_address": "695 COXWELL AVE",
+      "year_evaluated": 2025,
+      "evaluation_completed_on": "2025-11-28",
+      "current_building_eval_score": "96"
+    },
+    {
+      "source_row_index": 3979,
+      "source_record_id": "apartment_building_evaluation:id:3980",
+      "property_id": "toronto-address-point:4228715",
+      "rsn": "4155614",
+      "site_address": "695 COXWELL AVE",
+      "year_evaluated": 2023,
+      "evaluation_completed_on": "2023-10-11",
+      "current_building_eval_score": "97"
+    },
+    {
+      "source_row_index": 4223,
+      "source_record_id": "apartment_building_evaluation:id:4224",
+      "property_id": "toronto-address-point:14190726",
+      "rsn": "4156313",
+      "site_address": "3181 EGLINTON AVE E",
+      "year_evaluated": 2024,
+      "evaluation_completed_on": "2024-09-09",
+      "current_building_eval_score": "77"
+    },
+    {
+      "source_row_index": 4224,
+      "source_record_id": "apartment_building_evaluation:id:4225",
+      "property_id": "toronto-address-point:14190726",
+      "rsn": "4156313",
+      "site_address": "3181 EGLINTON AVE E",
+      "year_evaluated": 2026,
+      "evaluation_completed_on": "2026-07-09",
+      "current_building_eval_score": "83"
+    },
+    {
+      "source_row_index": 4527,
+      "source_record_id": "apartment_building_evaluation:id:4528",
+      "property_id": "toronto-address-point:14188550",
+      "rsn": "4154159",
+      "site_address": "85 THORNCLIFFE PARK DR",
+      "year_evaluated": 2023,
+      "evaluation_completed_on": "2023-09-15",
+      "current_building_eval_score": "83"
+    },
+    {
+      "source_row_index": 4528,
+      "source_record_id": "apartment_building_evaluation:id:4529",
+      "property_id": "toronto-address-point:14188550",
+      "rsn": "4154159",
+      "site_address": "85 THORNCLIFFE PARK DR",
+      "year_evaluated": 2025,
+      "evaluation_completed_on": "2025-10-08",
+      "current_building_eval_score": "90"
+    },
+    {
+      "source_row_index": 4529,
+      "source_record_id": "apartment_building_evaluation:id:4530",
+      "property_id": "toronto-address-point:14188550",
+      "rsn": "4237447",
+      "site_address": "95 THORNCLIFFE PARK DR",
+      "year_evaluated": 2024,
+      "evaluation_completed_on": "2024-08-26",
+      "current_building_eval_score": "90"
+    },
+    {
+      "source_row_index": 4685,
+      "source_record_id": "apartment_building_evaluation:id:4686",
+      "property_id": "toronto-address-point:14189265",
+      "rsn": "4154894",
+      "site_address": "8 ROANOKE RD",
+      "year_evaluated": 2025,
+      "evaluation_completed_on": "2025-06-23",
+      "current_building_eval_score": "92"
+    },
+    {
+      "source_row_index": 4686,
+      "source_record_id": "apartment_building_evaluation:id:4687",
+      "property_id": "toronto-address-point:14189265",
+      "rsn": "4154894",
+      "site_address": "8 ROANOKE RD",
+      "year_evaluated": 2023,
+      "evaluation_completed_on": "2023-07-14",
+      "current_building_eval_score": "96"
+    },
+    {
+      "source_row_index": 4692,
+      "source_record_id": "apartment_building_evaluation:id:4693",
+      "property_id": "toronto-address-point:556872",
+      "rsn": "4154770",
+      "site_address": "7 ROCHEFORT",
+      "year_evaluated": 2026,
+      "evaluation_completed_on": "2026-08-05",
+      "current_building_eval_score": "85"
+    },
+    {
+      "source_row_index": 4693,
+      "source_record_id": "apartment_building_evaluation:id:4694",
+      "property_id": "toronto-address-point:556872",
+      "rsn": "4154770",
+      "site_address": "7 ROCHEFORT",
+      "year_evaluated": 2024,
+      "evaluation_completed_on": "2024-09-06",
+      "current_building_eval_score": "98"
+    },
+    {
+      "source_row_index": 4846,
+      "source_record_id": "apartment_building_evaluation:id:4847",
+      "property_id": "toronto-address-point:30135362",
+      "rsn": "5516544",
+      "site_address": "18 TRETTI WAY - WARD 06",
+      "year_evaluated": 2025,
+      "evaluation_completed_on": "2025-10-10",
+      "current_building_eval_score": "100"
+    },
+    {
+      "source_row_index": 5758,
+      "source_record_id": "apartment_building_evaluation:id:5759",
+      "property_id": "toronto-address-point:376933",
+      "rsn": "4155743",
+      "site_address": "3015 D QUEEN ST E",
+      "year_evaluated": 2025,
+      "evaluation_completed_on": "2025-07-10",
+      "current_building_eval_score": "91"
+    },
+    {
+      "source_row_index": 5759,
+      "source_record_id": "apartment_building_evaluation:id:5760",
+      "property_id": "toronto-address-point:376933",
+      "rsn": "4155743",
+      "site_address": "3015 D QUEEN ST E",
+      "year_evaluated": 2023,
+      "evaluation_completed_on": "2023-07-11",
+      "current_building_eval_score": "93"
+    },
+    {
+      "source_row_index": 5951,
+      "source_record_id": "apartment_building_evaluation:id:5952",
+      "property_id": "toronto-address-point:10759059",
+      "rsn": "4221280",
+      "site_address": "6-10 WALMER RD",
+      "year_evaluated": 2025,
+      "evaluation_completed_on": "2025-08-18",
+      "current_building_eval_score": "90"
+    },
+    {
+      "source_row_index": 5952,
+      "source_record_id": "apartment_building_evaluation:id:5953",
+      "property_id": "toronto-address-point:10759059",
+      "rsn": "4221280",
+      "site_address": "6-10 WALMER RD",
+      "year_evaluated": 2023,
+      "evaluation_completed_on": "2023-08-16",
+      "current_building_eval_score": "91"
+    }
+  ]
+}

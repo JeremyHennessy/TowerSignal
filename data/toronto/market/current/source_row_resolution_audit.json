@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-source-row-resolution-audit-1.1",
-  "source_links": 40060,
+  "source_links": 40086,
   "status": "PASSED",
   "sources": {
     "311_matches_prior_poc": {
@@ -12,8 +12,8 @@
       "stable_id_address_match": 179
     },
     "apartment_building_evaluation": {
-      "index_address_match": 5288,
-      "stable_id_address_match": 5288
+      "index_address_match": 5314,
+      "stable_id_address_match": 5314
     },
     "business_licence_matches_prior_poc": {
       "index_address_match": 1452,
