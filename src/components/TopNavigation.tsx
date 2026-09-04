@@ -72,6 +72,7 @@ export function TopNavigation({
   }
 
   if (TORONTO_PREVIEW) return <header className="reference-top-nav">
+    <style>{'.toronto-filters > *{min-width:0}.toronto-filters input,.toronto-filters select{width:100%;min-width:0;box-sizing:border-box}'}</style>
     <button className="reference-brand" onClick={() => onNavigate('toronto')} aria-label="TowerSignal Toronto home"><span className="reference-brand-mark"><TowerSignalMark /></span><strong>TowerSignal</strong></button>
     <nav aria-label="TowerSignal Toronto workspace"><button className="active" onClick={() => onNavigate('toronto')}>Toronto Market</button></nav>
     <div className="reference-nav-tools">
