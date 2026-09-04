@@ -160,9 +160,13 @@ def row_is_toronto(record: dict[str, Any]) -> tuple[bool, str]:
 
 
 def resource_year(resource: dict[str, Any]) -> int | None:
-    text = " ".join(str(resource.get(key) or "") for key in ("name", "description", "url"))
-    years = re.findall(r"\b(20\d{2})\b", text)
-    return max((int(year) for year in years), default=None)
+    # Publisher resource names are authoritative when they carry a reporting year.
+    # Do not let publication/update years in descriptions override a named vintage.
+    for key in ("name", "url", "description"):
+        years = re.findall(r"\b(20\d{2})\b", str(resource.get(key) or ""))
+        if years:
+            return max(int(year) for year in years)
+    return None
 
 
 def resource_summary(resource: dict[str, Any]) -> dict[str, Any]:
