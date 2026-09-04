@@ -1,0 +1,103 @@
+name: Toronto App Builder Indexed Parity
+
+on:
+  push:
+    branches:
+      - agent/toronto-app-builder-index-20260904
+    paths:
+      - .github/workflows/toronto-app-builder-index-parity.yml
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact recovery baseline
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-app-builder-index-20260904
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Preserve committed recovery app payload
+        run: cp public/data/toronto-market.json /tmp/toronto-market-reference.json
+
+      - name: Apply indexed builder lookup only
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path_name: str, old: str, new: str) -> None:
+              path = Path(path_name)
+              text = path.read_text(encoding='utf-8')
+              if new in text:
+                  return
+              if old not in text:
+                  raise SystemExit(f'Patch anchor changed: {path_name}: {old!r}')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_once(
+              'scripts/toronto_app_sources.py',
+              'def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:\n    key = str(link.get("source_key") or "unknown")\n    row = _record_for_link(link, source_rows)\n',
+              'def normalize_source_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]], resolved_row: dict[str, Any] | None = None) -> dict[str, Any]:\n    key = str(link.get("source_key") or "unknown")\n    row = resolved_row if resolved_row is not None else _record_for_link(link, source_rows)\n',
+          )
+
+          builder = Path('scripts/build_toronto_app_data.py')
+          text = builder.read_text(encoding='utf-8')
+          text = text.replace(
+              'from toronto_app_sources import load_source_rows, normalize_source_link, valid_public_url\n',
+              'from toronto_app_sources import _record_for_link, load_source_rows, normalize_source_link, valid_public_url\nfrom toronto_source_identity import stable_source_record_id\n',
+              1,
+          )
+          helper = '''\n\ndef build_unique_record_indexes(source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, dict[str, dict[str, Any]]]:\n    indexes: dict[str, dict[str, dict[str, Any]]] = {}\n    for source, rows in source_rows.items():\n        unique: dict[str, dict[str, Any]] = {}\n        duplicates: set[str] = set()\n        for row in rows:\n            record_id = stable_source_record_id(source, row)\n            if record_id in unique:\n                duplicates.add(record_id)\n            else:\n                unique[record_id] = row\n        for record_id in duplicates:\n            unique.pop(record_id, None)\n        indexes[source] = unique\n    return indexes\n\n\ndef indexed_record_for_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]], indexes: dict[str, dict[str, dict[str, Any]]]) -> dict[str, Any]:\n    source = str(link.get("source_key") or "").strip()\n    record_id = str(link.get("source_record_id") or "").strip()\n    indexed = indexes.get(source, {}).get(record_id)\n    return indexed if indexed is not None else _record_for_link(link, source_rows)\n'''
+          anchor = '\n\ndef organization_names(graph: dict[str, Any]) -> dict[str, str]:\n'
+          if helper not in text:
+              if anchor not in text:
+                  raise SystemExit('Builder helper anchor changed')
+              text = text.replace(anchor, helper + anchor, 1)
+          text = text.replace(
+              '    source_rows = load_source_rows(ROOT, load)\n\n    links_by_property:',
+              '    source_rows = load_source_rows(ROOT, load)\n    source_record_indexes = build_unique_record_indexes(source_rows)\n\n    links_by_property:',
+              1,
+          )
+          text = text.replace(
+              '        normalized_link = normalize_source_link(link, source_rows)\n',
+              '        resolved_row = indexed_record_for_link(link, source_rows, source_record_indexes)\n        normalized_link = normalize_source_link(link, source_rows, resolved_row)\n',
+              1,
+          )
+          builder.write_text(text, encoding='utf-8')
+
+          Path('tests/python/test_toronto_app_builder_index.py').write_text('''from __future__ import annotations\n\nimport unittest\n\nfrom scripts.build_toronto_app_data import build_unique_record_indexes, indexed_record_for_link\nfrom scripts.toronto_app_sources import normalize_source_link\n\n\nclass TorontoAppBuilderIndexTests(unittest.TestCase):\n    def test_unique_index_and_legacy_fallback_preserve_normalization(self) -> None:\n        source = "chemtrac_2024"\n        row = {"_id": 42, "FACILITY_NAME": "Example", "FACILITY_ID": "F-1", "CHEMICAL_NAME": "Nickel", "FA_ADDRESS_GIVEN": "10 Example St"}\n        rows = {source: [row]}\n        link = {"source_key": source, "source_record_id": f"{source}:id:42", "source_row_index": 0, "match_basis": "EXACT", "source_address": "10 Example St"}\n        indexes = build_unique_record_indexes(rows)\n        resolved = indexed_record_for_link(link, rows, indexes)\n        self.assertIs(resolved, row)\n        self.assertEqual(normalize_source_link(link, rows), normalize_source_link(link, rows, resolved))\n\n\nif __name__ == "__main__":\n    unittest.main()\n''', encoding='utf-8')
+
+      - name: Compile and unit-test indexed builder
+        run: |
+          python -m py_compile scripts/toronto_app_sources.py scripts/build_toronto_app_data.py
+          PYTHONPATH=.:scripts python -m unittest tests.python.test_toronto_app_builder_index -v
+
+      - name: Rebuild app payload with indexed resolver
+        run: |
+          /usr/bin/time -f 'TORONTO_INDEXED_APP_BUILD_SECONDS=%e' -o /tmp/app-builder.time python scripts/build_toronto_app_data.py
+          cat /tmp/app-builder.time
+
+      - name: Require byte-identical payload
+        run: |
+          cmp -s /tmp/toronto-market-reference.json public/data/toronto-market.json || { echo 'Indexed builder changed Toronto payload bytes'; exit 1; }
+          echo 'TORONTO_APP_PAYLOAD_BYTE_PARITY=PASSED'
+
+      - name: Restore payload and persist only performance path
+        run: |
+          cp /tmp/toronto-market-reference.json public/data/toronto-market.json
+          git config user.name "TowerSignal Build Bot"
+          git config user.email "towersignal-build@users.noreply.github.com"
+          git add scripts/toronto_app_sources.py scripts/build_toronto_app_data.py tests/python/test_toronto_app_builder_index.py
+          git diff --cached --quiet && { echo 'No indexed builder change to persist'; exit 1; }
+          git commit -m "Toronto: index stable source rows in app builder"
+          git push origin HEAD:agent/toronto-app-builder-index-20260904
+          echo "TORONTO_APP_BUILDER_INDEX_SHA=$(git rev-parse HEAD)"
