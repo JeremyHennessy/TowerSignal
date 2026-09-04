@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from toronto_app_sources import load_source_rows, normalize_source_link
+from build_toronto_app_data import build_unique_record_indexes, indexed_record_for_link
 from toronto_market_common import utc_now, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -96,9 +97,11 @@ def main() -> None:
     def load_source(path: Path) -> dict[str, Any]:
         return json.loads(path.read_text(encoding="utf-8"))
     source_rows = load_source_rows(ROOT, load_source)
+    source_record_indexes = build_unique_record_indexes(source_rows)
     projected_by_source_property: dict[tuple[str, str], list[tuple[Any, ...]]] = defaultdict(list)
     for link in source_links:
-        normalized = normalize_source_link(link, source_rows)
+        resolved_row = indexed_record_for_link(link, source_rows, source_record_indexes)
+        normalized = normalize_source_link(link, source_rows, resolved_row)
         projected_by_source_property[(str(link.get("source_key")), str(link.get("property_id")))].append(projected_link_key(normalized))
     projected_duplicate_excess: dict[str, int] = defaultdict(int)
     for (source, _property_id), values in projected_by_source_property.items():
