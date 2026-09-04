@@ -1,0 +1,82 @@
+name: Toronto Monitor Shell Wire
+
+on:
+  push:
+    branches:
+      - agent/toronto-monitor-history-20260904
+    paths:
+      - .github/workflows/toronto-monitor-wire.yml
+
+permissions:
+  contents: write
+
+jobs:
+  wire-verify-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-monitor-history-20260904
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Wire Monitor into Toronto parity shell
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('src/components/TorontoParityShell.tsx')
+          text = path.read_text(encoding='utf-8')
+          def replace_once(old: str, new: str) -> None:
+              global text
+              if old not in text:
+                  raise SystemExit(f'Anchor changed: {old!r}')
+              text = text.replace(old, new, 1)
+
+          import_anchor = "import type { TorontoMarketPayload, TorontoProperty, TorontoSourceLink } from '../types/toronto'\n"
+          if "import { TorontoMonitorPage } from './TorontoMonitorPage'" not in text:
+              replace_once(import_anchor, import_anchor + "import { TorontoMonitorPage } from './TorontoMonitorPage'\n")
+          replace_once(
+              "type TorontoWorkspace = 'market' | 'prospects' | 'opportunities' | 'companies' | 'portfolios' | 'watchlist' | 'sources'",
+              "type TorontoWorkspace = 'market' | 'monitor' | 'prospects' | 'opportunities' | 'companies' | 'portfolios' | 'watchlist' | 'sources'",
+          )
+          replace_once(
+              "    { value: 'market', label: 'Market' },\n    { value: 'prospects', label: 'Prospects' },",
+              "    { value: 'market', label: 'Market' },\n    { value: 'monitor', label: 'Monitor' },\n    { value: 'prospects', label: 'Prospects' },",
+          )
+          replace_once(
+              "    if (view === 'market' || payload || error) return",
+              "    if (view === 'market' || view === 'monitor' || payload || error) return",
+          )
+          replace_once(
+              "    {view === 'market' ? explorer : <>\n      {error && <section",
+              "    {view === 'market' ? explorer : <>\n      {view === 'monitor' && <TorontoMonitorPage />}\n      {view !== 'monitor' && error && <section",
+          )
+          replace_once(
+              "      {!error && !payload && <section",
+              "      {view !== 'monitor' && !error && !payload && <section",
+          )
+          replace_once(
+              "This beta watchlist stays in this browser and does not imply monitoring of source changes.",
+              "This beta watchlist stays in this browser. Monitor separately shows verified release-to-release source changes.",
+          )
+          path.write_text(text, encoding='utf-8')
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify Monitor shell and existing Toronto workspaces
+        run: |
+          npm run lint
+          npm run typecheck
+          npm exec vitest run -- tests/frontend/TorontoMonitorPage.test.tsx tests/frontend/TorontoMonitorShell.test.tsx tests/frontend/TorontoParityShell.test.tsx tests/frontend/TorontoMarket.test.tsx
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vite build -- --base=/ --outDir=dist-toronto-monitor-shell
+      - name: Persist verified Monitor shell wiring
+        run: |
+          git config user.name "TowerSignal Toronto History Bot"
+          git config user.email "towersignal-toronto-history@users.noreply.github.com"
+          git rm .github/workflows/toronto-monitor-wire.yml
+          git add src/components/TorontoParityShell.tsx tests/frontend/TorontoMonitorShell.test.tsx
+          git diff --cached --quiet && { echo 'No Monitor shell changes to persist'; exit 1; }
+          git commit -m "Wire verified Toronto Monitor workspace"
+          git push origin HEAD:agent/toronto-monitor-history-20260904
+          echo "TORONTO_MONITOR_SHELL_SHA=$(git rev-parse HEAD)"
