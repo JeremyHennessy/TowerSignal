@@ -1,4 +1,4 @@
-import { type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 import { ShareButton } from './ShareButton'
 
@@ -18,6 +18,32 @@ const navigation: Array<{ mode: WorkspaceMode; label: string }> = [
   { mode: 'portfolios', label: 'Portfolios' },
   { mode: 'workflow', label: 'Workflow' },
 ]
+
+export const TORONTO_PREVIEW_NAVIGATION = [
+  { route: 'prospect', label: 'Prospect' },
+  { route: 'monitor', label: 'Monitor' },
+  { route: 'map', label: 'Map' },
+  { route: 'market', label: 'Toronto Market' },
+  { route: 'changes', label: 'Toronto Changes' },
+  { route: 'opportunities', label: 'Opportunities' },
+  { route: 'companies', label: 'Companies' },
+  { route: 'portfolios', label: 'Portfolios' },
+  { route: 'workflow', label: 'Workflow' },
+] as const
+
+type TorontoPreviewRoute = 'home' | typeof TORONTO_PREVIEW_NAVIGATION[number]['route'] | 'source-health' | 'benchmarking' | 'property' | 'company' | 'portfolio'
+const TORONTO_PREVIEW_ROUTES = new Set<TorontoPreviewRoute>(['home', 'source-health', 'benchmarking', 'property', 'company', 'portfolio', ...TORONTO_PREVIEW_NAVIGATION.map(item => item.route)])
+
+function currentTorontoPreviewRoute(): TorontoPreviewRoute {
+  const parts = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/').filter(Boolean)
+  const candidate = parts[0] === 'toronto' ? parts[1] : null
+  if (!candidate) return 'home'
+  return TORONTO_PREVIEW_ROUTES.has(candidate as TorontoPreviewRoute) ? candidate as TorontoPreviewRoute : 'market'
+}
+
+function goToronto(route: TorontoPreviewRoute) {
+  window.location.hash = `#/toronto/${route}`
+}
 
 function TowerSignalMark() {
   return <svg className="reference-brand-antenna" viewBox="0 0 28 32" aria-hidden="true">
@@ -66,18 +92,42 @@ export function TopNavigation({
   onSignUp: (email: string, password: string) => Promise<void>
   onSignOut: () => Promise<void>
 }) {
+  const [torontoRoute, setTorontoRoute] = useState<TorontoPreviewRoute>(() => currentTorontoPreviewRoute())
+
+  useEffect(() => {
+    if (!TORONTO_PREVIEW) return
+    const sync = () => setTorontoRoute(currentTorontoPreviewRoute())
+    sync()
+    window.addEventListener('hashchange', sync)
+    return () => window.removeEventListener('hashchange', sync)
+  }, [])
+
   const submit = (event: FormEvent) => {
     event.preventDefault()
+    if (TORONTO_PREVIEW) {
+      const term = search.trim()
+      window.location.hash = term ? `#/toronto/prospect?search=${encodeURIComponent(term)}` : '#/toronto/prospect'
+      return
+    }
     onSearchSubmit()
   }
 
   if (TORONTO_PREVIEW) return <header className="reference-top-nav">
     <style>{'.toronto-filters > *{min-width:0}.toronto-filters input,.toronto-filters select{width:100%;min-width:0;box-sizing:border-box}'}</style>
-    <button className="reference-brand" onClick={() => onNavigate('toronto')} aria-label="TowerSignal Toronto home"><span className="reference-brand-mark"><TowerSignalMark /></span><strong>TowerSignal</strong></button>
-    <nav aria-label="TowerSignal Toronto workspace"><button className="active" onClick={() => onNavigate('toronto')}>Toronto Market</button></nav>
+    <button className="reference-brand" onClick={() => goToronto('home')} aria-label="TowerSignal Toronto home"><span className="reference-brand-mark"><TowerSignalMark /></span><strong>TowerSignal</strong></button>
+    <nav aria-label="TowerSignal Toronto workspace">
+      <button className={torontoRoute === 'home' ? 'active' : ''} onClick={() => goToronto('home')}>Home</button>
+      {TORONTO_PREVIEW_NAVIGATION.map(item => <button key={item.route} className={torontoRoute === item.route || (item.route === 'prospect' && torontoRoute === 'property') || (item.route === 'companies' && torontoRoute === 'company') || (item.route === 'portfolios' && torontoRoute === 'portfolio') ? 'active' : ''} onClick={() => goToronto(item.route)}>{item.label}</button>)}
+    </nav>
     <div className="reference-nav-tools">
+      <select className="toronto-market-select" aria-label="Market" value="toronto" onChange={event => {
+        if (event.target.value === 'nyc') window.location.assign(NEW_YORK_APP_URL)
+        if (event.target.value === 'nys') window.location.assign(`${NEW_YORK_APP_URL}#/nys`)
+      }}><option value="toronto">Toronto</option><option value="nyc">New York City</option><option value="nys">New York State</option></select>
+      <form className="global-account-search" onSubmit={submit}><span aria-hidden="true">⌕</span><input aria-label="Search accounts or locations" value={search} onChange={event => onSearchChange(event.target.value)} placeholder="Search accounts or locations" /></form>
       <ShareButton label="Share" className="global-share-button" />
-      <a className="share-button global-share-button" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }} aria-label="Open New York app" href={NEW_YORK_APP_URL} target="_blank" rel="noreferrer">New York ↗</a>
+      <button className={`source-health-nav-button ${torontoRoute === 'source-health' ? 'active' : ''}`} onClick={() => goToronto('source-health')} aria-label="Source Health & Coverage" title="Source Health & Coverage"><span className="status-dot" /><span className="source-health-nav-label">Sources</span></button>
+      <button className="workflow-profile-trigger" aria-label="Open Toronto workflow" title="Toronto workflow" onClick={() => goToronto('workflow')}><span>TS</span></button>
     </div>
   </header>
 
