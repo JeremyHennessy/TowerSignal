@@ -1,0 +1,106 @@
+name: Toronto Post-Recovery TOBids Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-post-recovery-integration-20260904
+    paths:
+      - .github/workflows/toronto-post-recovery-tobids-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact integration branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Measure exact TOBids opportunities against recovered spine
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          from apply_toronto_tobids_relationships import (
+              SOURCE_LINK_KEY,
+              GRAPH_SOURCE_KEY,
+              RELATIONSHIP,
+              candidate_rows,
+              normalized_org,
+          )
+          from toronto_source_identity import find_source_record, stable_source_record_id
+
+          root = Path('.')
+          market = root / 'data/toronto/market/current'
+          spine = json.loads((market / 'property_spine.json').read_text(encoding='utf-8'))
+          links_payload = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
+          graph = json.loads((market / 'entity_graph.json').read_text(encoding='utf-8'))
+          tobids = json.loads((root / 'data/toronto/warehouse/current/open_licensed/tobids_awarded_contracts.json').read_text(encoding='utf-8'))
+          properties = [x for x in spine.get('properties', []) if isinstance(x, dict)]
+          rows = [x for x in tobids.get('rows', []) if isinstance(x, dict)]
+
+          exact, ambiguous, ambiguous_property_addresses = candidate_rows(properties, rows)
+          existing_links = [x for x in links_payload.get('links', []) if isinstance(x, dict) and x.get('source_key') == SOURCE_LINK_KEY]
+          existing_link_keys = set()
+          for link in existing_links:
+              resolved = find_source_record(SOURCE_LINK_KEY, str(link.get('source_record_id') or ''), rows)
+              if not resolved:
+                  raise SystemExit(f'Unresolved existing TOBids link: {link}')
+              existing_link_keys.add((str(link.get('property_id') or ''), stable_source_record_id(SOURCE_LINK_KEY, resolved)))
+
+          nodes = {str(x.get('node_id') or ''): x for x in graph.get('nodes', []) if isinstance(x, dict)}
+          existing_edge_pairs = set()
+          for edge in graph.get('edges', []):
+              if not isinstance(edge, dict) or edge.get('source_key') != GRAPH_SOURCE_KEY or edge.get('relationship') != RELATIONSHIP:
+                  continue
+              node = nodes.get(str(edge.get('from_node') or ''), {})
+              existing_edge_pairs.add((str(edge.get('property_id') or edge.get('to_node') or ''), normalized_org(node.get('name'))))
+
+          missing_links = []
+          missing_edges = []
+          for item in exact:
+              row = item['row']
+              pid = item['property_id']
+              rid = stable_source_record_id(SOURCE_LINK_KEY, row)
+              supplier = str(item.get('successful_supplier') or '').strip()
+              detail = {
+                  'source_row_index': item['source_row_index'],
+                  'property_id': pid,
+                  'display_address': item['display_address'],
+                  'document_number': row.get('Document Number'),
+                  'successful_supplier': supplier,
+                  'award': row.get('Award'),
+                  'award_date': row.get('Award Authority Obtained Date'),
+                  'division': row.get('Division'),
+                  'description': row.get('Solicitation Document Description'),
+                  'source_record_id': rid,
+              }
+              if (pid, rid) not in existing_link_keys:
+                  missing_links.append(detail)
+              if (pid, normalized_org(supplier)) not in existing_edge_pairs:
+                  missing_edges.append(detail)
+
+          print('PROPERTY_COUNT=', len(properties))
+          print('EXACT_COUNT=', len(exact))
+          print('AMBIGUOUS_COUNT=', len(ambiguous))
+          print('AMBIGUOUS_PROPERTY_ADDRESSES=', ambiguous_property_addresses)
+          print('EXISTING_TOBIDS_LINKS=', len(existing_links))
+          print('EXISTING_BIDDER_EDGES=', len(existing_edge_pairs))
+          print('MISSING_LINK_COUNT=', len(missing_links))
+          print('MISSING_EDGE_COUNT=', len(missing_edges))
+          for item in missing_links:
+              print('MISSING_TOBIDS_LINK=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+          for item in missing_edges:
+              print('MISSING_TOBIDS_EDGE=', json.dumps(item, ensure_ascii=False, sort_keys=True))
+
+          if len(properties) != 13380:
+              raise SystemExit(f'Recovered spine drift: {len(properties)}')
