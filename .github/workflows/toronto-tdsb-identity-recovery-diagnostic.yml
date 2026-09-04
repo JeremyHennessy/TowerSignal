@@ -1,0 +1,164 @@
+name: Toronto TDSB Identity Recovery Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-identity-recovery-diagnostic-20260904
+    paths:
+      - .github/workflows/toronto-tdsb-identity-recovery-diagnostic.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout recovery baseline
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download verified strict TDSB snapshot
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-tdsb-strict-snapshot
+          path: /tmp/tdsb
+          github-token: ${{ github.token }}
+          repository: JeremyHennessy/TowerSignal
+          run-id: 33810060526
+
+      - name: Measure deterministic withheld-school recovery rules
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          import re
+          from collections import defaultdict
+          from pathlib import Path
+
+          from toronto_final_identity_cleanup import address_point_root, canonical_address, load_address_points
+          from toronto_market_common import clean_text
+
+          snapshot = json.loads(Path('/tmp/tdsb/toronto-tdsb-strict-snapshot.json').read_text(encoding='utf-8'))
+          withheld = [x for x in (snapshot.get('unresolved') or []) + (snapshot.get('ambiguous') or []) if isinstance(x, dict)]
+          if len(withheld) != 18:
+              raise SystemExit(f'Withheld TDSB school count drift: {len(withheld)}')
+
+          by_id, _, scanned = load_address_points()
+          current = []
+          by_relaxed = defaultdict(list)
+          by_base = defaultdict(list)
+
+          STREET = {
+              'STREET':'ST','ST':'ST','ROAD':'RD','RD':'RD','AVENUE':'AVE','AVE':'AVE',
+              'BOULEVARD':'BLVD','BLVD':'BLVD','DRIVE':'DR','DR':'DR','COURT':'CRT','CRT':'CRT','CT':'CRT',
+              'CRESCENT':'CRES','CRES':'CRES','LANE':'LANE','LN':'LANE','PLACE':'PL','PL':'PL',
+              'PARKWAY':'PKWY','PKWY':'PKWY','PKY':'PKWY','HIGHWAY':'HWY','HWY':'HWY','TRAIL':'TRL','TRL':'TRL',
+              'TERRACE':'TER','TERR':'TER','TER':'TER','GATE':'GT','GT':'GT','GARDENS':'GDNS','GARDEN':'GDN',
+              'GDNS':'GDNS','GDN':'GDN','WAY':'WAY','SQUARE':'SQ','SQ':'SQ','CIRCLE':'CIR','CIR':'CIR',
+          }
+          DIR = {'NORTH':'N','SOUTH':'S','EAST':'E','WEST':'W','N':'N','S':'S','E':'E','W':'W'}
+
+          def relaxed(value):
+              text = clean_text(value).upper().split(',',1)[0].strip()
+              text = re.sub(r'^(\d+[A-Z]?)(?=[A-Z])', r'\1 ', text)
+              text = re.sub(r'\bFLOOR\s+\d+[A-Z]?\b', '', text)
+              text = re.sub(r'\bUNIT\s+[A-Z0-9-]+\b', '', text)
+              text = re.sub(r'\b(?:SUITE|STE)\s+[A-Z0-9-]+\b', '', text)
+              text = re.sub(r'[^A-Z0-9-]+', ' ', text)
+              tokens=[]
+              for token in text.split():
+                  tokens.append(STREET.get(token, DIR.get(token, token)))
+              return ' '.join(tokens)
+
+          def namekey(value):
+              return re.sub(r'[^A-Z0-9]+','',clean_text(value).upper())
+
+          for apid, row in by_id.items():
+              root = address_point_root(row, by_id)
+              root_id = clean_text(root.get('address_point_id'))
+              if not root_id:
+                  continue
+              item = {
+                  'root_id': root_id,
+                  'address': clean_text(root.get('address')),
+                  'place_name': clean_text(root.get('place_name')),
+                  'municipality_name': clean_text(root.get('municipality_name')),
+              }
+              key = relaxed(item['address'])
+              if item not in by_relaxed[key]:
+                  by_relaxed[key].append(item)
+              parts = key.split()
+              if parts and re.fullmatch(r'\d+[A-Z]?', parts[0]):
+                  base = ' '.join(parts[:-1]) if parts[-1] in {'N','S','E','W'} else key
+                  if item not in by_base[base]:
+                      by_base[base].append(item)
+
+          recovered = []
+          unresolved = []
+          for school in withheld:
+              sid = clean_text(school.get('school_id'))
+              name = clean_text(school.get('school_name'))
+              published = clean_text(school.get('published_address'))
+              key = relaxed(published)
+              variants = [('RELAXED_FORMAT_STREET_TYPE_FLOOR', key)]
+              if re.search(r'(?i)DONWAYE\b', published):
+                  variants.append(('PUBLISHER_CONCATENATED_DIRECTION', key.replace('DONWAYE','DONWAY E')))
+              seen_roots = set()
+              matches = []
+              for basis, variant in variants:
+                  candidates = by_relaxed.get(variant, [])
+                  roots = {x['root_id']: x for x in candidates}
+                  if len(roots) == 1:
+                      root = next(iter(roots.values()))
+                      if root['root_id'] not in seen_roots:
+                          matches.append((basis, root))
+                          seen_roots.add(root['root_id'])
+              if not matches:
+                  base_candidates = {x['root_id']:x for x in by_base.get(key, [])}
+                  directional = [x for x in base_candidates.values() if relaxed(x['address']) != key and relaxed(x['address']).startswith(key + ' ')]
+                  if len({x['root_id'] for x in directional}) == 1:
+                      matches.append(('UNIQUE_CURRENT_DIRECTIONAL_SUFFIX_FOR_EXACT_BASE_ADDRESS', directional[0]))
+
+              if not matches:
+                  exact_current_ids = [clean_text(x) for x in (school.get('candidate_root_address_point_ids') or []) if clean_text(x)]
+                  candidates=[]
+                  for root_id in exact_current_ids:
+                      row = by_id.get(root_id)
+                      if not row:
+                          continue
+                      root=address_point_root(row,by_id)
+                      candidates.append({
+                          'root_id':clean_text(root.get('address_point_id')),
+                          'address':clean_text(root.get('address')),
+                          'place_name':clean_text(root.get('place_name')),
+                      })
+                  named={x['root_id']:x for x in candidates if namekey(x.get('place_name')) and namekey(x.get('place_name')) == namekey(name)}
+                  if len(named)==1:
+                      matches.append(('AMBIGUOUS_ADDRESS_RESOLVED_BY_EXACT_CITY_PLACE_NAME_AND_TDSB_SCHOOL_NAME', next(iter(named.values()))))
+
+              unique = {root['root_id']:(basis,root) for basis,root in matches}
+              if len(unique)==1:
+                  basis, root = next(iter(unique.values()))
+                  result={'school_id':sid,'school_name':name,'published_address':published,'basis':basis,**root,'signals':school.get('signals') or []}
+                  recovered.append(result)
+                  print('RECOVERED_TDSB=', json.dumps(result, ensure_ascii=False, sort_keys=True))
+              else:
+                  candidate_ids = sorted({root['root_id'] for _,root in matches})
+                  result={'school_id':sid,'school_name':name,'published_address':published,'candidate_ids':candidate_ids,'original_candidate_ids':school.get('candidate_root_address_point_ids') or [],'signals':school.get('signals') or []}
+                  unresolved.append(result)
+                  print('STILL_WITHHELD_TDSB=', json.dumps(result, ensure_ascii=False, sort_keys=True))
+
+          print('ADDRESS_POINT_ROWS_SCANNED=', scanned)
+          print('WITHHELD_INPUT=', len(withheld))
+          print('DETERMINISTIC_RECOVERIES=', len(recovered))
+          print('STILL_WITHHELD=', len(unresolved))
+          print('RECOVERY_ROOTS=', len({x['root_id'] for x in recovered}))
+          print('RECOVERY_BASIS_COUNTS=', json.dumps({basis:sum(x['basis']==basis for x in recovered) for basis in sorted({x['basis'] for x in recovered})}, sort_keys=True))
