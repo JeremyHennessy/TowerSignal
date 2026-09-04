@@ -1,0 +1,142 @@
+name: Toronto TDSB Parity Apply
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-parity-integration-20260904
+    paths:
+      - .github/workflows/toronto-tdsb-parity-apply.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  apply-verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout exact TDSB parity branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-tdsb-parity-integration-20260904
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Download verified strict-SHA TDSB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-tdsb-strict-snapshot
+          path: /tmp/tdsb-strict
+          github-token: ${{ github.token }}
+          repository: JeremyHennessy/TowerSignal
+          run-id: 33810060526
+
+      - name: Compile TDSB ingestion and plumbing scripts
+        run: |
+          python -m py_compile \
+            scripts/build_toronto_tdsb_mechanical_snapshot.py \
+            scripts/apply_toronto_tdsb_mechanical_renewals.py \
+            scripts/patch_toronto_tdsb_source_plumbing.py
+
+      - name: Build verified TDSB snapshot and apply deterministic joins
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python scripts/build_toronto_tdsb_mechanical_snapshot.py /tmp/tdsb-strict/toronto-tdsb-strict-snapshot.json
+          python scripts/apply_toronto_tdsb_mechanical_renewals.py
+          python scripts/patch_toronto_tdsb_source_plumbing.py
+          python -m py_compile scripts/toronto_app_sources.py scripts/audit_toronto_source_row_resolution.py
+
+      - name: Rebuild Toronto coverage and app payload
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python scripts/toronto_final_coverage.py
+          python scripts/build_toronto_app_data.py
+
+      - name: Verify bounded TDSB data contract
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          app = json.loads(Path('public/data/toronto-market.json').read_text(encoding='utf-8'))
+          report = json.loads(Path('data/toronto/market/current/tdsb_mechanical_renewal_apply_report.json').read_text(encoding='utf-8'))
+          source = (app.get('source_coverage') or {}).get('tdsb_facility_condition_renewal') or {}
+          assert app['counts']['canonical_properties'] == 13669, app['counts']
+          assert app['counts']['source_links'] == 40841, app['counts']
+          assert app['counts']['official_source_families'] == 17, app['counts']
+          assert app['counts']['relationship_edges'] == 6343, app['counts']
+          assert app['counts']['documentary_confirmed_properties'] == 47, app['counts']
+          assert source.get('source_records') == 826, source
+          assert source.get('matched_records') == 782, source
+          assert source.get('matched_canonical_properties') == 330, source
+          assert source.get('unmatched_source_records') == 44, source
+          assert report['metrics']['tower_status_promotions'] == 0, report['metrics']
+          assert report['metrics']['relationship_edges_added'] == 0, report['metrics']
+          print('TDSB_PARITY_CONTRACT=PASSED')
+          PY
+          python -m unittest tests.python.test_toronto_tdsb_mechanical_renewal_apply -v
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+
+      - name: Validate official source actions and source semantics
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python scripts/validate_toronto_source_actions.py --strict --record-sample-size 3
+          python scripts/audit_toronto_source_semantics.py --strict
+          python scripts/audit_toronto_source_row_resolution.py --strict
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+          python -m unittest tests.python.test_toronto_tdsb_mechanical_renewal_apply -v
+
+      - name: Verify Toronto frontend and production build
+        run: |
+          npm run lint
+          npm run typecheck
+          npm exec vitest run -- tests/frontend/TorontoMarket.test.tsx tests/frontend/TorontoParityShell.test.tsx
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vite build -- --base=/ --outDir=dist-tdsb-parity
+
+      - name: Persist verified TDSB parity outputs
+        run: |
+          git config user.name "TowerSignal Toronto Data Bot"
+          git config user.email "towersignal-toronto@users.noreply.github.com"
+          git rm .github/workflows/toronto-tdsb-parity-apply.yml
+          git add \
+            scripts/build_toronto_tdsb_mechanical_snapshot.py \
+            scripts/apply_toronto_tdsb_mechanical_renewals.py \
+            scripts/patch_toronto_tdsb_source_plumbing.py \
+            scripts/toronto_app_sources.py \
+            scripts/audit_toronto_source_row_resolution.py \
+            src/components/TorontoMarketPage.tsx \
+            tests/python/test_toronto_tdsb_mechanical_renewal_apply.py \
+            data/toronto/warehouse/current/open_licensed/tdsb_facility_condition_renewal.json \
+            data/toronto/market/current/property_spine.json \
+            data/toronto/market/current/property_source_links.json \
+            data/toronto/market/current/entity_graph.json \
+            data/toronto/market/current/coverage_report.json \
+            data/toronto/market/current/source_action_qa.json \
+            data/toronto/market/current/source_semantic_audit.json \
+            data/toronto/market/current/source_row_resolution_audit.json \
+            data/toronto/market/current/qa_report.json \
+            data/toronto/market/current/tdsb_mechanical_renewal_apply_report.json \
+            public/data/toronto-market.json
+          git diff --cached --quiet && { echo 'No verified TDSB outputs to persist'; exit 1; }
+          git commit -m "Toronto: add TDSB mechanical renewal intelligence to parity base"
+          git push origin HEAD:agent/toronto-tdsb-parity-integration-20260904
+          echo "TORONTO_TDSB_PARITY_SHA=$(git rev-parse HEAD)"
