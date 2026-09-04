@@ -1,8 +1,10 @@
-import { type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 import { ShareButton } from './ShareButton'
 
 export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'toronto' | 'opportunities' | 'companies' | 'portfolios' | 'workflow' | 'source-health' | 'account'
+
+type TorontoHeaderWorkspace = 'market' | 'benchmarking' | 'prospects' | 'opportunities' | 'companies' | 'portfolios' | 'watchlist' | 'sources'
 
 const TORONTO_PREVIEW = import.meta.env.VITE_TORONTO_PREVIEW === 'true'
 const NEW_YORK_APP_URL = 'https://jeremyhennessy.github.io/TowerSignal/'
@@ -18,6 +20,33 @@ const navigation: Array<{ mode: WorkspaceMode; label: string }> = [
   { mode: 'portfolios', label: 'Portfolios' },
   { mode: 'workflow', label: 'Workflow' },
 ]
+
+const torontoNavigation: Array<{ workspace: TorontoHeaderWorkspace; label: string }> = [
+  { workspace: 'market', label: 'Market' },
+  { workspace: 'benchmarking', label: 'Benchmarking' },
+  { workspace: 'prospects', label: 'Prospects' },
+  { workspace: 'opportunities', label: 'Opportunities' },
+  { workspace: 'companies', label: 'Companies' },
+  { workspace: 'portfolios', label: 'Portfolios' },
+  { workspace: 'watchlist', label: 'Watchlist' },
+  { workspace: 'sources', label: 'Sources' },
+]
+
+function activateTorontoWorkspace(workspace: TorontoHeaderWorkspace) {
+  const item = torontoNavigation.find(candidate => candidate.workspace === workspace)
+  if (!item) return
+
+  const attempt = () => {
+    const tabs = document.querySelector('nav[aria-label="Toronto workspaces"]')
+    if (!tabs) return false
+    const button = Array.from(tabs.querySelectorAll('button')).find(candidate => candidate.textContent?.trim().startsWith(item.label))
+    if (!(button instanceof HTMLButtonElement)) return false
+    button.click()
+    return true
+  }
+
+  if (!attempt()) window.setTimeout(attempt, 0)
+}
 
 function TowerSignalMark() {
   return <svg className="reference-brand-antenna" viewBox="0 0 28 32" aria-hidden="true">
@@ -66,15 +95,22 @@ export function TopNavigation({
   onSignUp: (email: string, password: string) => Promise<void>
   onSignOut: () => Promise<void>
 }) {
+  const [torontoWorkspace, setTorontoWorkspace] = useState<TorontoHeaderWorkspace>('market')
+
   const submit = (event: FormEvent) => {
     event.preventDefault()
     onSearchSubmit()
   }
 
+  const goTorontoWorkspace = (workspace: TorontoHeaderWorkspace) => {
+    setTorontoWorkspace(workspace)
+    activateTorontoWorkspace(workspace)
+  }
+
   if (TORONTO_PREVIEW) return <header className="reference-top-nav">
-    <style>{'.toronto-filters > *{min-width:0}.toronto-filters input,.toronto-filters select{width:100%;min-width:0;box-sizing:border-box}'}</style>
-    <button className="reference-brand" onClick={() => onNavigate('toronto')} aria-label="TowerSignal Toronto home"><span className="reference-brand-mark"><TowerSignalMark /></span><strong>TowerSignal</strong></button>
-    <nav aria-label="TowerSignal Toronto workspace"><button className="active" onClick={() => onNavigate('toronto')}>Toronto Market</button></nav>
+    <style>{'.toronto-parity-tabs{display:none!important}.toronto-filters > *{min-width:0}.toronto-filters input,.toronto-filters select{width:100%;min-width:0;box-sizing:border-box}'}</style>
+    <button className="reference-brand" onClick={() => goTorontoWorkspace('market')} aria-label="TowerSignal Toronto home"><span className="reference-brand-mark"><TowerSignalMark /></span><strong>TowerSignal</strong></button>
+    <nav aria-label="TowerSignal Toronto workspace">{torontoNavigation.map(item => <button key={item.workspace} className={torontoWorkspace === item.workspace ? 'active' : ''} onClick={() => goTorontoWorkspace(item.workspace)}>{item.label}</button>)}</nav>
     <div className="reference-nav-tools">
       <ShareButton label="Share" className="global-share-button" />
       <a className="share-button global-share-button" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }} aria-label="Open New York app" href={NEW_YORK_APP_URL} target="_blank" rel="noreferrer">New York ↗</a>
