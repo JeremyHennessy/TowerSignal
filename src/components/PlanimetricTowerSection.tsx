@@ -6,8 +6,8 @@ import type { PlanimetricBuildingTowerFeature, SystemDetail } from '../types/dat
 
 const SOURCE_URL = 'https://data.cityofnewyork.us/City-Government/NYC-Planimetric-Database-Cooling-Towers/x748-37q7'
 
-function featureLabel(feature: PlanimetricBuildingTowerFeature, index: number) {
-  return feature.source_id ? `Source ${feature.source_id}` : feature.global_id ? `Feature ${feature.global_id}` : `Physical feature ${index + 1}`
+function featureLabel(index: number) {
+  return `Mapped tower footprint ${index + 1}`
 }
 
 export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
@@ -44,7 +44,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
           fillOpacity: 0.32,
         },
       }).addTo(map)
-      layer.bindTooltip(featureLabel(feature, index))
+      layer.bindTooltip(featureLabel(index))
       bounds.extend(layer.getBounds())
     })
 
@@ -71,11 +71,11 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
         <div ref={container} className="planimetric-map" role="region" aria-label={`Mapped physical cooling-tower features on BIN ${detail.identity.bin ?? 'unknown'}`} />
       </div>
       <div className="planimetric-feature-list">
-        {features?.map((feature, index) => <article className="planimetric-feature" key={feature.source_id ?? feature.global_id ?? `${feature.bin}-${index}`}>
-          <div className="planimetric-feature-head"><strong>{featureLabel(feature, index)}</strong><span>BIN {feature.bin}</span></div>
+        {features?.map((feature, index) => <article className="planimetric-feature" key={feature.global_id}>
+          <div className="planimetric-feature-head"><strong>{featureLabel(index)}</strong><span>BIN {feature.bin}</span></div>
           <dl className="identity-grid">
+            <div><dt>Global ID</dt><dd className="mono planimetric-id">{feature.global_id}</dd></div>
             <div><dt>Source ID</dt><dd>{feature.source_id ?? '—'}</dd></div>
-            <div><dt>Global ID</dt><dd className="mono planimetric-id">{feature.global_id ?? '—'}</dd></div>
             <div><dt>Feature code</dt><dd>{feature.feature_code ?? '—'}</dd></div>
             <div><dt>Sub-feature code</dt><dd>{feature.sub_feature_code ?? '—'}</dd></div>
             <div><dt>Source status</dt><dd>{feature.status ?? '—'}</dd></div>
@@ -83,7 +83,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
           </dl>
         </article>)}
       </div>
-      <p className="microcopy">NYC Planimetric cooling-tower geometry is attached only by exact BIN and is building-level physical context. It does not establish which mapped polygon corresponds to this specific registered System ID when a building has multiple systems, and it does not prove the current equipment configuration or operating status. Published feature and sub-feature codes are retained without guessing their numeric domain labels.</p>
+      <p className="microcopy">NYC Planimetric cooling-tower geometry is attached only by exact BIN and is building-level physical context. It does not establish which mapped polygon corresponds to this specific registered System ID when a building has multiple systems, and it does not prove the current equipment configuration or operating status. GlobalID is used as the feature identity because the current source has duplicate SOURCE_ID values; SOURCE_ID remains visible provenance. Published feature and sub-feature codes are retained without guessing their numeric domain labels.</p>
       <a className="planimetric-source-link" href={SOURCE_URL} target="_blank" rel="noreferrer">Open NYC Planimetric source ↗</a>
     </>}
   </section>
