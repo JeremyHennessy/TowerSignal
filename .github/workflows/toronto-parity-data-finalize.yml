@@ -1,0 +1,188 @@
+name: Toronto Parity Data Finalize
+
+on:
+  push:
+    branches:
+      - agent/toronto-ny-parity-20260904
+    paths:
+      - .github/workflows/toronto-parity-data-finalize.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout exact parity branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-ny-parity-20260904
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Align regression contracts with verified permit recovery and post-recovery TOBids scope
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path_name: str, old: str, new: str) -> None:
+              path = Path(path_name)
+              text = path.read_text(encoding='utf-8')
+              if old not in text:
+                  raise SystemExit(f'Patch anchor changed: {path_name}: {old!r}')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          permit_test = 'tests/python/test_toronto_building_permit_apply.py'
+          for old, new in [
+              ('("toronto_building_permits_active_targeted.json", 573, 540)', '("toronto_building_permits_active_targeted.json", 573, 572)'),
+              ('("toronto_building_permits_cleared_targeted_since_2017.json", 721, 704)', '("toronto_building_permits_cleared_targeted_since_2017.json", 721, 719)'),
+              ('self.assertEqual(len(spine["properties"]), 13371)', 'self.assertEqual(len(spine["properties"]), 13380)'),
+              ('self.assertEqual(len(permit_links), 1244)', 'self.assertEqual(len(permit_links), 1291)'),
+          ]:
+              replace_once(permit_test, old, new)
+
+          tobids_script = 'scripts/apply_toronto_tobids_relationships.py'
+          for old, new in [
+              ('EXPECTED_EXACT_ROWS = 15', 'EXPECTED_EXACT_ROWS = 16'),
+              ('EXPECTED_EXISTING_EXACT_ROWS = 3', 'EXPECTED_EXISTING_EXACT_ROWS = 15'),
+              ('EXPECTED_NEW_LINKS = 12', 'EXPECTED_NEW_LINKS = 1'),
+              ('EXPECTED_FINAL_SOURCE_LINKS = 17', 'EXPECTED_FINAL_SOURCE_LINKS = 18'),
+              ('EXPECTED_FINAL_PROPERTIES = 13', 'EXPECTED_FINAL_PROPERTIES = 14'),
+              ('EXPECTED_NEW_EDGES = 12', 'EXPECTED_NEW_EDGES = 1'),
+              ('EXPECTED_FINAL_BIDDER_EDGES = 17', 'EXPECTED_FINAL_BIDDER_EDGES = 18'),
+              ('EXPECTED_FINAL_BIDDER_PROPERTIES = 13', 'EXPECTED_FINAL_BIDDER_PROPERTIES = 14'),
+              ('    if len(properties) != 13065:\n        raise RuntimeError(f"Toronto property spine drift: expected 13065, found {len(properties)}")',
+               '    if len(properties) != 13380:\n        raise RuntimeError(f"Toronto property spine drift: expected 13380, found {len(properties)}")'),
+          ]:
+              replace_once(tobids_script, old, new)
+
+          legacy = 'tests/python/test_toronto_tobids_legacy_provenance.py'
+          for old, new in [
+              ('self.assertEqual(len(all_tobids_links), 17)', 'self.assertEqual(len(all_tobids_links), 18)'),
+              ('self.assertEqual(len(citywide), 12)', 'self.assertEqual(len(citywide), 13)'),
+              ('self.assertEqual(len(exact), 15)', 'self.assertEqual(len(exact), 16)'),
+          ]:
+              replace_once(legacy, old, new)
+
+      - name: Apply newly exposed exact-address TOBids relationship
+        env:
+          PYTHONPATH: scripts
+        run: python scripts/apply_toronto_tobids_relationships.py
+
+      - name: Rebuild Toronto coverage and app payload
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python scripts/toronto_final_coverage.py
+          python scripts/build_toronto_app_data.py
+
+      - name: Verify post-recovery TOBids and permit contracts
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          market = Path('data/toronto/market/current')
+          links = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
+          graph = json.loads((market / 'entity_graph.json').read_text(encoding='utf-8'))
+          report = json.loads((market / 'tobids_relationship_apply_report.json').read_text(encoding='utf-8'))
+          recovery = json.loads((market / 'building_permit_recovery_report.json').read_text(encoding='utf-8'))
+          app = json.loads(Path('public/data/toronto-market.json').read_text(encoding='utf-8'))
+          assert recovery['status'] == 'PASSED'
+          assert recovery['metrics']['final_properties'] == 13380
+          assert recovery['metrics']['final_permit_links'] == 1291
+          m = report['metrics']
+          assert m['exact_rows'] == 16, m
+          assert m['ambiguous_rows_not_forced'] == 5, m
+          assert m['existing_exact_rows'] == 15, m
+          assert m['new_links'] == 1, m
+          assert m['final_source_links'] == 18, m
+          assert m['final_source_properties'] == 14, m
+          assert m['new_relationship_edges'] == 1, m
+          assert m['final_successful_bidder_edges'] == 18, m
+          assert m['final_successful_bidder_properties'] == 14, m
+          assert report['new_relationships'] == [{
+              'source_row_index': 6851,
+              'property_id': 'toronto-address-point:7762664',
+              'display_address': '40 College St',
+              'successful_supplier': '1246175 Ontario Limited o/a Active Mechanical Services',
+              'document_number': '3704322859',
+          }], report['new_relationships']
+          source_links = [x for x in links['links'] if x.get('source_key') == 'tobids_awarded_contracts_exact_document_address_prior_poc']
+          assert len(source_links) == 18
+          bidder_edges = [x for x in graph['edges'] if x.get('source_key') == 'tobids_awarded_contracts' and x.get('relationship') == 'SUCCESSFUL_BIDDER_AT_PROPERTY']
+          assert len(bidder_edges) == 18
+          forty = [x for x in bidder_edges if x.get('property_id') == 'toronto-address-point:7762664' and (x.get('evidence') or {}).get('document_number') == '3704322859']
+          assert len(forty) == 1, forty
+          assert not any(x.get('source_key') == 'tobids_awarded_contracts' and x.get('relationship') != 'SUCCESSFUL_BIDDER_AT_PROPERTY' for x in graph['edges'])
+          assert app['counts']['canonical_properties'] == 13380, app['counts']
+          assert app['counts']['source_links'] == 40060, app['counts']
+          assert app['counts']['relationship_edges'] == 6344, app['counts']
+          assert app['counts']['documentary_confirmed_properties'] == 47, app['counts']
+          print('TORONTO_PARITY_POST_RECOVERY_DATA_CONTRACT=PASSED')
+          PY
+          python -m unittest tests.python.test_toronto_building_permit_apply tests.python.test_toronto_building_permit_recovery tests.python.test_toronto_tobids_relationship_apply tests.python.test_toronto_tobids_legacy_provenance -v
+
+      - name: Run strict Toronto evidence audits
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+          python scripts/validate_toronto_source_actions.py --strict --record-sample-size 5
+          python scripts/audit_toronto_source_semantics.py --strict
+          python scripts/audit_toronto_source_row_resolution.py --strict
+          python scripts/validate_toronto_market.py
+          python scripts/toronto_final_validate.py
+
+      - name: Run complete repository regression and production build
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python -m unittest discover -s tests/python -p 'test_*.py' -v
+          npm run lint
+          npm run typecheck
+          npm test -- --run
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vite build -- --base=/ --outDir=dist-toronto-parity
+
+      - name: Prove frontend source stayed unchanged during data finalization
+        run: |
+          git diff --exit-code c014b9646a88fd5a8affe8b1c48518faa52a2765 -- src
+
+      - name: Persist verified Toronto parity data finalization
+        run: |
+          git config user.name "TowerSignal Toronto Data Bot"
+          git config user.email "towersignal-toronto@users.noreply.github.com"
+          git rm .github/workflows/toronto-parity-data-finalize.yml
+          git add \
+            scripts/apply_toronto_tobids_relationships.py \
+            tests/python/test_toronto_building_permit_apply.py \
+            tests/python/test_toronto_tobids_legacy_provenance.py \
+            data/toronto/market/current/property_source_links.json \
+            data/toronto/market/current/entity_graph.json \
+            data/toronto/market/current/tobids_relationship_apply_report.json \
+            data/toronto/market/current/coverage_report.json \
+            data/toronto/market/current/source_action_qa.json \
+            data/toronto/market/current/source_semantic_audit.json \
+            data/toronto/market/current/source_row_resolution_audit.json \
+            data/toronto/market/current/qa_report.json \
+            public/data/toronto-market.json
+          git diff --cached --quiet && { echo 'No verified parity finalization outputs to persist'; exit 1; }
+          git commit -m "Toronto: finalize parity data after permit recovery"
+          git push origin HEAD:agent/toronto-ny-parity-20260904
+          echo "TORONTO_PARITY_FINAL_SHA=$(git rev-parse HEAD)"
