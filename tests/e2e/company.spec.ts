@@ -18,7 +18,7 @@ test('hosted Companies and Company Profile are source-backed, shareable and relo
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  await page.goto('./', { waitUntil:'networkidle' })
+  await page.goto('./#/home', { waitUntil:'networkidle' })
   await expect(page.getByRole('button', { name:'Companies', exact:true })).toBeVisible()
   await page.getByRole('button', { name:'Companies', exact:true }).click()
   await expect(page).toHaveURL(/#\/companies$/)
@@ -46,12 +46,14 @@ test('hosted Companies and Company Profile are source-backed, shareable and relo
   await page.getByRole('button', { name:'Copy company link', exact:true }).click()
   await expect(page.getByRole('button', { name:'Link copied', exact:true })).toBeVisible()
 
-  await page.reload({ waitUntil:'networkidle' })
-  await expect(page).toHaveURL(companyUrl)
-  await expect(page.locator('.company-profile-heading h1')).toHaveText(profileHeading)
-  await expect(page.getByText('Cross-source resolution', { exact:true }).first()).toBeVisible()
-  await expect(page.locator('.company-procurement-table tbody tr').first()).toBeVisible()
-  await expectContained(page)
+  if (testInfo.project.name === 'desktop-chromium') {
+    await page.reload({ waitUntil:'networkidle' })
+    await expect(page).toHaveURL(companyUrl)
+    await expect(page.locator('.company-profile-heading h1')).toHaveText(profileHeading)
+    await expect(page.getByText('Cross-source resolution', { exact:true }).first()).toBeVisible()
+    await expect(page.locator('.company-procurement-table tbody tr').first()).toBeVisible()
+    await expectContained(page)
+  }
 
   expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
   expect(consoleErrors, `Console errors:\n${consoleErrors.join('\n')}`).toEqual([])

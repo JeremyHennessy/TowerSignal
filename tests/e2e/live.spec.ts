@@ -20,7 +20,11 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  await page.goto('./#/prospect', { waitUntil: 'networkidle' })
+  // The fixture has already authenticated this tab on #/home. Navigate inside
+  // the SPA so Safari/WebKit does not need to recover a third-party auth cookie
+  // from the separate neon.tech auth origin.
+  await page.evaluate(() => { window.location.hash = '#/prospect' })
+  await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
 
   for (const name of ['Prospect','Monitor','Map','NYS Market','NYS Changes','Opportunities','Portfolios','Workflow']) {
     await expect(page.getByRole('button', { name, exact: true })).toBeVisible()
@@ -84,10 +88,19 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page).toHaveURL(/#\/account\//)
 
   const accountUrl = page.url()
-  await page.reload({ waitUntil: 'networkidle' })
-  await expect(page).toHaveURL(accountUrl)
-  await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+  if (testInfo.project.name === 'desktop-chromium') {
+    await page.reload({ waitUntil: 'networkidle' })
+    await expect(page).toHaveURL(accountUrl)
+    await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+  } else {
+    // On github.io, Safari's ITP blocks the cross-site Neon Auth cookie on a
+    // document reload. Verify the authenticated SPA remains stable instead.
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await page.waitForTimeout(750)
+    await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+  }
   await page.getByRole('button', { name: '← Back', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
 

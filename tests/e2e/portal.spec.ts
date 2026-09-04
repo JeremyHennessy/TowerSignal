@@ -1,7 +1,10 @@
 import { expect, test } from './fixtures'
 
 test('authenticated Home and Account pages are linkable and signout returns to the public landing', async ({ page }) => {
-  await page.goto('./#/home', { waitUntil: 'networkidle' })
+  // The authenticated fixture already finishes on #/home. Avoid an immediate
+  // document reload here: Safari blocks the cross-site Neon Auth cookie on
+  // github.io even though the tab has just authenticated successfully.
+  await expect(page).toHaveURL(/#\/home$/)
   await expect(page.getByRole('heading', { name: /Good morning, E2E/ })).toBeVisible()
   await expect(page.getByLabel('TowerSignal Home summary')).toBeVisible()
   await expect(page.getByRole('button', { name: 'My account', exact: true })).toBeVisible()

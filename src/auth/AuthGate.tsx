@@ -33,10 +33,10 @@ export function AuthGate() {
   const [route, setRoute] = useState<GateRoute>(currentRoute)
   const intendedHash = useRef(isPublicRoute(route) ? '#/home' : currentHashOrHome())
 
-  const refreshSession = useCallback(async () => {
+  const refreshSession = useCallback(async (preserveExisting = false) => {
     try {
       const sessionUser = await getWorkflowSession()
-      setUser(sessionUser)
+      setUser(current => sessionUser ?? (preserveExisting ? current : null))
       setSessionError(null)
     } catch (err) {
       setSessionError(err instanceof Error ? err.message : 'Unable to verify TowerSignal session.')
@@ -46,8 +46,13 @@ export function AuthGate() {
   }, [])
 
   useEffect(() => {
-    void refreshSession()
-    const onFocus = () => { void refreshSession() }
+    void refreshSession(false)
+    // Safari/WebKit can block the cross-site Neon Auth cookie after a successful
+    // sign-in while this GitHub Pages SPA is still open. A focus check may then
+    // return no cookie-backed session even though this tab has just authenticated.
+    // Keep the tab's in-memory authenticated state in that case. Initial page
+    // loads still fail closed, and explicit sign-out still clears the user.
+    const onFocus = () => { void refreshSession(true) }
     window.addEventListener('focus', onFocus)
     return () => window.removeEventListener('focus', onFocus)
   }, [refreshSession])

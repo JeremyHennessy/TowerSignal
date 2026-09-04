@@ -1,6 +1,7 @@
-import { expect, test } from './fixtures'
+import { expect, test } from '@playwright/test'
+import { testCredentials } from './auth.helpers'
 
-test('hosted physical roof map renders on desktop and iPhone', async ({ page }, testInfo) => {
+test('direct hosted roof link signs in and renders on desktop and iPhone', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', message => {
@@ -15,6 +16,14 @@ test('hosted physical roof map renders on desktop and iPhone', async ({ page }, 
   })
 
   await page.goto('./#/account/2000015564', { waitUntil: 'networkidle' })
+  const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
+  await expect(loginHeading).toBeVisible()
+  const credentials = testCredentials(testInfo.project.name)
+  await page.getByLabel('Email').fill(credentials.email)
+  await page.getByLabel('Password', { exact: true }).fill(credentials.password)
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click()
+  await expect(loginHeading).toHaveCount(0)
+  await expect(page).toHaveURL(/#\/account\/2000015564$/)
 
   const section = page.locator('section.planimetric-section')
   await expect(section).toBeVisible()
@@ -39,6 +48,12 @@ test('hosted physical roof map renders on desktop and iPhone', async ({ page }, 
   await expect(section.getByRole('link', { name: 'Tower polygons ↗', exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: 'Building footprints ↗', exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: '2022 NYS orthophoto ↗', exact: true })).toBeVisible()
+
+  // Reproduce a Safari focus/foreground check without hard-reloading the page.
+  // A missing third-party cookie must not erase the tab that just authenticated.
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await page.waitForTimeout(750)
+  await expect(section).toBeVisible()
 
   const viewportWidth = page.viewportSize()?.width ?? 0
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
