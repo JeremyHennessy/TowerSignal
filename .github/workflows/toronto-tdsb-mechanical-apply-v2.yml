@@ -14,7 +14,7 @@ permissions:
 jobs:
   apply-verify-and-persist:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 90
     steps:
       - name: Checkout exact TDSB apply branch
         uses: actions/checkout@v4
