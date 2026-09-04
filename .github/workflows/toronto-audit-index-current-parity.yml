@@ -1,0 +1,80 @@
+name: Toronto Audit Index Current Parity
+
+on:
+  push:
+    branches:
+      - agent/toronto-post-recovery-integration-20260904
+    paths:
+      - .github/workflows/toronto-audit-index-current-parity.yml
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-post-recovery-integration-20260904
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Preserve current green audit reports
+        run: |
+          mkdir -p /tmp/toronto-audit-current-reference
+          cp data/toronto/market/current/source_semantic_audit.json /tmp/toronto-audit-current-reference/source_semantic_audit.json
+          cp data/toronto/market/current/source_row_resolution_audit.json /tmp/toronto-audit-current-reference/source_row_resolution_audit.json
+
+      - name: Apply previously verified audit-only optimization
+        run: |
+          git cherry-pick --no-commit 6d3c62195dc59b6b92b3403dd53be51f100dd937
+          git diff --name-only
+          test "$(git diff --name-only | sort | tr '\n' ' ')" = "scripts/audit_toronto_source_row_resolution.py scripts/audit_toronto_source_semantics.py scripts/toronto_app_sources.py tests/python/test_toronto_audit_index_normalization.py "
+
+      - name: Compile and unit-test optimized path
+        run: |
+          python -m py_compile scripts/toronto_app_sources.py scripts/audit_toronto_source_semantics.py scripts/audit_toronto_source_row_resolution.py
+          PYTHONPATH=.:scripts python -m unittest tests.python.test_toronto_audit_index_normalization -v
+
+      - name: Run optimized audits on recovered state
+        run: |
+          /usr/bin/time -f 'SEMANTIC_CURRENT_INDEXED_SECONDS=%e' -o /tmp/semantic-current-indexed.time python scripts/audit_toronto_source_semantics.py --strict
+          /usr/bin/time -f 'ROW_CURRENT_INDEXED_SECONDS=%e' -o /tmp/row-current-indexed.time python scripts/audit_toronto_source_row_resolution.py --strict
+          cat /tmp/semantic-current-indexed.time
+          cat /tmp/row-current-indexed.time
+
+      - name: Require exact semantic parity
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          reference = Path('/tmp/toronto-audit-current-reference')
+          current = Path('data/toronto/market/current')
+          for filename in ('source_semantic_audit.json', 'source_row_resolution_audit.json'):
+              before = json.loads((reference / filename).read_text(encoding='utf-8'))
+              after = json.loads((current / filename).read_text(encoding='utf-8'))
+              if filename == 'source_semantic_audit.json':
+                  before.pop('generated_at', None)
+                  after.pop('generated_at', None)
+              if before != after:
+                  raise SystemExit(f'Current-state audit parity failure: {filename}')
+          print('CURRENT_AUDIT_OUTPUT_PARITY=PASSED')
+
+      - name: Restore generated audit reports and persist only optimization
+        run: |
+          cp /tmp/toronto-audit-current-reference/source_semantic_audit.json data/toronto/market/current/source_semantic_audit.json
+          cp /tmp/toronto-audit-current-reference/source_row_resolution_audit.json data/toronto/market/current/source_row_resolution_audit.json
+          git config user.name "TowerSignal Audit Bot"
+          git config user.email "towersignal-audit@users.noreply.github.com"
+          git add scripts/toronto_app_sources.py scripts/audit_toronto_source_semantics.py scripts/audit_toronto_source_row_resolution.py tests/python/test_toronto_audit_index_normalization.py
+          git diff --cached --quiet && { echo 'No audit optimization changes to persist'; exit 1; }
+          git commit -m "Toronto: index stable source rows in audits"
+          git push origin HEAD:agent/toronto-post-recovery-integration-20260904
+          echo "TORONTO_CURRENT_AUDIT_INDEX_SHA=$(git rev-parse HEAD)"
