@@ -187,8 +187,7 @@ def build(output_dir: Path) -> dict:
     systems_with_explicit_cooling_tower_dob_activity = 0
     systems_with_hpd_registration = 0
     systems_with_hpd_contacts = 0
-    systems_with_planimetric_tower_locations = 0
-    planimetric_tower_features_attached = 0
+    systems_with_planimetric_bin_match = 0
 
     for system in systems:
         inspections = inspections_by_system.get(system["system_id"], [])
@@ -202,7 +201,7 @@ def build(output_dir: Path) -> dict:
         dob_activity = dob_by_bbl.get(bbl_key, []) if bbl_key else []
         dob_summary = summarize_dob_activity(dob_activity, snapshot_date)
         hpd_registration = hpd_by_bbl.get(bbl_key) if bbl_key else None
-        planimetric_tower_locations = planimetric_by_bin.get(bin_key, []) if bin_key else []
+        planimetric_building_tower_features = planimetric_by_bin.get(bin_key, []) if bin_key else []
         if building_context:
             systems_with_pluto_context += 1
         if dob_summary["activity_count"]:
@@ -216,9 +215,8 @@ def build(output_dir: Path) -> dict:
         hpd_contact_count = len(hpd_registration["contacts"]) if hpd_registration else 0
         if hpd_contact_count:
             systems_with_hpd_contacts += 1
-        if planimetric_tower_locations:
-            systems_with_planimetric_tower_locations += 1
-            planimetric_tower_features_attached += len(planimetric_tower_locations)
+        if planimetric_building_tower_features:
+            systems_with_planimetric_bin_match += 1
         signal_state = build_signals(system, inspections, rules, snapshot_date)
         scoring = priority_score(system, signal_state)
         signals = signal_state["signals"]
@@ -286,8 +284,8 @@ def build(output_dir: Path) -> dict:
             "dob_mechanical_or_boiler_count": dob_summary["mechanical_or_boiler_count"],
             "latest_dob_activity_date": dob_summary["latest_activity_date"],
             "hpd_contact_count": hpd_contact_count,
-            "planimetric_match": bool(planimetric_tower_locations),
-            "planimetric_tower_count": len(planimetric_tower_locations),
+            "planimetric_bin_match": bool(planimetric_building_tower_features),
+            "planimetric_building_tower_count": len(planimetric_building_tower_features),
         }
         summary_rows.append(row)
 
@@ -312,7 +310,7 @@ def build(output_dir: Path) -> dict:
             "building_context": building_context,
             "dob_activity_history": dob_activity,
             "hpd_registration": hpd_registration,
-            "planimetric_tower_locations": planimetric_tower_locations,
+            "planimetric_building_tower_features": planimetric_building_tower_features,
             "sample_history": {
                 "source_raw": system["sampledates_raw"],
                 "dates": system["sample_dates"],
@@ -346,8 +344,7 @@ def build(output_dir: Path) -> dict:
             "systems_with_explicit_cooling_tower_dob_activity": systems_with_explicit_cooling_tower_dob_activity,
             "systems_with_hpd_registration": systems_with_hpd_registration,
             "systems_with_hpd_contacts": systems_with_hpd_contacts,
-            "systems_with_planimetric_tower_locations": systems_with_planimetric_tower_locations,
-            "planimetric_tower_features_attached": planimetric_tower_features_attached,
+            "systems_with_planimetric_bin_match": systems_with_planimetric_bin_match,
         },
         "systems": summary_rows,
     }
