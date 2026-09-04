@@ -68,6 +68,26 @@ jobs:
           Path('artifacts/roof-map-qa/cases.json').write_text(json.dumps(selected, indent=2))
           print(json.dumps(selected, indent=2))
           PY
+      - name: Inject runner-only authenticated QA client
+        run: |
+          cat > src/workflow/client.ts <<'EOF'
+          import type { WorkflowAccountPatch, WorkflowSavedView, WorkflowUser, WorkflowWatchlist } from '../types/workflow'
+
+          export const workflowRuntimeEnabled = false
+          const qaUser: WorkflowUser = { id: 'visual-qa-local', email: 'visual-qa@local.invalid', name: 'Visual QA' }
+
+          export async function getWorkflowSession(): Promise<WorkflowUser> { return qaUser }
+          export async function signInWorkflow(): Promise<WorkflowUser> { return qaUser }
+          export async function signUpWorkflow(): Promise<WorkflowUser> { return qaUser }
+          export async function signOutWorkflow(): Promise<void> {}
+          export async function loadWorkflowSnapshot() { return { savedViews: [], watchlists: [], accounts: [], memberships: [] } }
+          export async function saveRemoteView(_view: WorkflowSavedView): Promise<void> {}
+          export async function deleteRemoteView(_viewId: string): Promise<void> {}
+          export async function createRemoteWatchlist(_watchlist: WorkflowWatchlist): Promise<void> {}
+          export async function deleteRemoteWatchlist(_watchlistId: string): Promise<void> {}
+          export async function saveRemoteAccount(_systemId: string, _patch: WorkflowAccountPatch): Promise<void> {}
+          export async function setRemoteMembership(_systemId: string, _watchlistId: string, _enabled: boolean): Promise<void> {}
+          EOF
       - name: Start TowerSignal
         run: |
           nohup npx vite --host 127.0.0.1 --port 4173 > /tmp/towersignal-vite.log 2>&1 &
@@ -97,13 +117,23 @@ jobs:
             const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 })
             const page = await context.newPage()
             const consoleErrors = []
+            const failedResponses = []
             page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
             page.on('pageerror', err => consoleErrors.push(`pageerror: ${err.message}`))
+            page.on('response', response => { if (!response.ok() && response.url().includes('/data/')) failedResponses.push(`${response.status()} ${response.url()}`) })
             const url = `http://127.0.0.1:4173/TowerSignal/#/account/${encodeURIComponent(testCase.system_id)}`
             await page.goto(url, { waitUntil: 'networkidle', timeout: 120000 })
             if ((await page.locator('body').innerText()).includes('Intelligence workspace unavailable')) throw new Error(`${testCase.label}: workspace unavailable`)
             const section = page.locator('section.planimetric-section')
-            await section.waitFor({ state: 'visible', timeout: 60000 })
+            try {
+              await section.waitFor({ state: 'visible', timeout: 30000 })
+            } catch (error) {
+              const safe = `${testCase.label}-${testCase.system_id}`.replace(/[^a-zA-Z0-9_-]/g, '-')
+              const body = await page.locator('body').innerText()
+              fs.writeFileSync(`${out}/${safe}-diagnostic.txt`, `URL: ${page.url()}\n\nFAILED DATA RESPONSES:\n${failedResponses.join('\n')}\n\nCONSOLE:\n${consoleErrors.join('\n')}\n\nBODY:\n${body}`)
+              await page.screenshot({ path: `${out}/${safe}-diagnostic.png`, fullPage: true })
+              throw error
+            }
             await section.scrollIntoViewIfNeeded()
             const map = section.locator('.planimetric-map')
             await map.waitFor({ state: 'visible', timeout: 30000 })
@@ -134,7 +164,7 @@ jobs:
             await section.screenshot({ path: `${out}/${safe}-section-desktop.png` })
             await page.screenshot({ path: `${out}/${safe}-full-desktop.png`, fullPage: true })
 
-            results.push({ ...testCase, url, summary, aerialLoaded, buildingPaths, towerPaths, layerControl, scaleControl, legend, consoleErrors })
+            results.push({ ...testCase, url, summary, aerialLoaded, buildingPaths, towerPaths, layerControl, scaleControl, legend, failedResponses, consoleErrors })
             fatalConsole.push(...consoleErrors.filter(text => !text.includes('favicon') && !text.includes('Failed to load resource: the server responded with a status of 404')))
             await context.close()
           }
