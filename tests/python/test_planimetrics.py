@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from towersignal.fetch import SourceFetchError
 from towersignal.planimetrics import (
     DATASET_ID,
+    FEATURE_IDENTITY_BASIS,
     FILTERED_QUERY_LIMIT,
     MATCH_BASIS,
     SELECT_FIELDS,
@@ -49,13 +50,14 @@ class PlanimetricTests(unittest.TestCase):
         self.assertEqual(record["status"], "No change in 2022 collection")
         self.assertEqual(record["geometry"], GEOMETRY)
         self.assertEqual(record["match_basis"], MATCH_BASIS)
+        self.assertEqual(record["feature_identity_basis"], FEATURE_IDENTITY_BASIS)
         self.assertEqual(record["imagery_year"], 2022)
 
     def test_fetch_queries_only_requested_bins_and_groups_features_by_exact_bin(self):
         rows = [
             {
                 "the_geom": GEOMETRY,
-                "source_id": "11",
+                "source_id": "0.0",
                 "feature_co": "1000",
                 "sub_featur": "2",
                 "bin": "1015862",
@@ -64,7 +66,7 @@ class PlanimetricTests(unittest.TestCase):
             },
             {
                 "the_geom": GEOMETRY,
-                "source_id": "12",
+                "source_id": "0.0",
                 "feature_co": "1000",
                 "sub_featur": "2",
                 "bin": "1015862",
@@ -81,7 +83,7 @@ class PlanimetricTests(unittest.TestCase):
         where_mock.assert_called_once_with(
             DATASET_ID,
             "bin in (1015862)",
-            order_by="bin,source_id",
+            order_by="bin,globalid",
             select=SELECT_FIELDS,
         )
         self.assertEqual(len(by_bin["1015862"]), 2)
@@ -89,6 +91,33 @@ class PlanimetricTests(unittest.TestCase):
         self.assertEqual(metadata["matched_bin_count"], 1)
         self.assertEqual(metadata["matched_feature_count"], 2)
         self.assertEqual(metadata["source_record_count"], 82300)
+        self.assertEqual(metadata["feature_identity_basis"], FEATURE_IDENTITY_BASIS)
+
+    def test_duplicate_source_id_is_allowed_when_globalids_are_unique(self):
+        rows = [
+            {"the_geom": GEOMETRY, "source_id": "0.0", "bin": "1015862", "globalid": "A"},
+            {"the_geom": GEOMETRY, "source_id": "0.0", "bin": "1015862", "globalid": "B"},
+        ]
+        with patch("towersignal.planimetrics.fetch_count", return_value=2), \
+             patch("towersignal.planimetrics.fetch_metadata", return_value={"name": "Planimetric", "source_last_updated_at": None}), \
+             patch("towersignal.planimetrics.fetch_where", return_value=rows):
+            by_bin, _ = fetch_planimetric_towers_by_bin(["1015862"])
+        self.assertEqual([feature["global_id"] for feature in by_bin["1015862"]], ["A", "B"])
+
+    def test_duplicate_globalid_fails_closed(self):
+        rows = [
+            {"the_geom": GEOMETRY, "source_id": "11", "bin": "1015862", "globalid": "A"},
+            {"the_geom": GEOMETRY, "source_id": "12", "bin": "1015862", "globalid": "A"},
+        ]
+        with patch("towersignal.planimetrics.fetch_count", return_value=2), \
+             patch("towersignal.planimetrics.fetch_metadata", return_value={"name": "Planimetric", "source_last_updated_at": None}), \
+             patch("towersignal.planimetrics.fetch_where", return_value=rows):
+            with self.assertRaises(SourceFetchError):
+                fetch_planimetric_towers_by_bin(["1015862"])
+
+    def test_missing_globalid_fails_closed_even_when_source_id_exists(self):
+        with self.assertRaises(SourceFetchError):
+            normalize_planimetric_row({"the_geom": GEOMETRY, "source_id": "12345", "bin": "1015862"})
 
     def test_filtered_query_refuses_unrequested_bin(self):
         row = {
@@ -115,7 +144,7 @@ class PlanimetricTests(unittest.TestCase):
 
     def test_missing_geometry_fails_closed(self):
         with self.assertRaises(SourceFetchError):
-            normalize_planimetric_row({"source_id": "1", "bin": "1015862", "the_geom": None})
+            normalize_planimetric_row({"source_id": "1", "globalid": "A", "bin": "1015862", "the_geom": None})
 
 
 if __name__ == "__main__":
