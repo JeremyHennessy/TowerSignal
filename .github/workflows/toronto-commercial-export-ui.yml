@@ -1,0 +1,130 @@
+name: Toronto Commercial Export UI
+
+on:
+  push:
+    branches:
+      - agent/toronto-ewrb-projection-20260904
+    paths:
+      - .github/workflows/toronto-commercial-export-ui.yml
+
+permissions:
+  contents: write
+
+jobs:
+  wire-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-ewrb-projection-20260904
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wire exports and copy-lead actions
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('src/components/TorontoParityShell.tsx')
+          text = path.read_text(encoding='utf-8')
+          import_line = "import { buildTorontoCompanyCsv, buildTorontoLeadSummary, buildTorontoProspectCsv, copyText, downloadCsv } from '../utils/torontoCommercialExport'\n"
+          anchor = "import { TorontoBenchmarkingPage } from './TorontoBenchmarkingPage'\n"
+          if import_line not in text:
+              if anchor not in text:
+                  raise SystemExit('benchmarking import anchor changed')
+              text = text.replace(anchor, anchor + import_line, 1)
+
+          old = "function PropertyAction({ watched, onToggleWatch, onOpen }: { watched: boolean; onToggleWatch: () => void; onOpen: () => void }) {\n  return <div className=\"toronto-parity-actions\"><button className=\"primary\" onClick={onOpen}>Open evidence</button><button className={watched ? 'active-control' : ''} onClick={onToggleWatch}>{watched ? 'Watching' : 'Watch'}</button></div>\n}"
+          new = "function PropertyAction({ watched, onToggleWatch, onOpen, onCopyLead }: { watched: boolean; onToggleWatch: () => void; onOpen: () => void; onCopyLead?: () => void }) {\n  return <div className=\"toronto-parity-actions\"><button className=\"primary\" onClick={onOpen}>Open evidence</button>{onCopyLead && <button onClick={onCopyLead}>Copy lead</button>}<button className={watched ? 'active-control' : ''} onClick={onToggleWatch}>{watched ? 'Watching' : 'Watch'}</button></div>\n}"
+          if old not in text:
+              raise SystemExit('PropertyAction anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = "function ProspectTable({ rows, watchedIds, onToggleWatch, onOpen }: { rows: ProspectRow[]; watchedIds: Set<string>; onToggleWatch: (id: string) => void; onOpen: (property: TorontoProperty) => void }) {"
+          new = "function ProspectTable({ rows, watchedIds, onToggleWatch, onOpen, onCopyLead }: { rows: ProspectRow[]; watchedIds: Set<string>; onToggleWatch: (id: string) => void; onOpen: (property: TorontoProperty) => void; onCopyLead?: (row: ProspectRow) => void }) {"
+          if old not in text:
+              raise SystemExit('ProspectTable signature anchor changed')
+          text = text.replace(old, new, 1)
+          old = "<PropertyAction watched={watchedIds.has(row.property.property_id)} onToggleWatch={() => onToggleWatch(row.property.property_id)} onOpen={() => onOpen(row.property)} />"
+          new = "<PropertyAction watched={watchedIds.has(row.property.property_id)} onToggleWatch={() => onToggleWatch(row.property.property_id)} onOpen={() => onOpen(row.property)} onCopyLead={onCopyLead ? () => onCopyLead(row) : undefined} />"
+          text = text.replace(old, new)
+
+          state_anchor = "  const [companyRole, setCompanyRole] = useState('')\n"
+          if "const [copyFeedback, setCopyFeedback]" not in text:
+              if state_anchor not in text:
+                  raise SystemExit('state anchor changed')
+              text = text.replace(state_anchor, state_anchor + "  const [copyFeedback, setCopyFeedback] = useState('')\n", 1)
+
+          action_anchor = "  const openProperty = (property: TorontoProperty) => openInMarket(property, setView)\n"
+          actions = """  const copyLead = async (row: ProspectRow) => {\n    try {\n      await copyText(buildTorontoLeadSummary(row))\n      setCopyFeedback(`Copied ${row.property.display_address}`)\n    } catch {\n      setCopyFeedback('Clipboard unavailable')\n    }\n    window.setTimeout(() => setCopyFeedback(''), 2200)\n  }\n  const exportProspects = (rows: ProspectRow[], filename: string) => downloadCsv(filename, buildTorontoProspectCsv(rows))\n  const exportCompanies = (rows: CompanyRow[], filename: string) => downloadCsv(filename, buildTorontoCompanyCsv(rows))\n"""
+          if "const copyLead = async" not in text:
+              if action_anchor not in text:
+                  raise SystemExit('action anchor changed')
+              text = text.replace(action_anchor, action_anchor + actions, 1)
+
+          old = '<div className="toronto-parity-toolbar"><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search address, company, source or signal" /><strong>{highProspects.length.toLocaleString()} high-attention matches</strong></div>'
+          new = '<div className="toronto-parity-toolbar"><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search address, company, source or signal" /><div className="toronto-parity-toolbar-actions"><button onClick={() => exportProspects(filteredProspects, \'towersignal-toronto-prospects.csv\')}>Export CSV</button>{copyFeedback && <small role="status">{copyFeedback}</small>}</div><strong>{highProspects.length.toLocaleString()} high-attention matches</strong></div>'
+          if old not in text:
+              raise SystemExit('prospect toolbar anchor changed')
+          text = text.replace(old, new, 1)
+          old = '<ProspectTable rows={filteredProspects} watchedIds={watchedIds} onToggleWatch={toggleWatch} onOpen={openProperty} />'
+          new = '<ProspectTable rows={filteredProspects} watchedIds={watchedIds} onToggleWatch={toggleWatch} onOpen={openProperty} onCopyLead={copyLead} />'
+          if old not in text:
+              raise SystemExit('prospect table anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '<div className="toronto-parity-toolbar"><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search opportunity accounts" /><select value={opportunityFilter} onChange={event => setOpportunityFilter(event.target.value)}><option value="all">All opportunity signals</option><option value="confirmed-permit">Confirmed tower + mechanical permit</option><option value="mechanical">Mechanical / cooling-system permit</option><option value="planning">Planning / development</option><option value="relationship-gap">Relationship research gap</option><option value="multi-source">Multi-source context</option><option value="environment">Environmental / health context</option></select><strong>{opportunityRows.length.toLocaleString()} matches</strong></div>'
+          new = '<div className="toronto-parity-toolbar"><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search opportunity accounts" /><select value={opportunityFilter} onChange={event => setOpportunityFilter(event.target.value)}><option value="all">All opportunity signals</option><option value="confirmed-permit">Confirmed tower + mechanical permit</option><option value="mechanical">Mechanical / cooling-system permit</option><option value="planning">Planning / development</option><option value="relationship-gap">Relationship research gap</option><option value="multi-source">Multi-source context</option><option value="environment">Environmental / health context</option></select><div className="toronto-parity-toolbar-actions"><button onClick={() => exportProspects(opportunityRows, \'towersignal-toronto-opportunities.csv\')}>Export CSV</button>{copyFeedback && <small role="status">{copyFeedback}</small>}</div><strong>{opportunityRows.length.toLocaleString()} matches</strong></div>'
+          if old not in text:
+              raise SystemExit('opportunity toolbar anchor changed')
+          text = text.replace(old, new, 1)
+          old = '<PropertyAction watched={watchedIds.has(row.property.property_id)} onToggleWatch={() => toggleWatch(row.property.property_id)} onOpen={() => openProperty(row.property)} />'
+          new = '<PropertyAction watched={watchedIds.has(row.property.property_id)} onToggleWatch={() => toggleWatch(row.property.property_id)} onOpen={() => openProperty(row.property)} onCopyLead={() => copyLead(row)} />'
+          if old not in text:
+              raise SystemExit('opportunity action anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '<div className="toronto-parity-toolbar"><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search organization or role" /><select value={companyRole} onChange={event => setCompanyRole(event.target.value)}><option value="">All relationship roles</option>{roles.map(role => <option key={role} value={role}>{humanize(role)}</option>)}</select><strong>{filteredCompanies.length.toLocaleString()} organizations</strong></div>'
+          new = '<div className="toronto-parity-toolbar"><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search organization or role" /><select value={companyRole} onChange={event => setCompanyRole(event.target.value)}><option value="">All relationship roles</option>{roles.map(role => <option key={role} value={role}>{humanize(role)}</option>)}</select><div className="toronto-parity-toolbar-actions"><button onClick={() => exportCompanies(filteredCompanies, \'towersignal-toronto-companies.csv\')}>Export CSV</button></div><strong>{filteredCompanies.length.toLocaleString()} organizations</strong></div>'
+          if old not in text:
+              raise SystemExit('companies toolbar anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '<div className="toronto-parity-toolbar"><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search portfolio organization" /><select value={companyRole} onChange={event => setCompanyRole(event.target.value)}><option value="">All portfolio roles</option>{roles.filter(role => portfolioRoles.has(role)).map(role => <option key={role} value={role}>{humanize(role)}</option>)}</select><strong>{portfolioCompanies.length.toLocaleString()} portfolios</strong></div>'
+          new = '<div className="toronto-parity-toolbar"><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search portfolio organization" /><select value={companyRole} onChange={event => setCompanyRole(event.target.value)}><option value="">All portfolio roles</option>{roles.filter(role => portfolioRoles.has(role)).map(role => <option key={role} value={role}>{humanize(role)}</option>)}</select><div className="toronto-parity-toolbar-actions"><button onClick={() => exportCompanies(portfolioCompanies, \'towersignal-toronto-portfolios.csv\')}>Export CSV</button></div><strong>{portfolioCompanies.length.toLocaleString()} portfolios</strong></div>'
+          if old not in text:
+              raise SystemExit('portfolios toolbar anchor changed')
+          text = text.replace(old, new, 1)
+
+          old = '{watchRows.length ? <ProspectTable rows={watchRows} watchedIds={watchedIds} onToggleWatch={toggleWatch} onOpen={openProperty} /> : <div className="reference-empty-state">'
+          new = '{watchRows.length ? <><div className="toronto-parity-toolbar toronto-watchlist-toolbar"><div className="toronto-parity-toolbar-actions"><button onClick={() => exportProspects(watchRows, \'towersignal-toronto-watchlist.csv\')}>Export watchlist CSV</button>{copyFeedback && <small role="status">{copyFeedback}</small>}</div><strong>{watchRows.length.toLocaleString()} watched properties</strong></div><ProspectTable rows={watchRows} watchedIds={watchedIds} onToggleWatch={toggleWatch} onOpen={openProperty} onCopyLead={copyLead} /></> : <div className="reference-empty-state">'
+          if old not in text:
+              raise SystemExit('watchlist anchor changed')
+          text = text.replace(old, new, 1)
+
+          path.write_text(text, encoding='utf-8')
+
+          css = Path('src/styles/toronto-parity.css')
+          style = css.read_text(encoding='utf-8')
+          addition = """\n.toronto-parity-toolbar-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;min-width:0}.toronto-parity-toolbar-actions button{border:1px solid #cbd7e4;background:#fff;color:#155fa0;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:750;white-space:nowrap}.toronto-parity-toolbar-actions button:hover{background:#f3f8fd}.toronto-parity-toolbar-actions small{font-size:11px;color:#5f6d7d;white-space:nowrap}.toronto-watchlist-toolbar{grid-template-columns:1fr auto}.toronto-watchlist-toolbar .toronto-parity-toolbar-actions{justify-content:flex-start}\n@media(max-width:980px){.toronto-parity-toolbar-actions{justify-content:flex-start;flex-wrap:wrap}.toronto-watchlist-toolbar{grid-template-columns:1fr 1fr}}\n@media(max-width:600px){.toronto-watchlist-toolbar{grid-template-columns:1fr}.toronto-parity-toolbar-actions button{width:100%}}\n"""
+          if '.toronto-parity-toolbar-actions' not in style:
+              css.write_text(style.rstrip() + addition, encoding='utf-8')
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify exports and Toronto parity workspaces
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run test -- tests/frontend/TorontoCommercialExport.test.ts tests/frontend/TorontoBenchmarkingPage.test.tsx tests/frontend/TorontoParityShell.test.tsx tests/frontend/TorontoMarket.test.tsx
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm run build
+      - name: Persist verified export UI
+        run: |
+          git config user.name "TowerSignal Toronto UI Bot"
+          git config user.email "towersignal-toronto-ui@users.noreply.github.com"
+          git rm .github/workflows/toronto-commercial-export-ui.yml
+          git add src/components/TorontoParityShell.tsx src/styles/toronto-parity.css src/utils/torontoCommercialExport.ts tests/frontend/TorontoCommercialExport.test.ts
+          git commit -m "Add Toronto commercial export and lead-summary actions"
+          git push origin HEAD:agent/toronto-ewrb-projection-20260904
+          echo "TORONTO_EXPORT_UI_SHA=$(git rev-parse HEAD)"
