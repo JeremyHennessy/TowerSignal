@@ -10,11 +10,23 @@ This is a layered data-source proof. It does not modify production UI, scoring, 
 
 ## Source
 
-Every current PWS ID in the authoritative NYSDOH Lead Service Line Inventory index has a deterministic detail URL:
+Every current PWS ID in the authoritative NYSDOH Lead Service Line Inventory index is associated with a deterministic detail URL:
 
 `https://www.health.ny.gov/environmental/water/drinking/service_line/{PWSID}.htm`
 
-The workflow re-fetches the current index, requires unique PWS IDs, then retrieves every detail URL sequentially with a bounded request delay. A detail page must parse successfully and its internal PWS ID must equal the index PWS ID; otherwise the cache fails rather than publishing partial coverage.
+The workflow re-fetches the current index, requires unique PWS IDs, then requests every detail URL sequentially with bounded pacing. Parsed pages must contain the same PWS ID as the index and all required inventory/method fields.
+
+### Current-index detail 404s
+
+The live source proved that the NYSDOH index can contain a PWS whose indexed deterministic detail URL returns HTTP 404 (first observed example: `NY0117224`). This is a source inconsistency, not evidence that the PWS should disappear.
+
+Build 017G therefore distinguishes **index coverage** from **parsed detail coverage**:
+
+- a normally retrieved detail must still fully parse or the build fails;
+- transport errors other than explicit HTTP 404 still fail;
+- a current-index PWS whose primary/fallback detail retrieval ends in explicit HTTP 404 is retained as `DETAIL_UNAVAILABLE_404` with PWS/name/county/source URL/error evidence and no inferred inventory values;
+- the total of parsed details plus explicit unavailable records must exactly equal the current index count;
+- more than 25 explicit current-index 404s fails the production guard rather than normalizing widespread source breakage.
 
 ## Captured detail fields
 
@@ -60,10 +72,10 @@ Name/title/date are retained when structurally present in the source form. Blank
 
 ## Evidence and source integrity
 
-Each detail record keeps the official detail URL and SHA-256 of the exact HTML used. The source proof requires index count = detail count and no duplicate/mismatched PWS IDs. Every expected identification-method row must be present.
+Each parsed detail keeps the official detail URL and SHA-256 of the exact HTML used. The source proof requires exact current-index identity coverage across parsed + explicitly unavailable records, no duplicate/mismatched PWS IDs, and every expected identification-method row on parsed pages.
 
-The aggregate `source_reported_total_service_lines_sum` is only the arithmetic sum of individual PWS summary totals. It is not represented as a single-date statewide engineering inventory because individual source submissions may have different certification/update dates.
+The aggregate `source_reported_total_service_lines_sum` is only the arithmetic sum of successfully parsed PWS summary totals. It excludes explicit unavailable detail records and is not represented as a single-date statewide engineering inventory because individual source submissions may have different certification/update dates.
 
 ## Acceptance
 
-Do not advance this increment unless all 2,927-current-index detail pages (or whatever exact count the live index reports at run time) are retrieved and parsed with no silent omissions, inventory arithmetic reconciles, the artifact revalidates after download, and the full repository test/build gate is green against the verified Build 017C parent branch.
+Do not advance this increment unless every current-index PWS is accounted for as either a fully parsed detail or a narrowly evidenced `DETAIL_UNAVAILABLE_404`, no other errors are hidden, inventory arithmetic reconciles for all parsed details, the artifact revalidates after download, and the full repository test/build gate is green against the verified Build 017C parent branch.
