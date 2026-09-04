@@ -15,11 +15,12 @@ EXPECTED_METHODS = {
     "Sequential Sampling",
     "Statistical Analysis/Predictive Model",
 }
+MAX_EXPLICIT_UNAVAILABLE_404 = 25
 
 
 def validate(path: Path, *, max_age_days: int, require_production_volume: bool) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema_version") != "1.0" or payload.get("domain") != "NYS_LEAD_SERVICE_LINE_INVENTORY_DETAILS":
+    if payload.get("schema_version") != "1.1" or payload.get("domain") != "NYS_LEAD_SERVICE_LINE_INVENTORY_DETAILS":
         raise RuntimeError("Unexpected LSLI detail cache schema/domain")
     generated = datetime.fromisoformat(str(payload.get("generated_at") or "").replace("Z", "+00:00"))
     age_days = (datetime.now(timezone.utc) - generated).total_seconds() / 86400
@@ -29,14 +30,24 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     source = payload.get("source")
     summary = payload.get("summary")
     details = payload.get("details")
-    if not isinstance(source, dict) or not isinstance(summary, dict) or not isinstance(details, list):
-        raise RuntimeError("LSLI detail cache missing source/summary/details")
+    unavailable = payload.get("unavailable_details")
+    if not isinstance(source, dict) or not isinstance(summary, dict) or not isinstance(details, list) or not isinstance(unavailable, list):
+        raise RuntimeError("LSLI detail cache missing source/summary/details/unavailable_details")
+
     index_count = int(source.get("index_record_count") or 0)
-    detail_count = int(source.get("detail_record_count") or 0)
-    if source.get("retrieval_complete") is not True or index_count != detail_count or detail_count != len(details):
-        raise RuntimeError("LSLI detail retrieval is incomplete")
-    if int(summary.get("detail_count") or -1) != len(details):
-        raise RuntimeError("LSLI detail summary count mismatch")
+    parsed_count = int(source.get("parsed_detail_count") or 0)
+    unavailable_count = int(source.get("explicit_unavailable_404_count") or 0)
+    coverage_count = int(source.get("coverage_record_count") or 0)
+    if source.get("coverage_complete") is not True:
+        raise RuntimeError("LSLI index coverage is incomplete")
+    if parsed_count != len(details) or unavailable_count != len(unavailable):
+        raise RuntimeError("LSLI parsed/unavailable source counts do not match collections")
+    if parsed_count + unavailable_count != coverage_count or coverage_count != index_count:
+        raise RuntimeError("LSLI index coverage counts do not reconcile")
+    if unavailable_count > MAX_EXPLICIT_UNAVAILABLE_404:
+        raise RuntimeError(f"Too many current-index LSLI detail 404s: {unavailable_count}")
+    if int(summary.get("index_count") or -1) != index_count or int(summary.get("parsed_detail_count") or -1) != parsed_count or int(summary.get("unavailable_detail_count") or -1) != unavailable_count:
+        raise RuntimeError("LSLI summary coverage count mismatch")
 
     pws_ids: set[str] = set()
     total_service_lines = 0
@@ -46,6 +57,8 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         if not PWS_RE.fullmatch(pws_id) or pws_id in pws_ids:
             raise RuntimeError(f"Invalid/duplicate LSLI PWS ID: {pws_id!r}")
         pws_ids.add(pws_id)
+        if row.get("detail_status") != "PARSED":
+            raise RuntimeError(f"Parsed LSLI detail has wrong status: {pws_id}")
         if not str(row.get("source_url") or "").endswith(f"/{pws_id}.htm"):
             raise RuntimeError(f"LSLI detail URL mismatch: {pws_id}")
         source_hash = str(row.get("source_sha256") or "")
@@ -93,6 +106,23 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         if not EXPECTED_METHODS.issubset(names):
             raise RuntimeError(f"LSLI methods incomplete: {pws_id}")
 
+    for row in unavailable:
+        pws_id = str(row.get("pws_id") or "")
+        if not PWS_RE.fullmatch(pws_id) or pws_id in pws_ids:
+            raise RuntimeError(f"Invalid/duplicate unavailable LSLI PWS ID: {pws_id!r}")
+        pws_ids.add(pws_id)
+        if row.get("detail_status") != "DETAIL_UNAVAILABLE_404":
+            raise RuntimeError(f"Unexpected unavailable-detail status: {pws_id}")
+        if not str(row.get("source_url") or "").endswith(f"/{pws_id}.htm"):
+            raise RuntimeError(f"Unavailable LSLI detail URL mismatch: {pws_id}")
+        if not row.get("source_error") or "404" not in str(row.get("source_error")):
+            raise RuntimeError(f"Unavailable LSLI detail lacks 404 source evidence: {pws_id}")
+        forbidden = {"inventory", "material_matrix", "identification_methods", "owner_or_operator_form_contact"}
+        if any(field in row for field in forbidden):
+            raise RuntimeError(f"Unavailable LSLI detail contains inferred fields: {pws_id}")
+
+    if len(pws_ids) != index_count:
+        raise RuntimeError("LSLI PWS identity coverage does not equal current index")
     if int(summary.get("details_with_form_contact") or 0) != with_contact:
         raise RuntimeError("LSLI contact summary mismatch")
     if int(summary.get("source_reported_total_service_lines_sum") or -1) != total_service_lines:
@@ -101,6 +131,8 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     if require_production_volume:
         if index_count < 2500:
             raise RuntimeError(f"Implausibly small LSLI detail universe: {index_count:,}")
+        if parsed_count < index_count - MAX_EXPLICIT_UNAVAILABLE_404:
+            raise RuntimeError(f"Implausibly low parsed LSLI detail coverage: {parsed_count:,}/{index_count:,}")
         if with_contact < 1500:
             raise RuntimeError(f"Implausibly few LSLI form contacts: {with_contact:,}")
         if total_service_lines < 1_000_000:
