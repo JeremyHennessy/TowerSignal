@@ -1,7 +1,8 @@
 import { expect, test, vi } from 'vitest'
+import type { TorontoProperty } from '../../src/types/toronto'
 import { buildTorontoCompanyCsv, buildTorontoLeadSummary, buildTorontoProspectCsv, copyText, downloadCsv } from '../../src/utils/torontoCommercialExport'
 
-const property = {
+const property: TorontoProperty = {
   property_id: 'toronto-address-point:100',
   address_point_id: '100',
   display_address: '10 Alpha St, Toronto',
@@ -17,7 +18,7 @@ const property = {
   relationships: [{ relationship: 'PROPERTY_MANAGER_OF', organization: 'Alpha Management', source_key: 'rentsafe_registration', confidence: 'HIGH', basis: 'EXPLICIT_ROLE' }],
   aerial_review_rank: null,
   aerial_visual_similarity_score: null,
-} as const
+}
 
 const prospect = {
   property,
