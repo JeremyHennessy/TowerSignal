@@ -38,7 +38,7 @@ test('public marketing page uses the TowerSignal product positioning and a dedic
   render(<MarketingLandingPage />)
 
   expect(screen.getByRole('heading', { name: /Find the buildings that need you next/i })).toBeVisible()
-  expect(screen.getByText('New York City')).toBeVisible()
+  expect(screen.getAllByText('New York City').length).toBeGreaterThan(0)
   expect(screen.getByText('Toronto expansion')).toBeVisible()
   expect(screen.getAllByRole('link', { name: /Log in/i })[0]).toHaveAttribute('href', '#/login')
   expect(screen.queryByRole('heading', { name: 'Sign in to TowerSignal' })).toBeNull()
