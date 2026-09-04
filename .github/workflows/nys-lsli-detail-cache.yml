@@ -1,0 +1,76 @@
+name: Verify NYS LSLI detail cache
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [agent/nys-public-water-20260904]
+    paths:
+      - '.github/workflows/nys-lsli-detail-cache.yml'
+      - 'scripts/towersignal/nys_lsli_detail.py'
+      - 'scripts/towersignal/nys_public_water.py'
+      - 'scripts/build_nys_lsli_detail_cache.py'
+      - 'scripts/validate_nys_lsli_detail_cache.py'
+      - 'tests/python/test_nys_lsli_detail.py'
+      - 'docs/BUILD017G_NYS_LSLI_DETAILS.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-nys-lsli-details-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Crawl every current NYSDOH LSLI detail page
+        run: python scripts/build_nys_lsli_detail_cache.py --output nys-lsli-details/cache.json --request-delay-seconds 0.15
+      - name: Validate complete index/detail coverage and inventory reconciliation
+        run: python scripts/validate_nys_lsli_detail_cache.py --cache nys-lsli-details/cache.json --max-age-days 1 --require-production-volume
+      - name: Run LSLI detail parser tests
+        run: python -m unittest tests.python.test_nys_lsli_detail -v
+      - name: Upload verified LSLI detail cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-nys-lsli-detail-cache
+          path: nys-lsli-details/cache.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified LSLI detail cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-nys-lsli-detail-cache
+          path: .verified-nys-lsli-details
+      - name: Revalidate downloaded LSLI detail cache
+        run: python scripts/validate_nys_lsli_detail_cache.py --cache .verified-nys-lsli-details/cache.json --max-age-days 1 --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
