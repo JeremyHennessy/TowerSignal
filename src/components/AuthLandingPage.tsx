@@ -93,7 +93,7 @@ export function AuthLandingPage({
           <label>Password<input aria-label="Password" type="password" autoComplete={mode === 'sign-up' ? 'new-password' : 'current-password'} value={password} onChange={event => setPassword(event.target.value)} minLength={8} required /></label>
           {mode === 'sign-up' && <label>Confirm password<input aria-label="Confirm password" type="password" autoComplete="new-password" value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} minLength={8} required /></label>}
           {error && <div className="auth-form-error" role="alert">{error}</div>}
-          <button className="primary auth-submit" type="submit" disabled={busy || !email.trim() || password.length < 8 || (mode === 'sign-up' && (!name.trim() || confirmPassword.length < 8))}>{busy ? 'Working…' : mode === 'sign-up' ? 'Create account' : 'Sign in'} <span aria-hidden="true">→</span></button>
+          <button className="auth-submit" type="submit" disabled={busy || !email.trim() || password.length < 8 || (mode === 'sign-up' && (!name.trim() || confirmPassword.length < 8))}>{busy ? 'Working…' : mode === 'sign-up' ? 'Create account' : 'Sign in'} <span aria-hidden="true">→</span></button>
         </form>
         <div className="auth-security-note"><strong>Authenticated application access</strong><span>Your private workflow state is tied to your account. TowerSignal's underlying public-source datasets remain public-source evidence.</span></div>
       </div>
