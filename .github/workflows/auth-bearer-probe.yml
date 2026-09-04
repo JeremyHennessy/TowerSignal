@@ -16,20 +16,28 @@ jobs:
         run: |
           set -euo pipefail
           AUTH_URL='https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth'
+          ORIGIN='https://jeremyhennessy.github.io'
           EMAIL="towersignal-bearer-probe-${GITHUB_RUN_ID}@example.com"
           PASSWORD="Probe-${GITHUB_RUN_ID}-Aa9!"
-          SIGNUP=$(curl -fsS -c /tmp/neon-cookies.txt -H 'content-type: application/json' \
+
+          HTTP=$(curl -sS -o /tmp/signup.json -w '%{http_code}' -c /tmp/neon-cookies.txt \
+            -H 'content-type: application/json' -H "Origin: ${ORIGIN}" \
             -d "{\"name\":\"Bearer Probe\",\"email\":\"${EMAIL}\",\"password\":\"${PASSWORD}\"}" \
             "${AUTH_URL}/sign-up/email")
-          TOKEN=$(printf '%s' "$SIGNUP" | jq -r '.token // empty')
+          if [ "$HTTP" != '200' ]; then
+            echo "signup_http=${HTTP}"
+            jq -c '{code:(.code // null),message:(.message // null)}' /tmp/signup.json
+            exit 1
+          fi
+          TOKEN=$(jq -r '.token // empty' /tmp/signup.json)
           test -n "$TOKEN"
 
-          COOKIE_SESSION=$(curl -fsS -b /tmp/neon-cookies.txt "${AUTH_URL}/get-session")
+          COOKIE_SESSION=$(curl -fsS -b /tmp/neon-cookies.txt -H "Origin: ${ORIGIN}" "${AUTH_URL}/get-session")
           COOKIE_USER=$(printf '%s' "$COOKIE_SESSION" | jq -r '.user.id // empty')
           test -n "$COOKIE_USER"
           echo 'cookie_session_supported=true'
 
-          BEARER_SESSION=$(curl -fsS -H "Authorization: Bearer ${TOKEN}" "${AUTH_URL}/get-session")
+          BEARER_SESSION=$(curl -fsS -H "Origin: ${ORIGIN}" -H "Authorization: Bearer ${TOKEN}" "${AUTH_URL}/get-session")
           BEARER_USER=$(printf '%s' "$BEARER_SESSION" | jq -r '.user.id // empty')
           if [ -n "$BEARER_USER" ]; then
             echo 'bearer_session_supported=true'
