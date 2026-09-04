@@ -1,0 +1,72 @@
+name: Verify NYC LL84 building water cache
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/ll84-water-cache.yml'
+      - 'scripts/towersignal/ll84_water.py'
+      - 'scripts/build_ll84_water_cache.py'
+      - 'scripts/validate_ll84_water_cache.py'
+      - 'tests/python/test_ll84_water.py'
+      - 'docs/BUILD017B_LL84_WATER.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-ll84-water-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build exact-count LL84 water cache
+        run: python scripts/build_ll84_water_cache.py --output ll84-water-cache/cache.json --page-size 50000
+      - name: Validate LL84 identifiers, water metrics and production volume
+        run: python scripts/validate_ll84_water_cache.py --cache ll84-water-cache/cache.json --max-age-days 1 --require-production-volume
+      - name: Upload verified LL84 water cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-ll84-water-cache
+          path: ll84-water-cache/cache.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified LL84 water cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-ll84-water-cache
+          path: .verified-ll84-water
+      - name: Revalidate LL84 water cache
+        run: python scripts/validate_ll84_water_cache.py --cache .verified-ll84-water/cache.json --max-age-days 1 --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
