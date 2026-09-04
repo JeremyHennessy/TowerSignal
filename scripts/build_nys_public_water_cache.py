@@ -11,6 +11,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from towersignal import nys_public_water  # noqa: E402
 
 _ORIGINAL_PARSE_VIOLATION_PAGE = nys_public_water.parse_violation_page
+STATEWIDE_CERTIFIED_OPERATORS_URL = (
+    "https://www.health.ny.gov/environmental/water/drinking/operate/certified_operators/"
+    "statewide_certified_operators.htm"
+)
 
 
 def _rekey_violation_rows(rows: list[dict], *, source_url: str) -> list[dict]:
@@ -46,7 +50,15 @@ def parse_violation_page_allow_explicit_empty(html: str, *, source_url: str) -> 
     return _rekey_violation_rows(rows, source_url=source_url)
 
 
+def configure_authoritative_sources() -> None:
+    # The source module originally pointed at the New York County operator page,
+    # which contains only a small county-specific subset. The statewide NYSDOH
+    # page has the same schema and is the authoritative source for this cache.
+    nys_public_water.CERTIFIED_OPERATORS_URL = STATEWIDE_CERTIFIED_OPERATORS_URL
+
+
 def build(output: Path) -> dict:
+    configure_authoritative_sources()
     # County pages with an explicit NYSDOH "no violations" heading legitimately
     # omit the violation table. Tolerate only that exact source state; every other
     # missing/changed table remains fail-closed in the source parser.
