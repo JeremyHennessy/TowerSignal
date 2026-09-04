@@ -1,0 +1,26 @@
+name: Planimetric live branch diagnostic
+
+on:
+  push:
+    branches: [agent/planimetric-rooftop-20260904]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify current registry against NYC Planimetric cooling-tower features
+        run: python scripts/verify_live_planimetrics.py --output artifacts/planimetric-live-verification.json
+      - name: Preserve diagnostic report
+        uses: actions/upload-artifact@v4
+        with:
+          name: planimetric-live-verification
+          path: artifacts/planimetric-live-verification.json
+          retention-days: 7
