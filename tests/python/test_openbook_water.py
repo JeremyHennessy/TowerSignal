@@ -10,11 +10,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from towersignal.openbook_water import (  # noqa: E402
-    build_export_url,
-    classify_water_contract,
-    parse_export,
-)
+from towersignal.openbook_water import build_export_url, parse_export  # noqa: E402
+from towersignal.openbook_water_guard import classify_water_contract  # noqa: E402
 
 
 class OpenBookWaterTests(unittest.TestCase):
@@ -61,6 +58,11 @@ class OpenBookWaterTests(unittest.TestCase):
     def test_wastewater_does_not_become_domestic_water(self) -> None:
         result = classify_water_contract("Wastewater treatment plant pump replacement")
         self.assertEqual(result["service_category"], "UNRELATED")
+        self.assertEqual(result["classification_layer"], "OPENBOOK_CONTEXT_GUARD")
+
+    def test_explicit_cooling_tower_survives_unrelated_site_context(self) -> None:
+        result = classify_water_contract("Cooling tower maintenance at wastewater treatment facility")
+        self.assertEqual(result["service_category"], "COOLING_TOWER_MAINTENANCE")
 
     def test_plumbing_remains_review_level(self) -> None:
         result = classify_water_contract("Annual plumbing maintenance and repair")
