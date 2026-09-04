@@ -12,6 +12,7 @@ SOURCE_KEY = "NYC_OTI_PLANIMETRICS_COOLING_TOWERS"
 MATCH_BASIS = "BIN_EXACT"
 IMAGERY_YEAR = 2022
 SELECT_FIELDS = "the_geom,source_id,feature_co,sub_featur,bin,status,globalid"
+FILTERED_QUERY_LIMIT = 50000
 
 
 def normalize_bin(value: Any) -> str | None:
@@ -20,8 +21,9 @@ def normalize_bin(value: Any) -> str | None:
     text = str(value).strip()
     if text.endswith(".0") and text[:-2].isdigit():
         text = text[:-2]
-    digits = "".join(ch for ch in text if ch.isdigit())
-    return digits or None
+    if not text.isdigit():
+        return None
+    return text
 
 
 def _string_or_none(value: Any) -> str | None:
@@ -33,7 +35,7 @@ def _string_or_none(value: Any) -> str | None:
 
 def _normalize_geometry(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
-        raise SourceFetchError("Plan imetric cooling-tower row is missing GeoJSON geometry")
+        raise SourceFetchError("Planimetric cooling-tower row is missing GeoJSON geometry")
     geometry_type = value.get("type")
     coordinates = value.get("coordinates")
     if geometry_type not in {"Polygon", "MultiPolygon"} or not isinstance(coordinates, list) or not coordinates:
@@ -44,11 +46,11 @@ def _normalize_geometry(value: Any) -> dict[str, Any]:
 def normalize_planimetric_row(row: dict[str, Any]) -> dict[str, Any]:
     bin_value = normalize_bin(row.get("bin"))
     if not bin_value:
-        raise SourceFetchError("Plan imetric cooling-tower row is missing BIN")
+        raise SourceFetchError("Planimetric cooling-tower row is missing a valid numeric BIN")
     source_id = _string_or_none(row.get("source_id"))
     global_id = _string_or_none(row.get("globalid"))
     if not source_id and not global_id:
-        raise SourceFetchError(f"Plan imetric cooling-tower row for BIN {bin_value} has no source identifier")
+        raise SourceFetchError(f"Planimetric cooling-tower row for BIN {bin_value} has no source identifier")
     return {
         "source_id": source_id,
         "global_id": global_id,
@@ -66,7 +68,7 @@ def normalize_planimetric_row(row: dict[str, Any]) -> dict[str, Any]:
 def fetch_planimetric_towers_by_bin(
     bin_values: Iterable[Any],
     *,
-    batch_size: int = 75,
+    batch_size: int = 150,
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
     requested_bins = sorted({value for item in bin_values if (value := normalize_bin(item))}, key=int)
     source_record_count = fetch_count(DATASET_ID)
@@ -89,12 +91,16 @@ def fetch_planimetric_towers_by_bin(
             order_by="bin,source_id",
             select=SELECT_FIELDS,
         )
+        if len(rows) >= FILTERED_QUERY_LIMIT:
+            raise SourceFetchError(
+                "Planimetric exact-BIN query reached the filtered-query row limit; refusing a potentially truncated result"
+            )
         for raw in rows:
             feature = normalize_planimetric_row(raw)
             bin_value = feature["bin"]
             if bin_value not in requested_set:
                 raise SourceFetchError(
-                    f"Plan imetric filtered query returned BIN {bin_value} outside the requested exact-BIN universe"
+                    f"Planimetric filtered query returned BIN {bin_value} outside the requested exact-BIN universe"
                 )
             feature_identity = feature["source_id"] or feature["global_id"]
             assert feature_identity is not None
