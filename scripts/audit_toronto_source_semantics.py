@@ -30,6 +30,32 @@ def clean(value: Any) -> str:
     return "" if value is None else str(value).strip()
 
 
+def build_unique_record_indexes(source_rows: dict[str, list[dict[str, Any]]]) -> dict[str, dict[str, dict[str, Any]]]:
+    """Index only unique stable IDs; ambiguous IDs retain legacy fallback behavior."""
+    from toronto_source_identity import stable_source_record_id
+    indexes: dict[str, dict[str, dict[str, Any]]] = {}
+    for source, rows in source_rows.items():
+        unique: dict[str, dict[str, Any]] = {}
+        duplicates: set[str] = set()
+        for row in rows:
+            record_id = stable_source_record_id(source, row)
+            if record_id in unique:
+                duplicates.add(record_id)
+            else:
+                unique[record_id] = row
+        for record_id in duplicates:
+            unique.pop(record_id, None)
+        indexes[source] = unique
+    return indexes
+
+
+def indexed_record_for_link(link: dict[str, Any], source_rows: dict[str, list[dict[str, Any]]], indexes: dict[str, dict[str, dict[str, Any]]]) -> dict[str, Any]:
+    source = str(link.get("source_key") or "").strip()
+    record_id = str(link.get("source_record_id") or "").strip()
+    indexed = indexes.get(source, {}).get(record_id)
+    return indexed if indexed is not None else _record_for_link(link, source_rows)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Semantic/cardinality audit of Toronto property-source links")
     parser.add_argument("--market", type=Path, default=DEFAULT_MARKET)
@@ -42,6 +68,7 @@ def main() -> None:
     spine = load(market / "property_spine.json")
     coverage = load(market / "coverage_report.json")
     source_rows = load_source_rows(ROOT, load)
+    source_record_indexes = build_unique_record_indexes(source_rows)
 
     properties = [p for p in spine.get("properties", []) if isinstance(p, dict)]
     property_ids = {clean(p.get("property_id")) for p in properties if clean(p.get("property_id"))}
@@ -76,10 +103,10 @@ def main() -> None:
         if source not in EXPECTED_SOURCES:
             unknown_sources.append({"property_id": pid, "source_key": source, "source_record_id": rid})
         if source in EXPECTED_SOURCES:
-            row = _record_for_link(link, source_rows)
+            row = indexed_record_for_link(link, source_rows, source_record_indexes)
             if not row:
                 unresolved_source_rows.append({"property_id": pid, "source_key": source, "source_record_id": rid, "source_row_index": row_index})
-            normalized = normalize_source_link(link, source_rows)
+            normalized = normalize_source_link(link, source_rows, row)
             record_url = clean(normalized.get("record_url"))
             if record_url:
                 normalized_record_actions[source].add(record_url)
