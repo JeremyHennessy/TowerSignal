@@ -31,7 +31,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Probe live New York auth in Chromium
+      - name: Probe live New York auth in ordinary Chromium context
         run: |
           mkdir -p ny-live-auth-diagnostic
           cat > ny-auth-probe.mjs <<'EOF'
@@ -42,38 +42,21 @@ jobs:
           const authUrl = `https://${authNeedle}/neondb/auth/get-session`
           const liveUrl = `https://jeremyhennessy.github.io/TowerSignal/?ny_auth_diag=${Date.now()}`
           const browser = await chromium.launch()
-          const page = await browser.newPage({
-            viewport: { width: 1440, height: 1000 },
-            extraHTTPHeaders: { 'Cache-Control': 'no-cache' },
-          })
+          const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
 
           const events = []
           const safeHeaders = headers => Object.fromEntries(Object.entries(headers).filter(([key]) => !['cookie','authorization','set-cookie'].includes(key.toLowerCase())))
 
           page.on('request', request => {
             if (request.url().includes(authNeedle)) events.push({
-              type: 'request',
-              url: request.url(),
-              method: request.method(),
-              resourceType: request.resourceType(),
-              headers: safeHeaders(request.headers()),
+              type: 'request', url: request.url(), method: request.method(), resourceType: request.resourceType(), headers: safeHeaders(request.headers()),
             })
           })
           page.on('requestfailed', request => {
-            if (request.url().includes(authNeedle)) events.push({
-              type: 'requestfailed',
-              url: request.url(),
-              method: request.method(),
-              failure: request.failure(),
-            })
+            if (request.url().includes(authNeedle)) events.push({ type: 'requestfailed', url: request.url(), method: request.method(), failure: request.failure() })
           })
           page.on('response', async response => {
-            if (response.url().includes(authNeedle)) events.push({
-              type: 'response',
-              url: response.url(),
-              status: response.status(),
-              headers: safeHeaders(await response.allHeaders()),
-            })
+            if (response.url().includes(authNeedle)) events.push({ type: 'response', url: response.url(), status: response.status(), headers: safeHeaders(await response.allHeaders()) })
           })
           page.on('console', message => events.push({ type: 'console', level: message.type(), text: message.text() }))
           page.on('pageerror', error => events.push({ type: 'pageerror', message: error.message, stack: error.stack }))
@@ -87,13 +70,7 @@ jobs:
             for (const credentials of ['include', 'omit']) {
               try {
                 const response = await fetch(url, { method: 'GET', credentials, headers: { Accept: 'application/json' } })
-                result[credentials] = {
-                  ok: response.ok,
-                  status: response.status,
-                  type: response.type,
-                  url: response.url,
-                  body: await response.text(),
-                }
+                result[credentials] = { ok: response.ok, status: response.status, type: response.type, url: response.url, body: await response.text() }
               } catch (error) {
                 result[credentials] = { error: error instanceof Error ? error.message : String(error) }
               }
@@ -113,6 +90,9 @@ jobs:
           fs.writeFileSync('ny-live-auth-diagnostic/evidence.json', JSON.stringify(evidence, null, 2))
           await page.screenshot({ path: 'ny-live-auth-diagnostic/live-new-york.png', fullPage: true })
           console.log(JSON.stringify(evidence, null, 2))
+          if (evidence.bodyShowsFailedToFetch) throw new Error('New York page still shows Failed to fetch in ordinary browser context')
+          if (Object.values(directFetch).some(result => result.error || result.status !== 200)) throw new Error(`Direct in-page auth fetch failed: ${JSON.stringify(directFetch)}`)
+          if (events.some(event => event.type === 'requestfailed' && event.url?.includes(authNeedle))) throw new Error(`App auth request failed: ${JSON.stringify(events.filter(event => event.type === 'requestfailed'))}`)
           await browser.close()
           EOF
           node ny-auth-probe.mjs
