@@ -45,18 +45,11 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
-      - name: Check out last verified NYC tower snapshot
-        uses: actions/checkout@v4
-        with:
-          ref: data/towersignal-history
-          path: .history-store
-          fetch-depth: 1
-          sparse-checkout: data/history/latest.json
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build bounded ACRIS cache
-        run: python scripts/build_acris_cache.py --tower-snapshot .history-store/data/history/latest.json --output acris-cache/cache.json
+      - name: Build bounded ACRIS cache from current NYC registry
+        run: python scripts/build_acris_cache.py --output acris-cache/cache.json
       - name: Validate cache size, structure and production volume
         run: python scripts/validate_acris_cache.py --cache acris-cache/cache.json --max-age-days 1 --require-production-volume
       - name: Independently verify sampled cache rows against live ACRIS
