@@ -1,0 +1,39 @@
+name: Auth bearer probe
+
+on:
+  push:
+    branches: [agent/auth-bearer-probe-20260904]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe cookie and bearer session modes
+        shell: bash
+        run: |
+          set -euo pipefail
+          AUTH_URL='https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth'
+          EMAIL="towersignal-bearer-probe-${GITHUB_RUN_ID}@example.com"
+          PASSWORD="Probe-${GITHUB_RUN_ID}-Aa9!"
+          SIGNUP=$(curl -fsS -c /tmp/neon-cookies.txt -H 'content-type: application/json' \
+            -d "{\"name\":\"Bearer Probe\",\"email\":\"${EMAIL}\",\"password\":\"${PASSWORD}\"}" \
+            "${AUTH_URL}/sign-up/email")
+          TOKEN=$(printf '%s' "$SIGNUP" | jq -r '.token // empty')
+          test -n "$TOKEN"
+
+          COOKIE_SESSION=$(curl -fsS -b /tmp/neon-cookies.txt "${AUTH_URL}/get-session")
+          COOKIE_USER=$(printf '%s' "$COOKIE_SESSION" | jq -r '.user.id // empty')
+          test -n "$COOKIE_USER"
+          echo 'cookie_session_supported=true'
+
+          BEARER_SESSION=$(curl -fsS -H "Authorization: Bearer ${TOKEN}" "${AUTH_URL}/get-session")
+          BEARER_USER=$(printf '%s' "$BEARER_SESSION" | jq -r '.user.id // empty')
+          if [ -n "$BEARER_USER" ]; then
+            echo 'bearer_session_supported=true'
+          else
+            echo 'bearer_session_supported=false'
+            printf '%s' "$BEARER_SESSION" | jq -c '{has_session:(.session != null),has_user:(.user != null)}'
+          fi
