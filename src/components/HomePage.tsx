@@ -11,6 +11,8 @@ interface HomeSummary {
   generatedAt: string
 }
 
+const logoAsset = `${import.meta.env.BASE_URL}marketing/towersignal-logo.webp`
+
 function go(hash: string) {
   window.location.hash = hash
 }
@@ -42,26 +44,41 @@ export function HomePage({ user }: { user: WorkflowUser }) {
 
   return <main className="portal-page home-portal-page">
     <header className="portal-header">
-      <button className="portal-brand" onClick={() => go('#/home')} aria-label="TowerSignal Home"><span className="auth-brand-mark small">TS</span><strong>TowerSignal</strong></button>
+      <button className="portal-brand" onClick={() => go('#/home')} aria-label="TowerSignal Home"><img src={logoAsset} alt="TowerSignal" /></button>
       <nav aria-label="TowerSignal portal navigation">
         <button className="active" onClick={() => go('#/home')}>Home</button>
         <button onClick={() => go('#/prospect')}>Prospect</button>
+        <button onClick={() => go('#/monitor')}>Monitor</button>
+        <button onClick={() => go('#/map')}>Map</button>
         <button onClick={() => go('#/opportunities')}>Opportunities</button>
         <button onClick={() => go('#/companies')}>Companies</button>
+        <button onClick={() => go('#/portfolios')}>Portfolios</button>
         <button onClick={() => go('#/workflow')}>Workflow</button>
       </nav>
       <button className="portal-account-button" onClick={() => go('#/my-account')}>My account</button>
     </header>
 
     <section className="portal-content">
-      <div className="home-hero">
-        <div>
-          <span className="page-kicker">Authenticated commercial intelligence workspace</span>
-          <h1>Good morning, {firstName}.</h1>
-          <p>Start with the accounts, procurement changes and vendor relationships that deserve commercial attention. Priority Score 1.0 remains the deterministic account-timing signal; no acquisition or Opportunity Score is implied here.</p>
+      <section className="home-hero">
+        <div className="home-hero-copy">
+          <span className="page-kicker">TowerSignal intelligence workspace</span>
+          <h1>Good morning, {firstName}.<em>Find the next action.</em></h1>
+          <p>Start with the buildings, compliance changes, procurement activity and vendor relationships that deserve commercial attention. TowerSignal keeps the evidence attached so your team can move from signal to account context without guessing.</p>
+          <div className="home-hero-actions">
+            <button className="home-primary-action" onClick={() => go('#/prospect')}>Open Prospect workspace <span aria-hidden="true">→</span></button>
+            <button className="home-secondary-action" onClick={() => go('#/monitor')}>Review market changes</button>
+          </div>
         </div>
-        <button className="primary home-primary-action" onClick={() => go('#/prospect')}>Open Prospect workspace</button>
-      </div>
+        <aside className="home-hero-brief" aria-label="TowerSignal intelligence workflow">
+          <small>Authenticated workspace</small>
+          <strong>Evidence → context → action</strong>
+          <div className="home-brief-flow">
+            <span><i>01</i>Find accounts with actionable timing</span>
+            <span><i>02</i>Open the source-backed property evidence</span>
+            <span><i>03</i>Save the next action to private workflow</span>
+          </div>
+        </aside>
+      </section>
 
       {error && <div className="portal-alert" role="alert"><strong>Home summary unavailable</strong><span>{error}</span></div>}
       {!summary && !error && <div className="portal-loading">Loading current TowerSignal summary…</div>}
@@ -72,6 +89,11 @@ export function HomePage({ user }: { user: WorkflowUser }) {
         <article><small>Procurement observations</small><strong>{summary.procurementRecords.toLocaleString()}</strong><span>NYC + statewide NY authority sources</span></article>
         <article><small>Observed vendor companies</small><strong>{summary.observedCompanies.toLocaleString()}</strong><span>Conservative company identities</span></article>
       </div>}
+
+      <div className="home-section-heading">
+        <div><span className="page-kicker">Workspace</span><h2>Move from signal to action.</h2></div>
+        <p>Each workspace keeps the public evidence visible while giving commercial teams a faster path to the account, relationship or opportunity that matters.</p>
+      </div>
 
       <div className="home-workspace-grid">
         <button onClick={() => go('#/prospect')}><span>01</span><strong>Prospect</strong><p>Find accounts with actionable timing and evidence.</p></button>

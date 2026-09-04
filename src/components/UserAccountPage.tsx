@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 
+const logoAsset = `${import.meta.env.BASE_URL}marketing/towersignal-logo.webp`
+
 function go(hash: string) {
   window.location.hash = hash
 }
@@ -27,12 +29,15 @@ export function UserAccountPage({ user, onSignOut }: { user: WorkflowUser; onSig
 
   return <main className="portal-page account-portal-page">
     <header className="portal-header">
-      <button className="portal-brand" onClick={() => go('#/home')} aria-label="TowerSignal Home"><span className="auth-brand-mark small">TS</span><strong>TowerSignal</strong></button>
+      <button className="portal-brand" onClick={() => go('#/home')} aria-label="TowerSignal Home"><img src={logoAsset} alt="TowerSignal" /></button>
       <nav aria-label="TowerSignal portal navigation">
         <button onClick={() => go('#/home')}>Home</button>
         <button onClick={() => go('#/prospect')}>Prospect</button>
+        <button onClick={() => go('#/monitor')}>Monitor</button>
+        <button onClick={() => go('#/map')}>Map</button>
         <button onClick={() => go('#/opportunities')}>Opportunities</button>
         <button onClick={() => go('#/companies')}>Companies</button>
+        <button onClick={() => go('#/portfolios')}>Portfolios</button>
         <button onClick={() => go('#/workflow')}>Workflow</button>
       </nav>
       <button className="portal-account-button active" onClick={() => go('#/my-account')}>My account</button>
