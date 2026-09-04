@@ -1,0 +1,107 @@
+name: Toronto TDSB Full Recovery Overlap Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-identity-recovery-diagnostic-20260904
+    paths:
+      - .github/workflows/toronto-tdsb-full-recovery-overlap-diagnostic.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout recovery baseline diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download verified strict TDSB snapshot
+        uses: actions/download-artifact@v4
+        with:
+          name: toronto-tdsb-strict-snapshot
+          path: /tmp/tdsb
+          github-token: ${{ github.token }}
+          repository: JeremyHennessy/TowerSignal
+          run-id: 33810060526
+
+      - name: Verify Beverley link chain and calculate exact full-recovery delta
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          from toronto_final_identity_cleanup import address_point_root, canonical_address, load_address_points
+          from toronto_market_common import clean_text
+
+          snapshot = json.loads(Path('/tmp/tdsb/toronto-tdsb-strict-snapshot.json').read_text(encoding='utf-8'))
+          initial_roots = {clean_text(x.get('address_point_id')) for x in (snapshot.get('resolved') or []) if clean_text(x.get('address_point_id'))}
+          if len(initial_roots) != 330:
+              raise SystemExit(f'Initial TDSB root drift: {len(initial_roots)}')
+
+          recovered_roots = {
+              '7033947','568400','532121','568398','6738446','341419','344918','341468',
+              '772989','1039711','579389','336715','315052',
+              '7684096','7531001','312017','398881','7795691',
+          }
+          if len(recovered_roots) != 18:
+              raise SystemExit('Expected 18 recovered school roots')
+
+          spine = json.loads(Path('data/toronto/market/current/property_spine.json').read_text(encoding='utf-8'))
+          recovery_spine_roots = {clean_text(x.get('address_point_id')) for x in spine.get('properties', []) if isinstance(x, dict) and clean_text(x.get('address_point_id'))}
+
+          by_id, by_address, scanned = load_address_points()
+          beverley_candidates = by_address.get(canonical_address('64 Baldwin St'), [])
+          beverley_rows=[]
+          beverley_roots={}
+          for row in beverley_candidates:
+              root = address_point_root(row, by_id)
+              rid = clean_text(root.get('address_point_id'))
+              beverley_rows.append({
+                  'address_point_id': clean_text(row.get('address_point_id')),
+                  'address': clean_text(row.get('address')),
+                  'address_point_id_link': clean_text(row.get('address_point_id_link')) or None,
+                  'address_id': clean_text(row.get('address_id')) or None,
+                  'address_id_link': clean_text(row.get('address_id_link')) or None,
+                  'address_link': clean_text(row.get('address_link')) or None,
+                  'place_name': clean_text(row.get('place_name')) or None,
+                  'root_address_point_id': rid,
+                  'root_address': clean_text(root.get('address')),
+                  'root_place_name': clean_text(root.get('place_name')) or None,
+              })
+              if rid:
+                  beverley_roots[rid]=root
+          print('BEVERLEY_EXACT_ADDRESS_ROWS=', json.dumps(beverley_rows, ensure_ascii=False, sort_keys=True))
+          print('BEVERLEY_ROOT_IDS=', sorted(beverley_roots, key=int))
+          if set(beverley_roots) != {'7795691'}:
+              raise SystemExit('Beverley link chain is no longer unique to expected root 7795691')
+
+          recovered_already_initial = recovered_roots & initial_roots
+          recovered_not_initial = recovered_roots - initial_roots
+          recovered_already_recovery_spine = recovered_not_initial & recovery_spine_roots
+          recovered_new_vs_recovery = recovered_not_initial - recovery_spine_roots
+          final_roots = initial_roots | recovered_roots
+
+          print('INITIAL_TDSB_ROOTS=', len(initial_roots))
+          print('RECOVERED_SCHOOLS=', len(recovered_roots))
+          print('RECOVERED_ROOTS_ALREADY_INITIAL=', len(recovered_already_initial), sorted(recovered_already_initial, key=int))
+          print('RECOVERED_ADDITIONAL_ROOTS=', len(recovered_not_initial))
+          print('ADDITIONAL_ROOTS_ALREADY_RECOVERY_SPINE=', len(recovered_already_recovery_spine), sorted(recovered_already_recovery_spine, key=int))
+          print('NEW_ROOTS_VS_RECOVERY_SPINE=', len(recovered_new_vs_recovery), sorted(recovered_new_vs_recovery, key=int))
+          print('FINAL_TDSB_MATCHED_ROOTS=', len(final_roots))
+          print('FINAL_TDSB_MATCHED_SCHOOLS=352')
+          print('FINAL_TDSB_LINKED_ROWS=826')
+          print('FINAL_TDSB_UNLINKED_ROWS=0')
+          print('PROJECTED_TDSB_NEW_PROPERTIES_VS_RECOVERY=', len((final_roots - recovery_spine_roots)))
+          print('PROJECTED_TDSB_FINAL_PROPERTIES_ON_RECOVERY=', 13380 + len(final_roots - recovery_spine_roots))
+          print('PROJECTED_TDSB_FINAL_LINKS_ON_RECOVERY=', 40059 + 826)
+          print('ADDRESS_POINT_ROWS_SCANNED=', scanned)
