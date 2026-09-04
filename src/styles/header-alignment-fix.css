@@ -1,0 +1,34 @@
+/* Keep the authenticated TowerSignal header anchored to one left-hand grid across portal and workspace routes. */
+.portal-header,
+.reference-top-nav {
+  padding-left:20px!important;
+  padding-right:20px!important;
+}
+
+.portal-header {
+  gap:16px!important;
+}
+
+.portal-header nav,
+.reference-top-nav > nav {
+  justify-content:flex-start!important;
+  text-align:left;
+}
+
+.portal-header nav {
+  justify-self:start;
+  width:100%;
+}
+
+.reference-top-nav > nav {
+  margin-left:0!important;
+  margin-right:auto;
+}
+
+@media(max-width:980px){
+  .portal-header,
+  .reference-top-nav {
+    padding-left:16px!important;
+    padding-right:16px!important;
+  }
+}
