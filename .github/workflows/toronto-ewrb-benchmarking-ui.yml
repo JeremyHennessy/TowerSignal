@@ -1,5 +1,6 @@
 name: Toronto EWRB Benchmarking UI
 
+# Verification rerun after hardening duplicate annual-selection assertions.
 on:
   push:
     branches:
@@ -37,11 +38,6 @@ jobs:
           text = text.replace("    {view === 'market' ? explorer : <>\n      {error && <section", "    {view === 'market' ? explorer : <>\n      {view === 'benchmarking' && <TorontoBenchmarkingPage />}\n      {error && view !== 'benchmarking' && <section", 1)
           text = text.replace("      {!error && !payload && <section", "      {view !== 'benchmarking' && !error && !payload && <section", 1)
           path.write_text(text, encoding='utf-8')
-
-          test = Path('tests/frontend/TorontoBenchmarkingPage.test.tsx')
-          text = test.read_text(encoding='utf-8')
-          text = text.replace("await user.click(screen.getByRole('button', { name: '2023' }))", "await user.click(screen.getAllByRole('button', { name: '2023' })[0])", 1)
-          test.write_text(text, encoding='utf-8')
 
           css = Path('src/styles/toronto-parity.css')
           style = css.read_text(encoding='utf-8')
