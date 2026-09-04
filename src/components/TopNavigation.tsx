@@ -76,7 +76,7 @@ export function TopNavigation({
     <nav aria-label="TowerSignal Toronto workspace"><button className="active" onClick={() => onNavigate('toronto')}>Toronto Market</button></nav>
     <div className="reference-nav-tools">
       <ShareButton label="Share" className="global-share-button" />
-      <a className="share-button global-share-button" href={NEW_YORK_APP_URL} target="_blank" rel="noreferrer">New York app ↗</a>
+      <a className="share-button global-share-button" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }} aria-label="Open New York app" href={NEW_YORK_APP_URL} target="_blank" rel="noreferrer">New York ↗</a>
     </div>
   </header>
 
