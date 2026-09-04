@@ -57,6 +57,11 @@ export interface Metadata {
   hpd_requested_bbl_count?: number
   hpd_matched_registration_bbl_count?: number
   hpd_matched_contact_bbl_count?: number
+  planimetric_requested_bin_count?: number
+  planimetric_matched_bin_count?: number
+  planimetric_matched_feature_count?: number
+  planimetric_match_basis?: 'BIN_EXACT'
+  planimetric_imagery_year?: number
   rules_version: string
   priority_model_version: string
 }
@@ -102,6 +107,8 @@ export interface SystemSummary {
   dob_mechanical_or_boiler_count?: number
   latest_dob_activity_date?: string | null
   hpd_contact_count?: number
+  planimetric_bin_match?: boolean
+  planimetric_building_tower_count?: number
 }
 
 export interface SystemsPayload {
@@ -119,6 +126,7 @@ export interface SystemsPayload {
     systems_with_explicit_cooling_tower_dob_activity?: number
     systems_with_hpd_registration?: number
     systems_with_hpd_contacts?: number
+    systems_with_planimetric_bin_match?: number
   }
   systems: SystemSummary[]
 }
@@ -247,6 +255,23 @@ export interface HpdRegistrationContext {
   source: 'NYC_HPD_MULTIPLE_DWELLING_REGISTRATION'
 }
 
+export type PlanimetricGeometry =
+  | { type: 'Polygon'; coordinates: number[][][] }
+  | { type: 'MultiPolygon'; coordinates: number[][][][] }
+
+export interface PlanimetricBuildingTowerFeature {
+  source_id: string | null
+  global_id: string | null
+  bin: string
+  feature_code: string | null
+  sub_feature_code: string | null
+  status: string | null
+  geometry: PlanimetricGeometry
+  source: 'NYC_OTI_PLANIMETRICS_COOLING_TOWERS'
+  match_basis: 'BIN_EXACT'
+  imagery_year: 2022
+}
+
 export interface HistoricalProfile {
   registration_date: string | null
   registration_age_days: number | null
@@ -286,6 +311,7 @@ export interface SystemDetail {
   building_context?: BuildingContext | null
   dob_activity_history?: DobActivity[]
   hpd_registration?: HpdRegistrationContext | null
+  planimetric_building_tower_features?: PlanimetricBuildingTowerFeature[]
   sample_history: {
     source_raw: string
     dates: string[]
