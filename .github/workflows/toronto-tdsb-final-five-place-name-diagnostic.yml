@@ -1,0 +1,75 @@
+name: Toronto TDSB Final Five Place Name Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-identity-recovery-diagnostic-20260904
+    paths:
+      - .github/workflows/toronto-tdsb-final-five-place-name-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout recovery baseline diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve only unique exact City place-name matches
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          import re
+          from collections import defaultdict
+          from toronto_final_identity_cleanup import address_point_root, load_address_points
+          from toronto_market_common import clean_text
+
+          remaining = {
+              '3223': ('Park Lane Public School', '60 Park Lane Cir, North York, ON, M3C 2N2'),
+              '4120': ('Albert Campbell Collegiate Institute', '1550 Sandhurst Cir, Scarborough, ON, M1V 1S6'),
+              '4226': ("L'Amoreaux Collegiate Institute", '2501 Bridletowne Cir, Scarborough, ON, M1W 2K1'),
+              '4608': ('Joseph Howe Senior Public School', '20Winter Gardens Trail, Scarborough, ON, M1C 3E7'),
+              '5313': ('Beverley School', '64Baldwin St, Toronto, ON, M5T 1L4'),
+          }
+          def namekey(value):
+              return re.sub(r'[^A-Z0-9]+','',clean_text(value).upper())
+
+          by_id, _, scanned = load_address_points()
+          roots_by_name = defaultdict(dict)
+          for row in by_id.values():
+              root = address_point_root(row, by_id)
+              rid = clean_text(root.get('address_point_id'))
+              pname = clean_text(root.get('place_name'))
+              if rid and pname:
+                  roots_by_name[namekey(pname)][rid] = {
+                      'root_id': rid,
+                      'address': clean_text(root.get('address')),
+                      'place_name': pname,
+                      'municipality_name': clean_text(root.get('municipality_name')),
+                  }
+
+          recovered=[]
+          withheld=[]
+          for sid,(name,published) in remaining.items():
+              roots=roots_by_name.get(namekey(name),{})
+              item={'school_id':sid,'school_name':name,'published_address':published,'exact_place_name_root_count':len(roots),'roots':sorted(roots.values(), key=lambda x:int(x['root_id']))}
+              if len(roots)==1:
+                  recovered.append(item)
+                  print('EXACT_PLACE_NAME_RECOVERY=',json.dumps(item,ensure_ascii=False,sort_keys=True))
+              else:
+                  withheld.append(item)
+                  print('STILL_WITHHELD=',json.dumps(item,ensure_ascii=False,sort_keys=True))
+          print('ADDRESS_POINT_ROWS_SCANNED=',scanned)
+          print('FINAL_FIVE_INPUT=',len(remaining))
+          print('UNIQUE_EXACT_PLACE_NAME_RECOVERIES=',len(recovered))
+          print('STILL_WITHHELD=',len(withheld))
