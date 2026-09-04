@@ -24,11 +24,19 @@ jobs:
           cat get-headers.txt || true
           head -c 2000 get-body.txt || true
           echo
+          echo '=== GET WITH BROWSER ORIGIN ==='
+          curl -sS -D origin-get-headers.txt -o origin-get-body.txt -w 'status=%{http_code}\nremote_ip=%{remote_ip}\n' --max-time 30 \
+            -H 'Origin: https://jeremyhennessy.github.io' \
+            -H 'Accept: application/json' \
+            "$AUTH" || true
+          cat origin-get-headers.txt || true
+          head -c 2000 origin-get-body.txt || true
+          echo
           echo '=== OPTIONS CORS PREFLIGHT ==='
           curl -sS -X OPTIONS -D options-headers.txt -o options-body.txt -w 'status=%{http_code}\nremote_ip=%{remote_ip}\n' --max-time 30 \
             -H 'Origin: https://jeremyhennessy.github.io' \
             -H 'Access-Control-Request-Method: GET' \
-            -H 'Access-Control-Request-Headers: content-type' \
+            -H 'Access-Control-Request-Headers: content-type,x-neon-client-info' \
             "$AUTH" || true
           cat options-headers.txt || true
           head -c 2000 options-body.txt || true
@@ -42,6 +50,8 @@ jobs:
           path: |
             get-headers.txt
             get-body.txt
+            origin-get-headers.txt
+            origin-get-body.txt
             options-headers.txt
             options-body.txt
           if-no-files-found: warn
