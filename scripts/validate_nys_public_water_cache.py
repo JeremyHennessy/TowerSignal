@@ -98,7 +98,9 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
             "pws_system_count": 8000,
             "pws_contact_record_count": 8000,
             "certified_operator_count": 1000,
-            "lsli_required_system_count": 3000,
+            # Current authoritative NYSDOH LSLI index contains 2,927 systems.
+            # Keep a meaningful fail-closed floor while allowing the live source count.
+            "lsli_required_system_count": 2500,
             "violation_count_2025": 8000,
         }
         for key, minimum in floors.items():
