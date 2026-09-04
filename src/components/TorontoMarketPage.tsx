@@ -75,10 +75,20 @@ export interface TorontoSourceFilters {
   healthStatus: string
   environmentalRecord: string
   company: string
+  permitSignal: string
+  permitStatus: string
+  permitLifecycle: string
+  permitInterpretation: string
 }
 
 function sourceDetailValue(link: TorontoSourceLink, label: string): string {
   return link.record_details.find(detail => detail.label === label)?.value ?? ''
+}
+
+const permitSourceKeys = new Set(['toronto_building_permits_active_targeted', 'toronto_building_permits_cleared_targeted_since_2017'])
+
+function permitSignalValues(link: TorontoSourceLink): string[] {
+  return sourceDetailValue(link, 'Mechanical signals').split(',').map(value => value.trim()).filter(Boolean)
 }
 
 export function propertyMatchesTorontoSourceFilters(property: TorontoProperty, filters: TorontoSourceFilters): boolean {
@@ -86,12 +96,17 @@ export function propertyMatchesTorontoSourceFilters(property: TorontoProperty, f
   const aic = property.source_links.filter(link => link.source_key === 'toronto_aic_applications')
   const health = property.source_links.filter(link => link.source_key === 'toronto_highrise_residential_health_hazards')
   const environmental = property.source_links.filter(link => link.source_key === 'ontario_environmental_compliance_reports')
+  const permits = property.source_links.filter(link => permitSourceKeys.has(link.source_key))
   if (filters.chemical && !chemtrac.some(link => sourceDetailValue(link, 'Chemical') === filters.chemical)) return false
   if (filters.reportingYear && !chemtrac.some(link => link.record_date?.startsWith(filters.reportingYear))) return false
   if (filters.aicApplication && !aic.some(link => `${link.record_title ?? ''} ${link.source_record_id}`.toLowerCase().includes(filters.aicApplication.toLowerCase()))) return false
   if (filters.aicStatus && !aic.some(link => link.record_status === filters.aicStatus)) return false
   if (filters.healthStatus && !health.some(link => link.record_status === filters.healthStatus)) return false
   if (filters.environmentalRecord && !environmental.some(link => [link.source_record_id, link.record_title, ...link.record_details.map(detail => detail.value)].join(' ').toLowerCase().includes(filters.environmentalRecord.toLowerCase()))) return false
+  if (filters.permitSignal && !permits.some(link => permitSignalValues(link).includes(filters.permitSignal))) return false
+  if (filters.permitStatus && !permits.some(link => link.record_status === filters.permitStatus)) return false
+  if (filters.permitLifecycle && !permits.some(link => sourceDetailValue(link, 'Cooling tower lifecycle') === filters.permitLifecycle)) return false
+  if (filters.permitInterpretation && !permits.some(link => sourceDetailValue(link, 'Cooling tower current interpretation') === filters.permitInterpretation)) return false
   if (filters.company) {
     const term = filters.company.toLowerCase()
     const relationshipMatch = property.relationships.some(item => item.organization.toLowerCase().includes(term))
@@ -171,7 +186,7 @@ export function TorontoMarketPage() {
   const [source, setSource] = useState('')
   const [relationship, setRelationship] = useState('')
   const [scope, setScope] = useState<'all' | 'poc' | 'expanded'>('all')
-  const [sourceFilters, setSourceFilters] = useState<TorontoSourceFilters>({ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '' })
+  const [sourceFilters, setSourceFilters] = useState<TorontoSourceFilters>({ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '', permitSignal: '', permitStatus: '', permitLifecycle: '', permitInterpretation: '' })
   const [view, setView] = useState<'table' | 'map'>('table')
   const [selected, setSelected] = useState<TorontoProperty | null>(null)
 
@@ -195,14 +210,19 @@ export function TorontoMarketPage() {
   const sources = useMemo(() => payload ? [...new Set(payload.properties.flatMap(property => property.source_keys))].sort() : [], [payload])
   const relationships = useMemo(() => payload ? [...new Set(payload.properties.flatMap(property => property.relationships.map(item => item.relationship)))].sort() : [], [payload])
   const sourceFilterOptions = useMemo(() => {
-    if (!payload) return { chemicals: [], reportingYears: [], aicStatuses: [], healthStatuses: [] }
+    if (!payload) return { chemicals: [], reportingYears: [], aicStatuses: [], healthStatuses: [], permitSignals: [], permitStatuses: [], permitLifecycles: [], permitInterpretations: [] }
     const links = payload.properties.flatMap(property => property.source_links)
     const chemtrac = links.filter(link => link.source_key === 'chemtrac_history' || link.source_key === 'chemtrac_2024')
+    const permits = links.filter(link => permitSourceKeys.has(link.source_key))
     return {
       chemicals: [...new Set(chemtrac.map(link => sourceDetailValue(link, 'Chemical')).filter(Boolean))].sort(),
       reportingYears: [...new Set(chemtrac.map(link => link.record_date?.match(/^\d{4}/)?.[0]).filter((year): year is string => Boolean(year)))].sort().reverse(),
       aicStatuses: [...new Set(links.filter(link => link.source_key === 'toronto_aic_applications').map(link => link.record_status).filter((status): status is string => Boolean(status)))].sort(),
       healthStatuses: [...new Set(links.filter(link => link.source_key === 'toronto_highrise_residential_health_hazards').map(link => link.record_status).filter((status): status is string => Boolean(status)))].sort(),
+      permitSignals: [...new Set(permits.flatMap(permitSignalValues))].sort(),
+      permitStatuses: [...new Set(permits.map(link => link.record_status).filter((status): status is string => Boolean(status)))].sort(),
+      permitLifecycles: [...new Set(permits.map(link => sourceDetailValue(link, 'Cooling tower lifecycle')).filter(Boolean))].sort(),
+      permitInterpretations: [...new Set(permits.map(link => sourceDetailValue(link, 'Cooling tower current interpretation')).filter(Boolean))].sort(),
     }
   }, [payload])
   const searchIndex = useMemo(() => payload ? new Map(payload.properties.map(property => [property.property_id, buildTorontoPropertySearchText(property)])) : new Map<string, string>(), [payload])
@@ -252,7 +272,11 @@ export function TorontoMarketPage() {
       <label><span>Health status</span><select value={sourceFilters.healthStatus} onChange={event => setSourceFilters(current => ({ ...current, healthStatus: event.target.value }))}><option value="">All health statuses</option>{sourceFilterOptions.healthStatuses.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
       <label><span>Environmental record</span><input value={sourceFilters.environmentalRecord} onChange={event => setSourceFilters(current => ({ ...current, environmentalRecord: event.target.value }))} placeholder="Facility, contaminant or record ID" /></label>
       <label><span>Company</span><input value={sourceFilters.company} onChange={event => setSourceFilters(current => ({ ...current, company: event.target.value }))} placeholder="Company or organization" /></label>
-      <button onClick={() => setSourceFilters({ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '' })}>Clear source filters</button>
+      <label><span>Permit signal</span><select value={sourceFilters.permitSignal} onChange={event => setSourceFilters(current => ({ ...current, permitSignal: event.target.value }))}><option value="">All permit signals</option>{sourceFilterOptions.permitSignals.map(value => <option key={value} value={value}>{humanize(value)}</option>)}</select></label>
+      <label><span>Permit status</span><select value={sourceFilters.permitStatus} onChange={event => setSourceFilters(current => ({ ...current, permitStatus: event.target.value }))}><option value="">All permit statuses</option>{sourceFilterOptions.permitStatuses.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+      <label><span>Cooling tower lifecycle</span><select value={sourceFilters.permitLifecycle} onChange={event => setSourceFilters(current => ({ ...current, permitLifecycle: event.target.value }))}><option value="">All cooling tower lifecycle states</option>{sourceFilterOptions.permitLifecycles.map(value => <option key={value} value={value}>{humanize(value)}</option>)}</select></label>
+      <label><span>Cooling tower interpretation</span><select value={sourceFilters.permitInterpretation} onChange={event => setSourceFilters(current => ({ ...current, permitInterpretation: event.target.value }))}><option value="">All current interpretations</option>{sourceFilterOptions.permitInterpretations.map(value => <option key={value} value={value}>{humanize(value)}</option>)}</select></label>
+      <button onClick={() => setSourceFilters({ chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '', permitSignal: '', permitStatus: '', permitLifecycle: '', permitInterpretation: '' })}>Clear source filters</button>
     </div></details>
     <div className="toronto-result-heading"><strong>{filtered.length.toLocaleString()} matching properties</strong><span>All links use deterministic municipal identity.</span></div>
     {view === 'map' ? <TorontoMarketMap properties={filtered} selectedId={selected?.property_id ?? null} onSelect={openProperty} /> : <div className="toronto-table-wrap"><table className="toronto-table"><thead><tr><th>Property</th><th>Tower evidence</th><th>Sources</th><th>Relationships</th><th>Identity</th></tr></thead><tbody>{filtered.slice(0, 500).map(property => <tr key={property.property_id} onClick={() => openProperty(property)}><td><button>{property.display_address}</button><small>{property.address_point_id}</small></td><td><span className={`toronto-evidence-badge status-${property.tower_evidence_status.toLowerCase()}`}>{evidenceLabels[property.tower_evidence_status]}</span></td><td>{property.source_keys.length}</td><td>{property.relationships.length}</td><td>{property.identity_confidence || 'Deterministic'}</td></tr>)}</tbody></table>{filtered.length > 500 && <p className="toronto-table-limit">Showing the first 500 matching properties. Refine the filters or export the full result set.</p>}</div>}

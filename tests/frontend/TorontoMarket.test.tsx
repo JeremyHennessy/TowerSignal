@@ -159,9 +159,28 @@ test('matches health and environmental source filters without changing tower evi
       { source_key: 'ontario_environmental_compliance_reports', source_record_id: 'environment:42', match_basis: 'EXACT_ADDRESS', source_address: '30 Gamma Rd', record_url: null, record_link_label: null, record_title: 'Gamma Plant', record_date: '2024-01-01', record_status: 'Assessment Underway', record_details: [{ label: 'Contaminant', value: 'Temperature' }] },
     ], relationships: [], aerial_review_rank: null, aerial_visual_similarity_score: null,
   }
-  const empty = { chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '' }
+  const empty = { chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '', permitSignal: '', permitStatus: '', permitLifecycle: '', permitInterpretation: '' }
   expect(propertyMatchesTorontoSourceFilters(property, { ...empty, healthStatus: 'Closed' })).toBe(true)
   expect(propertyMatchesTorontoSourceFilters(property, { ...empty, environmentalRecord: 'environment:42' })).toBe(true)
+  expect(property.tower_evidence_status).toBe('NO_TOWER_ASSERTION')
+})
+
+test('filters permit records by signal status lifecycle and current interpretation without promoting tower evidence', () => {
+  const property = {
+    property_id: 'toronto-address-point:400', address_point_id: '400', display_address: '40 College St', municipality: 'Toronto', longitude: -79.38, latitude: 43.66, identity_basis: 'CURRENT_ID', identity_confidence: 'HIGH', is_original_poc_property: false, tower_evidence_status: 'NO_TOWER_ASSERTION' as const, source_keys: ['toronto_building_permits_active_targeted'], source_links: [
+      { source_key: 'toronto_building_permits_active_targeted', source_record_id: 'permit:1', match_basis: 'EXACT_ADDRESS', source_address: '40 College St', record_url: null, record_link_label: null, record_title: '26 100000 MSA · revision 00', record_date: '2026-08-01', record_status: 'Permit Issued', record_details: [
+        { label: 'Mechanical signals', value: 'chiller, cooling tower' },
+        { label: 'Cooling tower lifecycle', value: 'REPLACE_COOLING_TOWER' },
+        { label: 'Cooling tower current interpretation', value: 'ACTIVE_EXISTING_AND_REPLACEMENT_TOWER_SIGNAL' },
+      ] },
+    ], relationships: [], aerial_review_rank: null, aerial_visual_similarity_score: null,
+  }
+  const empty = { chemical: '', reportingYear: '', aicApplication: '', aicStatus: '', healthStatus: '', environmentalRecord: '', company: '', permitSignal: '', permitStatus: '', permitLifecycle: '', permitInterpretation: '' }
+  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitSignal: 'cooling tower' })).toBe(true)
+  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitSignal: 'boiler' })).toBe(false)
+  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitStatus: 'Permit Issued' })).toBe(true)
+  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitLifecycle: 'REPLACE_COOLING_TOWER' })).toBe(true)
+  expect(propertyMatchesTorontoSourceFilters(property, { ...empty, permitInterpretation: 'ACTIVE_EXISTING_AND_REPLACEMENT_TOWER_SIGNAL' })).toBe(true)
   expect(property.tower_evidence_status).toBe('NO_TOWER_ASSERTION')
 })
 
