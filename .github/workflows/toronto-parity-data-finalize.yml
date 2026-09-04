@@ -52,8 +52,16 @@ jobs:
               ('("toronto_building_permits_cleared_targeted_since_2017.json", 721, 704)', '("toronto_building_permits_cleared_targeted_since_2017.json", 721, 719)'),
               ('self.assertEqual(len(spine["properties"]), 13371)', 'self.assertEqual(len(spine["properties"]), 13380)'),
               ('self.assertEqual(len(permit_links), 1244)', 'self.assertEqual(len(permit_links), 1291)'),
+              ('self.assertEqual(len(graph.get("edges", [])), 6343)', 'self.assertEqual(len(graph.get("edges", [])), 6344)'),
           ]:
               replace_once(permit_test, old, new)
+
+          recovery_test = 'tests/python/test_toronto_building_permit_recovery.py'
+          replace_once(
+              recovery_test,
+              '        self.assertEqual(permit_edges, [])\n        self.assertEqual(len(graph.get("edges", [])), 6343)',
+              '        self.assertEqual(permit_edges, [])\n        new_property_edges = [edge for edge in graph.get("edges", []) if edge.get("property_id") in new_ids]\n        self.assertEqual(new_property_edges, [])\n        self.assertEqual(len(graph.get("edges", [])), 6344)',
+          )
 
           tobids_script = 'scripts/apply_toronto_tobids_relationships.py'
           for old, new in [
@@ -129,6 +137,9 @@ jobs:
           assert len(bidder_edges) == 18
           forty = [x for x in bidder_edges if x.get('property_id') == 'toronto-address-point:7762664' and (x.get('evidence') or {}).get('document_number') == '3704322859']
           assert len(forty) == 1, forty
+          permit_recovery_ids = set(recovery['new_property_ids'])
+          assert 'toronto-address-point:7762664' not in permit_recovery_ids
+          assert not any(edge.get('property_id') in permit_recovery_ids for edge in graph['edges'])
           assert not any(x.get('source_key') == 'tobids_awarded_contracts' and x.get('relationship') != 'SUCCESSFUL_BIDDER_AT_PROPERTY' for x in graph['edges'])
           assert app['counts']['canonical_properties'] == 13380, app['counts']
           assert app['counts']['source_links'] == 40060, app['counts']
@@ -172,6 +183,7 @@ jobs:
           git add \
             scripts/apply_toronto_tobids_relationships.py \
             tests/python/test_toronto_building_permit_apply.py \
+            tests/python/test_toronto_building_permit_recovery.py \
             tests/python/test_toronto_tobids_legacy_provenance.py \
             data/toronto/market/current/property_source_links.json \
             data/toronto/market/current/entity_graph.json \
