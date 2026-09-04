@@ -1,0 +1,53 @@
+name: Toronto Commercial Permit Filter Transplant
+
+on:
+  push:
+    branches:
+      - agent/toronto-commercial-integration-20260904
+    paths:
+      - .github/workflows/toronto-commercial-permit-filter-transplant.yml
+
+permissions:
+  contents: write
+
+jobs:
+  transplant-verify-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout commercial integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-commercial-integration-20260904
+          fetch-depth: 0
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Transplant only already-verified permit filter feature files
+        run: |
+          git checkout 6dac590827eae489f4eb89e085f97338a2aea29e -- src/components/TorontoMarketPage.tsx tests/frontend/TorontoMarket.test.tsx
+          test -z "$(git diff --name-only -- src/styles)" || { echo 'Permit filter transplant changed styles'; exit 1; }
+          git diff --name-only
+
+      - name: Reverify transplanted feature on recovery data
+        run: |
+          npm run lint
+          npm run typecheck
+          npm exec vitest run -- tests/frontend/TorontoMarket.test.tsx
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm exec vite build -- --base=/ --outDir=dist-commercial-permit-filter
+
+      - name: Persist only feature files and remove one-off workflow
+        run: |
+          git config user.name "TowerSignal UI Bot"
+          git config user.email "towersignal-ui@users.noreply.github.com"
+          git rm .github/workflows/toronto-commercial-permit-filter-transplant.yml
+          git add src/components/TorontoMarketPage.tsx tests/frontend/TorontoMarket.test.tsx
+          git commit -m "Toronto: carry verified permit filters onto recovery base"
+          git push origin HEAD:agent/toronto-commercial-integration-20260904
+          echo "TORONTO_COMMERCIAL_PERMIT_FILTER_SHA=$(git rev-parse HEAD)"
