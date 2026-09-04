@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
-from towersignal.planimetrics import fetch_planimetric_towers_by_bin  # noqa: E402
+from towersignal.planimetrics import fetch_planimetric_towers_by_bin, normalize_bin  # noqa: E402
 
 REGISTRATION_ID = "y4fw-iqfr"
 
@@ -19,7 +19,7 @@ REGISTRATION_ID = "y4fw-iqfr"
 def verify(output: Path) -> dict:
     registration_snapshot = fetch_dataset(REGISTRATION_ID, "system_id")
     systems, _ = normalize_registrations(registration_snapshot.rows)
-    requested_bins = sorted({str(system["bin"]) for system in systems if system.get("bin")}, key=int)
+    requested_bins = sorted({value for system in systems if (value := normalize_bin(system.get("bin")))}, key=int)
     by_bin, metadata = fetch_planimetric_towers_by_bin(requested_bins)
 
     if not requested_bins:
@@ -35,7 +35,8 @@ def verify(output: Path) -> dict:
     matched_system_count = 0
 
     for system in systems:
-        if system.get("bin") and str(system["bin"]) in by_bin:
+        bin_value = normalize_bin(system.get("bin"))
+        if bin_value and bin_value in by_bin:
             matched_system_count += 1
 
     for bin_value, features in by_bin.items():
