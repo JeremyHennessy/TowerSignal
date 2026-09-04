@@ -61,6 +61,7 @@ export interface Metadata {
   planimetric_matched_bin_count?: number
   planimetric_matched_feature_count?: number
   planimetric_match_basis?: 'BIN_EXACT'
+  planimetric_feature_identity_basis?: 'GLOBALID'
   planimetric_imagery_year?: number
   rules_version: string
   priority_model_version: string
@@ -261,7 +262,7 @@ export type PlanimetricGeometry =
 
 export interface PlanimetricBuildingTowerFeature {
   source_id: string | null
-  global_id: string | null
+  global_id: string
   bin: string
   feature_code: string | null
   sub_feature_code: string | null
@@ -269,6 +270,7 @@ export interface PlanimetricBuildingTowerFeature {
   geometry: PlanimetricGeometry
   source: 'NYC_OTI_PLANIMETRICS_COOLING_TOWERS'
   match_basis: 'BIN_EXACT'
+  feature_identity_basis: 'GLOBALID'
   imagery_year: 2022
 }
 
