@@ -1,0 +1,47 @@
+name: NY Auth Endpoint Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/ny-auth-diagnostic-20260904
+    paths:
+      - ".github/workflows/ny-auth-diagnostic.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe Neon auth endpoint
+        run: |
+          set -o pipefail
+          AUTH='https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth/get-session'
+          echo '=== GET ==='
+          curl -sS -D get-headers.txt -o get-body.txt -w 'status=%{http_code}\nremote_ip=%{remote_ip}\n' --max-time 30 "$AUTH" || true
+          cat get-headers.txt || true
+          head -c 2000 get-body.txt || true
+          echo
+          echo '=== OPTIONS CORS PREFLIGHT ==='
+          curl -sS -X OPTIONS -D options-headers.txt -o options-body.txt -w 'status=%{http_code}\nremote_ip=%{remote_ip}\n' --max-time 30 \
+            -H 'Origin: https://jeremyhennessy.github.io' \
+            -H 'Access-Control-Request-Method: GET' \
+            -H 'Access-Control-Request-Headers: content-type' \
+            "$AUTH" || true
+          cat options-headers.txt || true
+          head -c 2000 options-body.txt || true
+          echo
+
+      - name: Upload probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ny-auth-endpoint-diagnostic
+          path: |
+            get-headers.txt
+            get-body.txt
+            options-headers.txt
+            options-body.txt
+          if-no-files-found: warn
