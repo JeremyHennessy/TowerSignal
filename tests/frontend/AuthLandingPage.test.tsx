@@ -18,7 +18,7 @@ test('signed-out root renders the marketing page with login in the top navigatio
   render(<AuthLandingPage onSignIn={vi.fn().mockResolvedValue(user)} onSignUp={vi.fn().mockResolvedValue(user)} />)
 
   expect(screen.getByRole('heading', { name: /Know which accounts matter/i })).toBeVisible()
-  expect(screen.getByRole('button', { name: 'Log in' })).toBeVisible()
+  expect(screen.getAllByRole('button', { name: 'Log in' })[0]).toBeVisible()
   expect(screen.queryByRole('heading', { name: 'Sign in to TowerSignal' })).toBeNull()
 })
 
@@ -26,7 +26,7 @@ test('login button opens the existing authentication contract', async () => {
   const events = userEvent.setup()
   render(<AuthLandingPage onSignIn={vi.fn().mockResolvedValue(user)} onSignUp={vi.fn().mockResolvedValue(user)} />)
 
-  await events.click(screen.getByRole('button', { name: 'Log in' }))
+  await events.click(screen.getAllByRole('button', { name: 'Log in' })[0])
 
   expect(screen.getByRole('heading', { name: 'Sign in to TowerSignal' })).toBeVisible()
   expect(screen.getByLabelText('Email')).toBeVisible()
