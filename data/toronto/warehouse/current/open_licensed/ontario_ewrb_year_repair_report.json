@@ -1,0 +1,10 @@
+{
+  "status": "PASSED",
+  "contract": "Resource name reporting year takes precedence over later publication/update years in descriptions or URLs.",
+  "repaired_resource_name": "2022",
+  "repaired_toronto_rows": 2445,
+  "repaired_resources": 1,
+  "property_identity_effect": "NONE",
+  "tower_evidence_effect": "NONE",
+  "relationship_effect": "NONE"
+}
