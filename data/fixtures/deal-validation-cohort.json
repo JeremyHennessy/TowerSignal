@@ -1,10 +1,12 @@
 {
   "schema_version": "1.0",
   "curated_as_of": "2026-08-27",
-  "methodology_note": "Acquisition outcomes and exact aliases are curated from cited primary company/acquirer announcements. Alias matching in the validation is exact after case/punctuation normalization with legal suffixes preserved; no fuzzy entity resolution is permitted.",
+  "methodology_note": "Acquisition outcomes and exact aliases are curated from cited primary company/acquirer announcements. Alias matching in the validation is exact after case/punctuation normalization with legal suffixes preserved; explicit source-declared DBA aliases may also match exactly; no fuzzy entity resolution is permitted.",
   "validation_gate": {
     "min_observed_outcome_targets": 3,
-    "min_screened_outcome_targets": 2
+    "min_screened_outcome_targets": 2,
+    "score_authorization_locked": true,
+    "score_authorization_lock_reason": "Build 016H revised identity/source methodology after inspection of the known acquisition cohort. Coverage thresholds may continue to be measured, but Opportunity Score 2.0 and deal-driven Home require an independent pre-specified holdout or expanded validation cohort before authorization."
   },
   "screen_experiment": {
     "anchor_target_id": "barclay_2024",
