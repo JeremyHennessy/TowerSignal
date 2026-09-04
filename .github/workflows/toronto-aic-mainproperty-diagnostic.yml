@@ -29,24 +29,36 @@ jobs:
           import json
           from collections import defaultdict, Counter
           from pathlib import Path
-          from toronto_source_identity import stable_source_record_id
+          from toronto_source_identity import find_source_record, stable_source_record_id
 
+          source_key = 'toronto_aic_applications'
           market = Path('data/toronto/market/current')
           payload = json.loads((market / 'open_licensed/toronto_aic_applications.json').read_text(encoding='utf-8'))
           rows = [r for r in payload.get('applications', []) if isinstance(r, dict)]
           links_payload = json.loads((market / 'property_source_links.json').read_text(encoding='utf-8'))
-          links = [l for l in links_payload.get('links', []) if isinstance(l, dict) and l.get('source_key') == 'toronto_aic_applications']
-          by_source_id = {l.get('source_record_id'): l.get('property_id') for l in links if l.get('source_record_id') and l.get('property_id')}
+          links = [l for l in links_payload.get('links', []) if isinstance(l, dict) and l.get('source_key') == source_key]
+
+          by_stable_id = {}
+          unresolved_existing_links = []
+          for link in links:
+              record = find_source_record(source_key, str(link.get('source_record_id') or ''), rows)
+              if not record:
+                  unresolved_existing_links.append(link)
+                  continue
+              sid = stable_source_record_id(source_key, record)
+              pid = str(link.get('property_id') or '').strip()
+              existing = by_stable_id.get(sid)
+              if existing and existing != pid:
+                  raise SystemExit(f'Existing AIC row resolves to conflicting properties: {sid}: {existing} vs {pid}')
+              by_stable_id[sid] = pid
 
           main_to_properties = defaultdict(set)
           propertyrsn_to_properties = defaultdict(set)
-          linked_rows = 0
-          for row in rows:
-              sid = stable_source_record_id('toronto_aic_applications', row)
-              pid = by_source_id.get(sid)
-              if not pid:
-                  continue
-              linked_rows += 1
+          row_by_stable_id = {stable_source_record_id(source_key, row): row for row in rows}
+          for sid, pid in by_stable_id.items():
+              row = row_by_stable_id.get(sid)
+              if not row:
+                  raise SystemExit(f'Resolved stable AIC id missing from current source rows: {sid}')
               main = str(row.get('MAINPROPERTYRSN') or '').strip()
               prop = str(row.get('PROPERTYRSN') or '').strip()
               if main:
@@ -57,13 +69,11 @@ jobs:
           candidates = []
           ambiguous_identifier_rows = []
           no_identifier_rows = 0
-          already_linked = 0
           basis_counts = Counter()
           property_ids = set()
           for index, row in enumerate(rows):
-              sid = stable_source_record_id('toronto_aic_applications', row)
-              if sid in by_source_id:
-                  already_linked += 1
+              sid = stable_source_record_id(source_key, row)
+              if sid in by_stable_id:
                   continue
               main = str(row.get('MAINPROPERTYRSN') or '').strip()
               prop = str(row.get('PROPERTYRSN') or '').strip()
@@ -107,9 +117,10 @@ jobs:
 
           report = {
               'source_records': len(rows),
-              'existing_linked_rows_recomputed': linked_rows,
               'existing_source_links': len(links),
-              'unlinked_rows': len(rows) - already_linked,
+              'existing_links_resolved_to_publisher_rows': len(by_stable_id),
+              'existing_links_unresolved': len(unresolved_existing_links),
+              'unlinked_rows': len(rows) - len(by_stable_id),
               'unique_mainproperty_identifiers_from_linked_rows': sum(len(v) == 1 for v in main_to_properties.values()),
               'ambiguous_mainproperty_identifiers': sum(len(v) > 1 for v in main_to_properties.values()),
               'unique_propertyrsn_identifiers_from_linked_rows': sum(len(v) == 1 for v in propertyrsn_to_properties.values()),
@@ -121,12 +132,13 @@ jobs:
               'unlinked_rows_without_city_property_identifier': no_identifier_rows,
               'sample_candidates': candidates[:25],
               'sample_ambiguous': ambiguous_identifier_rows[:25],
-              'contract': 'A City property identifier may propagate identity only when that identifier is already observed on one or more exactly-address-linked AIC rows and maps to exactly one canonical Toronto property. Conflicting or multi-property identifiers are withheld. No tower or relationship assertion is created.',
+              'contract': 'A City property identifier may propagate identity only when that identifier is already observed on one or more existing deterministically linked AIC publisher rows and maps to exactly one canonical Toronto property. Conflicting or multi-property identifiers are withheld. No tower or relationship assertion is created.',
           }
           Path('/tmp/aic-mainproperty-diagnostic.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
           print(json.dumps(report, indent=2))
-          assert report['existing_linked_rows_recomputed'] == 11225, report
-          assert report['deterministically_recoverable_unlinked_rows'] >= 0
+          assert report['existing_source_links'] == 11225, report
+          assert report['existing_links_resolved_to_publisher_rows'] == 11225, report
+          assert report['existing_links_unresolved'] == 0, report
           PY
       - name: Upload diagnostic
         uses: actions/upload-artifact@v4
