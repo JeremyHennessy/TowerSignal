@@ -23,10 +23,10 @@ function formatFeet(value: number | null) {
 
 export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
   const container = useRef<HTMLDivElement | null>(null)
-  const features = detail.planimetric_building_tower_features ?? []
-  const buildingFootprints = detail.building_footprints ?? []
-  const featureCount = features.length
-  const footprintCount = buildingFootprints.length
+  const features = detail.planimetric_building_tower_features
+  const buildingFootprints = detail.building_footprints
+  const featureCount = features?.length ?? 0
+  const footprintCount = buildingFootprints?.length ?? 0
   const hasRoofMapContext = featureCount > 0 || footprintCount > 0
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
 
     const bounds = L.latLngBounds([])
 
-    buildingFootprints.forEach((footprint, index) => {
+    buildingFootprints?.forEach((footprint, index) => {
       const geoJsonFeature: Feature<Polygon | MultiPolygon> = {
         type: 'Feature',
         properties: {},
@@ -84,7 +84,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
       bounds.extend(shadow.getBounds())
     })
 
-    features.forEach((feature, index) => {
+    features?.forEach((feature, index) => {
       const geoJsonFeature: Feature<Polygon | MultiPolygon> = {
         type: 'Feature',
         properties: {},
@@ -134,7 +134,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
       <div className="empty-inline">No NYC Planimetric cooling-tower feature was exact-matched to this system's published BIN.</div>
       <p className="microcopy">A missing 2022 Planimetric feature is not evidence that the registered cooling tower does not physically exist. Where a current building footprint is available, the aerial roof context remains visible for field verification.</p>
     </> : <div className="planimetric-feature-list">
-      {features.map((feature, index) => <article className="planimetric-feature" key={feature.global_id}>
+      {features?.map((feature, index) => <article className="planimetric-feature" key={feature.global_id}>
         <div className="planimetric-feature-head"><strong>{featureLabel(index)}</strong><span>BIN {feature.bin}</span></div>
         <dl className="identity-grid">
           <div><dt>Global ID</dt><dd className="mono planimetric-id">{feature.global_id}</dd></div>
@@ -150,7 +150,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
     {footprintCount > 0 && <details className="roof-building-details">
       <summary>Building footprint context · {footprintCount} exact-BIN feature{footprintCount === 1 ? '' : 's'}</summary>
       <div className="planimetric-feature-list">
-        {buildingFootprints.map((footprint, index) => <article className="planimetric-feature" key={footprint.doitt_id ? `doitt-${footprint.doitt_id}` : `object-${footprint.object_id}`}>
+        {buildingFootprints?.map((footprint, index) => <article className="planimetric-feature" key={footprint.doitt_id ? `doitt-${footprint.doitt_id}` : `object-${footprint.object_id}`}>
           <div className="planimetric-feature-head"><strong>{footprintLabel(index)}</strong><span>BIN {footprint.bin}</span></div>
           <dl className="identity-grid">
             <div><dt>DOITT ID</dt><dd>{footprint.doitt_id ?? '—'}</dd></div>
