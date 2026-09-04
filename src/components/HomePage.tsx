@@ -43,9 +43,9 @@ export function HomePage({ user }: { user: WorkflowUser }) {
   const firstName = useMemo(() => displayName(user).split(/\s+/)[0], [user])
 
   return <main className="portal-page home-portal-page">
-    <header className="portal-header">
-      <button className="portal-brand" onClick={() => go('#/home')} aria-label="TowerSignal Home"><img src={logoAsset} alt="TowerSignal" /></button>
-      <nav aria-label="TowerSignal portal navigation">
+    <header className="reference-top-nav portal-route-nav">
+      <button className="reference-brand" onClick={() => go('#/home')} aria-label="TowerSignal home"><img src={logoAsset} alt="TowerSignal" /></button>
+      <nav aria-label="TowerSignal workspace">
         <button className="active" onClick={() => go('#/home')}>Home</button>
         <button onClick={() => go('#/prospect')}>Prospect</button>
         <button onClick={() => go('#/monitor')}>Monitor</button>
