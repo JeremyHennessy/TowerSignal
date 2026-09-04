@@ -1,0 +1,38 @@
+name: Header Live Proof
+
+on:
+  push:
+    branches:
+      - agent/header-live-proof-20260904
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prove-live-header-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Measure and screenshot production Home vs Prospect headers
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/header-live-proof.spec.ts --project=desktop-chromium --no-deps --workers=1
+      - name: Upload live header proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: header-live-proof
+          path: |
+            header-proof
+            playwright-report
+            test-results
+          retention-days: 7
+          if-no-files-found: warn
