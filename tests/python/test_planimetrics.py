@@ -9,9 +9,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from towersignal.fetch import SourceFetchError
 from towersignal.planimetrics import (
     DATASET_ID,
+    FILTERED_QUERY_LIMIT,
     MATCH_BASIS,
     SELECT_FIELDS,
     fetch_planimetric_towers_by_bin,
+    normalize_bin,
     normalize_planimetric_row,
 )
 
@@ -23,6 +25,12 @@ GEOMETRY = {
 
 
 class PlanimetricTests(unittest.TestCase):
+    def test_bin_normalization_is_strict(self):
+        self.assertEqual(normalize_bin("1015862"), "1015862")
+        self.assertEqual(normalize_bin("1015862.0"), "1015862")
+        self.assertIsNone(normalize_bin("101-5862"))
+        self.assertIsNone(normalize_bin("BIN 1015862"))
+
     def test_normalize_preserves_all_public_fields_and_exact_match_provenance(self):
         record = normalize_planimetric_row({
             "the_geom": GEOMETRY,
@@ -65,7 +73,7 @@ class PlanimetricTests(unittest.TestCase):
             },
         ]
         with patch("towersignal.planimetrics.fetch_count", return_value=82300) as count_mock, \
-             patch("towersignal.planimetrics.fetch_metadata", return_value={"name": "Plan imetric", "source_last_updated_at": "2025-12-04T00:00:00Z"}), \
+             patch("towersignal.planimetrics.fetch_metadata", return_value={"name": "Planimetric", "source_last_updated_at": "2025-12-04T00:00:00Z"}), \
              patch("towersignal.planimetrics.fetch_where", return_value=rows) as where_mock:
             by_bin, metadata = fetch_planimetric_towers_by_bin(["1015862", None, "1015862"])
 
@@ -93,8 +101,15 @@ class PlanimetricTests(unittest.TestCase):
             "globalid": "Z",
         }
         with patch("towersignal.planimetrics.fetch_count", return_value=1), \
-             patch("towersignal.planimetrics.fetch_metadata", return_value={"name": "Plan imetric", "source_last_updated_at": None}), \
+             patch("towersignal.planimetrics.fetch_metadata", return_value={"name": "Planimetric", "source_last_updated_at": None}), \
              patch("towersignal.planimetrics.fetch_where", return_value=[row]):
+            with self.assertRaises(SourceFetchError):
+                fetch_planimetric_towers_by_bin(["1015862"])
+
+    def test_filtered_query_refuses_possible_truncation(self):
+        with patch("towersignal.planimetrics.fetch_count", return_value=FILTERED_QUERY_LIMIT), \
+             patch("towersignal.planimetrics.fetch_metadata", return_value={"name": "Planimetric", "source_last_updated_at": None}), \
+             patch("towersignal.planimetrics.fetch_where", return_value=[{}] * FILTERED_QUERY_LIMIT):
             with self.assertRaises(SourceFetchError):
                 fetch_planimetric_towers_by_bin(["1015862"])
 
