@@ -1,0 +1,59 @@
+name: Toronto TDSB Beverley Address Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/toronto-tdsb-identity-recovery-diagnostic-20260904
+    paths:
+      - .github/workflows/toronto-tdsb-beverley-address-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout recovery baseline diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Test corrected exact civic address normalization
+        env:
+          PYTHONPATH: scripts
+        shell: python
+        run: |
+          import json
+          import re
+          from toronto_final_identity_cleanup import address_point_root, canonical_address, load_address_points
+          from toronto_market_common import clean_text
+
+          raw = '64Baldwin St, Toronto, ON, M5T 1L4'
+          fixed = re.sub(r'^(\d+)(?=[A-Za-z])', r'\1 ', raw)
+          canonical = canonical_address(fixed)
+          by_id, by_address, scanned = load_address_points()
+          candidates = by_address.get(canonical, [])
+          roots = {}
+          for row in candidates:
+              root = address_point_root(row, by_id)
+              rid = clean_text(root.get('address_point_id'))
+              if rid:
+                  roots[rid] = {
+                      'root_id': rid,
+                      'address': clean_text(root.get('address')),
+                      'place_name': clean_text(root.get('place_name')),
+                      'municipality_name': clean_text(root.get('municipality_name')),
+                  }
+          print('RAW=', raw)
+          print('FIXED=', fixed)
+          print('CANONICAL=', canonical)
+          print('CANDIDATE_ROOT_COUNT=', len(roots))
+          print('ROOTS=', json.dumps(sorted(roots.values(), key=lambda x:int(x['root_id'])), ensure_ascii=False, sort_keys=True))
+          print('ADDRESS_POINT_ROWS_SCANNED=', scanned)
+          if len(roots) != 1:
+              raise SystemExit('Beverley exact-address recovery is not unique')
