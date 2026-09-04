@@ -18,7 +18,10 @@ test('hosted Companies and Company Profile are source-backed, shareable and relo
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  await page.goto('./#/home', { waitUntil:'networkidle' })
+  // The authenticated fixture already leaves this tab on #/home. Do not
+  // perform an immediate document reload on Safari/WebKit because github.io
+  // cannot recover the cross-site neon.tech auth cookie after navigation.
+  await expect(page).toHaveURL(/#\/home$/)
   await expect(page.getByRole('button', { name:'Companies', exact:true })).toBeVisible()
   await page.getByRole('button', { name:'Companies', exact:true }).click()
   await expect(page).toHaveURL(/#\/companies$/)

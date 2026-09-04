@@ -6,6 +6,10 @@ export default defineConfig({
   testDir: './tests/e2e',
   timeout: 60_000,
   expect: { timeout: 15_000 },
+  // Hosted tests share one temporary account per browser family. Serializing
+  // CI avoids concurrent sign-in races against the managed Neon Auth service,
+  // while local development keeps Playwright's normal worker behavior.
+  workers: process.env.CI ? 1 : undefined,
   use: { baseURL, trace: 'retain-on-failure' },
   projects: [
     {
