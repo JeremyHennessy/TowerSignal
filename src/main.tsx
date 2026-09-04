@@ -11,6 +11,7 @@ import './styles/workflow.css'
 import './styles/product-redesign.css'
 import './styles/product-redesign-fixes.css'
 import './styles/product-redesign-final.css'
+import './styles/planimetrics.css'
 import './styles/auth-gate.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AuthGate /></React.StrictMode>)
