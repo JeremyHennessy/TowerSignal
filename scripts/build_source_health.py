@@ -55,13 +55,15 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
     hpd_contact_systems = sum(1 for row in systems if int(row.get("hpd_contact_count") or 0) > 0)
     hpd_registration_systems = int(summary.get("systems_with_hpd_registration") or 0)
     planimetric_systems = sum(1 for row in systems if bool(row.get("planimetric_bin_match")))
+    building_footprint_systems = sum(1 for row in systems if bool(row.get("building_footprint_bin_match")))
 
     reg = sources.get("y4fw-iqfr", {})
     insp = sources.get("f9wb-g8mb", {})
     oath = sources.get("jz4z-kudi", {})
     dob = sources.get("w9ak-ipjd", {})
     planimetric = sources.get("x748-37q7", {})
-    pluto = next((value for key, value in sources.items() if key not in {"y4fw-iqfr", "f9wb-g8mb", "jz4z-kudi", "w9ak-ipjd", "tesw-yqqr", "feu5-w2e2", "x748-37q7"} and "PLUTO" in str(value.get("name", "")).upper()), {})
+    building_footprints = sources.get("5zhs-2jue", {})
+    pluto = next((value for key, value in sources.items() if key not in {"y4fw-iqfr", "f9wb-g8mb", "jz4z-kudi", "w9ak-ipjd", "tesw-yqqr", "feu5-w2e2", "x748-37q7", "5zhs-2jue"} and "PLUTO" in str(value.get("name", "")).upper()), {})
     hpd_reg = sources.get("tesw-yqqr", {})
     hpd_contacts = sources.get("feu5-w2e2", {})
 
@@ -88,6 +90,23 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
             coverage_note=(
                 "Coverage is the share of current registry BINs with at least one exact-BIN 2022 aerial-derived Planimetric cooling-tower feature. "
                 "A missing physical match is not evidence that a registered tower does not exist, and a building-level physical feature is not a one-to-one System ID identity claim."
+            ),
+        ),
+        health_entry(
+            source_key="building_footprints",
+            dataset_id=str(building_footprints.get("dataset_id") or "5zhs-2jue"),
+            name=str(building_footprints.get("name") or "BUILDING"),
+            entity_unit="current cooling-tower BINs with current NYC building footprints",
+            retrieved_record_count=int(metadata.get("building_footprint_matched_feature_count") or 0),
+            requested_entity_count=int(metadata.get("building_footprint_requested_bin_count") or 0),
+            normalized_entity_count=int(metadata.get("building_footprint_matched_bin_count") or 0),
+            matched_entity_count=int(metadata.get("building_footprint_matched_bin_count") or 0),
+            attached_entity_count=building_footprint_systems,
+            displayed_entity_count=building_footprint_systems,
+            previous_coverage_percentage=previous_coverage("building_footprints"),
+            coverage_note=(
+                "Coverage is exact BIN attachment of the current NYC OTI building-footprint layer. "
+                "The footprint is used as roof/building context and does not change cooling-tower identity, compliance status, or Priority Score."
             ),
         ),
         health_entry(
