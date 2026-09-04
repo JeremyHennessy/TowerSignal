@@ -20,6 +20,7 @@ TowerSignal retrieves the current exact row count and only the fields needed for
 - property name/type/address;
 - source-reported BBL and BIN strings;
 - building gross floor area;
+- report generation/submission dates;
 - metered areas for water;
 - all-source total/indoor/outdoor water use;
 - municipally supplied potable mixed/total/indoor/outdoor water use;
@@ -37,6 +38,21 @@ An LL84 property can contain multiple tax lots and/or multiple buildings. TowerS
 - treats EPA property ID as the longitudinal LL84 identity;
 - marks rows with at least one BBL/BIN as `CONFIRMED_IDENTIFIER` and otherwise `UNLINKED`.
 
+## Live-source correction: multiple rows per property/year
+
+The first Build 017B live pull successfully retrieved all 103,259 current source rows, but validation found that `EPA property ID + report year` is not unique. The initial assumption of one row per property/year was therefore rejected rather than weakening the validator.
+
+The corrected model:
+
+- preserves every source row;
+- derives a deterministic full selected-row signature;
+- assigns distinct occurrence IDs when the source contains exact duplicate signatures;
+- records the number of same-property/same-year observations;
+- uses report submission date, then water-meter last-modified date, as same-year ordering evidence for the latest-property convenience view;
+- calculates year-over-year change only against the latest retained observation from a different prior report year.
+
+No duplicate source row is silently dropped or merged.
+
 ## Water metrics
 
 All numeric water values are kept in the source unit of thousand gallons (kgal). Missing and `Not Available` values remain null.
@@ -45,10 +61,11 @@ For a single effective municipal-potable metric, the source's `Municipally Suppl
 
 ## Longitudinal processing
 
-For each EPA property ID, TowerSignal retains every annual observation and also builds a latest-property profile. Year-over-year change is computed only where:
+For each EPA property ID, TowerSignal retains every annual/source observation and also builds a latest-property profile. Year-over-year change is computed only where:
 
 - the EPA property ID is identical;
-- both latest and immediately prior observations have numeric effective municipal potable-water values.
+- the comparison observations are from different report years;
+- both selected observations have numeric effective municipal potable-water values.
 
 No cross-property imputation occurs.
 
@@ -60,6 +77,7 @@ The cache must prove:
 - exact source count equals fetched row count;
 - deterministic complete pagination;
 - normalized observation count equals the source count;
+- every retained observation has a unique deterministic ID even when the source repeats a selected-row signature;
 - BBL/BIN arrays contain only valid-length numeric identifiers;
 - every latest-property record points to a retained observation;
 - production volume remains plausible.
