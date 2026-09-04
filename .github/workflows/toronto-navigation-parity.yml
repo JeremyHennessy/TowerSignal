@@ -1,0 +1,72 @@
+name: Toronto Navigation And Drillthrough Parity
+
+on:
+  push:
+    branches:
+      - agent/toronto-navigation-parity-20260904
+    paths:
+      - .github/workflows/toronto-navigation-parity.yml
+
+permissions:
+  contents: write
+
+jobs:
+  verify-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact navigation parity branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-navigation-parity-20260904
+          fetch-depth: 0
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Record immutable Toronto payload hash
+        run: echo "TORONTO_DATA_SHA=$(sha256sum public/data/toronto-market.json | cut -d' ' -f1)" >> "$GITHUB_ENV"
+
+      - name: Apply Toronto market route and responsive drillthrough patch
+        run: python scripts/apply_toronto_navigation_page_patch.py
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Verify navigation, drillthroughs, existing Toronto workspaces and production build
+        env:
+          VITE_ENABLE_TORONTO: 'true'
+          VITE_TORONTO_PREVIEW: 'true'
+        run: |
+          npm run lint
+          npm run typecheck
+          npm exec vitest run -- \
+            tests/frontend/TorontoUnifiedWorkspace.test.tsx \
+            tests/frontend/TorontoMarket.test.tsx \
+            tests/frontend/TorontoParityShell.test.tsx \
+            tests/frontend/TorontoBenchmarkingPage.test.tsx \
+            tests/frontend/TorontoCommercialExport.test.ts
+          npm exec vite build -- --base=/TowerSignal-Toronto-Preview/ --outDir=dist-navigation-parity
+
+      - name: Prove Toronto market payload is unchanged
+        run: |
+          test "$TORONTO_DATA_SHA" = "$(sha256sum public/data/toronto-market.json | cut -d' ' -f1)"
+          echo "TORONTO_PAYLOAD_UNCHANGED=$TORONTO_DATA_SHA"
+
+      - name: Persist verified navigation and drillthrough implementation
+        run: |
+          git config user.name "TowerSignal Toronto UI Bot"
+          git config user.email "towersignal-toronto-ui@users.noreply.github.com"
+          git rm .github/workflows/toronto-navigation-parity.yml scripts/apply_toronto_navigation_page_patch.py
+          git add \
+            src/components/TopNavigation.tsx \
+            src/components/TorontoMarketPage.tsx \
+            src/components/TorontoUnifiedWorkspace.tsx \
+            src/styles/toronto-parity.css \
+            tests/frontend/TorontoUnifiedWorkspace.test.tsx
+          git diff --cached --quiet && { echo 'No verified navigation changes to persist'; exit 1; }
+          git commit -m "Toronto: align navigation and drillthroughs with New York"
+          git push origin HEAD:agent/toronto-navigation-parity-20260904
+          echo "TORONTO_NAV_PARITY_SHA=$(git rev-parse HEAD)"
