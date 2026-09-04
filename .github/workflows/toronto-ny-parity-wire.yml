@@ -1,0 +1,79 @@
+name: Toronto NY Parity Wire
+
+on:
+  push:
+    branches:
+      - agent/toronto-ny-parity-20260904
+    paths:
+      - .github/workflows/toronto-ny-parity-wire.yml
+
+permissions:
+  contents: write
+
+jobs:
+  wire-test-persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout Toronto parity branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/toronto-ny-parity-20260904
+          fetch-depth: 0
+
+      - name: Wire parity shell and clean TypeScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          shell = Path('src/components/TorontoParityShell.tsx')
+          text = shell.read_text()
+          text = text.replace('TorontoMarketPayload, TorontoProperty, TorontoRelationship, TorontoSourceLink', 'TorontoMarketPayload, TorontoProperty, TorontoSourceLink')
+          text = text.replace("function PropertyAction({ row, watched, onToggleWatch, onOpen }: { row: ProspectRow; watched: boolean; onToggleWatch: () => void; onOpen: () => void })", "function PropertyAction({ watched, onToggleWatch, onOpen }: { watched: boolean; onToggleWatch: () => void; onOpen: () => void })")
+          text = text.replace('<PropertyAction row={row} ', '<PropertyAction ')
+          shell.write_text(text)
+
+          market = Path('src/components/TorontoMarketPage.tsx')
+          text = market.read_text()
+          parity_import = "import { TorontoParityShell } from './TorontoParityShell'\n"
+          if parity_import not in text:
+              text = text.replace("import { TorontoMarketMap } from './TorontoMarketMap'\n", "import { TorontoMarketMap } from './TorontoMarketMap'\n" + parity_import)
+          if 'function TorontoMarketExplorer()' not in text:
+              text = text.replace('export function TorontoMarketPage() {', 'function TorontoMarketExplorer() {', 1)
+              text = text.rstrip() + "\n\nexport function TorontoMarketPage() {\n  return <TorontoParityShell explorer={<TorontoMarketExplorer />} />\n}\n"
+          market.write_text(text)
+
+          main = Path('src/main.tsx')
+          text = main.read_text()
+          css_import = "import './styles/toronto-parity.css'\n"
+          if css_import not in text:
+              text = text.replace("import './styles/toronto.css'\n", "import './styles/toronto.css'\n" + css_import)
+          main.write_text(text)
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Frontend quality gate
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run test -- --run tests/frontend/TorontoMarket.test.tsx
+          VITE_ENABLE_TORONTO=true VITE_TORONTO_PREVIEW=true npm run build
+
+      - name: Preserve Toronto evidence boundary
+        env:
+          PYTHONPATH: .:scripts
+        run: |
+          python -m unittest tests.python.test_toronto_app_builder_index tests.python.test_toronto_building_permit_sources tests.python.test_toronto_relationship_evidence -v
+          python scripts/toronto_final_validate.py
+
+      - name: Persist verified parity workspace
+        run: |
+          git config user.name "TowerSignal Build Bot"
+          git config user.email "towersignal-build@users.noreply.github.com"
+          git rm .github/workflows/toronto-ny-parity-wire.yml
+          git add src/components/TorontoParityShell.tsx src/components/TorontoMarketPage.tsx src/main.tsx src/styles/toronto-parity.css
+          git commit -m "Add Toronto commercial parity workspaces"
+          git push origin HEAD:agent/toronto-ny-parity-20260904
+          echo "TORONTO_PARITY_SHA=$(git rev-parse HEAD)"
