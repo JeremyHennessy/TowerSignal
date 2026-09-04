@@ -1,0 +1,126 @@
+name: NY Live Browser Auth Diagnostic
+
+on:
+  push:
+    branches:
+      - agent/ny-auth-diagnostic-20260904
+    paths:
+      - ".github/workflows/ny-live-browser-auth-diagnostic.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  browser-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout approved New York source
+        uses: actions/checkout@v4
+        with:
+          ref: 91874fa1d9037b18cdc111de4c5b497420515128
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Probe live New York auth in Chromium
+        run: |
+          mkdir -p ny-live-auth-diagnostic
+          cat > ny-auth-probe.mjs <<'EOF'
+          import { chromium } from '@playwright/test'
+          import fs from 'node:fs'
+
+          const authNeedle = 'ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech'
+          const authUrl = `https://${authNeedle}/neondb/auth/get-session`
+          const liveUrl = `https://jeremyhennessy.github.io/TowerSignal/?ny_auth_diag=${Date.now()}`
+          const browser = await chromium.launch()
+          const page = await browser.newPage({
+            viewport: { width: 1440, height: 1000 },
+            extraHTTPHeaders: { 'Cache-Control': 'no-cache' },
+          })
+
+          const events = []
+          const safeHeaders = headers => Object.fromEntries(Object.entries(headers).filter(([key]) => !['cookie','authorization','set-cookie'].includes(key.toLowerCase())))
+
+          page.on('request', request => {
+            if (request.url().includes(authNeedle)) events.push({
+              type: 'request',
+              url: request.url(),
+              method: request.method(),
+              resourceType: request.resourceType(),
+              headers: safeHeaders(request.headers()),
+            })
+          })
+          page.on('requestfailed', request => {
+            if (request.url().includes(authNeedle)) events.push({
+              type: 'requestfailed',
+              url: request.url(),
+              method: request.method(),
+              failure: request.failure(),
+            })
+          })
+          page.on('response', async response => {
+            if (response.url().includes(authNeedle)) events.push({
+              type: 'response',
+              url: response.url(),
+              status: response.status(),
+              headers: safeHeaders(await response.allHeaders()),
+            })
+          })
+          page.on('console', message => events.push({ type: 'console', level: message.type(), text: message.text() }))
+          page.on('pageerror', error => events.push({ type: 'pageerror', message: error.message, stack: error.stack }))
+
+          const mainResponse = await page.goto(liveUrl, { waitUntil: 'domcontentloaded', timeout: 45000 })
+          await page.waitForTimeout(5000)
+          const bodyText = await page.locator('body').innerText()
+
+          const directFetch = await page.evaluate(async url => {
+            const result = {}
+            for (const credentials of ['include', 'omit']) {
+              try {
+                const response = await fetch(url, { method: 'GET', credentials, headers: { Accept: 'application/json' } })
+                result[credentials] = {
+                  ok: response.ok,
+                  status: response.status,
+                  type: response.type,
+                  url: response.url,
+                  body: await response.text(),
+                }
+              } catch (error) {
+                result[credentials] = { error: error instanceof Error ? error.message : String(error) }
+              }
+            }
+            return result
+          }, authUrl)
+
+          const evidence = {
+            liveUrl: page.url(),
+            mainStatus: mainResponse?.status() ?? null,
+            bodyShowsFailedToFetch: bodyText.includes('Failed to fetch'),
+            bodyText: bodyText.slice(0, 5000),
+            directFetch,
+            authEvents: events.filter(event => event.type !== 'console' || /fetch|cors|neon|auth|error/i.test(event.text || '')),
+          }
+
+          fs.writeFileSync('ny-live-auth-diagnostic/evidence.json', JSON.stringify(evidence, null, 2))
+          await page.screenshot({ path: 'ny-live-auth-diagnostic/live-new-york.png', fullPage: true })
+          console.log(JSON.stringify(evidence, null, 2))
+          await browser.close()
+          EOF
+          node ny-auth-probe.mjs
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ny-live-browser-auth-diagnostic
+          path: ny-live-auth-diagnostic
+          if-no-files-found: error
