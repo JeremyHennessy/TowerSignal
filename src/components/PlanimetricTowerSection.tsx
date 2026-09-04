@@ -12,11 +12,11 @@ function featureLabel(feature: PlanimetricBuildingTowerFeature, index: number) {
 
 export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
   const container = useRef<HTMLDivElement | null>(null)
-  const mapRef = useRef<L.Map | null>(null)
-  const features = detail.planimetric_building_tower_features ?? []
+  const features = detail.planimetric_building_tower_features
+  const featureCount = features?.length ?? 0
 
   useEffect(() => {
-    if (!container.current || features.length === 0) return
+    if (!container.current || !features?.length) return
 
     const map = L.map(container.current, {
       zoomControl: true,
@@ -51,29 +51,27 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
     if (bounds.isValid()) {
       map.fitBounds(bounds, { padding: [28, 28], maxZoom: 20 })
     }
-    mapRef.current = map
 
     return () => {
       map.remove()
-      mapRef.current = null
     }
   }, [features])
 
   return <section className="planimetric-section">
     <h3>Physical tower location</h3>
-    {features.length === 0 ? <>
+    {featureCount === 0 ? <>
       <div className="empty-inline">No NYC Planimetric cooling-tower feature was exact-matched to this system's published BIN.</div>
       <p className="microcopy">A missing 2022 Planimetric feature is not evidence that the registered cooling tower does not physically exist. The physical-map source and current regulatory registry have different observation and update regimes.</p>
     </> : <>
       <div className="planimetric-summary">
-        <strong>{features.length} mapped cooling-tower feature{features.length === 1 ? '' : 's'} on BIN {detail.identity.bin}</strong>
+        <strong>{featureCount} mapped cooling-tower feature{featureCount === 1 ? '' : 's'} on BIN {detail.identity.bin}</strong>
         <span>Exact BIN attachment · 2022 aerial-derived physical observation</span>
       </div>
       <div className="planimetric-map-shell">
         <div ref={container} className="planimetric-map" role="region" aria-label={`Mapped physical cooling-tower features on BIN ${detail.identity.bin ?? 'unknown'}`} />
       </div>
       <div className="planimetric-feature-list">
-        {features.map((feature, index) => <article className="planimetric-feature" key={feature.source_id ?? feature.global_id ?? `${feature.bin}-${index}`}>
+        {features?.map((feature, index) => <article className="planimetric-feature" key={feature.source_id ?? feature.global_id ?? `${feature.bin}-${index}`}>
           <div className="planimetric-feature-head"><strong>{featureLabel(feature, index)}</strong><span>BIN {feature.bin}</span></div>
           <dl className="identity-grid">
             <div><dt>Source ID</dt><dd>{feature.source_id ?? '—'}</dd></div>
