@@ -4,8 +4,7 @@ import hashlib
 import re
 import time
 from collections import Counter
-from datetime import date
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping
 
 from .domestic_water import normalize_space, parse_source_date, stable_id, utc_now
 from .nys_public_water import (
@@ -19,8 +18,9 @@ from .nys_public_water import (
     parse_lsli_index,
 )
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 DEFAULT_REQUEST_DELAY_SECONDS = 0.15
+MAX_EXPLICIT_UNAVAILABLE_DETAILS = 25
 
 KEY_FIELDS = {
     "water system name": "pws_name",
@@ -126,7 +126,9 @@ def _inventory_availability(parser, kv: Mapping[str, str]) -> dict[str, Any]:
         display = normalize_space(text)
         if not href_text.lower().startswith(("http://", "https://")):
             continue
-        if "health.ny.gov" in href_text.lower() or "ny.gov" in href_text.lower() and "leadfree" not in href_text.lower():
+        if "health.ny.gov" in href_text.lower() or (
+            "ny.gov" in href_text.lower() and "leadfree" not in href_text.lower()
+        ):
             continue
         candidate_links.append({"href": href_text, "text": display or None})
     return {
@@ -154,7 +156,6 @@ def _certification(parser) -> dict[str, Any]:
                     result[right_key] = parse_source_date(left) if right_key == "date" else left
 
         if all(result.get(field) is None for field in ("name", "title", "date")):
-            # Common converted-form layout: value row followed by Name/Title/Date labels.
             for index, row in enumerate(normalized_rows):
                 if row[:3] == ["name", "title", "date"] and index > 0:
                     prior = table[index - 1]
@@ -174,10 +175,7 @@ def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = No
     parsed: dict[str, Any] = {}
     for source_label, target in KEY_FIELDS.items():
         value = kv.get(source_label)
-        if target.endswith("_lines"):
-            parsed[target] = _int(value)
-        else:
-            parsed[target] = value or None
+        parsed[target] = _int(value) if target.endswith("_lines") else (value or None)
 
     pws_id = normalize_space(parsed.get("pws_id")).upper()
     if not re.fullmatch(r"NY\d{7}", pws_id):
@@ -217,11 +215,15 @@ def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = No
         "detail_id": stable_id("nys-lsli-detail", pws_id),
         "pws_id": pws_id,
         "pws_name": parsed.get("pws_name"),
+        "detail_status": "PARSED",
         "owner_or_operator_form_contact": {
             "name": parsed.get("contact_name"),
             "phone": parsed.get("contact_phone"),
             "email": parsed.get("contact_email"),
-            "relationship_role": "OWNER_OR_LICENSED_OPERATOR_OF_RECORD_FORM_CONTACT" if contact_present else None,
+            "relationship_role": (
+                "OWNER_OR_LICENSED_OPERATOR_OF_RECORD_FORM_CONTACT"
+                if contact_present else None
+            ),
             "relationship_evidence": "NYSDOH_LSLI_SECTION_II" if contact_present else None,
             "role_semantics": (
                 "Source section is labeled 'Owner / Licensed Operator of Record Completing the Form'; "
@@ -238,6 +240,28 @@ def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = No
     }
 
 
+def _explicit_detail_404(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return "http error 404" in text and "failed to retrieve nysdoh page" in text
+
+
+def _unavailable_detail(index_row: Mapping[str, Any], exc: Exception) -> dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "pws_id": str(index_row["pws_id"]),
+        "pws_name": index_row.get("pws_name"),
+        "county": index_row.get("county"),
+        "detail_status": "DETAIL_UNAVAILABLE_404",
+        "source_url": str(index_row["detail_url"]),
+        "source_error": normalize_space(exc),
+        "evidence_semantics": (
+            "PWS is present in the current authoritative NYSDOH LSLI index, but the indexed "
+            "detail URL returned HTTP 404 through both the primary and configured fallback hosts. "
+            "No inventory values are inferred."
+        ),
+    }
+
+
 def build_payload(*, request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECONDS) -> dict[str, Any]:
     index_snapshot = fetch_html(LSLI_INDEX_URL)
     index_rows = parse_lsli_index(index_snapshot.html, source_url=LSLI_INDEX_URL)
@@ -245,25 +269,39 @@ def build_payload(*, request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECOND
         raise NysPublicWaterSourceError("LSLI index contains duplicate PWS IDs")
 
     details: list[dict[str, Any]] = []
+    unavailable_details: list[dict[str, Any]] = []
     retrieved_at = utc_now()
     for ordinal, index_row in enumerate(index_rows, start=1):
-        snapshot = fetch_html(str(index_row["detail_url"]))
-        details.append(
-            parse_detail(
-                snapshot.html,
-                source_url=str(index_row["detail_url"]),
-                expected_pws_id=str(index_row["pws_id"]),
+        try:
+            snapshot = fetch_html(str(index_row["detail_url"]))
+        except NysPublicWaterSourceError as exc:
+            if not _explicit_detail_404(exc):
+                raise
+            unavailable_details.append(_unavailable_detail(index_row, exc))
+            if len(unavailable_details) > MAX_EXPLICIT_UNAVAILABLE_DETAILS:
+                raise NysPublicWaterSourceError(
+                    f"LSLI detail source has more than {MAX_EXPLICIT_UNAVAILABLE_DETAILS} explicit 404 entries"
+                ) from exc
+        else:
+            details.append(
+                parse_detail(
+                    snapshot.html,
+                    source_url=str(index_row["detail_url"]),
+                    expected_pws_id=str(index_row["pws_id"]),
+                )
             )
-        )
         if request_delay_seconds > 0 and ordinal < len(index_rows):
             time.sleep(request_delay_seconds)
 
     method_system_counts: Counter[str] = Counter()
     for detail in details:
         for method in detail["identification_methods"]:
-            if (method.get("pws_side_count") or 0) > 0 or (method.get("customer_side_count") or 0) > 0:
+            if (method.get("pws_side_count") or 0) > 0 or (
+                method.get("customer_side_count") or 0
+            ) > 0:
                 method_system_counts[str(method["method"])] += 1
 
+    coverage_count = len(details) + len(unavailable_details)
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at": retrieved_at,
@@ -272,23 +310,40 @@ def build_payload(*, request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECOND
             "name": "NYSDOH Lead Service Line Inventory detail pages",
             "index_url": LSLI_INDEX_URL,
             "index_record_count": len(index_rows),
-            "detail_record_count": len(details),
-            "retrieval_complete": len(details) == len(index_rows),
+            "parsed_detail_count": len(details),
+            "explicit_unavailable_404_count": len(unavailable_details),
+            "coverage_record_count": coverage_count,
+            "coverage_complete": coverage_count == len(index_rows),
+            "parsed_detail_complete": len(unavailable_details) == 0,
             "request_delay_seconds": request_delay_seconds,
         },
         "evidence_semantics": {
             "contact": "Section II source label combines owner / licensed operator of record completing the form; TowerSignal does not split that role without stronger evidence.",
             "inventory": "All line counts and identification methods are source-reported LSLI summary values for the PWS.",
+            "unavailable": "A current-index PWS whose detail page returns authoritative HTTP 404 is retained explicitly and receives no inferred detail values.",
             "certification": "Certification fields are preserved only when structurally parseable; a blank source certification remains blank.",
         },
         "summary": {
-            "detail_count": len(details),
-            "details_with_form_contact": sum(1 for row in details if row["owner_or_operator_form_contact"]["name"]),
-            "systems_with_lead_lines": sum(1 for row in details if int(row["inventory"]["lead_service_lines"]) > 0),
-            "systems_with_gslrr": sum(1 for row in details if int(row["inventory"]["gslrr_service_lines"]) > 0),
-            "systems_with_unknown_lines": sum(1 for row in details if int(row["inventory"]["unknown_service_lines"]) > 0),
-            "source_reported_total_service_lines_sum": sum(int(row["inventory"]["total_service_lines"]) for row in details),
+            "index_count": len(index_rows),
+            "parsed_detail_count": len(details),
+            "unavailable_detail_count": len(unavailable_details),
+            "details_with_form_contact": sum(
+                1 for row in details if row["owner_or_operator_form_contact"]["name"]
+            ),
+            "systems_with_lead_lines": sum(
+                1 for row in details if int(row["inventory"]["lead_service_lines"]) > 0
+            ),
+            "systems_with_gslrr": sum(
+                1 for row in details if int(row["inventory"]["gslrr_service_lines"]) > 0
+            ),
+            "systems_with_unknown_lines": sum(
+                1 for row in details if int(row["inventory"]["unknown_service_lines"]) > 0
+            ),
+            "source_reported_total_service_lines_sum": sum(
+                int(row["inventory"]["total_service_lines"]) for row in details
+            ),
             "identification_method_system_counts": dict(sorted(method_system_counts.items())),
         },
         "details": details,
+        "unavailable_details": unavailable_details,
     }
