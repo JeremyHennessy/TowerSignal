@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-source-row-resolution-audit-1.1",
-  "source_links": 40059,
+  "source_links": 40841,
   "status": "PASSED",
   "sources": {
     "311_matches_prior_poc": {
@@ -42,6 +42,10 @@
     "renewable_energy_installations": {
       "index_address_match": 85,
       "stable_id_address_match": 85
+    },
+    "tdsb_facility_condition_renewal": {
+      "index_address_match": 782,
+      "stable_id_address_match": 782
     },
     "toronto_aic_applications": {
       "index_address_match": 11225,

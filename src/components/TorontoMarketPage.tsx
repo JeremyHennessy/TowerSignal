@@ -18,6 +18,7 @@ const sourceLabels: Record<string, string> = {
   toronto_highrise_residential_health_hazards: 'Highrise residential health hazards',
   toronto_building_permits_active_targeted: 'Toronto active building permits',
   toronto_building_permits_cleared_targeted_since_2017: 'Toronto cleared building permits',
+  tdsb_facility_condition_renewal: 'TDSB facility condition renewals',
   ontario_environmental_compliance_reports: 'Ontario environmental compliance',
   ontario_bps_energy_2024: 'Ontario BPS energy 2024',
   tobids_awarded_contracts: 'TOBids awarded contracts',

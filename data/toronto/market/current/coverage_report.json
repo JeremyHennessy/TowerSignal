@@ -1,6 +1,6 @@
 {
   "schema_version": "toronto-market-coverage-1.2",
-  "generated_at": "2026-09-03T21:32:20.342744Z",
+  "generated_at": "2026-09-04T15:58:03.136719Z",
   "coverage_contract": {
     "meaning": "Measured source, reconciliation, document-access, relationship and screening coverage only.",
     "true_market_denominator": "No validated total installed Toronto cooling-tower population has been established from public data.",
@@ -21,10 +21,10 @@
     }
   },
   "expanded_property_universe": {
-    "canonical_address_point_properties": 13380,
+    "canonical_address_point_properties": 13669,
     "original_poc_properties_present_in_spine": 171,
-    "expanded_properties_beyond_original_poc": 13209,
-    "properties_with_usable_coordinates": 13380,
+    "expanded_properties_beyond_original_poc": 13498,
+    "properties_with_usable_coordinates": 13669,
     "unresolved_candidate_addresses": 2330
   },
   "documentary_tower_evidence": {
@@ -47,7 +47,7 @@
       "matched_canonical_properties": 1954,
       "ambiguous_address_rows_not_forced": 0,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.1460388639760837,
+      "candidate_universe_property_link_fraction": 0.142951203453069,
       "source_record_match_fraction": 0.7665631177633437,
       "unmatched_source_records": 4133
     },
@@ -71,7 +71,7 @@
       "matched_canonical_properties": 2,
       "ambiguous_address_rows_not_forced": 0,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.00014947683109118088,
+      "candidate_universe_property_link_fraction": 0.00014631648255175947,
       "source_record_match_fraction": 0.07142857142857142,
       "unmatched_source_records": 26
     },
@@ -83,7 +83,7 @@
       "matched_canonical_properties": 684,
       "ambiguous_address_rows_not_forced": 0,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.051121076233183856,
+      "candidate_universe_property_link_fraction": 0.05004023703270173,
       "source_record_match_fraction": 0.8090692124105012,
       "unmatched_source_records": 240
     },
@@ -95,7 +95,7 @@
       "matched_canonical_properties": 7211,
       "ambiguous_address_rows_not_forced": 5,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.5389387144992526,
+      "candidate_universe_property_link_fraction": 0.5275440778403687,
       "source_record_match_fraction": 0.707576903681291,
       "unmatched_source_records": 4639
     },
@@ -108,7 +108,7 @@
       "ambiguous_address_rows_not_forced": 1,
       "links_added": 1780,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.1272795216741405,
+      "candidate_universe_property_link_fraction": 0.12458848489282318,
       "source_record_match_fraction": 0.7382828701783493,
       "unmatched_source_records": 631
     },
@@ -121,7 +121,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 5288,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.22556053811659194,
+      "candidate_universe_property_link_fraction": 0.22079157217060502,
       "source_record_match_fraction": 0.8458093410108766,
       "unmatched_source_records": 964
     },
@@ -135,7 +135,7 @@
       "links_added": 362,
       "identity_limitation": null,
       "role_semantics": "Organization is retained only as FACILITY_OPERATOR_OR_REPORTER_AT; this source does not establish ownership.",
-      "candidate_universe_property_link_fraction": 0.02055306427503737,
+      "candidate_universe_property_link_fraction": 0.020118516350866925,
       "source_record_match_fraction": 0.19431025228126678,
       "unmatched_source_records": 1501
     },
@@ -148,7 +148,7 @@
       "ambiguous_address_rows_not_forced": 1,
       "links_added": 179,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.012630792227204783,
+      "candidate_universe_property_link_fraction": 0.012363742775623673,
       "source_record_match_fraction": 0.6605166051660517,
       "unmatched_source_records": 92
     },
@@ -161,7 +161,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 85,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.006053811659192825,
+      "candidate_universe_property_link_fraction": 0.005925817543346258,
       "source_record_match_fraction": 0.85,
       "unmatched_source_records": 15
     },
@@ -187,7 +187,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 973,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.03849028400597907,
+      "candidate_universe_property_link_fraction": 0.03767649425707806,
       "source_record_match_fraction": 0.7619420516836335,
       "unmatched_source_records": 304
     },
@@ -200,7 +200,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 1452,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 0.006576980568011958,
+      "candidate_universe_property_link_fraction": 0.006437925232277416,
       "source_record_match_fraction": 0.8601895734597157,
       "unmatched_source_records": 236
     },
@@ -213,7 +213,7 @@
       "ambiguous_address_rows_not_forced": 0,
       "links_added": 1,
       "identity_limitation": null,
-      "candidate_universe_property_link_fraction": 7.473841554559044e-05,
+      "candidate_universe_property_link_fraction": 7.315824127587973e-05,
       "source_record_match_fraction": 1.0,
       "unmatched_source_records": 0
     },
@@ -229,7 +229,7 @@
       "ambiguous_property_addresses_not_used": 2,
       "links_added_in_citywide_exact_description_pass": 12,
       "role_semantics": "Successful Supplier supports SUCCESSFUL_BIDDER_AT_PROPERTY only. Mechanical, contractor-specialty, engineering, ownership, and consulting roles are not inferred from category or keywords.",
-      "candidate_universe_property_link_fraction": 0.0009715994020926756,
+      "candidate_universe_property_link_fraction": 0.0009510571365864364,
       "source_record_match_fraction": 0.002216427640156454,
       "unmatched_source_records": 7653
     },
@@ -253,7 +253,7 @@
       "property_links": 2815,
       "links_added_by_application_number": 2808,
       "identity_limitation": "Only exact public-notice application numbers already joined through the deterministic AIC property spine are linked; no text/address fuzzy match is used.",
-      "candidate_universe_property_link_fraction": 0.10956651718983558,
+      "candidate_universe_property_link_fraction": 0.10724998171043969,
       "source_record_match_fraction": 0.739501312335958,
       "unmatched_source_records": 397
     },
@@ -285,7 +285,7 @@
         "OFFICIAL_STREET_RENAME_ALIAS_SAME_ADDRESS_POINT_ID": 3,
         "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 23
       },
-      "candidate_universe_property_link_fraction": 0.025336322869955158,
+      "candidate_universe_property_link_fraction": 0.02480064379252323,
       "source_record_match_fraction": 0.9982547993019197,
       "unmatched_source_records": 1
     },
@@ -317,9 +317,31 @@
         "EXPLICIT_RANGE_ENDPOINTS_CONVERGE_ON_CURRENT_ROOT": 7,
         "RELAXED_PUBLISHER_FORMAT_MATCH_TO_GEO_ID_CHILD": 5
       },
-      "candidate_universe_property_link_fraction": 0.03258594917787743,
+      "candidate_universe_property_link_fraction": 0.031896993196283564,
       "source_record_match_fraction": 0.9972260748959778,
       "unmatched_source_records": 2
+    },
+    "tdsb_facility_condition_renewal": {
+      "status": "JOINED_EXACT_LITERAL_ADDRESS",
+      "source_records": 826,
+      "records_with_property_address": 826,
+      "matched_records": 782,
+      "matched_canonical_properties": 330,
+      "unmatched_source_records": 44,
+      "renewal_schools": 352,
+      "resolved_schools": 334,
+      "ambiguous_schools_not_forced": 4,
+      "unresolved_schools_not_forced": 14,
+      "explicit_cooling_tower_schools": 13,
+      "resolution_basis_counts": {
+        "EXACT_LITERAL_TDSB_CIVIC_ADDRESS_TO_UNIQUE_CURRENT_ROOT": 782,
+        "UNLINKED_AMBIGUOUS_OR_NO_EXACT_CURRENT_ROOT": 44
+      },
+      "identity_limitation": "Only exact literal official TDSB school addresses resolving to one current City Address Point root are joined. Four ambiguous and fourteen unmatched schools remain unlinked.",
+      "scope_limitation": "Non-cooling-tower renewal rows are supporting mechanical renewal intelligence only and do not establish cooling-tower presence.",
+      "role_semantics": "TDSB facility-condition renewal records create no organization relationship role.",
+      "candidate_universe_property_link_fraction": 0.02414221962104031,
+      "source_record_match_fraction": 0.9467312348668281
     }
   },
   "aic_coverage": {
@@ -378,7 +400,7 @@
   },
   "aerial_screening": {
     "status": "WEAK_LABEL_MODEL_FIT",
-    "canonical_properties_with_coordinates": 13380,
+    "canonical_properties_with_coordinates": 13669,
     "requested_positive_properties": 46,
     "requested_weak_controls": 92,
     "usable_training_images": 138,
