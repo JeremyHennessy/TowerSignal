@@ -152,9 +152,17 @@ jobs:
           }
           Path('/tmp/toronto-apartment-identity-diagnostic.json').write_text(json.dumps(report, indent=2, default=str), encoding='utf-8')
           print(json.dumps(report, indent=2, default=str))
-          assert report['existing_source_links'] == 5802, report
-          assert report['existing_links_resolved'] == 5802, report
+          assert report['source_records'] == 6252, report
+          assert report['existing_source_links'] == 5288, report
+          assert report['existing_links_resolved'] == 5288, report
           assert report['existing_links_unresolved'] == 0, report
+          assert report['unlinked_rows'] == 964, report
+          assert report['candidate_identifier_keys'] == ['RSN'], report
+          assert report['linked_identifier_consistency']['RSN']['conflict'] == 0, report
+          assert report['rentsafe_ambiguous_rsn_count'] == 0, report
+          assert report['deterministically_recoverable_rows'] == 26, report
+          assert report['recoverable_properties'] == 14, report
+          assert report['ambiguous_rows_not_forced'] == 0, report
           PY
       - name: Upload diagnostic
         uses: actions/upload-artifact@v4
