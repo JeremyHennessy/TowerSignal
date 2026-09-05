@@ -54,6 +54,28 @@ function id(prefix: string): string {
   return `${prefix}-${random ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`}`
 }
 
+function mergeAccounts(remote: WorkflowAccountState[], current: WorkflowAccountState[]): WorkflowAccountState[] {
+  const byId = new Map(remote.map(account => [account.system_id, account]))
+  current.forEach(account => byId.set(account.system_id, account))
+  return [...byId.values()]
+}
+
+function mergeWatchlists(remote: WorkflowWatchlist[], current: WorkflowWatchlist[]): WorkflowWatchlist[] {
+  const byId = new Map(remote.map(watchlist => [watchlist.id, watchlist]))
+  current.forEach(watchlist => byId.set(watchlist.id, watchlist))
+  return [...byId.values()]
+}
+
+function membershipKey(item: WorkflowMembership): string {
+  return `${item.watchlist_id}::${item.system_id}`
+}
+
+function mergeMemberships(remote: WorkflowMembership[], current: WorkflowMembership[]): WorkflowMembership[] {
+  const byId = new Map(remote.map(item => [membershipKey(item), item]))
+  current.forEach(item => byId.set(membershipKey(item), item))
+  return [...byId.values()]
+}
+
 export function useWorkflow() {
   const [user, setUser] = useState<WorkflowUser | null>(null)
   const [savedViews, setSavedViews] = useState<WorkflowSavedView[]>(readLocalViews)
@@ -86,9 +108,9 @@ export function useWorkflow() {
     }
     const normalizedViews = snapshot.savedViews.map(view => ({ ...view, filters: { ...initialFilters, ...view.filters } }))
     setSavedViews(normalizedViews)
-    setWatchlists(snapshot.watchlists)
-    setAccounts(snapshot.accounts)
-    setMemberships(snapshot.memberships)
+    setWatchlists(current => mergeWatchlists(snapshot.watchlists, current))
+    setAccounts(current => mergeAccounts(snapshot.accounts, current))
+    setMemberships(current => mergeMemberships(snapshot.memberships, current))
     setError(null)
   }, [])
 
