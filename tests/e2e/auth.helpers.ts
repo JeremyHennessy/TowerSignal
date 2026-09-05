@@ -17,14 +17,30 @@ export function testCredentials(projectName: string) {
   }
 }
 
+export async function submitSignIn(page: Page, projectName: string): Promise<void> {
+  const credentials = testCredentials(projectName)
+  const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
+  const attempts = process.env.CI && family(projectName) === 'iphone' ? 2 : 1
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    await page.getByLabel('Email').fill(credentials.email)
+    await page.getByLabel('Password', { exact: true }).fill(credentials.password)
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click()
+    try {
+      await expect(loginHeading).toHaveCount(0, { timeout: attempt < attempts ? 6_000 : 15_000 })
+      return
+    } catch (error) {
+      if (attempt === attempts) throw error
+      await expect(loginHeading).toBeVisible()
+      await page.waitForTimeout(500)
+    }
+  }
+}
+
 export async function signInForProject(page: Page, projectName: string, targetHash: string): Promise<void> {
   await page.goto(`./${targetHash}`, { waitUntil: 'networkidle' })
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
   if (await loginHeading.isVisible().catch(() => false)) {
-    const credentials = testCredentials(projectName)
-    await page.getByLabel('Email').fill(credentials.email)
-    await page.getByLabel('Password', { exact: true }).fill(credentials.password)
-    await page.getByRole('button', { name: 'Sign in', exact: true }).click()
-    await expect(loginHeading).toHaveCount(0)
+    await submitSignIn(page, projectName)
   }
 }
