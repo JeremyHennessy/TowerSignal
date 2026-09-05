@@ -137,6 +137,8 @@ test('filters records and opens a shareable full account profile with DOB projec
   expect(window.location.hash).toBe('#/account/SYS-1')
   expect(screen.getByRole('button', { name:'Copy account link' })).toBeInTheDocument()
   const detailPanel = screen.getByRole('complementary', { name: 'Selected cooling tower detail' })
+  expect(within(detailPanel).getByRole('heading', { name:'Pre-visit field pack' })).toBeInTheDocument()
+  expect(within(detailPanel).getByText('Schematics / mechanical drawings')).toBeInTheDocument()
   expect(within(detailPanel).getByText('Potential sampling gap')).toBeInTheDocument()
   expect(within(detailPanel).getByRole('heading', { name:'DOB NOW project activity' })).toBeInTheDocument()
   expect(within(detailPanel).getByText('Cooling tower mention')).toBeInTheDocument()
