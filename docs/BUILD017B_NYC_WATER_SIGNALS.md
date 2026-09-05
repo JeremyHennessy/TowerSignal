@@ -49,9 +49,10 @@ description.
 The cache records the HPD fetch strategy explicitly as
 `UPPERCASE_KEYWORD_PARTITIONS`. HPD descriptions are standardized uppercase text,
 so the source query avoids `lower(novdescription)` scans that can time out on
-hosted runners. Each term partition must still fetch exactly its source-reported
-count, then the cache de-duplicates overlapping partition matches by
-`violationid` and records the duplicate count explicitly.
+hosted runners. Each term partition uses `violationid` keyset pagination instead
+of high-offset pagination, must still fetch exactly its source-reported count,
+then the cache de-duplicates overlapping partition matches by `violationid` and
+records the duplicate count explicitly.
 
 An HPD record is a confirmed housing-code violation observation; it is not evidence of which contractor currently services the property.
 

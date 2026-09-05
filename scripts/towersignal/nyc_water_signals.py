@@ -24,7 +24,7 @@ DOB_APPROVED_PERMITS_DATASET_ID = "rbx6-tga4"
 LL84_DATASET_ID = "5zyy-y8am"
 NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
-HPD_MAX_PAGE_SIZE = 5000
+HPD_MAX_PAGE_SIZE = 10000
 HPD_WATER_TERMS = (
     "hot water",
     "water supply",
@@ -191,6 +191,7 @@ def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
                 page_size=min(page_size, HPD_MAX_PAGE_SIZE),
                 allow_count_fallback=True,
                 progress_label=f"NYC water HPD term {term!r}",
+                seek_field="violationid",
             )
         )
     return snapshots

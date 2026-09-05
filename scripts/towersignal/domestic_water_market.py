@@ -217,6 +217,7 @@ def fetch_snapshot(
     allow_count_fallback: bool = False,
     max_pages_without_count: int = 10000,
     progress_label: str | None = None,
+    seek_field: str | None = None,
 ) -> SourceSnapshot:
     metadata = fetch_metadata(dataset_id, api_root=api_root)
     available = set(metadata["fields"])
@@ -239,10 +240,17 @@ def fetch_snapshot(
     offset = 0
     active_page_size = page_size
     pages_without_count = 0
-    while expected_count is None or offset < expected_count:
-        params: dict[str, Any] = {"$limit": active_page_size, "$offset": offset, "$order": order_by}
-        if where:
-            params["$where"] = where
+    seek_value: int | None = None
+    while expected_count is None or len(rows) < expected_count:
+        params: dict[str, Any] = {"$limit": active_page_size, "$order": order_by}
+        page_where = where
+        if seek_field and seek_value is not None:
+            seek_clause = f"{seek_field} > {seek_value}"
+            page_where = f"({where}) AND {seek_clause}" if where else seek_clause
+        elif not seek_field:
+            params["$offset"] = offset
+        if page_where:
+            params["$where"] = page_where
         if select:
             params["$select"] = select
         try:
@@ -262,7 +270,20 @@ def fetch_snapshot(
                 print(f"{progress_label}: fetched {len(rows):,}/{expected_count:,} rows", file=sys.stderr, flush=True)
         if len(page) < active_page_size:
             break
-        offset += active_page_size
+        if seek_field:
+            raw_seek = normalize_space(page[-1].get(seek_field)) if page and isinstance(page[-1], dict) else ""
+            if not re.fullmatch(r"\d+", raw_seek):
+                raise DomesticWaterSourceError(
+                    f"Dataset {dataset_id} seek pagination missing numeric {seek_field!r} value"
+                )
+            next_seek = int(raw_seek)
+            if seek_value is not None and next_seek <= seek_value:
+                raise DomesticWaterSourceError(
+                    f"Dataset {dataset_id} seek pagination did not advance beyond {seek_value}"
+                )
+            seek_value = next_seek
+        else:
+            offset += active_page_size
         if expected_count is None:
             pages_without_count += 1
             if pages_without_count >= max_pages_without_count:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -123,6 +124,7 @@ class NycWaterSignalsTests(unittest.TestCase):
             calls.append((dataset_id, int(kwargs["page_size"])))
             if dataset_id == HPD_VIOLATIONS_DATASET_ID:
                 where = str(kwargs.get("where") or "")
+                self.assertEqual(kwargs.get("seek_field"), "violationid")
                 hpd_wheres.append(where)
                 self.assertNotIn("lower(", where)
                 self.assertRegex(where, r"novdescription like '%[A-Z ]+%'")
@@ -161,7 +163,7 @@ class NycWaterSignalsTests(unittest.TestCase):
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
         self.assertEqual(len(hpd_calls), len(HPD_WATER_TERMS))
         self.assertEqual(len(hpd_wheres), len(HPD_WATER_TERMS))
-        self.assertLessEqual(HPD_MAX_PAGE_SIZE, 5000)
+        self.assertLessEqual(HPD_MAX_PAGE_SIZE, 10000)
 
     def test_snapshot_reduces_page_size_after_repeated_source_timeout(self) -> None:
         rows = [{"id": str(index)} for index in range(5)]
@@ -223,6 +225,41 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual([row["id"] for row in snapshot.rows], ["0", "1", "2", "3", "4"])
         self.assertEqual(snapshot.source_record_count, 5)
         self.assertEqual(page_offsets, [0, 2, 4])
+
+    def test_snapshot_can_seek_page_by_numeric_identity_without_offsets(self) -> None:
+        rows = [{"id": str(index)} for index in (10, 20, 30, 40, 50)]
+        wheres: list[str] = []
+
+        def fake_query(dataset_id: str, *, api_root: str, params):
+            self.assertEqual(dataset_id, "seek-demo")
+            self.assertEqual(api_root, "https://example.test")
+            self.assertNotIn("$offset", params)
+            where = str(params.get("$where") or "")
+            wheres.append(where)
+            threshold = 0
+            match = re.search(r"id > (\d+)", where)
+            if match:
+                threshold = int(match.group(1))
+            limit = int(params["$limit"])
+            return [row for row in rows if int(row["id"]) > threshold][:limit]
+
+        with (
+            patch("towersignal.domestic_water_market.fetch_metadata", return_value={"name": "Seek demo", "source_last_updated_at": None, "fields": ("id",)}),
+            patch("towersignal.domestic_water_market.fetch_count", return_value=len(rows)),
+            patch("towersignal.domestic_water_market._query", side_effect=fake_query),
+        ):
+            snapshot = fetch_source_snapshot(
+                "seek-demo",
+                api_root="https://example.test",
+                order_by="id",
+                required_fields=("id",),
+                where="status='Open'",
+                page_size=2,
+                seek_field="id",
+            )
+
+        self.assertEqual([row["id"] for row in snapshot.rows], ["10", "20", "30", "40", "50"])
+        self.assertEqual(wheres, ["status='Open'", "(status='Open') AND id > 20", "(status='Open') AND id > 40"])
 
     def test_validator_accepts_zero_count_source_partitions(self) -> None:
         hpd_row = {
