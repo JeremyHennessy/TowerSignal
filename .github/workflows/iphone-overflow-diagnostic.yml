@@ -1,0 +1,89 @@
+name: iPhone overflow diagnostic
+
+on:
+  push:
+    branches:
+      - agent/iphone-overflow-fix-20260905
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Attach current production data
+        run: |
+          mkdir -p public/data/details/20
+          base="https://jeremyhennessy.github.io/TowerSignal/data"
+          curl -fsSL "$base/systems.json" -o public/data/systems.json
+          curl -fsSL "$base/changes.json" -o public/data/changes.json
+          curl -fsSL "$base/nys-systems.json" -o public/data/nys-systems.json
+          curl -fsSL "$base/nys-changes.json" -o public/data/nys-changes.json
+          curl -fsSL "$base/details/20/2000010821.json" -o public/data/details/20/2000010821.json
+      - name: Bypass outer auth only for disposable layout diagnostic
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/main.tsx')
+          s=p.read_text()
+          s=s.replace("import { AuthGate } from './auth/AuthGate'", "import App from './App'")
+          s=s.replace('<AuthGate />', '<App />')
+          p.write_text(s)
+          PY
+      - name: Build disposable diagnostic UI
+        run: npm run build
+      - name: Start preview
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4173 > /tmp/ts-overflow-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/TowerSignal/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/ts-overflow-preview.log
+          exit 1
+      - name: Find overflow elements at iPhone width
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from '@playwright/test'
+          const browser = await chromium.launch({ channel: 'chrome' })
+          const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true })
+          const page = await context.newPage()
+          await page.route(/orthos\.its\.ny\.gov|tile\.openstreetmap\.org/, route => route.abort())
+          await page.goto('http://127.0.0.1:4173/TowerSignal/#/account/2000010821', { waitUntil: 'domcontentloaded' })
+          await page.getByRole('heading', { name: 'Identity', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+          const diagnostic = await page.evaluate(() => {
+            const viewport = document.documentElement.clientWidth
+            const rows = [...document.querySelectorAll('*')].map(element => {
+              const rect = element.getBoundingClientRect()
+              const html = element
+              return {
+                tag: html.tagName,
+                cls: html.className && typeof html.className === 'string' ? html.className : '',
+                id: html.id || '',
+                left: Math.round(rect.left * 10) / 10,
+                right: Math.round(rect.right * 10) / 10,
+                width: Math.round(rect.width * 10) / 10,
+                scrollWidth: html.scrollWidth,
+                clientWidth: html.clientWidth,
+                text: (html.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 120),
+              }
+            }).filter(row => row.right > viewport + .5 || row.left < -.5 || row.scrollWidth > row.clientWidth + 1)
+            return {
+              viewport,
+              innerWidth: window.innerWidth,
+              bodyScrollWidth: document.body.scrollWidth,
+              rootScrollWidth: document.documentElement.scrollWidth,
+              rows: rows.slice(0, 80),
+            }
+          })
+          console.log(JSON.stringify(diagnostic, null, 2))
+          await browser.close()
+          NODE
