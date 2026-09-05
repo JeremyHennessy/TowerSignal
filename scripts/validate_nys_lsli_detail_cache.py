@@ -18,6 +18,12 @@ EXPECTED_METHODS = {
 MAX_EXPLICIT_UNAVAILABLE_404 = 25
 
 
+def _required_int(value: object, *, field: str, pws_id: str) -> int:
+    if value is None:
+        raise RuntimeError(f"LSLI reconciliation field missing: {pws_id} {field}")
+    return int(value)
+
+
 def validate(path: Path, *, max_age_days: int, require_production_volume: bool) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("schema_version") != "1.2" or payload.get("domain") != "NYS_LEAD_SERVICE_LINE_INVENTORY_DETAILS":
@@ -53,6 +59,8 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     total_service_lines = 0
     with_contact = 0
     derived_identified_count = 0
+    identified_reconciliation_mismatch_count = 0
+    total_reconciliation_mismatch_count = 0
     for row in details:
         pws_id = str(row.get("pws_id") or "")
         if not PWS_RE.fullmatch(pws_id) or pws_id in pws_ids:
@@ -69,7 +77,13 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         inventory = row.get("inventory")
         source_reported = row.get("source_reported_inventory")
         evidence = row.get("inventory_evidence")
-        if not isinstance(inventory, dict) or not isinstance(source_reported, dict) or not isinstance(evidence, dict):
+        reconciliation = row.get("inventory_reconciliation")
+        if (
+            not isinstance(inventory, dict)
+            or not isinstance(source_reported, dict)
+            or not isinstance(evidence, dict)
+            or not isinstance(reconciliation, dict)
+        ):
             raise RuntimeError(f"LSLI inventory/evidence objects missing: {pws_id}")
         values = {
             key: int(inventory[key])
@@ -89,10 +103,41 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
             + values["gslrr_service_lines"]
             + values["non_lead_service_lines"]
         )
-        if values["identified_service_lines"] != derived:
-            raise RuntimeError(f"LSLI identified-line reconciliation failed: {pws_id}")
-        if values["total_service_lines"] != values["identified_service_lines"] + values["unknown_service_lines"]:
-            raise RuntimeError(f"LSLI total-line reconciliation failed: {pws_id}")
+        total_expected = values["identified_service_lines"] + values["unknown_service_lines"]
+        identified_matches = values["identified_service_lines"] == derived
+        total_matches = values["total_service_lines"] == total_expected
+        if reconciliation.get("identified_matches_components") is not identified_matches:
+            raise RuntimeError(f"LSLI identified reconciliation flag mismatch: {pws_id}")
+        if _required_int(
+            reconciliation.get("identified_expected_from_components"),
+            field="identified_expected_from_components",
+            pws_id=pws_id,
+        ) != derived:
+            raise RuntimeError(f"LSLI identified reconciliation expected count mismatch: {pws_id}")
+        if _required_int(
+            reconciliation.get("identified_component_delta"),
+            field="identified_component_delta",
+            pws_id=pws_id,
+        ) != values["identified_service_lines"] - derived:
+            raise RuntimeError(f"LSLI identified reconciliation delta mismatch: {pws_id}")
+        if reconciliation.get("total_matches_identified_plus_unknown") is not total_matches:
+            raise RuntimeError(f"LSLI total reconciliation flag mismatch: {pws_id}")
+        if _required_int(
+            reconciliation.get("total_expected_from_identified_plus_unknown"),
+            field="total_expected_from_identified_plus_unknown",
+            pws_id=pws_id,
+        ) != total_expected:
+            raise RuntimeError(f"LSLI total reconciliation expected count mismatch: {pws_id}")
+        if _required_int(
+            reconciliation.get("total_identified_unknown_delta"),
+            field="total_identified_unknown_delta",
+            pws_id=pws_id,
+        ) != values["total_service_lines"] - total_expected:
+            raise RuntimeError(f"LSLI total reconciliation delta mismatch: {pws_id}")
+        if not identified_matches:
+            identified_reconciliation_mismatch_count += 1
+        if not total_matches:
+            total_reconciliation_mismatch_count += 1
 
         identified_evidence = evidence.get("identified_service_lines")
         source_identified = source_reported.get("identified_service_lines")
@@ -101,8 +146,20 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
                 raise RuntimeError(f"Missing source identified count was not explicitly derived: {pws_id}")
             derived_identified_count += 1
         else:
-            if identified_evidence != "SOURCE_REPORTED" or int(source_identified) != values["identified_service_lines"]:
+            expected_identified_evidence = (
+                "SOURCE_REPORTED"
+                if identified_matches
+                else "SOURCE_REPORTED_RECONCILIATION_MISMATCH"
+            )
+            if identified_evidence != expected_identified_evidence or int(source_identified) != values["identified_service_lines"]:
                 raise RuntimeError(f"Source-reported identified count evidence mismatch: {pws_id}")
+        expected_total_evidence = (
+            "SOURCE_REPORTED"
+            if total_matches
+            else "SOURCE_REPORTED_RECONCILIATION_MISMATCH"
+        )
+        if evidence.get("total_service_lines") != expected_total_evidence:
+            raise RuntimeError(f"Source-reported total count evidence mismatch: {pws_id}")
 
         for field in (
             "total_service_lines",
@@ -148,6 +205,7 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
             "material_matrix",
             "identification_methods",
             "owner_or_operator_form_contact",
+            "inventory_reconciliation",
         }
         if any(field in row for field in forbidden):
             raise RuntimeError(f"Unavailable LSLI detail contains inferred fields: {pws_id}")
@@ -156,6 +214,10 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         raise RuntimeError("LSLI PWS identity coverage does not equal current index")
     if int(summary.get("details_with_derived_identified_count") or 0) != derived_identified_count:
         raise RuntimeError("LSLI derived-identified summary mismatch")
+    if int(summary.get("details_with_identified_reconciliation_mismatch_count") or 0) != identified_reconciliation_mismatch_count:
+        raise RuntimeError("LSLI identified reconciliation mismatch summary mismatch")
+    if int(summary.get("details_with_total_reconciliation_mismatch_count") or 0) != total_reconciliation_mismatch_count:
+        raise RuntimeError("LSLI total reconciliation mismatch summary mismatch")
     if int(summary.get("details_with_form_contact") or 0) != with_contact:
         raise RuntimeError("LSLI contact summary mismatch")
     if int(summary.get("source_reported_total_service_lines_sum") or -1) != total_service_lines:

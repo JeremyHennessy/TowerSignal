@@ -185,7 +185,7 @@ def _certification(parser) -> dict[str, Any]:
     return {"name": None, "title": None, "date": None, "raw_table": None}
 
 
-def _normalized_inventory(parsed: Mapping[str, Any], *, source_url: str) -> tuple[dict[str, int], dict[str, Any], dict[str, str]]:
+def _normalized_inventory(parsed: Mapping[str, Any], *, source_url: str) -> tuple[dict[str, int], dict[str, Any], dict[str, str], dict[str, Any]]:
     missing_components = [
         field for field in COMPONENT_REQUIRED_FIELDS if parsed.get(field) is None
     ]
@@ -208,16 +208,15 @@ def _normalized_inventory(parsed: Mapping[str, Any], *, source_url: str) -> tupl
         evidence = "DERIVED_FROM_SOURCE_COMPONENT_COUNTS"
     else:
         identified = int(source_identified)
-        evidence = "SOURCE_REPORTED"
-        if identified != derived_identified:
-            raise NysPublicWaterSourceError(
-                f"LSLI identified-line source total does not reconcile with components: {source_url}"
-            )
-
-    if total != identified + unknown:
-        raise NysPublicWaterSourceError(
-            f"LSLI total-line source count does not reconcile with identified + unknown: {source_url}"
+        evidence = (
+            "SOURCE_REPORTED"
+            if identified == derived_identified
+            else "SOURCE_REPORTED_RECONCILIATION_MISMATCH"
         )
+
+    identified_matches_components = identified == derived_identified
+    total_expected_from_components = identified + unknown
+    total_matches_identified_plus_unknown = total == total_expected_from_components
 
     inventory = {
         "total_service_lines": total,
@@ -229,9 +228,22 @@ def _normalized_inventory(parsed: Mapping[str, Any], *, source_url: str) -> tupl
     }
     inventory_evidence = {
         "identified_service_lines": evidence,
+        "total_service_lines": (
+            "SOURCE_REPORTED"
+            if total_matches_identified_plus_unknown
+            else "SOURCE_REPORTED_RECONCILIATION_MISMATCH"
+        ),
         "all_other_inventory_fields": "SOURCE_REPORTED",
     }
-    return inventory, source_reported, inventory_evidence
+    inventory_reconciliation = {
+        "identified_matches_components": identified_matches_components,
+        "identified_expected_from_components": derived_identified,
+        "identified_component_delta": identified - derived_identified,
+        "total_matches_identified_plus_unknown": total_matches_identified_plus_unknown,
+        "total_expected_from_identified_plus_unknown": total_expected_from_components,
+        "total_identified_unknown_delta": total - total_expected_from_components,
+    }
+    return inventory, source_reported, inventory_evidence, inventory_reconciliation
 
 
 def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = None) -> dict[str, Any]:
@@ -251,7 +263,12 @@ def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = No
             f"LSLI detail PWS mismatch: expected {expected_pws_id}, got {pws_id}: {source_url}"
         )
 
-    inventory, source_reported_inventory, inventory_evidence = _normalized_inventory(
+    (
+        inventory,
+        source_reported_inventory,
+        inventory_evidence,
+        inventory_reconciliation,
+    ) = _normalized_inventory(
         parsed, source_url=source_url
     )
 
@@ -289,6 +306,7 @@ def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = No
         "inventory": inventory,
         "source_reported_inventory": source_reported_inventory,
         "inventory_evidence": inventory_evidence,
+        "inventory_reconciliation": inventory_reconciliation,
         "material_matrix": _material_matrix(parser),
         "identification_methods": methods,
         "inventory_availability": _inventory_availability(parser, kv),
@@ -390,6 +408,16 @@ def build_payload(*, request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECOND
                 for row in details
                 if row["inventory_evidence"]["identified_service_lines"]
                 == "DERIVED_FROM_SOURCE_COMPONENT_COUNTS"
+            ),
+            "details_with_identified_reconciliation_mismatch_count": sum(
+                1
+                for row in details
+                if not row["inventory_reconciliation"]["identified_matches_components"]
+            ),
+            "details_with_total_reconciliation_mismatch_count": sum(
+                1
+                for row in details
+                if not row["inventory_reconciliation"]["total_matches_identified_plus_unknown"]
             ),
             "details_with_form_contact": sum(
                 1 for row in details if row["owner_or_operator_form_contact"]["name"]

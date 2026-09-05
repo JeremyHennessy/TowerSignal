@@ -101,6 +101,49 @@ class NysLsliDetailTests(unittest.TestCase):
             "DERIVED_FROM_SOURCE_COMPONENT_COUNTS",
         )
 
+    def test_source_total_reconciliation_mismatch_is_preserved_with_evidence(self) -> None:
+        html = sample_html().replace(
+            "<tr><td>Total Number of Service Lines in the Distribution System</td><td>100</td></tr>",
+            "<tr><td>Total Number of Service Lines in the Distribution System</td><td>111</td></tr>",
+        )
+        result = parse_detail(html, source_url="https://example.test/NY7003493.htm")
+        self.assertEqual(result["inventory"]["total_service_lines"], 111)
+        self.assertEqual(result["source_reported_inventory"]["total_service_lines"], 111)
+        self.assertEqual(
+            result["inventory_evidence"]["total_service_lines"],
+            "SOURCE_REPORTED_RECONCILIATION_MISMATCH",
+        )
+        self.assertFalse(
+            result["inventory_reconciliation"]["total_matches_identified_plus_unknown"]
+        )
+        self.assertEqual(
+            result["inventory_reconciliation"]["total_expected_from_identified_plus_unknown"],
+            100,
+        )
+        self.assertEqual(result["inventory_reconciliation"]["total_identified_unknown_delta"], 11)
+
+    def test_source_identified_reconciliation_mismatch_is_preserved_with_evidence(self) -> None:
+        html = sample_html().replace(
+            "<tr><td>Total Number of Identified Service Lines</td><td>80</td></tr>",
+            "<tr><td>Total Number of Identified Service Lines</td><td>81</td></tr>",
+        ).replace(
+            "<tr><td>Total Number of Service Lines in the Distribution System</td><td>100</td></tr>",
+            "<tr><td>Total Number of Service Lines in the Distribution System</td><td>101</td></tr>",
+        )
+        result = parse_detail(html, source_url="https://example.test/NY7003493.htm")
+        self.assertEqual(result["inventory"]["identified_service_lines"], 81)
+        self.assertEqual(result["source_reported_inventory"]["identified_service_lines"], 81)
+        self.assertEqual(
+            result["inventory_evidence"]["identified_service_lines"],
+            "SOURCE_REPORTED_RECONCILIATION_MISMATCH",
+        )
+        self.assertFalse(result["inventory_reconciliation"]["identified_matches_components"])
+        self.assertEqual(
+            result["inventory_reconciliation"]["identified_expected_from_components"],
+            80,
+        )
+        self.assertEqual(result["inventory_reconciliation"]["identified_component_delta"], 1)
+
     def test_parses_gsl_text_as_numeric_count(self) -> None:
         result = parse_detail(
             sample_html(),

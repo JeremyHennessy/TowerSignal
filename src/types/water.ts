@@ -140,6 +140,16 @@ export interface LsliDetailRecord {
     non_lead_service_lines: number | null
     unknown_service_lines: number | null
   }
+  source_reported_inventory?: Record<string, number | null>
+  inventory_evidence?: Record<string, string>
+  inventory_reconciliation?: {
+    identified_matches_components: boolean
+    identified_expected_from_components: number
+    identified_component_delta: number
+    total_matches_identified_plus_unknown: boolean
+    total_expected_from_identified_plus_unknown: number
+    total_identified_unknown_delta: number
+  }
   identification_methods?: Array<Record<string, unknown>>
   inventory_availability?: Record<string, unknown>
   public_availability?: Record<string, unknown>

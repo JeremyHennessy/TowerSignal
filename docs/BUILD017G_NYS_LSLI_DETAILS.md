@@ -56,13 +56,19 @@ NYSDOH labels this section `Contact Information for Owner / Licensed Operator of
 - Sequential Sampling
 - Statistical Analysis/Predictive Model
 
-The validator independently requires:
+The validator independently evaluates:
 
 `identified = lead + GSLRR + non-lead`
 
 and
 
 `total = identified + unknown`.
+
+When a NYSDOH page's own aggregate fields do not reconcile, TowerSignal preserves
+the source-reported values, records `inventory_reconciliation` deltas, and marks
+the affected aggregate evidence as `SOURCE_REPORTED_RECONCILIATION_MISMATCH`.
+Those rows remain parsed source records; no aggregate count is silently replaced
+with a computed value.
 
 ### Section IV — public availability
 Public-access text and external inventory links are retained where source-present.
@@ -78,4 +84,4 @@ The aggregate `source_reported_total_service_lines_sum` is only the arithmetic s
 
 ## Acceptance
 
-Do not advance this increment unless every current-index PWS is accounted for as either a fully parsed detail or a narrowly evidenced `DETAIL_UNAVAILABLE_404`, no other errors are hidden, inventory arithmetic reconciles for all parsed details, the artifact revalidates after download, and the full repository test/build gate is green against the verified Build 017C parent branch.
+Do not advance this increment unless every current-index PWS is accounted for as either a fully parsed detail or a narrowly evidenced `DETAIL_UNAVAILABLE_404`, no other errors are hidden, any source-reported inventory arithmetic mismatches are explicitly counted with reconciliation deltas, the artifact revalidates after download, and the full repository test/build gate is green against the verified Build 017C parent branch.
