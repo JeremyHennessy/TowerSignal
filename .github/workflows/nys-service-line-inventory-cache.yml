@@ -1,0 +1,89 @@
+name: Verify NYS address-level service-line inventory cache
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/nys-service-line-inventory-cache.yml'
+      - 'scripts/towersignal/nys_service_line_inventory.py'
+      - 'scripts/build_nys_service_line_inventory_cache.py'
+      - 'scripts/validate_nys_service_line_inventory_cache.py'
+      - 'tests/python/test_nys_service_line_inventory.py'
+      - 'docs/BUILD017I_NYS_ADDRESS_SERVICE_LINES.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-nys-service-line-inventory-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build coherent full NYSDOH service-line inventory cache
+        run: >-
+          python scripts/build_nys_service_line_inventory_cache.py
+          --data nys-service-lines/service-lines.csv.gz
+          --summary nys-service-lines/summary.json
+      - name: Re-read and validate every normalized service-line row
+        run: >-
+          python scripts/validate_nys_service_line_inventory_cache.py
+          --data nys-service-lines/service-lines.csv.gz
+          --summary nys-service-lines/summary.json
+          --max-age-days 1
+          --require-production-volume
+      - name: Run service-line normalization tests
+        run: python -m unittest tests.python.test_nys_service_line_inventory -v
+      - name: Upload verified NYS address-level service-line cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-nys-service-line-inventory-cache
+          path: nys-service-lines/
+          retention-days: 7
+          compression-level: 0
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified NYS service-line cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-nys-service-line-inventory-cache
+          path: .verified-nys-service-lines
+      - name: Revalidate downloaded cache row-for-row
+        run: >-
+          python scripts/validate_nys_service_line_inventory_cache.py
+          --data .verified-nys-service-lines/service-lines.csv.gz
+          --summary .verified-nys-service-lines/summary.json
+          --max-age-days 1
+          --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
