@@ -212,6 +212,7 @@ def fetch_snapshot(
     where: str | None = None,
     select: str | None = None,
     page_size: int = 50000,
+    minimum_page_size: int = 1000,
 ) -> SourceSnapshot:
     metadata = fetch_metadata(dataset_id, api_root=api_root)
     available = set(metadata["fields"])
@@ -222,19 +223,26 @@ def fetch_snapshot(
     expected_count = fetch_count(dataset_id, api_root=api_root, where=where)
     rows: list[dict[str, Any]] = []
     offset = 0
+    active_page_size = page_size
     while offset < expected_count:
-        params: dict[str, Any] = {"$limit": page_size, "$offset": offset, "$order": order_by}
+        params: dict[str, Any] = {"$limit": active_page_size, "$offset": offset, "$order": order_by}
         if where:
             params["$where"] = where
         if select:
             params["$select"] = select
-        page = _query(dataset_id, api_root=api_root, params=params)
+        try:
+            page = _query(dataset_id, api_root=api_root, params=params)
+        except DomesticWaterSourceError:
+            if active_page_size <= minimum_page_size:
+                raise
+            active_page_size = max(minimum_page_size, active_page_size // 2)
+            continue
         if not isinstance(page, list):
             raise DomesticWaterSourceError(f"Dataset {dataset_id} returned a non-list page at offset {offset}")
         rows.extend(row for row in page if isinstance(row, dict))
-        if len(page) < page_size:
+        if len(page) < active_page_size:
             break
-        offset += page_size
+        offset += active_page_size
 
     if len(rows) != expected_count:
         raise DomesticWaterSourceError(

@@ -10,7 +10,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from towersignal.domestic_water_market import SourceSnapshot  # noqa: E402
+from towersignal.domestic_water_market import DomesticWaterSourceError, SourceSnapshot, fetch_snapshot as fetch_source_snapshot  # noqa: E402
 from towersignal.nyc_water_signals import (  # noqa: E402
     DOB_APPROVED_PERMITS_DATASET_ID,
     DOB_JOB_FILINGS_DATASET_ID,
@@ -151,6 +151,38 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(page_sizes[LL84_DATASET_ID], 50000)
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
         self.assertEqual(len(hpd_calls), len(HPD_WATER_TERMS))
+        self.assertLessEqual(HPD_MAX_PAGE_SIZE, 5000)
+
+    def test_snapshot_reduces_page_size_after_repeated_source_timeout(self) -> None:
+        rows = [{"id": str(index)} for index in range(5)]
+        page_limits: list[int] = []
+
+        def fake_query(dataset_id: str, *, api_root: str, params):
+            self.assertEqual(dataset_id, "timeout-demo")
+            self.assertEqual(api_root, "https://example.test")
+            limit = int(params["$limit"])
+            offset = int(params["$offset"])
+            page_limits.append(limit)
+            if limit == 4:
+                raise DomesticWaterSourceError("source page timed out")
+            return rows[offset:offset + limit]
+
+        with (
+            patch("towersignal.domestic_water_market.fetch_metadata", return_value={"name": "Timeout demo", "source_last_updated_at": None, "fields": ("id",)}),
+            patch("towersignal.domestic_water_market.fetch_count", return_value=len(rows)),
+            patch("towersignal.domestic_water_market._query", side_effect=fake_query),
+        ):
+            snapshot = fetch_source_snapshot(
+                "timeout-demo",
+                api_root="https://example.test",
+                order_by="id",
+                required_fields=("id",),
+                page_size=4,
+                minimum_page_size=2,
+            )
+
+        self.assertEqual([row["id"] for row in snapshot.rows], ["0", "1", "2", "3", "4"])
+        self.assertEqual(page_limits, [4, 2, 2, 2])
 
     def test_validator_accepts_zero_count_source_partitions(self) -> None:
         hpd_row = {
