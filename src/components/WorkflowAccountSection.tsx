@@ -18,6 +18,8 @@ export function WorkflowAccountSection({
   watchlists,
   membershipIds,
   busy,
+  storageMode = 'remote',
+  syncWarning,
   onSave,
   onToggleMembership,
 }: {
@@ -26,6 +28,8 @@ export function WorkflowAccountSection({
   watchlists: WorkflowWatchlist[]
   membershipIds: Set<string>
   busy: boolean
+  storageMode?: 'remote' | 'local' | 'signed-out'
+  syncWarning?: string | null
   onSave: (patch: WorkflowAccountPatch) => Promise<void>
   onToggleMembership: (watchlistId: string, enabled: boolean) => Promise<void>
 }) {
@@ -34,19 +38,27 @@ export function WorkflowAccountSection({
 
   useEffect(() => {
     setDraft(account ? { status: account.status, note: account.note, next_action_date: account.next_action_date } : DEFAULT_ACCOUNT)
-    setSaved(false)
   }, [account])
+
+  useEffect(() => {
+    setSaved(false)
+  }, [account?.system_id])
 
   if (!signedIn) return <section className="workflow-account-section"><div className="workflow-section-heading"><span className="eyebrow">User workflow</span><h3>Account workflow</h3></div><p>Sign in with <strong>Sync workflow</strong> to keep watchlists, disposition, notes and next actions across sessions and devices.</p><p className="microcopy">Workflow state is private user-entered context and is never treated as public-source evidence or scoring input.</p></section>
 
   const save = async () => {
     setSaved(false)
-    await onSave(draft)
-    setSaved(true)
+    try {
+      await onSave(draft)
+      setSaved(true)
+    } catch {
+      setSaved(false)
+    }
   }
 
   return <section className="workflow-account-section">
-    <div className="workflow-section-heading"><div><span className="eyebrow">User workflow</span><h3>Account workflow</h3></div>{saved && <span className="workflow-saved">Saved</span>}</div>
+    <div className="workflow-section-heading"><div><span className="eyebrow">User workflow</span><h3>Account workflow</h3></div><div className="workflow-storage-state">{storageMode === 'local' && <span className="workflow-local-badge">On device</span>}{saved && <span className="workflow-saved">Saved</span>}</div></div>
+    {storageMode === 'local' && <p className="workflow-local-warning"><strong>On-device workflow.</strong> Private changes in this browser are stored only on this device until secure remote sync is available again.{syncWarning ? ` ${syncWarning}` : ''}</p>}
     <div className="workflow-account-grid">
       <label>Status<select value={draft.status} onChange={event => setDraft(current => ({ ...current, status: event.target.value as AccountDisposition }))}>{STATUS_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
       <label>Next action<input type="date" value={draft.next_action_date ?? ''} onChange={event => setDraft(current => ({ ...current, next_action_date: event.target.value || null }))} /></label>
