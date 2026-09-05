@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Feature, MultiPolygon, Polygon } from 'geojson'
@@ -33,7 +33,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetailWithDo
   const container = useRef<HTMLDivElement | null>(null)
   const features = detail.planimetric_building_tower_features
   const buildingFootprints = detail.building_footprints
-  const waterTanks = detail.domestic_water?.planimetric_tank_features ?? []
+  const waterTanks = useMemo(() => detail.domestic_water?.planimetric_tank_features ?? [], [detail.domestic_water?.planimetric_tank_features])
   const featureCount = features?.length ?? 0
   const footprintCount = buildingFootprints?.length ?? 0
   const waterTankCount = waterTanks.length
