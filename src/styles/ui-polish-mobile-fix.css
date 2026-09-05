@@ -1,3 +1,11 @@
+/* Portal-route/mobile cleanup layered after the main UI polish sheet. */
+.portal-route-nav .workflow-profile-trigger{display:none}
+
+@media(max-width:900px){
+  .portal-route-nav .workflow-profile-trigger{display:grid!important}
+  .portal-route-nav .reference-desktop-account{display:none!important}
+}
+
 /* Keep account search reachable even on the narrowest supported iPhone widths. */
 @media(max-width:430px){
   .reference-mobile-search-trigger{display:grid!important}
