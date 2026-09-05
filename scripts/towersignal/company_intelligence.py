@@ -40,6 +40,8 @@ def _ambiguous_base_name(value: str) -> bool:
 def _observation_date(row: Mapping[str, Any]) -> str | None:
     for field in (
         "award_date",
+        "approved_date",
+        "latest_approved_filed_date",
         "registration_date",
         "start_date",
         "notice_start_date",

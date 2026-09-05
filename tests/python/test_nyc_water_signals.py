@@ -1,0 +1,89 @@
+from __future__ import annotations
+
+import sys
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from towersignal.nyc_water_signals import (  # noqa: E402
+    _dob_business_profiles,
+    classify_311,
+    classify_dob_work,
+    normalize_311,
+    normalize_dob_job,
+    normalize_dob_permit,
+    normalize_hpd,
+    normalize_ll84,
+)
+
+
+class NycWaterSignalsTests(unittest.TestCase):
+    def test_311_keeps_street_context_out_of_building_evidence(self) -> None:
+        street = {"unique_key": "1", "agency": "DEP", "complaint_type": "Water System", "descriptor": "Water Main Break", "incident_address": "1 MAIN ST", "bbl": "1000010001"}
+        building = {"unique_key": "2", "agency": "DEP", "complaint_type": "Water Quality", "descriptor": "Dirty Water", "incident_address": "2 WATER ST", "bbl": "1000020001"}
+        self.assertEqual(classify_311(street), "STREET_WATER_MAIN_CONTEXT")
+        normalized_street = normalize_311(street)
+        self.assertFalse(normalized_street["is_building_water_signal"])
+        self.assertEqual(normalized_street["property_link_confidence"], "CONTEXT_ONLY")
+        normalized_building = normalize_311(building)
+        self.assertTrue(normalized_building["is_building_water_signal"])
+        self.assertEqual(normalized_building["property_link_confidence"], "CONFIRMED_SOURCE_BBL")
+
+    def test_hpd_open_water_violation_preserves_source_property_identifiers(self) -> None:
+        normalized = normalize_hpd({
+            "violationid": "123", "buildingid": "456", "registrationid": "789", "boro": "MANHATTAN",
+            "housenumber": "10", "streetname": "WATER ST", "zip": "10001", "class": "C",
+            "inspectiondate": "2026-08-01T00:00:00.000", "novdescription": "PROVIDE HOT WATER",
+            "currentstatus": "NOV SENT OUT", "currentstatusdate": "2026-08-02T00:00:00.000",
+            "violationstatus": "Open", "rentimpairing": "Y", "bin": "1000001", "bbl": "1000010001",
+        })
+        self.assertEqual(normalized["category"], "HOT_WATER")
+        self.assertEqual(normalized["bbl"], "1000010001")
+        self.assertEqual(normalized["bin"], "1000001")
+        self.assertEqual(normalized["property_link_confidence"], "CONFIRMED_SOURCE_BBL")
+
+    def test_dob_applicant_role_is_not_promoted_to_service_contract(self) -> None:
+        job = normalize_dob_job({
+            "job_filing_number": "M123-I1", "filing_status": "Approved", "house_no": "10", "street_name": "TANK ST",
+            "borough": "MANHATTAN", "bin": "1000001", "bbl": "1000010001", "plumbing_work_type": "YES",
+            "mechanical_systems_work_type_": "NO", "boiler_equipment_work_type_": "NO",
+            "job_description": "REPLACE DOMESTIC WATER TANK AND BOOSTER PUMP", "applicant_business_name": "Example Plumbing LLC",
+            "applicant_first_name": "Alex", "applicant_last_name": "Smith", "applicant_license": "123456",
+        })
+        self.assertEqual(job["category"], "DOMESTIC_WATER_STORAGE")
+        self.assertEqual(job["relationship_role"], "JOB_APPLICANT_OF_RECORD")
+        self.assertEqual(job["relationship_evidence"], "RECORDED_DOB_ROLE")
+        self.assertEqual(job["service_assignment_confidence"], "NOT_PROOF_OF_SERVICE_CONTRACT")
+        permit = normalize_dob_permit({
+            "job_filing_number": "M123-I1", "work_permit": "M123-I1-PL", "sequence_number": "1",
+            "house_no": "10", "street_name": "TANK ST", "borough": "MANHATTAN", "bin": "1000001", "bbl": "1000010001",
+            "work_type": "Plumbing", "job_description": "INSTALL RPZ BACKFLOW PREVENTER",
+            "applicant_business_name": "Example Plumbing Inc.", "applicant_license": "123456", "permittee_s_license_type": "P",
+        })
+        self.assertEqual(permit["category"], "BACKFLOW_PREVENTION")
+        self.assertEqual(permit["relationship_role"], "PERMIT_APPLICANT_OF_RECORD")
+        profiles = _dob_business_profiles([job], [permit])
+        self.assertEqual(len(profiles), 1)
+        self.assertEqual(profiles[0]["record_count"], 2)
+        self.assertEqual(profiles[0]["job_filing_count"], 1)
+        self.assertEqual(profiles[0]["permit_count"], 1)
+
+    def test_dob_fire_water_context_does_not_become_domestic_water(self) -> None:
+        self.assertEqual(classify_dob_work({"job_description": "REPLACE FIRE SPRINKLER WATER PIPING", "work_type": "Plumbing"}), "FIRE_WATER_CONTEXT")
+        self.assertEqual(classify_dob_work({"job_description": "REPLACE DOMESTIC WATER PIPING", "work_type": "Plumbing"}), "DOMESTIC_WATER_SYSTEM")
+
+    def test_ll84_multi_bbl_is_not_force_linked(self) -> None:
+        single = normalize_ll84({"report_year": "2025", "property_id": "1", "nyc_borough_block_and_lot": "1000010001", "nyc_building_identification": "1000001", "municipally_supplied_potable_1": "1234.5"})
+        self.assertEqual(single["property_link_confidence"], "EXACT_SINGLE_BBL")
+        self.assertEqual(single["property_key"], "NYC-BBL-1000010001")
+        self.assertEqual(single["municipal_potable_total_kgal"], 1234.5)
+        multi = normalize_ll84({"report_year": "2025", "property_id": "2", "nyc_borough_block_and_lot": "1000010001, 1000020002", "nyc_building_identification": "1000001, 1000002"})
+        self.assertEqual(multi["property_link_confidence"], "MULTI_IDENTIFIER_CONTEXT")
+        self.assertIsNone(multi["property_key"])
+        self.assertEqual(multi["bbls"], ["1000010001", "1000020002"])
+
+
+if __name__ == "__main__":
+    unittest.main()

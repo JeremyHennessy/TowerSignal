@@ -1,0 +1,77 @@
+name: Verify NYC building water signals
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/nyc-water-signals-cache.yml'
+      - 'scripts/towersignal/nyc_water_signals.py'
+      - 'scripts/build_nyc_water_signals_cache.py'
+      - 'scripts/validate_nyc_water_signals_cache.py'
+      - 'scripts/attach_nyc_water_signals.py'
+      - 'tests/python/test_nyc_water_signals.py'
+      - 'tests/python/test_attach_nyc_water_signals.py'
+      - 'docs/BUILD017B_NYC_WATER_SIGNALS.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-nyc-water-signals-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build bounded NYC building-water signals cache
+        run: python scripts/build_nyc_water_signals_cache.py --output nyc-water-signals/cache.json --page-size 50000
+      - name: Validate exact source counts and evidence boundaries
+        run: python scripts/validate_nyc_water_signals_cache.py --cache nyc-water-signals/cache.json --max-age-days 1 --require-production-volume
+      - name: Run NYC water signal unit tests
+        run: python -m unittest tests.python.test_nyc_water_signals tests.python.test_attach_nyc_water_signals -v
+      - name: Upload verified NYC water signals cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-nyc-water-signals
+          path: nyc-water-signals/cache.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified NYC water signals cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-nyc-water-signals
+          path: .verified-nyc-water-signals
+      - name: Revalidate downloaded cache
+        run: python scripts/validate_nyc_water_signals_cache.py --cache .verified-nyc-water-signals/cache.json --max-age-days 1 --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build

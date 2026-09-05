@@ -39,6 +39,7 @@ export function UserAccountPage({ user, onSignOut }: { user: WorkflowUser; onSig
         <button onClick={() => go('#/nys-changes')}>NYS Changes</button>
         <button onClick={() => go('#/opportunities')}>Opportunities</button>
         <button onClick={() => go('#/companies')}>Companies</button>
+        <button onClick={() => go('#/water-quality')}>Water Quality</button>
         <button onClick={() => go('#/portfolios')}>Portfolios</button>
         <button onClick={() => go('#/workflow')}>Workflow</button>
       </nav>

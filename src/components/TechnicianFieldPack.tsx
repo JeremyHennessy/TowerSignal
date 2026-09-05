@@ -42,6 +42,7 @@ function sourceItems(row: SystemSummary, detail: SystemDetailWithDomesticWater):
   const towers = detail.planimetric_building_tower_features ?? []
   const footprints = detail.building_footprints ?? []
   const domestic = detail.domestic_water
+  const buildingWater = detail.nyc_building_water_signals
   const contacts = detail.hpd_registration?.contacts ?? []
   const dobJobs = detail.dob_activity_history ?? []
   return [
@@ -70,6 +71,12 @@ function sourceItems(row: SystemSummary, detail: SystemDetailWithDomesticWater):
       tone: domestic ? 'ready' : 'missing',
     },
     {
+      label: 'Building-water signals',
+      value: buildingWater ? `${plural(buildingWater.summary.record_count, 'exact property signal')}` : 'No exact-BBL/BIN water-signal match',
+      detail: buildingWater ? '311, HPD, DOB and LL84 building-water evidence stays separate from compliance scoring and service-provider claims.' : 'No exact source BBL/BIN 311, HPD, DOB or LL84 building-water signal is represented for this detail record.',
+      tone: buildingWater ? 'verify' : 'missing',
+    },
+    {
       label: 'HPD contact / access cues',
       value: contacts.length ? `${plural(contacts.length, 'public contact')}` : 'No public HPD contact match',
       detail: contacts.length ? 'Use as an access/research cue only; it does not prove service responsibility.' : 'Plan to confirm owner, manager, roof access and site contact before dispatch.',
@@ -94,6 +101,7 @@ export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detai
   const towers = detail.planimetric_building_tower_features ?? []
   const footprints = detail.building_footprints ?? []
   const domesticTanks = detail.domestic_water?.summary.planimetric_tank_count ?? 0
+  const buildingWaterSignals = detail.nyc_building_water_signals?.summary.record_count ?? 0
   const contacts = detail.hpd_registration?.contacts ?? []
   const roofLevel = towers.filter(feature => feature.sub_feature_code === '212000').length
   const groundLevel = towers.filter(feature => feature.sub_feature_code === '212010').length
@@ -115,6 +123,7 @@ export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detai
       <article><small>Latest public sample</small><strong>{sampleLabel(row)}</strong></article>
       <article><small>NYC Health inspection</small><strong>{row.latest_inspection_date ? `${formatDate(row.latest_inspection_date)}${row.confirmed_violation ? ' with violation evidence' : ''}` : 'No joined inspection'}</strong></article>
       <article><small>Physical roof evidence</small><strong>{plural(towers.length, 'tower footprint')}; {plural(footprints.length, 'building outline')}</strong></article>
+      <article><small>Building-water signals</small><strong>{buildingWaterSignals ? plural(buildingWaterSignals, 'exact property record') : 'No exact match'}</strong></article>
       <article><small>Contacts and access cues</small><strong>{contacts.length ? plural(contacts.length, 'HPD contact') : 'No public HPD contact'}</strong></article>
     </div>
 
@@ -125,6 +134,7 @@ export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detai
           <li><strong>Confirm identity:</strong> {display(row.address)}; System {row.system_id}; BIN {display(row.bin)}; BBL {display(row.bbl)}.</li>
           <li><strong>Confirm access:</strong> {contacts.length ? `${contacts[0]?.corporation_name ?? contacts[0]?.person_name ?? 'HPD contact'} is published as a contact cue.` : 'No public access contact is matched; verify owner or manager route before sending a technician.'}</li>
           <li><strong>Review compliance context:</strong> sample {sampleLabel(row)}; {row.oath_case_count ? `${plural(row.oath_case_count, 'exact-matched OATH case')}.` : 'no exact-matched OATH case.'}</li>
+          <li><strong>Review building-water context:</strong> {buildingWaterSignals ? `${plural(buildingWaterSignals, 'exact 311/HPD/DOB/LL84 signal')} attached.` : 'no exact-BBL/BIN building-water signal attached.'}</li>
           <li><strong>Check project timing:</strong> {latestDobLabel(detail)}.</li>
         </ul>
       </div>

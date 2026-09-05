@@ -9,7 +9,51 @@ const number = new Intl.NumberFormat('en-US')
 
 function procurementHealthRows(procurement: ProcurementBundle | null): ProcurementSourceHealth[] {
   if (!procurement) return []
-  return [procurement.cityRecord.source_health, ...Object.values(procurement.checkbook.source_health)]
+  const rows: ProcurementSourceHealth[] = [procurement.cityRecord.source_health, ...Object.values(procurement.checkbook.source_health)]
+  if (procurement.openBookWater) {
+    const source = procurement.openBookWater.source
+    const transportComplete = source.transport_complete === true
+    const schemaValid = source.schema_valid === true
+    rows.push({
+      source: 'NYS_OPEN_BOOK',
+      status: transportComplete && schemaValid ? 'HEALTHY' : 'WARNING',
+      record_count: procurement.openBookWater.summary.source_transaction_count,
+      relevant_record_count: procurement.openBookWater.summary.relevant_transaction_count,
+      normalized_contract_count: procurement.openBookWater.summary.relevant_contract_count,
+      normalized_notice_count: 0,
+      resolved_company_count: 0,
+      unresolved_vendor_count: procurement.openBookWater.summary.relevant_vendor_count,
+      facility_link_count: 0,
+      exact_tower_link_count: 0,
+      pagination_complete: transportComplete,
+      schema_valid: schemaValid,
+      freshness: `generated ${procurement.openBookWater.generated_at.slice(0, 10)}`,
+      status_reasons: ['CSV transport hash verified', 'facility links intentionally unlinked'],
+    })
+  }
+  if (procurement.nychaWater) {
+    const sourceRows = procurement.nychaWater.source_health
+    const partitionsHealthy = sourceRows.every(row => row.status === 'HEALTHY')
+    const paginationComplete = sourceRows.every(row => row.pagination_complete === true)
+    const schemaValid = sourceRows.every(row => row.schema_valid === true)
+    rows.push({
+      source: 'NYC_CHECKBOOK_NYCHA',
+      status: partitionsHealthy && paginationComplete && schemaValid ? 'HEALTHY' : 'WARNING',
+      record_count: procurement.nychaWater.summary.source_record_count,
+      relevant_record_count: procurement.nychaWater.summary.relevant_release_line_count,
+      normalized_contract_count: procurement.nychaWater.summary.relevant_contract_count,
+      normalized_notice_count: 0,
+      resolved_company_count: 0,
+      unresolved_vendor_count: procurement.nychaWater.summary.relevant_vendor_count,
+      facility_link_count: 0,
+      exact_tower_link_count: 0,
+      pagination_complete: paginationComplete,
+      schema_valid: schemaValid,
+      freshness: `${procurement.nychaWater.summary.fiscal_year_count} fiscal-year partitions`,
+      status_reasons: ['NYCHA location text retained as source context', 'line/release amounts are not summed as company revenue'],
+    })
+  }
+  return rows
 }
 
 export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
@@ -42,7 +86,7 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
       <article><span className="reference-metric-icon warning">◷</span><div><small>Warnings</small><strong>{warning}</strong><span>Require review, not silent fallback</span></div></article>
       <article><span className="reference-metric-icon">◎</span><div><small>Average account coverage</small><strong>{averageCoverage == null ? '—' : `${averageCoverage.toFixed(1)}%`}</strong><span>Across sources publishing coverage</span></div></article>
       <article><span className="reference-metric-icon success">⌂</span><div><small>NYC accounts</small><strong>{number.format(payload.summary.registered_systems)}</strong><span>Current normalized systems</span></div></article>
-      <article><span className="reference-metric-icon">▤</span><div><small>Procurement source rows</small><strong>{procurement ? number.format(procurementRecords) : '—'}</strong><span>City Record + Checkbook scoped rows</span></div></article>
+      <article><span className="reference-metric-icon">▤</span><div><small>Procurement source rows</small><strong>{procurement ? number.format(procurementRecords) : '—'}</strong><span>City Record, Checkbook and water caches</span></div></article>
     </div>
 
     {health.length === 0 ? <div className="reference-empty-state"><strong>Source-health metrics are not available in this payload.</strong><span>TowerSignal will not infer a healthy state when source diagnostics are missing.</span></div> : <div className="reference-table-card">
@@ -62,7 +106,11 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
 
     <div className="reference-table-card">
       <div className="reference-table-heading"><div><strong>Procurement sources</strong><span>Retrieval, normalization and linkage remain separate from account-source coverage.</span></div></div>
-      {procurementError ? <div className="reference-empty-state"><strong>Procurement source health unavailable.</strong><span>{procurementError}</span><span>No healthy status is inferred when the production procurement payload cannot be loaded.</span></div> : !procurement ? <div className="reference-empty-state"><strong>Loading procurement source health…</strong></div> : <div className="reference-table-scroll"><table className="reference-table procurement-health-table"><thead><tr><th>Source</th><th>Status</th><th>Source rows</th><th>Relevant</th><th>Contracts</th><th>Notices</th><th>Companies resolved</th><th>Vendors unresolved</th><th>Facility links</th><th>Exact tower links</th><th>Guards</th></tr></thead><tbody>{procurementHealth.map(source => <tr key={source.source}>
+      {procurementError ? <div className="reference-empty-state"><strong>Procurement source health unavailable.</strong><span>{procurementError}</span><span>No healthy status is inferred when the production procurement payload cannot be loaded.</span></div> : !procurement ? <div className="reference-empty-state"><strong>Loading procurement source health…</strong></div> : <><div className="source-health-warning-stack">
+        {procurement.sourceErrors.nysAuthorities && <div className="reference-empty-state compact"><strong>NYS authority procurement unavailable.</strong><span>{procurement.sourceErrors.nysAuthorities}</span></div>}
+        {procurement.sourceErrors.openBookWater && <div className="reference-empty-state compact"><strong>Open Book water procurement unavailable.</strong><span>{procurement.sourceErrors.openBookWater}</span></div>}
+        {procurement.sourceErrors.nychaWater && <div className="reference-empty-state compact"><strong>NYCHA water procurement unavailable.</strong><span>{procurement.sourceErrors.nychaWater}</span></div>}
+      </div><div className="reference-table-scroll"><table className="reference-table procurement-health-table"><thead><tr><th>Source</th><th>Status</th><th>Source rows</th><th>Relevant</th><th>Contracts</th><th>Notices</th><th>Companies resolved</th><th>Vendors unresolved</th><th>Facility links</th><th>Exact tower links</th><th>Guards</th></tr></thead><tbody>{procurementHealth.map(source => <tr key={source.source}>
         <td><strong>{source.source}</strong><small>{source.freshness ?? 'freshness not published'}</small></td>
         <td><span className={`health-badge health-${source.status.toLowerCase()}`}>{source.status}</span></td>
         <td>{number.format(source.record_count)}</td>
@@ -74,7 +122,7 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
         <td>{number.format(source.facility_link_count)}</td>
         <td>{number.format(source.exact_tower_link_count)}</td>
         <td><span>{source.pagination_complete ? 'Pagination complete' : 'Pagination incomplete'}</span><small>{source.schema_valid ? 'Schema valid' : 'Schema invalid'}</small></td>
-      </tr>)}</tbody></table></div>}
+      </tr>)}</tbody></table></div></>}
     </div>
 
     <div className="source-health-footnote">Source health distinguishes expected scope limits from unexpected data loss. Procurement rows remain unlinked to cooling-tower accounts until an exact or explicitly reviewed facility relationship is available.</div>

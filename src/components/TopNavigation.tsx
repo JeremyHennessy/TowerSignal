@@ -2,7 +2,7 @@ import { type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 import { ShareButton } from './ShareButton'
 
-export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'opportunities' | 'companies' | 'portfolios' | 'workflow' | 'source-health' | 'account'
+export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'opportunities' | 'companies' | 'water-quality' | 'portfolios' | 'workflow' | 'source-health' | 'account'
 
 const logoAsset = `${import.meta.env.BASE_URL}marketing/towersignal-logo.webp`
 
@@ -14,6 +14,7 @@ const navigation: Array<{ mode: WorkspaceMode; label: string }> = [
   { mode: 'nys-changes', label: 'NYS Changes' },
   { mode: 'opportunities', label: 'Opportunities' },
   { mode: 'companies', label: 'Companies' },
+  { mode: 'water-quality', label: 'Water Quality' },
   { mode: 'portfolios', label: 'Portfolios' },
   { mode: 'workflow', label: 'Workflow' },
 ]

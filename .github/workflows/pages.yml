@@ -60,6 +60,47 @@ jobs:
         run: python scripts/build_data.py --output public/data
       - name: Attach exact-BIN domestic-water roof and inspection context
         run: python scripts/build_domestic_water_data.py --output public/data
+      - name: Build domestic-water provider/lab/DEC market cache
+        run: python scripts/build_domestic_water_market_cache.py --output public/data/domestic-water-market.json --page-size 50000
+      - name: Validate domestic-water provider/lab/DEC market cache
+        run: python scripts/validate_domestic_water_market_cache.py --cache public/data/domestic-water-market.json --max-age-days 1 --require-production-volume
+      - name: Build provider identity review queue
+        run: python scripts/build_provider_resolution_review.py --domestic-cache public/data/domestic-water-market.json --output public/data/provider-resolution-review.json
+      - name: Validate provider identity review queue
+        run: python scripts/validate_provider_resolution_review.py --review public/data/provider-resolution-review.json --require-production-volume
+      - name: Build NYC building-water signal cache
+        run: python scripts/build_nyc_water_signals_cache.py --output public/data/nyc-water-signals.json --page-size 50000
+      - name: Validate NYC building-water signal cache
+        run: python scripts/validate_nyc_water_signals_cache.py --cache public/data/nyc-water-signals.json --max-age-days 1 --require-production-volume
+      - name: Attach exact-BBL/BIN NYC building-water signals
+        run: python scripts/attach_nyc_water_signals.py --output public/data --cache public/data/nyc-water-signals.json
+      - name: Build exact-count NYC lead service-line cache
+        run: >-
+          python scripts/build_lead_service_line_cache.py
+          --output .lead-service-line-cache/lead-service-lines.ndjson.gz
+          --summary .lead-service-line-cache/summary.json
+          --page-size 50000
+      - name: Validate NYC lead service-line cache
+        run: >-
+          python scripts/validate_lead_service_line_cache.py
+          --data .lead-service-line-cache/lead-service-lines.ndjson.gz
+          --summary .lead-service-line-cache/summary.json
+          --max-age-days 1
+          --require-production-volume
+      - name: Attach exact-BBL NYC lead service-line records
+        run: >-
+          python scripts/attach_nyc_service_lines.py
+          --output public/data
+          --data .lead-service-line-cache/lead-service-lines.ndjson.gz
+          --summary .lead-service-line-cache/summary.json
+      - name: Build NYC distribution water-quality cache
+        run: python scripts/build_nyc_distribution_water_cache.py --output public/data/nyc-distribution-water.json --page-size 50000
+      - name: Validate NYC distribution water-quality cache
+        run: python scripts/validate_nyc_distribution_water_cache.py --cache public/data/nyc-distribution-water.json --max-age-days 1 --require-production-volume
+      - name: Probe ELAP public source contract
+        run: python scripts/probe_elap_search.py > public/data/elap-source-probe.json
+      - name: Validate ELAP public source contract
+        run: python scripts/validate_elap_source_probe.py --probe public/data/elap-source-probe.json
       - name: Fetch, validate and normalize NYC City Record procurement
         run: python scripts/build_city_record_procurement.py --output public/data/procurement-city-record.json
       - name: Attach last verified Checkbook NYC procurement cache
@@ -70,12 +111,42 @@ jobs:
         run: python scripts/build_nys_authority_procurement.py --output public/data/procurement-nys-authorities.json --cohort data/fixtures/deal-validation-cohort.json
       - name: Validate statewide NYS authority procurement
         run: python scripts/validate_nys_authority_procurement.py --input public/data/procurement-nys-authorities.json
+      - name: Build Open Book NY water procurement cache
+        run: python scripts/build_openbook_water_cache.py --output public/data/procurement-openbook-water.json
+      - name: Validate Open Book NY water procurement cache
+        run: python scripts/validate_openbook_water_cache.py --cache public/data/procurement-openbook-water.json --max-age-days 1 --require-production-volume
+      - name: Build NYCHA water-contract release-line cache
+        run: python scripts/build_nycha_water_cache.py --output public/data/procurement-nycha-water.json --fiscal-year-count 5 --page-size 5000
+      - name: Validate NYCHA water-contract release-line cache
+        run: python scripts/validate_nycha_water_cache.py --cache public/data/procurement-nycha-water.json --max-age-days 1 --require-production-volume
       - name: Build conservative observed-vendor company intelligence
-        run: python scripts/build_company_intelligence.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json --output public/data/companies.json
+        run: >-
+          python scripts/build_company_intelligence.py
+          --city-record public/data/procurement-city-record.json
+          --checkbook public/data/procurement-checkbook.json
+          --extra-procurement public/data/procurement-nys-authorities.json
+          --extra-procurement public/data/procurement-openbook-water.json
+          --extra-procurement public/data/procurement-nycha-water.json
+          --output public/data/companies.json
       - name: Verify cross-source company aggregation
-        run: python scripts/validate_company_intelligence.py --companies public/data/companies.json --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json
+        run: >-
+          python scripts/validate_company_intelligence.py
+          --companies public/data/companies.json
+          --city-record public/data/procurement-city-record.json
+          --checkbook public/data/procurement-checkbook.json
+          --extra-procurement public/data/procurement-nys-authorities.json
+          --extra-procurement public/data/procurement-openbook-water.json
+          --extra-procurement public/data/procurement-nycha-water.json
       - name: Build empirical Deal Intelligence validation
-        run: python scripts/build_deal_validation.py --city-record public/data/procurement-city-record.json --checkbook public/data/procurement-checkbook.json --extra-procurement public/data/procurement-nys-authorities.json --cohort data/fixtures/deal-validation-cohort.json --output public/data/deal-validation.json
+        run: >-
+          python scripts/build_deal_validation.py
+          --city-record public/data/procurement-city-record.json
+          --checkbook public/data/procurement-checkbook.json
+          --extra-procurement public/data/procurement-nys-authorities.json
+          --extra-procurement public/data/procurement-openbook-water.json
+          --extra-procurement public/data/procurement-nycha-water.json
+          --cohort data/fixtures/deal-validation-cohort.json
+          --output public/data/deal-validation.json
       - name: Validate Deal Intelligence methodology and gate
         run: python scripts/validate_deal_validation.py --report public/data/deal-validation.json
       - name: Attach last verified ACRIS timing cache
@@ -106,6 +177,26 @@ jobs:
           PY
       - name: Fetch, validate and generate current NYS registry data
         run: python scripts/build_nys_data.py --output public/data
+      - name: Build NYS public-water system cache
+        run: python scripts/build_nys_public_water_cache.py --output public/data/nys-public-water.json
+      - name: Validate NYS public-water system cache
+        run: python scripts/validate_nys_public_water_cache.py --cache public/data/nys-public-water.json --max-age-days 1 --require-production-volume
+      - name: Build NYS LSLI detail cache
+        run: python scripts/build_nys_lsli_detail_cache.py --output public/data/nys-lsli-details.json --request-delay-seconds 0.15
+      - name: Validate NYS LSLI detail cache
+        run: python scripts/validate_nys_lsli_detail_cache.py --cache public/data/nys-lsli-details.json --max-age-days 1 --require-production-volume
+      - name: Build NYS address-level service-line summary
+        run: >-
+          python scripts/build_nys_service_line_inventory_cache.py
+          --data .nys-service-lines/service-lines.csv.gz
+          --summary public/data/nys-service-line-inventory-summary.json
+      - name: Validate NYS address-level service-line summary
+        run: >-
+          python scripts/validate_nys_service_line_inventory_cache.py
+          --data .nys-service-lines/service-lines.csv.gz
+          --summary public/data/nys-service-line-inventory-summary.json
+          --max-age-days 1
+          --require-production-volume
       - name: Build and validate source-health coverage
         run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Attach domestic-water source health
