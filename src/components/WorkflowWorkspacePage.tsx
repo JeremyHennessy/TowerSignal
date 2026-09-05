@@ -17,6 +17,7 @@ const columns: Array<{ value: AccountDisposition; label: string }> = [
 ]
 
 const number = new Intl.NumberFormat('en-US')
+const RECENT_CHANGE_WINDOW_MS = 7 * 86400000
 
 type DomesticWaterSummaryFields = {
   dwt_planimetric_bin_match?: boolean
@@ -64,7 +65,7 @@ function isPropertyProjectChange(event: ChangeEvent) {
 function attentionReasons(item: AttentionItem, today: string) {
   const reasons: string[] = []
   if (isDue(item.account, today)) reasons.push(item.account?.next_action_date && item.account.next_action_date < today ? 'Overdue action' : 'Action due today')
-  if (item.events.length > 0) reasons.push(`${item.events.length} new source change${item.events.length === 1 ? '' : 's'}`)
+  if (item.events.length > 0) reasons.push(`${item.events.length} source change${item.events.length === 1 ? '' : 's'} · 7d`)
   if (item.row.recent_confirmed_violation) reasons.push('Recent confirmed violation')
   if (isSamplingFollowUp(item.row)) reasons.push('Sampling follow-up')
   if ((item.row.dwt_violation_record_count ?? 0) > 0) reasons.push('DWT violation record')
@@ -107,13 +108,15 @@ export function WorkflowWorkspacePage({
   memberships.forEach(item => membershipCounts.set(item.watchlist_id, (membershipCounts.get(item.watchlist_id) ?? 0) + 1))
 
   const today = new Date().toISOString().slice(0, 10)
+  const recentCutoff = Date.now() - RECENT_CHANGE_WINDOW_MS
+  const recentEvents = (changes?.events ?? []).filter(event => new Date(event.detected_at).getTime() >= recentCutoff)
   const watchedIds = new Set(memberships.map(item => item.system_id))
   const scopeIds = new Set([...accounts.map(account => account.system_id), ...memberships.map(item => item.system_id)])
   const scopedRows = systems.filter(row => scopeIds.has(row.system_id))
   const missingScopeCount = [...scopeIds].filter(systemId => !byId.has(systemId)).length
 
   const eventsBySystem = new Map<string, ChangeEvent[]>()
-  ;(changes?.events ?? []).forEach(event => {
+  recentEvents.forEach(event => {
     if (!scopeIds.has(event.system_id)) return
     const list = eventsBySystem.get(event.system_id) ?? []
     list.push(event)
@@ -164,14 +167,14 @@ export function WorkflowWorkspacePage({
 
   const summaryParts: string[] = []
   if (due.length > 0) summaryParts.push(`${due.length} due or overdue action${due.length === 1 ? '' : 's'}`)
-  if (changedAccounts.length > 0) summaryParts.push(`${changedAccounts.length} account${changedAccounts.length === 1 ? '' : 's'} with new source changes`)
+  if (changedAccounts.length > 0) summaryParts.push(`${changedAccounts.length} account${changedAccounts.length === 1 ? '' : 's'} changed in the past 7 days`)
   if (highPriority.length > 0) summaryParts.push(`${highPriority.length} high-priority account${highPriority.length === 1 ? '' : 's'}`)
   if (samplingFollowUp.length > 0) summaryParts.push(`${samplingFollowUp.length} sampling follow-up signal${samplingFollowUp.length === 1 ? '' : 's'}`)
   const operationalSummary = scopedRows.length === 0
     ? 'No current accounts are in the private workflow scope yet. Add an account to a watchlist or save a workflow status from an account profile to build an operational queue here.'
     : summaryParts.length > 0
       ? `Your private workflow covers ${scopedRows.length.toLocaleString()} current NYC account${scopedRows.length === 1 ? '' : 's'}. Most important now: ${summaryParts.join(' · ')}.`
-      : `Your private workflow covers ${scopedRows.length.toLocaleString()} current NYC account${scopedRows.length === 1 ? '' : 's'}. No dated follow-up, fresh monitored change, high-priority account or sampling follow-up is currently pressing.`
+      : `Your private workflow covers ${scopedRows.length.toLocaleString()} current NYC account${scopedRows.length === 1 ? '' : 's'}. No dated follow-up, source change in the past 7 days, high-priority account or sampling follow-up is currently pressing.`
 
   const categories: Array<{ title: string; purpose: string; metrics: CategoryMetric[]; next: string }> = [
     {
@@ -215,12 +218,12 @@ export function WorkflowWorkspacePage({
       next: 'Tank service history, treatment readings and longitudinal water-quality trends will extend this category without being mixed into cooling-tower compliance.',
     },
     {
-      title: 'Monitoring & change', purpose: 'What changed since the previous preserved public observation.',
+      title: 'Monitoring & change', purpose: 'What changed in the past 7 days versus preserved public-source history.',
       metrics: [
-        { label: 'Accounts changed', value: changedAccounts.length, note: 'Distinct workflow accounts with events' },
-        { label: 'Change events', value: scopeEvents.length, note: 'All current preserved events in scope' },
-        { label: 'Compliance / timing changes', value: scopeEvents.filter(isComplianceChange).length, note: 'Sample, inspection, violation or OATH' },
-        { label: 'Property / project changes', value: scopeEvents.filter(isPropertyProjectChange).length, note: 'HPD, PLUTO or DOB' },
+        { label: 'Accounts changed', value: changedAccounts.length, note: 'Distinct workflow accounts · past 7 days' },
+        { label: 'Change events', value: scopeEvents.length, note: 'Preserved events detected in past 7 days' },
+        { label: 'Compliance / timing changes', value: scopeEvents.filter(isComplianceChange).length, note: 'Sample, inspection, violation or OATH · 7d' },
+        { label: 'Property / project changes', value: scopeEvents.filter(isPropertyProjectChange).length, note: 'HPD, PLUTO or DOB · 7d' },
       ],
       next: 'Domestic-water deltas and private service-event changes can join this lane once deterministic history rules are defined.',
     },
@@ -255,10 +258,10 @@ export function WorkflowWorkspacePage({
       <div className="workflow-command-copy"><span className="page-kicker">Operational summary</span><h2 id="workflow-summary-heading">What matters now</h2><p>{operationalSummary}</p>
         <div className="workflow-summary-meta"><span>Workflow scope <strong>{number.format(scopedRows.length)}</strong></span><span>NYC market <strong>{number.format(systems.length)}</strong></span>{changes?.observed_at && <span>Data observed <strong>{formatTimestamp(changes.observed_at)}</strong></span>}{changes?.history_started_at && <span>History since <strong>{formatDate(changes.history_started_at)}</strong></span>}{changeLoadFailed && <span className="workflow-meta-warning">Monitor history unavailable in this view</span>}{missingScopeCount > 0 && <span className="workflow-meta-warning"><strong>{missingScopeCount}</strong> saved account{missingScopeCount === 1 ? '' : 's'} not in current snapshot</span>}</div>
       </div>
-      <div className="workflow-command-metrics"><article className={due.length > 0 ? 'urgent' : ''}><small>Due / overdue</small><strong>{number.format(due.length)}</strong><span>Dated private next actions</span></article><article><small>Changed accounts</small><strong>{number.format(changedAccounts.length)}</strong><span>Fresh preserved source events</span></article><article><small>High priority</small><strong>{number.format(highPriority.length)}</strong><span>Public Priority Score 70+</span></article><article><small>Contact-ready</small><strong>{number.format(contactReady.length)}</strong><span>HPD contact evidence</span></article></div>
+      <div className="workflow-command-metrics"><article className={due.length > 0 ? 'urgent' : ''}><small>Due / overdue</small><strong>{number.format(due.length)}</strong><span>Dated private next actions</span></article><article><small>Changed accounts · 7d</small><strong>{number.format(changedAccounts.length)}</strong><span>Recent preserved source events</span></article><article><small>High priority</small><strong>{number.format(highPriority.length)}</strong><span>Public Priority Score 70+</span></article><article><small>Contact-ready</small><strong>{number.format(contactReady.length)}</strong><span>HPD contact evidence</span></article></div>
     </section>
 
-    <section className="workflow-section-block"><div className="workflow-block-heading"><div><span className="page-kicker">Action first</span><h2>Attention queue</h2><p>Due actions first, then accounts with current source changes, then earlier next-action dates and public Priority Score. This ordering does not alter TowerSignal Priority Score.</p></div><strong>{attention.length}</strong></div>
+    <section className="workflow-section-block"><div className="workflow-block-heading"><div><span className="page-kicker">Action first</span><h2>Attention queue</h2><p>Due actions first, then accounts with source changes detected in the past 7 days, then earlier next-action dates and public Priority Score. This ordering does not alter TowerSignal Priority Score.</p></div><strong>{attention.length}</strong></div>
       {attention.length === 0 ? <div className="reference-empty-state compact"><span>Add accounts to a watchlist or save workflow status from an account profile. The highest-attention items will surface here automatically.</span></div> : <div className="workflow-attention-list">{attention.map(item => {
         const reasons = attentionReasons(item, today)
         return <article className="workflow-attention-card" key={item.row.system_id} onClick={() => onOpenAccount(item.row)}><div className="workflow-attention-main"><div><span className="workflow-account-location">{[item.row.borough, item.row.zip].filter(Boolean).join(' · ') || item.row.system_id}</span><strong>{item.row.address ?? item.row.system_id}</strong></div><span className={item.row.priority_score >= 70 ? 'workflow-priority high' : 'workflow-priority'}>P{item.row.priority_score}</span></div><div className="workflow-attention-reasons">{reasons.map(reason => <span key={reason}>{reason}</span>)}{reasons.length === 0 && <span>Workflow account</span>}</div><footer><span className="status-chip">{statusLabel(item.account?.status)}</span><span>{item.account?.next_action_date ? `Next ${formatDate(item.account.next_action_date)}` : 'No dated next action'}</span><button className="table-link" onClick={event => { event.stopPropagation(); onOpenAccount(item.row) }}>Open account →</button></footer></article>
