@@ -6,6 +6,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+def _as_int(value: object, *, default: int = 0) -> int:
+    return default if value is None else int(value)
+
+
 def validate(path: Path, *, max_age_days: int, require_production_volume: bool) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("schema_version") != "1.0" or payload.get("domain") != "NYCHA_WATER_CONTRACT_RELEASE_LINES":
@@ -20,17 +24,23 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     records = payload.get("records")
     if not isinstance(summary, dict) or not isinstance(health, list) or not isinstance(records, list):
         raise RuntimeError("NYCHA water cache missing summary/source health/records")
-    if len(health) != int(summary.get("fiscal_year_count") or 0):
-        raise RuntimeError("NYCHA fiscal-year/source-health count mismatch")
+    expected_partition_count = _as_int(summary.get("fiscal_year_count")) * _as_int(summary.get("purpose_query_term_count"))
+    if len(health) != expected_partition_count:
+        raise RuntimeError("NYCHA fiscal-year/purpose-query/source-health count mismatch")
+    seen_partitions: set[tuple[int, str]] = set()
     for source in health:
         if source.get("status") != "HEALTHY" or source.get("pagination_complete") is not True or source.get("schema_valid") is not True:
             raise RuntimeError(f"Unhealthy NYCHA source partition: {source.get('fiscal_year')}")
-        if int(source.get("source_record_count") or -1) != int(source.get("fetched_record_count") or -2):
+        if _as_int(source.get("source_record_count"), default=-1) != _as_int(source.get("fetched_record_count"), default=-2):
             raise RuntimeError(f"NYCHA source-count mismatch: {source.get('fiscal_year')}")
+        partition_key = (_as_int(source.get("fiscal_year")), str(source.get("purpose_query") or ""))
+        if partition_key in seen_partitions:
+            raise RuntimeError(f"Duplicate NYCHA source partition: {partition_key}")
+        seen_partitions.add(partition_key)
 
-    if len(records) != int(summary.get("relevant_release_line_count") or -1):
+    if len(records) != _as_int(summary.get("relevant_release_line_count"), default=-1):
         raise RuntimeError("NYCHA relevant record count mismatch")
-    if sum(int(source.get("source_record_count") or 0) for source in health) != int(summary.get("source_record_count") or -1):
+    if sum(_as_int(source.get("source_record_count")) for source in health) != _as_int(summary.get("source_record_count"), default=-1):
         raise RuntimeError("NYCHA total source count mismatch")
 
     ids: set[str] = set()
@@ -61,20 +71,23 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         "relevant_location_count": len(locations),
     }
     for key, value in expected_sets.items():
-        if int(summary.get(key) or -1) != value:
+        if _as_int(summary.get(key), default=-1) != value:
             raise RuntimeError(f"NYCHA summary mismatch for {key}")
 
     if require_production_volume:
-        if int(summary.get("fiscal_year_count") or 0) != 5:
+        if _as_int(summary.get("fiscal_year_count")) != 5:
             raise RuntimeError("NYCHA production cache must cover five fiscal years")
+        if _as_int(summary.get("purpose_query_term_count")) < 8:
+            raise RuntimeError("NYCHA production cache must cover the bounded purpose query set")
         floors = {
             "source_record_count": 5000,
+            "unique_scanned_release_line_count": 2500,
             "relevant_release_line_count": 10,
             "relevant_contract_count": 5,
             "relevant_vendor_count": 3,
         }
         for key, floor in floors.items():
-            value = int(summary.get(key) or 0)
+            value = _as_int(summary.get(key))
             if value < floor:
                 raise RuntimeError(f"Implausibly small NYCHA {key}: {value:,} < {floor:,}")
     return payload

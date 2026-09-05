@@ -14,6 +14,8 @@ Checkbook NYC exposes NYCHA contracts through the distinct `Contracts_NYCHA` API
 
 NYCHA rows are release/line-item observations. The adapter preserves source fields including contract ID, release/line/shipment identity, purpose, item description, vendor, NYCHA location, responsibility center, funding source, program/project, dates, procurement metadata, and separate line/release/contract amount and invoiced fields.
 
+Live source validation found that unfiltered NYCHA fiscal-year partitions can exceed the Checkbook API's repeatable deep-pagination range. The production cache therefore uses bounded `purpose=value` keyword partitions for observed building-water terms. `purpose` is a valid `Contracts_NYCHA` criterion; `item_description` is retrieved and preserved but is not an accepted source-side search criterion. Published counts must be described as bounded NYCHA purpose-query source rows, not all NYCHA release lines.
+
 ## Bounded retrieval
 
 The first proof uses the latest five NYC fiscal years. Each fiscal year is queried independently through the existing paced Checkbook XML transport. Every partition must retain a stable source-reported record count throughout pagination and the retrieved row count must exactly match that count.
@@ -34,4 +36,4 @@ Generic wastewater, stormwater, public water-main, hydrant, pool and fire-protec
 
 ## Acceptance
 
-Do not merge based on code alone. The live workflow must prove the current `Contracts_NYCHA` response vocabulary, exact pagination for all five fiscal years, realistic source/relevant volumes, unique release-line identities, evidence boundaries, artifact revalidation, and the complete existing Python/frontend/lint/typecheck/build gate.
+Do not merge based on code alone. The live workflow must prove the current `Contracts_NYCHA` response vocabulary, exact pagination for all five fiscal years across every bounded purpose-query partition, realistic source/relevant volumes, unique release-line identities, evidence boundaries, artifact revalidation, and the complete existing Python/frontend/lint/typecheck/build gate.

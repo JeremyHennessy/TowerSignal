@@ -127,10 +127,25 @@ PROTECTED_MARKERS = (
     "ashrae 188",
 )
 
+PURPOSE_QUERY_TERMS = (
+    "water",
+    "cooling",
+    "legionella",
+    "chlorination",
+    "backflow",
+    "plumbing",
+    "tank",
+    "pump",
+    "booster",
+    "potable",
+    "domestic",
+)
+
 
 @dataclass(frozen=True)
 class NychaPartition:
     fiscal_year: int
+    purpose_query: str | None
     expected_count: int
     rows: tuple[dict[str, str], ...]
     pagination_complete: bool
@@ -198,6 +213,7 @@ def parse_nycha_response(payload: bytes | str) -> tuple[int, tuple[dict[str, str
 def fetch_partition(
     fiscal_year: int,
     *,
+    purpose_query: str | None = None,
     page_size: int = PAGE_SIZE,
     request_xml=_default_request_xml,
 ) -> NychaPartition:
@@ -207,25 +223,34 @@ def fetch_partition(
     rows: list[dict[str, str]] = []
     expected_count: int | None = None
     records_from = 1
+    criteria: tuple[tuple[str, str, str], ...] = (("fiscal_year", "value", str(fiscal_year)),)
+    if purpose_query:
+        criteria = (*criteria, ("purpose", "value", purpose_query))
     while expected_count is None or len(rows) < expected_count:
         request = build_request_xml(
             NYCHA_SCOPE,
             records_from=records_from,
             max_records=page_size,
-            extra_criteria=(("fiscal_year", "value", str(fiscal_year)),),
+            extra_criteria=criteria,
         )
-        page_count, page_rows = parse_nycha_response(request_xml(request))
+        try:
+            page_count, page_rows = parse_nycha_response(request_xml(request))
+        except CheckbookSourceError as exc:
+            raise CheckbookSourceError(
+                f"Checkbook NYCHA FY{fiscal_year} {purpose_query or 'all'} "
+                f"records_from={records_from} max_records={page_size}: {exc}"
+            ) from exc
         if expected_count is None:
             expected_count = page_count
         elif page_count != expected_count:
             raise CheckbookSourceError(
-                f"Checkbook NYCHA FY{fiscal_year} count changed during pagination: "
+                f"Checkbook NYCHA FY{fiscal_year} {purpose_query or 'all'} count changed during pagination: "
                 f"{expected_count} -> {page_count}"
             )
         if not page_rows:
             if len(rows) < (expected_count or 0):
                 raise CheckbookSourceError(
-                    f"Checkbook NYCHA FY{fiscal_year} ended early at "
+                    f"Checkbook NYCHA FY{fiscal_year} {purpose_query or 'all'} ended early at "
                     f"{len(rows)} of {expected_count}"
                 )
             break
@@ -235,10 +260,10 @@ def fetch_partition(
     expected = expected_count or 0
     if len(rows) != expected:
         raise CheckbookSourceError(
-            f"Checkbook NYCHA FY{fiscal_year} incomplete: "
+            f"Checkbook NYCHA FY{fiscal_year} {purpose_query or 'all'} incomplete: "
             f"expected {expected}, retrieved {len(rows)}"
         )
-    return NychaPartition(fiscal_year, expected, tuple(rows), True)
+    return NychaPartition(fiscal_year, purpose_query, expected, tuple(rows), True)
 
 
 def classify_nycha_water(*values: Any) -> dict[str, Any]:
@@ -383,21 +408,28 @@ def build_payload(
     *,
     as_of: date | None = None,
     fiscal_year_count: int = DEFAULT_FISCAL_YEAR_COUNT,
+    purpose_query_terms: Sequence[str] = PURPOSE_QUERY_TERMS,
     page_size: int = PAGE_SIZE,
     request_xml=_default_request_xml,
 ) -> dict[str, Any]:
     as_of = as_of or date.today()
     fiscal_years = recent_nyc_fiscal_years(as_of, fiscal_year_count)
+    purpose_query_terms = tuple(normalize_space(term).lower() for term in purpose_query_terms if normalize_space(term))
+    if not purpose_query_terms:
+        raise ValueError("purpose_query_terms must contain at least one NYCHA purpose search term")
     generated_at = utc_now()
     partitions = [
-        fetch_partition(year, page_size=page_size, request_xml=request_xml)
+        fetch_partition(year, purpose_query=term, page_size=page_size, request_xml=request_xml)
         for year in fiscal_years
+        for term in purpose_query_terms
     ]
 
     relevant_rows: list[dict[str, Any]] = []
     seen_record_ids: set[str] = set()
+    scanned_record_ids: set[str] = set()
     for partition in partitions:
         for row in partition.rows:
+            scanned_record_ids.add(_source_record_id(row, partition.fiscal_year))
             normalized = normalize_row(
                 row,
                 fiscal_year=partition.fiscal_year,
@@ -436,6 +468,8 @@ def build_payload(
             "contract_api_url": CONTRACT_API_URL,
             "type_of_data": "Contracts_NYCHA",
             "fiscal_years": list(fiscal_years),
+            "purpose_query_terms": list(purpose_query_terms),
+            "source_scope": "Bounded live Checkbook NYCHA purpose=value keyword partitions; item_description is retrieved and preserved but is not an accepted source-side search criterion.",
             "granularity": "release/line-item",
         },
         "evidence_semantics": {
@@ -446,7 +480,10 @@ def build_payload(
         },
         "summary": {
             "fiscal_year_count": len(fiscal_years),
+            "purpose_query_term_count": len(purpose_query_terms),
             "source_record_count": sum(partition.expected_count for partition in partitions),
+            "fetched_record_count": sum(len(partition.rows) for partition in partitions),
+            "unique_scanned_release_line_count": len(scanned_record_ids),
             "relevant_release_line_count": len(relevant_rows),
             "relevant_contract_count": len(contract_ids),
             "relevant_vendor_count": len(vendor_keys),
@@ -457,6 +494,7 @@ def build_payload(
             {
                 "source": SOURCE,
                 "fiscal_year": partition.fiscal_year,
+                "purpose_query": partition.purpose_query,
                 "status": "HEALTHY",
                 "source_record_count": partition.expected_count,
                 "fetched_record_count": len(partition.rows),
