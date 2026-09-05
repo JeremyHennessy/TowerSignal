@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { submitSignIn } from './auth.helpers'
-import { expectContained, expectDomAttribute, expectElementContained, expectSectionText, isIphoneProject } from './iphone.helpers'
+import { expectAccountDetailHydrated, expectContained, expectDomAttribute, expectElementContained, expectSectionText, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
@@ -27,6 +27,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   const isIphone = isIphoneProject(testInfo)
   const section = page.locator('section.planimetric-section')
   if (isIphone) {
+    await expectAccountDetailHydrated(page)
     await expect(section).toHaveCount(1)
     await expectSectionText(page, testInfo, 'Physical tower location', [
       '1 mapped cooling-tower footprint · 1 building outline',

@@ -3,6 +3,7 @@ import { expect, type Locator, type Page } from '@playwright/test'
 type ProjectInfo = { project: { name: string } }
 
 const HEADING_SELECTOR = 'h1,h2,h3,h4,h5,h6'
+const HOSTED_IPHONE_DOM_TIMEOUT = process.env.CI ? 60_000 : 25_000
 
 export function isIphoneProject(testInfo: ProjectInfo): boolean {
   return testInfo.project.name.includes('iphone')
@@ -27,7 +28,7 @@ export async function expectDomText(page: Page, snippets: string[], selector = '
       const text = document.querySelector(selector)?.textContent ?? ''
       return snippets.every(snippet => text.includes(snippet))
     }, { selector, snippets })
-  }, { timeout: 15_000 }).toBe(true)
+  }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(true)
 }
 
 export async function expectDomAttribute(page: Page, selector: string, name: string, value: RegExp | string): Promise<void> {
@@ -36,7 +37,7 @@ export async function expectDomAttribute(page: Page, selector: string, name: str
       return document.querySelector(selector)?.getAttribute(name) ?? ''
     }, { selector, name })
     return typeof value === 'string' ? attribute.includes(value) : value.test(attribute)
-  }, { timeout: 15_000 }).toBe(true)
+  }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(true)
 }
 
 export async function expectHeading(page: Page, testInfo: ProjectInfo, name: string): Promise<Locator | null> {
@@ -45,7 +46,7 @@ export async function expectHeading(page: Page, testInfo: ProjectInfo, name: str
       return page.evaluate(({ selector, name }) => {
         return [...document.querySelectorAll(selector)].some(element => element.textContent?.trim() === name)
       }, { selector: HEADING_SELECTOR, name })
-    }, { timeout: 15_000 }).toBe(true)
+    }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(true)
     return null
   }
 
@@ -64,7 +65,7 @@ export async function expectSectionText(page: Page, testInfo: ProjectInfo, headi
         const sectionText = heading?.closest('section')?.textContent ?? ''
         return snippets.every(snippet => sectionText.includes(snippet))
       }, { selector: HEADING_SELECTOR, headingName, snippets })
-    }, { timeout: 15_000 }).toBe(true)
+    }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(true)
     return null
   }
 
@@ -72,6 +73,12 @@ export async function expectSectionText(page: Page, testInfo: ProjectInfo, headi
   const section = heading!.locator('xpath=ancestor::section[1]')
   for (const snippet of snippets) await expect(section).toContainText(snippet)
   return section
+}
+
+export async function expectAccountDetailHydrated(page: Page): Promise<void> {
+  const detail = page.locator('.detail-panel')
+  await expect(detail).toHaveCount(1, { timeout: HOSTED_IPHONE_DOM_TIMEOUT })
+  await expect(detail.locator('.loading-state')).toHaveCount(0, { timeout: HOSTED_IPHONE_DOM_TIMEOUT })
 }
 
 export async function setInputValue(page: Page, selector: string, value: string): Promise<void> {

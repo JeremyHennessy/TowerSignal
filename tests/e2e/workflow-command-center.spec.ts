@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import { signInForProject } from './auth.helpers'
 import {
   clickElement,
+  expectAccountDetailHydrated,
   expectContained,
   expectDomText,
   expectElementContained,
@@ -32,6 +33,7 @@ test('workflow command center groups current and future intelligence on desktop 
   const workflowAccount = page.locator('section.workflow-account-section')
   if (isIphone) {
     await expect(workflowAccount).toHaveCount(1)
+    await expectAccountDetailHydrated(page)
   } else {
     await expect(workflowAccount).toBeVisible()
     await workflowAccount.getByLabel('Status').selectOption('investigate')
