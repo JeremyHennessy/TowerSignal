@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { submitSignIn } from './auth.helpers'
-import { expectAccountDetailHydrated, expectDomText, expectElementContained, isIphoneProject } from './iphone.helpers'
+import { expectAccountDetailHydrated, expectDomAttribute, expectDomText, expectElementContained, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
@@ -31,7 +31,6 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
   if (isIphone) {
     await expectDomText(page, [
       'Pre-call sales brief',
-      'Sales pre-call summary',
       'Why call now',
       'Account scale',
       'Contact path',
@@ -45,6 +44,7 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
       'evidence class is not win probability',
       'Pre-visit field pack',
     ], '.detail-panel')
+    await expectDomAttribute(page, '.sales-pack-metrics', 'aria-label', 'Sales pre-call summary')
   } else {
     await expect(sales).toBeVisible()
     await expect(technician).toBeVisible()
