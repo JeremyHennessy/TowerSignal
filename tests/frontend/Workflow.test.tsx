@@ -33,6 +33,12 @@ const remoteSnapshot = {
   memberships: [{ watchlist_id: 'default', system_id: 'SYS-1' }],
 }
 
+function deferred<T>() {
+  let resolve!: (value: T) => void
+  const promise = new Promise<T>(done => { resolve = done })
+  return { promise, resolve }
+}
+
 beforeEach(() => {
   window.localStorage.clear()
   Object.values(remote).forEach(mock => mock.mockReset())
@@ -68,6 +74,39 @@ test('keeps authenticated workflow controls available when remote hydration is b
   expect(result.current.user?.email).toBe('sales@example.test')
   expect(result.current.error).toContain('AuthRequired')
   expect(result.current.accounts).toEqual([])
+})
+
+test('keeps account edits made before remote hydration finishes', async () => {
+  const hydration = deferred<typeof remoteSnapshot>()
+  remote.loadWorkflowSnapshot.mockReturnValueOnce(hydration.promise)
+
+  const { result } = renderHook(() => useWorkflow())
+  await waitFor(() => expect(result.current.user?.email).toBe('sales@example.test'))
+
+  await act(async () => {
+    await result.current.saveAccount('SYS-RACE', {
+      status: 'investigate',
+      note: 'Saved while hydration is still loading',
+      next_action_date: '2026-09-05',
+    })
+  })
+
+  await act(async () => {
+    hydration.resolve({
+      savedViews: [],
+      watchlists: [{ id: 'default', name: 'My watchlist' }],
+      accounts: [],
+      memberships: [],
+    })
+    await hydration.promise
+  })
+
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(result.current.accountBySystemId.get('SYS-RACE')).toEqual(expect.objectContaining({
+    status: 'investigate',
+    note: 'Saved while hydration is still loading',
+    next_action_date: '2026-09-05',
+  }))
 })
 
 test('migrates existing browser-local saved views when first signing into an empty remote workspace', async () => {
