@@ -25,6 +25,8 @@ import {
 
 const SAVED_VIEWS_KEY = 'towersignal.savedViews.v1'
 
+export type WorkflowSaveResult = 'synced' | 'session-only'
+
 function readLocalViews(): WorkflowSavedView[] {
   try {
     const raw = window.localStorage.getItem(SAVED_VIEWS_KEY)
@@ -63,6 +65,12 @@ export function useWorkflow() {
   const [error, setError] = useState<string | null>(null)
 
   const hydrateRemote = useCallback(async (sessionUser: WorkflowUser) => {
+    // Authentication and workflow hydration are separate concerns. Safari/WebKit
+    // can accept a successful Neon sign-in response while blocking the cross-site
+    // session cookie on the follow-up Data API/JWT request. Keep the authenticated
+    // in-tab user visible even if remote workflow hydration cannot complete.
+    setUser(sessionUser)
+
     let snapshot = await loadWorkflowSnapshot()
     const localViews = readLocalViews()
     const remoteIds = new Set(snapshot.savedViews.map(view => view.id))
@@ -77,11 +85,11 @@ export function useWorkflow() {
       snapshot = await loadWorkflowSnapshot()
     }
     const normalizedViews = snapshot.savedViews.map(view => ({ ...view, filters: { ...initialFilters, ...view.filters } }))
-    setUser(sessionUser)
     setSavedViews(normalizedViews)
     setWatchlists(snapshot.watchlists)
     setAccounts(snapshot.accounts)
     setMemberships(snapshot.memberships)
+    setError(null)
   }, [])
 
   useEffect(() => {
@@ -91,7 +99,11 @@ export function useWorkflow() {
     }
     getWorkflowSession()
       .then(async sessionUser => {
-        if (sessionUser) await hydrateRemote(sessionUser)
+        if (!sessionUser) return
+        // Set the user before the remote snapshot request. A remote sync failure
+        // must not make an already-authenticated account look signed out.
+        setUser(sessionUser)
+        await hydrateRemote(sessionUser)
       })
       .catch(err => setError(err instanceof Error ? err.message : 'Unable to initialize workflow sync'))
       .finally(() => setLoading(false))
@@ -101,7 +113,12 @@ export function useWorkflow() {
     setBusy(true); setError(null)
     try {
       const sessionUser = await signInWorkflow(email, password)
-      await hydrateRemote(sessionUser)
+      setUser(sessionUser)
+      try {
+        await hydrateRemote(sessionUser)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Signed in, but workflow sync is unavailable in this browser session')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to sign in')
       throw err
@@ -114,7 +131,12 @@ export function useWorkflow() {
     setBusy(true); setError(null)
     try {
       const sessionUser = await signUpWorkflow(email, password)
-      await hydrateRemote(sessionUser)
+      setUser(sessionUser)
+      try {
+        await hydrateRemote(sessionUser)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Account created, but workflow sync is unavailable in this browser session')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create account')
       throw err
@@ -152,7 +174,12 @@ export function useWorkflow() {
     }
     setBusy(true); setError(null)
     try { await saveRemoteView(view) }
-    catch (err) { setError(err instanceof Error ? err.message : 'Unable to sync saved view') }
+    catch (err) {
+      // Saved views already have a browser-local contract; preserve that fallback
+      // if a signed-in browser cannot reach the remote workflow store.
+      writeLocalViews(next)
+      setError(err instanceof Error ? err.message : 'Unable to sync saved view')
+    }
     finally { setBusy(false) }
   }, [savedViews, user])
 
@@ -165,7 +192,10 @@ export function useWorkflow() {
     }
     setBusy(true); setError(null)
     try { await deleteRemoteView(viewId) }
-    catch (err) { setError(err instanceof Error ? err.message : 'Unable to delete saved view') }
+    catch (err) {
+      writeLocalViews(next)
+      setError(err instanceof Error ? err.message : 'Unable to delete saved view')
+    }
     finally { setBusy(false) }
   }, [savedViews, user])
 
@@ -178,48 +208,63 @@ export function useWorkflow() {
       await createRemoteWatchlist(watchlist)
       setWatchlists(current => [...current, watchlist])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to create watchlist')
+      // Keep the current tab usable without pretending the private list synced.
+      setWatchlists(current => [...current, watchlist])
+      setError(err instanceof Error ? err.message : 'Unable to create synced watchlist; list is available in this tab only')
     } finally { setBusy(false) }
   }, [user])
 
   const deleteWatchlist = useCallback(async (watchlistId: string) => {
     if (!user) return
+    const previousWatchlists = watchlists
+    const previousMemberships = memberships
+    setWatchlists(current => current.filter(item => item.id !== watchlistId))
+    setMemberships(current => current.filter(item => item.watchlist_id !== watchlistId))
     setBusy(true); setError(null)
     try {
       await deleteRemoteWatchlist(watchlistId)
-      setWatchlists(current => current.filter(item => item.id !== watchlistId))
-      setMemberships(current => current.filter(item => item.watchlist_id !== watchlistId))
     } catch (err) {
+      setWatchlists(previousWatchlists)
+      setMemberships(previousMemberships)
       setError(err instanceof Error ? err.message : 'Unable to delete watchlist')
     } finally { setBusy(false) }
-  }, [user])
+  }, [user, watchlists, memberships])
 
-  const saveAccount = useCallback(async (systemId: string, patch: WorkflowAccountPatch) => {
-    if (!user) return
+  const saveAccount = useCallback(async (systemId: string, patch: WorkflowAccountPatch): Promise<WorkflowSaveResult> => {
+    if (!user) return 'session-only'
+
+    // Make private workflow usable in the authenticated tab even when Safari
+    // blocks Neon's cross-site cookie/JWT follow-up. This state is deliberately
+    // memory-only on failure: private notes are not written to localStorage on
+    // the shared github.io origin.
+    const next: WorkflowAccountState = { system_id: systemId, ...patch, updated_at: new Date().toISOString() }
+    setAccounts(current => [...current.filter(item => item.system_id !== systemId), next])
+
     setBusy(true); setError(null)
     try {
       await saveRemoteAccount(systemId, patch)
-      setAccounts(current => {
-        const next: WorkflowAccountState = { system_id: systemId, ...patch, updated_at: new Date().toISOString() }
-        return [...current.filter(item => item.system_id !== systemId), next]
-      })
+      return 'synced'
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to save account workflow state')
+      setError(err instanceof Error
+        ? `${err.message}. The change is available in this tab only; cross-device sync could not be confirmed.`
+        : 'Unable to sync account workflow state. The change is available in this tab only.')
+      return 'session-only'
     } finally { setBusy(false) }
   }, [user])
 
   const toggleMembership = useCallback(async (systemId: string, watchlistId: string, enabled: boolean) => {
     if (!user) return
+    const applyLocal = (current: WorkflowMembership[]) => enabled
+      ? current.some(item => item.system_id === systemId && item.watchlist_id === watchlistId)
+        ? current
+        : [...current, { system_id: systemId, watchlist_id: watchlistId, added_at: new Date().toISOString() }]
+      : current.filter(item => !(item.system_id === systemId && item.watchlist_id === watchlistId))
+    setMemberships(applyLocal)
     setBusy(true); setError(null)
     try {
       await setRemoteMembership(systemId, watchlistId, enabled)
-      setMemberships(current => enabled
-        ? current.some(item => item.system_id === systemId && item.watchlist_id === watchlistId)
-          ? current
-          : [...current, { system_id: systemId, watchlist_id: watchlistId, added_at: new Date().toISOString() }]
-        : current.filter(item => !(item.system_id === systemId && item.watchlist_id === watchlistId)))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to update watchlist')
+      setError(err instanceof Error ? `${err.message}. Watchlist change is available in this tab only.` : 'Unable to sync watchlist change')
     } finally { setBusy(false) }
   }, [user])
 
