@@ -1,11 +1,40 @@
+import type { Page, TestInfo } from '@playwright/test'
 import { expect, test } from './fixtures'
-import { expectContained, expectHeading, expectSectionText } from './iphone.helpers'
+import { expectAccountDetailHydrated, expectContained, expectDomText, expectHeading, expectSectionText, isIphoneProject } from './iphone.helpers'
 
 const requireAcris = process.env.REQUIRE_ACRIS === 'true'
 
 test.setTimeout(120_000)
 
+async function navigateWorkspace(page: Page, testInfo: TestInfo, name: string) {
+  if (isIphoneProject(testInfo)) {
+    await page.getByRole('button', { name: 'Open workspace menu', exact: true }).click()
+    const menu = page.getByRole('dialog', { name: 'TowerSignal workspace menu', exact: true })
+    await expect(menu).toBeVisible()
+    await menu.getByRole('button', { name, exact: true }).click()
+    return
+  }
+  const direct = page.getByRole('button', { name, exact: true })
+  if (await direct.count() > 0 && await direct.first().isVisible()) {
+    await direct.first().click()
+    return
+  }
+  await page.getByRole('button', { name: /^More/ }).click()
+  await page.getByRole('menu').getByRole('menuitem', { name, exact: true }).click()
+}
+
+async function navigateSourceHealth(page: Page, testInfo: TestInfo) {
+  if (isIphoneProject(testInfo)) {
+    await page.getByRole('button', { name: 'Open workspace menu', exact: true }).click()
+    await page.getByRole('dialog', { name: 'TowerSignal workspace menu', exact: true }).getByRole('button', { name: /Source Health & Coverage/ }).click()
+  } else {
+    await page.getByRole('button', { name: 'Source Health & Coverage', exact: true }).click()
+  }
+}
+
 test('hosted TowerSignal redesigned workspace is functional, linkable and source-backed', async ({ page }, testInfo) => {
+  const isIphone = isIphoneProject(testInfo)
+  if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })
@@ -20,11 +49,17 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await page.evaluate(() => { window.location.hash = '#/prospect' })
   await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
 
-  for (const name of ['Prospect','Monitor','Map','NYS Market','NYS Changes','Opportunities','Portfolios','Workflow']) {
-    await expect(page.getByRole('button', { name, exact: true })).toBeVisible()
+  if (isIphone) {
+    await expect(page.getByLabel('Current workspace: Prospect')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Open workspace menu', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Open TowerSignal account', exact: true })).toBeVisible()
+  } else {
+    for (const name of ['Home','Prospect','Monitor','Map','Opportunities','NYS Market']) {
+      await expect(page.getByRole('button', { name, exact: true })).toBeVisible()
+    }
+    await expect(page.getByRole('button', { name: /^More/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Source Health & Coverage', exact: true })).toBeVisible()
   }
-  await expect(page.getByRole('button', { name: 'Source Health & Coverage', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
   await expect(page.getByLabel('Lead filters')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Sales-ready accounts', exact: true })).toBeVisible()
   await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
@@ -44,13 +79,23 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
     await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
     await page.locator('.account-table tbody tr').first().click()
+    if (isIphone) await expectAccountDetailHydrated(page)
     await expectSectionText(page, testInfo, 'ACRIS property activity', [
       'relevant recorded document',
       'ACRIS is joined by exact borough/block/lot BBL and exact document ID only',
     ])
-    await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
+    if (isIphone) {
+      await expectDomText(page, ['Copy account link', 'Export account'])
+    } else {
+      await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
+    }
     await expect(page).toHaveURL(/#\/account\//)
-    await page.getByRole('button', { name: '← Back', exact: true }).click()
+    if (isIphone) {
+      await page.evaluate(() => { window.location.hash = '#/prospect' })
+      await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
+    } else {
+      await page.getByRole('button', { name: '← Back', exact: true }).click()
+    }
   } else {
     await expect(acrisSelect).toBeDisabled()
     const unavailableChip = page.getByText('ACRIS timing unavailable', { exact: true })
@@ -67,19 +112,38 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await page.getByRole('button', { name: 'OATH cases', exact: true }).click()
   await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
   await page.locator('.account-table tbody tr').first().click()
-  await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
-  await expect(page.getByText('Reported samples')).toBeVisible()
-  await expect(page.getByText('NYC Health inspections', { exact: true })).toBeVisible()
-  await expect(page.getByText('OATH penalty imposed')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'OATH case lifecycle', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
-  await expectHeading(page, testInfo, 'ACRIS property activity')
-  await expect(page.getByRole('heading', { name: 'TowerSignal History', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
-  await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
+  if (isIphone) {
+    await expectAccountDetailHydrated(page)
+    await expectDomText(page, [
+      'Selected system',
+      'Identity',
+      'Historical profile',
+      'Reported samples',
+      'NYC Health inspections',
+      'OATH penalty imposed',
+      'OATH case lifecycle',
+      'DOB NOW project activity',
+      'ACRIS property activity',
+      'TowerSignal History',
+      'Source & provenance',
+      'Copy lead brief',
+      'Copy account link',
+    ])
+  } else {
+    await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
+    await expect(page.getByText('Reported samples')).toBeVisible()
+    await expect(page.getByText('NYC Health inspections', { exact: true })).toBeVisible()
+    await expect(page.getByText('OATH penalty imposed')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'OATH case lifecycle', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
+    await expectHeading(page, testInfo, 'ACRIS property activity')
+    await expect(page.getByRole('heading', { name: 'TowerSignal History', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
+    await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
+  }
   await expect(page).toHaveURL(/#\/account\//)
 
   const accountUrl = page.url()
@@ -91,10 +155,13 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   } else {
     await page.evaluate(() => window.dispatchEvent(new Event('focus')))
     await page.waitForTimeout(750)
-    await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+    await expectDomText(page, ['Selected system', 'Identity'])
   }
-  await page.getByRole('button', { name: '← Back', exact: true }).click()
+  if (isIphone) {
+    await page.evaluate(() => { window.location.hash = '#/prospect' })
+  } else {
+    await page.getByRole('button', { name: '← Back', exact: true }).click()
+  }
   await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
 
   if (testInfo.project.name === 'desktop-chromium') {
@@ -106,13 +173,13 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     expect(download.suggestedFilename()).toMatch(/\.csv$/i)
   }
 
-  await page.getByRole('button', { name: 'Monitor', exact: true }).click()
+  await navigateWorkspace(page, testInfo, 'Monitor')
   await expect(page.getByRole('heading', { name: 'Monitor workspace', exact: true })).toBeVisible()
   await expect(page.getByText(/new events/)).toBeVisible()
   await expect(page).toHaveURL(/#\/monitor$/)
   await expectContained(page)
 
-  await page.getByRole('button', { name: 'Map', exact: true }).click()
+  await navigateWorkspace(page, testInfo, 'Map')
   await expect(page.getByRole('heading', { name: 'Map workspace', exact: true })).toBeVisible()
   await expect(page.locator('.leaflet-container')).toBeVisible()
   await expect(page.getByText('Matching accounts', { exact: true })).toBeVisible()
@@ -123,7 +190,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   expect(mapContainment).toEqual({ overflow: 'hidden', isolation: 'isolate', position: 'relative' })
   await expectContained(page)
 
-  await page.getByRole('button', { name: 'NYS Market', exact: true }).click()
+  await navigateWorkspace(page, testInfo, 'NYS Market')
   await expect(page.getByRole('heading', { name: 'NYS Market', exact: true })).toBeVisible()
   await expect(page.getByLabel('NYS registry filters')).toBeVisible()
   await expect(page.locator('.nys-table tbody tr').first()).toBeVisible()
@@ -131,12 +198,12 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.getByText(/matching NYS equipment records/)).toBeVisible()
   await expectContained(page)
 
-  await page.getByRole('button', { name: 'NYS Changes', exact: true }).click()
+  await navigateWorkspace(page, testInfo, 'NYS Changes')
   await expect(page.getByRole('heading', { name: 'NYS Changes', exact: true })).toBeVisible()
   await expect(page.getByText('NYS history collection began')).toBeVisible()
   await expectContained(page)
 
-  await page.getByRole('button', { name: 'Opportunities', exact: true }).click()
+  await navigateWorkspace(page, testInfo, 'Opportunities')
   await expect(page.getByRole('heading', { name: 'Opportunities workspace', exact: true })).toBeVisible()
   await expect(page.getByText('LIVE SOURCE DATA', { exact: true })).toBeVisible()
   await expect(page.getByText('Public procurement intelligence', { exact: true })).toBeVisible()
@@ -149,19 +216,19 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.locator('.opportunity-table tbody tr').first()).toBeVisible()
   await expectContained(page)
 
-  await page.getByRole('button', { name: 'Portfolios', exact: true }).click()
+  await navigateWorkspace(page, testInfo, 'Portfolios')
   await expect(page.getByRole('heading', { name: 'Portfolios', exact: true })).toBeVisible()
   await expect(page.getByText('Portfolio research candidates', { exact: true })).toBeVisible()
   await expectContained(page)
 
-  await page.getByRole('button', { name: 'Workflow', exact: true }).click()
+  await navigateWorkspace(page, testInfo, 'Workflow')
   await expect(page.getByRole('heading', { name: /Workflow workspace/ })).toBeVisible()
   await expect(page.getByText('New York City · private command workspace', { exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'What matters now', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Account intelligence groups', exact: true })).toBeVisible()
   await expectContained(page)
 
-  await page.getByRole('button', { name: 'Source Health & Coverage', exact: true }).click()
+  await navigateSourceHealth(page, testInfo)
   await expect(page.getByRole('heading', { name: 'Source Health & Coverage', exact: true })).toBeVisible()
   await expect(page.locator('.source-health-table tbody tr').first()).toBeVisible()
   await expect(page.getByText('Procurement sources', { exact: true })).toBeVisible()

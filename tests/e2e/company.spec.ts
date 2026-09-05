@@ -1,9 +1,22 @@
 import { expect, test } from './fixtures'
+import { isIphoneProject } from './iphone.helpers'
 
 const expectContained = async (page: import('@playwright/test').Page) => {
   const viewportWidth = page.viewportSize()?.width ?? 0
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
   expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
+}
+
+async function openCompanies(page: import('@playwright/test').Page, projectName: string) {
+  if (projectName.includes('iphone')) {
+    await page.getByRole('button', { name: 'Open workspace menu', exact: true }).click()
+    const menu = page.getByRole('dialog', { name: 'TowerSignal workspace menu', exact: true })
+    await expect(menu).toBeVisible()
+    await menu.getByRole('button', { name: 'Companies', exact: true }).click()
+    return
+  }
+  await page.getByRole('button', { name: /^More/ }).click()
+  await page.getByRole('menu').getByRole('menuitem', { name: 'Companies', exact: true }).click()
 }
 
 test('hosted Companies and Company Profile are source-backed, shareable and reload-safe', async ({ page }, testInfo) => {
@@ -22,8 +35,12 @@ test('hosted Companies and Company Profile are source-backed, shareable and relo
   // perform an immediate document reload on Safari/WebKit because github.io
   // cannot recover the cross-site neon.tech auth cookie after navigation.
   await expect(page).toHaveURL(/#\/home$/)
-  await expect(page.getByRole('button', { name:'Companies', exact:true })).toBeVisible()
-  await page.getByRole('button', { name:'Companies', exact:true }).click()
+  if (isIphoneProject(testInfo)) {
+    await expect(page.getByRole('button', { name: 'Open workspace menu', exact: true })).toBeVisible()
+  } else {
+    await expect(page.getByRole('button', { name: /^More/ })).toBeVisible()
+  }
+  await openCompanies(page, testInfo.project.name)
   await expect(page).toHaveURL(/#\/companies$/)
   await expect(page.getByRole('heading', { name:'Companies', exact:true })).toBeVisible()
   await expect(page.getByText('Company & vendor intelligence', { exact:true })).toBeVisible()

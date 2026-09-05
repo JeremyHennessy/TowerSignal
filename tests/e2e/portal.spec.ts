@@ -1,16 +1,31 @@
 import { expect, test } from './fixtures'
+import { isIphoneProject } from './iphone.helpers'
 
-test('authenticated Home and Account pages are linkable and signout returns to the public landing', async ({ page }) => {
+test('authenticated Home and Account pages are linkable, responsive and signout returns to the public landing', async ({ page }, testInfo) => {
   // The authenticated fixture already finishes on #/home. Avoid an immediate
   // document reload here: Safari blocks the cross-site Neon Auth cookie on
   // github.io even though the tab has just authenticated successfully.
   await expect(page).toHaveURL(/#\/home$/)
   await expect(page.getByRole('heading', { name: /Good morning, E2E/ })).toBeVisible()
   await expect(page.getByLabel('TowerSignal Home summary')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'My account', exact: true })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Prospect', exact: true })).toBeVisible()
 
-  await page.getByRole('button', { name: 'My account', exact: true }).click()
+  if (isIphoneProject(testInfo)) {
+    await expect(page.getByLabel('Current workspace: Home')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Search accounts', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Open workspace menu', exact: true }).click()
+    const menu = page.getByRole('dialog', { name: 'TowerSignal workspace menu', exact: true })
+    await expect(menu).toBeVisible()
+    await expect(menu.getByRole('button', { name: 'Prospect', exact: true })).toBeVisible()
+    await expect(menu.getByRole('button', { name: 'Companies', exact: true })).toBeVisible()
+    await menu.getByRole('button', { name: 'Close workspace menu', exact: true }).click()
+    await page.getByRole('button', { name: 'Open TowerSignal account', exact: true }).click()
+  } else {
+    await expect(page.getByRole('button', { name: 'Prospect', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^More/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'My account', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'My account', exact: true }).click()
+  }
+
   await expect(page).toHaveURL(/#\/my-account$/)
   await expect(page.getByRole('heading', { name: 'E2E Verification', exact: true })).toBeVisible()
   await expect(page.getByText('Authenticated', { exact: true })).toBeVisible()

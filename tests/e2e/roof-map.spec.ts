@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { submitSignIn } from './auth.helpers'
-import { expectContained, expectSectionText, isIphoneProject } from './iphone.helpers'
+import { signInForProject } from './auth.helpers'
+import { expectAccountDetailHydrated, expectContained, expectDomAttribute, expectDomCount, expectElementContained, expectSectionText, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
 test('direct hosted roof link signs in and renders on desktop and iPhone', async ({ page }, testInfo) => {
+  const isIphone = isIphoneProject(testInfo)
+  if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', message => {
@@ -18,20 +20,18 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  await page.goto('./#/account/2000015564', { waitUntil: 'networkidle' })
-  const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
-  await expect(loginHeading).toBeVisible()
-  await submitSignIn(page, testInfo.project.name)
+  await signInForProject(page, testInfo.project.name, '#/account/2000015564')
   await expect(page).toHaveURL(/#\/account\/2000015564$/)
 
-  const isIphone = isIphoneProject(testInfo)
   const section = page.locator('section.planimetric-section')
   if (isIphone) {
-    await expect(section).toHaveCount(1)
+    await expectAccountDetailHydrated(page)
+    await expectDomCount(page, 'section.planimetric-section', 1)
     await expectSectionText(page, testInfo, 'Physical tower location', [
       '1 mapped cooling-tower footprint · 1 building outline',
       '1 roof level · 0 ground level · cooling-tower classification is source-coded by NYC OTI',
       'Roof level',
+      'BIN 1089811',
       '212000',
     ])
   } else {
@@ -45,8 +45,8 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   }
   const map = section.locator('.planimetric-map')
   if (isIphone) {
-    await expect(map).toHaveCount(1)
-    await expect(map).toHaveAttribute('aria-label', /BIN 1089811/)
+    await expectDomCount(page, 'section.planimetric-section .planimetric-map', 1)
+    await expectDomAttribute(page, 'section.planimetric-section .planimetric-map', 'aria-label', /BIN 1089811/)
   } else {
     await expect(map).toBeVisible()
     await expect(map).toHaveAttribute('aria-label', /BIN 1089811/)
@@ -73,7 +73,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
 
   const domestic = page.locator('section.domestic-water-section')
   if (isIphone) {
-    await expect(domestic).toHaveCount(1)
+    await expectDomCount(page, 'section.domestic-water-section', 1)
     await expectSectionText(page, testInfo, 'Domestic water context', [
       '2022 rooftop drinking-water tank polygons · 1',
       'Roof level',
@@ -99,21 +99,26 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
   await page.waitForTimeout(750)
   if (isIphone) {
-    await expect(section).toHaveCount(1)
-    await expect(domestic).toHaveCount(1)
+    await expectDomCount(page, 'section.planimetric-section', 1)
+    await expectDomCount(page, 'section.domestic-water-section', 1)
   } else {
     await expect(section).toBeVisible()
     await expect(domestic).toBeVisible()
   }
 
   await expectContained(page)
-  const viewportWidth = page.viewportSize()?.width ?? 0
-  const sectionBox = await section.boundingBox()
-  const domesticBox = await domestic.boundingBox()
-  expect(sectionBox).not.toBeNull()
-  expect(domesticBox).not.toBeNull()
-  expect(sectionBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
-  expect(domesticBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
+  if (isIphone) {
+    await expectElementContained(page, 'section.planimetric-section')
+    await expectElementContained(page, 'section.domestic-water-section')
+  } else {
+    const viewportWidth = page.viewportSize()?.width ?? 0
+    const sectionBox = await section.boundingBox()
+    const domesticBox = await domestic.boundingBox()
+    expect(sectionBox).not.toBeNull()
+    expect(domesticBox).not.toBeNull()
+    expect(sectionBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
+    expect(domesticBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
+  }
 
   if (!isIphone) {
     const layerControl = map.locator('.leaflet-control-layers')

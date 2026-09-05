@@ -1,9 +1,14 @@
 import { expect, type Page } from '@playwright/test'
 
 const PASSWORD = 'TowerSignal-E2E-2026!'
+const AUTH_STATE_DIR = 'test-results/.auth'
 
 function family(projectName: string): 'desktop' | 'iphone' {
   return projectName.includes('iphone') ? 'iphone' : 'desktop'
+}
+
+export function authStatePath(projectName: string): string {
+  return `${AUTH_STATE_DIR}/${family(projectName)}.json`
 }
 
 export function testCredentials(projectName: string) {
