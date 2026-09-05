@@ -29,6 +29,9 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await expect(section).toBeVisible()
   await expect(section.getByRole('heading', { name: 'Physical tower location', exact: true })).toBeVisible()
   await expect(section.getByText('1 mapped cooling-tower footprint · 1 building outline', { exact: true })).toBeVisible()
+  await expect(section.getByText('1 roof level · 0 ground level · classification is source-coded by NYC OTI', { exact: true })).toBeVisible()
+  await expect(section.getByText('Roof level', { exact: true }).first()).toBeVisible()
+  await expect(section.getByText('212000', { exact: true }).first()).toBeVisible()
 
   const map = section.locator('.planimetric-map')
   await expect(map).toBeVisible()
@@ -46,6 +49,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await expect(map.locator('.leaflet-control-scale')).toBeVisible()
   await expect(section.locator('.roof-map-legend')).toBeVisible()
   await expect(section.getByRole('link', { name: 'Tower polygons ↗', exact: true })).toBeVisible()
+  await expect(section.getByRole('link', { name: 'Roof/ground code domain ↗', exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: 'Building footprints ↗', exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: '2022 NYS orthophoto ↗', exact: true })).toBeVisible()
 

@@ -12,6 +12,15 @@ SOURCE_KEY = "NYC_OTI_PLANIMETRICS_COOLING_TOWERS"
 MATCH_BASIS = "BIN_EXACT"
 FEATURE_IDENTITY_BASIS = "GLOBALID"
 IMAGERY_YEAR = 2022
+EXPECTED_FEATURE_CODE = "2120"
+SUB_FEATURE_DOMAIN = {
+    "212000": "ROOF_LEVEL",
+    "212010": "GROUND_LEVEL",
+}
+SUB_FEATURE_DOMAIN_SOURCE_URL = (
+    "https://services6.arcgis.com/yG5s3afENB5iO9fj/ArcGIS/rest/services/"
+    "Cooling_Towers_2022/FeatureServer/3"
+)
 SELECT_FIELDS = "the_geom,source_id,feature_co,sub_featur,bin,status,globalid"
 FILTERED_QUERY_LIMIT = 50000
 
@@ -44,6 +53,20 @@ def _normalize_geometry(value: Any) -> dict[str, Any]:
     return {"type": geometry_type, "coordinates": coordinates}
 
 
+def _location_level(feature_code: str | None, sub_feature_code: str | None, bin_value: str) -> str:
+    if feature_code != EXPECTED_FEATURE_CODE:
+        raise SourceFetchError(
+            f"Unexpected Planimetric cooling-tower feature code for BIN {bin_value}: {feature_code!r}; "
+            f"expected {EXPECTED_FEATURE_CODE}"
+        )
+    if sub_feature_code not in SUB_FEATURE_DOMAIN:
+        raise SourceFetchError(
+            f"Unexpected Planimetric cooling-tower sub-feature code for BIN {bin_value}: {sub_feature_code!r}; "
+            "refusing to infer roof/ground location"
+        )
+    return SUB_FEATURE_DOMAIN[sub_feature_code]
+
+
 def normalize_planimetric_row(row: dict[str, Any]) -> dict[str, Any]:
     bin_value = normalize_bin(row.get("bin"))
     if not bin_value:
@@ -54,12 +77,15 @@ def normalize_planimetric_row(row: dict[str, Any]) -> dict[str, Any]:
         raise SourceFetchError(
             f"Planimetric cooling-tower row for BIN {bin_value} has no GlobalID; refusing an unstable feature identity"
         )
+    feature_code = _string_or_none(row.get("feature_co"))
+    sub_feature_code = _string_or_none(row.get("sub_featur"))
     return {
         "source_id": source_id,
         "global_id": global_id,
         "bin": bin_value,
-        "feature_code": _string_or_none(row.get("feature_co")),
-        "sub_feature_code": _string_or_none(row.get("sub_featur")),
+        "feature_code": feature_code,
+        "sub_feature_code": sub_feature_code,
+        "location_level": _location_level(feature_code, sub_feature_code, bin_value),
         "status": _string_or_none(row.get("status")),
         "geometry": _normalize_geometry(row.get("the_geom")),
         "source": SOURCE_KEY,
@@ -116,6 +142,15 @@ def fetch_planimetric_towers_by_bin(
         features.sort(key=lambda item: item["global_id"])
 
     matched_feature_count = sum(len(features) for features in by_bin.values())
+    location_level_counts = {
+        level: sum(
+            1
+            for features in by_bin.values()
+            for feature in features
+            if feature["location_level"] == level
+        )
+        for level in SUB_FEATURE_DOMAIN.values()
+    }
     metadata = {
         "dataset_id": DATASET_ID,
         "name": source_metadata.get("name") or SOURCE_NAME,
@@ -130,5 +165,8 @@ def fetch_planimetric_towers_by_bin(
         "match_basis": MATCH_BASIS,
         "feature_identity_basis": FEATURE_IDENTITY_BASIS,
         "imagery_year": IMAGERY_YEAR,
+        "sub_feature_domain": SUB_FEATURE_DOMAIN,
+        "sub_feature_domain_source_url": SUB_FEATURE_DOMAIN_SOURCE_URL,
+        "location_level_counts": location_level_counts,
     }
     return by_bin, metadata

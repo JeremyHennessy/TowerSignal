@@ -5,6 +5,7 @@ import type { Feature, MultiPolygon, Polygon } from 'geojson'
 import type { SystemDetail } from '../types/data'
 
 const PLANIMETRIC_SOURCE_URL = 'https://data.cityofnewyork.us/City-Government/NYC-Planimetric-Database-Cooling-Towers/x748-37q7'
+const PLANIMETRIC_DOMAIN_URL = 'https://services6.arcgis.com/yG5s3afENB5iO9fj/ArcGIS/rest/services/Cooling_Towers_2022/FeatureServer/3'
 const BUILDING_SOURCE_URL = 'https://data.cityofnewyork.us/City-Government/BUILDING/5zhs-2jue'
 const ORTHO_SOURCE_URL = 'https://gis.ny.gov/2022-orthoimagery'
 const ORTHO_TILE_URL = 'https://orthos.its.ny.gov/arcgis/rest/services/wms/2022/MapServer/tile/{z}/{y}/{x}'
@@ -18,6 +19,12 @@ function footprintLabel(index: number) {
   return `Building outline ${index + 1}`
 }
 
+function locationLevelLabel(code: string | null) {
+  if (code === '212000') return 'Roof level'
+  if (code === '212010') return 'Ground level'
+  return 'Unresolved source code'
+}
+
 function formatFeet(value: number | null) {
   return value == null ? '—' : `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })} ft`
 }
@@ -28,6 +35,8 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
   const buildingFootprints = detail.building_footprints
   const featureCount = features?.length ?? 0
   const footprintCount = buildingFootprints?.length ?? 0
+  const roofLevelCount = features?.filter(feature => feature.sub_feature_code === '212000').length ?? 0
+  const groundLevelCount = features?.filter(feature => feature.sub_feature_code === '212010').length ?? 0
   const hasRoofMapContext = featureCount > 0 || footprintCount > 0
 
   useEffect(() => {
@@ -98,9 +107,10 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
           opacity: 1,
           fillColor: '#f59e0b',
           fillOpacity: 0.38,
+          dashArray: feature.sub_feature_code === '212010' ? '7 5' : undefined,
         },
       }).addTo(map)
-      layer.bindTooltip(featureLabel(index))
+      layer.bindTooltip(`${featureLabel(index)} · ${locationLevelLabel(feature.sub_feature_code)}`)
       bounds.extend(layer.getBounds())
     })
 
@@ -116,10 +126,11 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
   const featureCards = features?.map((feature, index) => <article className="planimetric-feature" key={feature.global_id}>
     <div className="planimetric-feature-head"><strong>{featureLabel(index)}</strong><span>BIN {feature.bin}</span></div>
     <dl className="identity-grid">
+      <div><dt>Structure location</dt><dd><strong>{locationLevelLabel(feature.sub_feature_code)}</strong></dd></div>
+      <div><dt>Source sub-feature code</dt><dd>{feature.sub_feature_code ?? '—'}</dd></div>
       <div><dt>Global ID</dt><dd className="mono planimetric-id">{feature.global_id}</dd></div>
       <div><dt>Source ID</dt><dd>{feature.source_id ?? '—'}</dd></div>
       <div><dt>Feature code</dt><dd>{feature.feature_code ?? '—'}</dd></div>
-      <div><dt>Sub-feature code</dt><dd>{feature.sub_feature_code ?? '—'}</dd></div>
       <div><dt>Source status</dt><dd>{feature.status ?? '—'}</dd></div>
       <div><dt>Observation imagery</dt><dd>{feature.imagery_year}</dd></div>
     </dl>
@@ -130,6 +141,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
     <div className="planimetric-summary">
       <strong>{featureCount} mapped cooling-tower footprint{featureCount === 1 ? '' : 's'} · {footprintCount} building outline{footprintCount === 1 ? '' : 's'}</strong>
       <span>Exact BIN attachment · tower observation and aerial imagery: 2022 · building footprint: current NYC layer</span>
+      {featureCount > 0 && <span>{roofLevelCount} roof level · {groundLevelCount} ground level · classification is source-coded by NYC OTI</span>}
     </div>
 
     {hasRoofMapContext && <>
@@ -168,9 +180,10 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
       </div>
     </details>}
 
-    <p className="microcopy">The orange tower polygons are NYC Planimetric physical observations derived from 2022 aerial imagery and are attached only by exact BIN. The dashed building outline comes from NYC OTI's current building-footprint layer and can therefore reflect edits made after the 2022 imagery. Neither layer establishes which polygon corresponds to a specific System ID when multiple registered systems share a building, nor do they prove current equipment configuration or operating status.</p>
+    <p className="microcopy">The orange tower polygons are NYC Planimetric physical observations derived from 2022 aerial imagery and are attached only by exact BIN. NYC OTI's coded domain defines sub-feature 212000 as Roof Level and 212010 as Ground Level; TowerSignal preserves that source classification rather than inferring location from imagery. The dashed building outline comes from NYC OTI's current building-footprint layer and can therefore reflect edits made after the 2022 imagery. Neither layer establishes which polygon corresponds to a specific System ID when multiple registered systems share a building, nor do they prove current equipment configuration or operating status.</p>
     <div className="roof-source-links">
       <a className="planimetric-source-link" href={PLANIMETRIC_SOURCE_URL} target="_blank" rel="noreferrer">Tower polygons ↗</a>
+      <a className="planimetric-source-link" href={PLANIMETRIC_DOMAIN_URL} target="_blank" rel="noreferrer">Roof/ground code domain ↗</a>
       <a className="planimetric-source-link" href={BUILDING_SOURCE_URL} target="_blank" rel="noreferrer">Building footprints ↗</a>
       <a className="planimetric-source-link" href={ORTHO_SOURCE_URL} target="_blank" rel="noreferrer">2022 NYS orthophoto ↗</a>
     </div>
