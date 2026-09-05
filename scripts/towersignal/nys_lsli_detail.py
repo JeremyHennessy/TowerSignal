@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import re
+import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import Counter
 from typing import Any, Mapping
 
@@ -20,6 +22,8 @@ from .nys_public_water import (
 
 SCHEMA_VERSION = "1.2"
 DEFAULT_REQUEST_DELAY_SECONDS = 0.15
+DEFAULT_MAX_WORKERS = 1
+DEFAULT_PROGRESS_INTERVAL = 250
 MAX_EXPLICIT_UNAVAILABLE_DETAILS = 25
 
 KEY_FIELDS = {
@@ -338,36 +342,90 @@ def _unavailable_detail(index_row: Mapping[str, Any], exc: Exception) -> dict[st
     }
 
 
-def build_payload(*, request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECONDS) -> dict[str, Any]:
+def _fetch_detail_result(index_row: Mapping[str, Any]) -> tuple[str, dict[str, Any]]:
+    try:
+        snapshot = fetch_html(str(index_row["detail_url"]))
+    except NysPublicWaterSourceError as exc:
+        if not _explicit_detail_404(exc):
+            raise
+        return "unavailable", _unavailable_detail(index_row, exc)
+    return (
+        "detail",
+        parse_detail(
+            snapshot.html,
+            source_url=str(index_row["detail_url"]),
+            expected_pws_id=str(index_row["pws_id"]),
+        ),
+    )
+
+
+def _progress(completed: int, total: int) -> None:
+    if completed and (completed % DEFAULT_PROGRESS_INTERVAL == 0 or completed == total):
+        print(f"LSLI detail crawl progress: {completed:,}/{total:,}", file=sys.stderr, flush=True)
+
+
+def _crawl_details(
+    index_rows: list[dict[str, Any]],
+    *,
+    request_delay_seconds: float,
+    max_workers: int,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    if max_workers <= 1:
+        results: list[tuple[int, str, dict[str, Any]]] = []
+        for ordinal, index_row in enumerate(index_rows, start=1):
+            kind, detail = _fetch_detail_result(index_row)
+            results.append((ordinal, kind, detail))
+            _progress(ordinal, len(index_rows))
+            if request_delay_seconds > 0 and ordinal < len(index_rows):
+                time.sleep(request_delay_seconds)
+    else:
+        results = []
+        completed = 0
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {}
+            for ordinal, index_row in enumerate(index_rows, start=1):
+                futures[executor.submit(_fetch_detail_result, index_row)] = ordinal
+                if request_delay_seconds > 0 and ordinal < len(index_rows):
+                    time.sleep(request_delay_seconds)
+            for future in as_completed(futures):
+                ordinal = futures[future]
+                kind, detail = future.result()
+                results.append((ordinal, kind, detail))
+                completed += 1
+                _progress(completed, len(index_rows))
+
+    details: list[dict[str, Any]] = []
+    unavailable_details: list[dict[str, Any]] = []
+    for _, kind, detail in sorted(results, key=lambda item: item[0]):
+        if kind == "unavailable":
+            unavailable_details.append(detail)
+            if len(unavailable_details) > MAX_EXPLICIT_UNAVAILABLE_DETAILS:
+                raise NysPublicWaterSourceError(
+                    f"LSLI detail source has more than {MAX_EXPLICIT_UNAVAILABLE_DETAILS} explicit 404 entries"
+                )
+        else:
+            details.append(detail)
+    return details, unavailable_details
+
+
+def build_payload(
+    *,
+    request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECONDS,
+    max_workers: int = DEFAULT_MAX_WORKERS,
+) -> dict[str, Any]:
+    if max_workers <= 0:
+        raise ValueError("max_workers must be positive")
     index_snapshot = fetch_html(LSLI_INDEX_URL)
     index_rows = parse_lsli_index(index_snapshot.html, source_url=LSLI_INDEX_URL)
     if len({row["pws_id"] for row in index_rows}) != len(index_rows):
         raise NysPublicWaterSourceError("LSLI index contains duplicate PWS IDs")
 
-    details: list[dict[str, Any]] = []
-    unavailable_details: list[dict[str, Any]] = []
     retrieved_at = utc_now()
-    for ordinal, index_row in enumerate(index_rows, start=1):
-        try:
-            snapshot = fetch_html(str(index_row["detail_url"]))
-        except NysPublicWaterSourceError as exc:
-            if not _explicit_detail_404(exc):
-                raise
-            unavailable_details.append(_unavailable_detail(index_row, exc))
-            if len(unavailable_details) > MAX_EXPLICIT_UNAVAILABLE_DETAILS:
-                raise NysPublicWaterSourceError(
-                    f"LSLI detail source has more than {MAX_EXPLICIT_UNAVAILABLE_DETAILS} explicit 404 entries"
-                ) from exc
-        else:
-            details.append(
-                parse_detail(
-                    snapshot.html,
-                    source_url=str(index_row["detail_url"]),
-                    expected_pws_id=str(index_row["pws_id"]),
-                )
-            )
-        if request_delay_seconds > 0 and ordinal < len(index_rows):
-            time.sleep(request_delay_seconds)
+    details, unavailable_details = _crawl_details(
+        index_rows,
+        request_delay_seconds=request_delay_seconds,
+        max_workers=max_workers,
+    )
 
     method_system_counts: Counter[str] = Counter()
     for detail in details:
@@ -392,6 +450,7 @@ def build_payload(*, request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECOND
             "coverage_complete": coverage_count == len(index_rows),
             "parsed_detail_complete": len(unavailable_details) == 0,
             "request_delay_seconds": request_delay_seconds,
+            "max_workers": max_workers,
         },
         "evidence_semantics": {
             "contact": "Section II source label combines owner / licensed operator of record completing the form; TowerSignal does not split that role without stronger evidence.",

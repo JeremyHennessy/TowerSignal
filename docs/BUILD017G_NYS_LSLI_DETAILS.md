@@ -14,7 +14,7 @@ Every current PWS ID in the authoritative NYSDOH Lead Service Line Inventory ind
 
 `https://www.health.ny.gov/environmental/water/drinking/service_line/{PWSID}.htm`
 
-The workflow re-fetches the current index, requires unique PWS IDs, then requests every detail URL sequentially with bounded pacing. Parsed pages must contain the same PWS ID as the index and all required inventory/method fields.
+The workflow re-fetches the current index, requires unique PWS IDs, then requests every detail URL with a bounded worker pool and paced submission. Parsed pages must contain the same PWS ID as the index and all required inventory/method fields. Output remains sorted by index order, and validation still requires complete current-index coverage.
 
 ### Current-index detail 404s
 

@@ -182,7 +182,7 @@ jobs:
       - name: Validate NYS public-water system cache
         run: python scripts/validate_nys_public_water_cache.py --cache public/data/nys-public-water.json --max-age-days 1 --require-production-volume
       - name: Build NYS LSLI detail cache
-        run: python scripts/build_nys_lsli_detail_cache.py --output public/data/nys-lsli-details.json --request-delay-seconds 0.15
+        run: python scripts/build_nys_lsli_detail_cache.py --output public/data/nys-lsli-details.json --request-delay-seconds 0.05 --max-workers 6
       - name: Validate NYS LSLI detail cache
         run: python scripts/validate_nys_lsli_detail_cache.py --cache public/data/nys-lsli-details.json --max-age-days 1 --require-production-volume
       - name: Build NYS address-level service-line summary

@@ -23,14 +23,14 @@ concurrency:
 jobs:
   build-cache:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Crawl every current NYSDOH LSLI detail page
-        run: python scripts/build_nys_lsli_detail_cache.py --output nys-lsli-details/cache.json --request-delay-seconds 0.15
+        run: python scripts/build_nys_lsli_detail_cache.py --output nys-lsli-details/cache.json --request-delay-seconds 0.05 --max-workers 6
       - name: Validate complete index/detail coverage and inventory reconciliation
         run: python scripts/validate_nys_lsli_detail_cache.py --cache nys-lsli-details/cache.json --max-age-days 1 --require-production-volume
       - name: Run LSLI detail parser tests

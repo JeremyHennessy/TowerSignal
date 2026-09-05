@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -10,9 +11,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from towersignal.nys_lsli_detail import (  # noqa: E402
     _explicit_detail_404,
     _unavailable_detail,
+    build_payload,
     parse_detail,
 )
-from towersignal.nys_public_water import NysPublicWaterSourceError  # noqa: E402
+from towersignal.nys_public_water import HtmlSnapshot, LSLI_INDEX_URL, NysPublicWaterSourceError  # noqa: E402
 
 
 def sample_html(pws_id: str = "NY7003493") -> str:
@@ -59,6 +61,21 @@ def sample_html(pws_id: str = "NY7003493") -> str:
       <tr><td>Jane Operator</td><td>Name</td></tr>
       <tr><td>Water Superintendent</td><td>Title</td></tr>
       <tr><td>12/29/2025</td><td>Date</td></tr>
+    </table>
+    </body></html>
+    """
+
+
+def index_html(pws_ids: list[str]) -> str:
+    rows = "\n".join(
+        f"<tr><td>{pws_id}</td><td>System {pws_id}</td><td>Albany</td></tr>"
+        for pws_id in pws_ids
+    )
+    return f"""
+    <html><body>
+    <table>
+      <tr><th>PWS ID Number</th><th>PWS Name</th><th>Principal County Served</th></tr>
+      {rows}
     </table>
     </body></html>
     """
@@ -199,6 +216,23 @@ class NysLsliDetailTests(unittest.TestCase):
         self.assertEqual(row["pws_id"], "NY0117224")
         self.assertEqual(row["principal_county_served"], "ALBANY")
         self.assertNotIn("inventory", row)
+
+    def test_concurrent_payload_crawl_preserves_index_order_and_metadata(self) -> None:
+        pws_ids = ["NY0000001", "NY0000002", "NY0000003"]
+
+        def fake_fetch_html(url: str):
+            if url == LSLI_INDEX_URL:
+                return HtmlSnapshot(url=url, html=index_html(pws_ids), retrieved_at="2026-09-05T00:00:00Z")
+            pws_id = Path(url).stem
+            return HtmlSnapshot(url=url, html=sample_html(pws_id), retrieved_at="2026-09-05T00:00:00Z")
+
+        with patch("towersignal.nys_lsli_detail.fetch_html", side_effect=fake_fetch_html):
+            payload = build_payload(request_delay_seconds=0, max_workers=3)
+
+        self.assertEqual(payload["source"]["index_record_count"], 3)
+        self.assertEqual(payload["source"]["parsed_detail_count"], 3)
+        self.assertEqual(payload["source"]["max_workers"], 3)
+        self.assertEqual([row["pws_id"] for row in payload["details"]], pws_ids)
 
 
 if __name__ == "__main__":
