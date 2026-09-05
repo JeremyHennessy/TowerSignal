@@ -4,6 +4,7 @@ import {
   clickElement,
   expectAccountDetailHydrated,
   expectContained,
+  expectDomAttribute,
   expectDomText,
   expectElementContained,
   isIphoneProject,
@@ -55,8 +56,8 @@ test('workflow command center groups current and future intelligence on desktop 
   const workflow = page.locator('section.workflow-workspace-page')
   const categories = ['Compliance & timing', 'Ownership, access & property', 'Field & physical', 'Domestic water', 'Monitoring & change', 'Commercial readiness']
   if (isIphone) {
+    await expectDomAttribute(page, 'section.workflow-workspace-page h1', 'aria-label', 'Workflow workspace')
     await expectDomText(page, [
-      'Workflow workspace',
       'What matters now',
       'Your private workflow covers 1 current NYC account',
       '1 due or overdue action',
