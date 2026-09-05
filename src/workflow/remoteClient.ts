@@ -124,7 +124,7 @@ export async function saveRemoteView(view: WorkflowSavedView): Promise<void> {
     .select('view_id')
   throwIfError('Unable to update saved view', update.error)
   if ((update.data ?? []).length > 0) return
-  const insert = await client.from('workflow_saved_views').insert({ view_id: view.id, name: view.name, filters: view.filters, updated_at: now })
+  const insert = await client.from('workflow_saved_views').insert({ view_id: view.id, name: view.name, filters: view.filters, updated_at: now }).select('view_id')
   throwIfError('Unable to save view', insert.error)
 }
 
@@ -134,7 +134,7 @@ export async function deleteRemoteView(viewId: string): Promise<void> {
 }
 
 export async function createRemoteWatchlist(watchlist: WorkflowWatchlist): Promise<void> {
-  const result = await client.from('workflow_watchlists').insert({ watchlist_id: watchlist.id, name: watchlist.name })
+  const result = await client.from('workflow_watchlists').insert({ watchlist_id: watchlist.id, name: watchlist.name }).select('watchlist_id')
   throwIfError('Unable to create watchlist', result.error)
 }
 
@@ -149,16 +149,18 @@ export async function saveRemoteAccount(systemId: string, patch: WorkflowAccount
   const update = await client.from('workflow_accounts').update(values).eq('system_id', systemId).select('system_id')
   throwIfError('Unable to update account workflow state', update.error)
   if ((update.data ?? []).length > 0) return
-  const insert = await client.from('workflow_accounts').insert({ system_id: systemId, ...values })
+  const insert = await client.from('workflow_accounts').insert({ system_id: systemId, ...values }).select('system_id')
   throwIfError('Unable to save account workflow state', insert.error)
+  if ((insert.data ?? []).length <= 0) throw new Error('Unable to save account workflow state: inserted row was not returned')
 }
 
 async function ensureRemoteAccount(systemId: string): Promise<void> {
   const existing = await client.from('workflow_accounts').select('system_id').eq('system_id', systemId).limit(1)
   throwIfError('Unable to check account workflow state', existing.error)
   if ((existing.data ?? []).length > 0) return
-  const insert = await client.from('workflow_accounts').insert({ system_id: systemId })
+  const insert = await client.from('workflow_accounts').insert({ system_id: systemId }).select('system_id')
   throwIfError('Unable to initialize account workflow state', insert.error)
+  if ((insert.data ?? []).length <= 0) throw new Error('Unable to initialize account workflow state: inserted row was not returned')
 }
 
 export async function setRemoteMembership(systemId: string, watchlistId: string, enabled: boolean): Promise<void> {
@@ -171,6 +173,6 @@ export async function setRemoteMembership(systemId: string, watchlistId: string,
   const existing = await client.from('workflow_watchlist_members').select('system_id').eq('system_id', systemId).eq('watchlist_id', watchlistId).limit(1)
   throwIfError('Unable to check watchlist membership', existing.error)
   if ((existing.data ?? []).length > 0) return
-  const insert = await client.from('workflow_watchlist_members').insert({ system_id: systemId, watchlist_id: watchlistId })
+  const insert = await client.from('workflow_watchlist_members').insert({ system_id: systemId, watchlist_id: watchlistId }).select('system_id')
   throwIfError('Unable to add account to watchlist', insert.error)
 }
