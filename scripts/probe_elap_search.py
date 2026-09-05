@@ -102,6 +102,10 @@ def classify_value(value: str | None) -> str:
     return "OTHER"
 
 
+def _select_label(select: dict) -> str:
+    return f"{select.get('id') or ''} {select.get('name') or ''}".strip().lower()
+
+
 def build_probe() -> dict:
     html = fetch_html()
     if "Search NY Accredited Environmental Laboratories" not in html:
@@ -113,7 +117,7 @@ def build_probe() -> dict:
         raise ElapProbeError(f"Implausibly few ELAP selects: {len(parser.selects)}")
 
     result_selects = []
-    lab_candidates = []
+    explicit_lab_candidates = []
     for select in parser.selects:
         options = [option for option in select["options"] if option.get("text")]
         value_classes = Counter(classify_value(option.get("value")) for option in options)
@@ -128,22 +132,31 @@ def build_probe() -> dict:
             ],
         }
         result_selects.append(result)
-        joined = f"{select.get('id') or ''} {select.get('name') or ''}".lower()
-        if "lab" in joined or len(options) > 200:
-            lab_candidates.append((select, options, value_classes))
+        if "lab" in _select_label(select):
+            explicit_lab_candidates.append((select, options, value_classes))
 
-    if not lab_candidates:
-        raise ElapProbeError("Could not identify ELAP laboratory selector")
-    lab_select, lab_options, lab_value_classes = max(lab_candidates, key=lambda item: len(item[1]))
-    nonblank_options = [option for option in lab_options if str(option.get("value") or "").strip()]
+    if len(explicit_lab_candidates) != 1:
+        raise ElapProbeError(
+            "Expected exactly one explicitly lab-named ELAP selector; "
+            f"found {[(item[0].get('id'), item[0].get('name'), len(item[1])) for item in explicit_lab_candidates]}; "
+            f"all_selects={[(s.get('id'), s.get('name'), len(s.get('options') or [])) for s in parser.selects]}"
+        )
+
+    lab_select, lab_options, lab_value_classes = explicit_lab_candidates[0]
+    nonblank_options = [
+        option for option in lab_options if str(option.get("value") or "").strip()
+    ]
     unsupported = [
         option
         for option in nonblank_options
-        if classify_value(option.get("value")) not in {"INTEGER", "TOKEN", "LABID_URL_OR_QUERY"}
+        if classify_value(option.get("value"))
+        not in {"INTEGER", "TOKEN", "LABID_URL_OR_QUERY"}
     ]
     stable_value_count = len(nonblank_options) - len(unsupported)
     if len(nonblank_options) < 250:
-        raise ElapProbeError(f"Implausibly few populated ELAP lab options: {len(nonblank_options)}")
+        raise ElapProbeError(
+            f"Implausibly few populated ELAP lab options: {len(nonblank_options)}"
+        )
     if unsupported:
         raise ElapProbeError(
             "ELAP lab selector contains unsupported option-value shapes: "
@@ -174,7 +187,9 @@ def build_probe() -> dict:
                 for option in nonblank_options[-5:]
             ],
         },
-        "links_with_labdetail": [url for url in parser.links if "labdetail" in url.lower()][:20],
+        "links_with_labdetail": [
+            url for url in parser.links if "labdetail" in url.lower()
+        ][:20],
     }
 
 
