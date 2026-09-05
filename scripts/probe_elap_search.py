@@ -136,17 +136,19 @@ def build_probe() -> dict:
         raise ElapProbeError("Could not identify ELAP laboratory selector")
     lab_select, lab_options, lab_value_classes = max(lab_candidates, key=lambda item: len(item[1]))
     nonblank_options = [option for option in lab_options if str(option.get("value") or "").strip()]
-    stable_value_count = sum(
-        1
+    unsupported = [
+        option
         for option in nonblank_options
-        if classify_value(option.get("value")) in {"INTEGER", "TOKEN", "LABID_URL_OR_QUERY"}
-    )
+        if classify_value(option.get("value")) not in {"INTEGER", "TOKEN", "LABID_URL_OR_QUERY"}
+    ]
+    stable_value_count = len(nonblank_options) - len(unsupported)
     if len(nonblank_options) < 250:
         raise ElapProbeError(f"Implausibly few populated ELAP lab options: {len(nonblank_options)}")
-    if stable_value_count != len(nonblank_options):
+    if unsupported:
         raise ElapProbeError(
-            f"ELAP lab selector contains unsupported option-value shapes: "
-            f"{dict(sorted(lab_value_classes.items()))}"
+            "ELAP lab selector contains unsupported option-value shapes: "
+            f"classes={dict(sorted(lab_value_classes.items()))}; "
+            f"unsupported={unsupported[:10]}; forms={parser.forms}"
         )
 
     return {
@@ -161,6 +163,7 @@ def build_probe() -> dict:
             "name": lab_select.get("name"),
             "option_count": len(lab_options),
             "populated_option_count": len(nonblank_options),
+            "stable_value_count": stable_value_count,
             "value_class_counts": dict(sorted(lab_value_classes.items())),
             "first_20": [
                 {"value": option.get("value"), "text": option.get("text")}
