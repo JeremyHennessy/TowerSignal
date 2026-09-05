@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { testCredentials } from './auth.helpers'
+import { submitSignIn } from './auth.helpers'
 
 test('direct hosted roof link signs in and renders on desktop and iPhone', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
@@ -18,18 +18,15 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await page.goto('./#/account/2000015564', { waitUntil: 'networkidle' })
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
   await expect(loginHeading).toBeVisible()
-  const credentials = testCredentials(testInfo.project.name)
-  await page.getByLabel('Email').fill(credentials.email)
-  await page.getByLabel('Password', { exact: true }).fill(credentials.password)
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click()
-  await expect(loginHeading).toHaveCount(0)
+  await submitSignIn(page, testInfo.project.name)
   await expect(page).toHaveURL(/#\/account\/2000015564$/)
 
   const section = page.locator('section.planimetric-section')
   await expect(section).toBeVisible()
   await expect(section.getByRole('heading', { name: 'Physical tower location', exact: true })).toBeVisible()
   await expect(section.getByText('1 mapped cooling-tower footprint · 1 building outline', { exact: true })).toBeVisible()
-  await expect(section.getByText('1 roof level · 0 ground level · classification is source-coded by NYC OTI', { exact: true })).toBeVisible()
+  await expect(section.getByText('1 mapped rooftop drinking-water tank footprint', { exact: true })).toBeVisible()
+  await expect(section.getByText('1 roof level · 0 ground level · cooling-tower classification is source-coded by NYC OTI', { exact: true })).toBeVisible()
   await expect(section.getByText('Roof level', { exact: true }).first()).toBeVisible()
   await expect(section.getByText('212000', { exact: true }).first()).toBeVisible()
 
@@ -45,26 +42,44 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
 
   expect(await map.locator('path[stroke="#ffffff"]').count()).toBeGreaterThanOrEqual(1)
   expect(await map.locator('path[fill="#f59e0b"]').count()).toBeGreaterThanOrEqual(1)
+  expect(await map.locator('path[fill="#38bdf8"]').count()).toBeGreaterThanOrEqual(1)
   await expect(map.locator('.leaflet-control-layers')).toBeVisible()
   await expect(map.locator('.leaflet-control-scale')).toBeVisible()
   await expect(section.locator('.roof-map-legend')).toBeVisible()
+  await expect(section.getByText('Drinking-water tank footprint', { exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: 'Tower polygons ↗', exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: 'Roof/ground code domain ↗', exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: 'Building footprints ↗', exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: '2022 NYS orthophoto ↗', exact: true })).toBeVisible()
+
+  const domestic = page.locator('section.domestic-water-section')
+  await expect(domestic).toBeVisible()
+  await expect(domestic.getByRole('heading', { name: 'Domestic water context', exact: true })).toBeVisible()
+  const physicalDwtSummary = domestic.getByText('2022 rooftop drinking-water tank polygons · 1', { exact: true })
+  await expect(physicalDwtSummary).toBeVisible()
+  await physicalDwtSummary.click()
+  await expect(domestic.getByText('Roof level', { exact: true }).first()).toBeVisible()
+  await expect(domestic.getByText('22.8 ft', { exact: true }).first()).toBeVisible()
+  await expect(domestic.getByRole('link', { name: 'Water-tank polygons ↗', exact: true })).toBeVisible()
+  await expect(domestic.getByRole('link', { name: 'DOHMH oversight ↗', exact: true })).toBeVisible()
+  await expect(domestic.getByRole('link', { name: 'Self-reported inspections ↗', exact: true })).toBeVisible()
 
   // Reproduce a Safari focus/foreground check without hard-reloading the page.
   // A missing third-party cookie must not erase the tab that just authenticated.
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
   await page.waitForTimeout(750)
   await expect(section).toBeVisible()
+  await expect(domestic).toBeVisible()
 
   const viewportWidth = page.viewportSize()?.width ?? 0
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
   expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
   const sectionBox = await section.boundingBox()
+  const domesticBox = await domestic.boundingBox()
   expect(sectionBox).not.toBeNull()
+  expect(domesticBox).not.toBeNull()
   expect(sectionBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
+  expect(domesticBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
 
   if (testInfo.project.name === 'desktop-chromium') {
     const layerControl = map.locator('.leaflet-control-layers')
@@ -81,6 +96,8 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
 
   const screenshot = await section.screenshot()
   await testInfo.attach(`roof-map-${testInfo.project.name}.png`, { body: screenshot, contentType: 'image/png' })
+  const domesticScreenshot = await domestic.screenshot()
+  await testInfo.attach(`domestic-water-${testInfo.project.name}.png`, { body: domesticScreenshot, contentType: 'image/png' })
 
   expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
   expect(consoleErrors, `Console errors:\n${consoleErrors.join('\n')}`).toEqual([])

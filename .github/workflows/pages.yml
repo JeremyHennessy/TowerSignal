@@ -58,6 +58,8 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
         run: python scripts/build_data.py --output public/data
+      - name: Attach exact-BIN domestic-water roof and inspection context
+        run: python scripts/build_domestic_water_data.py --output public/data
       - name: Fetch, validate and normalize NYC City Record procurement
         run: python scripts/build_city_record_procurement.py --output public/data/procurement-city-record.json
       - name: Attach last verified Checkbook NYC procurement cache
@@ -106,6 +108,8 @@ jobs:
         run: python scripts/build_nys_data.py --output public/data
       - name: Build and validate source-health coverage
         run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
+      - name: Attach domestic-water source health
+        run: python scripts/attach_domestic_water_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Attach ACRIS cache health and freshness
         run: python scripts/attach_acris_health.py --output public/data
       - name: Build deterministic NYC historical changes
@@ -118,6 +122,8 @@ jobs:
         run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
       - name: Independently verify generated systems and OATH cases against current NYC sources
         run: python scripts/verify_live_data.py --sample-size 5
+      - name: Independently verify generated domestic-water context against current sources
+        run: python scripts/verify_live_domestic_water.py --output public/data --sample-size 3
       - name: Independently verify generated NYS equipment against current NYS source
         run: python scripts/verify_live_nys.py --sample-size 5
       - name: Python fixture tests
