@@ -23,9 +23,9 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
 
   const section = page.locator('section.planimetric-section')
   await expect(section).toBeVisible()
+  await section.scrollIntoViewIfNeeded()
   await expect(section.getByRole('heading', { name: 'Physical tower location', exact: true })).toBeVisible()
   await expect(section.getByText('1 mapped cooling-tower footprint · 1 building outline', { exact: true })).toBeVisible()
-  await expect(section.getByText('1 mapped rooftop drinking-water tank footprint', { exact: true })).toBeVisible()
   await expect(section.getByText('1 roof level · 0 ground level · cooling-tower classification is source-coded by NYC OTI', { exact: true })).toBeVisible()
   await expect(section.getByText('Roof level', { exact: true }).first()).toBeVisible()
   await expect(section.getByText('212000', { exact: true }).first()).toBeVisible()
@@ -46,6 +46,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await expect(map.locator('.leaflet-control-layers')).toBeVisible()
   await expect(map.locator('.leaflet-control-scale')).toBeVisible()
   await expect(section.locator('.roof-map-legend')).toBeVisible()
+  await expect(section.locator('.roof-legend-water-tank')).toBeVisible()
   await expect(section.getByText('Drinking-water tank footprint', { exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: 'Tower polygons ↗', exact: true })).toBeVisible()
   await expect(section.getByRole('link', { name: 'Roof/ground code domain ↗', exact: true })).toBeVisible()
@@ -54,6 +55,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
 
   const domestic = page.locator('section.domestic-water-section')
   await expect(domestic).toBeVisible()
+  await domestic.scrollIntoViewIfNeeded()
   await expect(domestic.getByRole('heading', { name: 'Domestic water context', exact: true })).toBeVisible()
   const physicalDwtSummary = domestic.getByText('2022 rooftop drinking-water tank polygons · 1', { exact: true })
   await expect(physicalDwtSummary).toBeVisible()
@@ -64,8 +66,6 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await expect(domestic.getByRole('link', { name: 'DOHMH oversight ↗', exact: true })).toBeVisible()
   await expect(domestic.getByRole('link', { name: 'Self-reported inspections ↗', exact: true })).toBeVisible()
 
-  // Reproduce a Safari focus/foreground check without hard-reloading the page.
-  // A missing third-party cookie must not erase the tab that just authenticated.
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
   await page.waitForTimeout(750)
   await expect(section).toBeVisible()
