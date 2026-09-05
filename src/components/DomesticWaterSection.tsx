@@ -82,9 +82,43 @@ export type SystemDetailWithDomesticWater = SystemDetail & { domestic_water?: Do
 const display = (value: string | number | null | undefined) => value == null || value === '' ? '—' : String(value)
 const feet = (value: number | null) => value == null ? '—' : `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })} ft`
 
-function latestSelfReportRows(records: DwtSelfReportRecord[]) {
-  const latestYear = records.find(record => record.reporting_year)?.reporting_year
-  return latestYear ? records.filter(record => record.reporting_year === latestYear) : records.slice(0, 1)
+function groupSelfReports(records: DwtSelfReportRecord[]) {
+  const groups = new Map<string, DwtSelfReportRecord[]>()
+  records.forEach(record => {
+    const key = record.tank_num?.trim() || 'Not published'
+    const group = groups.get(key) ?? []
+    group.push(record)
+    groups.set(key, group)
+  })
+  return [...groups.entries()].map(([tank, history]) => ({ tank, history }))
+}
+
+function compactSelfReport(report: DwtSelfReportRecord, index: number) {
+  return <article className="dwt-history-row" key={`${report.reporting_year ?? 'year'}-${report.inspection_date ?? index}-${index}`}>
+    <div><strong>{report.inspection_date ?? report.reporting_year ?? 'Date not published'}</strong><span>{report.inspection_by_firm ?? 'Inspector / firm not published'}</span></div>
+    <dl className="identity-grid">
+      <div><dt>Sample collected</dt><dd>{display(report.sample_collected)}</dd></div>
+      <div><dt>Meets standards</dt><dd>{display(report.meet_standards)}</dd></div>
+      <div><dt>Coliform</dt><dd>{display(report.coliform)}</dd></div>
+      <div><dt>E. coli</dt><dd>{display(report.ecoli)}</dd></div>
+    </dl>
+  </article>
+}
+
+function complianceCard(record: DwtComplianceRecord, index: number) {
+  return <article className="signal-card" key={`${record.activity_year ?? 'year'}-${record.summons_number ?? record.violation_code ?? index}-${index}`}>
+    <div className="signal-card-head"><strong>{record.activity_type ?? 'DWT oversight record'}</strong><span>{record.activity_year ?? record.compliance_year ?? 'Year not published'}</span></div>
+    <dl className="identity-grid">
+      <div><dt>Status</dt><dd>{record.status ?? '—'}</dd></div>
+      <div><dt>Reported tank count</dt><dd>{record.number_of_dwt ?? '—'}</dd></div>
+      <div><dt>Compliance year</dt><dd>{record.compliance_year ?? '—'}</dd></div>
+      <div><dt>Date of occurrence</dt><dd>{record.date_of_occurrence ?? '—'}</dd></div>
+      <div><dt>Violation code</dt><dd>{record.violation_code ?? '—'}</dd></div>
+      <div><dt>Law section</dt><dd>{record.law_section ?? '—'}</dd></div>
+      <div><dt>Summons</dt><dd>{record.summons_number ?? '—'}</dd></div>
+    </dl>
+    {record.violation_text && <p>{record.violation_text}</p>}
+  </article>
 }
 
 export function DomesticWaterSection({ detail }: { detail: SystemDetailWithDomesticWater }) {
@@ -92,7 +126,10 @@ export function DomesticWaterSection({ detail }: { detail: SystemDetailWithDomes
   if (!context) return null
 
   const { summary, planimetric_tank_features: physical, compliance_history: compliance, self_report_history: reports } = context
-  const latestReports = latestSelfReportRows(reports)
+  const reportGroups = groupSelfReports(reports)
+  const latestReports = reportGroups.map(group => ({ ...group, latest: group.history[0], older: group.history.slice(1) })).filter(group => Boolean(group.latest))
+  const primaryCompliance = compliance.slice(0, 3)
+  const olderCompliance = compliance.slice(3)
   const hasAny = physical.length > 0 || compliance.length > 0 || reports.length > 0
 
   return <section className="domestic-water-section">
@@ -112,22 +149,27 @@ export function DomesticWaterSection({ detail }: { detail: SystemDetailWithDomes
 
       {latestReports.length > 0 && <div className="domestic-water-latest">
         <strong>Latest self-reported inspection evidence</strong>
-        <p>{latestReports.length.toLocaleString()} tank record{latestReports.length === 1 ? '' : 's'} in reporting year {latestReports[0]?.reporting_year ?? 'not published'}.</p>
-        <div className="signal-list">
-          {latestReports.map((report, index) => <article className="signal-card" key={`${report.reporting_year ?? 'year'}-${report.tank_num ?? index}`}>
-            <div className="signal-card-head"><strong>Tank {report.tank_num ?? index + 1}</strong><span>{report.inspection_date ?? 'Inspection date not published'}</span></div>
+        <p>{latestReports.length.toLocaleString()} tank{latestReports.length === 1 ? '' : 's'} with self-reported history. Latest record per tank is shown first.</p>
+        <div className="signal-list dwt-latest-grid">
+          {latestReports.map(({ tank, latest, older }, index) => <article className="signal-card dwt-latest-card" key={`${tank}-${latest.reporting_year ?? index}`}>
+            <div className="signal-card-head"><strong>Tank {tank}</strong><span>{latest.inspection_date ?? 'Inspection date not published'}</span></div>
             <dl className="identity-grid">
-              <div><dt>Inspector / firm</dt><dd>{report.inspection_by_firm ?? '—'}</dd></div>
-              <div><dt>Inspection performed</dt><dd>{display(report.inspection_performed)}</dd></div>
-              <div><dt>Sample collected</dt><dd>{display(report.sample_collected)}</dd></div>
-              <div><dt>Meets standards</dt><dd>{display(report.meet_standards)}</dd></div>
-              <div><dt>Total coliform result</dt><dd>{display(report.coliform)}</dd></div>
-              <div><dt>E. coli result</dt><dd>{display(report.ecoli)}</dd></div>
-              <div><dt>Sediment condition</dt><dd>{display(report.sediment_result)}</dd></div>
-              <div><dt>Biological growth condition</dt><dd>{display(report.biological_growth_result)}</dd></div>
-              <div><dt>Debris / insects condition</dt><dd>{display(report.debris_insects_result)}</dd></div>
-              <div><dt>Rodent / bird condition</dt><dd>{display(report.rodent_bird_result)}</dd></div>
+              <div><dt>Reporting year</dt><dd>{latest.reporting_year ?? '—'}</dd></div>
+              <div><dt>Inspector / firm</dt><dd>{latest.inspection_by_firm ?? '—'}</dd></div>
+              <div><dt>Inspection performed</dt><dd>{display(latest.inspection_performed)}</dd></div>
+              <div><dt>Sample collected</dt><dd>{display(latest.sample_collected)}</dd></div>
+              <div><dt>Meets standards</dt><dd>{display(latest.meet_standards)}</dd></div>
+              <div><dt>Total coliform result</dt><dd>{display(latest.coliform)}</dd></div>
+              <div><dt>E. coli result</dt><dd>{display(latest.ecoli)}</dd></div>
+              <div><dt>Sediment condition</dt><dd>{display(latest.sediment_result)}</dd></div>
+              <div><dt>Biological growth condition</dt><dd>{display(latest.biological_growth_result)}</dd></div>
+              <div><dt>Debris / insects condition</dt><dd>{display(latest.debris_insects_result)}</dd></div>
+              <div><dt>Rodent / bird condition</dt><dd>{display(latest.rodent_bird_result)}</dd></div>
             </dl>
+            {older.length > 0 && <details className="dwt-older-history">
+              <summary>View {older.length.toLocaleString()} older inspection{older.length === 1 ? '' : 's'}</summary>
+              <div className="dwt-history-list">{older.map(compactSelfReport)}</div>
+            </details>}
           </article>)}
         </div>
         <p className="microcopy">Condition and lab values are displayed exactly as published by DOHMH. TowerSignal does not decode abbreviated A/P/N or similar source values unless the source data dictionary explicitly defines them.</p>
@@ -154,37 +196,11 @@ export function DomesticWaterSection({ detail }: { detail: SystemDetailWithDomes
 
       {compliance.length > 0 && <details className="domestic-water-history" open>
         <summary>DOHMH oversight / compliance history · {compliance.length.toLocaleString()} record{compliance.length === 1 ? '' : 's'}</summary>
-        <div className="signal-list">
-          {compliance.map((record, index) => <article className="signal-card" key={`${record.activity_year ?? 'year'}-${record.summons_number ?? record.violation_code ?? index}`}>
-            <div className="signal-card-head"><strong>{record.activity_type ?? 'DWT oversight record'}</strong><span>{record.activity_year ?? record.compliance_year ?? 'Year not published'}</span></div>
-            <dl className="identity-grid">
-              <div><dt>Status</dt><dd>{record.status ?? '—'}</dd></div>
-              <div><dt>Reported tank count</dt><dd>{record.number_of_dwt ?? '—'}</dd></div>
-              <div><dt>Compliance year</dt><dd>{record.compliance_year ?? '—'}</dd></div>
-              <div><dt>Date of occurrence</dt><dd>{record.date_of_occurrence ?? '—'}</dd></div>
-              <div><dt>Violation code</dt><dd>{record.violation_code ?? '—'}</dd></div>
-              <div><dt>Law section</dt><dd>{record.law_section ?? '—'}</dd></div>
-              <div><dt>Summons</dt><dd>{record.summons_number ?? '—'}</dd></div>
-            </dl>
-            {record.violation_text && <p>{record.violation_text}</p>}
-          </article>)}
-        </div>
-      </details>}
-
-      {reports.length > latestReports.length && <details className="domestic-water-history">
-        <summary>Full self-reported inspection history · {reports.length.toLocaleString()} tank records</summary>
-        <div className="signal-list">
-          {reports.map((report, index) => <article className="signal-card" key={`${report.reporting_year ?? 'year'}-${report.tank_num ?? index}-${report.inspection_date ?? index}`}>
-            <div className="signal-card-head"><strong>Tank {report.tank_num ?? '—'}</strong><span>{report.reporting_year ?? 'Year not published'} · {report.inspection_date ?? 'Date not published'}</span></div>
-            <p>{report.inspection_by_firm ?? 'Inspector / firm not published'}</p>
-            <dl className="identity-grid">
-              <div><dt>Sample collected</dt><dd>{display(report.sample_collected)}</dd></div>
-              <div><dt>Meets standards</dt><dd>{display(report.meet_standards)}</dd></div>
-              <div><dt>Coliform</dt><dd>{display(report.coliform)}</dd></div>
-              <div><dt>E. coli</dt><dd>{display(report.ecoli)}</dd></div>
-            </dl>
-          </article>)}
-        </div>
+        <div className="signal-list">{primaryCompliance.map(complianceCard)}</div>
+        {olderCompliance.length > 0 && <details className="dwt-older-history dwt-older-oversight">
+          <summary>View {olderCompliance.length.toLocaleString()} older oversight record{olderCompliance.length === 1 ? '' : 's'}</summary>
+          <div className="signal-list">{olderCompliance.map(complianceCard)}</div>
+        </details>}
       </details>}
 
       <p className="microcopy">Evidence is intentionally separated by source and vintage. The mapped polygons are 2022 rooftop physical observations. DOHMH oversight/compliance records and certified-inspector self-reports are separate regulatory evidence joined by exact BIN. Differences between physical polygon count and later reported tank count are verification cues, not proof of a violation, removal, or unreported installation.</p>

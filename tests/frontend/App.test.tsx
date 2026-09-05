@@ -112,14 +112,30 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+async function clickWorkspace(user: ReturnType<typeof userEvent.setup>, name: string) {
+  const direct = screen.queryByRole('button', { name })
+  if (direct) {
+    await user.click(direct)
+    return
+  }
+  await user.click(screen.getByRole('button', { name: /^More/ }))
+  await user.click(screen.getByRole('menuitem', { name }))
+}
+
 test('renders the redesigned commercial account-intelligence workspace after dataset load', async () => {
+  const user = userEvent.setup()
   render(<App />)
   expect(await screen.findByRole('heading', { name:'Prospect workspace', level:1 })).toBeInTheDocument()
   expect(screen.getByText((_, element) => element?.textContent === '2 matching systems')).toBeInTheDocument()
   expect(screen.getByText('High priority accounts')).toBeInTheDocument()
   expect(screen.getByText('Sampling follow-up')).toBeInTheDocument()
-  for (const name of ['Monitor','Map','NYS Market','NYS Changes','Opportunities','Portfolios','Workflow']) {
+  for (const name of ['Home','Monitor','Map','Opportunities','NYS Market']) {
     expect(screen.getByRole('button', { name })).toBeInTheDocument()
+  }
+  expect(screen.getByRole('button', { name:/^More/ })).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name:/^More/ }))
+  for (const name of ['NYS Changes','Companies','Portfolios','Workflow']) {
+    expect(screen.getByRole('menuitem', { name })).toBeInTheDocument()
   }
   expect(screen.getByRole('button', { name:'Source Health & Coverage' })).toBeInTheDocument()
 })
@@ -197,7 +213,7 @@ test('opens NYS Changes and shows Equipment_ID-exact evidence', async () => {
   const user = userEvent.setup()
   render(<App />)
   await screen.findByText('10 ALPHA ST')
-  await user.click(screen.getByRole('button', { name:'NYS Changes' }))
+  await clickWorkspace(user, 'NYS Changes')
   expect(await screen.findByRole('heading', { name:'NYS Changes', level:1 })).toBeInTheDocument()
   expect(screen.getAllByText('NYS cooling-tower status changed')).toHaveLength(2)
   expect(screen.getByText('Evidence: EQUIPMENT_ID_EXACT')).toBeInTheDocument()
@@ -217,13 +233,13 @@ test('opens the commercial, portfolio, workflow and source-health workspaces wit
   expect(screen.getAllByText('$250,000').length).toBeGreaterThanOrEqual(1)
   expect(screen.getByText('Current account timing opportunities')).toBeInTheDocument()
 
-  await user.click(screen.getByRole('button', { name:'Portfolios' }))
+  await clickWorkspace(user, 'Portfolios')
   expect(screen.getByRole('heading', { name:'Portfolios', level:1 })).toBeInTheDocument()
   expect(screen.getAllByText('ALPHA OWNER LLC').length).toBeGreaterThanOrEqual(2)
   expect(screen.getByText('1 multi-property group')).toBeInTheDocument()
   expect(screen.getByText('2 cooling-tower accounts · 4 active equipment · 1 contact-ready · 750,000 sq ft PLUTO building area')).toBeInTheDocument()
 
-  await user.click(screen.getByRole('button', { name:'Workflow' }))
+  await clickWorkspace(user, 'Workflow')
   expect(screen.getByRole('heading', { name:/Workflow workspace/, level:1 })).toBeInTheDocument()
   expect(screen.getByText('Sign in from the profile control to sync workflow state across sessions and devices.')).toBeInTheDocument()
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadChanges, loadCompanies, loadProcurement, loadSystems } from '../data/api'
 import type { WorkflowUser } from '../types/workflow'
+import { PortalNavigation } from './PortalNavigation'
 
 interface HomeSummary {
   registeredSystems: number
@@ -10,8 +11,6 @@ interface HomeSummary {
   observedCompanies: number
   generatedAt: string
 }
-
-const logoAsset = `${import.meta.env.BASE_URL}marketing/towersignal-logo.webp`
 
 function go(hash: string) {
   window.location.hash = hash
@@ -43,22 +42,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
   const firstName = useMemo(() => displayName(user).split(/\s+/)[0], [user])
 
   return <main className="portal-page home-portal-page">
-    <header className="reference-top-nav portal-route-nav">
-      <button className="reference-brand" onClick={() => go('#/home')} aria-label="TowerSignal home"><img src={logoAsset} alt="TowerSignal" /></button>
-      <nav aria-label="TowerSignal workspace">
-        <button className="active" onClick={() => go('#/home')}>Home</button>
-        <button onClick={() => go('#/prospect')}>Prospect</button>
-        <button onClick={() => go('#/monitor')}>Monitor</button>
-        <button onClick={() => go('#/map')}>Map</button>
-        <button onClick={() => go('#/nys')}>NYS Market</button>
-        <button onClick={() => go('#/nys-changes')}>NYS Changes</button>
-        <button onClick={() => go('#/opportunities')}>Opportunities</button>
-        <button onClick={() => go('#/companies')}>Companies</button>
-        <button onClick={() => go('#/portfolios')}>Portfolios</button>
-        <button onClick={() => go('#/workflow')}>Workflow</button>
-      </nav>
-      <button className="portal-account-button" onClick={() => go('#/my-account')}>My account</button>
-    </header>
+    <PortalNavigation current="home" user={user} />
 
     <section className="portal-content">
       <section className="home-hero">

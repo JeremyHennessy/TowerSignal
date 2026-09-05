@@ -2,6 +2,7 @@ import { formatDate } from '../domain/labels'
 import type { AcrisPropertyActivity, AcrisSummaryFields } from '../types/acris'
 import type { SystemSummary } from '../types/data'
 import type { SystemDetailWithDomesticWater } from './DomesticWaterSection'
+import { AccountSectionNavigator } from './AccountSectionNavigator'
 
 type SalesTone = 'ready' | 'attention' | 'verify' | 'missing'
 
@@ -191,6 +192,14 @@ function talkingPoints(row: SystemSummary, detail: SalesDetail): SalesFact[] {
   return points
 }
 
+function factCard(point: SalesFact) {
+  return <article key={point.label} className={`sales-fact sales-fact-${point.tone}`}>
+    <span>{point.label}</span>
+    <strong>{point.value}</strong>
+    <small>{point.detail}</small>
+  </article>
+}
+
 export function SalesPreCallPack({ row, detail }: { row: SystemSummary; detail: SystemDetailWithDomesticWater }) {
   const enrichedDetail = detail as SalesDetail
   const towers = enrichedDetail.planimetric_building_tower_features ?? []
@@ -199,8 +208,11 @@ export function SalesPreCallPack({ row, detail }: { row: SystemSummary; detail: 
   const questions = buildQuestions(row, enrichedDetail)
   const verify = verificationItems(row, enrichedDetail)
   const points = talkingPoints(row, enrichedDetail)
+  const primaryPoints = points.slice(0, 3)
+  const additionalPoints = points.slice(3)
 
   return <div className="sales-precall-pack" aria-labelledby="sales-precall-pack-title">
+    <AccountSectionNavigator />
     <div className="sales-pack-header">
       <div>
         <span className="eyebrow">Sales pre-call pack</span>
@@ -222,30 +234,31 @@ export function SalesPreCallPack({ row, detail }: { row: SystemSummary; detail: 
       <strong>{callObjective(enrichedDetail)}</strong>
     </div>
 
-    <div className="sales-pack-columns">
+    <div className="sales-pack-flow">
       <section className="sales-pack-panel">
         <h4>Before the call</h4>
         <div className="sales-opening-angle"><span>Best opening angle</span><p>{openingAngle(row, enrichedDetail)}</p></div>
-        <div className="sales-talking-points">
-          <strong>Source-backed talking points</strong>
-          {points.map(point => <article key={point.label} className={`sales-fact sales-fact-${point.tone}`}>
-            <span>{point.label}</span>
-            <strong>{point.value}</strong>
-            <small>{point.detail}</small>
-          </article>)}
+        <div className="sales-talking-points sales-talking-points-primary">
+          <strong>Top source-backed talking points</strong>
+          <div className="sales-primary-fact-grid">{primaryPoints.map(factCard)}</div>
         </div>
+        {additionalPoints.length > 0 && <details className="sales-pack-expand">
+          <summary><strong>More account talking points</strong><span>{additionalPoints.length}</span></summary>
+          <div className="sales-expanded-facts">{additionalPoints.map(factCard)}</div>
+        </details>}
       </section>
 
-      <section className="sales-pack-panel">
+      <section className="sales-pack-panel sales-call-panel">
         <h4>During the call</h4>
-        <strong className="sales-panel-label">Qualification questions</strong>
-        <ol className="sales-question-list">
-          {questions.map(question => <li key={question}>{question}</li>)}
-        </ol>
-        <div className="sales-verify-block">
-          <strong>Verify before asserting</strong>
-          <ul>{verify.map(item => <li key={item}>{item}</li>)}</ul>
-        </div>
+        <div className="sales-call-starter"><span>Start with</span><p>{questions[0]}</p></div>
+        <details className="sales-pack-expand">
+          <summary><strong>Qualification questions</strong><span>{questions.length}</span></summary>
+          <ol className="sales-question-list">{questions.map(question => <li key={question}>{question}</li>)}</ol>
+        </details>
+        <details className="sales-pack-expand sales-pack-verify-details">
+          <summary><strong>Verify before asserting</strong><span>{verify.length}</span></summary>
+          <div className="sales-verify-block"><ul>{verify.map(item => <li key={item}>{item}</li>)}</ul></div>
+        </details>
       </section>
     </div>
 
