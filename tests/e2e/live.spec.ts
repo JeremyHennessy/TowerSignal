@@ -2,6 +2,8 @@ import { expect, test } from './fixtures'
 
 const requireAcris = process.env.REQUIRE_ACRIS === 'true'
 
+test.setTimeout(120_000)
+
 const expectContained = async (page: import('@playwright/test').Page) => {
   const viewportWidth = page.viewportSize()?.width ?? 0
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
