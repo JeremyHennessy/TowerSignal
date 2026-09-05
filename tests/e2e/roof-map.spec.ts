@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { testCredentials } from './auth.helpers'
+import { submitSignIn } from './auth.helpers'
 
 test('direct hosted roof link signs in and renders on desktop and iPhone', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
@@ -18,11 +18,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await page.goto('./#/account/2000015564', { waitUntil: 'networkidle' })
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
   await expect(loginHeading).toBeVisible()
-  const credentials = testCredentials(testInfo.project.name)
-  await page.getByLabel('Email').fill(credentials.email)
-  await page.getByLabel('Password', { exact: true }).fill(credentials.password)
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click()
-  await expect(loginHeading).toHaveCount(0)
+  await submitSignIn(page, testInfo.project.name)
   await expect(page).toHaveURL(/#\/account\/2000015564$/)
 
   const section = page.locator('section.planimetric-section')
