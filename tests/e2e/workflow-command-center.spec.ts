@@ -28,7 +28,7 @@ test('workflow command center groups current and future intelligence on desktop 
   await page.evaluate(() => { window.location.hash = '#/workflow' })
   const workflow = page.locator('section.workflow-workspace-page')
   await expect(workflow).toBeVisible()
-  await expect(workflow.getByRole('heading', { name: 'Workflow', exact: true })).toBeVisible()
+  await expect(workflow.getByRole('heading', { name: 'Workflow workspace', exact: true })).toBeVisible()
 
   const summary = workflow.locator('.workflow-command-summary')
   await expect(summary.getByRole('heading', { name: 'What matters now', exact: true })).toBeVisible()
