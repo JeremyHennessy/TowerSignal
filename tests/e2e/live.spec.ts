@@ -8,6 +8,13 @@ const expectContained = async (page: import('@playwright/test').Page) => {
   expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
 }
 
+const expectVisibleHeading = async (page: import('@playwright/test').Page, name: string) => {
+  const heading = page.getByRole('heading', { name, exact: true })
+  await heading.scrollIntoViewIfNeeded()
+  await expect(heading).toBeVisible()
+  return heading
+}
+
 test('hosted TowerSignal redesigned workspace is functional, linkable and source-backed', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
@@ -20,9 +27,6 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  // The fixture has already authenticated this tab on #/home. Navigate inside
-  // the SPA so Safari/WebKit does not need to recover a third-party auth cookie
-  // from the separate neon.tech auth origin.
   await page.evaluate(() => { window.location.hash = '#/prospect' })
   await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
 
@@ -50,8 +54,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
     await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
     await page.locator('.account-table tbody tr').first().click()
-    const acrisHeading = page.getByRole('heading', { name: 'ACRIS property activity', exact: true })
-    await expect(acrisHeading).toBeVisible()
+    const acrisHeading = await expectVisibleHeading(page, 'ACRIS property activity')
     const acrisSection = acrisHeading.locator('..')
     await expect(acrisSection.getByText(/relevant recorded document/)).toBeVisible()
     await expect(acrisSection.getByText(/ACRIS is joined by exact borough\/block\/lot BBL and exact document ID only/)).toBeVisible()
@@ -82,7 +85,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.getByText('OATH penalty imposed')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'OATH case lifecycle', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'ACRIS property activity', exact: true })).toBeVisible()
+  await expectVisibleHeading(page, 'ACRIS property activity')
   await expect(page.getByRole('heading', { name: 'TowerSignal History', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
@@ -96,8 +99,6 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
   } else {
-    // On github.io, Safari's ITP blocks the cross-site Neon Auth cookie on a
-    // document reload. Verify the authenticated SPA remains stable instead.
     await page.evaluate(() => window.dispatchEvent(new Event('focus')))
     await page.waitForTimeout(750)
     await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
