@@ -74,6 +74,10 @@ class NysLsliDetailTests(unittest.TestCase):
         self.assertEqual(result["detail_status"], "PARSED")
         self.assertEqual(result["inventory"]["total_service_lines"], 100)
         self.assertEqual(result["inventory"]["lead_service_lines"], 10)
+        self.assertEqual(
+            result["inventory_evidence"]["identified_service_lines"],
+            "SOURCE_REPORTED",
+        )
         self.assertEqual(result["owner_or_operator_form_contact"]["name"], "Jane Operator")
         self.assertEqual(
             result["owner_or_operator_form_contact"]["relationship_role"],
@@ -83,6 +87,19 @@ class NysLsliDetailTests(unittest.TestCase):
         self.assertEqual(result["certification"]["name"], "Jane Operator")
         self.assertEqual(result["certification"]["title"], "Water Superintendent")
         self.assertEqual(result["certification"]["date"], "2025-12-29")
+
+    def test_missing_identified_aggregate_is_derived_from_source_components(self) -> None:
+        html = sample_html().replace(
+            "<tr><td>Total Number of Identified Service Lines</td><td>80</td></tr>",
+            "",
+        )
+        result = parse_detail(html, source_url="https://example.test/NY7003493.htm")
+        self.assertIsNone(result["source_reported_inventory"]["identified_service_lines"])
+        self.assertEqual(result["inventory"]["identified_service_lines"], 80)
+        self.assertEqual(
+            result["inventory_evidence"]["identified_service_lines"],
+            "DERIVED_FROM_SOURCE_COMPONENT_COUNTS",
+        )
 
     def test_parses_gsl_text_as_numeric_count(self) -> None:
         result = parse_detail(
@@ -107,12 +124,12 @@ class NysLsliDetailTests(unittest.TestCase):
                 expected_pws_id="NY9999999",
             )
 
-    def test_missing_required_inventory_field_fails_closed(self) -> None:
+    def test_missing_required_inventory_component_fails_closed(self) -> None:
         broken = sample_html().replace(
             "<tr><td>Total Number of Unknown Service Lines</td><td>20</td></tr>",
             "",
         )
-        with self.assertRaisesRegex(NysPublicWaterSourceError, "required inventory"):
+        with self.assertRaisesRegex(NysPublicWaterSourceError, "required inventory component"):
             parse_detail(broken, source_url="https://example.test/NY7003493.htm")
 
     def test_only_explicit_fetch_404_is_treated_as_unavailable_detail(self) -> None:
@@ -130,13 +147,14 @@ class NysLsliDetailTests(unittest.TestCase):
             {
                 "pws_id": "NY0117224",
                 "pws_name": "Example Indexed System",
-                "county": "Example",
+                "principal_county_served": "ALBANY",
                 "detail_url": "https://www.health.ny.gov/environmental/water/drinking/service_line/NY0117224.htm",
             },
             exc,
         )
         self.assertEqual(row["detail_status"], "DETAIL_UNAVAILABLE_404")
         self.assertEqual(row["pws_id"], "NY0117224")
+        self.assertEqual(row["principal_county_served"], "ALBANY")
         self.assertNotIn("inventory", row)
 
 
