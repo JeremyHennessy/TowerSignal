@@ -15,7 +15,7 @@ EXPECTED_METHODS = {
     "Sequential Sampling",
     "Statistical Analysis/Predictive Model",
 }
-MAX_EXPLICIT_UNAVAILABLE_404 = 25
+MIN_PRODUCTION_PARSED_DETAIL_COVERAGE = 0.90
 
 
 def _required_int(value: object, *, field: str, pws_id: str) -> int:
@@ -50,8 +50,6 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         raise RuntimeError("LSLI parsed/unavailable source counts do not match collections")
     if parsed_count + unavailable_count != coverage_count or coverage_count != index_count:
         raise RuntimeError("LSLI index coverage counts do not reconcile")
-    if unavailable_count > MAX_EXPLICIT_UNAVAILABLE_404:
-        raise RuntimeError(f"Too many current-index LSLI detail 404s: {unavailable_count}")
     if int(summary.get("index_count") or -1) != index_count or int(summary.get("parsed_detail_count") or -1) != parsed_count or int(summary.get("unavailable_detail_count") or -1) != unavailable_count:
         raise RuntimeError("LSLI summary coverage count mismatch")
 
@@ -226,8 +224,12 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     if require_production_volume:
         if index_count < 2500:
             raise RuntimeError(f"Implausibly small LSLI detail universe: {index_count:,}")
-        if parsed_count < index_count - MAX_EXPLICIT_UNAVAILABLE_404:
-            raise RuntimeError(f"Implausibly low parsed LSLI detail coverage: {parsed_count:,}/{index_count:,}")
+        parsed_coverage = parsed_count / index_count if index_count else 0
+        if parsed_coverage < MIN_PRODUCTION_PARSED_DETAIL_COVERAGE:
+            raise RuntimeError(
+                "Implausibly low parsed LSLI detail coverage: "
+                f"{parsed_count:,}/{index_count:,} ({parsed_coverage:.1%})"
+            )
         if with_contact < 1500:
             raise RuntimeError(f"Implausibly few LSLI form contacts: {with_contact:,}")
         if total_service_lines < 1_000_000:

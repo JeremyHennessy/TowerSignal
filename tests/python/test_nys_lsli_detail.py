@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import copy
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -15,6 +18,7 @@ from towersignal.nys_lsli_detail import (  # noqa: E402
     parse_detail,
 )
 from towersignal.nys_public_water import HtmlSnapshot, LSLI_INDEX_URL, NysPublicWaterSourceError  # noqa: E402
+from validate_nys_lsli_detail_cache import validate as validate_lsli_cache  # noqa: E402
 
 
 def sample_html(pws_id: str = "NY7003493") -> str:
@@ -233,6 +237,117 @@ class NysLsliDetailTests(unittest.TestCase):
         self.assertEqual(payload["source"]["parsed_detail_count"], 3)
         self.assertEqual(payload["source"]["max_workers"], 3)
         self.assertEqual([row["pws_id"] for row in payload["details"]], pws_ids)
+
+    def test_payload_retains_many_explicit_404_details(self) -> None:
+        pws_ids = [f"NY{index:07d}" for index in range(1, 31)]
+
+        def fake_fetch_html(url: str):
+            if url == LSLI_INDEX_URL:
+                return HtmlSnapshot(url=url, html=index_html(pws_ids), retrieved_at="2026-09-05T00:00:00Z")
+            raise NysPublicWaterSourceError(
+                "Failed to retrieve NYSDOH page after fallback/retries: "
+                f"{url}: HTTP Error 404: Not Found"
+            )
+
+        with patch("towersignal.nys_lsli_detail.fetch_html", side_effect=fake_fetch_html):
+            payload = build_payload(request_delay_seconds=0, max_workers=4)
+
+        self.assertEqual(payload["source"]["index_record_count"], 30)
+        self.assertEqual(payload["source"]["parsed_detail_count"], 0)
+        self.assertEqual(payload["source"]["explicit_unavailable_404_count"], 30)
+        self.assertTrue(payload["source"]["coverage_complete"])
+        self.assertFalse(payload["source"]["parsed_detail_complete"])
+        self.assertEqual(len(payload["unavailable_details"]), 30)
+
+    def test_validator_accepts_many_explicit_404_details_when_coverage_is_complete(self) -> None:
+        base = parse_detail(
+            sample_html("NY0000001"),
+            source_url="https://www.health.ny.gov/environmental/water/drinking/service_line/NY0000001.htm",
+            expected_pws_id="NY0000001",
+        )
+        base["inventory"] = {
+            "total_service_lines": 1000,
+            "identified_service_lines": 800,
+            "lead_service_lines": 100,
+            "gslrr_service_lines": 50,
+            "non_lead_service_lines": 650,
+            "unknown_service_lines": 200,
+        }
+        base["source_reported_inventory"] = dict(base["inventory"])
+        base["inventory_evidence"] = {
+            "identified_service_lines": "SOURCE_REPORTED",
+            "total_service_lines": "SOURCE_REPORTED",
+            "all_other_inventory_fields": "SOURCE_REPORTED",
+        }
+        base["inventory_reconciliation"] = {
+            "identified_matches_components": True,
+            "identified_expected_from_components": 800,
+            "identified_component_delta": 0,
+            "total_matches_identified_plus_unknown": True,
+            "total_expected_from_identified_plus_unknown": 1000,
+            "total_identified_unknown_delta": 0,
+        }
+        details = []
+        for index in range(1, 2551):
+            pws_id = f"NY{index:07d}"
+            row = copy.deepcopy(base)
+            row["pws_id"] = pws_id
+            row["source_url"] = (
+                "https://www.health.ny.gov/environmental/water/drinking/service_line/"
+                f"{pws_id}.htm"
+            )
+            details.append(row)
+
+        unavailable_details = [
+            _unavailable_detail(
+                {
+                    "pws_id": f"NY{index:07d}",
+                    "pws_name": f"System NY{index:07d}",
+                    "principal_county_served": "ALBANY",
+                    "detail_url": (
+                        "https://www.health.ny.gov/environmental/water/drinking/service_line/"
+                        f"NY{index:07d}.htm"
+                    ),
+                },
+                NysPublicWaterSourceError(
+                    "Failed to retrieve NYSDOH page after fallback/retries: "
+                    "HTTP Error 404: Not Found"
+                ),
+            )
+            for index in range(2551, 2601)
+        ]
+        payload = {
+            "schema_version": "1.2",
+            "generated_at": "2026-09-05T00:00:00Z",
+            "domain": "NYS_LEAD_SERVICE_LINE_INVENTORY_DETAILS",
+            "source": {
+                "index_record_count": 2600,
+                "parsed_detail_count": len(details),
+                "explicit_unavailable_404_count": len(unavailable_details),
+                "coverage_record_count": 2600,
+                "coverage_complete": True,
+            },
+            "summary": {
+                "index_count": 2600,
+                "parsed_detail_count": len(details),
+                "unavailable_detail_count": len(unavailable_details),
+                "details_with_derived_identified_count": 0,
+                "details_with_identified_reconciliation_mismatch_count": 0,
+                "details_with_total_reconciliation_mismatch_count": 0,
+                "details_with_form_contact": len(details),
+                "source_reported_total_service_lines_sum": len(details) * 1000,
+            },
+            "details": details,
+            "unavailable_details": unavailable_details,
+        }
+
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as handle:
+            json.dump(payload, handle)
+            path = Path(handle.name)
+        self.addCleanup(path.unlink, missing_ok=True)
+
+        validated = validate_lsli_cache(path, max_age_days=2, require_production_volume=True)
+        self.assertEqual(validated["source"]["explicit_unavailable_404_count"], 50)
 
 
 if __name__ == "__main__":

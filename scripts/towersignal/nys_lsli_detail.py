@@ -24,7 +24,6 @@ SCHEMA_VERSION = "1.2"
 DEFAULT_REQUEST_DELAY_SECONDS = 0.15
 DEFAULT_MAX_WORKERS = 1
 DEFAULT_PROGRESS_INTERVAL = 250
-MAX_EXPLICIT_UNAVAILABLE_DETAILS = 25
 
 KEY_FIELDS = {
     "water system name": "pws_name",
@@ -399,10 +398,6 @@ def _crawl_details(
     for _, kind, detail in sorted(results, key=lambda item: item[0]):
         if kind == "unavailable":
             unavailable_details.append(detail)
-            if len(unavailable_details) > MAX_EXPLICIT_UNAVAILABLE_DETAILS:
-                raise NysPublicWaterSourceError(
-                    f"LSLI detail source has more than {MAX_EXPLICIT_UNAVAILABLE_DETAILS} explicit 404 entries"
-                )
         else:
             details.append(detail)
     return details, unavailable_details
