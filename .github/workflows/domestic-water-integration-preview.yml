@@ -1,0 +1,51 @@
+name: Domestic Water Integration Proof
+
+on:
+  push:
+    branches: [agent/domestic-water-roof-intel-20260904]
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build fresh NYC base data
+        run: python scripts/build_data.py --output preview-data
+      - name: Attach exact-BIN domestic-water context
+        run: python scripts/build_domestic_water_data.py --output preview-data
+      - name: Build current NYS data required by source-health gate
+        run: python scripts/build_nys_data.py --output preview-data
+      - name: Build base source health
+        run: python scripts/build_source_health.py --output preview-data
+      - name: Attach domestic-water source health
+        run: python scripts/attach_domestic_water_health.py --output preview-data
+      - name: Independently verify live domestic-water matches
+        run: python scripts/verify_live_domestic_water.py --output preview-data --sample-size 3
+      - name: Python fixture tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
+      - name: Preserve proof outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: domestic-water-integration-proof
+          path: |
+            preview-data/domestic-water-coverage.json
+            preview-data/source-health.json
+            preview-data/metadata.json
+          retention-days: 7
