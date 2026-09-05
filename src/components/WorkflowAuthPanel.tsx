@@ -31,18 +31,23 @@ export function WorkflowAuthPanel({
   const avatar = useMemo(() => user ? initials(user) : 'TS', [user])
 
   if (loading) return <span className="workflow-sync-chip">Checking workflow sync…</span>
-  if (user) return <div className="workflow-auth signed-in">
-    <span className="workflow-sync-state-label">Workflow synced</span>
-    {error && <div className="workflow-error workflow-auth-error" role="alert" title={error}>{error}</div>}
-    <button className="workflow-profile-trigger" aria-label="Open workflow account menu" aria-expanded={open} onClick={() => setOpen(value => !value)}><span>{avatar}</span></button>
-    {open && <div className="workflow-profile-popover">
-      <span className="eyebrow">Private workspace</span>
-      <strong>Workflow synced</strong>
-      <small>{user.email}</small>
-      <p>Saved views, watchlists, account status, notes and next actions are private workflow data.</p>
-      <button onClick={() => void onSignOut()} disabled={busy}>{busy ? 'Signing out…' : 'Sign out'}</button>
-    </div>}
-  </div>
+  if (user) {
+    const syncConfirmed = !error
+    return <div className={`workflow-auth signed-in ${syncConfirmed ? '' : 'sync-degraded'}`}>
+      <span className="workflow-sync-state-label">{syncConfirmed ? 'Workflow synced' : 'Workflow session'}</span>
+      {error && <div className="workflow-error workflow-auth-error" role="alert" title={error}>{error}</div>}
+      <button className="workflow-profile-trigger" aria-label="Open workflow account menu" aria-expanded={open} onClick={() => setOpen(value => !value)}><span>{avatar}</span></button>
+      {open && <div className="workflow-profile-popover">
+        <span className="eyebrow">Private workspace</span>
+        <strong>{syncConfirmed ? 'Workflow synced' : 'Sync not confirmed'}</strong>
+        <small>{user.email}</small>
+        <p>{syncConfirmed
+          ? 'Saved views, watchlists, account status, notes and next actions are private workflow data.'
+          : 'You are signed in, but cross-device workflow sync is not currently confirmed. Session-only changes are identified where they are saved.'}</p>
+        <button onClick={() => void onSignOut()} disabled={busy}>{busy ? 'Signing out…' : 'Sign out'}</button>
+      </div>}
+    </div>
+  }
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -67,6 +72,6 @@ export function WorkflowAuthPanel({
         <button className="primary" type="submit" disabled={busy || !email.trim() || password.length < 8}>{busy ? 'Working…' : createAccount ? 'Create account' : 'Sign in'}</button>
       </form>
       <button className="link-button" onClick={() => setCreateAccount(value => !value)}>{createAccount ? 'Already have an account? Sign in' : 'Need an account? Create one'}</button>
-    </div>}
+    </div>
   </div>
 }
