@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-05T12:47:46.507639Z",
+  "generated_at": "2026-09-05T15:45:32.315248Z",
   "sources": [
     {
       "source_key": "registrations",
@@ -193,8 +193,8 @@
       "attached_entity_count": 1613,
       "displayed_entity_count": 1613,
       "coverage_percentage": 32.63,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 32.63,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is observed exact-BIN overlap between current cooling-tower buildings and the NYC OTI 2022 rooftop water-tank physical layer. A missing polygon is not evidence that a building has no current domestic-water tank.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -211,8 +211,8 @@
       "attached_entity_count": 2364,
       "displayed_entity_count": 2364,
       "coverage_percentage": 44.75,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 44.75,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is observed exact-BIN prevalence of official DOHMH drinking-water tank oversight/compliance records among cooling-tower buildings, not an expected-completeness target. No match does not establish that a building has no tank or no private compliance records.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -229,8 +229,8 @@
       "attached_entity_count": 2350,
       "displayed_entity_count": 2350,
       "coverage_percentage": 44.27,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 44.27,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is observed exact-BIN prevalence of owner/certified-inspector annual drinking-water tank reports among cooling-tower buildings. Self-reported records remain distinct from DOHMH inspection/audit evidence and do not affect TowerSignal Priority Score.",
       "status": "HEALTHY",
       "status_reasons": []
