@@ -24,8 +24,8 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
 
     summary = payload.get("summary")
     source_health = payload.get("source_health")
-    if not isinstance(summary, dict) or not isinstance(source_health, list) or len(source_health) != 5:
-        raise RuntimeError("NYC water signal cache must contain summary and five source-health records")
+    if not isinstance(summary, dict) or not isinstance(source_health, list) or len(source_health) < 5:
+        raise RuntimeError("NYC water signal cache must contain summary and source-health records")
     for source in source_health:
         if not isinstance(source, dict):
             raise RuntimeError("Source-health record is not an object")
@@ -33,6 +33,22 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
             raise RuntimeError(f"Unhealthy source {source.get('dataset_id')}")
         if int(source.get("source_record_count") or -1) != int(source.get("fetched_record_count") or -2):
             raise RuntimeError(f"Source count mismatch for {source.get('dataset_id')}")
+    hpd_sources = [
+        source for source in source_health if source.get("dataset_id") == "wvxf-dwi5"
+    ]
+    hpd_partition_count = int(summary.get("hpd_source_partition_count") or 0)
+    if len(hpd_sources) != hpd_partition_count or hpd_partition_count < 8:
+        raise RuntimeError("HPD source partition count mismatch")
+    hpd_partition_records = sum(
+        int(source.get("source_record_count") or 0) for source in hpd_sources
+    )
+    if int(summary.get("hpd_source_partition_record_count") or -1) != hpd_partition_records:
+        raise RuntimeError("HPD source partition record count mismatch")
+    hpd_unique = int(summary.get("hpd_open_water_violation_count") or 0)
+    hpd_duplicate_raw = summary.get("hpd_duplicate_partition_violation_count")
+    hpd_duplicates = -1 if hpd_duplicate_raw is None else int(hpd_duplicate_raw)
+    if hpd_duplicates < 0 or hpd_partition_records - hpd_duplicates != hpd_unique:
+        raise RuntimeError("HPD partition de-duplication counts do not reconcile")
 
     collections = {
         "water_311_request_count": "water_311_requests",

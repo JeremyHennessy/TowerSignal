@@ -6,6 +6,7 @@ from typing import Any, Mapping, Sequence
 
 from towersignal.domestic_water_market import (
     NYC_API_ROOT,
+    SourceSnapshot,
     fetch_snapshot,
     normalize_company_key,
     normalize_space,
@@ -24,20 +25,24 @@ LL84_DATASET_ID = "5zyy-y8am"
 NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
 HPD_MAX_PAGE_SIZE = 10000
+HPD_WATER_TERMS = (
+    "hot water",
+    "water supply",
+    "potable",
+    "plumbing",
+    "faucet",
+    "sink",
+    "toilet",
+    "shower",
+    "bathtub",
+    "water closet",
+)
 
 NYC_311_WHERE = (
     "agency='DEP' AND created_date >= '2025-01-01T00:00:00.000' AND ("
     "lower(complaint_type) like '%water%' OR lower(descriptor) like '%water%' OR "
     "lower(descriptor_2) like '%water%' OR lower(complaint_type) like '%lead%' OR "
     "lower(descriptor) like '%lead%' OR lower(descriptor_2) like '%lead%')"
-)
-HPD_WATER_WHERE = (
-    "violationstatus='Open' AND ("
-    "lower(novdescription) like '%hot water%' OR lower(novdescription) like '%water supply%' OR "
-    "lower(novdescription) like '%potable%' OR lower(novdescription) like '%plumbing%' OR "
-    "lower(novdescription) like '%faucet%' OR lower(novdescription) like '%sink%' OR "
-    "lower(novdescription) like '%toilet%' OR lower(novdescription) like '%shower%' OR "
-    "lower(novdescription) like '%bathtub%' OR lower(novdescription) like '%water closet%')"
 )
 DOB_WATER_TERMS = (
     "lower(job_description) like '%water%' OR lower(job_description) like '%plumb%' OR "
@@ -168,6 +173,38 @@ def normalize_hpd(row: Mapping[str, Any]) -> dict[str, Any]:
         "property_link_confidence": "CONFIRMED_SOURCE_BBL" if bbl else ("CONFIRMED_SOURCE_BIN" if bin_value else "ADDRESS_CONTEXT"),
         "raw": dict(row),
     }
+
+
+def _hpd_term_where(term: str) -> str:
+    return f"violationstatus='Open' AND lower(novdescription) like '%{term}%'"
+
+
+def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
+    snapshots: list[SourceSnapshot] = []
+    for term in HPD_WATER_TERMS:
+        snapshots.append(
+            fetch_snapshot(
+                HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="violationid",
+                required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
+                where=_hpd_term_where(term),
+                select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
+                page_size=min(page_size, HPD_MAX_PAGE_SIZE),
+            )
+        )
+    return snapshots
+
+
+def _dedupe_hpd_rows(snapshots: Sequence[SourceSnapshot]) -> tuple[list[dict[str, Any]], int]:
+    rows_by_id: dict[str, dict[str, Any]] = {}
+    duplicate_count = 0
+    for snapshot in snapshots:
+        for row in snapshot.rows:
+            violation_id = normalize_space(row.get("violationid")) or stable_id("hpd-water-source", row)
+            if violation_id in rows_by_id:
+                duplicate_count += 1
+                continue
+            rows_by_id[violation_id] = row
+    return sorted(rows_by_id.values(), key=lambda row: normalize_space(row.get("violationid"))), duplicate_count
 
 
 def classify_dob_work(row: Mapping[str, Any]) -> str:
@@ -362,13 +399,8 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         select="unique_key,created_date,closed_date,agency,agency_name,complaint_type,descriptor,descriptor_2,incident_zip,incident_address,street_name,status,resolution_description,bbl,borough",
         page_size=page_size,
     )
-    hpd_snapshot = fetch_snapshot(
-        HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="violationid",
-        required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
-        where=HPD_WATER_WHERE,
-        select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
-        page_size=min(page_size, HPD_MAX_PAGE_SIZE),
-    )
+    hpd_snapshots = _fetch_hpd_snapshots(page_size=page_size)
+    hpd_rows, hpd_duplicate_partition_count = _dedupe_hpd_rows(hpd_snapshots)
     job_snapshot = fetch_snapshot(
         DOB_JOB_FILINGS_DATASET_ID, api_root=NYC_API_ROOT, order_by="job_filing_number",
         required_fields=("job_filing_number", "filing_status", "house_no", "street_name", "borough", "bin", "bbl", "applicant_professional_title", "applicant_license", "applicant_first_name", "applicants_middle_initial", "applicant_last_name", "applicant_business_name", "owner_s_business_name", "plumbing_work_type", "boiler_equipment_work_type_", "mechanical_systems_work_type_", "filing_date", "approved_date", "signoff_date", "job_description"),
@@ -390,7 +422,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         page_size=page_size,
     )
     requests = [normalize_311(row) for row in requests_snapshot.rows]
-    hpd = [normalize_hpd(row) for row in hpd_snapshot.rows]
+    hpd = [normalize_hpd(row) for row in hpd_rows]
     jobs = [normalize_dob_job(row) for row in job_snapshot.rows]
     permits = [normalize_dob_permit(row) for row in permit_snapshot.rows]
     ll84 = [normalize_ll84(row) for row in ll84_snapshot.rows]
@@ -399,7 +431,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
         "domain": "NYC_BUILDING_WATER_SIGNALS",
-        "query_boundaries": {"311_start": NYC_311_START, "hpd_scope": "Current open HPD violations with explicit water/plumbing/fixture text.", "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
+        "query_boundaries": {"311_start": NYC_311_START, "hpd_scope": "Current open HPD violations fetched through source-counted water/plumbing/fixture keyword partitions.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
         "evidence_semantics": {
             "311": "Service-request observations. Building signal only when classification is building-water; street/hydrant/sewer remain context.",
             "hpd": "Current HPD violation evidence directly tied to source BIN/BBL when present.",
@@ -410,6 +442,9 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
             "water_311_request_count": len(requests),
             "water_311_building_signal_count": sum(1 for row in requests if row["is_building_water_signal"]),
             "hpd_open_water_violation_count": len(hpd),
+            "hpd_source_partition_count": len(hpd_snapshots),
+            "hpd_source_partition_record_count": sum(snapshot.source_record_count for snapshot in hpd_snapshots),
+            "hpd_duplicate_partition_violation_count": hpd_duplicate_partition_count,
             "dob_water_job_filing_count": len(jobs),
             "dob_water_permit_count": len(permits),
             "dob_observed_business_count": len(dob_businesses),
@@ -418,7 +453,13 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
             "ll84_multi_identifier_count": sum(1 for row in ll84 if row["property_link_confidence"] == "MULTI_IDENTIFIER_CONTEXT"),
             "ll84_rows_with_municipal_potable_total": sum(1 for row in ll84 if row["municipal_potable_total_kgal"] is not None),
         },
-        "source_health": [source_health(requests_snapshot, normalized_count=len(requests)), source_health(hpd_snapshot, normalized_count=len(hpd)), source_health(job_snapshot, normalized_count=len(jobs)), source_health(permit_snapshot, normalized_count=len(permits)), source_health(ll84_snapshot, normalized_count=len(ll84))],
+        "source_health": [
+            source_health(requests_snapshot, normalized_count=len(requests)),
+            *[source_health(snapshot, normalized_count=len(snapshot.rows)) for snapshot in hpd_snapshots],
+            source_health(job_snapshot, normalized_count=len(jobs)),
+            source_health(permit_snapshot, normalized_count=len(permits)),
+            source_health(ll84_snapshot, normalized_count=len(ll84)),
+        ],
         "water_311_requests": requests,
         "hpd_open_water_violations": hpd,
         "dob_water_job_filings": jobs,

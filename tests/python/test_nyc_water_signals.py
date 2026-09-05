@@ -14,6 +14,7 @@ from towersignal.nyc_water_signals import (  # noqa: E402
     DOB_JOB_FILINGS_DATASET_ID,
     HPD_MAX_PAGE_SIZE,
     HPD_VIOLATIONS_DATASET_ID,
+    HPD_WATER_TERMS,
     LL84_DATASET_ID,
     NYC_311_DATASET_ID,
     _dob_business_profiles,
@@ -95,16 +96,35 @@ class NycWaterSignalsTests(unittest.TestCase):
 
     def test_build_payload_caps_hpd_page_size_for_large_text_query(self) -> None:
         calls: list[tuple[str, int]] = []
+        hpd_row = {
+            "violationid": "123",
+            "buildingid": "456",
+            "registrationid": "789",
+            "boro": "MANHATTAN",
+            "housenumber": "10",
+            "streetname": "WATER ST",
+            "zip": "10001",
+            "class": "C",
+            "inspectiondate": "2026-08-01T00:00:00.000",
+            "novdescription": "PROVIDE HOT WATER AND REPAIR PLUMBING",
+            "currentstatus": "NOV SENT OUT",
+            "currentstatusdate": "2026-08-02T00:00:00.000",
+            "violationstatus": "Open",
+            "rentimpairing": "Y",
+            "bin": "1000001",
+            "bbl": "1000010001",
+        }
 
         def fake_fetch_snapshot(dataset_id: str, **kwargs):
             calls.append((dataset_id, int(kwargs["page_size"])))
+            rows = [hpd_row] if dataset_id == HPD_VIOLATIONS_DATASET_ID else []
             return SourceSnapshot(
                 dataset_id=dataset_id,
                 name=dataset_id,
                 api_root=str(kwargs["api_root"]),
-                rows=[],
+                rows=rows,
                 retrieved_at="2026-09-05T00:00:00Z",
-                source_record_count=0,
+                source_record_count=len(rows),
                 source_last_updated_at="2026-09-05T00:00:00Z",
                 source_query_scope=str(kwargs.get("where") or "ALL_ROWS"),
                 fields=tuple(kwargs["required_fields"]),
@@ -113,13 +133,21 @@ class NycWaterSignalsTests(unittest.TestCase):
         with patch("towersignal.nyc_water_signals.fetch_snapshot", side_effect=fake_fetch_snapshot):
             payload = build_payload(page_size=50000)
 
-        self.assertEqual(payload["summary"]["hpd_open_water_violation_count"], 0)
+        self.assertEqual(payload["summary"]["hpd_open_water_violation_count"], 1)
+        self.assertEqual(payload["summary"]["hpd_source_partition_count"], len(HPD_WATER_TERMS))
+        self.assertEqual(payload["summary"]["hpd_source_partition_record_count"], len(HPD_WATER_TERMS))
+        self.assertEqual(
+            payload["summary"]["hpd_duplicate_partition_violation_count"],
+            len(HPD_WATER_TERMS) - 1,
+        )
         page_sizes = dict(calls)
         self.assertEqual(page_sizes[NYC_311_DATASET_ID], 50000)
         self.assertEqual(page_sizes[HPD_VIOLATIONS_DATASET_ID], HPD_MAX_PAGE_SIZE)
         self.assertEqual(page_sizes[DOB_JOB_FILINGS_DATASET_ID], 50000)
         self.assertEqual(page_sizes[DOB_APPROVED_PERMITS_DATASET_ID], 50000)
         self.assertEqual(page_sizes[LL84_DATASET_ID], 50000)
+        hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
+        self.assertEqual(len(hpd_calls), len(HPD_WATER_TERMS))
 
 
 if __name__ == "__main__":
