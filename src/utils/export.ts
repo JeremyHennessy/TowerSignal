@@ -10,6 +10,17 @@ type ExportDomesticWaterContext = {
   }
 }
 
+type ExportBuildingWaterSignalsContext = {
+  summary: {
+    record_count: number
+    water_311_building_signal_count: number
+    hpd_open_water_violation_count: number
+    dob_water_job_filing_count: number
+    dob_water_permit_count: number
+    ll84_water_benchmark_count: number
+  }
+}
+
 function csvCell(value: unknown): string {
   const text = value == null ? '' : String(value)
   return `"${text.replaceAll('"', '""')}"`
@@ -64,10 +75,11 @@ export function leadSummary(row: SystemSummary, metadata: Metadata, detail?: Sys
   }
 
   if (detail) {
-    const fieldPackDetail = detail as SystemDetail & { domestic_water?: ExportDomesticWaterContext }
+    const fieldPackDetail = detail as SystemDetail & { domestic_water?: ExportDomesticWaterContext; nyc_building_water_signals?: ExportBuildingWaterSignalsContext | null }
     const towerFootprintCount = detail.planimetric_building_tower_features?.length ?? 0
     const buildingFootprintCount = detail.building_footprints?.length ?? 0
     const domesticWater = fieldPackDetail.domestic_water
+    const buildingWater = fieldPackDetail.nyc_building_water_signals
     const domesticWaterRecordCount = domesticWater ? domesticWater.summary.compliance_record_count + domesticWater.summary.self_report_record_count : 0
     const hpdContactCount = detail.hpd_registration?.contacts.length ?? 0
     const dobActivity = detail.dob_activity_history ?? []
@@ -79,6 +91,7 @@ export function leadSummary(row: SystemSummary, metadata: Metadata, detail?: Sys
     lines.push(`Access/contact cues: ${hpdContactCount} HPD public contact row(s); confirm current owner/manager, roof access and site contact before dispatch`)
     lines.push(`DOB project context: ${dobActivity.length} exact-BBL filing(s); ${dobActivity.filter(item => item.explicit_cooling_tower_mention).length} explicitly name cooling-tower work; ${dobActivity.filter(item => item.mechanical_systems || item.boiler_equipment).length} carry mechanical/boiler flags`)
     lines.push(`Domestic-water context: ${domesticWater ? `${domesticWaterRecordCount} DOHMH oversight/self-report record(s)` : 'No domestic-water payload represented for this record'}`)
+    lines.push(`Building-water signals: ${buildingWater ? `${buildingWater.summary.record_count} exact-BBL/BIN 311/HPD/DOB/LL84 record(s); ${buildingWater.summary.hpd_open_water_violation_count} open HPD water violation(s); ${buildingWater.summary.dob_water_job_filing_count + buildingWater.summary.dob_water_permit_count} DOB water work role record(s)` : 'No exact-BBL/BIN building-water signal represented for this record'}`)
     lines.push('Schematics/mechanical drawings: Not in current public payload; do not infer drawings from permits or project descriptions.')
     lines.push('Field observations such as operator labels, controller model, basin condition, photos and access blockers should remain private workflow notes until source-backed.')
 

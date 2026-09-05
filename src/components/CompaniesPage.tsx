@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { loadCompanies } from '../data/api'
+import { loadCompanies, loadDomesticWaterMarket, loadElapProbe, loadProviderResolution } from '../data/api'
 import type { CompanyIntelligencePayload, CompanyIntelligenceRecord } from '../types/company'
+import type { DomesticWaterMarketPayload, ElapProbePayload, ProviderCompanyObservation, ProviderResolutionPayload } from '../types/water'
 import { formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
 
@@ -11,15 +12,85 @@ function categoryLabel(value: string): string {
   return value.replaceAll('_', ' ').toLowerCase().replace(/(^|\s)\S/g, match => match.toUpperCase())
 }
 
+function waterObservationType(value: ProviderCompanyObservation['type']): string {
+  if (value === 'DWT_PROVIDER') return 'DWT provider'
+  if (value === 'DWT_LAB') return 'DWT laboratory'
+  return 'DEC 7G'
+}
+
+function marketObservationRows(payload: DomesticWaterMarketPayload | null): ProviderCompanyObservation[] {
+  if (!payload) return []
+  return [
+    ...payload.providers.map(provider => ({
+      id: provider.provider_id,
+      label: provider.aliases[0]?.name ?? provider.provider_key,
+      type: 'DWT_PROVIDER' as const,
+      observedBuildings: provider.observed_building_count,
+      observationCount: provider.inspection_count,
+      confidence: 'VERIFY' as const,
+      evidence: 'NYC drinking-water tank inspection provider field',
+    })),
+    ...payload.laboratories.map(lab => ({
+      id: lab.lab_id,
+      label: lab.aliases[0]?.name ?? lab.lab_key,
+      type: 'DWT_LAB' as const,
+      observedBuildings: lab.observed_building_count,
+      observationCount: lab.inspection_count,
+      confidence: 'VERIFY' as const,
+      evidence: 'NYC drinking-water tank inspection laboratory field',
+    })),
+    ...payload.dec_7g_businesses.map((business, index) => ({
+      id: business.qualification_id || `dec-7g-${index}`,
+      label: business.provider_name ?? business.provider_key,
+      type: 'DEC_7G' as const,
+      observedBuildings: null,
+      observationCount: 1,
+      confidence: 'VERIFY' as const,
+      evidence: [business.qualification_scope, business.registration_number].filter(Boolean).join(' · ') || 'DEC 7G qualified business registration',
+    })),
+  ].sort((a, b) => (b.observedBuildings ?? 0) - (a.observedBuildings ?? 0) || (b.observationCount ?? 0) - (a.observationCount ?? 0) || a.label.localeCompare(b.label))
+}
+
 export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: CompanyIntelligenceRecord) => void }) {
   const [payload, setPayload] = useState<CompanyIntelligencePayload | null>(null)
+  const [market, setMarket] = useState<DomesticWaterMarketPayload | null>(null)
+  const [resolutionReview, setResolutionReview] = useState<ProviderResolutionPayload | null>(null)
+  const [elapProbe, setElapProbe] = useState<ElapProbePayload | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [marketError, setMarketError] = useState<string | null>(null)
+  const [resolutionError, setResolutionError] = useState<string | null>(null)
+  const [elapError, setElapError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('ALL')
   const [resolution, setResolution] = useState('ALL')
 
   useEffect(() => {
-    loadCompanies().then(setPayload).catch(err => setError(err instanceof Error ? err.message : 'Unable to load company intelligence'))
+    let cancelled = false
+    Promise.allSettled([loadCompanies(), loadDomesticWaterMarket(), loadProviderResolution(), loadElapProbe()])
+      .then(([companiesResult, marketResult, resolutionResult, elapResult]) => {
+        if (cancelled) return
+        if (companiesResult.status === 'fulfilled') {
+          setPayload(companiesResult.value)
+        } else {
+          setError(companiesResult.reason instanceof Error ? companiesResult.reason.message : 'Unable to load company intelligence')
+        }
+        if (marketResult.status === 'fulfilled') {
+          setMarket(marketResult.value)
+        } else {
+          setMarketError(marketResult.reason instanceof Error ? marketResult.reason.message : 'Domestic-water provider intelligence is unavailable')
+        }
+        if (resolutionResult.status === 'fulfilled') {
+          setResolutionReview(resolutionResult.value)
+        } else {
+          setResolutionError(resolutionResult.reason instanceof Error ? resolutionResult.reason.message : 'Provider identity review is unavailable')
+        }
+        if (elapResult.status === 'fulfilled') {
+          setElapProbe(elapResult.value)
+        } else {
+          setElapError(elapResult.reason instanceof Error ? elapResult.reason.message : 'ELAP source probe is unavailable')
+        }
+      })
+    return () => { cancelled = true }
   }, [])
 
   const categories = useMemo(() => payload ? [...new Set(payload.companies.flatMap(company => company.service_categories))].sort() : [], [payload])
@@ -33,6 +104,11 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
 
   const totalObservedValue = payload?.companies.reduce((sum, company) => sum + company.metrics.observed_contract_value, 0) ?? 0
   const repeatRelationshipCompanies = payload?.companies.filter(company => company.metrics.repeat_customer_count > 0).length ?? 0
+  const waterObservations = useMemo(() => marketObservationRows(market), [market])
+  const visibleWaterObservations = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    return waterObservations.filter(row => !query || `${row.label} ${row.evidence}`.toLowerCase().includes(query)).slice(0, 80)
+  }, [waterObservations, search])
 
   return <section className="product-page companies-page">
     <div className="product-page-heading">
@@ -50,6 +126,35 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         <article><span className="reference-metric-icon warning">?</span><div><small>Resolution review</small><strong>{number.format(payload.summary.companies_requiring_resolution_review)}</strong><span>Potential legal-suffix/source variants</span></div></article>
         <article><span className="reference-metric-icon">↻</span><div><small>Repeat-customer evidence</small><strong>{number.format(repeatRelationshipCompanies)}</strong><span>Companies with 2+ observations for a buyer</span></div></article>
         <article><span className="reference-metric-icon">$</span><div><small>Observed contract value</small><strong>{currency.format(totalObservedValue)}</strong><span>Public Checkbook values · not revenue</span></div></article>
+        <article><span className="reference-metric-icon">WT</span><div><small>DWT provider observations</small><strong>{market ? number.format(market.summary.observed_provider_count) : '—'}</strong><span>{market ? 'NYC tank inspection source labels' : 'Optional cache unavailable'}</span></div></article>
+        <article><span className="reference-metric-icon">LAB</span><div><small>DWT labs observed</small><strong>{market ? number.format(market.summary.observed_laboratory_count) : '—'}</strong><span>{elapProbe ? `ELAP selector ${number.format(elapProbe.lab_selector.populated_option_count)}` : 'ELAP scope claims gated'}</span></div></article>
+      </div>
+
+      <div className="company-profile-grid water-company-evidence-grid">
+        <section className="reference-table-card company-evidence-card">
+          <div className="reference-table-heading"><div><strong>Domestic-water provider and lab observations</strong><span>{number.format(visibleWaterObservations.length)} shown · provider, lab and DEC labels are not merged into procurement companies automatically</span></div></div>
+          {marketError ? <div className="reference-empty-state compact"><strong>Domestic-water market cache unavailable.</strong><span>{marketError}</span></div> : !market ? <div className="reference-empty-state compact"><strong>Domestic-water provider cache not loaded.</strong><span>The Companies table remains limited to public procurement vendors.</span></div> : <div className="reference-table-scroll"><table className="reference-table provider-observation-table"><thead><tr><th>Name</th><th>Evidence type</th><th>Buildings</th><th>Observations</th><th>Confidence</th><th>Evidence</th></tr></thead><tbody>{visibleWaterObservations.map(row => <tr key={`${row.type}-${row.id}`}>
+            <td><strong>{row.label}</strong><small>{row.id}</small></td>
+            <td>{waterObservationType(row.type)}</td>
+            <td>{row.observedBuildings == null ? '—' : number.format(row.observedBuildings)}</td>
+            <td>{row.observationCount == null ? '—' : number.format(row.observationCount)}</td>
+            <td><span className="health-badge health-warning">{row.confidence}</span></td>
+            <td>{row.evidence}</td>
+          </tr>)}</tbody></table></div>}
+        </section>
+        <section className="reference-table-card company-evidence-card">
+          <div className="reference-table-heading"><div><strong>Provider identity review and ELAP gate</strong><span>Review signals only; no provider or lab accreditation merge is inferred</span></div></div>
+          {resolutionError && <div className="reference-empty-state compact"><strong>Provider review cache unavailable.</strong><span>{resolutionError}</span></div>}
+          {resolutionReview && <dl className="detail-grid company-review-summary">
+            <div><dt>Alias review candidates</dt><dd>{number.format(resolutionReview.summary.alias_review_candidate_count)}</dd></div>
+            <div><dt>High-priority candidates</dt><dd>{number.format(resolutionReview.summary.high_priority_alias_candidate_count)}</dd></div>
+            <div><dt>DEC name matches</dt><dd>{number.format(resolutionReview.summary.dec_name_match_count)}</dd></div>
+            <div><dt>Merges applied</dt><dd>{number.format(resolutionReview.summary.merge_applied_count)}</dd></div>
+          </dl>}
+          {resolutionReview && resolutionReview.dec_name_matches.length > 0 && <div className="evidence-list"><strong>Top DEC name matches</strong>{resolutionReview.dec_name_matches.slice(0, 8).map(match => <div key={match.match_id}><span>{match.provider_key}</span><small>{match.dec_provider_name ?? 'DEC name unavailable'} · {match.identity_confidence} · {match.relationship_evidence}</small></div>)}</div>}
+          {elapError && <div className="reference-empty-state compact"><strong>ELAP source probe unavailable.</strong><span>{elapError}</span></div>}
+          {elapProbe && <div className="source-row"><strong>ELAP public search contract</strong><span>{number.format(elapProbe.lab_selector.populated_option_count)} populated lab options · {elapProbe.detail_resolution_probe.detail_resolution_status}</span><small>Scope/accreditation assertions stay disabled until a deterministic potable-water scope crawler is built.</small></div>}
+        </section>
       </div>
 
       <div className="reference-table-card">

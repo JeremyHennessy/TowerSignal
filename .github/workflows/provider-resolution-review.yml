@@ -1,0 +1,82 @@
+name: Verify provider identity review queue
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/provider-resolution-review.yml'
+      - 'scripts/towersignal/provider_resolution.py'
+      - 'scripts/towersignal/domestic_water_market.py'
+      - 'scripts/build_domestic_water_market_cache.py'
+      - 'scripts/validate_domestic_water_market_cache.py'
+      - 'scripts/build_provider_resolution_review.py'
+      - 'scripts/validate_provider_resolution_review.py'
+      - 'tests/python/test_provider_resolution.py'
+      - 'docs/BUILD017D_PROVIDER_RESOLUTION.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-provider-resolution-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild exact-count domestic-water market cache
+        run: python scripts/build_domestic_water_market_cache.py --output provider-review/domestic-cache.json --page-size 50000
+      - name: Revalidate domestic-water market source cache
+        run: python scripts/validate_domestic_water_market_cache.py --cache provider-review/domestic-cache.json --max-age-days 1 --require-production-volume
+      - name: Build conservative provider identity review queue
+        run: python scripts/build_provider_resolution_review.py --domestic-cache provider-review/domestic-cache.json --output provider-review/review.json
+      - name: Validate zero-auto-merge evidence rules
+        run: python scripts/validate_provider_resolution_review.py --review provider-review/review.json --require-production-volume
+      - name: Run provider resolution tests
+        run: python -m unittest tests.python.test_provider_resolution -v
+      - name: Upload provider identity review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-provider-resolution-review
+          path: provider-review/review.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download provider identity review artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-provider-resolution-review
+          path: .verified-provider-review
+      - name: Revalidate downloaded review queue
+        run: python scripts/validate_provider_resolution_review.py --review .verified-provider-review/review.json --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build

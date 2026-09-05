@@ -1,0 +1,52 @@
+name: Verify NYC lead service line cache
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lead-service-line-cache.yml'
+      - 'scripts/build_lead_service_line_cache.py'
+      - 'scripts/validate_lead_service_line_cache.py'
+      - 'scripts/attach_nyc_service_lines.py'
+      - 'tests/python/test_lead_service_line_cache.py'
+      - 'tests/python/test_attach_nyc_service_lines.py'
+      - 'docs/BUILD017_DOMESTIC_WATER_PROVIDER_INTELLIGENCE.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-lead-service-line-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build exact-count lead service line cache without geometry
+        run: >-
+          python scripts/build_lead_service_line_cache.py
+          --output lead-service-line-cache/lead-service-lines.ndjson.gz
+          --summary lead-service-line-cache/summary.json
+          --page-size 50000
+      - name: Validate compressed cache and exact source count
+        run: >-
+          python scripts/validate_lead_service_line_cache.py
+          --data lead-service-line-cache/lead-service-lines.ndjson.gz
+          --summary lead-service-line-cache/summary.json
+          --max-age-days 1
+          --require-production-volume
+      - name: Run lead-service-line unit tests
+        run: python -m unittest tests.python.test_lead_service_line_cache tests.python.test_attach_nyc_service_lines -v
+      - name: Upload verified lead-service-line cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-lead-service-line-cache
+          path: lead-service-line-cache/
+          retention-days: 7

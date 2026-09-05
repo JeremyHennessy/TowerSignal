@@ -31,7 +31,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
           registeredSystems: systems.summary.registered_systems,
           highPriorityAccounts: systems.systems.filter(row => row.priority_score >= 70).length,
           recentChanges: changes.new_event_count,
-          procurementRecords: procurement.cityRecord.notices.length + procurement.checkbook.contracts.length + (procurement.nysAuthorities?.contracts.length ?? 0),
+          procurementRecords: procurement.cityRecord.notices.length + procurement.checkbook.contracts.length + (procurement.nysAuthorities?.contracts.length ?? 0) + (procurement.openBookWater?.contracts.length ?? 0) + (procurement.nychaWater?.records.length ?? 0),
           observedCompanies: companies.summary.observed_vendor_company_count,
           generatedAt: systems.metadata.generated_at,
         })
@@ -72,7 +72,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
         <article><small>NYC registered systems</small><strong>{summary.registeredSystems.toLocaleString()}</strong><span>Current source-backed account universe</span></article>
         <article><small>High-priority accounts</small><strong>{summary.highPriorityAccounts.toLocaleString()}</strong><span>Priority Score 1.0 ≥ 70</span></article>
         <article><small>New deterministic changes</small><strong>{summary.recentChanges.toLocaleString()}</strong><span>Current history-build delta</span></article>
-        <article><small>Procurement observations</small><strong>{summary.procurementRecords.toLocaleString()}</strong><span>NYC + statewide NY authority sources</span></article>
+        <article><small>Procurement observations</small><strong>{summary.procurementRecords.toLocaleString()}</strong><span>NYC, statewide authority and water sources</span></article>
         <article><small>Observed vendor companies</small><strong>{summary.observedCompanies.toLocaleString()}</strong><span>Conservative company identities</span></article>
       </div>}
 
@@ -86,8 +86,9 @@ export function HomePage({ user }: { user: WorkflowUser }) {
         <button onClick={() => go('#/monitor')}><span>02</span><strong>Monitor</strong><p>Review deterministic changes across the market.</p></button>
         <button onClick={() => go('#/opportunities')}><span>03</span><strong>Opportunities</strong><p>Inspect live source-backed procurement activity.</p></button>
         <button onClick={() => go('#/companies')}><span>04</span><strong>Companies</strong><p>Review observed vendors, customers and contracts.</p></button>
-        <button onClick={() => go('#/map')}><span>05</span><strong>Map</strong><p>Explore the current account universe geographically.</p></button>
-        <button onClick={() => go('#/workflow')}><span>06</span><strong>Workflow</strong><p>Open your private watchlists, notes and next actions.</p></button>
+        <button onClick={() => go('#/water-quality')}><span>05</span><strong>Water Quality</strong><p>Inspect unlinked NYC DEP distribution sample evidence.</p></button>
+        <button onClick={() => go('#/map')}><span>06</span><strong>Map</strong><p>Explore the current account universe geographically.</p></button>
+        <button onClick={() => go('#/workflow')}><span>07</span><strong>Workflow</strong><p>Open your private watchlists, notes and next actions.</p></button>
       </div>
 
       <section className="home-methodology-note">
