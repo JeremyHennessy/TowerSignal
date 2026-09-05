@@ -1,0 +1,54 @@
+name: Workflow Command Center Visual Proof
+
+on:
+  push:
+    branches: [agent/workflow-command-center-visual-proof-20260905]
+
+permissions:
+  contents: read
+
+jobs:
+  visual-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Attach current production data needed by Workflow
+        run: |
+          mkdir -p public/data/details/20
+          base="https://jeremyhennessy.github.io/TowerSignal/data"
+          curl -fsSL "$base/systems.json" -o public/data/systems.json
+          curl -fsSL "$base/changes.json" -o public/data/changes.json
+          curl -fsSL "$base/nys-systems.json" -o public/data/nys-systems.json
+          curl -fsSL "$base/nys-changes.json" -o public/data/nys-changes.json
+          curl -fsSL "$base/companies.json" -o public/data/companies.json
+          curl -fsSL "$base/details/20/2000015564.json" -o public/data/details/20/2000015564.json
+      - name: Build branch UI
+        run: npm run build
+      - name: Install test browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Start branch preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/towersignal-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/TowerSignal/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/towersignal-preview.log
+          exit 1
+      - name: Verify Workflow on desktop and iPhone
+        env:
+          BASE_URL: http://127.0.0.1:4173/TowerSignal/
+          CI: true
+        run: npx playwright test tests/e2e/workflow-command-center.spec.ts --project=desktop-chromium --project=iphone
+      - name: Upload visual report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-command-center-visual-proof
+          path: playwright-report
+          retention-days: 7
