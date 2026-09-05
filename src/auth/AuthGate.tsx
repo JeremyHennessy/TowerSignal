@@ -105,5 +105,5 @@ export function AuthGate() {
   if (!user) return <AuthLandingPage initialError={sessionError} onSignIn={signIn} onSignUp={signUp} />
   if (route === 'login' || route === 'home') return <HomePage user={user} />
   if (route === 'account') return <UserAccountPage user={user} onSignOut={signOut} />
-  return <App />
+  return <App initialWorkflowUser={user} />
 }
