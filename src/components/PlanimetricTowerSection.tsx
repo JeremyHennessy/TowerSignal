@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Feature, MultiPolygon, Polygon } from 'geojson'
-import type { SystemDetail } from '../types/data'
+import { DomesticWaterSection, type SystemDetailWithDomesticWater } from './DomesticWaterSection'
 
 const PLANIMETRIC_SOURCE_URL = 'https://data.cityofnewyork.us/City-Government/NYC-Planimetric-Database-Cooling-Towers/x748-37q7'
 const PLANIMETRIC_DOMAIN_URL = 'https://services6.arcgis.com/yG5s3afENB5iO9fj/ArcGIS/rest/services/Cooling_Towers_2022/FeatureServer/3'
@@ -29,15 +29,17 @@ function formatFeet(value: number | null) {
   return value == null ? '—' : `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })} ft`
 }
 
-export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
+export function PlanimetricTowerSection({ detail }: { detail: SystemDetailWithDomesticWater }) {
   const container = useRef<HTMLDivElement | null>(null)
   const features = detail.planimetric_building_tower_features
   const buildingFootprints = detail.building_footprints
+  const waterTanks = detail.domestic_water?.planimetric_tank_features ?? []
   const featureCount = features?.length ?? 0
   const footprintCount = buildingFootprints?.length ?? 0
+  const waterTankCount = waterTanks.length
   const roofLevelCount = features?.filter(feature => feature.sub_feature_code === '212000').length ?? 0
   const groundLevelCount = features?.filter(feature => feature.sub_feature_code === '212010').length ?? 0
-  const hasRoofMapContext = featureCount > 0 || footprintCount > 0
+  const hasRoofMapContext = featureCount > 0 || footprintCount > 0 || waterTankCount > 0
 
   useEffect(() => {
     if (!container.current || !hasRoofMapContext) return
@@ -114,6 +116,25 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
       bounds.extend(layer.getBounds())
     })
 
+    waterTanks.forEach((tank, index) => {
+      const geoJsonFeature: Feature<Polygon | MultiPolygon> = {
+        type: 'Feature',
+        properties: {},
+        geometry: tank.geometry as Polygon | MultiPolygon,
+      }
+      const layer = L.geoJSON(geoJsonFeature, {
+        style: {
+          color: '#38bdf8',
+          weight: 3,
+          opacity: 1,
+          fillColor: '#38bdf8',
+          fillOpacity: 0.36,
+        },
+      }).addTo(map)
+      layer.bindTooltip(`Drinking-water tank footprint ${index + 1} · Roof level`)
+      bounds.extend(layer.getBounds())
+    })
+
     if (bounds.isValid()) {
       map.fitBounds(bounds, { padding: [34, 34], maxZoom: 20 })
     }
@@ -121,7 +142,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
     return () => {
       map.remove()
     }
-  }, [buildingFootprints, features, hasRoofMapContext])
+  }, [buildingFootprints, features, hasRoofMapContext, waterTanks])
 
   const featureCards = features?.map((feature, index) => <article className="planimetric-feature" key={feature.global_id}>
     <div className="planimetric-feature-head"><strong>{featureLabel(index)}</strong><span>BIN {feature.bin}</span></div>
@@ -136,56 +157,61 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetail }) {
     </dl>
   </article>)
 
-  return <section className="planimetric-section">
-    <h3>Physical tower location</h3>
-    <div className="planimetric-summary">
-      <strong>{featureCount} mapped cooling-tower footprint{featureCount === 1 ? '' : 's'} · {footprintCount} building outline{footprintCount === 1 ? '' : 's'}</strong>
-      <span>Exact BIN attachment · tower observation and aerial imagery: 2022 · building footprint: current NYC layer</span>
-      {featureCount > 0 && <span>{roofLevelCount} roof level · {groundLevelCount} ground level · classification is source-coded by NYC OTI</span>}
-    </div>
-
-    {hasRoofMapContext && <>
-      <div className="planimetric-map-shell">
-        <div ref={container} className="planimetric-map" role="region" aria-label={`Aerial roof map with cooling-tower and building footprints on BIN ${detail.identity.bin ?? 'unknown'}`} />
+  return <>
+    <section className="planimetric-section">
+      <h3>Physical tower location</h3>
+      <div className="planimetric-summary">
+        <strong>{featureCount} mapped cooling-tower footprint{featureCount === 1 ? '' : 's'} · {footprintCount} building outline{footprintCount === 1 ? '' : 's'}</strong>
+        {waterTankCount > 0 && <span><strong>{waterTankCount} mapped rooftop drinking-water tank footprint{waterTankCount === 1 ? '' : 's'}</strong></span>}
+        <span>Exact BIN attachment · tower observations and aerial imagery: 2022 · building footprint: current NYC layer</span>
+        {featureCount > 0 && <span>{roofLevelCount} roof level · {groundLevelCount} ground level · cooling-tower classification is source-coded by NYC OTI</span>}
       </div>
-      <div className="roof-map-legend" aria-label="Roof map legend">
-        <span><i className="roof-legend-tower" />Cooling-tower footprint</span>
-        <span><i className="roof-legend-building" />Current building outline</span>
-        <span className="roof-legend-imagery">2022 NYS orthophoto</span>
+
+      {hasRoofMapContext && <>
+        <div className="planimetric-map-shell">
+          <div ref={container} className="planimetric-map" role="region" aria-label={`Aerial roof map with cooling-tower, drinking-water tank and building footprints on BIN ${detail.identity.bin ?? 'unknown'}`} />
+        </div>
+        <div className="roof-map-legend" aria-label="Roof map legend">
+          <span><i className="roof-legend-tower" />Cooling-tower footprint</span>
+          {waterTankCount > 0 && <span><i className="roof-legend-water-tank" />Drinking-water tank footprint</span>}
+          <span><i className="roof-legend-building" />Current building outline</span>
+          <span className="roof-legend-imagery">2022 NYS orthophoto</span>
+        </div>
+      </>}
+
+      {featureCount === 0 ? <>
+        <div className="empty-inline">No NYC Planimetric cooling-tower feature was exact-matched to this system's published BIN.</div>
+        <p className="microcopy">A missing 2022 Planimetric cooling-tower feature is not evidence that the registered tower does not physically exist. Where building or drinking-water-tank geometry is available, the aerial roof context remains visible for field verification.</p>
+      </> : featureCount > COLLAPSE_TOWER_DETAILS_AT ? <details className="roof-tower-details">
+        <summary>Tower feature evidence · {featureCount} mapped footprints</summary>
+        <div className="planimetric-feature-list">{featureCards}</div>
+      </details> : <div className="planimetric-feature-list">{featureCards}</div>}
+
+      {footprintCount > 0 && <details className="roof-building-details">
+        <summary>Building footprint context · {footprintCount} exact-BIN feature{footprintCount === 1 ? '' : 's'}</summary>
+        <div className="planimetric-feature-list">
+          {buildingFootprints?.map((footprint, index) => <article className="planimetric-feature" key={footprint.doitt_id ? `doitt-${footprint.doitt_id}` : `object-${footprint.object_id}`}>
+            <div className="planimetric-feature-head"><strong>{footprintLabel(index)}</strong><span>BIN {footprint.bin}</span></div>
+            <dl className="identity-grid">
+              <div><dt>DOITT ID</dt><dd>{footprint.doitt_id ?? '—'}</dd></div>
+              <div><dt>Roof height</dt><dd>{formatFeet(footprint.height_roof_ft)}</dd></div>
+              <div><dt>Ground elevation</dt><dd>{formatFeet(footprint.ground_elevation_ft)}</dd></div>
+              <div><dt>Construction year</dt><dd>{footprint.construction_year ?? '—'}</dd></div>
+              <div><dt>Geometry source</dt><dd>{footprint.geometry_source ?? '—'}</dd></div>
+              <div><dt>Footprint status</dt><dd>{footprint.last_status_type ?? '—'}</dd></div>
+            </dl>
+          </article>)}
+        </div>
+      </details>}
+
+      <p className="microcopy">The orange cooling-tower polygons and blue drinking-water-tank polygons are separate NYC OTI physical observations derived from 2022 aerial imagery and attached only by exact BIN. The dashed building outline comes from NYC OTI's current building-footprint layer and can therefore reflect edits made after the 2022 imagery. These physical layers do not establish one-to-one System ID identity on multi-system buildings and do not prove current equipment configuration or operating status.</p>
+      <div className="roof-source-links">
+        <a className="planimetric-source-link" href={PLANIMETRIC_SOURCE_URL} target="_blank" rel="noreferrer">Tower polygons ↗</a>
+        <a className="planimetric-source-link" href={PLANIMETRIC_DOMAIN_URL} target="_blank" rel="noreferrer">Roof/ground code domain ↗</a>
+        <a className="planimetric-source-link" href={BUILDING_SOURCE_URL} target="_blank" rel="noreferrer">Building footprints ↗</a>
+        <a className="planimetric-source-link" href={ORTHO_SOURCE_URL} target="_blank" rel="noreferrer">2022 NYS orthophoto ↗</a>
       </div>
-    </>}
-
-    {featureCount === 0 ? <>
-      <div className="empty-inline">No NYC Planimetric cooling-tower feature was exact-matched to this system's published BIN.</div>
-      <p className="microcopy">A missing 2022 Planimetric feature is not evidence that the registered cooling tower does not physically exist. Where a current building footprint is available, the aerial roof context remains visible for field verification.</p>
-    </> : featureCount > COLLAPSE_TOWER_DETAILS_AT ? <details className="roof-tower-details">
-      <summary>Tower feature evidence · {featureCount} mapped footprints</summary>
-      <div className="planimetric-feature-list">{featureCards}</div>
-    </details> : <div className="planimetric-feature-list">{featureCards}</div>}
-
-    {footprintCount > 0 && <details className="roof-building-details">
-      <summary>Building footprint context · {footprintCount} exact-BIN feature{footprintCount === 1 ? '' : 's'}</summary>
-      <div className="planimetric-feature-list">
-        {buildingFootprints?.map((footprint, index) => <article className="planimetric-feature" key={footprint.doitt_id ? `doitt-${footprint.doitt_id}` : `object-${footprint.object_id}`}>
-          <div className="planimetric-feature-head"><strong>{footprintLabel(index)}</strong><span>BIN {footprint.bin}</span></div>
-          <dl className="identity-grid">
-            <div><dt>DOITT ID</dt><dd>{footprint.doitt_id ?? '—'}</dd></div>
-            <div><dt>Roof height</dt><dd>{formatFeet(footprint.height_roof_ft)}</dd></div>
-            <div><dt>Ground elevation</dt><dd>{formatFeet(footprint.ground_elevation_ft)}</dd></div>
-            <div><dt>Construction year</dt><dd>{footprint.construction_year ?? '—'}</dd></div>
-            <div><dt>Geometry source</dt><dd>{footprint.geometry_source ?? '—'}</dd></div>
-            <div><dt>Footprint status</dt><dd>{footprint.last_status_type ?? '—'}</dd></div>
-          </dl>
-        </article>)}
-      </div>
-    </details>}
-
-    <p className="microcopy">The orange tower polygons are NYC Planimetric physical observations derived from 2022 aerial imagery and are attached only by exact BIN. NYC OTI's coded domain defines sub-feature 212000 as Roof Level and 212010 as Ground Level; TowerSignal preserves that source classification rather than inferring location from imagery. The dashed building outline comes from NYC OTI's current building-footprint layer and can therefore reflect edits made after the 2022 imagery. Neither layer establishes which polygon corresponds to a specific System ID when multiple registered systems share a building, nor do they prove current equipment configuration or operating status.</p>
-    <div className="roof-source-links">
-      <a className="planimetric-source-link" href={PLANIMETRIC_SOURCE_URL} target="_blank" rel="noreferrer">Tower polygons ↗</a>
-      <a className="planimetric-source-link" href={PLANIMETRIC_DOMAIN_URL} target="_blank" rel="noreferrer">Roof/ground code domain ↗</a>
-      <a className="planimetric-source-link" href={BUILDING_SOURCE_URL} target="_blank" rel="noreferrer">Building footprints ↗</a>
-      <a className="planimetric-source-link" href={ORTHO_SOURCE_URL} target="_blank" rel="noreferrer">2022 NYS orthophoto ↗</a>
-    </div>
-  </section>
+    </section>
+    <DomesticWaterSection detail={detail} />
+  </>
 }
