@@ -213,6 +213,8 @@ def fetch_snapshot(
     select: str | None = None,
     page_size: int = 50000,
     minimum_page_size: int = 1000,
+    allow_count_fallback: bool = False,
+    max_pages_without_count: int = 10000,
 ) -> SourceSnapshot:
     metadata = fetch_metadata(dataset_id, api_root=api_root)
     available = set(metadata["fields"])
@@ -220,11 +222,17 @@ def fetch_snapshot(
     if missing:
         raise DomesticWaterSourceError(f"Dataset {dataset_id} is missing required fields: {', '.join(missing)}")
 
-    expected_count = fetch_count(dataset_id, api_root=api_root, where=where)
+    try:
+        expected_count: int | None = fetch_count(dataset_id, api_root=api_root, where=where)
+    except DomesticWaterSourceError:
+        if not allow_count_fallback:
+            raise
+        expected_count = None
     rows: list[dict[str, Any]] = []
     offset = 0
     active_page_size = page_size
-    while offset < expected_count:
+    pages_without_count = 0
+    while expected_count is None or offset < expected_count:
         params: dict[str, Any] = {"$limit": active_page_size, "$offset": offset, "$order": order_by}
         if where:
             params["$where"] = where
@@ -243,8 +251,15 @@ def fetch_snapshot(
         if len(page) < active_page_size:
             break
         offset += active_page_size
+        if expected_count is None:
+            pages_without_count += 1
+            if pages_without_count >= max_pages_without_count:
+                raise DomesticWaterSourceError(
+                    f"Dataset {dataset_id} exceeded {max_pages_without_count:,} pages without a source count. Refusing unbounded crawl."
+                )
 
-    if len(rows) != expected_count:
+    source_record_count = expected_count if expected_count is not None else len(rows)
+    if expected_count is not None and len(rows) != expected_count:
         raise DomesticWaterSourceError(
             f"Dataset {dataset_id} pagination incomplete: expected {expected_count:,} rows, fetched {len(rows):,}. Refusing partial snapshot."
         )
@@ -256,7 +271,7 @@ def fetch_snapshot(
         api_root=api_root,
         rows=rows,
         retrieved_at=utc_now(),
-        source_record_count=expected_count,
+        source_record_count=source_record_count,
         source_last_updated_at=metadata.get("source_last_updated_at"),
         source_query_scope=scope,
         fields=tuple(metadata["fields"]),

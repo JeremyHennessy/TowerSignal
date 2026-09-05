@@ -189,6 +189,7 @@ def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
                 where=_hpd_term_where(term),
                 select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
                 page_size=min(page_size, HPD_MAX_PAGE_SIZE),
+                allow_count_fallback=True,
             )
         )
     return snapshots
