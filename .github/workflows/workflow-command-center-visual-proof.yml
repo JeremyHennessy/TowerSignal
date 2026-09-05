@@ -33,7 +33,7 @@ jobs:
         run: npx playwright install --with-deps chromium webkit
       - name: Start branch preview
         run: |
-          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/towersignal-preview.log 2>&1 &
+          npx vite preview --host 127.0.0.1 --port 4173 > /tmp/towersignal-preview.log 2>&1 &
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:4173/TowerSignal/ >/dev/null; then exit 0; fi
             sleep 1
