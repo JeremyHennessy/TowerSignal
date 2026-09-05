@@ -1,0 +1,87 @@
+name: iPhone detail diagnostic
+
+on:
+  push:
+    branches:
+      - agent/iphone-detail-diagnostic-20260905
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Attach current production data
+        run: |
+          mkdir -p public/data/details/20
+          base="https://jeremyhennessy.github.io/TowerSignal/data"
+          curl -fsSL "$base/systems.json" -o public/data/systems.json
+          curl -fsSL "$base/changes.json" -o public/data/changes.json
+          curl -fsSL "$base/nys-systems.json" -o public/data/nys-systems.json
+          curl -fsSL "$base/nys-changes.json" -o public/data/nys-changes.json
+          curl -fsSL "$base/details/20/2000010821.json" -o public/data/details/20/2000010821.json
+      - name: Bypass outer auth only for disposable renderer diagnostic
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/main.tsx')
+          s=p.read_text()
+          s=s.replace("import { AuthGate } from './auth/AuthGate'", "import App from './App'")
+          s=s.replace('<AuthGate />', '<App />')
+          p.write_text(s)
+          PY
+      - name: Build disposable diagnostic UI
+        run: npm run build
+      - name: Install WebKit
+        run: npx playwright install --with-deps webkit
+      - name: Start preview
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4173 > /tmp/ts-detail-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/TowerSignal/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/ts-detail-preview.log
+          exit 1
+      - name: Render exact previously hanging account in iPhone WebKit
+        run: |
+          node --input-type=module <<'NODE'
+          import { webkit, devices } from '@playwright/test'
+          const browser = await webkit.launch()
+          const context = await browser.newContext({ ...devices['iPhone 13'] })
+          const page = await context.newPage()
+          await page.route(/orthos\.its\.ny\.gov|tile\.openstreetmap\.org/, route => route.abort())
+          const errors = []
+          page.on('console', m => { if (m.type() === 'error') errors.push(m.text()) })
+          page.on('pageerror', e => errors.push(`pageerror: ${e.message}`))
+          const started = Date.now()
+          await page.goto('http://127.0.0.1:4173/TowerSignal/#/account/2000010821', { waitUntil: 'domcontentloaded' })
+          await page.getByLabel('Selected cooling tower detail').waitFor({ state: 'visible', timeout: 15000 })
+          await page.getByRole('heading', { name: 'Identity', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+          const identityMs = Date.now() - started
+          await page.getByRole('heading', { name: 'ACRIS property activity', exact: true }).waitFor({ state: 'attached', timeout: 15000 })
+          const acrisMs = Date.now() - started
+          const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
+          const viewportWidth = page.viewportSize()?.width ?? 0
+          console.log(JSON.stringify({ identityMs, acrisMs, bodyWidth, viewportWidth, errors }, null, 2))
+          if (bodyWidth > viewportWidth + 2) throw new Error(`horizontal overflow ${bodyWidth} > ${viewportWidth}`)
+          if (errors.length) throw new Error(`console/page errors: ${errors.join(' | ')}`)
+          await page.screenshot({ path: 'iphone-detail-diagnostic.png', fullPage: true })
+          await browser.close()
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iphone-detail-diagnostic
+          path: |
+            iphone-detail-diagnostic.png
+            /tmp/ts-detail-preview.log
+          retention-days: 7
