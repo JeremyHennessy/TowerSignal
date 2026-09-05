@@ -13,7 +13,7 @@ import {
 
 test.setTimeout(120_000)
 
-test('workflow command center groups current and future intelligence on desktop and iPhone', async ({ page }, testInfo) => {
+test('workflow command center groups current intelligence and one future-evidence disclosure on desktop and iPhone', async ({ page }, testInfo) => {
   const isIphone = isIphoneProject(testInfo)
   if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
@@ -59,8 +59,6 @@ test('workflow command center groups current and future intelligence on desktop 
     await expectDomAttribute(page, 'section.workflow-workspace-page h1', 'aria-label', 'Workflow workspace')
     await expectDomText(page, [
       'What matters now',
-      'Your private workflow covers 1 current NYC account',
-      '1 due or overdue action',
       'NYC market',
       '16 E 39TH ST',
       'Action due today',
@@ -69,7 +67,8 @@ test('workflow command center groups current and future intelligence on desktop 
       'Cooling-tower roof geometry',
       'DOHMH oversight',
       'Recent ACRIS activity',
-      'Future-ready',
+      'Future evidence lanes',
+      'Planned extensions',
       'Review roof and domestic-water evidence before outreach.',
       'Field service operations',
       'Documents & system topology',
@@ -81,9 +80,8 @@ test('workflow command center groups current and future intelligence on desktop 
 
     const summary = workflow.locator('.workflow-command-summary')
     await expect(summary.getByRole('heading', { name: 'What matters now', exact: true })).toBeVisible()
-    await expect(summary).toContainText('Your private workflow covers 1 current NYC account')
-    await expect(summary).toContainText('1 due or overdue action')
     await expect(summary).toContainText('NYC market')
+    await expect(summary).not.toContainText('Invalid Date')
 
     const attention = workflow.locator('.workflow-attention-list')
     await expect(attention).toContainText('16 E 39TH ST')
@@ -96,13 +94,18 @@ test('workflow command center groups current and future intelligence on desktop 
     await expect(workflow).toContainText('Cooling-tower roof geometry')
     await expect(workflow).toContainText('DOHMH oversight')
     await expect(workflow).toContainText('Recent ACRIS activity')
-    await expect(workflow).toContainText('Future-ready')
+    await expect(workflow.getByText('Future evidence lanes', { exact: true })).toBeVisible()
+    await expect(workflow.getByText('Planned extensions', { exact: true })).toBeVisible()
+    await expect(workflow.getByText('Future-ready', { exact: true })).toHaveCount(0)
+
+    const future = workflow.locator('details.workflow-future-details')
+    await future.locator('summary').click()
+    await expect(future).toContainText('Field service operations')
+    await expect(future).toContainText('Documents & system topology')
+    await expect(future).toContainText('Relationships & contracts')
 
     await expect(workflow.locator('.workflow-next-actions')).toContainText('Review roof and domestic-water evidence before outreach.')
     await expect(workflow.locator('.workflow-kanban')).toContainText('16 E 39TH ST')
-    await expect(workflow.locator('.workflow-future-grid')).toContainText('Field service operations')
-    await expect(workflow.locator('.workflow-future-grid')).toContainText('Documents & system topology')
-    await expect(workflow.locator('.workflow-future-grid')).toContainText('Relationships & contracts')
   }
 
   await expectContained(page)

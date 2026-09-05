@@ -20,5 +20,7 @@ import './styles/auth-theme.css'
 import './styles/app-brand-theme.css'
 import './styles/header-alignment-fix.css'
 import './styles/account-report.css'
+import './styles/ui-polish.css'
+import './styles/ui-polish-mobile-fix.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AuthGate /></React.StrictMode>)

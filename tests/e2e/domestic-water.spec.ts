@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { submitSignIn } from './auth.helpers'
 
-test('hosted domestic-water account shows physical, oversight and self-report evidence', async ({ page }, testInfo) => {
+test('hosted domestic-water account shows physical, oversight and compact self-report evidence', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', message => {
@@ -30,8 +30,9 @@ test('hosted domestic-water account shows physical, oversight and self-report ev
 
   await expect(domestic.getByRole('heading', { name: 'Domestic water context', exact: true })).toBeVisible()
   await expect(domestic.getByText('Latest self-reported inspection evidence', { exact: true })).toBeVisible()
+  expect(await domestic.locator('.dwt-latest-card').count()).toBeGreaterThan(0)
   await expect(domestic.locator('details.domestic-water-history').first().locator('summary')).toHaveText(/DOHMH oversight \/ compliance history · [1-9]\d* records?/)
-  await expect(domestic.locator('details.domestic-water-history').nth(1).locator('summary')).toHaveText(/Full self-reported inspection history · [1-9]\d* tank records/)
+  expect(await domestic.locator('details.dwt-older-history').count()).toBeGreaterThan(0)
   await expect(domestic.getByText(/2022 rooftop drinking-water tank polygons · [1-9]\d*/)).toBeVisible()
   await expect(domestic.locator('.signal-card').first()).toBeVisible()
   await expect(domestic.getByRole('link', { name: 'Water-tank polygons ↗', exact: true })).toBeVisible()

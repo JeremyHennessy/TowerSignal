@@ -8,5 +8,21 @@ export const signalLabels: Record<string, string> = {
 }
 
 export function signalLabel(value: string): string { return signalLabels[value] ?? value.replaceAll('_', ' ') }
-export function formatDate(value: string | null): string { return value ? new Date(`${value}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available' }
-export function formatTimestamp(value: string): string { return new Date(value).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) }
+
+function parseDate(value: string | null | undefined): Date | null {
+  if (!value) return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  const parsed = /^\d{4}-\d{2}-\d{2}$/.test(trimmed) ? new Date(`${trimmed}T00:00:00`) : new Date(trimmed)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+export function formatDate(value: string | null | undefined): string {
+  const parsed = parseDate(value)
+  return parsed ? parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available'
+}
+
+export function formatTimestamp(value: string | null | undefined): string {
+  const parsed = parseDate(value)
+  return parsed ? parsed.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'Not available'
+}

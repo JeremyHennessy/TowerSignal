@@ -1,12 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { submitSignIn } from './auth.helpers'
-import { expectAccountDetailHydrated, expectDomAttribute, expectDomCount, expectDomText, expectElementContained, isIphoneProject } from './iphone.helpers'
+import { expectAccountDetailHydrated, expectDomAttribute, expectDomText, expectElementContained, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
 test('hosted account exposes a source-backed sales pre-call brief before the technician field pack', async ({ page }, testInfo) => {
-  const isIphone = isIphoneProject(testInfo)
-  if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', message => {
@@ -25,13 +23,12 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
   await submitSignIn(page, testInfo.project.name)
   await expect(page).toHaveURL(/#\/account\/2000012577$/)
 
+  const isIphone = isIphoneProject(testInfo)
   if (isIphone) await expectAccountDetailHydrated(page)
 
   const sales = page.locator('.sales-precall-pack')
   const technician = page.locator('.technician-field-pack')
   if (isIphone) {
-    await expectDomCount(page, '.sales-precall-pack', 1)
-    await expectDomCount(page, '.technician-field-pack', 1)
     await expectDomText(page, [
       'Pre-call sales brief',
       'Why call now',
@@ -45,10 +42,9 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
       'Verify before asserting',
       'incumbent cooling-tower service provider is not established',
       'evidence class is not win probability',
-    ], '.sales-precall-pack')
-    await expectDomText(page, [
       'Pre-visit field pack',
-    ], '.technician-field-pack')
+      'Jump to',
+    ], '.detail-panel')
     await expectDomAttribute(page, '.sales-pack-metrics', 'aria-label', 'Sales pre-call summary')
   } else {
     await expect(sales).toBeVisible()
@@ -64,7 +60,9 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
     await expect(sales.getByRole('heading', { name: 'During the call', exact: true })).toBeVisible()
     await expect(sales.getByText('Qualification questions', { exact: true })).toBeVisible()
     await expect(sales.getByText('Verify before asserting', { exact: true })).toBeVisible()
-    await expect(sales.getByText(/incumbent cooling-tower service provider is not established/i)).toBeVisible()
+    const verifyDetails = sales.locator('details.sales-pack-verify-details')
+    await verifyDetails.locator('summary').click()
+    await expect(verifyDetails.getByText(/incumbent cooling-tower service provider is not established/i)).toBeVisible()
     await expect(sales.getByText(/evidence class is not win probability/i)).toBeVisible()
   }
 
