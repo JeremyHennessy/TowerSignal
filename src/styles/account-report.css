@@ -1,0 +1,126 @@
+/* Full-page account reports are long-form evidence documents, not masonry dashboards.
+   Keep bounded fact grids inside sections, but never pair independent evidence sections
+   into shared grid rows where one tall section can create a large blank region beside it. */
+
+.account-profile-page .account-profile-toolbar{
+  max-width:1320px;
+  margin:0 auto 10px;
+}
+
+.account-profile-page .detail-panel{
+  display:grid!important;
+  grid-template-columns:repeat(12,minmax(0,1fr))!important;
+  gap:10px!important;
+  align-items:start!important;
+  width:100%!important;
+  max-width:1320px!important;
+  margin:0 auto!important;
+}
+
+/* Only the bounded account header and score/action summary share a row. */
+.account-profile-page .detail-header{
+  grid-column:1 / span 9!important;
+  grid-row:auto!important;
+}
+
+.account-profile-page .detail-actions{
+  grid-column:10 / -1!important;
+  grid-row:auto!important;
+}
+
+/* Every variable-height report section owns its own row. This deliberately overrides
+   the older nth-of-type dashboard rules, including sections added later by new sources. */
+.account-profile-page .workflow-account-section,
+.account-profile-page .technician-field-pack,
+.account-profile-page .detail-panel>section:nth-of-type(n),
+.account-profile-page .detail-panel>.error-state,
+.account-profile-page .detail-panel>.loading-state{
+  grid-column:1 / -1!important;
+  grid-row:auto!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  min-width:0!important;
+}
+
+/* Bounded key/value facts still benefit from columns because their content model is
+   homogeneous. Long narrative/evidence sections remain single-flow at the section level. */
+.account-profile-page .detail-panel>section .identity-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+
+.account-profile-page .detail-panel>section,
+.account-profile-page .technician-field-pack,
+.account-profile-page .workflow-account-section{
+  scroll-margin-top:76px;
+}
+
+.account-profile-page .detail-panel>section>p,
+.account-profile-page .detail-panel>section>.microcopy{
+  max-width:1120px;
+}
+
+/* Empty-source messages should explain a coverage limitation without visually becoming
+   a large report block. */
+.account-profile-page .detail-panel .empty-inline{
+  padding:11px 12px;
+  border:1px dashed #d9e2e4;
+  border-radius:7px;
+  background:#fafcfc;
+  line-height:1.45;
+}
+
+/* Preserve wide maps/tables while keeping prose readable inside the full-width report. */
+.account-profile-page .planimetric-map-shell,
+.account-profile-page .reference-table-scroll,
+.account-profile-page .table-scroll{
+  max-width:100%;
+}
+
+@media(max-width:1180px){
+  .account-profile-page .account-profile-toolbar{
+    max-width:none;
+  }
+
+  .account-profile-page .detail-panel{
+    grid-template-columns:1fr!important;
+    max-width:none!important;
+  }
+
+  .account-profile-page .detail-header,
+  .account-profile-page .detail-actions,
+  .account-profile-page .workflow-account-section,
+  .account-profile-page .technician-field-pack,
+  .account-profile-page .detail-panel>section:nth-of-type(n),
+  .account-profile-page .detail-panel>.error-state,
+  .account-profile-page .detail-panel>.loading-state{
+    grid-column:1!important;
+  }
+
+  .account-profile-page .detail-header,
+  .account-profile-page .detail-actions{
+    min-height:auto!important;
+  }
+
+  .account-profile-page .detail-panel>section .identity-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+
+@media(max-width:780px){
+  .account-profile-page .detail-panel{
+    display:block!important;
+  }
+
+  .account-profile-page .detail-panel>section .identity-grid{
+    grid-template-columns:1fr!important;
+  }
+
+  .account-profile-page .detail-header,
+  .account-profile-page .detail-actions,
+  .account-profile-page .workflow-account-section,
+  .account-profile-page .technician-field-pack,
+  .account-profile-page .detail-panel>section:nth-of-type(n){
+    margin:0 0 9px!important;
+  }
+}
