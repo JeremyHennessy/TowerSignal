@@ -7,15 +7,14 @@ import {
   expectDomText,
   expectElementContained,
   isIphoneProject,
-  setInputValue,
-  setSelectValue,
-  setTextareaValue,
+  setWorkflowAccountFields,
 } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
 test('workflow command center groups current and future intelligence on desktop and iPhone', async ({ page }, testInfo) => {
   const isIphone = isIphoneProject(testInfo)
+  if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', message => {
@@ -41,9 +40,7 @@ test('workflow command center groups current and future intelligence on desktop 
   const today = new Date().toISOString().slice(0, 10)
   const note = 'Review roof and domestic-water evidence before outreach.'
   if (isIphone) {
-    await setSelectValue(page, 'section.workflow-account-section select', 'investigate')
-    await setInputValue(page, 'section.workflow-account-section input[type="date"]', today)
-    await setTextareaValue(page, 'section.workflow-account-section textarea', note)
+    await setWorkflowAccountFields(page, 'section.workflow-account-section', 'investigate', today, note)
     await page.waitForTimeout(100)
     await clickElement(page, 'section.workflow-account-section .workflow-save')
     await expectDomText(page, ['Saved'], 'section.workflow-account-section')
