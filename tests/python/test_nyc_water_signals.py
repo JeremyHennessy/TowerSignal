@@ -3,12 +3,21 @@ from __future__ import annotations
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from towersignal.domestic_water_market import SourceSnapshot  # noqa: E402
 from towersignal.nyc_water_signals import (  # noqa: E402
+    DOB_APPROVED_PERMITS_DATASET_ID,
+    DOB_JOB_FILINGS_DATASET_ID,
+    HPD_MAX_PAGE_SIZE,
+    HPD_VIOLATIONS_DATASET_ID,
+    LL84_DATASET_ID,
+    NYC_311_DATASET_ID,
     _dob_business_profiles,
+    build_payload,
     classify_311,
     classify_dob_work,
     normalize_311,
@@ -83,6 +92,34 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(multi["property_link_confidence"], "MULTI_IDENTIFIER_CONTEXT")
         self.assertIsNone(multi["property_key"])
         self.assertEqual(multi["bbls"], ["1000010001", "1000020002"])
+
+    def test_build_payload_caps_hpd_page_size_for_large_text_query(self) -> None:
+        calls: list[tuple[str, int]] = []
+
+        def fake_fetch_snapshot(dataset_id: str, **kwargs):
+            calls.append((dataset_id, int(kwargs["page_size"])))
+            return SourceSnapshot(
+                dataset_id=dataset_id,
+                name=dataset_id,
+                api_root=str(kwargs["api_root"]),
+                rows=[],
+                retrieved_at="2026-09-05T00:00:00Z",
+                source_record_count=0,
+                source_last_updated_at="2026-09-05T00:00:00Z",
+                source_query_scope=str(kwargs.get("where") or "ALL_ROWS"),
+                fields=tuple(kwargs["required_fields"]),
+            )
+
+        with patch("towersignal.nyc_water_signals.fetch_snapshot", side_effect=fake_fetch_snapshot):
+            payload = build_payload(page_size=50000)
+
+        self.assertEqual(payload["summary"]["hpd_open_water_violation_count"], 0)
+        page_sizes = dict(calls)
+        self.assertEqual(page_sizes[NYC_311_DATASET_ID], 50000)
+        self.assertEqual(page_sizes[HPD_VIOLATIONS_DATASET_ID], HPD_MAX_PAGE_SIZE)
+        self.assertEqual(page_sizes[DOB_JOB_FILINGS_DATASET_ID], 50000)
+        self.assertEqual(page_sizes[DOB_APPROVED_PERMITS_DATASET_ID], 50000)
+        self.assertEqual(page_sizes[LL84_DATASET_ID], 50000)
 
 
 if __name__ == "__main__":

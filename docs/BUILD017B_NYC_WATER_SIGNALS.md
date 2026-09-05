@@ -42,6 +42,11 @@ Only `BUILDING_*` classifications may receive building-level property linkage. S
 
 The authoritative HPD source contains more than eight million violation records, so Build 017B does not copy the entire corpus. It requests the current open water/plumbing subset server-side and preserves HPD's source BBL/BIN, violation class, inspection date, current status and description.
 
+The HPD text-filtered subset is paged more conservatively than the nominal cache
+page size because large Socrata pages for this query can time out on hosted
+runners. This changes request granularity only; the source count must still
+equal the fetched row count before the cache is accepted.
+
 An HPD record is a confirmed housing-code violation observation; it is not evidence of which contractor currently services the property.
 
 ## DOB evidence boundary

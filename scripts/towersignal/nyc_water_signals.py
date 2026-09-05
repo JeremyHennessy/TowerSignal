@@ -23,6 +23,7 @@ DOB_APPROVED_PERMITS_DATASET_ID = "rbx6-tga4"
 LL84_DATASET_ID = "5zyy-y8am"
 NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
+HPD_MAX_PAGE_SIZE = 10000
 
 NYC_311_WHERE = (
     "agency='DEP' AND created_date >= '2025-01-01T00:00:00.000' AND ("
@@ -366,7 +367,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
         where=HPD_WATER_WHERE,
         select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
-        page_size=page_size,
+        page_size=min(page_size, HPD_MAX_PAGE_SIZE),
     )
     job_snapshot = fetch_snapshot(
         DOB_JOB_FILINGS_DATASET_ID, api_root=NYC_API_ROOT, order_by="job_filing_number",
