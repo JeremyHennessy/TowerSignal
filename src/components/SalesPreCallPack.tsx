@@ -28,7 +28,7 @@ function statusFor(row: SystemSummary): { label: string; tone: SalesTone } {
 function primaryTimingCue(row: SystemSummary, detail: SalesDetail): string {
   const confirmed = detail.signals.find(signal => signal.evidence_confidence === 'CONFIRMED')
   const signal = confirmed ?? detail.signals[0]
-  if (signal) return signal.title
+  if (signal) return `Current signal · ${signal.title}`
   if ((row.dob_recent_activity_count ?? 0) > 0) return 'Recent DOB project activity'
   if ((detail.acris_activity?.recent_document_count ?? 0) > 0) return 'Recent ACRIS property activity'
   return 'Account scale / routine research'
