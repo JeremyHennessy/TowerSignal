@@ -245,7 +245,7 @@ export function WorkflowWorkspacePage({
 
   return <section className="product-page workflow-workspace-page">
     <div className="product-page-heading workflow-page-heading">
-      <div><span className="page-kicker">New York City · private command workspace</span><h1>Workflow <span className="private-chip">Private</span></h1><p>Turn public-source intelligence into a usable operating queue. Private notes, status, watchlists and next actions remain separate from the source-backed evidence that explains why an account matters.</p></div>
+      <div><span className="page-kicker">New York City · private command workspace</span><h1 aria-label="Workflow workspace">Workflow <span className="private-chip">Private</span></h1><p>Turn public-source intelligence into a usable operating queue. Private notes, status, watchlists and next actions remain separate from the source-backed evidence that explains why an account matters.</p></div>
       <div className="page-actions"><ShareButton label="Share public page link" /></div>
     </div>
 
