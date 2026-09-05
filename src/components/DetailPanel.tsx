@@ -7,6 +7,7 @@ import type { ChangeEvent } from '../types/history'
 import { StatusBadge } from './StatusBadge'
 import { AcrisActivitySection } from './AcrisActivitySection'
 import { PlanimetricTowerSection } from './PlanimetricTowerSection'
+import { TechnicianFieldPack } from './TechnicianFieldPack'
 
 const money = (value: number | null) => value == null ? '—' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
 const number = (value: number | null) => value == null ? '—' : new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(value)
@@ -37,6 +38,7 @@ export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, wo
     {error && <div className="error-state">{error}</div>}
     {!detail && !error && <div className="loading-state">Loading source-backed details…</div>}
     {detail && <>
+      <TechnicianFieldPack row={row} detail={detail} />
       <section><h3>Identity</h3><dl className="identity-grid"><div><dt>BIN</dt><dd>{detail.identity.bin ?? '—'}</dd></div><div><dt>BBL</dt><dd>{detail.identity.bbl ?? '—'}</dd></div><div><dt>Active equipment</dt><dd>{detail.identity.active_equipment}</dd></div><div><dt>Coordinates</dt><dd>{detail.identity.coordinate_status === 'VALID' && detail.identity.latitude != null && detail.identity.longitude != null ? `${detail.identity.latitude.toFixed(4)}, ${detail.identity.longitude.toFixed(4)}` : detail.identity.coordinate_status === 'INVALID_SOURCE' ? `Unusable source coordinates (${detail.identity.source_latitude_raw ?? 'blank'}, ${detail.identity.source_longitude_raw ?? 'blank'})` : 'Not published'}</dd></div></dl></section>
       <PlanimetricTowerSection detail={detail} />
       <section><h3>Building context</h3>{!detail.building_context ? <div className="empty-inline">No exact BBL match was returned from NYC DCP PLUTO for this system.</div> : <><dl className="identity-grid"><div><dt>PLUTO owner</dt><dd>{detail.building_context.owner_name ?? '—'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '—'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '—'}</dd></div><div><dt>Year built</dt><dd>{detail.building_context.year_built || '—'}</dd></div><div><dt>Building area</dt><dd>{number(detail.building_context.building_area_sqft)} sq ft</dd></div><div><dt>Lot area</dt><dd>{number(detail.building_context.lot_area_sqft)} sq ft</dd></div><div><dt>Floors</dt><dd>{number(detail.building_context.floors)}</dd></div><div><dt>Total units</dt><dd>{detail.building_context.total_units ?? '—'}</dd></div></dl><p className="microcopy">Context from NYC Department of City Planning PLUTO, joined by exact BBL. These property attributes do not affect TowerSignal's priority score or cooling-tower compliance signals.</p></>}</section>

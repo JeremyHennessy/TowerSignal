@@ -27,6 +27,10 @@ const detail: SystemDetail = {
 
 test('lead summary includes loaded PLUTO and HPD context with sourcing caveat', () => {
   const text = leadSummary(row, metadata, detail)
+  expect(text).toContain('Technician field pack')
+  expect(text).toContain('Physical roof evidence: 0 mapped 2022 cooling-tower footprint(s); 0 building footprint(s); 0 mapped rooftop drinking-water tank footprint(s)')
+  expect(text).toContain('Schematics/mechanical drawings: Not in current public payload')
+  expect(text).toContain('Field observations such as operator labels, controller model, basin condition, photos and access blockers should remain private workflow notes until source-backed.')
   expect(text).toContain('PLUTO owner: ALPHA OWNER LLC')
   expect(text).toContain('ManagingAgent: ALPHA MANAGEMENT LLC')
   expect(text).toContain('person JANE DOE')
