@@ -6,6 +6,8 @@ export interface WorkflowUser {
   id: string
   email: string
   name: string | null
+  workflow_sync_mode?: 'remote' | 'local'
+  workflow_sync_warning?: string | null
 }
 
 export interface WorkflowSavedView {
