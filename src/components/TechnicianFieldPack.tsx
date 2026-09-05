@@ -105,57 +105,57 @@ export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detai
   return <>
     <SalesPreCallPack row={row} detail={detail} />
     <div className="technician-field-pack" aria-labelledby="technician-field-pack-title">
-      <div className="field-pack-header">
-        <div>
-          <span className="eyebrow">Technician field pack</span>
-          <h3 id="technician-field-pack-title">Pre-visit field pack</h3>
-          <p>Source-backed dispatch context for access planning, roof verification and service conversation prep.</p>
-        </div>
-        <span className={`field-pack-status field-pack-status-${status.tone}`}>{status.label}</span>
+    <div className="field-pack-header">
+      <div>
+        <span className="eyebrow">Technician field pack</span>
+        <h3 id="technician-field-pack-title">Pre-visit field pack</h3>
+        <p>Source-backed dispatch context for access planning, roof verification and service conversation prep.</p>
       </div>
-
-      <div className="field-pack-metrics" aria-label="Field pack metrics">
-        <article><small>Latest public sample</small><strong>{sampleLabel(row)}</strong></article>
-        <article><small>NYC Health inspection</small><strong>{row.latest_inspection_date ? `${formatDate(row.latest_inspection_date)}${row.confirmed_violation ? ' with violation evidence' : ''}` : 'No joined inspection'}</strong></article>
-        <article><small>Physical roof evidence</small><strong>{plural(towers.length, 'tower footprint')}; {plural(footprints.length, 'building outline')}</strong></article>
-        <article><small>Contacts and access cues</small><strong>{contacts.length ? plural(contacts.length, 'HPD contact') : 'No public HPD contact'}</strong></article>
-      </div>
-
-      <div className="field-pack-checklists">
-        <div>
-          <h4>Before dispatch</h4>
-          <ul>
-            <li><strong>Confirm identity:</strong> {display(row.address)}; System {row.system_id}; BIN {display(row.bin)}; BBL {display(row.bbl)}.</li>
-            <li><strong>Confirm access:</strong> {contacts.length ? `${contacts[0]?.corporation_name ?? contacts[0]?.person_name ?? 'HPD contact'} is published as a contact cue.` : 'No public access contact is matched; verify owner or manager route before sending a technician.'}</li>
-            <li><strong>Review compliance context:</strong> sample {sampleLabel(row)}; {row.oath_case_count ? `${plural(row.oath_case_count, 'exact-matched OATH case')}.` : 'no exact-matched OATH case.'}</li>
-            <li><strong>Check project timing:</strong> {latestDobLabel(detail)}.</li>
-          </ul>
-        </div>
-        <div>
-          <h4>On roof / site</h4>
-          <ul>
-            <li><strong>Verify equipment count:</strong> {row.active_equipment.toLocaleString()} active unit{row.active_equipment === 1 ? '' : 's'} in registration; {plural(towers.length, 'mapped tower footprint')} in the 2022 planimetric layer.</li>
-            <li><strong>Confirm tower location:</strong> {roofLevel.toLocaleString()} roof-level footprint{roofLevel === 1 ? '' : 's'}; {groundLevel.toLocaleString()} ground-level footprint{groundLevel === 1 ? '' : 's'}; map evidence is below when available.</li>
-            <li><strong>Check adjacent water assets:</strong> {domesticTanks ? `${plural(domesticTanks, 'mapped rooftop drinking-water tank')} on this BIN.` : 'no mapped rooftop drinking-water tank represented for this BIN.'}</li>
-            <li><strong>Capture private field notes:</strong> current operator label, controller/service tags, make/model, basin condition, access blockers and photos should stay in workflow notes until source-backed.</li>
-          </ul>
-        </div>
-      </div>
-
-      {mappedMismatch && <div className="field-pack-alert"><strong>Field verification cue:</strong> Registered active equipment count and mapped footprint count differ. This may reflect multi-system buildings, 2022 imagery vintage, source coding or current configuration changes.</div>}
-
-      <details className="field-pack-source-details">
-        <summary>Public inputs available for this field pack</summary>
-        <div className="field-pack-source-grid">
-          {items.map(item => <article key={item.label} className={`field-pack-source field-pack-source-${item.tone}`}>
-            <span>{item.label}</span>
-            <strong>{item.value}</strong>
-            <small>{item.detail}</small>
-          </article>)}
-        </div>
-      </details>
-
-      <p className="microcopy">This pack is a dispatch aid only. It separates public evidence from field observations and does not assert current operating status, service responsibility, safety status, compliance or roof access.</p>
+      <span className={`field-pack-status field-pack-status-${status.tone}`}>{status.label}</span>
     </div>
+
+    <div className="field-pack-metrics" aria-label="Field pack metrics">
+      <article><small>Latest public sample</small><strong>{sampleLabel(row)}</strong></article>
+      <article><small>NYC Health inspection</small><strong>{row.latest_inspection_date ? `${formatDate(row.latest_inspection_date)}${row.confirmed_violation ? ' with violation evidence' : ''}` : 'No joined inspection'}</strong></article>
+      <article><small>Physical roof evidence</small><strong>{plural(towers.length, 'tower footprint')}; {plural(footprints.length, 'building outline')}</strong></article>
+      <article><small>Contacts and access cues</small><strong>{contacts.length ? plural(contacts.length, 'HPD contact') : 'No public HPD contact'}</strong></article>
+    </div>
+
+    <div className="field-pack-checklists">
+      <div>
+        <h4>Before dispatch</h4>
+        <ul>
+          <li><strong>Confirm identity:</strong> {display(row.address)}; System {row.system_id}; BIN {display(row.bin)}; BBL {display(row.bbl)}.</li>
+          <li><strong>Confirm access:</strong> {contacts.length ? `${contacts[0]?.corporation_name ?? contacts[0]?.person_name ?? 'HPD contact'} is published as a contact cue.` : 'No public access contact is matched; verify owner or manager route before sending a technician.'}</li>
+          <li><strong>Review compliance context:</strong> sample {sampleLabel(row)}; {row.oath_case_count ? `${plural(row.oath_case_count, 'exact-matched OATH case')}.` : 'no exact-matched OATH case.'}</li>
+          <li><strong>Check project timing:</strong> {latestDobLabel(detail)}.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>On roof / site</h4>
+        <ul>
+          <li><strong>Verify equipment count:</strong> {row.active_equipment.toLocaleString()} active unit{row.active_equipment === 1 ? '' : 's'} in registration; {plural(towers.length, 'mapped tower footprint')} in the 2022 planimetric layer.</li>
+          <li><strong>Confirm tower location:</strong> {roofLevel.toLocaleString()} roof-level footprint{roofLevel === 1 ? '' : 's'}; {groundLevel.toLocaleString()} ground-level footprint{groundLevel === 1 ? '' : 's'}; map evidence is below when available.</li>
+          <li><strong>Check adjacent water assets:</strong> {domesticTanks ? `${plural(domesticTanks, 'mapped rooftop drinking-water tank')} on this BIN.` : 'no mapped rooftop drinking-water tank represented for this BIN.'}</li>
+          <li><strong>Capture private field notes:</strong> current operator label, controller/service tags, make/model, basin condition, access blockers and photos should stay in workflow notes until source-backed.</li>
+        </ul>
+      </div>
+    </div>
+
+    {mappedMismatch && <div className="field-pack-alert"><strong>Field verification cue:</strong> Registered active equipment count and mapped footprint count differ. This may reflect multi-system buildings, 2022 imagery vintage, source coding or current configuration changes.</div>}
+
+    <details className="field-pack-source-details">
+      <summary>Public inputs available for this field pack</summary>
+      <div className="field-pack-source-grid">
+        {items.map(item => <article key={item.label} className={`field-pack-source field-pack-source-${item.tone}`}>
+          <span>{item.label}</span>
+          <strong>{item.value}</strong>
+          <small>{item.detail}</small>
+        </article>)}
+      </div>
+    </details>
+
+    <p className="microcopy">This pack is a dispatch aid only. It separates public evidence from field observations and does not assert current operating status, service responsibility, safety status, compliance or roof access.</p>
+  </div>
   </>
 }
