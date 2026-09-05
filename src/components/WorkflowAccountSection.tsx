@@ -11,6 +11,7 @@ const STATUS_OPTIONS: Array<{ value: AccountDisposition; label: string }> = [
 ]
 
 const DEFAULT_ACCOUNT: WorkflowAccountPatch = { status: 'new', note: '', next_action_date: null }
+type SaveState = 'synced' | 'session-only' | null
 
 export function WorkflowAccountSection({
   signedIn,
@@ -26,34 +27,42 @@ export function WorkflowAccountSection({
   watchlists: WorkflowWatchlist[]
   membershipIds: Set<string>
   busy: boolean
-  onSave: (patch: WorkflowAccountPatch) => Promise<void>
+  onSave: (patch: WorkflowAccountPatch) => Promise<'synced' | 'session-only'>
   onToggleMembership: (watchlistId: string, enabled: boolean) => Promise<void>
 }) {
   const [draft, setDraft] = useState<WorkflowAccountPatch>(DEFAULT_ACCOUNT)
-  const [saved, setSaved] = useState(false)
+  const [saveState, setSaveState] = useState<SaveState>(null)
 
   useEffect(() => {
     setDraft(account ? { status: account.status, note: account.note, next_action_date: account.next_action_date } : DEFAULT_ACCOUNT)
-    setSaved(false)
   }, [account])
+
+  useEffect(() => {
+    if (!saveState) return
+    const timer = window.setTimeout(() => setSaveState(null), 4000)
+    return () => window.clearTimeout(timer)
+  }, [saveState])
 
   if (!signedIn) return <section className="workflow-account-section"><div className="workflow-section-heading"><span className="eyebrow">User workflow</span><h3>Account workflow</h3></div><p>Sign in with <strong>Sync workflow</strong> to keep watchlists, disposition, notes and next actions across sessions and devices.</p><p className="microcopy">Workflow state is private user-entered context and is never treated as public-source evidence or scoring input.</p></section>
 
+  const markEdited = () => setSaveState(null)
+
   const save = async () => {
-    setSaved(false)
-    await onSave(draft)
-    setSaved(true)
+    setSaveState(null)
+    const result = await onSave(draft)
+    setSaveState(result)
   }
 
   return <section className="workflow-account-section">
-    <div className="workflow-section-heading"><div><span className="eyebrow">User workflow</span><h3>Account workflow</h3></div>{saved && <span className="workflow-saved">Saved</span>}</div>
+    <div className="workflow-section-heading"><div><span className="eyebrow">User workflow</span><h3>Account workflow</h3></div>{saveState && <span className={`workflow-saved ${saveState === 'session-only' ? 'workflow-saved-session' : ''}`}><span>Saved</span>{saveState === 'session-only' && <small>Session only</small>}</span>}</div>
     <div className="workflow-account-grid">
-      <label>Status<select value={draft.status} onChange={event => setDraft(current => ({ ...current, status: event.target.value as AccountDisposition }))}>{STATUS_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
-      <label>Next action<input type="date" value={draft.next_action_date ?? ''} onChange={event => setDraft(current => ({ ...current, next_action_date: event.target.value || null }))} /></label>
+      <label>Status<select value={draft.status} onChange={event => { markEdited(); setDraft(current => ({ ...current, status: event.target.value as AccountDisposition })) }}>{STATUS_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+      <label>Next action<input type="date" value={draft.next_action_date ?? ''} onChange={event => { markEdited(); setDraft(current => ({ ...current, next_action_date: event.target.value || null })) }} /></label>
     </div>
-    <label className="workflow-note">Private note<textarea value={draft.note} onChange={event => setDraft(current => ({ ...current, note: event.target.value }))} placeholder="Commercial context, contact outcome, follow-up detail…" rows={4} /></label>
-    <div className="workflow-watchlist-picker"><strong>Watchlists</strong>{watchlists.map(watchlist => <label key={watchlist.id}><input type="checkbox" checked={membershipIds.has(watchlist.id)} disabled={busy} onChange={event => void onToggleMembership(watchlist.id, event.target.checked)} />{watchlist.name}</label>)}</div>
+    <label className="workflow-note">Private note<textarea value={draft.note} onChange={event => { markEdited(); setDraft(current => ({ ...current, note: event.target.value })) }} placeholder="Commercial context, contact outcome, follow-up detail…" rows={4} /></label>
+    <div className="workflow-watchlist-picker"><strong>Watchlists</strong>{watchlists.map(watchlist => <label key={watchlist.id}><input type="checkbox" checked={membershipIds.has(watchlist.id)} disabled={busy} onChange={event => { markEdited(); void onToggleMembership(watchlist.id, event.target.checked) }} />{watchlist.name}</label>)}</div>
     <button className="primary workflow-save" disabled={busy} onClick={() => void save()}>{busy ? 'Saving…' : 'Save workflow state'}</button>
+    {saveState === 'session-only' && <p className="workflow-session-note"><strong>Saved in this tab.</strong> Cross-device sync could not be confirmed in this browser session. Keep this tab open if you need the private note or next action before sync is restored.</p>}
     <p className="microcopy">Disposition, notes, next-action dates and watchlist membership are user-entered commercial workflow state. They do not alter Priority Score 1.0 or any source-backed evidence.</p>
   </section>
 }

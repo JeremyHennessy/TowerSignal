@@ -59,6 +59,17 @@ test('hydrates signed-in private workflow state without changing public filters'
   expect(result.current.watchlistIdsBySystemId.get('SYS-1')?.has('default')).toBe(true)
 })
 
+test('keeps authenticated workflow controls available when remote hydration is blocked', async () => {
+  remote.loadWorkflowSnapshot.mockRejectedValueOnce(new Error('AuthRequired'))
+
+  const { result } = renderHook(() => useWorkflow())
+  await waitFor(() => expect(result.current.loading).toBe(false))
+
+  expect(result.current.user?.email).toBe('sales@example.test')
+  expect(result.current.error).toContain('AuthRequired')
+  expect(result.current.accounts).toEqual([])
+})
+
 test('migrates existing browser-local saved views when first signing into an empty remote workspace', async () => {
   const localView = { id: 'local-1', name: 'Queens follow-up', filters: { ...initialFilters, borough: 'Queens' } }
   window.localStorage.setItem('towersignal.savedViews.v1', JSON.stringify([localView]))
@@ -124,11 +135,32 @@ test('keeps signed-in saved-view changes private from the signed-out local fallb
 test('saves private account disposition without treating it as source evidence', async () => {
   const { result } = renderHook(() => useWorkflow())
   await waitFor(() => expect(result.current.loading).toBe(false))
+  let saveResult: 'synced' | 'session-only' | undefined
   await act(async () => {
-    await result.current.saveAccount('SYS-2', { status: 'follow-up', note: 'Asked for proposal timing', next_action_date: '2026-09-15' })
+    saveResult = await result.current.saveAccount('SYS-2', { status: 'follow-up', note: 'Asked for proposal timing', next_action_date: '2026-09-15' })
   })
+  expect(saveResult).toBe('synced')
   expect(remote.saveRemoteAccount).toHaveBeenCalledWith('SYS-2', { status: 'follow-up', note: 'Asked for proposal timing', next_action_date: '2026-09-15' })
   expect(result.current.accountBySystemId.get('SYS-2')?.status).toBe('follow-up')
+})
+
+test('keeps account workflow usable in the current tab when Safari-style remote sync fails', async () => {
+  const { result } = renderHook(() => useWorkflow())
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  remote.saveRemoteAccount.mockRejectedValueOnce(new Error('AuthRequired'))
+
+  let saveResult: 'synced' | 'session-only' | undefined
+  await act(async () => {
+    saveResult = await result.current.saveAccount('SYS-IOS', { status: 'investigate', note: 'Review roof access', next_action_date: '2026-09-05' })
+  })
+
+  expect(saveResult).toBe('session-only')
+  expect(result.current.accountBySystemId.get('SYS-IOS')).toEqual(expect.objectContaining({
+    status: 'investigate',
+    note: 'Review roof access',
+    next_action_date: '2026-09-05',
+  }))
+  expect(result.current.error).toContain('available in this tab only')
 })
 
 test('first watchlist membership does not synthesize local account state that can overwrite an unsaved draft', async () => {
@@ -161,7 +193,7 @@ test('includes an annotated non-watchlisted account in CRM workflow export', () 
 })
 
 test('labels account workflow as user-entered private context', () => {
-  render(<WorkflowAccountSection signedIn={false} account={undefined} watchlists={[]} membershipIds={new Set()} busy={false} onSave={vi.fn()} onToggleMembership={vi.fn()} />)
+  render(<WorkflowAccountSection signedIn={false} account={undefined} watchlists={[]} membershipIds={new Set()} busy={false} onSave={vi.fn().mockResolvedValue('synced')} onToggleMembership={vi.fn()} />)
   expect(screen.getByText('User workflow')).toBeInTheDocument()
   expect(screen.getByText(/never treated as public-source evidence or scoring input/i)).toBeInTheDocument()
 })
