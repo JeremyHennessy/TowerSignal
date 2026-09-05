@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures'
-import { expectContained, expectDomText, expectHeading, expectSectionText, isIphoneProject } from './iphone.helpers'
+import { expectAccountDetailHydrated, expectContained, expectDomText, expectHeading, expectSectionText, isIphoneProject } from './iphone.helpers'
 
 const requireAcris = process.env.REQUIRE_ACRIS === 'true'
 
@@ -45,6 +45,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
     await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
     await page.locator('.account-table tbody tr').first().click()
+    if (isIphone) await expectAccountDetailHydrated(page)
     await expectSectionText(page, testInfo, 'ACRIS property activity', [
       'relevant recorded document',
       'ACRIS is joined by exact borough/block/lot BBL and exact document ID only',
@@ -78,6 +79,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
   await page.locator('.account-table tbody tr').first().click()
   if (isIphone) {
+    await expectAccountDetailHydrated(page)
     await expectDomText(page, [
       'Selected system',
       'Identity',
