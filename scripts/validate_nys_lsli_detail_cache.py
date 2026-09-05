@@ -20,7 +20,7 @@ MAX_EXPLICIT_UNAVAILABLE_404 = 25
 
 def validate(path: Path, *, max_age_days: int, require_production_volume: bool) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema_version") != "1.1" or payload.get("domain") != "NYS_LEAD_SERVICE_LINE_INVENTORY_DETAILS":
+    if payload.get("schema_version") != "1.2" or payload.get("domain") != "NYS_LEAD_SERVICE_LINE_INVENTORY_DETAILS":
         raise RuntimeError("Unexpected LSLI detail cache schema/domain")
     generated = datetime.fromisoformat(str(payload.get("generated_at") or "").replace("Z", "+00:00"))
     age_days = (datetime.now(timezone.utc) - generated).total_seconds() / 86400
@@ -52,6 +52,7 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     pws_ids: set[str] = set()
     total_service_lines = 0
     with_contact = 0
+    derived_identified_count = 0
     for row in details:
         pws_id = str(row.get("pws_id") or "")
         if not PWS_RE.fullmatch(pws_id) or pws_id in pws_ids:
@@ -66,8 +67,10 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
             raise RuntimeError(f"LSLI detail source hash missing: {pws_id}")
 
         inventory = row.get("inventory")
-        if not isinstance(inventory, dict):
-            raise RuntimeError(f"LSLI inventory missing: {pws_id}")
+        source_reported = row.get("source_reported_inventory")
+        evidence = row.get("inventory_evidence")
+        if not isinstance(inventory, dict) or not isinstance(source_reported, dict) or not isinstance(evidence, dict):
+            raise RuntimeError(f"LSLI inventory/evidence objects missing: {pws_id}")
         values = {
             key: int(inventory[key])
             for key in (
@@ -81,14 +84,35 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         }
         if any(value < 0 for value in values.values()):
             raise RuntimeError(f"Negative LSLI inventory count: {pws_id}")
-        if values["identified_service_lines"] != (
+        derived = (
             values["lead_service_lines"]
             + values["gslrr_service_lines"]
             + values["non_lead_service_lines"]
-        ):
+        )
+        if values["identified_service_lines"] != derived:
             raise RuntimeError(f"LSLI identified-line reconciliation failed: {pws_id}")
         if values["total_service_lines"] != values["identified_service_lines"] + values["unknown_service_lines"]:
             raise RuntimeError(f"LSLI total-line reconciliation failed: {pws_id}")
+
+        identified_evidence = evidence.get("identified_service_lines")
+        source_identified = source_reported.get("identified_service_lines")
+        if source_identified is None:
+            if identified_evidence != "DERIVED_FROM_SOURCE_COMPONENT_COUNTS":
+                raise RuntimeError(f"Missing source identified count was not explicitly derived: {pws_id}")
+            derived_identified_count += 1
+        else:
+            if identified_evidence != "SOURCE_REPORTED" or int(source_identified) != values["identified_service_lines"]:
+                raise RuntimeError(f"Source-reported identified count evidence mismatch: {pws_id}")
+
+        for field in (
+            "total_service_lines",
+            "lead_service_lines",
+            "gslrr_service_lines",
+            "non_lead_service_lines",
+            "unknown_service_lines",
+        ):
+            if source_reported.get(field) is None or int(source_reported[field]) != values[field]:
+                raise RuntimeError(f"Required source inventory field lost or altered: {pws_id} {field}")
         total_service_lines += values["total_service_lines"]
 
         contact = row.get("owner_or_operator_form_contact")
@@ -117,12 +141,21 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
             raise RuntimeError(f"Unavailable LSLI detail URL mismatch: {pws_id}")
         if not row.get("source_error") or "404" not in str(row.get("source_error")):
             raise RuntimeError(f"Unavailable LSLI detail lacks 404 source evidence: {pws_id}")
-        forbidden = {"inventory", "material_matrix", "identification_methods", "owner_or_operator_form_contact"}
+        forbidden = {
+            "inventory",
+            "source_reported_inventory",
+            "inventory_evidence",
+            "material_matrix",
+            "identification_methods",
+            "owner_or_operator_form_contact",
+        }
         if any(field in row for field in forbidden):
             raise RuntimeError(f"Unavailable LSLI detail contains inferred fields: {pws_id}")
 
     if len(pws_ids) != index_count:
         raise RuntimeError("LSLI PWS identity coverage does not equal current index")
+    if int(summary.get("details_with_derived_identified_count") or 0) != derived_identified_count:
+        raise RuntimeError("LSLI derived-identified summary mismatch")
     if int(summary.get("details_with_form_contact") or 0) != with_contact:
         raise RuntimeError("LSLI contact summary mismatch")
     if int(summary.get("source_reported_total_service_lines_sum") or -1) != total_service_lines:
