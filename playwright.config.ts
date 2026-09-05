@@ -1,6 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:4173/TowerSignal/'
+const authStateDir = 'test-results/.auth'
+const desktopAuthState = process.env.CI ? { storageState: `${authStateDir}/desktop.json` } : {}
+const iphoneAuthState = process.env.CI ? { storageState: `${authStateDir}/iphone.json` } : {}
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -21,7 +24,7 @@ export default defineConfig({
       name: 'desktop-chromium',
       testIgnore: /auth\.setup\.ts/,
       dependencies: ['setup-desktop'],
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], ...desktopAuthState },
     },
     {
       name: 'setup-iphone',
@@ -32,7 +35,7 @@ export default defineConfig({
       name: 'iphone',
       testIgnore: /auth\.setup\.ts/,
       dependencies: ['setup-iphone'],
-      use: { ...devices['iPhone 13'] },
+      use: { ...devices['iPhone 13'], ...iphoneAuthState },
     },
   ],
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],

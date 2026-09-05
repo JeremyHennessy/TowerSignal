@@ -25,10 +25,10 @@ export async function expectElementContained(page: Page, selector: string): Prom
 export async function expectDomText(page: Page, snippets: string[], selector = 'body'): Promise<void> {
   await expect.poll(async () => {
     return page.evaluate(({ selector, snippets }) => {
-      const text = document.querySelector(selector)?.textContent ?? ''
-      return snippets.every(snippet => text.includes(snippet))
+      const text = [...document.querySelectorAll(selector)].map(element => element.textContent ?? '').join('\n')
+      return snippets.filter(snippet => !text.includes(snippet))
     }, { selector, snippets })
-  }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(true)
+  }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toEqual([])
 }
 
 export async function expectDomCount(page: Page, selector: string, count: number): Promise<void> {
@@ -39,10 +39,10 @@ export async function expectDomCount(page: Page, selector: string, count: number
 
 export async function expectDomAttribute(page: Page, selector: string, name: string, value: RegExp | string): Promise<void> {
   await expect.poll(async () => {
-    const attribute = await page.evaluate(({ selector, name }) => {
-      return document.querySelector(selector)?.getAttribute(name) ?? ''
+    const attributes = await page.evaluate(({ selector, name }) => {
+      return [...document.querySelectorAll(selector)].map(element => element.getAttribute(name) ?? '')
     }, { selector, name })
-    return typeof value === 'string' ? attribute.includes(value) : value.test(attribute)
+    return attributes.some(attribute => typeof value === 'string' ? attribute.includes(value) : value.test(attribute))
   }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(true)
 }
 
@@ -67,11 +67,12 @@ export async function expectSectionText(page: Page, testInfo: ProjectInfo, headi
   if (isIphoneProject(testInfo)) {
     await expect.poll(async () => {
       return page.evaluate(({ selector, headingName, snippets }) => {
-        const heading = [...document.querySelectorAll(selector)].find(element => element.textContent?.trim() === headingName)
-        const sectionText = heading?.closest('section')?.textContent ?? ''
-        return snippets.every(snippet => sectionText.includes(snippet))
+        const sectionTexts = [...document.querySelectorAll(selector)]
+          .filter(element => element.textContent?.trim() === headingName)
+          .map(element => element.closest('section')?.textContent ?? '')
+        return snippets.filter(snippet => !sectionTexts.some(text => text.includes(snippet)))
       }, { selector: HEADING_SELECTOR, headingName, snippets })
-    }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(true)
+    }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toEqual([])
     return null
   }
 
