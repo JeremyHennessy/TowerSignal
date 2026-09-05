@@ -5,6 +5,7 @@ import {
   expectAccountDetailHydrated,
   expectContained,
   expectDomAttribute,
+  expectDomCount,
   expectDomText,
   expectElementContained,
   isIphoneProject,
@@ -32,7 +33,7 @@ test('workflow command center groups current intelligence and one future-evidenc
   await signInForProject(page, testInfo.project.name, '#/account/2000015564')
   const workflowAccount = page.locator('section.workflow-account-section')
   if (isIphone) {
-    await expect(workflowAccount).toHaveCount(1)
+    await expectDomCount(page, 'section.workflow-account-section', 1)
     await expectAccountDetailHydrated(page)
   } else {
     await expect(workflowAccount).toBeVisible()

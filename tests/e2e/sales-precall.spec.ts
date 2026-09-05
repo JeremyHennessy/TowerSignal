@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { submitSignIn } from './auth.helpers'
-import { expectAccountDetailHydrated, expectDomAttribute, expectDomText, expectElementContained, isIphoneProject } from './iphone.helpers'
+import { signInForProject } from './auth.helpers'
+import { expectAccountDetailHydrated, expectDomAttribute, expectDomCount, expectDomText, expectElementContained, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
@@ -18,9 +18,7 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  await page.goto('./#/account/2000012577', { waitUntil: 'networkidle' })
-  await expect(page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })).toBeVisible()
-  await submitSignIn(page, testInfo.project.name)
+  await signInForProject(page, testInfo.project.name, '#/account/2000012577')
   await expect(page).toHaveURL(/#\/account\/2000012577$/)
 
   const isIphone = isIphoneProject(testInfo)
@@ -29,6 +27,8 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
   const sales = page.locator('.sales-precall-pack')
   const technician = page.locator('.technician-field-pack')
   if (isIphone) {
+    await expectDomCount(page, '.sales-precall-pack', 1)
+    await expectDomCount(page, '.technician-field-pack', 1)
     await expectDomText(page, [
       'Pre-call sales brief',
       'Why call now',

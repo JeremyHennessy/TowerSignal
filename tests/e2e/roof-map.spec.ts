@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { submitSignIn } from './auth.helpers'
+import { signInForProject } from './auth.helpers'
 import { expectAccountDetailHydrated, expectContained, expectDomAttribute, expectDomCount, expectElementContained, expectSectionText, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
@@ -20,16 +20,13 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  await page.goto('./#/account/2000015564', { waitUntil: 'networkidle' })
-  const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
-  await expect(loginHeading).toBeVisible()
-  await submitSignIn(page, testInfo.project.name)
+  await signInForProject(page, testInfo.project.name, '#/account/2000015564')
   await expect(page).toHaveURL(/#\/account\/2000015564$/)
 
   const section = page.locator('section.planimetric-section')
   if (isIphone) {
     await expectAccountDetailHydrated(page)
-    await expect(section).toHaveCount(1)
+    await expectDomCount(page, 'section.planimetric-section', 1)
     await expectSectionText(page, testInfo, 'Physical tower location', [
       '1 mapped cooling-tower footprint · 1 building outline',
       '1 roof level · 0 ground level · cooling-tower classification is source-coded by NYC OTI',
@@ -76,7 +73,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
 
   const domestic = page.locator('section.domestic-water-section')
   if (isIphone) {
-    await expect(domestic).toHaveCount(1)
+    await expectDomCount(page, 'section.domestic-water-section', 1)
     await expectSectionText(page, testInfo, 'Domestic water context', [
       '2022 rooftop drinking-water tank polygons · 1',
       'Roof level',
@@ -102,8 +99,8 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
   await page.waitForTimeout(750)
   if (isIphone) {
-    await expect(section).toHaveCount(1)
-    await expect(domestic).toHaveCount(1)
+    await expectDomCount(page, 'section.planimetric-section', 1)
+    await expectDomCount(page, 'section.domestic-water-section', 1)
   } else {
     await expect(section).toBeVisible()
     await expect(domestic).toBeVisible()
