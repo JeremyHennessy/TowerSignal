@@ -15,7 +15,6 @@ from towersignal.nyc_water_signals import (  # noqa: E402
     DOB_APPROVED_PERMITS_DATASET_ID,
     DOB_JOB_FILINGS_DATASET_ID,
     HPD_MAX_PAGE_SIZE,
-    HPD_OPEN_WHERE,
     HPD_VIOLATIONS_DATASET_ID,
     HPD_WATER_TERMS,
     LL84_DATASET_ID,
@@ -98,8 +97,9 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertIsNone(multi["property_key"])
         self.assertEqual(multi["bbls"], ["1000010001", "1000020002"])
 
-    def test_build_payload_fetches_open_hpd_once_and_filters_water_terms_locally(self) -> None:
+    def test_build_payload_uses_uppercase_hpd_keyword_partitions(self) -> None:
         calls: list[tuple[str, int]] = []
+        hpd_wheres: list[str] = []
         hpd_row = {
             "violationid": "123",
             "buildingid": "456",
@@ -118,13 +118,15 @@ class NycWaterSignalsTests(unittest.TestCase):
             "bin": "1000001",
             "bbl": "1000010001",
         }
-        non_water_hpd_row = dict(hpd_row, violationid="124", novdescription="PAINT PEELING")
 
         def fake_fetch_snapshot(dataset_id: str, **kwargs):
             calls.append((dataset_id, int(kwargs["page_size"])))
             if dataset_id == HPD_VIOLATIONS_DATASET_ID:
-                self.assertEqual(kwargs.get("where"), HPD_OPEN_WHERE)
-                rows = [hpd_row, dict(hpd_row), non_water_hpd_row]
+                where = str(kwargs.get("where") or "")
+                hpd_wheres.append(where)
+                self.assertNotIn("lower(", where)
+                self.assertRegex(where, r"novdescription like '%[A-Z ]+%'")
+                rows = [hpd_row]
             else:
                 rows = []
             return SourceSnapshot(
@@ -143,10 +145,13 @@ class NycWaterSignalsTests(unittest.TestCase):
             payload = build_payload(page_size=50000)
 
         self.assertEqual(payload["summary"]["hpd_open_water_violation_count"], 1)
-        self.assertEqual(payload["summary"]["hpd_source_fetch_strategy"], "OPEN_VIOLATIONS_LOCAL_TERM_FILTER")
-        self.assertEqual(payload["summary"]["hpd_source_partition_count"], 1)
-        self.assertEqual(payload["summary"]["hpd_source_partition_record_count"], 3)
-        self.assertEqual(payload["summary"]["hpd_duplicate_partition_violation_count"], 1)
+        self.assertEqual(payload["summary"]["hpd_source_fetch_strategy"], "UPPERCASE_KEYWORD_PARTITIONS")
+        self.assertEqual(payload["summary"]["hpd_source_partition_count"], len(HPD_WATER_TERMS))
+        self.assertEqual(payload["summary"]["hpd_source_partition_record_count"], len(HPD_WATER_TERMS))
+        self.assertEqual(
+            payload["summary"]["hpd_duplicate_partition_violation_count"],
+            len(HPD_WATER_TERMS) - 1,
+        )
         page_sizes = dict(calls)
         self.assertEqual(page_sizes[NYC_311_DATASET_ID], 50000)
         self.assertEqual(page_sizes[HPD_VIOLATIONS_DATASET_ID], HPD_MAX_PAGE_SIZE)
@@ -154,8 +159,9 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(page_sizes[DOB_APPROVED_PERMITS_DATASET_ID], 50000)
         self.assertEqual(page_sizes[LL84_DATASET_ID], 50000)
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
-        self.assertEqual(len(hpd_calls), 1)
-        self.assertLessEqual(HPD_MAX_PAGE_SIZE, 25000)
+        self.assertEqual(len(hpd_calls), len(HPD_WATER_TERMS))
+        self.assertEqual(len(hpd_wheres), len(HPD_WATER_TERMS))
+        self.assertLessEqual(HPD_MAX_PAGE_SIZE, 5000)
 
     def test_snapshot_reduces_page_size_after_repeated_source_timeout(self) -> None:
         rows = [{"id": str(index)} for index in range(5)]
@@ -240,7 +246,7 @@ class NycWaterSignalsTests(unittest.TestCase):
 
         def fake_fetch_snapshot(dataset_id: str, **kwargs):
             where = str(kwargs.get("where") or "")
-            rows = [hpd_row] if dataset_id == HPD_VIOLATIONS_DATASET_ID and where == HPD_OPEN_WHERE else []
+            rows = [hpd_row] if dataset_id == HPD_VIOLATIONS_DATASET_ID and "HOT WATER" in where else []
             return SourceSnapshot(
                 dataset_id=dataset_id,
                 name=dataset_id,

@@ -24,7 +24,7 @@ DOB_APPROVED_PERMITS_DATASET_ID = "rbx6-tga4"
 LL84_DATASET_ID = "5zyy-y8am"
 NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
-HPD_MAX_PAGE_SIZE = 25000
+HPD_MAX_PAGE_SIZE = 5000
 HPD_WATER_TERMS = (
     "hot water",
     "water supply",
@@ -37,7 +37,6 @@ HPD_WATER_TERMS = (
     "bathtub",
     "water closet",
 )
-HPD_OPEN_WHERE = "violationstatus='Open'"
 
 NYC_311_WHERE = (
     "agency='DEP' AND created_date >= '2025-01-01T00:00:00.000' AND ("
@@ -177,24 +176,24 @@ def normalize_hpd(row: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _hpd_term_where(term: str) -> str:
-    return f"violationstatus='Open' AND lower(novdescription) like '%{term}%'"
+    return f"violationstatus='Open' AND novdescription like '%{term.upper()}%'"
 
 
 def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
-    snapshot = fetch_snapshot(
-        HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="violationid",
-        required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
-        where=HPD_OPEN_WHERE,
-        select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
-        page_size=min(page_size, HPD_MAX_PAGE_SIZE),
-        progress_label="NYC water HPD open violations",
-    )
-    return [snapshot]
-
-
-def _row_matches_hpd_water_terms(row: Mapping[str, Any]) -> bool:
-    text = _lower_text(row.get("novdescription"))
-    return any(term in text for term in HPD_WATER_TERMS)
+    snapshots: list[SourceSnapshot] = []
+    for term in HPD_WATER_TERMS:
+        snapshots.append(
+            fetch_snapshot(
+                HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="violationid",
+                required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
+                where=_hpd_term_where(term),
+                select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
+                page_size=min(page_size, HPD_MAX_PAGE_SIZE),
+                allow_count_fallback=True,
+                progress_label=f"NYC water HPD term {term!r}",
+            )
+        )
+    return snapshots
 
 
 def _dedupe_hpd_rows(snapshots: Sequence[SourceSnapshot]) -> tuple[list[dict[str, Any]], int]:
@@ -202,8 +201,6 @@ def _dedupe_hpd_rows(snapshots: Sequence[SourceSnapshot]) -> tuple[list[dict[str
     duplicate_count = 0
     for snapshot in snapshots:
         for row in snapshot.rows:
-            if not _row_matches_hpd_water_terms(row):
-                continue
             violation_id = normalize_space(row.get("violationid")) or stable_id("hpd-water-source", row)
             if violation_id in rows_by_id:
                 duplicate_count += 1
@@ -440,7 +437,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
         "domain": "NYC_BUILDING_WATER_SIGNALS",
-        "query_boundaries": {"311_start": NYC_311_START, "hpd_scope": "Current open HPD violations fetched once and locally filtered to water/plumbing/fixture terms.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
+        "query_boundaries": {"311_start": NYC_311_START, "hpd_scope": "Current open HPD violations fetched through uppercase source-description keyword partitions.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
         "evidence_semantics": {
             "311": "Service-request observations. Building signal only when classification is building-water; street/hydrant/sewer remain context.",
             "hpd": "Current HPD violation evidence directly tied to source BIN/BBL when present.",
@@ -451,7 +448,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
             "water_311_request_count": len(requests),
             "water_311_building_signal_count": sum(1 for row in requests if row["is_building_water_signal"]),
             "hpd_open_water_violation_count": len(hpd),
-            "hpd_source_fetch_strategy": "OPEN_VIOLATIONS_LOCAL_TERM_FILTER",
+            "hpd_source_fetch_strategy": "UPPERCASE_KEYWORD_PARTITIONS",
             "hpd_source_partition_count": len(hpd_snapshots),
             "hpd_source_partition_record_count": sum(snapshot.source_record_count for snapshot in hpd_snapshots),
             "hpd_duplicate_partition_violation_count": hpd_duplicate_partition_count,

@@ -59,15 +59,14 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     hpd_duplicate_raw = summary.get("hpd_duplicate_partition_violation_count")
     hpd_duplicates = -1 if hpd_duplicate_raw is None else int(hpd_duplicate_raw)
     if hpd_fetch_strategy == "OPEN_VIOLATIONS_LOCAL_TERM_FILTER":
-        if hpd_partition_count != 1:
-            raise RuntimeError("HPD local-filter strategy must use one open-violations source snapshot")
-        if hpd_duplicates < 0 or hpd_unique > hpd_partition_records:
-            raise RuntimeError("HPD local-filter counts do not reconcile")
-    else:
+        raise RuntimeError("HPD local-filter strategy is too broad for production cache verification")
+    if hpd_fetch_strategy in {"KEYWORD_PARTITIONS", "UPPERCASE_KEYWORD_PARTITIONS"}:
         if hpd_partition_count < 8:
             raise RuntimeError("HPD source partition count mismatch")
         if hpd_duplicates < 0 or hpd_partition_records - hpd_duplicates != hpd_unique:
             raise RuntimeError("HPD partition de-duplication counts do not reconcile")
+    else:
+        raise RuntimeError(f"Unknown HPD source fetch strategy: {hpd_fetch_strategy}")
 
     collections = {
         "water_311_request_count": "water_311_requests",
