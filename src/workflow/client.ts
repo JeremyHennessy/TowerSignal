@@ -1,49 +1,48 @@
 import type { WorkflowAccountPatch, WorkflowSavedView, WorkflowUser, WorkflowWatchlist } from '../types/workflow'
+import * as remote from './remoteClient'
 
 export const workflowRuntimeEnabled = import.meta.env.MODE !== 'test'
 
-const loadRemote = () => import('./remoteClient')
-
 export async function getWorkflowSession() {
-  return (await loadRemote()).getWorkflowSession()
+  return remote.getWorkflowSession()
 }
 
 export async function signInWorkflow(email: string, password: string): Promise<WorkflowUser> {
-  return (await loadRemote()).signInWorkflow(email, password)
+  return remote.signInWorkflow(email, password)
 }
 
 export async function signUpWorkflow(email: string, password: string, name?: string): Promise<WorkflowUser> {
-  return (await loadRemote()).signUpWorkflow(email, password, name)
+  return remote.signUpWorkflow(email, password, name)
 }
 
 export async function signOutWorkflow(): Promise<void> {
-  return (await loadRemote()).signOutWorkflow()
+  return remote.signOutWorkflow()
 }
 
 export async function loadWorkflowSnapshot() {
-  return (await loadRemote()).loadWorkflowSnapshot()
+  return remote.loadWorkflowSnapshot()
 }
 
 export async function saveRemoteView(view: WorkflowSavedView): Promise<void> {
-  return (await loadRemote()).saveRemoteView(view)
+  return remote.saveRemoteView(view)
 }
 
 export async function deleteRemoteView(viewId: string): Promise<void> {
-  return (await loadRemote()).deleteRemoteView(viewId)
+  return remote.deleteRemoteView(viewId)
 }
 
 export async function createRemoteWatchlist(watchlist: WorkflowWatchlist): Promise<void> {
-  return (await loadRemote()).createRemoteWatchlist(watchlist)
+  return remote.createRemoteWatchlist(watchlist)
 }
 
 export async function deleteRemoteWatchlist(watchlistId: string): Promise<void> {
-  return (await loadRemote()).deleteRemoteWatchlist(watchlistId)
+  return remote.deleteRemoteWatchlist(watchlistId)
 }
 
 export async function saveRemoteAccount(systemId: string, patch: WorkflowAccountPatch): Promise<void> {
-  return (await loadRemote()).saveRemoteAccount(systemId, patch)
+  return remote.saveRemoteAccount(systemId, patch)
 }
 
 export async function setRemoteMembership(systemId: string, watchlistId: string, enabled: boolean): Promise<void> {
-  return (await loadRemote()).setRemoteMembership(systemId, watchlistId, enabled)
+  return remote.setRemoteMembership(systemId, watchlistId, enabled)
 }
