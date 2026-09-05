@@ -25,6 +25,7 @@ SOURCE_PAGE = f"{API_ROOT}/Health/New-York-State-Lead-Service-Line-Inventory/{DA
 USER_AGENT = "TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)"
 SCHEMA_VERSION = "1.0"
 MAX_BULK_ROWS = 5_000_000
+COMPUTED_REGION_PREFIX = ":@computed_region_"
 
 SOURCE_FIELDS = (
     "locality",
@@ -95,7 +96,6 @@ METHOD_EXACT = {
     "predictive modeling": "STATISTICAL_MODEL",
     "excavation": "EXCAVATION",
     "other": "OTHER",
-    "customer identification with photo or other verification": "CUSTOMER_IDENTIFICATION",
     "customer identification with photo or other verification": "CUSTOMER_IDENTIFICATION",
     "sequential sampling": "SEQUENTIAL_SAMPLING",
 }
@@ -181,7 +181,6 @@ def parse_location(value: Any) -> tuple[float | None, float | None]:
     text = normalize_space(value)
     if not text:
         return None, None
-    # Socrata CSV point values are commonly `POINT (longitude latitude)`.
     match = re.search(
         r"POINT\s*\(\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*\)",
         text,
@@ -190,7 +189,6 @@ def parse_location(value: Any) -> tuple[float | None, float | None]:
     if match:
         longitude, latitude = float(match.group(1)), float(match.group(2))
     else:
-        # Retain a deliberately narrow fallback for `(lat, lon)`/`lat,lon` exports.
         numbers = re.findall(r"-?\d+(?:\.\d+)?", text)
         if len(numbers) != 2:
             return None, None
@@ -218,21 +216,32 @@ def _request_json(url: str, *, retries: int = 4, timeout: int = 120) -> Any:
     raise NysServiceLineSourceError(f"Failed to retrieve NYS LSLI source: {url}: {last_error}")
 
 
+def _authoritative_metadata_fields(fields: tuple[str, ...]) -> tuple[str, ...]:
+    authoritative = tuple(
+        field for field in fields if not field.startswith(COMPUTED_REGION_PREFIX)
+    )
+    computed = tuple(
+        field for field in fields if field.startswith(COMPUTED_REGION_PREFIX)
+    )
+    if authoritative != SOURCE_FIELDS or len(authoritative) + len(computed) != len(fields):
+        missing = sorted(set(SOURCE_FIELDS) - set(authoritative))
+        extra = sorted(set(authoritative) - set(SOURCE_FIELDS))
+        raise NysServiceLineSourceError(
+            f"NYS LSLI authoritative schema drift: missing={missing}, extra={extra}, ordered_fields={fields}"
+        )
+    return authoritative
+
+
 def fetch_source_state() -> SourceState:
     metadata = _request_json(METADATA_URL)
     if not isinstance(metadata, dict):
         raise NysServiceLineSourceError("NYS LSLI metadata returned a non-object payload")
-    fields = tuple(
+    raw_fields = tuple(
         str(column.get("fieldName"))
         for column in metadata.get("columns", [])
         if isinstance(column, dict) and column.get("fieldName")
     )
-    if fields != SOURCE_FIELDS:
-        missing = sorted(set(SOURCE_FIELDS) - set(fields))
-        extra = sorted(set(fields) - set(SOURCE_FIELDS))
-        raise NysServiceLineSourceError(
-            f"NYS LSLI schema drift: missing={missing}, extra={extra}, ordered_fields={fields}"
-        )
+    fields = _authoritative_metadata_fields(raw_fields)
     count_payload = _request_json(
         f"{RESOURCE_ROOT}.json?{urlencode({'$select': 'count(*) as count'})}"
     )
@@ -249,7 +258,8 @@ def fetch_source_state() -> SourceState:
 
 
 def _bulk_csv_url(limit: int) -> str:
-    return f"{RESOURCE_ROOT}.csv?{urlencode({'$limit': limit})}"
+    select = ",".join(f"{field} AS {field}" for field in SOURCE_FIELDS)
+    return f"{RESOURCE_ROOT}.csv?{urlencode({'$select': select, '$limit': limit})}"
 
 
 def download_bulk_csv(path: Path, *, expected_count: int, retries: int = 3, timeout: int = 600) -> dict[str, Any]:
@@ -293,7 +303,10 @@ def normalize_row(row: Mapping[str, Any], *, source_row_ordinal: int) -> dict[st
     zip_raw = normalize_space(row.get("zip_code")) or None
     locality_code = normalize_space(locality_raw).upper()
     latitude, longitude = parse_location(row.get("location"))
-    result = {field: (row.get(field) if row.get(field) not in (None, "") else None) for field in SOURCE_FIELDS}
+    result = {
+        field: (row.get(field) if row.get(field) not in (None, "") else None)
+        for field in SOURCE_FIELDS
+    }
     result.update(
         {
             "source_row_ordinal": source_row_ordinal,
@@ -349,8 +362,13 @@ def process_csv(source_path: Path, output_path: Path, *, expected_count: int) ->
                 customer_material_counts[str(normalized["customer_material_normalized"])] += 1
                 public_method_counts[str(normalized["public_method_normalized"])] += 1
                 customer_method_counts[str(normalized["customer_method_normalized"])] += 1
-                building_type_counts[normalize_space(normalized.get("building_type")) or "MISSING"] += 1
-                pou_poe_raw = normalize_space(normalized.get("pou_or_poe_treatment_present")) or "MISSING"
+                building_type_counts[
+                    normalize_space(normalized.get("building_type")) or "MISSING"
+                ] += 1
+                pou_poe_raw = (
+                    normalize_space(normalized.get("pou_or_poe_treatment_present"))
+                    or "MISSING"
+                )
                 pou_poe_raw_counts[pou_poe_raw] += 1
                 if _is_yes(normalized.get("pou_or_poe_treatment_present")):
                     pou_poe_yes_count += 1
@@ -358,7 +376,10 @@ def process_csv(source_path: Path, output_path: Path, *, expected_count: int) ->
                     borough_counts[str(normalized["nyc_borough"])] += 1
                 if normalized.get("service_address_id") is None:
                     address_key_missing_count += 1
-                if normalized.get("latitude") is not None and normalized.get("longitude") is not None:
+                if (
+                    normalized.get("latitude") is not None
+                    and normalized.get("longitude") is not None
+                ):
                     location_count += 1
                 if normalized.get("note") not in (None, ""):
                     note_count += 1
@@ -389,10 +410,14 @@ def process_csv(source_path: Path, output_path: Path, *, expected_count: int) ->
 
 def build_cache(data_output: Path, summary_output: Path) -> dict[str, Any]:
     before = fetch_source_state()
-    temp_path = Path(tempfile.mkstemp(prefix="towersignal-nys-lsli-", suffix=".csv")[1])
+    temp_path = Path(
+        tempfile.mkstemp(prefix="towersignal-nys-lsli-", suffix=".csv")[1]
+    )
     try:
         download = download_bulk_csv(temp_path, expected_count=before.row_count)
-        processed = process_csv(temp_path, data_output, expected_count=before.row_count)
+        processed = process_csv(
+            temp_path, data_output, expected_count=before.row_count
+        )
     finally:
         temp_path.unlink(missing_ok=True)
 
@@ -402,7 +427,10 @@ def build_cache(data_output: Path, summary_output: Path) -> dict[str, Any]:
         raise NysServiceLineSourceError(
             f"NYS LSLI source row count changed during coherent snapshot: {before.row_count:,} -> {after.row_count:,}"
         )
-    if before.rows_updated_at != after.rows_updated_at or before.data_updated_at != after.data_updated_at:
+    if (
+        before.rows_updated_at != after.rows_updated_at
+        or before.data_updated_at != after.data_updated_at
+    ):
         data_output.unlink(missing_ok=True)
         raise NysServiceLineSourceError(
             "NYS LSLI source update timestamp changed during coherent snapshot; refusing mixed-version cache"
@@ -427,6 +455,7 @@ def build_cache(data_output: Path, summary_output: Path) -> dict[str, Any]:
             "before_after_update_timestamp_stable": True,
             "schema_valid": True,
             "source_fields": list(SOURCE_FIELDS),
+            "socrata_computed_region_columns": "Excluded from bulk export; platform-generated fields are not part of the NYSDOH 20-field service-line schema.",
         },
         "identity_semantics": {
             "pws_id": "The published line-level dataset does not contain PWSID; no PWS relationship is inferred from locality/address.",
@@ -436,14 +465,16 @@ def build_cache(data_output: Path, summary_output: Path) -> dict[str, Any]:
             "nyc": "NYC locality codes MN/BX/BK/QN/SI are labeled for analysis only. This adapter does not collapse the current paired-row NYC source pattern into one service line.",
         },
         "normalization_semantics": {
-            "raw_preserved": "All 20 source fields are preserved in the compressed cache.",
+            "raw_preserved": "All 20 NYSDOH source fields are preserved in the compressed cache.",
             "materials": "Only exact/case/punctuation-normalized known material labels are mapped to canonical categories; unrecognized source text remains OTHER_RAW.",
             "methods": "Only explicit recognized verification-method labels/known spelling variants are mapped; unrecognized source text remains OTHER_RAW.",
-            "metadata_warning": "Portal column names are authoritative for field selection; source metadata descriptions are not used to shift values between columns.",
+            "metadata_warning": "Portal column names are authoritative for field selection; Socrata platform-generated computed-region columns are excluded and source metadata descriptions are not used to shift values between columns.",
         },
         "summary": processed,
         "data_file": data_output.name,
     }
     summary_output.parent.mkdir(parents=True, exist_ok=True)
-    summary_output.write_text(json.dumps(summary, separators=(",", ":")), encoding="utf-8")
+    summary_output.write_text(
+        json.dumps(summary, separators=(",", ":")), encoding="utf-8"
+    )
     return summary
