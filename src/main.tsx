@@ -19,5 +19,6 @@ import './styles/marketing-landing.css'
 import './styles/auth-theme.css'
 import './styles/app-brand-theme.css'
 import './styles/header-alignment-fix.css'
+import './styles/account-report.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AuthGate /></React.StrictMode>)
