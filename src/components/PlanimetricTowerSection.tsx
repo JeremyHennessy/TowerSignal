@@ -40,16 +40,20 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetailWithDo
   const roofLevelCount = features?.filter(feature => feature.sub_feature_code === '212000').length ?? 0
   const groundLevelCount = features?.filter(feature => feature.sub_feature_code === '212010').length ?? 0
   const hasRoofMapContext = featureCount > 0 || footprintCount > 0 || waterTankCount > 0
+  const roofMapLabel = `Aerial roof map with cooling-tower, drinking-water tank and building footprints on BIN ${detail.identity.bin ?? 'unknown'}`
 
   useEffect(() => {
-    if (!container.current || !hasRoofMapContext) return
+    const mapElement = container.current
+    if (!mapElement || !hasRoofMapContext) return
+    mapElement.setAttribute('aria-label', roofMapLabel)
 
-    const map = L.map(container.current, {
+    const map = L.map(mapElement, {
       zoomControl: true,
       attributionControl: true,
       scrollWheelZoom: false,
       maxZoom: 20,
     })
+    mapElement.setAttribute('aria-label', roofMapLabel)
 
     const ortho = L.tileLayer(ORTHO_TILE_URL, {
       minZoom: 0,
@@ -142,7 +146,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetailWithDo
     return () => {
       map.remove()
     }
-  }, [buildingFootprints, features, hasRoofMapContext, waterTanks])
+  }, [buildingFootprints, features, hasRoofMapContext, roofMapLabel, waterTanks])
 
   const featureCards = features?.map((feature, index) => <article className="planimetric-feature" key={feature.global_id}>
     <div className="planimetric-feature-head"><strong>{featureLabel(index)}</strong><span>BIN {feature.bin}</span></div>
@@ -169,7 +173,7 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetailWithDo
 
       {hasRoofMapContext && <>
         <div className="planimetric-map-shell">
-          <div ref={container} className="planimetric-map" role="region" aria-label={`Aerial roof map with cooling-tower, drinking-water tank and building footprints on BIN ${detail.identity.bin ?? 'unknown'}`} />
+          <div ref={container} className="planimetric-map" role="region" aria-label={roofMapLabel} />
         </div>
         <div className="roof-map-legend" aria-label="Roof map legend">
           <span><i className="roof-legend-tower" />Cooling-tower footprint</span>

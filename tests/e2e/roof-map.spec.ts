@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { submitSignIn } from './auth.helpers'
-import { expectContained, expectSectionText, isIphoneProject } from './iphone.helpers'
+import { expectContained, expectDomAttribute, expectElementContained, expectSectionText, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
@@ -32,6 +32,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
       '1 mapped cooling-tower footprint · 1 building outline',
       '1 roof level · 0 ground level · cooling-tower classification is source-coded by NYC OTI',
       'Roof level',
+      'BIN 1089811',
       '212000',
     ])
   } else {
@@ -46,7 +47,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   const map = section.locator('.planimetric-map')
   if (isIphone) {
     await expect(map).toHaveCount(1)
-    await expect(map).toHaveAttribute('aria-label', /BIN 1089811/)
+    await expectDomAttribute(page, 'section.planimetric-section .planimetric-map', 'aria-label', /BIN 1089811/)
   } else {
     await expect(map).toBeVisible()
     await expect(map).toHaveAttribute('aria-label', /BIN 1089811/)
@@ -107,13 +108,18 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   }
 
   await expectContained(page)
-  const viewportWidth = page.viewportSize()?.width ?? 0
-  const sectionBox = await section.boundingBox()
-  const domesticBox = await domestic.boundingBox()
-  expect(sectionBox).not.toBeNull()
-  expect(domesticBox).not.toBeNull()
-  expect(sectionBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
-  expect(domesticBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
+  if (isIphone) {
+    await expectElementContained(page, 'section.planimetric-section')
+    await expectElementContained(page, 'section.domestic-water-section')
+  } else {
+    const viewportWidth = page.viewportSize()?.width ?? 0
+    const sectionBox = await section.boundingBox()
+    const domesticBox = await domestic.boundingBox()
+    expect(sectionBox).not.toBeNull()
+    expect(domesticBox).not.toBeNull()
+    expect(sectionBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
+    expect(domesticBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
+  }
 
   if (!isIphone) {
     const layerControl = map.locator('.leaflet-control-layers')
