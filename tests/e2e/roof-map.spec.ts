@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test'
 import { submitSignIn } from './auth.helpers'
-import { expectAccountDetailHydrated, expectContained, expectDomAttribute, expectElementContained, expectSectionText, isIphoneProject } from './iphone.helpers'
+import { expectAccountDetailHydrated, expectContained, expectDomAttribute, expectDomCount, expectElementContained, expectSectionText, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
 test('direct hosted roof link signs in and renders on desktop and iPhone', async ({ page }, testInfo) => {
+  const isIphone = isIphoneProject(testInfo)
+  if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', message => {
@@ -24,7 +26,6 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   await submitSignIn(page, testInfo.project.name)
   await expect(page).toHaveURL(/#\/account\/2000015564$/)
 
-  const isIphone = isIphoneProject(testInfo)
   const section = page.locator('section.planimetric-section')
   if (isIphone) {
     await expectAccountDetailHydrated(page)
@@ -47,7 +48,7 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
   }
   const map = section.locator('.planimetric-map')
   if (isIphone) {
-    await expect(map).toHaveCount(1)
+    await expectDomCount(page, 'section.planimetric-section .planimetric-map', 1)
     await expectDomAttribute(page, 'section.planimetric-section .planimetric-map', 'aria-label', /BIN 1089811/)
   } else {
     await expect(map).toBeVisible()

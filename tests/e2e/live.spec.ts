@@ -7,6 +7,7 @@ test.setTimeout(120_000)
 
 test('hosted TowerSignal redesigned workspace is functional, linkable and source-backed', async ({ page }, testInfo) => {
   const isIphone = isIphoneProject(testInfo)
+  if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()) })

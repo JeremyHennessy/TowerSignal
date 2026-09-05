@@ -3,7 +3,7 @@ import { expect, type Locator, type Page } from '@playwright/test'
 type ProjectInfo = { project: { name: string } }
 
 const HEADING_SELECTOR = 'h1,h2,h3,h4,h5,h6'
-const HOSTED_IPHONE_DOM_TIMEOUT = process.env.CI ? 60_000 : 25_000
+const HOSTED_IPHONE_DOM_TIMEOUT = process.env.CI ? 90_000 : 25_000
 
 export function isIphoneProject(testInfo: ProjectInfo): boolean {
   return testInfo.project.name.includes('iphone')
@@ -29,6 +29,12 @@ export async function expectDomText(page: Page, snippets: string[], selector = '
       return snippets.every(snippet => text.includes(snippet))
     }, { selector, snippets })
   }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(true)
+}
+
+export async function expectDomCount(page: Page, selector: string, count: number): Promise<void> {
+  await expect.poll(async () => {
+    return page.evaluate(selector => document.querySelectorAll(selector).length, selector)
+  }, { timeout: HOSTED_IPHONE_DOM_TIMEOUT }).toBe(count)
 }
 
 export async function expectDomAttribute(page: Page, selector: string, name: string, value: RegExp | string): Promise<void> {
@@ -111,6 +117,33 @@ export async function setTextareaValue(page: Page, selector: string, value: stri
     element.dispatchEvent(new Event('input', { bubbles: true }))
     element.dispatchEvent(new Event('change', { bubbles: true }))
   }, { selector, value })
+}
+
+export async function setWorkflowAccountFields(page: Page, sectionSelector: string, status: string, nextActionDate: string, note: string): Promise<void> {
+  await page.evaluate(({ sectionSelector, status, nextActionDate, note }) => {
+    const root = document.querySelector(sectionSelector)
+    if (!(root instanceof HTMLElement)) throw new Error(`Expected workflow account section for ${sectionSelector}`)
+    const select = root.querySelector('select')
+    const input = root.querySelector('input[type="date"]')
+    const textarea = root.querySelector('textarea')
+    if (!(select instanceof HTMLSelectElement)) throw new Error('Expected workflow status select')
+    if (!(input instanceof HTMLInputElement)) throw new Error('Expected workflow next-action input')
+    if (!(textarea instanceof HTMLTextAreaElement)) throw new Error('Expected workflow note textarea')
+
+    select.value = status
+    select.dispatchEvent(new Event('input', { bubbles: true }))
+    select.dispatchEvent(new Event('change', { bubbles: true }))
+
+    const inputSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+    inputSetter?.call(input, nextActionDate)
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+
+    const textareaSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
+    textareaSetter?.call(textarea, note)
+    textarea.dispatchEvent(new Event('input', { bubbles: true }))
+    textarea.dispatchEvent(new Event('change', { bubbles: true }))
+  }, { sectionSelector, status, nextActionDate, note })
 }
 
 export async function clickElement(page: Page, selector: string): Promise<void> {

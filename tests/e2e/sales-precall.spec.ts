@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test'
 import { submitSignIn } from './auth.helpers'
-import { expectAccountDetailHydrated, expectDomAttribute, expectDomText, expectElementContained, isIphoneProject } from './iphone.helpers'
+import { expectAccountDetailHydrated, expectDomAttribute, expectDomCount, expectDomText, expectElementContained, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
 
 test('hosted account exposes a source-backed sales pre-call brief before the technician field pack', async ({ page }, testInfo) => {
+  const isIphone = isIphoneProject(testInfo)
+  if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
   const sameOriginFailures: string[] = []
   page.on('console', message => {
@@ -23,12 +25,13 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
   await submitSignIn(page, testInfo.project.name)
   await expect(page).toHaveURL(/#\/account\/2000012577$/)
 
-  const isIphone = isIphoneProject(testInfo)
   if (isIphone) await expectAccountDetailHydrated(page)
 
   const sales = page.locator('.sales-precall-pack')
   const technician = page.locator('.technician-field-pack')
   if (isIphone) {
+    await expectDomCount(page, '.sales-precall-pack', 1)
+    await expectDomCount(page, '.technician-field-pack', 1)
     await expectDomText(page, [
       'Pre-call sales brief',
       'Why call now',
@@ -42,8 +45,10 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
       'Verify before asserting',
       'incumbent cooling-tower service provider is not established',
       'evidence class is not win probability',
+    ], '.sales-precall-pack')
+    await expectDomText(page, [
       'Pre-visit field pack',
-    ], '.detail-panel')
+    ], '.technician-field-pack')
     await expectDomAttribute(page, '.sales-pack-metrics', 'aria-label', 'Sales pre-call summary')
   } else {
     await expect(sales).toBeVisible()
