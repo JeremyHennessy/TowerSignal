@@ -1,22 +1,9 @@
 import { expect, test } from './fixtures'
+import { expectContained, expectHeading, expectSectionText } from './iphone.helpers'
 
 const requireAcris = process.env.REQUIRE_ACRIS === 'true'
 
 test.setTimeout(120_000)
-
-const expectContained = async (page: import('@playwright/test').Page) => {
-  const viewportWidth = page.viewportSize()?.width ?? 0
-  const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
-  expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
-}
-
-const expectVisibleHeading = async (page: import('@playwright/test').Page, name: string) => {
-  const heading = page.locator('h1,h2,h3,h4,h5,h6').filter({ hasText: name }).first()
-  await expect(heading).toHaveText(name)
-  await heading.evaluate(element => element.scrollIntoView({ block: 'center', inline: 'nearest' }))
-  await expect(heading).toBeVisible()
-  return heading
-}
 
 test('hosted TowerSignal redesigned workspace is functional, linkable and source-backed', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
@@ -57,10 +44,10 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
     await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
     await page.locator('.account-table tbody tr').first().click()
-    const acrisHeading = await expectVisibleHeading(page, 'ACRIS property activity')
-    const acrisSection = acrisHeading.locator('xpath=ancestor::section[1]')
-    await expect(acrisSection.getByText(/relevant recorded document/)).toBeVisible()
-    await expect(acrisSection.getByText(/ACRIS is joined by exact borough\/block\/lot BBL and exact document ID only/)).toBeVisible()
+    await expectSectionText(page, testInfo, 'ACRIS property activity', [
+      'relevant recorded document',
+      'ACRIS is joined by exact borough/block/lot BBL and exact document ID only',
+    ])
     await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
     await expect(page).toHaveURL(/#\/account\//)
     await page.getByRole('button', { name: '← Back', exact: true }).click()
@@ -88,7 +75,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.getByText('OATH penalty imposed')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'OATH case lifecycle', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
-  await expectVisibleHeading(page, 'ACRIS property activity')
+  await expectHeading(page, testInfo, 'ACRIS property activity')
   await expect(page.getByRole('heading', { name: 'TowerSignal History', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()

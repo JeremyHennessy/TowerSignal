@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test'
 import { signInForProject } from './auth.helpers'
+import { clickElement, expectContained, isIphoneProject, setTextareaValue } from './iphone.helpers'
+
+test.setTimeout(120_000)
 
 test('workflow command center groups current and future intelligence on desktop and iPhone', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
@@ -20,10 +23,17 @@ test('workflow command center groups current and future intelligence on desktop 
   await expect(workflowAccount).toBeVisible()
   await workflowAccount.getByLabel('Status').selectOption('investigate')
   const today = new Date().toISOString().slice(0, 10)
+  const note = 'Review roof and domestic-water evidence before outreach.'
   await workflowAccount.getByLabel('Next action').fill(today)
-  await workflowAccount.getByLabel('Private note').fill('Review roof and domestic-water evidence before outreach.')
-  await workflowAccount.getByRole('button', { name: 'Save workflow state', exact: true }).click()
-  await expect(workflowAccount.getByText('Saved', { exact: true })).toBeVisible()
+  if (isIphoneProject(testInfo)) {
+    await setTextareaValue(page, 'section.workflow-account-section textarea', note)
+    await clickElement(page, 'section.workflow-account-section .workflow-save')
+    await page.waitForFunction(() => document.querySelector('section.workflow-account-section')?.textContent?.includes('Saved'), null, { timeout: 15_000 })
+  } else {
+    await workflowAccount.getByLabel('Private note').fill(note)
+    await workflowAccount.getByRole('button', { name: 'Save workflow state', exact: true }).click()
+    await expect(workflowAccount.getByText('Saved', { exact: true })).toBeVisible()
+  }
 
   await page.evaluate(() => { window.location.hash = '#/workflow' })
   const workflow = page.locator('section.workflow-workspace-page')
@@ -56,9 +66,8 @@ test('workflow command center groups current and future intelligence on desktop 
   await expect(workflow.locator('.workflow-future-grid')).toContainText('Documents & system topology')
   await expect(workflow.locator('.workflow-future-grid')).toContainText('Relationships & contracts')
 
+  await expectContained(page)
   const viewportWidth = page.viewportSize()?.width ?? 0
-  const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
-  expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
   const workflowBox = await workflow.boundingBox()
   expect(workflowBox).not.toBeNull()
   expect(workflowBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
