@@ -18,7 +18,7 @@ from .nys_public_water import (
     parse_lsli_index,
 )
 
-SCHEMA_VERSION = "1.1"
+SCHEMA_VERSION = "1.2"
 DEFAULT_REQUEST_DELAY_SECONDS = 0.15
 MAX_EXPLICIT_UNAVAILABLE_DETAILS = 25
 
@@ -35,6 +35,23 @@ KEY_FIELDS = {
     "total number of non lsl": "non_lead_service_lines",
     "total number of unknown service lines": "unknown_service_lines",
 }
+
+INVENTORY_FIELDS = (
+    "total_service_lines",
+    "identified_service_lines",
+    "lead_service_lines",
+    "gslrr_service_lines",
+    "non_lead_service_lines",
+    "unknown_service_lines",
+)
+
+COMPONENT_REQUIRED_FIELDS = (
+    "total_service_lines",
+    "lead_service_lines",
+    "gslrr_service_lines",
+    "non_lead_service_lines",
+    "unknown_service_lines",
+)
 
 METHOD_LABELS = (
     "Historical Records",
@@ -168,6 +185,55 @@ def _certification(parser) -> dict[str, Any]:
     return {"name": None, "title": None, "date": None, "raw_table": None}
 
 
+def _normalized_inventory(parsed: Mapping[str, Any], *, source_url: str) -> tuple[dict[str, int], dict[str, Any], dict[str, str]]:
+    missing_components = [
+        field for field in COMPONENT_REQUIRED_FIELDS if parsed.get(field) is None
+    ]
+    if missing_components:
+        raise NysPublicWaterSourceError(
+            f"LSLI detail missing required inventory component fields {missing_components}: {source_url}"
+        )
+
+    source_reported = {field: parsed.get(field) for field in INVENTORY_FIELDS}
+    lead = int(parsed["lead_service_lines"])
+    gslrr = int(parsed["gslrr_service_lines"])
+    non_lead = int(parsed["non_lead_service_lines"])
+    unknown = int(parsed["unknown_service_lines"])
+    total = int(parsed["total_service_lines"])
+    derived_identified = lead + gslrr + non_lead
+
+    source_identified = parsed.get("identified_service_lines")
+    if source_identified is None:
+        identified = derived_identified
+        evidence = "DERIVED_FROM_SOURCE_COMPONENT_COUNTS"
+    else:
+        identified = int(source_identified)
+        evidence = "SOURCE_REPORTED"
+        if identified != derived_identified:
+            raise NysPublicWaterSourceError(
+                f"LSLI identified-line source total does not reconcile with components: {source_url}"
+            )
+
+    if total != identified + unknown:
+        raise NysPublicWaterSourceError(
+            f"LSLI total-line source count does not reconcile with identified + unknown: {source_url}"
+        )
+
+    inventory = {
+        "total_service_lines": total,
+        "identified_service_lines": identified,
+        "lead_service_lines": lead,
+        "gslrr_service_lines": gslrr,
+        "non_lead_service_lines": non_lead,
+        "unknown_service_lines": unknown,
+    }
+    inventory_evidence = {
+        "identified_service_lines": evidence,
+        "all_other_inventory_fields": "SOURCE_REPORTED",
+    }
+    return inventory, source_reported, inventory_evidence
+
+
 def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = None) -> dict[str, Any]:
     parser = parse_html(html)
     kv = _kv_rows(parser)
@@ -185,19 +251,9 @@ def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = No
             f"LSLI detail PWS mismatch: expected {expected_pws_id}, got {pws_id}: {source_url}"
         )
 
-    required_counts = (
-        "total_service_lines",
-        "identified_service_lines",
-        "lead_service_lines",
-        "gslrr_service_lines",
-        "non_lead_service_lines",
-        "unknown_service_lines",
+    inventory, source_reported_inventory, inventory_evidence = _normalized_inventory(
+        parsed, source_url=source_url
     )
-    missing = [field for field in required_counts if parsed.get(field) is None]
-    if missing:
-        raise NysPublicWaterSourceError(
-            f"LSLI detail missing required inventory fields {missing}: {source_url}"
-        )
 
     methods = _identification_methods(parser)
     method_names = {_key(row["method"]) for row in methods}
@@ -230,7 +286,9 @@ def parse_detail(html: str, *, source_url: str, expected_pws_id: str | None = No
                 "TowerSignal does not infer whether the named contact is owner versus operator."
             ) if contact_present else None,
         },
-        "inventory": {field: parsed[field] for field in required_counts},
+        "inventory": inventory,
+        "source_reported_inventory": source_reported_inventory,
+        "inventory_evidence": inventory_evidence,
         "material_matrix": _material_matrix(parser),
         "identification_methods": methods,
         "inventory_availability": _inventory_availability(parser, kv),
@@ -250,7 +308,7 @@ def _unavailable_detail(index_row: Mapping[str, Any], exc: Exception) -> dict[st
         "schema_version": SCHEMA_VERSION,
         "pws_id": str(index_row["pws_id"]),
         "pws_name": index_row.get("pws_name"),
-        "county": index_row.get("county"),
+        "principal_county_served": index_row.get("principal_county_served"),
         "detail_status": "DETAIL_UNAVAILABLE_404",
         "source_url": str(index_row["detail_url"]),
         "source_error": normalize_space(exc),
@@ -319,7 +377,7 @@ def build_payload(*, request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECOND
         },
         "evidence_semantics": {
             "contact": "Section II source label combines owner / licensed operator of record completing the form; TowerSignal does not split that role without stronger evidence.",
-            "inventory": "All line counts and identification methods are source-reported LSLI summary values for the PWS.",
+            "inventory": "Lead, GSLRR, non-lead, unknown and total line counts must be source-reported. If the source omits only the aggregate identified count, TowerSignal preserves that source null and separately derives identified = lead + GSLRR + non-lead with explicit evidence metadata.",
             "unavailable": "A current-index PWS whose detail page returns authoritative HTTP 404 is retained explicitly and receives no inferred detail values.",
             "certification": "Certification fields are preserved only when structurally parseable; a blank source certification remains blank.",
         },
@@ -327,6 +385,12 @@ def build_payload(*, request_delay_seconds: float = DEFAULT_REQUEST_DELAY_SECOND
             "index_count": len(index_rows),
             "parsed_detail_count": len(details),
             "unavailable_detail_count": len(unavailable_details),
+            "details_with_derived_identified_count": sum(
+                1
+                for row in details
+                if row["inventory_evidence"]["identified_service_lines"]
+                == "DERIVED_FROM_SOURCE_COMPONENT_COUNTS"
+            ),
             "details_with_form_contact": sum(
                 1 for row in details if row["owner_or_operator_form_contact"]["name"]
             ),
