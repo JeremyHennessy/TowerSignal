@@ -38,7 +38,10 @@ async function gotoHosted(page: Page, targetHash: string): Promise<void> {
 export async function submitSignIn(page: Page, projectName: string): Promise<void> {
   const credentials = testCredentials(projectName)
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
-  const attempts = process.env.CI && family(projectName) === 'iphone' ? 2 : 1
+  // Hosted Neon Auth can return a short 429 rate-limit window during the
+  // serialized browser suite. The trace exposes x-retry-after: 1, so allow one
+  // bounded retry on both Chrome and WebKit without masking persistent failure.
+  const attempts = process.env.CI ? 2 : 1
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     await page.getByLabel('Email').fill(credentials.email)
@@ -50,7 +53,7 @@ export async function submitSignIn(page: Page, projectName: string): Promise<voi
     } catch (error) {
       if (attempt === attempts) throw error
       await expect(loginHeading).toBeVisible()
-      await page.waitForTimeout(500)
+      await page.waitForTimeout(1_100)
     }
   }
 }
