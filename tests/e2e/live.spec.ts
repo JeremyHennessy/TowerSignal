@@ -11,8 +11,9 @@ const expectContained = async (page: import('@playwright/test').Page) => {
 }
 
 const expectVisibleHeading = async (page: import('@playwright/test').Page, name: string) => {
-  const heading = page.getByRole('heading', { name, exact: true })
-  await heading.scrollIntoViewIfNeeded()
+  const heading = page.locator('h1,h2,h3,h4,h5,h6').filter({ hasText: name }).first()
+  await expect(heading).toHaveText(name)
+  await heading.evaluate(element => element.scrollIntoView({ block: 'center', inline: 'nearest' }))
   await expect(heading).toBeVisible()
   return heading
 }
@@ -57,7 +58,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
     await page.locator('.account-table tbody tr').first().click()
     const acrisHeading = await expectVisibleHeading(page, 'ACRIS property activity')
-    const acrisSection = acrisHeading.locator('..')
+    const acrisSection = acrisHeading.locator('xpath=ancestor::section[1]')
     await expect(acrisSection.getByText(/relevant recorded document/)).toBeVisible()
     await expect(acrisSection.getByText(/ACRIS is joined by exact borough\/block\/lot BBL and exact document ID only/)).toBeVisible()
     await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
