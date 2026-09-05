@@ -3,11 +3,16 @@ from __future__ import annotations
 import sys
 import unittest
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.nys_service_line_inventory import (  # noqa: E402
+    SOURCE_FIELDS,
+    NysServiceLineSourceError,
+    _authoritative_metadata_fields,
+    _bulk_csv_url,
     normalize_category,
     normalize_material,
     normalize_method,
@@ -67,6 +72,20 @@ class NysServiceLineInventoryTests(unittest.TestCase):
         self.assertAlmostEqual(lat or 0, 40.69)
         self.assertAlmostEqual(lon or 0, -73.99)
         self.assertEqual(parse_location("POINT (0 0)"), (None, None))
+
+    def test_socrata_computed_region_columns_are_not_agency_schema(self) -> None:
+        fields = (*SOURCE_FIELDS, ":@computed_region_9yqb_tdyd", ":@computed_region_43an_4dx5")
+        self.assertEqual(_authoritative_metadata_fields(fields), SOURCE_FIELDS)
+        with self.assertRaisesRegex(NysServiceLineSourceError, "authoritative schema drift"):
+            _authoritative_metadata_fields((*SOURCE_FIELDS, "unexpected_agency_field"))
+
+    def test_bulk_csv_explicitly_selects_only_authoritative_fields(self) -> None:
+        query = parse_qs(urlparse(_bulk_csv_url(5_000_000)).query)
+        self.assertEqual(query["$limit"], ["5000000"])
+        select = query["$select"][0]
+        for field in SOURCE_FIELDS:
+            self.assertIn(f"{field} AS {field}", select)
+        self.assertNotIn(":@computed_region_", select)
 
 
 if __name__ == "__main__":
