@@ -1,6 +1,7 @@
 import { formatDate } from '../domain/labels'
 import type { SystemSummary } from '../types/data'
 import type { SystemDetailWithDomesticWater } from './DomesticWaterSection'
+import { SalesPreCallPack } from './SalesPreCallPack'
 
 type PackTone = 'ready' | 'attention' | 'verify' | 'missing'
 
@@ -101,7 +102,9 @@ export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detai
   const status = mainStatus(row)
   const items = sourceItems(row, detail)
 
-  return <div className="technician-field-pack" aria-labelledby="technician-field-pack-title">
+  return <>
+    <SalesPreCallPack row={row} detail={detail} />
+    <div className="technician-field-pack" aria-labelledby="technician-field-pack-title">
     <div className="field-pack-header">
       <div>
         <span className="eyebrow">Technician field pack</span>
@@ -154,4 +157,5 @@ export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detai
 
     <p className="microcopy">This pack is a dispatch aid only. It separates public evidence from field observations and does not assert current operating status, service responsibility, safety status, compliance or roof access.</p>
   </div>
+  </>
 }
