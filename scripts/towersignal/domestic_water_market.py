@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
 import time
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -215,6 +216,7 @@ def fetch_snapshot(
     minimum_page_size: int = 1000,
     allow_count_fallback: bool = False,
     max_pages_without_count: int = 10000,
+    progress_label: str | None = None,
 ) -> SourceSnapshot:
     metadata = fetch_metadata(dataset_id, api_root=api_root)
     available = set(metadata["fields"])
@@ -227,7 +229,12 @@ def fetch_snapshot(
     except DomesticWaterSourceError:
         if not allow_count_fallback:
             raise
+        if progress_label:
+            print(f"{progress_label}: source count query unavailable; paging until short page", file=sys.stderr, flush=True)
         expected_count = None
+    else:
+        if progress_label:
+            print(f"{progress_label}: source count {expected_count:,}", file=sys.stderr, flush=True)
     rows: list[dict[str, Any]] = []
     offset = 0
     active_page_size = page_size
@@ -248,6 +255,11 @@ def fetch_snapshot(
         if not isinstance(page, list):
             raise DomesticWaterSourceError(f"Dataset {dataset_id} returned a non-list page at offset {offset}")
         rows.extend(row for row in page if isinstance(row, dict))
+        if progress_label:
+            if expected_count is None:
+                print(f"{progress_label}: fetched {len(rows):,} rows", file=sys.stderr, flush=True)
+            else:
+                print(f"{progress_label}: fetched {len(rows):,}/{expected_count:,} rows", file=sys.stderr, flush=True)
         if len(page) < active_page_size:
             break
         offset += active_page_size

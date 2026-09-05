@@ -47,7 +47,8 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         source for source in source_health if source.get("dataset_id") == "wvxf-dwi5"
     ]
     hpd_partition_count = int(summary.get("hpd_source_partition_count") or 0)
-    if len(hpd_sources) != hpd_partition_count or hpd_partition_count < 8:
+    hpd_fetch_strategy = str(summary.get("hpd_source_fetch_strategy") or "KEYWORD_PARTITIONS")
+    if len(hpd_sources) != hpd_partition_count:
         raise RuntimeError("HPD source partition count mismatch")
     hpd_partition_records = sum(
         int(source.get("source_record_count") or 0) for source in hpd_sources
@@ -57,8 +58,16 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     hpd_unique = int(summary.get("hpd_open_water_violation_count") or 0)
     hpd_duplicate_raw = summary.get("hpd_duplicate_partition_violation_count")
     hpd_duplicates = -1 if hpd_duplicate_raw is None else int(hpd_duplicate_raw)
-    if hpd_duplicates < 0 or hpd_partition_records - hpd_duplicates != hpd_unique:
-        raise RuntimeError("HPD partition de-duplication counts do not reconcile")
+    if hpd_fetch_strategy == "OPEN_VIOLATIONS_LOCAL_TERM_FILTER":
+        if hpd_partition_count != 1:
+            raise RuntimeError("HPD local-filter strategy must use one open-violations source snapshot")
+        if hpd_duplicates < 0 or hpd_unique > hpd_partition_records:
+            raise RuntimeError("HPD local-filter counts do not reconcile")
+    else:
+        if hpd_partition_count < 8:
+            raise RuntimeError("HPD source partition count mismatch")
+        if hpd_duplicates < 0 or hpd_partition_records - hpd_duplicates != hpd_unique:
+            raise RuntimeError("HPD partition de-duplication counts do not reconcile")
 
     collections = {
         "water_311_request_count": "water_311_requests",

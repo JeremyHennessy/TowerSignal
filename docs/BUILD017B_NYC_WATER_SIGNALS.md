@@ -15,7 +15,7 @@ Add a second independently verified NYC domestic-water cache covering building-c
 ## Source scope
 
 1. Official NYC 311 Service Requests from 2020 to Present (`erm2-nwe9`): DEP water/lead requests from 2025-01-01 forward, retrieved by deterministic server-side filter.
-2. Authoritative HPD Housing Maintenance Code Violations (`wvxf-dwi5`): current `Open` violations with explicit hot-water, water-supply, potable-water, plumbing or plumbing-fixture wording.
+2. Authoritative HPD Housing Maintenance Code Violations (`wvxf-dwi5`): current `Open` violations fetched once, then locally filtered to explicit hot-water, water-supply, potable-water, plumbing or plumbing-fixture wording.
 3. DOB NOW Job Application Filings (`w9ak-ipjd`): water/plumbing/tank/pump/backflow-related filings from 2024-01-01 forward where the source marks plumbing, mechanical or boiler work.
 4. DOB NOW Approved Permits (`rbx6-tga4`): similarly bounded approved/issued water-related permits from 2024-01-01 forward.
 5. Local Law 84 consolidated energy/water disclosure (`5zyy-y8am`): all current 2022-present rows, selecting only identity and water-related fields.
@@ -40,13 +40,19 @@ Only `BUILDING_*` classifications may receive building-level property linkage. S
 
 ## HPD evidence boundary
 
-The authoritative HPD source contains more than eight million violation records, so Build 017B does not copy the entire corpus. It requests the current open water/plumbing subset server-side and preserves HPD's source BBL/BIN, violation class, inspection date, current status and description.
+The authoritative HPD source contains more than eight million violation records,
+so Build 017B does not copy the entire corpus. It fetches the current `Open`
+violation universe with exact source-count pagination, then filters water/plumbing
+descriptions locally. This avoids repeated server-side text scans that can time
+out on hosted runners while preserving HPD's source BBL/BIN, violation class,
+inspection date, current status and description.
 
-The HPD text-filtered subset is fetched through source-counted keyword
-partitions because a single large Socrata OR query can time out on hosted
-runners. Each term partition must still fetch exactly its source-reported count,
-then the cache de-duplicates overlapping partition matches by `violationid` and
-records the duplicate count explicitly.
+The cache records the HPD fetch strategy explicitly as
+`OPEN_VIOLATIONS_LOCAL_TERM_FILTER`. The source-health row counts the current
+open HPD rows fetched from the authoritative source, while the normalized
+collection count reports only rows whose source description matches the bounded
+water/plumbing term set. Any duplicate `violationid` observed after local
+filtering is de-duplicated and counted explicitly.
 
 An HPD record is a confirmed housing-code violation observation; it is not evidence of which contractor currently services the property.
 
