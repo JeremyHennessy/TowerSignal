@@ -3,20 +3,34 @@ import * as remote from './remoteClient'
 
 export const workflowRuntimeEnabled = import.meta.env.MODE !== 'test'
 
-export async function getWorkflowSession() {
-  return remote.getWorkflowSession()
+let inMemorySessionUser: WorkflowUser | null = null
+
+export async function getWorkflowSession(): Promise<WorkflowUser | null> {
+  try {
+    const sessionUser = await remote.getWorkflowSession()
+    if (sessionUser) inMemorySessionUser = sessionUser
+    return sessionUser ?? inMemorySessionUser
+  } catch (error) {
+    if (inMemorySessionUser) return inMemorySessionUser
+    throw error
+  }
 }
 
 export async function signInWorkflow(email: string, password: string): Promise<WorkflowUser> {
-  return remote.signInWorkflow(email, password)
+  const user = await remote.signInWorkflow(email, password)
+  inMemorySessionUser = user
+  return user
 }
 
 export async function signUpWorkflow(email: string, password: string, name?: string): Promise<WorkflowUser> {
-  return remote.signUpWorkflow(email, password, name)
+  const user = await remote.signUpWorkflow(email, password, name)
+  inMemorySessionUser = user
+  return user
 }
 
 export async function signOutWorkflow(): Promise<void> {
-  return remote.signOutWorkflow()
+  await remote.signOutWorkflow()
+  inMemorySessionUser = null
 }
 
 export async function loadWorkflowSnapshot() {
