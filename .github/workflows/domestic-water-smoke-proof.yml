@@ -1,0 +1,50 @@
+name: Domestic Water Smoke Proof
+
+on:
+  push:
+    branches: [agent/domestic-water-smoke-proof-20260904]
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create minimal exact-BIN TowerSignal payload
+        run: |
+          mkdir -p smoke-data/details/20
+          cat > smoke-data/systems.json <<'JSON'
+          {"metadata":{},"summary":{},"systems":[{"system_id":"2000010073","bin":"1087284","address":"425 East 67th Street","borough":"Manhattan"}]}
+          JSON
+          cat > smoke-data/metadata.json <<'JSON'
+          {}
+          JSON
+          cat > smoke-data/details/20/2000010073.json <<'JSON'
+          {"identity":{"system_id":"2000010073","bin":"1087284","address":"425 East 67th Street","borough":"Manhattan"},"metadata":{}}
+          JSON
+      - name: Attach live domestic-water context
+        run: python scripts/build_domestic_water_data.py --output smoke-data
+      - name: Attach domestic-water source health
+        run: python scripts/attach_domestic_water_health.py --output smoke-data
+      - name: Independently re-query live domestic-water sources
+        run: python scripts/verify_live_domestic_water.py --output smoke-data --sample-size 1
+      - name: Assert rich building evidence attached
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('smoke-data/systems.json').read_text())
+          row = payload['systems'][0]
+          assert row['dwt_planimetric_tank_count'] >= 1, row
+          assert row['dwt_compliance_record_count'] >= 1, row
+          assert row['dwt_self_report_record_count'] >= 1, row
+          health = {e['source_key']: e for e in payload['metadata']['source_health']}
+          for key in ('dwt_planimetric','dwt_compliance','dwt_self_reports'):
+              assert health[key]['status'] == 'HEALTHY', health[key]
+          print(json.dumps({'system': row, 'health': health}, indent=2))
+          PY
