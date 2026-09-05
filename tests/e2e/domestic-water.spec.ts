@@ -31,7 +31,7 @@ test('hosted domestic-water account shows physical, oversight and compact self-r
   await expect(domestic.getByRole('heading', { name: 'Domestic water context', exact: true })).toBeVisible()
   await expect(domestic.getByText('Latest self-reported inspection evidence', { exact: true })).toBeVisible()
   expect(await domestic.locator('.dwt-latest-card').count()).toBeGreaterThan(0)
-  await expect(domestic.locator('details.domestic-water-history').first().locator('summary')).toHaveText(/DOHMH oversight \/ compliance history · [1-9]\d* records?/)
+  await expect(domestic.locator('details.domestic-water-history').first().locator(':scope > summary')).toHaveText(/DOHMH oversight \/ compliance history · [1-9]\d* records?/)
   expect(await domestic.locator('details.dwt-older-history').count()).toBeGreaterThan(0)
   await expect(domestic.getByText(/2022 rooftop drinking-water tank polygons · [1-9]\d*/)).toBeVisible()
   await expect(domestic.locator('.signal-card').first()).toBeVisible()
