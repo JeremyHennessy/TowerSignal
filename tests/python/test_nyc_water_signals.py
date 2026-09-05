@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -27,6 +29,7 @@ from towersignal.nyc_water_signals import (  # noqa: E402
     normalize_hpd,
     normalize_ll84,
 )
+from validate_nyc_water_signals_cache import validate  # noqa: E402
 
 
 class NycWaterSignalsTests(unittest.TestCase):
@@ -148,6 +151,57 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(page_sizes[LL84_DATASET_ID], 50000)
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
         self.assertEqual(len(hpd_calls), len(HPD_WATER_TERMS))
+
+    def test_validator_accepts_zero_count_source_partitions(self) -> None:
+        hpd_row = {
+            "violationid": "123",
+            "buildingid": "456",
+            "registrationid": "789",
+            "boro": "MANHATTAN",
+            "housenumber": "10",
+            "streetname": "WATER ST",
+            "zip": "10001",
+            "class": "C",
+            "inspectiondate": "2026-08-01T00:00:00.000",
+            "novdescription": "PROVIDE HOT WATER",
+            "currentstatus": "NOV SENT OUT",
+            "currentstatusdate": "2026-08-02T00:00:00.000",
+            "violationstatus": "Open",
+            "rentimpairing": "Y",
+            "bin": "1000001",
+            "bbl": "1000010001",
+        }
+
+        def fake_fetch_snapshot(dataset_id: str, **kwargs):
+            where = str(kwargs.get("where") or "")
+            rows = [hpd_row] if dataset_id == HPD_VIOLATIONS_DATASET_ID and "hot water" in where else []
+            return SourceSnapshot(
+                dataset_id=dataset_id,
+                name=dataset_id,
+                api_root=str(kwargs["api_root"]),
+                rows=rows,
+                retrieved_at="2026-09-05T00:00:00Z",
+                source_record_count=len(rows),
+                source_last_updated_at="2026-09-05T00:00:00Z",
+                source_query_scope=where or "ALL_ROWS",
+                fields=tuple(kwargs["required_fields"]),
+            )
+
+        with patch("towersignal.nyc_water_signals.fetch_snapshot", side_effect=fake_fetch_snapshot):
+            payload = build_payload(page_size=50000)
+
+        handle = tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False)
+        with handle:
+            json.dump(payload, handle)
+        cache = Path(handle.name)
+        try:
+            validated = validate(cache, max_age_days=1, require_production_volume=False)
+        finally:
+            cache.unlink()
+
+        self.assertEqual(validated["summary"]["hpd_open_water_violation_count"], 1)
+        self.assertEqual(validated["summary"]["hpd_source_partition_record_count"], 1)
+        self.assertEqual(validated["summary"]["hpd_duplicate_partition_violation_count"], 0)
 
 
 if __name__ == "__main__":

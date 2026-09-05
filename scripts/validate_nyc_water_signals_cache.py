@@ -14,6 +14,15 @@ def _timestamp(value: Any) -> datetime:
     return datetime.fromisoformat(text.replace("Z", "+00:00"))
 
 
+def _int_field(record: dict[str, Any], key: str, *, context: str) -> int:
+    if key not in record or record[key] is None:
+        raise RuntimeError(f"Missing integer field {key} for {context}")
+    try:
+        return int(record[key])
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError(f"Invalid integer field {key} for {context}: {record[key]!r}") from exc
+
+
 def validate(path: Path, *, max_age_days: int, require_production_volume: bool) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("schema_version") != "1.0":
@@ -31,7 +40,8 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
             raise RuntimeError("Source-health record is not an object")
         if source.get("status") != "HEALTHY" or source.get("pagination_complete") is not True or source.get("schema_valid") is not True:
             raise RuntimeError(f"Unhealthy source {source.get('dataset_id')}")
-        if int(source.get("source_record_count") or -1) != int(source.get("fetched_record_count") or -2):
+        context = str(source.get("dataset_id") or "unknown source")
+        if _int_field(source, "source_record_count", context=context) != _int_field(source, "fetched_record_count", context=context):
             raise RuntimeError(f"Source count mismatch for {source.get('dataset_id')}")
     hpd_sources = [
         source for source in source_health if source.get("dataset_id") == "wvxf-dwi5"
