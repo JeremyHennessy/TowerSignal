@@ -55,10 +55,10 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     )
     if "water_311_source_partition_record_count" in summary and int(summary["water_311_source_partition_record_count"]) != request_partition_records:
         raise RuntimeError("311 source partition record count mismatch")
-    if request_fetch_strategy == "FIELD_KEYWORD_PARTITIONS":
-        expected_partitions = 6
-        if request_partition_count != expected_partitions:
-            raise RuntimeError(f"311 source partition count mismatch: {request_partition_count} != {expected_partitions}")
+    if request_fetch_strategy in {"FIELD_KEYWORD_PARTITIONS", "MONTHLY_FIELD_KEYWORD_PARTITIONS"}:
+        field_keyword_partition_size = 6
+        if request_partition_count < field_keyword_partition_size or request_partition_count % field_keyword_partition_size != 0:
+            raise RuntimeError("311 source partition count mismatch")
         request_duplicates = int(summary.get("water_311_duplicate_partition_request_count") or 0)
         request_unique = int(summary.get("water_311_request_count") or 0)
         if request_partition_records - request_duplicates != request_unique:
