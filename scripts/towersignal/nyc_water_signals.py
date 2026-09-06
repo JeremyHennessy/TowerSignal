@@ -28,6 +28,7 @@ NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
 NYC_311_MAX_PAGE_SIZE = 50000
 HPD_MAX_PAGE_SIZE = 10000
+HPD_HEAVY_TERM_PAGE_SIZE = 1000
 HPD_BOROUGH_PARTITION_TERMS = {"hot water"}
 HPD_BOROUGHS = ("MANHATTAN", "BRONX", "BROOKLYN", "QUEENS", "STATEN ISLAND")
 HPD_WATER_TERMS = (
@@ -288,6 +289,10 @@ def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
     snapshots: list[SourceSnapshot] = []
     for term in HPD_WATER_TERMS:
         boroughs: tuple[str | None, ...] = HPD_BOROUGHS if term in HPD_BOROUGH_PARTITION_TERMS else (None,)
+        partition_page_size = min(
+            page_size,
+            HPD_HEAVY_TERM_PAGE_SIZE if term in HPD_BOROUGH_PARTITION_TERMS else HPD_MAX_PAGE_SIZE,
+        )
         for borough in boroughs:
             label_suffix = f" {borough}" if borough else ""
             snapshots.append(
@@ -296,7 +301,7 @@ def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
                     required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
                     where=_hpd_term_where(term, borough=borough),
                     select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
-                    page_size=min(page_size, HPD_MAX_PAGE_SIZE),
+                    page_size=partition_page_size,
                     allow_count_fallback=True,
                     progress_label=f"NYC water HPD term {term!r}{label_suffix}",
                     skip_count=True,
