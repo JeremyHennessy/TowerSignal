@@ -101,6 +101,24 @@ class NycWaterSignalsTests(unittest.TestCase):
     def test_build_payload_uses_uppercase_hpd_keyword_partitions(self) -> None:
         calls: list[tuple[str, int]] = []
         hpd_wheres: list[str] = []
+        request_wheres: list[str] = []
+        request_row = {
+            "unique_key": "70000001",
+            "created_date": "2026-08-01T00:00:00.000",
+            "closed_date": "",
+            "agency": "DEP",
+            "agency_name": "Department of Environmental Protection",
+            "complaint_type": "Water Quality",
+            "descriptor": "Dirty Water",
+            "descriptor_2": "",
+            "incident_zip": "10001",
+            "incident_address": "1 WATER ST",
+            "street_name": "WATER ST",
+            "status": "Open",
+            "resolution_description": "",
+            "bbl": "1000010001",
+            "borough": "MANHATTAN",
+        }
         hpd_row = {
             "violationid": "123",
             "buildingid": "456",
@@ -122,7 +140,16 @@ class NycWaterSignalsTests(unittest.TestCase):
 
         def fake_fetch_snapshot(dataset_id: str, **kwargs):
             calls.append((dataset_id, int(kwargs["page_size"])))
-            if dataset_id == HPD_VIOLATIONS_DATASET_ID:
+            if dataset_id == NYC_311_DATASET_ID:
+                where = str(kwargs.get("where") or "")
+                self.assertEqual(kwargs.get("seek_field"), "unique_key")
+                self.assertIs(kwargs.get("seek_field_is_text"), True)
+                self.assertIn("agency='DEP'", where)
+                self.assertIn("created_date >=", where)
+                self.assertRegex(where, r"lower\((complaint_type|descriptor|descriptor_2)\) like '%(water|lead)%'")
+                request_wheres.append(where)
+                rows = [request_row] if len(request_wheres) <= 2 else []
+            elif dataset_id == HPD_VIOLATIONS_DATASET_ID:
                 where = str(kwargs.get("where") or "")
                 self.assertEqual(kwargs.get("seek_field"), "violationid")
                 hpd_wheres.append(where)
@@ -130,9 +157,6 @@ class NycWaterSignalsTests(unittest.TestCase):
                 self.assertRegex(where, r"novdescription like '%[A-Z ]+%'")
                 rows = [hpd_row]
             else:
-                if dataset_id == NYC_311_DATASET_ID:
-                    self.assertEqual(kwargs.get("seek_field"), "unique_key")
-                    self.assertIs(kwargs.get("seek_field_is_text"), True)
                 rows = []
             return SourceSnapshot(
                 dataset_id=dataset_id,
@@ -149,6 +173,11 @@ class NycWaterSignalsTests(unittest.TestCase):
         with patch("towersignal.nyc_water_signals.fetch_snapshot", side_effect=fake_fetch_snapshot):
             payload = build_payload(page_size=50000)
 
+        self.assertEqual(payload["summary"]["water_311_request_count"], 1)
+        self.assertEqual(payload["summary"]["water_311_source_fetch_strategy"], "FIELD_KEYWORD_PARTITIONS")
+        self.assertEqual(payload["summary"]["water_311_source_partition_count"], 6)
+        self.assertEqual(payload["summary"]["water_311_source_partition_record_count"], 2)
+        self.assertEqual(payload["summary"]["water_311_duplicate_partition_request_count"], 1)
         self.assertEqual(payload["summary"]["hpd_open_water_violation_count"], 1)
         self.assertEqual(payload["summary"]["hpd_source_fetch_strategy"], "UPPERCASE_KEYWORD_PARTITIONS")
         self.assertEqual(payload["summary"]["hpd_source_partition_count"], len(HPD_WATER_TERMS))
@@ -163,6 +192,10 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(page_sizes[DOB_JOB_FILINGS_DATASET_ID], 50000)
         self.assertEqual(page_sizes[DOB_APPROVED_PERMITS_DATASET_ID], 50000)
         self.assertEqual(page_sizes[LL84_DATASET_ID], 50000)
+        request_calls = [call for call in calls if call[0] == NYC_311_DATASET_ID]
+        self.assertEqual(len(request_calls), 6)
+        self.assertEqual(len(request_wheres), 6)
+        self.assertEqual(len(set(request_wheres)), 6)
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
         self.assertEqual(len(hpd_calls), len(HPD_WATER_TERMS))
         self.assertEqual(len(hpd_wheres), len(HPD_WATER_TERMS))
