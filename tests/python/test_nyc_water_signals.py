@@ -130,6 +130,8 @@ class NycWaterSignalsTests(unittest.TestCase):
                 self.assertRegex(where, r"novdescription like '%[A-Z ]+%'")
                 rows = [hpd_row]
             else:
+                if dataset_id == NYC_311_DATASET_ID:
+                    self.assertEqual(kwargs.get("seek_field"), "unique_key")
                 rows = []
             return SourceSnapshot(
                 dataset_id=dataset_id,
