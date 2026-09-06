@@ -7,6 +7,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from towersignal.fetch import SourceFetchError
 from towersignal.oath import fetch_oath_cases
 
 
@@ -37,6 +38,29 @@ class OathBatchFetchTests(unittest.TestCase):
         for call in fetch_where_mock.call_args_list:
             queried_tickets.extend(re.findall(r"'([^']+)'", call.args[1]))
         self.assertCountEqual(queried_tickets, requested)
+
+    @patch("towersignal.oath.time.sleep")
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_rate_limited_batch_retries_without_losing_exact_identity(self, fetch_where_mock, _fetch_metadata_mock, sleep_mock):
+        requested = ["0880900460", "0880900470"]
+        calls = 0
+
+        def fetch_side_effect(dataset_id, where, order_by=None, select=None, api_root=None):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise SourceFetchError("HTTP Error 429: Too Many Requests")
+            tickets = re.findall(r"'([^']+)'", where)
+            return [{"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in tickets]
+
+        fetch_where_mock.side_effect = fetch_side_effect
+        cases, metadata = fetch_oath_cases(requested, batch_size=2, max_workers=1)
+
+        self.assertEqual(set(cases), set(requested))
+        self.assertEqual(metadata["matched_ticket_count"], 2)
+        self.assertEqual(fetch_where_mock.call_count, 2)
+        sleep_mock.assert_called_once_with(15)
 
 
 if __name__ == "__main__":
