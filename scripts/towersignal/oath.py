@@ -16,6 +16,9 @@ DEFAULT_MAX_WORKERS = 2
 OATH_RATE_LIMIT_RETRIES = 4
 OATH_REQUEST_RETRIES = 1
 OATH_REQUEST_TIMEOUT_SECONDS = 30
+OATH_AGENCY_SLICE_MIN_REQUESTED = 1000
+OATH_AGENCY_PAGE_SIZE = 50000
+OATH_COOLING_TOWER_AGENCY = "COOLING TOWERS - DOHMH"
 
 OATH_SELECT = ",".join([
     "ticket_number", "issuing_agency", "violation_date",
@@ -182,6 +185,71 @@ def _merge_exact_ticket_batch(cases: dict[str, dict[str, Any]], batch: list[str]
             cases[ticket] = case
 
 
+def _cooling_tower_agency_where() -> str:
+    agency = OATH_COOLING_TOWER_AGENCY.replace("'", "''")
+    return f"issuing_agency='{agency}'"
+
+
+def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, dict[str, Any]], int]:
+    where = _cooling_tower_agency_where()
+    count_rows = fetch_where(
+        OATH_DATASET_ID,
+        where,
+        select="count(*) as count",
+        request_retries=OATH_REQUEST_RETRIES,
+        request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
+        limit=1,
+    )
+    try:
+        expected_count = int(count_rows[0]["count"])
+    except (IndexError, KeyError, TypeError, ValueError) as exc:
+        raise SourceFetchError("OATH cooling-tower agency count returned an unexpected payload") from exc
+
+    print(
+        f"[oath] Fetching {expected_count:,} {OATH_COOLING_TOWER_AGENCY} cases; "
+        f"intersecting with {len(requested):,} exact summons tickets",
+        flush=True,
+    )
+    cases: dict[str, dict[str, Any]] = {}
+    fetched_count = 0
+    for offset in range(0, expected_count, OATH_AGENCY_PAGE_SIZE):
+        rows = fetch_where(
+            OATH_DATASET_ID,
+            where,
+            order_by="ticket_number",
+            select=OATH_SELECT,
+            request_retries=OATH_REQUEST_RETRIES,
+            request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
+            limit=OATH_AGENCY_PAGE_SIZE,
+            offset=offset,
+        )
+        fetched_count += len(rows)
+        for row in rows:
+            case = normalize_case(row)
+            if not case:
+                continue
+            ticket = case["ticket_number"]
+            if ticket not in requested:
+                continue
+            existing = cases.get(ticket)
+            if existing is None or _completeness(case) > _completeness(existing):
+                cases[ticket] = case
+        print(
+            f"[oath] Read {fetched_count:,}/{expected_count:,} agency-slice cases; "
+            f"matched {len(cases):,}/{len(requested):,} requested tickets",
+            flush=True,
+        )
+        if len(rows) < OATH_AGENCY_PAGE_SIZE:
+            break
+
+    if fetched_count != expected_count:
+        raise SourceFetchError(
+            f"OATH cooling-tower agency pagination was incomplete: expected {expected_count:,} rows, "
+            f"fetched {fetched_count:,}. Refusing to publish a partial lifecycle snapshot."
+        )
+    return cases, fetched_count
+
+
 def fetch_oath_cases(
     ticket_numbers: Iterable[str],
     batch_size: int = DEFAULT_BATCH_SIZE,
@@ -190,26 +258,30 @@ def fetch_oath_cases(
     requested = sorted({ticket for value in ticket_numbers if (ticket := normalize_ticket_number(value))})
     cases: dict[str, dict[str, Any]] = {}
     query_row_count = 0
-    batches = [requested[start : start + batch_size] for start in range(0, len(requested), batch_size)]
-    worker_count = max(1, min(max_workers, len(batches))) if batches else 1
 
-    if batches:
-        print(
-            f"[oath] Fetching {len(requested):,} exact tickets in {len(batches):,} batches with {worker_count} worker(s)",
-            flush=True,
-        )
-        with ThreadPoolExecutor(max_workers=worker_count) as executor:
-            futures = [executor.submit(_fetch_exact_ticket_batch, batch) for batch in batches]
-            for completed_count, future in enumerate(as_completed(futures), start=1):
-                batch, rows = future.result()
-                query_row_count += len(rows)
-                _merge_exact_ticket_batch(cases, batch, rows)
-                if completed_count % 10 == 0 or completed_count == len(batches):
-                    print(
-                        f"[oath] Completed {completed_count:,}/{len(batches):,} exact-ticket batches; "
-                        f"matched {len(cases):,}/{len(requested):,} tickets so far",
-                        flush=True,
-                    )
+    if len(requested) >= OATH_AGENCY_SLICE_MIN_REQUESTED:
+        cases, query_row_count = _fetch_cooling_tower_agency_cases(set(requested))
+    else:
+        batches = [requested[start : start + batch_size] for start in range(0, len(requested), batch_size)]
+        worker_count = max(1, min(max_workers, len(batches))) if batches else 1
+
+        if batches:
+            print(
+                f"[oath] Fetching {len(requested):,} exact tickets in {len(batches):,} batches with {worker_count} worker(s)",
+                flush=True,
+            )
+            with ThreadPoolExecutor(max_workers=worker_count) as executor:
+                futures = [executor.submit(_fetch_exact_ticket_batch, batch) for batch in batches]
+                for completed_count, future in enumerate(as_completed(futures), start=1):
+                    batch, rows = future.result()
+                    query_row_count += len(rows)
+                    _merge_exact_ticket_batch(cases, batch, rows)
+                    if completed_count % 10 == 0 or completed_count == len(batches):
+                        print(
+                            f"[oath] Completed {completed_count:,}/{len(batches):,} exact-ticket batches; "
+                            f"matched {len(cases):,}/{len(requested):,} tickets so far",
+                            flush=True,
+                        )
 
     metadata = fetch_metadata(OATH_DATASET_ID)
     matched = set(cases)
@@ -220,7 +292,10 @@ def fetch_oath_cases(
         "name": metadata["name"],
         "retrieved_at": retrieved_at,
         "source_record_count": query_row_count,
-        "source_query_scope": "Exact ticket_number queries for summonses present in NYC Cooling Tower System Inspection Results",
+        "source_query_scope": (
+            f"OATH issuing_agency='{OATH_COOLING_TOWER_AGENCY}' rows intersected by exact "
+            "NYC Health summons_number values"
+        ),
         "source_last_updated_at": metadata.get("source_last_updated_at"),
         "url": OATH_SOURCE_URL,
         "requested_ticket_count": len(requested),
