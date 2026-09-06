@@ -41,26 +41,59 @@ def safe_detail_path(base: Path, system_id: str) -> Path:
     return target
 
 
+def progress(message: str) -> None:
+    print(f"[build_data] {message}", flush=True)
+
+
 def build(output_dir: Path) -> dict:
+    progress("Loading NYC rules")
     rules = load_rules()
+
+    progress("Fetching NYC cooling tower registrations")
     registration_snapshot = fetch_dataset(REGISTRATION_ID, "system_id")
+    progress(f"Fetched {len(registration_snapshot.rows):,} cooling tower registrations")
+
+    progress("Fetching NYC cooling tower inspections")
     inspection_snapshot = fetch_dataset(INSPECTION_ID, "system_id,inspection_date")
+    progress(f"Fetched {len(inspection_snapshot.rows):,} cooling tower inspections")
+
+    progress("Validating NYC registration and inspection sources")
     validate_sources(registration_snapshot.rows, inspection_snapshot.rows)
 
+    progress("Normalizing NYC cooling tower registrations")
     systems, dedupe_meta = normalize_registrations(registration_snapshot.rows)
     snapshot_date = datetime.now(ZoneInfo("America/New_York")).date()
     validate_normalized(systems, snapshot_date)
     inspections_by_system = aggregate_inspections(inspection_snapshot.rows)
+    progress(f"Normalized {len(systems):,} systems")
 
     bbl_values = {system["bbl"] for system in systems if system.get("bbl")}
     bin_values = {system["bin"] for system in systems if system.get("bin")}
     oath_ticket_numbers = summons_numbers_from_inspections(inspections_by_system)
+
+    progress(f"Fetching OATH cases for {len(oath_ticket_numbers):,} summons tickets")
     oath_cases_by_ticket, oath_meta = fetch_oath_cases(oath_ticket_numbers)
+    progress(f"Matched {len(oath_cases_by_ticket):,} OATH cases")
+
+    progress(f"Fetching PLUTO context for {len(bbl_values):,} BBLs")
     pluto_by_bbl, pluto_meta = fetch_pluto_by_bbl(bbl_values)
+    progress(f"Matched PLUTO context for {len(pluto_by_bbl):,} BBLs")
+
+    progress(f"Fetching DOB NOW activity for {len(bbl_values):,} BBLs")
     dob_by_bbl, dob_meta = fetch_dob_activity_by_bbl(bbl_values)
+    progress(f"Matched DOB NOW activity for {len(dob_by_bbl):,} BBLs")
+
+    progress(f"Fetching HPD contacts for {len(bbl_values):,} BBLs")
     hpd_by_bbl, hpd_meta = fetch_hpd_contacts_by_bbl(bbl_values)
+    progress(f"Matched HPD contacts for {len(hpd_by_bbl):,} BBLs")
+
+    progress(f"Fetching Planimetrics cooling-tower geometry for {len(bin_values):,} BINs")
     planimetric_by_bin, planimetric_meta = fetch_planimetric_towers_by_bin(bin_values)
+    progress(f"Matched Planimetrics geometry for {len(planimetric_by_bin):,} BINs")
+
+    progress(f"Fetching building footprints for {len(bin_values):,} BINs")
     building_footprints_by_bin, building_footprint_meta = fetch_building_footprints_by_bin(bin_values)
+    progress(f"Matched building footprints for {len(building_footprints_by_bin):,} BINs")
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [
