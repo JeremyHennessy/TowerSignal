@@ -100,9 +100,15 @@ jobs:
       - name: Validate NYC distribution water-quality cache
         run: python scripts/validate_nyc_distribution_water_cache.py --cache public/data/nyc-distribution-water.json --max-age-days 1 --require-production-volume
       - name: Probe ELAP public source contract
-        run: python scripts/probe_elap_search.py > public/data/elap-source-probe.json
+        timeout-minutes: 5
+        run: >-
+          python scripts/probe_elap_search.py
+          --allow-source-unavailable
+          --retries 2
+          --timeout 30
+          > public/data/elap-source-probe.json
       - name: Validate ELAP public source contract
-        run: python scripts/validate_elap_source_probe.py --probe public/data/elap-source-probe.json
+        run: python scripts/validate_elap_source_probe.py --probe public/data/elap-source-probe.json --allow-source-unavailable
       - name: Fetch, validate and normalize NYC City Record procurement
         run: python scripts/build_city_record_procurement.py --output public/data/procurement-city-record.json
       - name: Attach last verified Checkbook NYC procurement cache
