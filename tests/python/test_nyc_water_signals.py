@@ -144,6 +144,7 @@ class NycWaterSignalsTests(unittest.TestCase):
                 where = str(kwargs.get("where") or "")
                 self.assertEqual(kwargs.get("seek_field"), "unique_key")
                 self.assertIs(kwargs.get("seek_field_is_text"), True)
+                self.assertIs(kwargs.get("skip_count"), True)
                 self.assertIn("agency='DEP'", where)
                 self.assertIn("created_date >=", where)
                 self.assertRegex(where, r"lower\((complaint_type|descriptor|descriptor_2)\) like '%(water|lead)%'")
@@ -256,6 +257,36 @@ class NycWaterSignalsTests(unittest.TestCase):
                 required_fields=("id",),
                 page_size=2,
                 allow_count_fallback=True,
+            )
+
+        self.assertEqual([row["id"] for row in snapshot.rows], ["0", "1", "2", "3", "4"])
+        self.assertEqual(snapshot.source_record_count, 5)
+        self.assertEqual(page_offsets, [0, 2, 4])
+
+    def test_snapshot_can_skip_count_query_and_page_until_short_page(self) -> None:
+        rows = [{"id": str(index)} for index in range(5)]
+        page_offsets: list[int] = []
+
+        def fake_query(dataset_id: str, *, api_root: str, params):
+            self.assertEqual(dataset_id, "skip-count-demo")
+            self.assertEqual(api_root, "https://example.test")
+            limit = int(params["$limit"])
+            offset = int(params["$offset"])
+            page_offsets.append(offset)
+            return rows[offset:offset + limit]
+
+        with (
+            patch("towersignal.domestic_water_market.fetch_metadata", return_value={"name": "Skip count demo", "source_last_updated_at": None, "fields": ("id",)}),
+            patch("towersignal.domestic_water_market.fetch_count", side_effect=AssertionError("count should not be called")),
+            patch("towersignal.domestic_water_market._query", side_effect=fake_query),
+        ):
+            snapshot = fetch_source_snapshot(
+                "skip-count-demo",
+                api_root="https://example.test",
+                order_by="id",
+                required_fields=("id",),
+                page_size=2,
+                skip_count=True,
             )
 
         self.assertEqual([row["id"] for row in snapshot.rows], ["0", "1", "2", "3", "4"])
