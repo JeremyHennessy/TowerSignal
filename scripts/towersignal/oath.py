@@ -258,9 +258,14 @@ def fetch_oath_cases(
     requested = sorted({ticket for value in ticket_numbers if (ticket := normalize_ticket_number(value))})
     cases: dict[str, dict[str, Any]] = {}
     query_row_count = 0
+    query_scope = "Exact ticket_number queries for summonses present in NYC Cooling Tower System Inspection Results"
 
     if len(requested) >= OATH_AGENCY_SLICE_MIN_REQUESTED:
         cases, query_row_count = _fetch_cooling_tower_agency_cases(set(requested))
+        query_scope = (
+            f"OATH issuing_agency='{OATH_COOLING_TOWER_AGENCY}' rows intersected by exact "
+            "NYC Health summons_number values"
+        )
     else:
         batches = [requested[start : start + batch_size] for start in range(0, len(requested), batch_size)]
         worker_count = max(1, min(max_workers, len(batches))) if batches else 1
@@ -292,10 +297,7 @@ def fetch_oath_cases(
         "name": metadata["name"],
         "retrieved_at": retrieved_at,
         "source_record_count": query_row_count,
-        "source_query_scope": (
-            f"OATH issuing_agency='{OATH_COOLING_TOWER_AGENCY}' rows intersected by exact "
-            "NYC Health summons_number values"
-        ),
+        "source_query_scope": query_scope,
         "source_last_updated_at": metadata.get("source_last_updated_at"),
         "url": OATH_SOURCE_URL,
         "requested_ticket_count": len(requested),
