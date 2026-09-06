@@ -124,3 +124,5 @@ This integration branch keeps the standalone 017B data proof unchanged and adds
 attach step only promotes exact source BBL/BIN rows into NYC Account and
 Technician Field Pack context; address-only, street-infrastructure and LL84
 multi-identifier rows remain outside account detail.
+
+<!-- Diagnostic-only PR trigger, 2026-09-06: no production behavior change. -->
