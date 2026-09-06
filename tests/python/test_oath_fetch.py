@@ -131,7 +131,7 @@ class OathBatchFetchTests(unittest.TestCase):
         ):
             self.assertEqual(dataset_id, "jz4z-kudi")
             self.assertIn("COOLING TOWERS - DOHMH", where)
-            self.assertEqual(request_retries, 1)
+            self.assertEqual(request_retries, 4)
             self.assertEqual(request_timeout, 30)
             if select == "count(*) as count":
                 self.assertEqual(limit, 1)
