@@ -35,7 +35,11 @@ export default defineConfig({
       name: 'iphone',
       testIgnore: /auth\.setup\.ts/,
       dependencies: ['setup-iphone'],
-      use: { ...devices['iPhone 13'], ...iphoneAuthState },
+      // Retained WebKit DOM snapshots take tens of seconds each on dense account
+      // reports and can consume the test budget before the assertion runs. Keep
+      // a failure screenshot for hosted evidence, but do not continuously trace
+      // the iPhone project. Desktop retains full trace diagnostics.
+      use: { ...devices['iPhone 13'], ...iphoneAuthState, trace: 'off', screenshot: 'only-on-failure' },
     },
   ],
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
