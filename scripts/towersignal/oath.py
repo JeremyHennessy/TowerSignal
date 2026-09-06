@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from typing import Any, Iterable
 
@@ -9,6 +10,8 @@ OATH_DATASET_ID = "jz4z-kudi"
 OATH_SOURCE_URL = "https://data.cityofnewyork.us/City-Government/OATH-Hearings-Division-Case-Status/jz4z-kudi"
 MATCH_BASIS = "SUMMONS_NUMBER_EXACT"
 MIN_EXPECTED_MATCH_RATIO = 0.90
+DEFAULT_BATCH_SIZE = 250
+DEFAULT_MAX_WORKERS = 4
 
 OATH_SELECT = ",".join([
     "ticket_number", "issuing_agency", "violation_date",
@@ -128,32 +131,59 @@ def validate_match_coverage(requested_count: int, matched_count: int, minimum_ra
         )
 
 
-def fetch_oath_cases(ticket_numbers: Iterable[str], batch_size: int = 250) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
+    quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
+    rows = fetch_where(
+        OATH_DATASET_ID,
+        f"ticket_number in ({quoted})",
+        order_by="ticket_number",
+        select=OATH_SELECT,
+    )
+    return batch, rows
+
+
+def _merge_exact_ticket_batch(cases: dict[str, dict[str, Any]], batch: list[str], rows: list[dict[str, Any]]) -> None:
+    expected = set(batch)
+    for row in rows:
+        case = normalize_case(row)
+        if not case:
+            continue
+        ticket = case["ticket_number"]
+        if ticket not in expected:
+            raise SourceFetchError(f"OATH query returned unexpected ticket {ticket}")
+        existing = cases.get(ticket)
+        if existing is None or _completeness(case) > _completeness(existing):
+            cases[ticket] = case
+
+
+def fetch_oath_cases(
+    ticket_numbers: Iterable[str],
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    max_workers: int = DEFAULT_MAX_WORKERS,
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     requested = sorted({ticket for value in ticket_numbers if (ticket := normalize_ticket_number(value))})
     cases: dict[str, dict[str, Any]] = {}
     query_row_count = 0
+    batches = [requested[start : start + batch_size] for start in range(0, len(requested), batch_size)]
+    worker_count = max(1, min(max_workers, len(batches))) if batches else 1
 
-    for start in range(0, len(requested), batch_size):
-        batch = requested[start : start + batch_size]
-        quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
-        rows = fetch_where(
-            OATH_DATASET_ID,
-            f"ticket_number in ({quoted})",
-            order_by="ticket_number",
-            select=OATH_SELECT,
+    if batches:
+        print(
+            f"[oath] Fetching {len(requested):,} exact tickets in {len(batches):,} batches with {worker_count} worker(s)",
+            flush=True,
         )
-        query_row_count += len(rows)
-        expected = set(batch)
-        for row in rows:
-            case = normalize_case(row)
-            if not case:
-                continue
-            ticket = case["ticket_number"]
-            if ticket not in expected:
-                raise SourceFetchError(f"OATH query returned unexpected ticket {ticket}")
-            existing = cases.get(ticket)
-            if existing is None or _completeness(case) > _completeness(existing):
-                cases[ticket] = case
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            futures = [executor.submit(_fetch_exact_ticket_batch, batch) for batch in batches]
+            for completed_count, future in enumerate(as_completed(futures), start=1):
+                batch, rows = future.result()
+                query_row_count += len(rows)
+                _merge_exact_ticket_batch(cases, batch, rows)
+                if completed_count % 10 == 0 or completed_count == len(batches):
+                    print(
+                        f"[oath] Completed {completed_count:,}/{len(batches):,} exact-ticket batches; "
+                        f"matched {len(cases):,}/{len(requested):,} tickets so far",
+                        flush=True,
+                    )
 
     metadata = fetch_metadata(OATH_DATASET_ID)
     matched = set(cases)
