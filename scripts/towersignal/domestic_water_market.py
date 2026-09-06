@@ -219,6 +219,7 @@ def fetch_snapshot(
     progress_label: str | None = None,
     seek_field: str | None = None,
     seek_field_is_text: bool = False,
+    skip_count: bool = False,
 ) -> SourceSnapshot:
     metadata = fetch_metadata(dataset_id, api_root=api_root)
     available = set(metadata["fields"])
@@ -226,17 +227,22 @@ def fetch_snapshot(
     if missing:
         raise DomesticWaterSourceError(f"Dataset {dataset_id} is missing required fields: {', '.join(missing)}")
 
-    try:
-        expected_count: int | None = fetch_count(dataset_id, api_root=api_root, where=where)
-    except DomesticWaterSourceError:
-        if not allow_count_fallback:
-            raise
+    if skip_count:
         if progress_label:
-            print(f"{progress_label}: source count query unavailable; paging until short page", file=sys.stderr, flush=True)
-        expected_count = None
+            print(f"{progress_label}: source count skipped; paging until short page", file=sys.stderr, flush=True)
+        expected_count: int | None = None
     else:
-        if progress_label:
-            print(f"{progress_label}: source count {expected_count:,}", file=sys.stderr, flush=True)
+        try:
+            expected_count = fetch_count(dataset_id, api_root=api_root, where=where)
+        except DomesticWaterSourceError:
+            if not allow_count_fallback:
+                raise
+            if progress_label:
+                print(f"{progress_label}: source count query unavailable; paging until short page", file=sys.stderr, flush=True)
+            expected_count = None
+        else:
+            if progress_label:
+                print(f"{progress_label}: source count {expected_count:,}", file=sys.stderr, flush=True)
     rows: list[dict[str, Any]] = []
     offset = 0
     active_page_size = page_size

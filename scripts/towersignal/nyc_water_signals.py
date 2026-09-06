@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import re
+import sys
 from collections import Counter
+from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from towersignal.domestic_water_market import (
@@ -24,6 +26,7 @@ DOB_APPROVED_PERMITS_DATASET_ID = "rbx6-tga4"
 LL84_DATASET_ID = "5zyy-y8am"
 NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
+NYC_311_MAX_PAGE_SIZE = 50000
 HPD_MAX_PAGE_SIZE = 10000
 HPD_WATER_TERMS = (
     "hot water",
@@ -38,8 +41,29 @@ HPD_WATER_TERMS = (
     "water closet",
 )
 
+NYC_311_BASE_WHERE = f"agency='DEP' AND created_date >= '{NYC_311_START}'"
+NYC_311_WATER_TERMS = ("water", "lead")
+NYC_311_TEXT_FIELDS = ("complaint_type", "descriptor", "descriptor_2")
+NYC_311_REQUIRED_FIELDS = (
+    "unique_key",
+    "created_date",
+    "closed_date",
+    "agency",
+    "agency_name",
+    "complaint_type",
+    "descriptor",
+    "descriptor_2",
+    "incident_zip",
+    "incident_address",
+    "street_name",
+    "status",
+    "resolution_description",
+    "bbl",
+    "borough",
+)
+NYC_311_SELECT = ",".join(NYC_311_REQUIRED_FIELDS)
 NYC_311_WHERE = (
-    "agency='DEP' AND created_date >= '2025-01-01T00:00:00.000' AND ("
+    f"{NYC_311_BASE_WHERE} AND ("
     "lower(complaint_type) like '%water%' OR lower(descriptor) like '%water%' OR "
     "lower(descriptor_2) like '%water%' OR lower(complaint_type) like '%lead%' OR "
     "lower(descriptor) like '%lead%' OR lower(descriptor_2) like '%lead%')"
@@ -88,6 +112,82 @@ def _number(value: Any) -> float | None:
         return float(text)
     except ValueError:
         return None
+
+
+def _month_floor(value: datetime) -> tuple[int, int]:
+    return value.year, value.month
+
+
+def _next_month(year: int, month: int) -> tuple[int, int]:
+    return (year + 1, 1) if month == 12 else (year, month + 1)
+
+
+def _month_start(year: int, month: int) -> str:
+    return f"{year:04d}-{month:02d}-01T00:00:00.000"
+
+
+def _nyc_311_month_windows(*, now: datetime | None = None) -> list[tuple[str, str]]:
+    start = datetime.fromisoformat(NYC_311_START.replace("Z", "+00:00"))
+    end = now or datetime.now(timezone.utc)
+    year, month = _month_floor(start)
+    end_year, end_month = _month_floor(end)
+    windows: list[tuple[str, str]] = []
+    while (year, month) <= (end_year, end_month):
+        next_year, next_month = _next_month(year, month)
+        windows.append((_month_start(year, month), _month_start(next_year, next_month)))
+        year, month = next_year, next_month
+    return windows
+
+
+def _nyc_311_partition_where(start: str, end: str) -> str:
+    return (
+        f"agency='DEP' AND created_date >= '{start}' AND created_date < '{end}' AND ("
+        "lower(complaint_type) like '%water%' OR lower(descriptor) like '%water%' OR "
+        "lower(descriptor_2) like '%water%' OR lower(complaint_type) like '%lead%' OR "
+        "lower(descriptor) like '%lead%' OR lower(descriptor_2) like '%lead%')"
+    )
+
+
+def _fetch_311_snapshots(*, page_size: int) -> list[SourceSnapshot]:
+    snapshots: list[SourceSnapshot] = []
+    bounded_page_size = min(page_size, NYC_311_MAX_PAGE_SIZE)
+    for start, end in _nyc_311_month_windows():
+        month_label = start[:7]
+        label = f"NYC water 311 DEP requests {month_label} water/lead"
+        print(f"{label}: starting", file=sys.stderr, flush=True)
+        snapshots.append(
+            fetch_snapshot(
+                NYC_311_DATASET_ID,
+                api_root=NYC_API_ROOT,
+                order_by="created_date,unique_key",
+                required_fields=NYC_311_REQUIRED_FIELDS,
+                where=_nyc_311_partition_where(start, end),
+                select=NYC_311_SELECT,
+                page_size=bounded_page_size,
+                progress_label=label,
+                skip_count=True,
+                allow_count_fallback=True,
+            )
+        )
+    return snapshots
+
+
+def _dedupe_311_rows(snapshots: Sequence[SourceSnapshot]) -> tuple[list[dict[str, Any]], int]:
+    rows_by_key: dict[str, dict[str, Any]] = {}
+    duplicate_count = 0
+    for snapshot in snapshots:
+        for row in snapshot.rows:
+            unique_key = normalize_space(row.get("unique_key")) or stable_id("nyc-311-water-source", row)
+            if unique_key in rows_by_key:
+                duplicate_count += 1
+                continue
+            rows_by_key[unique_key] = row
+
+    def sort_key(row: Mapping[str, Any]) -> tuple[int, int | str]:
+        unique_key = normalize_space(row.get("unique_key"))
+        return (0, int(unique_key)) if unique_key.isdigit() else (1, unique_key)
+
+    return sorted(rows_by_key.values(), key=sort_key), duplicate_count
 
 
 def classify_311(row: Mapping[str, Any]) -> str:
@@ -184,14 +284,14 @@ def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
     for term in HPD_WATER_TERMS:
         snapshots.append(
             fetch_snapshot(
-                HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="violationid",
+                HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="inspectiondate,violationid",
                 required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
                 where=_hpd_term_where(term),
                 select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
                 page_size=min(page_size, HPD_MAX_PAGE_SIZE),
                 allow_count_fallback=True,
                 progress_label=f"NYC water HPD term {term!r}",
-                seek_field="violationid",
+                skip_count=True,
             )
         )
     return snapshots
@@ -395,16 +495,10 @@ def _dob_business_profiles(*collections: Sequence[Mapping[str, Any]]) -> list[di
 
 
 def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
-    requests_snapshot = fetch_snapshot(
-        NYC_311_DATASET_ID, api_root=NYC_API_ROOT, order_by="unique_key",
-        required_fields=("unique_key", "created_date", "closed_date", "agency", "agency_name", "complaint_type", "descriptor", "descriptor_2", "incident_zip", "incident_address", "street_name", "status", "resolution_description", "bbl", "borough"),
-        where=NYC_311_WHERE,
-        select="unique_key,created_date,closed_date,agency,agency_name,complaint_type,descriptor,descriptor_2,incident_zip,incident_address,street_name,status,resolution_description,bbl,borough",
-        page_size=page_size,
-        progress_label="NYC water 311 DEP requests",
-        seek_field="unique_key",
-        seek_field_is_text=True,
-    )
+    print("NYC water signals: fetching 311 DEP water/lead request partitions", file=sys.stderr, flush=True)
+    requests_snapshots = _fetch_311_snapshots(page_size=page_size)
+    request_rows, request_duplicate_partition_count = _dedupe_311_rows(requests_snapshots)
+    print("NYC water signals: fetching HPD water violation partitions", file=sys.stderr, flush=True)
     hpd_snapshots = _fetch_hpd_snapshots(page_size=page_size)
     hpd_rows, hpd_duplicate_partition_count = _dedupe_hpd_rows(hpd_snapshots)
     job_snapshot = fetch_snapshot(
@@ -430,7 +524,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         page_size=page_size,
         progress_label="NYC water LL84 benchmarks",
     )
-    requests = [normalize_311(row) for row in requests_snapshot.rows]
+    requests = [normalize_311(row) for row in request_rows]
     hpd = [normalize_hpd(row) for row in hpd_rows]
     jobs = [normalize_dob_job(row) for row in job_snapshot.rows]
     permits = [normalize_dob_permit(row) for row in permit_snapshot.rows]
@@ -440,7 +534,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
         "domain": "NYC_BUILDING_WATER_SIGNALS",
-        "query_boundaries": {"311_start": NYC_311_START, "hpd_scope": "Current open HPD violations fetched through uppercase source-description keyword partitions.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
+        "query_boundaries": {"311_start": NYC_311_START, "311_scope": "DEP service requests fetched through monthly water/lead source-filter partitions and de-duplicated by unique_key.", "311_fields": list(NYC_311_TEXT_FIELDS), "311_terms": list(NYC_311_WATER_TERMS), "311_month_partition_count": len(_nyc_311_month_windows()), "hpd_scope": "Current open HPD violations fetched through uppercase source-description keyword partitions.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
         "evidence_semantics": {
             "311": "Service-request observations. Building signal only when classification is building-water; street/hydrant/sewer remain context.",
             "hpd": "Current HPD violation evidence directly tied to source BIN/BBL when present.",
@@ -450,6 +544,10 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "summary": {
             "water_311_request_count": len(requests),
             "water_311_building_signal_count": sum(1 for row in requests if row["is_building_water_signal"]),
+            "water_311_source_fetch_strategy": "MONTHLY_OR_PARTITIONS",
+            "water_311_source_partition_count": len(requests_snapshots),
+            "water_311_source_partition_record_count": sum(snapshot.source_record_count for snapshot in requests_snapshots),
+            "water_311_duplicate_partition_request_count": request_duplicate_partition_count,
             "hpd_open_water_violation_count": len(hpd),
             "hpd_source_fetch_strategy": "UPPERCASE_KEYWORD_PARTITIONS",
             "hpd_source_partition_count": len(hpd_snapshots),
@@ -464,7 +562,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
             "ll84_rows_with_municipal_potable_total": sum(1 for row in ll84 if row["municipal_potable_total_kgal"] is not None),
         },
         "source_health": [
-            source_health(requests_snapshot, normalized_count=len(requests)),
+            *[source_health(snapshot, normalized_count=len(snapshot.rows)) for snapshot in requests_snapshots],
             *[source_health(snapshot, normalized_count=len(snapshot.rows)) for snapshot in hpd_snapshots],
             source_health(job_snapshot, normalized_count=len(jobs)),
             source_health(permit_snapshot, normalized_count=len(permits)),
