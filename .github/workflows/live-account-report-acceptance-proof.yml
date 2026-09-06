@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/live-account-report-acceptance-proof.yml'
       - 'tests/e2e/account-report-acceptance-proof.spec.ts'
+      - 'playwright.config.ts'
 
 permissions:
   contents: read
@@ -17,7 +18,7 @@ concurrency:
 jobs:
   verify-live-report:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,6 +32,14 @@ jobs:
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
         run: npx playwright test tests/e2e/account-report-acceptance-proof.spec.ts --project=desktop-chromium --project=iphone
+      - name: Verify full production hosted suite without iPhone trace snapshots
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: >-
+          npx playwright test
+          --project=desktop-chromium
+          --project=iphone
+          --grep-invert 'hosted (dense|sparse) account reports preserve the approved single-flow layout'
       - name: Upload report acceptance evidence
         if: always()
         uses: actions/upload-artifact@v4
