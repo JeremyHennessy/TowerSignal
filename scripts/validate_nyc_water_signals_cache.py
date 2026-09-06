@@ -63,6 +63,13 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         request_unique = int(summary.get("water_311_request_count") or 0)
         if request_partition_records - request_duplicates != request_unique:
             raise RuntimeError("311 partition de-duplication counts do not reconcile")
+    elif request_fetch_strategy == "MONTHLY_OR_PARTITIONS":
+        if request_partition_count < 1:
+            raise RuntimeError("311 source partition count mismatch")
+        request_duplicates = int(summary.get("water_311_duplicate_partition_request_count") or 0)
+        request_unique = int(summary.get("water_311_request_count") or 0)
+        if request_partition_records - request_duplicates != request_unique:
+            raise RuntimeError("311 partition de-duplication counts do not reconcile")
     elif request_fetch_strategy != "SINGLE_OR_QUERY":
         raise RuntimeError(f"Unknown 311 source fetch strategy: {request_fetch_strategy}")
 
