@@ -3,6 +3,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from typing import Any, Iterable
+import time
 
 from towersignal.fetch import SourceFetchError, fetch_metadata, fetch_where
 
@@ -10,8 +11,9 @@ OATH_DATASET_ID = "jz4z-kudi"
 OATH_SOURCE_URL = "https://data.cityofnewyork.us/City-Government/OATH-Hearings-Division-Case-Status/jz4z-kudi"
 MATCH_BASIS = "SUMMONS_NUMBER_EXACT"
 MIN_EXPECTED_MATCH_RATIO = 0.90
-DEFAULT_BATCH_SIZE = 250
-DEFAULT_MAX_WORKERS = 4
+DEFAULT_BATCH_SIZE = 100
+DEFAULT_MAX_WORKERS = 2
+OATH_RATE_LIMIT_RETRIES = 3
 
 OATH_SELECT = ",".join([
     "ticket_number", "issuing_agency", "violation_date",
@@ -131,15 +133,35 @@ def validate_match_coverage(requested_count: int, matched_count: int, minimum_ra
         )
 
 
+def _is_rate_limit_error(exc: SourceFetchError) -> bool:
+    return "429" in str(exc) or "Too Many Requests" in str(exc)
+
+
 def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
     quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
-    rows = fetch_where(
-        OATH_DATASET_ID,
-        f"ticket_number in ({quoted})",
-        order_by="ticket_number",
-        select=OATH_SELECT,
-    )
-    return batch, rows
+    where = f"ticket_number in ({quoted})"
+    last_error: SourceFetchError | None = None
+    for attempt in range(OATH_RATE_LIMIT_RETRIES):
+        try:
+            rows = fetch_where(
+                OATH_DATASET_ID,
+                where,
+                order_by="ticket_number",
+                select=OATH_SELECT,
+            )
+            return batch, rows
+        except SourceFetchError as exc:
+            last_error = exc
+            if not _is_rate_limit_error(exc) or attempt + 1 >= OATH_RATE_LIMIT_RETRIES:
+                raise
+            delay = 15 * (attempt + 1)
+            print(
+                f"[oath] OATH rate limit while fetching {len(batch):,} exact tickets; "
+                f"retrying in {delay}s",
+                flush=True,
+            )
+            time.sleep(delay)
+    raise last_error or SourceFetchError("OATH exact-ticket batch failed")
 
 
 def _merge_exact_ticket_batch(cases: dict[str, dict[str, Any]], batch: list[str], rows: list[dict[str, Any]]) -> None:
