@@ -29,6 +29,10 @@ REGISTRATION_ID = "y4fw-iqfr"
 INSPECTION_ID = "f9wb-g8mb"
 
 
+def log_step(message: str) -> None:
+    print(f"[build_data] {message}", flush=True)
+
+
 def load_rules() -> dict:
     return json.loads((ROOT / "config/rules/nyc.json").read_text(encoding="utf-8"))
 
@@ -43,10 +47,15 @@ def safe_detail_path(base: Path, system_id: str) -> Path:
 
 def build(output_dir: Path) -> dict:
     rules = load_rules()
+    log_step("fetching NYC cooling-tower registrations")
     registration_snapshot = fetch_dataset(REGISTRATION_ID, "system_id")
+    log_step(f"fetched {registration_snapshot.source_record_count:,} registration rows")
+    log_step("fetching NYC cooling-tower inspections")
     inspection_snapshot = fetch_dataset(INSPECTION_ID, "system_id,inspection_date")
+    log_step(f"fetched {inspection_snapshot.source_record_count:,} inspection rows")
     validate_sources(registration_snapshot.rows, inspection_snapshot.rows)
 
+    log_step("normalizing cooling-tower systems and inspection history")
     systems, dedupe_meta = normalize_registrations(registration_snapshot.rows)
     snapshot_date = datetime.now(ZoneInfo("America/New_York")).date()
     validate_normalized(systems, snapshot_date)
@@ -55,12 +64,24 @@ def build(output_dir: Path) -> dict:
     bbl_values = {system["bbl"] for system in systems if system.get("bbl")}
     bin_values = {system["bin"] for system in systems if system.get("bin")}
     oath_ticket_numbers = summons_numbers_from_inspections(inspections_by_system)
+    log_step(f"fetching OATH cases for {len(oath_ticket_numbers):,} exact summons numbers")
     oath_cases_by_ticket, oath_meta = fetch_oath_cases(oath_ticket_numbers)
+    log_step(f"matched {oath_meta['matched_ticket_count']:,} OATH tickets")
+    log_step(f"fetching PLUTO for {len(bbl_values):,} cooling-tower BBLs")
     pluto_by_bbl, pluto_meta = fetch_pluto_by_bbl(bbl_values)
+    log_step(f"matched {pluto_meta['matched_bbl_count']:,} PLUTO BBLs")
+    log_step(f"fetching DOB NOW activity for {len(bbl_values):,} cooling-tower BBLs")
     dob_by_bbl, dob_meta = fetch_dob_activity_by_bbl(bbl_values)
+    log_step(f"matched {dob_meta['matched_filing_count']:,} DOB NOW filings")
+    log_step(f"fetching HPD contacts for {len(bbl_values):,} cooling-tower BBLs")
     hpd_by_bbl, hpd_meta = fetch_hpd_contacts_by_bbl(bbl_values)
+    log_step(f"matched {hpd_meta['matched_contact_record_count']:,} HPD contact records")
+    log_step(f"fetching planimetric tower features for {len(bin_values):,} cooling-tower BINs")
     planimetric_by_bin, planimetric_meta = fetch_planimetric_towers_by_bin(bin_values)
+    log_step(f"matched {planimetric_meta['matched_feature_count']:,} planimetric tower features")
+    log_step(f"fetching building footprints for {len(bin_values):,} cooling-tower BINs")
     building_footprints_by_bin, building_footprint_meta = fetch_building_footprints_by_bin(bin_values)
+    log_step(f"matched {building_footprint_meta['matched_feature_count']:,} building footprint features")
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [
@@ -384,7 +405,7 @@ def build(output_dir: Path) -> dict:
     print(f"HPD exact BBL registrations: {hpd_meta['matched_registration_bbl_count']:,}/{hpd_meta['requested_bbl_count']:,}; contacts on {hpd_meta['matched_contact_bbl_count']:,} BBLs")
     print(f"Planimetric exact BIN matches: {planimetric_meta['matched_bin_count']:,}/{planimetric_meta['requested_bin_count']:,}; {planimetric_meta['matched_feature_count']:,} physical tower features")
     print(f"Building-footprint exact BIN matches: {building_footprint_meta['matched_bin_count']:,}/{building_footprint_meta['requested_bin_count']:,}; {building_footprint_meta['matched_feature_count']:,} footprint features")
-    print(f"Generated {len(summary_rows):,} systems at {generated_at}")
+    log_step(f"generated {len(summary_rows):,} systems at {generated_at}")
     return payload
 
 
