@@ -26,7 +26,7 @@ DOB_APPROVED_PERMITS_DATASET_ID = "rbx6-tga4"
 LL84_DATASET_ID = "5zyy-y8am"
 NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
-NYC_311_MAX_PAGE_SIZE = 10000
+NYC_311_MAX_PAGE_SIZE = 50000
 HPD_MAX_PAGE_SIZE = 10000
 HPD_WATER_TERMS = (
     "hot water",
@@ -139,10 +139,12 @@ def _nyc_311_month_windows(*, now: datetime | None = None) -> list[tuple[str, st
     return windows
 
 
-def _nyc_311_partition_where(field: str, term: str, start: str, end: str) -> str:
+def _nyc_311_partition_where(start: str, end: str) -> str:
     return (
-        f"agency='DEP' AND created_date >= '{start}' AND created_date < '{end}' "
-        f"AND lower({field}) like '%{term}%'"
+        f"agency='DEP' AND created_date >= '{start}' AND created_date < '{end}' AND ("
+        "lower(complaint_type) like '%water%' OR lower(descriptor) like '%water%' OR "
+        "lower(descriptor_2) like '%water%' OR lower(complaint_type) like '%lead%' OR "
+        "lower(descriptor) like '%lead%' OR lower(descriptor_2) like '%lead%')"
     )
 
 
@@ -151,24 +153,22 @@ def _fetch_311_snapshots(*, page_size: int) -> list[SourceSnapshot]:
     bounded_page_size = min(page_size, NYC_311_MAX_PAGE_SIZE)
     for start, end in _nyc_311_month_windows():
         month_label = start[:7]
-        for field in NYC_311_TEXT_FIELDS:
-            for term in NYC_311_WATER_TERMS:
-                label = f"NYC water 311 DEP requests {month_label} {field} contains {term!r}"
-                print(f"{label}: starting", file=sys.stderr, flush=True)
-                snapshots.append(
-                    fetch_snapshot(
-                        NYC_311_DATASET_ID,
-                        api_root=NYC_API_ROOT,
-                        order_by="created_date,unique_key",
-                        required_fields=NYC_311_REQUIRED_FIELDS,
-                        where=_nyc_311_partition_where(field, term, start, end),
-                        select=NYC_311_SELECT,
-                        page_size=bounded_page_size,
-                        progress_label=label,
-                        skip_count=True,
-                        allow_count_fallback=True,
-                    )
-                )
+        label = f"NYC water 311 DEP requests {month_label} water/lead"
+        print(f"{label}: starting", file=sys.stderr, flush=True)
+        snapshots.append(
+            fetch_snapshot(
+                NYC_311_DATASET_ID,
+                api_root=NYC_API_ROOT,
+                order_by="created_date,unique_key",
+                required_fields=NYC_311_REQUIRED_FIELDS,
+                where=_nyc_311_partition_where(start, end),
+                select=NYC_311_SELECT,
+                page_size=bounded_page_size,
+                progress_label=label,
+                skip_count=True,
+                allow_count_fallback=True,
+            )
+        )
     return snapshots
 
 
@@ -534,7 +534,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
         "domain": "NYC_BUILDING_WATER_SIGNALS",
-        "query_boundaries": {"311_start": NYC_311_START, "311_scope": "DEP service requests fetched through monthly source-field keyword partitions and de-duplicated by unique_key.", "311_fields": list(NYC_311_TEXT_FIELDS), "311_terms": list(NYC_311_WATER_TERMS), "311_month_partition_count": len(_nyc_311_month_windows()), "hpd_scope": "Current open HPD violations fetched through uppercase source-description keyword partitions.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
+        "query_boundaries": {"311_start": NYC_311_START, "311_scope": "DEP service requests fetched through monthly water/lead source-filter partitions and de-duplicated by unique_key.", "311_fields": list(NYC_311_TEXT_FIELDS), "311_terms": list(NYC_311_WATER_TERMS), "311_month_partition_count": len(_nyc_311_month_windows()), "hpd_scope": "Current open HPD violations fetched through uppercase source-description keyword partitions.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
         "evidence_semantics": {
             "311": "Service-request observations. Building signal only when classification is building-water; street/hydrant/sewer remain context.",
             "hpd": "Current HPD violation evidence directly tied to source BIN/BBL when present.",
@@ -544,7 +544,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "summary": {
             "water_311_request_count": len(requests),
             "water_311_building_signal_count": sum(1 for row in requests if row["is_building_water_signal"]),
-            "water_311_source_fetch_strategy": "MONTHLY_FIELD_KEYWORD_PARTITIONS",
+            "water_311_source_fetch_strategy": "MONTHLY_OR_PARTITIONS",
             "water_311_source_partition_count": len(requests_snapshots),
             "water_311_source_partition_record_count": sum(snapshot.source_record_count for snapshot in requests_snapshots),
             "water_311_duplicate_partition_request_count": request_duplicate_partition_count,
