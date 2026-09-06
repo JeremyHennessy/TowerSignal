@@ -35,6 +35,8 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     source_health = payload.get("source_health")
     if not isinstance(summary, dict) or not isinstance(source_health, list) or len(source_health) < 5:
         raise RuntimeError("NYC water signal cache must contain summary and source-health records")
+    query_boundaries = payload.get("query_boundaries")
+    query_boundaries = query_boundaries if isinstance(query_boundaries, dict) else {}
     for source in source_health:
         if not isinstance(source, dict):
             raise RuntimeError("Source-health record is not an object")
@@ -90,7 +92,15 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     hpd_duplicates = -1 if hpd_duplicate_raw is None else int(hpd_duplicate_raw)
     if hpd_fetch_strategy == "OPEN_VIOLATIONS_LOCAL_TERM_FILTER":
         raise RuntimeError("HPD local-filter strategy is too broad for production cache verification")
-    if hpd_fetch_strategy in {"KEYWORD_PARTITIONS", "UPPERCASE_KEYWORD_PARTITIONS"}:
+    if hpd_fetch_strategy == "BOROUGH_OR_PARTITIONS":
+        expected_boroughs = query_boundaries.get("hpd_boroughs")
+        if not isinstance(expected_boroughs, list) or len(expected_boroughs) < 5:
+            raise RuntimeError("HPD borough partition metadata is missing")
+        if hpd_partition_count != len(expected_boroughs):
+            raise RuntimeError("HPD borough partition count mismatch")
+        if hpd_duplicates < 0 or hpd_partition_records - hpd_duplicates != hpd_unique:
+            raise RuntimeError("HPD borough partition de-duplication counts do not reconcile")
+    elif hpd_fetch_strategy in {"KEYWORD_PARTITIONS", "UPPERCASE_KEYWORD_PARTITIONS"}:
         if hpd_partition_count < 8:
             raise RuntimeError("HPD source partition count mismatch")
         if hpd_duplicates < 0 or hpd_partition_records - hpd_duplicates != hpd_unique:
