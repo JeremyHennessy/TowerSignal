@@ -196,7 +196,7 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
         OATH_DATASET_ID,
         where,
         select="count(*) as count",
-        request_retries=OATH_REQUEST_RETRIES,
+        request_retries=OATH_RATE_LIMIT_RETRIES,
         request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
         limit=1,
     )
@@ -218,7 +218,7 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
             where,
             order_by="ticket_number",
             select=OATH_SELECT,
-            request_retries=OATH_REQUEST_RETRIES,
+            request_retries=OATH_RATE_LIMIT_RETRIES,
             request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
             limit=OATH_AGENCY_PAGE_SIZE,
             offset=offset,
