@@ -130,6 +130,9 @@ class NycWaterSignalsTests(unittest.TestCase):
                 self.assertRegex(where, r"novdescription like '%[A-Z ]+%'")
                 rows = [hpd_row]
             else:
+                if dataset_id == NYC_311_DATASET_ID:
+                    self.assertEqual(kwargs.get("seek_field"), "unique_key")
+                    self.assertIs(kwargs.get("seek_field_is_text"), True)
                 rows = []
             return SourceSnapshot(
                 dataset_id=dataset_id,
@@ -342,6 +345,42 @@ class NycWaterSignalsTests(unittest.TestCase):
 
         self.assertEqual([row["id"] for row in snapshot.rows], ["10", "20", "30", "40", "50"])
         self.assertEqual(wheres, ["status='Open'", "(status='Open') AND id > 20", "(status='Open') AND id > 40"])
+
+    def test_snapshot_can_seek_page_by_numeric_text_identity_without_offsets(self) -> None:
+        rows = [{"id": str(index)} for index in (10, 20, 30, 40, 50)]
+        wheres: list[str] = []
+
+        def fake_query(dataset_id: str, *, api_root: str, params):
+            self.assertEqual(dataset_id, "text-seek-demo")
+            self.assertEqual(api_root, "https://example.test")
+            self.assertNotIn("$offset", params)
+            where = str(params.get("$where") or "")
+            wheres.append(where)
+            threshold = 0
+            match = re.search(r"id > '(\d+)'", where)
+            if match:
+                threshold = int(match.group(1))
+            limit = int(params["$limit"])
+            return [row for row in rows if int(row["id"]) > threshold][:limit]
+
+        with (
+            patch("towersignal.domestic_water_market.fetch_metadata", return_value={"name": "Text seek demo", "source_last_updated_at": None, "fields": ("id",)}),
+            patch("towersignal.domestic_water_market.fetch_count", return_value=len(rows)),
+            patch("towersignal.domestic_water_market._query", side_effect=fake_query),
+        ):
+            snapshot = fetch_source_snapshot(
+                "text-seek-demo",
+                api_root="https://example.test",
+                order_by="id",
+                required_fields=("id",),
+                where="status='Open'",
+                page_size=2,
+                seek_field="id",
+                seek_field_is_text=True,
+            )
+
+        self.assertEqual([row["id"] for row in snapshot.rows], ["10", "20", "30", "40", "50"])
+        self.assertEqual(wheres, ["status='Open'", "(status='Open') AND id > '20'", "(status='Open') AND id > '40'"])
 
     def test_validator_accepts_zero_count_source_partitions(self) -> None:
         hpd_row = {
