@@ -61,6 +61,10 @@ DOB_PERMIT_WHERE = (
 )
 
 
+def log_step(message: str) -> None:
+    print(f"[nyc_water_signals] {message}", flush=True)
+
+
 def _lower_text(*values: Any) -> str:
     return normalize_space(" ".join(str(value or "") for value in values)).lower()
 
@@ -182,6 +186,7 @@ def _hpd_term_where(term: str) -> str:
 def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
     snapshots: list[SourceSnapshot] = []
     for term in HPD_WATER_TERMS:
+        log_step(f"fetching HPD open water violations for term {term!r}")
         snapshots.append(
             fetch_snapshot(
                 HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="violationid",
@@ -194,6 +199,7 @@ def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
                 seek_field="violationid",
             )
         )
+        log_step(f"fetched {snapshots[-1].source_record_count:,} HPD rows for term {term!r}")
     return snapshots
 
 
@@ -395,6 +401,7 @@ def _dob_business_profiles(*collections: Sequence[Mapping[str, Any]]) -> list[di
 
 
 def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
+    log_step("fetching NYC 311 DEP water requests")
     requests_snapshot = fetch_snapshot(
         NYC_311_DATASET_ID, api_root=NYC_API_ROOT, order_by="unique_key",
         required_fields=("unique_key", "created_date", "closed_date", "agency", "agency_name", "complaint_type", "descriptor", "descriptor_2", "incident_zip", "incident_address", "street_name", "status", "resolution_description", "bbl", "borough"),
@@ -403,8 +410,12 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         page_size=page_size,
         progress_label="NYC water 311 DEP requests",
     )
+    log_step(f"fetched {requests_snapshot.source_record_count:,} NYC 311 DEP water request rows")
     hpd_snapshots = _fetch_hpd_snapshots(page_size=page_size)
+    log_step("deduplicating HPD water violation partitions")
     hpd_rows, hpd_duplicate_partition_count = _dedupe_hpd_rows(hpd_snapshots)
+    log_step(f"deduplicated HPD water violations to {len(hpd_rows):,} rows")
+    log_step("fetching DOB NOW water job filings")
     job_snapshot = fetch_snapshot(
         DOB_JOB_FILINGS_DATASET_ID, api_root=NYC_API_ROOT, order_by="job_filing_number",
         required_fields=("job_filing_number", "filing_status", "house_no", "street_name", "borough", "bin", "bbl", "applicant_professional_title", "applicant_license", "applicant_first_name", "applicants_middle_initial", "applicant_last_name", "applicant_business_name", "owner_s_business_name", "plumbing_work_type", "boiler_equipment_work_type_", "mechanical_systems_work_type_", "filing_date", "approved_date", "signoff_date", "job_description"),
@@ -413,6 +424,8 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         page_size=page_size,
         progress_label="NYC water DOB job filings",
     )
+    log_step(f"fetched {job_snapshot.source_record_count:,} DOB NOW water job filing rows")
+    log_step("fetching DOB NOW approved water permits")
     permit_snapshot = fetch_snapshot(
         DOB_APPROVED_PERMITS_DATASET_ID, api_root=NYC_API_ROOT, order_by="job_filing_number,work_permit,sequence_number",
         required_fields=("job_filing_number", "work_permit", "sequence_number", "filing_reason", "house_no", "street_name", "borough", "bin", "bbl", "work_type", "permittee_s_license_type", "applicant_license", "applicant_first_name", "applicant_last_name", "applicant_business_name", "approved_date", "issued_date", "expired_date", "job_description", "estimated_job_costs", "owner_business_name", "permit_status"),
@@ -421,6 +434,8 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         page_size=page_size,
         progress_label="NYC water DOB approved permits",
     )
+    log_step(f"fetched {permit_snapshot.source_record_count:,} DOB NOW approved water permit rows")
+    log_step("fetching LL84 water benchmark rows")
     ll84_snapshot = fetch_snapshot(
         LL84_DATASET_ID, api_root=NYC_API_ROOT, order_by="report_year,property_id",
         required_fields=("report_year", "property_id", "property_name", "year_ending", "nyc_borough_block_and_lot", "nyc_building_identification", "address_1", "city", "postal_code", "metered_areas_water", "water_use_all_water_sources", "indoor_water_use_all_water", "outdoor_water_use_all_water", "municipally_supplied_potable", "municipally_supplied_potable_1", "municipally_supplied_potable_2", "municipally_supplied_potable_3", "estimated_values_water", "alert_water_meter_has_less", "last_modified_date_water"),
@@ -428,12 +443,15 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         page_size=page_size,
         progress_label="NYC water LL84 benchmarks",
     )
+    log_step(f"fetched {ll84_snapshot.source_record_count:,} LL84 water benchmark rows")
+    log_step("normalizing NYC building-water signal rows")
     requests = [normalize_311(row) for row in requests_snapshot.rows]
     hpd = [normalize_hpd(row) for row in hpd_rows]
     jobs = [normalize_dob_job(row) for row in job_snapshot.rows]
     permits = [normalize_dob_permit(row) for row in permit_snapshot.rows]
     ll84 = [normalize_ll84(row) for row in ll84_snapshot.rows]
     dob_businesses = _dob_business_profiles(jobs, permits)
+    log_step("built NYC building-water signal payload")
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
