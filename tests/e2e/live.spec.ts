@@ -208,7 +208,8 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await expect(page.getByText('LIVE SOURCE DATA', { exact: true })).toBeVisible()
   if (isIphone) {
     const procurementSource = page.getByLabel('Procurement source')
-    if (await procurementSource.count()) {
+    const procurementSourceVisible = await procurementSource.isVisible().catch(() => false)
+    if (procurementSourceVisible) {
       await expect(procurementSource).toBeVisible()
     } else {
       await expect(page.getByText('Loading verified procurement intelligence…', { exact: true })).toBeVisible()
