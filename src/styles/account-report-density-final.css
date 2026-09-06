@@ -1,0 +1,26 @@
+/* Final full-account density cleanup. Drawer behavior stays unchanged. */
+
+.account-profile-page .property-coverage-summary{display:grid;gap:10px}
+.account-profile-page .property-coverage-callout{display:grid;gap:4px;padding:12px 14px;border:1px solid #dbe4ee;border-radius:10px;background:#f8fafc}
+.account-profile-page .property-coverage-callout strong{color:var(--ts-navy);font-size:12px}
+.account-profile-page .property-coverage-callout p{margin:0;max-width:980px;color:#566678;font-size:11.5px;line-height:1.5}
+.account-profile-page .property-source-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0}
+.account-profile-page .property-source-list>div{display:grid;gap:3px;padding:9px 10px;border:1px solid #e3e9f0;border-radius:8px;background:#fff}
+.account-profile-page .property-source-list dt{color:#31445a;font-size:10.5px;font-weight:850}
+.account-profile-page .property-source-list dd{margin:0;color:#748293;font-size:10px;line-height:1.4}
+
+.account-profile-page .source-provenance-section>p{margin-bottom:9px}
+.account-profile-page .account-provenance-details{border:1px solid #dfe6ee;border-radius:9px;background:#fbfcfd;overflow:hidden}
+.account-profile-page .account-provenance-details>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;cursor:pointer;list-style:none;color:var(--ts-navy);font-weight:850}
+.account-profile-page .account-provenance-details>summary::-webkit-details-marker{display:none}
+.account-profile-page .account-provenance-details>summary span{font-size:10.5px}
+.account-profile-page .account-provenance-details>summary strong{font-size:9.5px;color:#6d7d8f;text-transform:uppercase;letter-spacing:.04em}
+.account-profile-page .account-provenance-body{display:grid;gap:7px;padding:0 10px 10px}
+.account-profile-page .account-provenance-body>.microcopy{margin:0;padding:7px 8px;border-radius:7px;background:#fff}
+.account-profile-page .account-provenance-body>.source-row{margin:0}
+
+@media(max-width:780px){
+  .account-profile-page .property-source-list{grid-template-columns:1fr}
+  .account-profile-page .property-coverage-callout{padding:11px}
+  .account-profile-page .account-provenance-details>summary{padding:10px}
+}

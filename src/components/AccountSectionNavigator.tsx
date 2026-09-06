@@ -13,7 +13,7 @@ const targets: AccountSectionTarget[] = [
   { label: 'Field pack', selector: '.account-profile-page .technician-field-pack' },
   { label: 'Tower location', selector: '.account-profile-page section.planimetric-section' },
   { label: 'Domestic water', selector: '.account-profile-page section.domestic-water-section' },
-  { label: 'Property & contacts', heading: 'Building context' },
+  { label: 'Property & contacts', selector: '.account-profile-page section.property-context-section' },
   { label: 'Current signals', heading: 'Current TowerSignal signals' },
   { label: 'Samples', heading: 'Sample history' },
   { label: 'Inspections', heading: 'NYC Health inspection history' },
