@@ -43,6 +43,29 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
         context = str(source.get("dataset_id") or "unknown source")
         if _int_field(source, "source_record_count", context=context) != _int_field(source, "fetched_record_count", context=context):
             raise RuntimeError(f"Source count mismatch for {source.get('dataset_id')}")
+    request_sources = [
+        source for source in source_health if source.get("dataset_id") == "erm2-nwe9"
+    ]
+    request_partition_count = int(summary.get("water_311_source_partition_count") or len(request_sources))
+    request_fetch_strategy = str(summary.get("water_311_source_fetch_strategy") or "SINGLE_OR_QUERY")
+    if len(request_sources) != request_partition_count:
+        raise RuntimeError("311 source partition count mismatch")
+    request_partition_records = sum(
+        int(source.get("source_record_count") or 0) for source in request_sources
+    )
+    if "water_311_source_partition_record_count" in summary and int(summary.get("water_311_source_partition_record_count") or -1) != request_partition_records:
+        raise RuntimeError("311 source partition record count mismatch")
+    if request_fetch_strategy == "FIELD_KEYWORD_PARTITIONS":
+        expected_partitions = 6
+        if request_partition_count != expected_partitions:
+            raise RuntimeError(f"311 source partition count mismatch: {request_partition_count} != {expected_partitions}")
+        request_duplicates = int(summary.get("water_311_duplicate_partition_request_count") or 0)
+        request_unique = int(summary.get("water_311_request_count") or 0)
+        if request_partition_records - request_duplicates != request_unique:
+            raise RuntimeError("311 partition de-duplication counts do not reconcile")
+    elif request_fetch_strategy != "SINGLE_OR_QUERY":
+        raise RuntimeError(f"Unknown 311 source fetch strategy: {request_fetch_strategy}")
+
     hpd_sources = [
         source for source in source_health if source.get("dataset_id") == "wvxf-dwi5"
     ]
