@@ -89,6 +89,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm install --no-audit --no-fund
       - name: Generate current NYC data
+        timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
       - name: Attach verified ACRIS cache
         run: python scripts/attach_acris.py --output public/data --cache .verified-acris/cache.json
