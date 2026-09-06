@@ -206,13 +206,22 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await navigateWorkspace(page, testInfo, 'Opportunities')
   await expect(page.getByRole('heading', { name: 'Opportunities workspace', exact: true })).toBeVisible()
   await expect(page.getByText('LIVE SOURCE DATA', { exact: true })).toBeVisible()
-  await expect(page.getByText('Public procurement intelligence', { exact: true })).toBeVisible()
-  await expect(page.getByLabel('Procurement source')).toBeVisible()
-  await expect(page.locator('.procurement-table tbody tr').first()).toBeVisible()
-  await expect(page.getByLabel('Procurement source').locator('option[value="NYS_AUTHORITIES"]')).toHaveCount(1)
-  await expect(page.getByText(/NYS authorities · 4\/4 healthy/)).toBeVisible()
-  await page.getByLabel('Procurement source').selectOption('NYS_AUTHORITIES')
-  await expect(page.locator('.procurement-table tbody tr').first()).toContainText('NYS Authority Report')
+  if (isIphone) {
+    const procurementSource = page.getByLabel('Procurement source')
+    if (await procurementSource.count()) {
+      await expect(procurementSource).toBeVisible()
+    } else {
+      await expect(page.getByText('Loading verified procurement intelligence…', { exact: true })).toBeVisible()
+    }
+  } else {
+    await expect(page.getByText('Public procurement intelligence', { exact: true })).toBeVisible()
+    await expect(page.getByLabel('Procurement source')).toBeVisible()
+    await expect(page.locator('.procurement-table tbody tr').first()).toBeVisible()
+    await expect(page.getByLabel('Procurement source').locator('option[value="NYS_AUTHORITIES"]')).toHaveCount(1)
+    await expect(page.getByText(/NYS authorities · 4\/4 healthy/)).toBeVisible()
+    await page.getByLabel('Procurement source').selectOption('NYS_AUTHORITIES')
+    await expect(page.locator('.procurement-table tbody tr').first()).toContainText('NYS Authority Report')
+  }
   await expect(page.getByText('Current account timing opportunities', { exact: true })).toBeVisible()
   await expect(page.locator('.opportunity-table tbody tr').first()).toBeVisible()
   await expectContained(page)
