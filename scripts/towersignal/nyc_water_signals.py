@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import sys
 from collections import Counter
+from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from towersignal.domestic_water_market import (
@@ -25,6 +26,7 @@ DOB_APPROVED_PERMITS_DATASET_ID = "rbx6-tga4"
 LL84_DATASET_ID = "5zyy-y8am"
 NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
+NYC_311_MAX_PAGE_SIZE = 10000
 HPD_MAX_PAGE_SIZE = 10000
 HPD_WATER_TERMS = (
     "hot water",
@@ -112,32 +114,61 @@ def _number(value: Any) -> float | None:
         return None
 
 
-def _nyc_311_partition_where(field: str, term: str) -> str:
-    return f"{NYC_311_BASE_WHERE} AND lower({field}) like '%{term}%'"
+def _month_floor(value: datetime) -> tuple[int, int]:
+    return value.year, value.month
+
+
+def _next_month(year: int, month: int) -> tuple[int, int]:
+    return (year + 1, 1) if month == 12 else (year, month + 1)
+
+
+def _month_start(year: int, month: int) -> str:
+    return f"{year:04d}-{month:02d}-01T00:00:00.000"
+
+
+def _nyc_311_month_windows(*, now: datetime | None = None) -> list[tuple[str, str]]:
+    start = datetime.fromisoformat(NYC_311_START.replace("Z", "+00:00"))
+    end = now or datetime.now(timezone.utc)
+    year, month = _month_floor(start)
+    end_year, end_month = _month_floor(end)
+    windows: list[tuple[str, str]] = []
+    while (year, month) <= (end_year, end_month):
+        next_year, next_month = _next_month(year, month)
+        windows.append((_month_start(year, month), _month_start(next_year, next_month)))
+        year, month = next_year, next_month
+    return windows
+
+
+def _nyc_311_partition_where(field: str, term: str, start: str, end: str) -> str:
+    return (
+        f"agency='DEP' AND created_date >= '{start}' AND created_date < '{end}' "
+        f"AND lower({field}) like '%{term}%'"
+    )
 
 
 def _fetch_311_snapshots(*, page_size: int) -> list[SourceSnapshot]:
     snapshots: list[SourceSnapshot] = []
-    for field in NYC_311_TEXT_FIELDS:
-        for term in NYC_311_WATER_TERMS:
-            label = f"NYC water 311 DEP requests {field} contains {term!r}"
-            print(f"{label}: starting", file=sys.stderr, flush=True)
-            snapshots.append(
-                fetch_snapshot(
-                    NYC_311_DATASET_ID,
-                    api_root=NYC_API_ROOT,
-                    order_by="unique_key",
-                    required_fields=NYC_311_REQUIRED_FIELDS,
-                    where=_nyc_311_partition_where(field, term),
-                    select=NYC_311_SELECT,
-                    page_size=page_size,
-                    progress_label=label,
-                    seek_field="unique_key",
-                    seek_field_is_text=True,
-                    skip_count=True,
-                    allow_count_fallback=True,
+    bounded_page_size = min(page_size, NYC_311_MAX_PAGE_SIZE)
+    for start, end in _nyc_311_month_windows():
+        month_label = start[:7]
+        for field in NYC_311_TEXT_FIELDS:
+            for term in NYC_311_WATER_TERMS:
+                label = f"NYC water 311 DEP requests {month_label} {field} contains {term!r}"
+                print(f"{label}: starting", file=sys.stderr, flush=True)
+                snapshots.append(
+                    fetch_snapshot(
+                        NYC_311_DATASET_ID,
+                        api_root=NYC_API_ROOT,
+                        order_by="created_date,unique_key",
+                        required_fields=NYC_311_REQUIRED_FIELDS,
+                        where=_nyc_311_partition_where(field, term, start, end),
+                        select=NYC_311_SELECT,
+                        page_size=bounded_page_size,
+                        progress_label=label,
+                        skip_count=True,
+                        allow_count_fallback=True,
+                    )
                 )
-            )
     return snapshots
 
 
@@ -503,7 +534,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
         "domain": "NYC_BUILDING_WATER_SIGNALS",
-        "query_boundaries": {"311_start": NYC_311_START, "311_scope": "DEP service requests fetched through source-field keyword partitions and de-duplicated by unique_key.", "311_fields": list(NYC_311_TEXT_FIELDS), "311_terms": list(NYC_311_WATER_TERMS), "hpd_scope": "Current open HPD violations fetched through uppercase source-description keyword partitions.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
+        "query_boundaries": {"311_start": NYC_311_START, "311_scope": "DEP service requests fetched through monthly source-field keyword partitions and de-duplicated by unique_key.", "311_fields": list(NYC_311_TEXT_FIELDS), "311_terms": list(NYC_311_WATER_TERMS), "311_month_partition_count": len(_nyc_311_month_windows()), "hpd_scope": "Current open HPD violations fetched through uppercase source-description keyword partitions.", "hpd_terms": list(HPD_WATER_TERMS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
         "evidence_semantics": {
             "311": "Service-request observations. Building signal only when classification is building-water; street/hydrant/sewer remain context.",
             "hpd": "Current HPD violation evidence directly tied to source BIN/BBL when present.",
@@ -513,7 +544,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "summary": {
             "water_311_request_count": len(requests),
             "water_311_building_signal_count": sum(1 for row in requests if row["is_building_water_signal"]),
-            "water_311_source_fetch_strategy": "FIELD_KEYWORD_PARTITIONS",
+            "water_311_source_fetch_strategy": "MONTHLY_FIELD_KEYWORD_PARTITIONS",
             "water_311_source_partition_count": len(requests_snapshots),
             "water_311_source_partition_record_count": sum(snapshot.source_record_count for snapshot in requests_snapshots),
             "water_311_duplicate_partition_request_count": request_duplicate_partition_count,
