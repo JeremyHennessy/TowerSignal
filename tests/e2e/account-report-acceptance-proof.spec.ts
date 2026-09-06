@@ -101,7 +101,7 @@ for (const cohort of [
       const detail = await openAccount(page, account.id)
       await expect(detail).toContainText(account.label, { timeout: 30_000 })
       await expect(detail.getByRole('heading', { name: 'NYC building-water signals', exact: true })).toBeVisible()
-      await expect(detail.getByRole('heading', { name: 'NYC lead service lines', exact: true })).toBeVisible()
+      await expect(detail.getByRole('heading', { name: 'NYC service-line records', exact: true })).toBeVisible()
       await expect(detail.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
       await expect(detail.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
 
