@@ -28,6 +28,8 @@ NYC_311_START = "2025-01-01T00:00:00.000"
 DOB_START = "2024-01-01T00:00:00.000"
 NYC_311_MAX_PAGE_SIZE = 50000
 HPD_MAX_PAGE_SIZE = 10000
+HPD_FIRST_INSPECTION_YEAR = 1968
+HPD_DATE_PARTITION_TERMS = {"hot water"}
 HPD_WATER_TERMS = (
     "hot water",
     "water supply",
@@ -137,6 +139,14 @@ def _nyc_311_month_windows(*, now: datetime | None = None) -> list[tuple[str, st
         windows.append((_month_start(year, month), _month_start(next_year, next_month)))
         year, month = next_year, next_month
     return windows
+
+
+def _hpd_year_windows(*, now: datetime | None = None) -> list[tuple[str, str]]:
+    current_year = (now or datetime.now(timezone.utc)).year
+    return [
+        (f"{year:04d}-01-01T00:00:00.000", f"{year + 1:04d}-01-01T00:00:00.000")
+        for year in range(HPD_FIRST_INSPECTION_YEAR, current_year + 1)
+    ]
 
 
 def _nyc_311_partition_where(start: str, end: str) -> str:
@@ -275,25 +285,32 @@ def normalize_hpd(row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _hpd_term_where(term: str) -> str:
-    return f"violationstatus='Open' AND novdescription like '%{term.upper()}%'"
+def _hpd_term_where(term: str, *, start: str | None = None, end: str | None = None) -> str:
+    clauses = ["violationstatus='Open'", f"novdescription like '%{term.upper()}%'"]
+    if start and end:
+        clauses.append(f"inspectiondate >= '{start}' AND inspectiondate < '{end}'")
+    return " AND ".join(clauses)
 
 
 def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
     snapshots: list[SourceSnapshot] = []
+    bounded_page_size = min(page_size, HPD_MAX_PAGE_SIZE)
     for term in HPD_WATER_TERMS:
-        snapshots.append(
-            fetch_snapshot(
-                HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="inspectiondate,violationid",
-                required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
-                where=_hpd_term_where(term),
-                select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
-                page_size=min(page_size, HPD_MAX_PAGE_SIZE),
-                allow_count_fallback=True,
-                progress_label=f"NYC water HPD term {term!r}",
-                skip_count=True,
+        windows = _hpd_year_windows() if term in HPD_DATE_PARTITION_TERMS else [(None, None)]
+        for start, end in windows:
+            year_label = f" {str(start)[:4]}" if start else ""
+            snapshots.append(
+                fetch_snapshot(
+                    HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="inspectiondate,violationid",
+                    required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
+                    where=_hpd_term_where(term, start=start, end=end),
+                    select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
+                    page_size=bounded_page_size,
+                    allow_count_fallback=True,
+                    progress_label=f"NYC water HPD term {term!r}{year_label}",
+                    skip_count=True,
+                )
             )
-        )
     return snapshots
 
 
