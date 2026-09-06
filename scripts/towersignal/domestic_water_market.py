@@ -292,10 +292,18 @@ def fetch_snapshot(
                 )
 
     source_record_count = expected_count if expected_count is not None else len(rows)
-    if expected_count is not None and len(rows) != expected_count:
+    if expected_count is not None and len(rows) < expected_count:
         raise DomesticWaterSourceError(
             f"Dataset {dataset_id} pagination incomplete: expected {expected_count:,} rows, fetched {len(rows):,}. Refusing partial snapshot."
         )
+    if expected_count is not None and len(rows) > expected_count:
+        source_record_count = len(rows)
+        if progress_label:
+            print(
+                f"{progress_label}: source count grew during pagination; fetched {len(rows):,} rows from initial count {expected_count:,}",
+                file=sys.stderr,
+                flush=True,
+            )
 
     scope = where or "ALL_ROWS"
     return SourceSnapshot(
