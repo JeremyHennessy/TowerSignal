@@ -190,7 +190,7 @@ class NycWaterSignalsTests(unittest.TestCase):
             len(HPD_WATER_TERMS) - 1,
         )
         page_sizes = dict(calls)
-        self.assertEqual(page_sizes[NYC_311_DATASET_ID], 50000)
+        self.assertEqual(page_sizes[NYC_311_DATASET_ID], 10000)
         self.assertEqual(page_sizes[HPD_VIOLATIONS_DATASET_ID], HPD_MAX_PAGE_SIZE)
         self.assertEqual(page_sizes[DOB_JOB_FILINGS_DATASET_ID], 50000)
         self.assertEqual(page_sizes[DOB_APPROVED_PERMITS_DATASET_ID], 50000)
