@@ -53,7 +53,7 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     request_partition_records = sum(
         int(source.get("source_record_count") or 0) for source in request_sources
     )
-    if "water_311_source_partition_record_count" in summary and int(summary.get("water_311_source_partition_record_count") or -1) != request_partition_records:
+    if "water_311_source_partition_record_count" in summary and int(summary["water_311_source_partition_record_count"]) != request_partition_records:
         raise RuntimeError("311 source partition record count mismatch")
     if request_fetch_strategy == "FIELD_KEYWORD_PARTITIONS":
         expected_partitions = 6
