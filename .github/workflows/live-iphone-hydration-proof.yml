@@ -1,0 +1,40 @@
+name: Verify live iPhone procurement hydration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/live-iphone-hydration-proof.yml'
+      - 'tests/e2e/hydration-proof.spec.ts'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-iphone-hydration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-live-iphone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install WebKit browser
+        run: npx playwright install --with-deps webkit
+      - name: Require real procurement hydration on hosted iPhone
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/hydration-proof.spec.ts --project=iphone
+      - name: Upload hydration proof report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-iphone-hydration-proof
+          path: playwright-report
+          retention-days: 14
