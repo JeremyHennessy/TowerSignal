@@ -32,6 +32,9 @@ const procurement = {
 
 vi.mock('../../src/data/api', () => ({
   loadCompanies: vi.fn(() => Promise.resolve(companiesPayload)),
+  loadDomesticWaterMarket: vi.fn(() => Promise.resolve(null)),
+  loadElapProbe: vi.fn(() => Promise.resolve(null)),
+  loadProviderResolution: vi.fn(() => Promise.resolve(null)),
   loadProcurement: vi.fn(() => Promise.resolve(procurement)),
 }))
 

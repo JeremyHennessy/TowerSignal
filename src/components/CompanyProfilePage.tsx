@@ -17,7 +17,16 @@ function recordDate(row: ProcurementRecord): string | null {
 }
 
 function recordAmount(row: ProcurementRecord): number | null {
-  return row.current_amount ?? row.amount ?? row.original_amount ?? null
+  return row.current_amount ?? row.amount ?? row.spend_to_date ?? row.original_amount ?? null
+}
+
+function sourceLabel(row: ProcurementRecord): string {
+  if (row.source === 'NYC_CITY_RECORD') return row.scope === 'OPEN_SOLICITATIONS' ? 'City Record · Solicitation' : 'City Record · Award'
+  if (row.source === 'NYC_CHECKBOOK_NYCHA') return 'Checkbook · NYCHA'
+  if (row.source === 'NYS_OPEN_BOOK') return 'Open Book NY'
+  if (row.source === 'NYC_CHECKBOOK_EDC') return 'Checkbook · NYCEDC'
+  if (row.source.startsWith('NYS_ABO_')) return 'NYS Authority Report'
+  return row.vendor_role === 'SUBCONTRACTOR' ? 'Checkbook · Subcontract' : 'Checkbook · Contract'
 }
 
 export function CompanyProfilePage({ companyId, onBack, onOpenCompany }: { companyId: string; onBack: () => void; onOpenCompany: (company: CompanyIntelligenceRecord) => void }) {
@@ -35,7 +44,13 @@ export function CompanyProfilePage({ companyId, onBack, onOpenCompany }: { compa
   const records = useMemo(() => {
     if (!company || !procurement) return []
     const ids = new Set(company.procurement_ids)
-    return [...procurement.cityRecord.notices, ...procurement.checkbook.contracts]
+    return [
+      ...procurement.cityRecord.notices,
+      ...procurement.checkbook.contracts,
+      ...(procurement.nysAuthorities?.contracts ?? []),
+      ...(procurement.openBookWater?.contracts ?? []),
+      ...(procurement.nychaWater?.records ?? []),
+    ]
       .filter(row => ids.has(row.procurement_id))
       .sort((a, b) => (recordDate(b) ?? '').localeCompare(recordDate(a) ?? ''))
   }, [company, procurement])
@@ -64,7 +79,7 @@ export function CompanyProfilePage({ companyId, onBack, onOpenCompany }: { compa
 
     {candidateCompanies.length > 0 && <div className="reference-table-card"><div className="reference-table-heading"><div><strong>Resolution candidates requiring review</strong><span>Similar normalized base name; not a confirmed corporate relationship.</span></div></div><div className="candidate-company-list">{candidateCompanies.map(candidate => <button key={candidate.company_id} onClick={() => onOpenCompany(candidate)}><strong>{candidate.canonical_name}</strong><span>{candidate.cross_source_resolution_confidence} · separate observed vendor entity</span></button>)}</div></div>}
 
-    <div className="reference-table-card"><div className="reference-table-heading"><div><strong>Public procurement observations</strong><span>{number.format(records.length)} source-backed records linked by this exact observed vendor entity</span></div></div><div className="reference-table-scroll"><table className="reference-table company-procurement-table"><thead><tr><th>Record</th><th>Source</th><th>Buyer</th><th>Service</th><th>Observed value</th><th>Date</th><th>Source evidence</th></tr></thead><tbody>{records.map(row => <tr key={row.procurement_id}><td><strong>{row.title ?? row.description ?? row.source_record_id}</strong><small>{row.source_contract_id ?? row.notice_id ?? row.source_record_id}</small></td><td>{row.source}<small>{row.vendor_role ?? row.scope ?? 'source observation'}</small></td><td>{row.buyer_name ?? row.agency ?? '—'}</td><td>{categoryLabel(row.service_category)}<small>{row.service_confidence}</small></td><td>{recordAmount(row) == null ? '—' : currency.format(recordAmount(row) ?? 0)}<small>{row.observed_value_evidence ?? row.amount_evidence ?? 'No amount published'}</small></td><td>{recordDate(row) ? formatDate(recordDate(row) ?? '') : '—'}</td><td>{row.source_url ? <a className="table-link" href={row.source_url} target="_blank" rel="noreferrer">Open source ↗</a> : '—'}</td></tr>)}</tbody></table></div></div>
+    <div className="reference-table-card"><div className="reference-table-heading"><div><strong>Public procurement observations</strong><span>{number.format(records.length)} source-backed records linked by this exact observed vendor entity</span></div></div><div className="reference-table-scroll"><table className="reference-table company-procurement-table"><thead><tr><th>Record</th><th>Source</th><th>Buyer</th><th>Service</th><th>Observed value</th><th>Date</th><th>Source evidence</th></tr></thead><tbody>{records.map(row => <tr key={row.procurement_id}><td><strong>{row.title ?? row.description ?? row.source_record_id}</strong><small>{row.source_contract_id ?? row.notice_id ?? row.source_record_id}</small></td><td>{sourceLabel(row)}<small>{row.vendor_role ?? row.scope ?? 'source observation'}</small></td><td>{row.buyer_name ?? row.agency ?? '—'}</td><td>{categoryLabel(row.service_category)}<small>{row.service_confidence}</small></td><td>{recordAmount(row) == null ? '—' : currency.format(recordAmount(row) ?? 0)}<small>{row.observed_value_evidence ?? row.amount_evidence ?? 'No amount published'}</small></td><td>{recordDate(row) ? formatDate(recordDate(row) ?? '') : '—'}</td><td>{row.source_url ? <a className="table-link" href={row.source_url} target="_blank" rel="noreferrer">Open source ↗</a> : '—'}<small>{row.facility_match_confidence ?? row.tower_link_confidence ?? 'UNLINKED'} facility/account</small></td></tr>)}</tbody></table></div></div>
 
     <div className="source-health-footnote">{company.value_semantics} No parent, sponsor, acquisition or private-company financial claims are created from procurement names alone.</div>
   </section>

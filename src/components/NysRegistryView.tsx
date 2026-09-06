@@ -3,6 +3,9 @@ import type { NysSystem, NysSystemsPayload } from '../types/nys'
 import { formatTimestamp } from '../domain/labels'
 import { NysTowerMap } from './NysTowerMap'
 import { NysSystemTable } from './NysSystemTable'
+import { NysWaterMarketSubViews, type NysWaterSubview } from './NysWaterMarketSubViews'
+
+type NysMarketSubview = 'registry' | NysWaterSubview
 
 export interface NysFilterState {
   search: string
@@ -37,6 +40,7 @@ export function filterNysSystems(rows: NysSystem[], filters: NysFilterState): Ny
 }
 
 export function NysRegistryView({ payload, selected, onSelect }: { payload: NysSystemsPayload; selected: NysSystem | null; onSelect: (row: NysSystem | null) => void }) {
+  const [subview, setSubview] = useState<NysMarketSubview>('registry')
   const [filters, setFilters] = useState<NysFilterState>(EMPTY_FILTERS)
   const filtered = useMemo(() => filterNysSystems(payload.systems, filters), [payload.systems, filters])
   const statuses = [...new Set(payload.systems.map(row => row.ct_status).filter(Boolean))].sort() as string[]
@@ -47,6 +51,14 @@ export function NysRegistryView({ payload, selected, onSelect }: { payload: NysS
   const set = (patch: Partial<NysFilterState>) => setFilters(current => ({ ...current, ...patch }))
 
   return <>
+    <div className="market-subnav" role="tablist" aria-label="NYS Market subviews">
+      <button className={subview === 'registry' ? 'active' : ''} onClick={() => setSubview('registry')} role="tab" aria-selected={subview === 'registry'}>Cooling towers</button>
+      <button className={subview === 'pws' ? 'active' : ''} onClick={() => setSubview('pws')} role="tab" aria-selected={subview === 'pws'}>Public-water systems</button>
+      <button className={subview === 'lsli' ? 'active' : ''} onClick={() => setSubview('lsli')} role="tab" aria-selected={subview === 'lsli'}>LSLI detail</button>
+      <button className={subview === 'service-lines' ? 'active' : ''} onClick={() => setSubview('service-lines')} role="tab" aria-selected={subview === 'service-lines'}>Address service lines</button>
+    </div>
+
+    {subview === 'registry' ? <>
     <section className="hero"><div><span className="eyebrow">New York State source regime</span><h2>Statewide cooling-tower registry intelligence without projecting NYC rules.</h2><p>Explore current NYS Equipment_ID records, source-published compliance and operating status, Legionella sample/result context, and exact published-address equipment clusters.</p></div><div className="hero-actions"><strong>{sourceHealth ? `NYS source health ${sourceHealth.status}` : 'NYS source health unavailable'}</strong><span>Generated {formatTimestamp(payload.metadata.generated_at)}</span><span>{payload.metadata.source.source_record_count.toLocaleString()} source rows · {payload.summary.mapped_equipment.toLocaleString()} mapped</span></div></section>
 
     <div className="disclaimer"><strong>Separate evidence regime.</strong> NYS values are represented directly from the official weekly extract. NYC Priority Score, NYC Health inspections, OATH, PLUTO and HPD are not applied here. The source is a weekly snapshot; TowerSignal preserves separate NYS observations going forward. Published county is retained as provenance but is not used alone to identify NYC because the live source contains inconsistent county labels.</div>
@@ -73,5 +85,6 @@ export function NysRegistryView({ payload, selected, onSelect }: { payload: NysS
     </section>
 
     <section className="workspace"><NysTowerMap systems={filtered} selectedId={selected?.system_id ?? null} onSelect={id => onSelect(payload.systems.find(row => row.system_id === id) ?? null)} /><NysSystemTable rows={filtered} onSelect={onSelect} /></section>
+    </> : <NysWaterMarketSubViews view={subview} />}
   </>
 }

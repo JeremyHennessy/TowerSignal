@@ -1,0 +1,75 @@
+name: Verify NYS public water systems
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/nys-public-water-cache.yml'
+      - 'scripts/towersignal/nys_public_water.py'
+      - 'scripts/build_nys_public_water_cache.py'
+      - 'scripts/validate_nys_public_water_cache.py'
+      - 'tests/python/test_nys_public_water.py'
+      - 'docs/BUILD017C_NYS_PUBLIC_WATER.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-nys-public-water-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build statewide NYSDOH public-water cache
+        run: python scripts/build_nys_public_water_cache.py --output nys-public-water/cache.json
+      - name: Validate PWSID spine, evidence boundaries and production volume
+        run: python scripts/validate_nys_public_water_cache.py --cache nys-public-water/cache.json --max-age-days 1 --require-production-volume
+      - name: Run NYS public-water unit tests
+        run: python -m unittest tests.python.test_nys_public_water -v
+      - name: Upload verified NYS public-water cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-nys-public-water
+          path: nys-public-water/cache.json
+          retention-days: 7
+
+  integration:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download verified NYS public-water cache
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-nys-public-water
+          path: .verified-nys-public-water
+      - name: Revalidate downloaded cache
+        run: python scripts/validate_nys_public_water_cache.py --cache .verified-nys-public-water/cache.json --max-age-days 1 --require-production-volume
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Python tests
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Lint frontend
+        run: npm run lint
+      - name: Typecheck frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build

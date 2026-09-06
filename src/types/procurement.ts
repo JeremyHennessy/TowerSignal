@@ -118,11 +118,53 @@ export interface NysAuthorityProcurementPayload {
   contracts: ProcurementRecord[]
 }
 
+export interface OpenBookWaterPayload {
+  schema_version: string
+  generated_at: string
+  as_of_date: string
+  domain: 'NYS_OPEN_BOOK_WATER_CONTRACT_TRANSACTIONS'
+  source: Record<string, unknown>
+  evidence_semantics: Record<string, string>
+  summary: {
+    source_transaction_count: number
+    source_contract_count: number
+    relevant_contract_count: number
+    relevant_transaction_count: number
+    relevant_vendor_count: number
+    classification_counts: Record<string, number>
+  }
+  contracts: ProcurementRecord[]
+}
+
+export interface NychaWaterPayload {
+  schema_version: string
+  generated_at: string
+  as_of_date: string
+  domain: 'NYCHA_WATER_CONTRACT_RELEASE_LINES'
+  source: Record<string, unknown>
+  evidence_semantics: Record<string, string>
+  summary: {
+    fiscal_year_count: number
+    source_record_count: number
+    relevant_release_line_count: number
+    relevant_contract_count: number
+    relevant_vendor_count: number
+    relevant_location_count: number
+    classification_counts: Record<string, number>
+  }
+  source_health: Array<Record<string, unknown>>
+  records: ProcurementRecord[]
+}
+
 export interface ProcurementBundle {
   cityRecord: CityRecordProcurementPayload
   checkbook: CheckbookProcurementPayload
   nysAuthorities: NysAuthorityProcurementPayload | null
+  openBookWater: OpenBookWaterPayload | null
+  nychaWater: NychaWaterPayload | null
   sourceErrors: {
     nysAuthorities?: string
+    openBookWater?: string
+    nychaWater?: string
   }
 }

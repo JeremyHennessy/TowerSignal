@@ -67,6 +67,18 @@ export interface Metadata {
   building_footprint_matched_bin_count?: number
   building_footprint_matched_feature_count?: number
   building_footprint_match_basis?: 'BIN_EXACT'
+  nyc_water_signal_cache_available?: boolean
+  nyc_water_signal_match_basis?: 'EXACT_SOURCE_BBL_OR_BIN'
+  nyc_water_signal_source_record_count?: number
+  nyc_water_signal_systems_attached?: number
+  nyc_water_signal_attached_record_count?: number
+  nyc_lead_service_line_cache_available?: boolean
+  nyc_lead_service_line_dataset_id?: 'jqfp-uff7'
+  nyc_lead_service_line_source_record_count?: number
+  nyc_lead_service_line_requested_bbl_count?: number
+  nyc_lead_service_line_matched_bbl_count?: number
+  nyc_lead_service_line_matched_record_count?: number
+  nyc_lead_service_line_match_basis?: 'BBL_EXACT'
   rules_version: string
   priority_model_version: string
 }
@@ -116,6 +128,10 @@ export interface SystemSummary {
   planimetric_building_tower_count?: number
   building_footprint_bin_match?: boolean
   building_footprint_count?: number
+  nyc_building_water_signal_count?: number
+  nyc_building_water_signal_types?: string[]
+  nyc_lead_service_line_record_count?: number
+  nyc_lead_service_line_materials?: string[]
 }
 
 export interface SystemsPayload {
@@ -135,6 +151,8 @@ export interface SystemsPayload {
     systems_with_hpd_contacts?: number
     systems_with_planimetric_bin_match?: number
     systems_with_building_footprint_match?: number
+    systems_with_nyc_building_water_signals?: number
+    systems_with_nyc_lead_service_line_records?: number
   }
   systems: SystemSummary[]
 }
@@ -302,6 +320,68 @@ export interface BuildingFootprintFeature {
   feature_identity_basis: 'DOITT_ID' | 'OBJECTID'
 }
 
+export interface NycLeadServiceLineRecord {
+  record_id: string | null
+  bbl: string | null
+  address: string | null
+  material: string | null
+  record_type: string | null
+  city_owned: string | null
+  source_dataset_id: 'jqfp-uff7'
+}
+
+export interface NycLeadServiceLineContext {
+  summary: {
+    record_count: number
+    material_counts: Record<string, number>
+    record_type_counts: Record<string, number>
+    city_owned_counts: Record<string, number>
+  }
+  records: NycLeadServiceLineRecord[]
+  evidence_boundaries: {
+    property_link: string
+    material: string
+  }
+  source: {
+    dataset_id: 'jqfp-uff7'
+    name: string
+    url: string
+    source_record_count: number
+    source_last_updated_at: string | null
+    generated_at: string
+  }
+}
+
+export interface NycBuildingWaterSignalsContext {
+  summary: {
+    record_count: number
+    water_311_building_signal_count: number
+    hpd_open_water_violation_count: number
+    dob_water_job_filing_count: number
+    dob_water_permit_count: number
+    ll84_water_benchmark_count: number
+    dob_applicant_business_count: number
+    category_counts: Record<string, number>
+    latest_observation_date: string | null
+  }
+  water_311_requests: Array<Record<string, unknown>>
+  hpd_open_water_violations: Array<Record<string, unknown>>
+  dob_water_job_filings: Array<Record<string, unknown>>
+  dob_water_permits: Array<Record<string, unknown>>
+  ll84_water_benchmarks: Array<Record<string, unknown>>
+  evidence_boundaries: {
+    property_link: string
+    roles: string
+    ll84: string
+  }
+  source: {
+    dataset_ids: string[]
+    source_record_count: number
+    generated_at: string
+    query_boundaries: Record<string, unknown>
+  }
+}
+
 export interface HistoricalProfile {
   registration_date: string | null
   registration_age_days: number | null
@@ -343,6 +423,8 @@ export interface SystemDetail {
   hpd_registration?: HpdRegistrationContext | null
   planimetric_building_tower_features?: PlanimetricBuildingTowerFeature[]
   building_footprints?: BuildingFootprintFeature[]
+  nyc_building_water_signals?: NycBuildingWaterSignalsContext | null
+  nyc_lead_service_lines?: NycLeadServiceLineContext | null
   sample_history: {
     source_raw: string
     dates: string[]

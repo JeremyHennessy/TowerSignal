@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 import { ShareButton } from './ShareButton'
 
-export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'opportunities' | 'companies' | 'portfolios' | 'workflow' | 'source-health' | 'account'
+export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'opportunities' | 'companies' | 'water-quality' | 'portfolios' | 'workflow' | 'source-health' | 'account'
 
 type NavigationItem = { mode: WorkspaceMode; label: string }
 
@@ -19,6 +19,7 @@ const primaryNavigation: NavigationItem[] = [
 const secondaryNavigation: NavigationItem[] = [
   { mode: 'nys-changes', label: 'NYS Changes' },
   { mode: 'companies', label: 'Companies' },
+  { mode: 'water-quality', label: 'Water Quality' },
   { mode: 'portfolios', label: 'Portfolios' },
   { mode: 'workflow', label: 'Workflow' },
 ]

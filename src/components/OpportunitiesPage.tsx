@@ -26,12 +26,14 @@ function procurementDate(row: ProcurementRecord): string | null {
 }
 
 function procurementAmount(row: ProcurementRecord): number | null {
-  return row.current_amount ?? row.amount ?? row.original_amount ?? null
+  return row.current_amount ?? row.amount ?? row.spend_to_date ?? row.original_amount ?? null
 }
 
 function sourceLabel(row: ProcurementRecord): string {
   if (row.source === 'NYC_CITY_RECORD') return row.scope === 'OPEN_SOLICITATIONS' ? 'City Record · Solicitation' : 'City Record · Award'
   if (row.source === 'NYC_CHECKBOOK_EDC') return 'Checkbook · NYCEDC'
+  if (row.source === 'NYS_OPEN_BOOK') return 'Open Book NY'
+  if (row.source === 'NYC_CHECKBOOK_NYCHA') return 'Checkbook · NYCHA'
   if (row.source.startsWith('NYS_ABO_')) return 'NYS Authority Report'
   return row.vendor_role === 'SUBCONTRACTOR' ? 'Checkbook · Subcontract' : 'Checkbook · Contract'
 }
@@ -62,18 +64,24 @@ export function OpportunitiesPage({ payload, onOpenAccount }: { payload: Systems
     ...procurement.cityRecord.notices,
     ...procurement.checkbook.contracts,
     ...(procurement.nysAuthorities?.contracts ?? []),
+    ...(procurement.openBookWater?.contracts ?? []),
+    ...(procurement.nychaWater?.records ?? []),
   ].sort((a, b) => (procurementDate(b) ?? '').localeCompare(procurementDate(a) ?? '')) : [], [procurement])
 
   const categories = useMemo(() => [...new Set(procurementRows.map(row => row.service_category))].sort(), [procurementRows])
   const filteredProcurement = useMemo(() => procurementRows.filter(row => {
+    const isNysAuthority = row.source.startsWith('NYS_ABO_')
+    const isCoreCheckbook = row.source.startsWith('NYC_CHECKBOOK') && row.source !== 'NYC_CHECKBOOK_NYCHA'
     if (sourceFilter === 'CITY_RECORD' && row.source !== 'NYC_CITY_RECORD') return false
-    if (sourceFilter === 'CHECKBOOK' && (row.source === 'NYC_CITY_RECORD' || row.source.startsWith('NYS_ABO_'))) return false
-    if (sourceFilter === 'NYS_AUTHORITIES' && !row.source.startsWith('NYS_ABO_')) return false
+    if (sourceFilter === 'CHECKBOOK' && !isCoreCheckbook) return false
+    if (sourceFilter === 'NYS_AUTHORITIES' && !isNysAuthority) return false
+    if (sourceFilter === 'OPENBOOK' && row.source !== 'NYS_OPEN_BOOK') return false
+    if (sourceFilter === 'NYCHA' && row.source !== 'NYC_CHECKBOOK_NYCHA') return false
     if (categoryFilter !== 'ALL' && row.service_category !== categoryFilter) return false
     return true
   }).slice(0, 100), [procurementRows, sourceFilter, categoryFilter])
 
-  const observedContractValue = procurement?.checkbook.contracts.reduce((sum, row) => sum + (row.current_amount ?? 0), 0) ?? 0
+  const observedContractValue = procurementRows.reduce((sum, row) => sum + (procurementAmount(row) ?? 0), 0)
   const unresolved = procurementRows.filter(row => row.vendor_raw && !row.company_id).length
   const nysHealthyCount = procurement?.nysAuthorities?.source_health.filter(row => row.status === 'HEALTHY').length ?? 0
   const nysSourceCount = procurement?.nysAuthorities?.source_health.length ?? 0
@@ -89,25 +97,28 @@ export function OpportunitiesPage({ payload, onOpenAccount }: { payload: Systems
 
     {procurement && <>
       {procurement.sourceErrors.nysAuthorities && <div className="reference-empty-state procurement-source-warning"><strong>NYS authority procurement is unavailable.</strong><span>{procurement.sourceErrors.nysAuthorities}</span><span>Verified NYC City Record and Checkbook intelligence remains available; TowerSignal does not substitute fixture or roadmap data for the failed statewide source.</span></div>}
+      {procurement.sourceErrors.openBookWater && <div className="reference-empty-state procurement-source-warning"><strong>Open Book NY water procurement is unavailable.</strong><span>{procurement.sourceErrors.openBookWater}</span></div>}
+      {procurement.sourceErrors.nychaWater && <div className="reference-empty-state procurement-source-warning"><strong>NYCHA water procurement is unavailable.</strong><span>{procurement.sourceErrors.nychaWater}</span></div>}
       <div className="reference-metric-grid">
         <article><span className="reference-metric-icon urgent">↗</span><div><small>Open solicitations</small><strong>{number.format(procurement.cityRecord.summary.open_relevant_opportunities)}</strong><span>Relevant City Record notices</span></div></article>
         <article><span className="reference-metric-icon warning">◷</span><div><small>Recent awards</small><strong>{number.format(procurement.cityRecord.summary.recent_relevant_awards)}</strong><span>City Record lookback window</span></div></article>
         <article><span className="reference-metric-icon success">◎</span><div><small>Verified NYC contracts</small><strong>{number.format(procurement.checkbook.summary.relevant_contract_count)}</strong><span>Relevant Checkbook records</span></div></article>
-        <article><span className="reference-metric-icon">NY</span><div><small>Statewide authority records</small><strong>{procurement.nysAuthorities ? number.format(procurement.nysAuthorities.summary.relevant_contract_count) : '—'}</strong><span>{procurement.nysAuthorities ? 'Four ABO procurement datasets' : 'Source unavailable'}</span></div></article>
-        <article><span className="reference-metric-icon">$</span><div><small>Observed NYC contract value</small><strong>{currency.format(observedContractValue)}</strong><span>Checkbook current amounts · not revenue</span></div></article>
+        <article><span className="reference-metric-icon">NY</span><div><small>Open Book water contracts</small><strong>{procurement.openBookWater ? number.format(procurement.openBookWater.summary.relevant_contract_count) : '—'}</strong><span>{procurement.openBookWater ? 'OSC transaction history' : 'Source unavailable'}</span></div></article>
+        <article><span className="reference-metric-icon">NYC</span><div><small>NYCHA release lines</small><strong>{procurement.nychaWater ? number.format(procurement.nychaWater.summary.relevant_release_line_count) : '—'}</strong><span>{procurement.nychaWater ? 'Line/release evidence' : 'Source unavailable'}</span></div></article>
+        <article><span className="reference-metric-icon">$</span><div><small>Observed public value</small><strong>{currency.format(observedContractValue)}</strong><span>Source-reported values · not revenue</span></div></article>
         <article><span className="reference-metric-icon">?</span><div><small>Unresolved vendors</small><strong>{number.format(unresolved)}</strong><span>Preserved for company resolution</span></div></article>
       </div>
 
       <div className="roadmap-data-banner">
-        <div><span className="roadmap-status">LIVE SOURCE DATA</span><strong>{procurement.nysAuthorities ? 'NYC City Record + verified Checkbook + NYS authority procurement are connected.' : 'NYC City Record + verified Checkbook are connected; NYS authority source is degraded.'}</strong><p>NYS authority records come from official Authorities Budget Office reports covering State Authorities, Local Authorities, Local Development Corporations and Industrial Development Agencies. Exact source provenance, classifications and value semantics remain available for review whenever that source is healthy.</p></div>
-        <div className="roadmap-source-list"><span>City Record · {procurement.cityRecord.source_health.status}</span><span>Checkbook · verified {formatDate(procurement.checkbook.generated_at)}</span><span>NYS authorities · {procurement.nysAuthorities ? `${nysHealthyCount}/${nysSourceCount} healthy` : 'unavailable'}</span><span>No inferred property linkage</span></div>
+        <div><span className="roadmap-status">LIVE SOURCE DATA</span><strong>Procurement is loaded as source-observed public evidence, separate from account priority.</strong><p>Open Book NY and NYCHA records expand the water-contract view, but facility, department and NYCHA location text remain contracting context unless another source establishes an exact property relationship.</p></div>
+        <div className="roadmap-source-list"><span>City Record · {procurement.cityRecord.source_health.status}</span><span>Checkbook · verified {formatDate(procurement.checkbook.generated_at)}</span><span>NYS authorities · {procurement.nysAuthorities ? `${nysHealthyCount}/${nysSourceCount} healthy` : 'unavailable'}</span><span>Open Book · {procurement.openBookWater ? number.format(procurement.openBookWater.summary.relevant_contract_count) : 'unavailable'}</span><span>NYCHA · {procurement.nychaWater ? number.format(procurement.nychaWater.summary.relevant_release_line_count) : 'unavailable'}</span><span>No inferred property linkage</span></div>
       </div>
 
       <div className="reference-table-card">
         <div className="reference-table-heading">
           <div><strong>Public procurement intelligence</strong><span>{number.format(filteredProcurement.length)} shown · {number.format(procurementRows.length)} relevant source-backed records loaded</span></div>
           <div className="page-actions">
-            <label>Source <select aria-label="Procurement source" value={sourceFilter} onChange={event => setSourceFilter(event.target.value)}><option value="ALL">All</option><option value="CITY_RECORD">City Record</option><option value="CHECKBOOK">Checkbook NYC</option>{procurement.nysAuthorities && <option value="NYS_AUTHORITIES">NYS authorities</option>}</select></label>
+            <label>Source <select aria-label="Procurement source" value={sourceFilter} onChange={event => setSourceFilter(event.target.value)}><option value="ALL">All</option><option value="CITY_RECORD">City Record</option><option value="CHECKBOOK">Checkbook NYC</option>{procurement.nysAuthorities && <option value="NYS_AUTHORITIES">NYS authorities</option>}{procurement.openBookWater && <option value="OPENBOOK">Open Book NY</option>}{procurement.nychaWater && <option value="NYCHA">NYCHA</option>}</select></label>
             <label>Service <select aria-label="Procurement service category" value={categoryFilter} onChange={event => setCategoryFilter(event.target.value)}><option value="ALL">All services</option>{categories.map(category => <option key={category} value={category}>{categoryLabel(category)}</option>)}</select></label>
           </div>
         </div>

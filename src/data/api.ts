@@ -1,8 +1,9 @@
 import type { SystemDetail, SystemsPayload } from '../types/data'
 import type { ChangesPayload } from '../types/history'
 import type { NysChangesPayload, NysSystemsPayload } from '../types/nys'
-import type { CheckbookProcurementPayload, CityRecordProcurementPayload, NysAuthorityProcurementPayload, ProcurementBundle } from '../types/procurement'
+import type { CheckbookProcurementPayload, CityRecordProcurementPayload, NysAuthorityProcurementPayload, NychaWaterPayload, OpenBookWaterPayload, ProcurementBundle } from '../types/procurement'
 import type { CompanyIntelligencePayload } from '../types/company'
+import type { DomesticWaterMarketPayload, ElapProbePayload, NysLsliDetailPayload, NysPublicWaterPayload, NysServiceLineInventorySummaryPayload, NycDistributionWaterPayload, NycWaterSignalsPayload, ProviderResolutionPayload } from '../types/water'
 
 const base = import.meta.env.BASE_URL
 
@@ -10,6 +11,23 @@ async function loadJson<T>(path: string, label: string): Promise<T> {
   const response = await fetch(`${base}data/${path}`, { cache: 'no-store' })
   if (!response.ok) throw new Error(`${label} request failed: HTTP ${response.status}`)
   return response.json() as Promise<T>
+}
+
+async function loadOptionalJson<T>(path: string, label: string, valid: (payload: T) => boolean): Promise<T | null> {
+  const response = await fetch(`${base}data/${path}`, { cache: 'no-store' })
+  if (response.status === 404) return null
+  if (!response.ok) throw new Error(`${label} request failed: HTTP ${response.status}`)
+  const payload = await response.json() as T
+  if (!valid(payload)) throw new Error(`${label} dataset is malformed`)
+  return payload
+}
+
+async function optionalResult<T>(load: () => Promise<T | null>): Promise<{ payload: T | null; error?: string }> {
+  try {
+    return { payload: await load() }
+  } catch (error) {
+    return { payload: null, error: error instanceof Error ? error.message : 'Optional source cache is unavailable' }
+  }
 }
 
 export async function loadSystems(): Promise<SystemsPayload> {
@@ -54,18 +72,40 @@ export async function loadNysAuthorityProcurement(): Promise<NysAuthorityProcure
   return payload
 }
 
+export async function loadOpenBookWater(): Promise<OpenBookWaterPayload | null> {
+  return loadOptionalJson<OpenBookWaterPayload>(
+    'procurement-openbook-water.json',
+    'Open Book NY water procurement',
+    payload => payload?.domain === 'NYS_OPEN_BOOK_WATER_CONTRACT_TRANSACTIONS' && Array.isArray(payload.contracts),
+  )
+}
+
+export async function loadNychaWater(): Promise<NychaWaterPayload | null> {
+  return loadOptionalJson<NychaWaterPayload>(
+    'procurement-nycha-water.json',
+    'NYCHA water procurement',
+    payload => payload?.domain === 'NYCHA_WATER_CONTRACT_RELEASE_LINES' && Array.isArray(payload.records),
+  )
+}
+
 export async function loadProcurement(): Promise<ProcurementBundle> {
   const [cityRecord, checkbook] = await Promise.all([loadCityRecordProcurement(), loadCheckbookProcurement()])
-  try {
-    const nysAuthorities = await loadNysAuthorityProcurement()
-    return { cityRecord, checkbook, nysAuthorities, sourceErrors: {} }
-  } catch (error) {
-    return {
-      cityRecord,
-      checkbook,
-      nysAuthorities: null,
-      sourceErrors: { nysAuthorities: error instanceof Error ? error.message : 'NYS authority procurement is unavailable' },
-    }
+  const [nysAuthorities, openBookWater, nychaWater] = await Promise.all([
+    optionalResult(loadNysAuthorityProcurement),
+    optionalResult(loadOpenBookWater),
+    optionalResult(loadNychaWater),
+  ])
+  return {
+    cityRecord,
+    checkbook,
+    nysAuthorities: nysAuthorities.payload,
+    openBookWater: openBookWater.payload,
+    nychaWater: nychaWater.payload,
+    sourceErrors: {
+      ...(nysAuthorities.error ? { nysAuthorities: nysAuthorities.error } : {}),
+      ...(openBookWater.error ? { openBookWater: openBookWater.error } : {}),
+      ...(nychaWater.error ? { nychaWater: nychaWater.error } : {}),
+    },
   }
 }
 
@@ -75,6 +115,70 @@ export async function loadCompanies(): Promise<CompanyIntelligencePayload> {
     throw new Error('TowerSignal company intelligence dataset is malformed')
   }
   return payload
+}
+
+export async function loadDomesticWaterMarket(): Promise<DomesticWaterMarketPayload | null> {
+  return loadOptionalJson<DomesticWaterMarketPayload>(
+    'domestic-water-market.json',
+    'Domestic-water provider intelligence',
+    payload => payload?.domain === 'NY_DOMESTIC_WATER_PROVIDER_INTELLIGENCE' && Array.isArray(payload.providers) && Array.isArray(payload.laboratories),
+  )
+}
+
+export async function loadProviderResolution(): Promise<ProviderResolutionPayload | null> {
+  return loadOptionalJson<ProviderResolutionPayload>(
+    'provider-resolution-review.json',
+    'Provider identity review',
+    payload => payload?.domain === 'PROVIDER_IDENTITY_REVIEW' && Array.isArray(payload.alias_review_candidates) && Array.isArray(payload.dec_name_matches),
+  )
+}
+
+export async function loadNysPublicWater(): Promise<NysPublicWaterPayload | null> {
+  return loadOptionalJson<NysPublicWaterPayload>(
+    'nys-public-water.json',
+    'NYS public-water systems',
+    payload => payload?.domain === 'NYS_PUBLIC_WATER_SYSTEMS' && Array.isArray(payload.pws_systems),
+  )
+}
+
+export async function loadNysLsliDetails(): Promise<NysLsliDetailPayload | null> {
+  return loadOptionalJson<NysLsliDetailPayload>(
+    'nys-lsli-details.json',
+    'NYS LSLI detail',
+    payload => payload?.domain === 'NYS_LEAD_SERVICE_LINE_INVENTORY_DETAILS' && Array.isArray(payload.details),
+  )
+}
+
+export async function loadNysServiceLineSummary(): Promise<NysServiceLineInventorySummaryPayload | null> {
+  return loadOptionalJson<NysServiceLineInventorySummaryPayload>(
+    'nys-service-line-inventory-summary.json',
+    'NYS address service-line inventory',
+    payload => payload?.domain === 'NYS_ADDRESS_LEVEL_SERVICE_LINE_INVENTORY' && typeof payload.summary === 'object',
+  )
+}
+
+export async function loadNycDistributionWater(): Promise<NycDistributionWaterPayload | null> {
+  return loadOptionalJson<NycDistributionWaterPayload>(
+    'nyc-distribution-water.json',
+    'NYC distribution water quality',
+    payload => payload?.domain === 'NYC_DISTRIBUTION_DRINKING_WATER_QUALITY' && Array.isArray(payload.sites),
+  )
+}
+
+export async function loadNycWaterSignals(): Promise<NycWaterSignalsPayload | null> {
+  return loadOptionalJson<NycWaterSignalsPayload>(
+    'nyc-water-signals.json',
+    'NYC building-water signals',
+    payload => payload?.domain === 'NYC_BUILDING_WATER_SIGNALS' && typeof payload.summary === 'object',
+  )
+}
+
+export async function loadElapProbe(): Promise<ElapProbePayload | null> {
+  return loadOptionalJson<ElapProbePayload>(
+    'elap-source-probe.json',
+    'ELAP source probe',
+    payload => typeof payload?.search_url === 'string' && typeof payload?.lab_selector === 'object',
+  )
 }
 
 export function systemDetailUrl(systemId: string): string {

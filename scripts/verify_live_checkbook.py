@@ -10,7 +10,15 @@ from typing import Any, Mapping, Sequence
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from towersignal.checkbook import CITYWIDE_SOURCE, EDC_SOURCE, fetch_contract_by_id
+from towersignal.checkbook import (
+    CITYWIDE_SCOPE,
+    CITYWIDE_SOURCE,
+    EDC_SCOPE,
+    EDC_SOURCE,
+    RequestXml,
+    _default_request_xml,
+    fetch_scope,
+)
 from towersignal.procurement import normalize_space
 
 
@@ -54,7 +62,39 @@ def _deterministic_sample(rows: Sequence[Mapping[str, Any]], *, seed: str, sampl
     return ranked[:sample_size]
 
 
-def verify_cache(path: Path, *, sample_size: int) -> dict[str, Any]:
+def _live_contract_rows(
+    source: str,
+    contract_id: str,
+    cached_contract: Mapping[str, Any],
+    *,
+    request_xml: RequestXml,
+) -> tuple[dict[str, str], ...]:
+    extra_criteria: list[tuple[str, str, str]] = []
+    if source == CITYWIDE_SOURCE:
+        fiscal_year = normalize_space(str(cached_contract.get("source_fiscal_year") or ""))
+        if fiscal_year:
+            extra_criteria.append(("fiscal_year", "value", fiscal_year))
+        spec = CITYWIDE_SCOPE
+    elif source == EDC_SOURCE:
+        spec = EDC_SCOPE
+    else:
+        raise ValueError(f"Unsupported Checkbook source: {source}")
+
+    extra_criteria.append(("contract_id", "value", contract_id))
+    return fetch_scope(
+        spec,
+        request_xml=request_xml,
+        page_size=100,
+        extra_criteria=tuple(extra_criteria),
+    ).rows
+
+
+def verify_cache(
+    path: Path,
+    *,
+    sample_size: int,
+    request_xml: RequestXml = _default_request_xml,
+) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     generated_at = str(payload.get("generated_at") or "")
     contracts = payload.get("contracts")
@@ -84,7 +124,7 @@ def verify_cache(path: Path, *, sample_size: int) -> dict[str, Any]:
     for contract in selected:
         source = str(contract["source"])
         contract_id = str(contract["source_contract_id"])
-        live_rows = fetch_contract_by_id(source, contract_id)
+        live_rows = _live_contract_rows(source, contract_id, contract, request_xml=request_xml)
         if not live_rows:
             raise RuntimeError(f"Live Checkbook query returned no rows for {source} {contract_id}")
 
@@ -110,6 +150,7 @@ def verify_cache(path: Path, *, sample_size: int) -> dict[str, Any]:
             {
                 "source": source,
                 "contract_id": contract_id,
+                "source_fiscal_year": contract.get("source_fiscal_year"),
                 "fields": list(COMPARE_FIELDS[source]),
                 "result": "PASS" if passed else "FAIL",
             }

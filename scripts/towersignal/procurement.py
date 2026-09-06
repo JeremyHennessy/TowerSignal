@@ -570,7 +570,7 @@ def procurement_source_health(
 
 
 def _effective_value(contract: Mapping[str, Any]) -> float:
-    for key in ("current_amount", "original_amount", "spend_to_date"):
+    for key in ("current_amount", "amount", "net_transaction_amount", "line_current_amount", "original_amount", "spend_to_date"):
         value = contract.get(key)
         if isinstance(value, (int, float)):
             return float(value)

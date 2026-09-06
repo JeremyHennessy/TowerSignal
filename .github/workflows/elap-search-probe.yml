@@ -1,0 +1,40 @@
+name: Probe ELAP public search source contract
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/elap-search-probe.yml'
+      - 'scripts/probe_elap_search.py'
+      - 'scripts/validate_elap_source_probe.py'
+      - 'docs/BUILD017J_ELAP_SOURCE_PROBE.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: towersignal-elap-probe-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  source-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inspect authoritative ELAP public-search form and lab option keys
+        run: |
+          mkdir -p elap-source-probe
+          python scripts/probe_elap_search.py | tee elap-source-probe/source-contract.json
+      - name: Validate ELAP source-contract probe
+        run: python scripts/validate_elap_source_probe.py --probe elap-source-probe/source-contract.json
+      - name: Upload ELAP source-contract probe
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-elap-source-probe
+          path: elap-source-probe/source-contract.json
+          retention-days: 7
