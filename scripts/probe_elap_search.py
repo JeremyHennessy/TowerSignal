@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import time
@@ -16,6 +17,10 @@ PREFERRED_TEST_LAB = "DIST WATER QUAL OPS NYCDEP DISTRIBUTION LAB"
 
 
 class ElapProbeError(RuntimeError):
+    pass
+
+
+class ElapFetchError(ElapProbeError):
     pass
 
 
@@ -107,7 +112,7 @@ def fetch_page(opener, url: str, *, data: bytes | None = None, retries: int = 4,
                 break
             if attempt + 1 < retries:
                 time.sleep(2**attempt)
-    raise ElapProbeError(f"Failed to fetch ELAP public page {url}: {last_error}")
+    raise ElapFetchError(f"Failed to fetch ELAP public page {url}: {last_error}")
 
 
 def classify_value(value: str | None) -> str:
@@ -142,9 +147,9 @@ def _lab_detail_links(links: list[str]) -> list[dict[str, str | None]]:
     return result
 
 
-def build_probe() -> dict:
+def build_probe(*, retries: int = 4, timeout: int = 90) -> dict:
     opener = _opener()
-    html = fetch_page(opener, SEARCH_URL)
+    html = fetch_page(opener, SEARCH_URL, retries=retries, timeout=timeout)
     if "Search NY Accredited Environmental Laboratories" not in html:
         raise ElapProbeError("ELAP search-page marker missing")
     parser = FormParser()
@@ -225,6 +230,8 @@ def build_probe() -> dict:
         opener,
         result_url,
         data=urlencode(post_fields).encode("utf-8"),
+        retries=retries,
+        timeout=timeout,
     )
     result_parser = FormParser()
     result_parser.feed(result_html)
@@ -276,8 +283,29 @@ def build_probe() -> dict:
     }
 
 
+def build_unavailable_probe(error: Exception) -> dict:
+    return {
+        "search_url": SEARCH_URL,
+        "probe_status": "SOURCE_UNAVAILABLE",
+        "source_error": str(error),
+        "scope_claims_created": 0,
+    }
+
+
 def main() -> None:
-    print(json.dumps(build_probe(), indent=2, sort_keys=True))
+    parser = argparse.ArgumentParser(description="Probe the NYSDOH ELAP public search source contract")
+    parser.add_argument("--allow-source-unavailable", action="store_true")
+    parser.add_argument("--retries", type=int, default=4)
+    parser.add_argument("--timeout", type=int, default=90)
+    args = parser.parse_args()
+    try:
+        payload = build_probe(retries=args.retries, timeout=args.timeout)
+        payload["probe_status"] = "SOURCE_CONTRACT_PROVEN"
+    except ElapFetchError as exc:
+        if not args.allow_source_unavailable:
+            raise
+        payload = build_unavailable_probe(exc)
+    print(json.dumps(payload, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
