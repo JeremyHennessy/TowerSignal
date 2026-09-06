@@ -35,7 +35,7 @@ export default defineConfig({
       name: 'iphone',
       testIgnore: /auth\.setup\.ts/,
       dependencies: ['setup-iphone'],
-      use: { ...devices['iPhone 13'], ...iphoneAuthState },
+      use: { ...devices['iPhone 13'], ...iphoneAuthState, trace: 'off', screenshot: 'only-on-failure' },
     },
   ],
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
