@@ -284,7 +284,7 @@ def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
     for term in HPD_WATER_TERMS:
         snapshots.append(
             fetch_snapshot(
-                HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="inspectiondate,violationid",
+                HPD_VIOLATIONS_DATASET_ID, api_root=NYC_API_ROOT, order_by="violationid",
                 required_fields=("violationid", "buildingid", "registrationid", "boro", "housenumber", "streetname", "zip", "class", "inspectiondate", "novdescription", "currentstatus", "currentstatusdate", "violationstatus", "rentimpairing", "bin", "bbl"),
                 where=_hpd_term_where(term),
                 select="violationid,buildingid,registrationid,boro,housenumber,streetname,zip,class,inspectiondate,novdescription,currentstatus,currentstatusdate,violationstatus,rentimpairing,bin,bbl",
@@ -292,6 +292,7 @@ def _fetch_hpd_snapshots(*, page_size: int) -> list[SourceSnapshot]:
                 allow_count_fallback=True,
                 progress_label=f"NYC water HPD term {term!r}",
                 skip_count=True,
+                seek_field="violationid",
             )
         )
     return snapshots
