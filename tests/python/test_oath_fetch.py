@@ -42,6 +42,7 @@ class OathBatchFetchTests(unittest.TestCase):
         self.assertEqual(metadata["matched_ticket_count"], 4)
         self.assertEqual(metadata["unmatched_ticket_count"], 0)
         self.assertEqual(metadata["source_record_count"], 4)
+        self.assertEqual(metadata["source_query_scope"], "Exact ticket_number queries for summonses present in NYC Cooling Tower System Inspection Results")
         self.assertEqual(fetch_where_mock.call_count, 2)
 
         queried_tickets = []
@@ -110,6 +111,51 @@ class OathBatchFetchTests(unittest.TestCase):
         self.assertEqual(metadata["matched_ticket_count"], 2)
         self.assertEqual(fetch_where_mock.call_count, 2)
         sleep_mock.assert_called_once_with(10)
+
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_large_ticket_set_uses_cooling_tower_agency_slice(self, fetch_where_mock, _fetch_metadata_mock):
+        requested = [f"{index:010d}" for index in range(1000)]
+        extra_agency_ticket = "9999999999"
+
+        def fetch_side_effect(
+            dataset_id,
+            where,
+            order_by=None,
+            select=None,
+            api_root=None,
+            request_retries=None,
+            request_timeout=None,
+            limit=50000,
+            offset=None,
+        ):
+            self.assertEqual(dataset_id, "jz4z-kudi")
+            self.assertIn("COOLING TOWERS - DOHMH", where)
+            self.assertEqual(request_retries, 1)
+            self.assertEqual(request_timeout, 30)
+            if select == "count(*) as count":
+                self.assertEqual(limit, 1)
+                self.assertIsNone(order_by)
+                self.assertIsNone(offset)
+                return [{"count": str(len(requested) + 1)}]
+            self.assertEqual(order_by, "ticket_number")
+            self.assertEqual(limit, 50000)
+            self.assertEqual(offset, 0)
+            return [
+                *({"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in requested),
+                {"ticket_number": extra_agency_ticket, "hearing_status": "HEARING COMPLETED"},
+            ]
+
+        fetch_where_mock.side_effect = fetch_side_effect
+        cases, metadata = fetch_oath_cases(requested)
+
+        self.assertEqual(set(cases), set(requested))
+        self.assertNotIn(extra_agency_ticket, cases)
+        self.assertEqual(metadata["requested_ticket_count"], len(requested))
+        self.assertEqual(metadata["matched_ticket_count"], len(requested))
+        self.assertEqual(metadata["source_record_count"], len(requested) + 1)
+        self.assertIn("issuing_agency='COOLING TOWERS - DOHMH'", metadata["source_query_scope"])
+        self.assertEqual(fetch_where_mock.call_count, 2)
 
 
 if __name__ == "__main__":

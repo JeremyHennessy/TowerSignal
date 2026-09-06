@@ -106,8 +106,12 @@ def fetch_where(
     api_root: str = API_ROOT,
     request_retries: int = 4,
     request_timeout: int = 90,
+    limit: int = 50000,
+    offset: int | None = None,
 ) -> list[dict[str, Any]]:
-    params: dict[str, Any] = {"$limit": 50000, "$where": where}
+    params: dict[str, Any] = {"$limit": limit, "$where": where}
+    if offset is not None:
+        params["$offset"] = offset
     if order_by:
         params["$order"] = order_by
     if select:
