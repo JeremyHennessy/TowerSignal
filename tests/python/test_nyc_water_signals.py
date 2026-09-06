@@ -153,8 +153,8 @@ class NycWaterSignalsTests(unittest.TestCase):
                 rows = [request_row] if len(request_wheres) <= 2 else []
             elif dataset_id == HPD_VIOLATIONS_DATASET_ID:
                 where = str(kwargs.get("where") or "")
-                self.assertIsNone(kwargs.get("seek_field"))
-                self.assertEqual(kwargs.get("order_by"), "inspectiondate,violationid")
+                self.assertEqual(kwargs.get("seek_field"), "violationid")
+                self.assertEqual(kwargs.get("order_by"), "violationid")
                 self.assertIs(kwargs.get("skip_count"), True)
                 hpd_wheres.append(where)
                 self.assertNotIn("lower(", where)
