@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from attach_domestic_water_market import attach as attach_market  # noqa: E402
 from towersignal.domestic_water_market import build_payload  # noqa: E402
 
 
@@ -15,6 +16,9 @@ def build(output: Path, *, page_size: int) -> dict:
     payload = build_payload(page_size=page_size)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    systems_path = output.parent / "systems.json"
+    if systems_path.exists():
+        attach_market(output.parent, output)
     return payload
 
 

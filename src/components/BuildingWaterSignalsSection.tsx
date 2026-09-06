@@ -1,7 +1,24 @@
 import { formatDate, formatTimestamp } from '../domain/labels'
+import { isReplacementServiceLineMaterial, isSpecificBuildingWaterSignalType } from '../domain/waterOpportunity'
 import type { SystemDetail } from '../types/data'
 
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 })
+
+type WaterOpportunityDetail = SystemDetail & {
+  domestic_water?: {
+    summary: { violation_record_count: number }
+  }
+  domestic_water_market?: {
+    property_profile: {
+      current_observed_provider_id: string | null
+      current_observed_provider_raw: string | null
+      latest_inspection_date: string | null
+      violation_count: number
+    }
+    match_basis: 'BIN_EXACT'
+    evidence_boundaries: { provider: string }
+  } | null
+}
 
 function text(row: Record<string, unknown>, key: string): string {
   const value = row[key]
@@ -30,10 +47,53 @@ function waterUse(row: Record<string, unknown>, key: string): string {
   return typeof value === 'number' ? `${number.format(value)} kgal` : text(row, key)
 }
 
+function humanize(value: string): string {
+  return value.replaceAll('_', ' ').toLowerCase().replace(/(^|\s)\S/g, match => match.toUpperCase())
+}
+
 export function BuildingWaterSignalsSection({ detail }: { detail: SystemDetail }) {
   const context = detail.nyc_building_water_signals
+  const enriched = detail as WaterOpportunityDetail
+  const marketProfile = enriched.domestic_water_market?.property_profile
+  const dwtViolationCount = Math.max(
+    enriched.domestic_water?.summary.violation_record_count ?? 0,
+    marketProfile?.violation_count ?? 0,
+  )
+  const specificCategories = context
+    ? Object.keys(context.summary.category_counts).filter(isSpecificBuildingWaterSignalType).sort()
+    : []
+  const replacementMaterials = detail.nyc_lead_service_lines
+    ? Object.entries(detail.nyc_lead_service_lines.summary.material_counts)
+      .filter(([material, count]) => count > 0 && isReplacementServiceLineMaterial(material))
+      .map(([material]) => material)
+      .sort()
+    : []
+  const familyCount = Number(dwtViolationCount > 0) + Number(specificCategories.length > 0) + Number(replacementMaterials.length > 0)
+  const providerName = marketProfile?.current_observed_provider_id && marketProfile.current_observed_provider_raw
+    ? marketProfile.current_observed_provider_raw
+    : null
+  const providerDate = providerName ? marketProfile?.latest_inspection_date ?? null : null
+  const opportunityNotes = [
+    dwtViolationCount > 0 ? `${dwtViolationCount.toLocaleString()} DWT violation record${dwtViolationCount === 1 ? '' : 's'}` : null,
+    specificCategories.length > 0 ? `specific building-water evidence: ${specificCategories.map(humanize).join(', ')}` : null,
+    replacementMaterials.length > 0 ? `service-line material: ${replacementMaterials.join(', ')}` : null,
+  ].filter((value): value is string => Boolean(value))
+
   return <section className="building-water-signals-section">
     <h3>NYC building-water signals</h3>
+    {(familyCount > 0 || providerName) && <div className="signal-list">
+      <article className="signal-card">
+        <div className="signal-card-head"><strong>Water opportunity context</strong><span>{familyCount > 0 ? `${familyCount} specific evidence ${familyCount === 1 ? 'family' : 'families'}` : 'Provider context only'}</span></div>
+        {opportunityNotes.length > 0 && <p>{opportunityNotes.join(' · ')}</p>}
+        <dl className="identity-grid">
+          <div><dt>Specific evidence families</dt><dd>{familyCount}</dd></div>
+          <div><dt>Observed DWT inspection firm</dt><dd>{providerName ?? '—'}</dd></div>
+          <div><dt>Latest provider observation</dt><dd>{providerDate ? formatDate(providerDate) : '—'}</dd></div>
+          <div><dt>Lead / replacement material</dt><dd>{replacementMaterials.length ? replacementMaterials.join(', ') : '—'}</dd></div>
+        </dl>
+        <p className="microcopy">This is separate commercial qualification context. It does not change the cooling-tower Priority Score or its evidence-confidence label. An observed DWT inspection firm is source-reported drinking-water-tank service evidence, not proof of a current cooling-tower incumbent or exclusive contract.</p>
+      </article>
+    </div>}
     {!context ? <>
       <div className="empty-inline">No exact-BBL/BIN NYC 311, HPD, DOB or LL84 building-water signal was attached to this cooling-tower property.</div>
       <p className="microcopy">Address text, street-infrastructure complaints and multi-identifier LL84 benchmarking rows are not used as fallback account evidence.</p>

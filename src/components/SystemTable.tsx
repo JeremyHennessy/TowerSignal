@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { SystemSummary } from '../types/data'
 import type { AcrisSummaryFields } from '../types/acris'
 import { formatDate, signalLabel } from '../domain/labels'
+import { observedDwtProvider, waterEvidenceFamilies } from '../domain/waterOpportunity'
 import { StatusBadge } from './StatusBadge'
 
 const PAGE_SIZE = 50
@@ -31,16 +32,19 @@ export function SystemTable({ rows, onSelect }: { rows: SystemSummary[]; onSelec
   return <div className="table-card account-table-card">
     <div className="table-heading"><div><strong>{rows.length.toLocaleString()}</strong> matching systems</div><div>Showing {visible.length ? activePage * PAGE_SIZE + 1 : 0}–{Math.min((activePage + 1) * PAGE_SIZE, rows.length)}</div></div>
     {rows.length === 0 ? <div className="empty-state"><strong>No accounts match these filters.</strong><span>Try widening the territory, timing signal or priority criteria.</span></div> : <div className="table-scroll"><table className="account-table"><thead><tr>
-      <th><button onClick={() => changeSort('address')}>Account</button></th><th><button onClick={() => changeSort('priority_score')}>Priority</button></th><th>Timing signal</th><th>Contact</th><th><button onClick={() => changeSort('days_since_latest_sample')}>Sampling</button></th><th><button onClick={() => changeSort('oath_case_count')}>Activity</button></th><th>Evidence</th><th aria-label="Open account" />
+      <th><button onClick={() => changeSort('address')}>Account</button></th><th><button onClick={() => changeSort('priority_score')}>Priority</button></th><th>Timing signal</th><th>Contact</th><th>Water opportunity</th><th><button onClick={() => changeSort('days_since_latest_sample')}>Sampling</button></th><th><button onClick={() => changeSort('oath_case_count')}>Activity</button></th><th>Evidence</th><th aria-label="Open account" />
     </tr></thead><tbody>{visible.map(row => {
       const acris = row as EnrichedSystemSummary
       const acrisCount = acris.acris_recent_document_count ?? 0
       const hasActivity = (row.oath_case_count ?? 0) > 0 || (row.dob_recent_activity_count ?? 0) > 0 || acrisCount > 0
+      const provider = observedDwtProvider(row)
+      const waterFamilies = waterEvidenceFamilies(row)
       return <tr key={row.system_id} onClick={() => onSelect(row)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') onSelect(row) }}>
         <td className="account-cell"><strong>{row.address ?? 'Address unavailable'}</strong><span>{row.borough ?? '—'} · {row.zip ?? '—'}</span><small className="mono">{row.system_id} · {row.active_equipment} active unit{row.active_equipment === 1 ? '' : 's'}</small></td>
         <td><div className={`priority-indicator priority-${priorityBand(row.priority_score)}`}><strong>{row.priority_score}</strong><span><i style={{ width:`${Math.max(4, row.priority_score)}%` }} /></span></div></td>
         <td><span className={`signal signal-${row.primary_signal.toLowerCase()}`}>{signalLabel(row.primary_signal)}</span>{row.confirmed_violation && <small className="urgent-copy">Confirmed record</small>}</td>
         <td>{(row.hpd_contact_count ?? 0) > 0 ? <span className="contact-ready">✓ {row.hpd_contact_count} HPD contact{row.hpd_contact_count === 1 ? '' : 's'}</span> : <span className="muted-copy">No matched contact</span>}</td>
+        <td>{provider ? <><strong title="Observed drinking-water-tank inspection firm; not proof of a current cooling-tower incumbent or exclusive contract.">{provider.name}</strong><small>{waterFamilies.length > 0 ? `${waterFamilies.length} specific evidence ${waterFamilies.length === 1 ? 'family' : 'families'} · ` : ''}{provider.observedDate ? `DWT observed ${formatDate(provider.observedDate)}` : 'Source-observed DWT service'}</small></> : waterFamilies.length > 0 ? <><strong>{waterFamilies.length} specific evidence {waterFamilies.length === 1 ? 'family' : 'families'}</strong><small>DWT violation, specific building-water, or replacement service-line evidence</small></> : <span className="muted-copy">No specific match</span>}</td>
         <td>{formatDate(row.latest_sample_date)}<small>{row.days_since_latest_sample == null ? 'No usable date' : `${row.days_since_latest_sample} days ago`}</small></td>
         <td><div className="activity-stack">{(row.oath_case_count ?? 0) > 0 && <span>OATH · {row.oath_case_count}</span>}{(row.dob_recent_activity_count ?? 0) > 0 && <span>DOB · {row.dob_recent_activity_count}</span>}{acrisCount > 0 && <span title={acris.latest_acris_recorded_date ? `Latest recorded ${formatDate(acris.latest_acris_recorded_date)}` : undefined}>ACRIS · {acrisCount}</span>}{!hasActivity && <span className="muted-copy">No recent match</span>}</div></td>
         <td><StatusBadge value={row.evidence_confidence} /></td><td className="row-arrow">›</td>
