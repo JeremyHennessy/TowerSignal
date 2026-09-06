@@ -98,14 +98,25 @@ def fetch_dataset(dataset_id: str, order_by: str, page_size: int = 50000, api_ro
     )
 
 
-def fetch_where(dataset_id: str, where: str, order_by: str | None = None, select: str | None = None,
-                api_root: str = API_ROOT) -> list[dict[str, Any]]:
+def fetch_where(
+    dataset_id: str,
+    where: str,
+    order_by: str | None = None,
+    select: str | None = None,
+    api_root: str = API_ROOT,
+    request_retries: int = 4,
+    request_timeout: int = 90,
+) -> list[dict[str, Any]]:
     params: dict[str, Any] = {"$limit": 50000, "$where": where}
     if order_by:
         params["$order"] = order_by
     if select:
         params["$select"] = select
-    payload = _request_json(f"{api_root}/resource/{dataset_id}.json?{urlencode(params)}")
+    payload = _request_json(
+        f"{api_root}/resource/{dataset_id}.json?{urlencode(params)}",
+        retries=request_retries,
+        timeout=request_timeout,
+    )
     if not isinstance(payload, list):
         raise SourceFetchError(f"Filtered query for {dataset_id} returned a non-list payload")
     return payload
