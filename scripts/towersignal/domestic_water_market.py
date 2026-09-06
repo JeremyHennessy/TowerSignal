@@ -218,6 +218,7 @@ def fetch_snapshot(
     max_pages_without_count: int = 10000,
     progress_label: str | None = None,
     seek_field: str | None = None,
+    seek_field_is_text: bool = False,
 ) -> SourceSnapshot:
     metadata = fetch_metadata(dataset_id, api_root=api_root)
     available = set(metadata["fields"])
@@ -245,7 +246,8 @@ def fetch_snapshot(
         params: dict[str, Any] = {"$limit": active_page_size, "$order": order_by}
         page_where = where
         if seek_field and seek_value is not None:
-            seek_clause = f"{seek_field} > {seek_value}"
+            seek_literal = f"'{seek_value}'" if seek_field_is_text else str(seek_value)
+            seek_clause = f"{seek_field} > {seek_literal}"
             page_where = f"({where}) AND {seek_clause}" if where else seek_clause
         elif not seek_field:
             params["$offset"] = offset

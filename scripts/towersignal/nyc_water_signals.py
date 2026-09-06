@@ -403,6 +403,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         page_size=page_size,
         progress_label="NYC water 311 DEP requests",
         seek_field="unique_key",
+        seek_field_is_text=True,
     )
     hpd_snapshots = _fetch_hpd_snapshots(page_size=page_size)
     hpd_rows, hpd_duplicate_partition_count = _dedupe_hpd_rows(hpd_snapshots)
