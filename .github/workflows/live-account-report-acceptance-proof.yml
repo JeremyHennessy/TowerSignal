@@ -1,0 +1,40 @@
+name: Verify live account report layout
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/live-account-report-acceptance-proof.yml'
+      - 'tests/e2e/account-report-acceptance-proof.spec.ts'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-account-report-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-live-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install hosted-test browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Verify dense and sparse reports in desktop and iPhone contexts
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/account-report-acceptance-proof.spec.ts --project=desktop-chromium --project=iphone
+      - name: Upload report acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-account-report-acceptance-proof
+          path: playwright-report
+          retention-days: 14
