@@ -16,6 +16,7 @@ from towersignal.nyc_water_signals import (  # noqa: E402
     DOB_APPROVED_PERMITS_DATASET_ID,
     DOB_JOB_FILINGS_DATASET_ID,
     HPD_BOROUGHS,
+    HPD_HEAVY_TERM_PAGE_SIZE,
     HPD_MAX_PAGE_SIZE,
     HPD_VIOLATIONS_DATASET_ID,
     HPD_WATER_TERMS,
@@ -100,7 +101,7 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(multi["bbls"], ["1000010001", "1000020002"])
 
     def test_build_payload_uses_uppercase_hpd_keyword_partitions(self) -> None:
-        calls: list[tuple[str, int]] = []
+        calls: list[tuple[str, int, str]] = []
         hpd_wheres: list[str] = []
         request_wheres: list[str] = []
         request_row = {
@@ -140,7 +141,7 @@ class NycWaterSignalsTests(unittest.TestCase):
         }
 
         def fake_fetch_snapshot(dataset_id: str, **kwargs):
-            calls.append((dataset_id, int(kwargs["page_size"])))
+            calls.append((dataset_id, int(kwargs["page_size"]), str(kwargs.get("where") or "")))
             if dataset_id == NYC_311_DATASET_ID:
                 where = str(kwargs.get("where") or "")
                 self.assertIsNone(kwargs.get("seek_field"))
@@ -192,7 +193,7 @@ class NycWaterSignalsTests(unittest.TestCase):
             payload["summary"]["hpd_duplicate_partition_violation_count"],
             expected_hpd_partitions - 1,
         )
-        page_sizes = dict(calls)
+        page_sizes = {dataset_id: page_size for dataset_id, page_size, _ in calls}
         self.assertEqual(page_sizes[NYC_311_DATASET_ID], 50000)
         self.assertEqual(page_sizes[HPD_VIOLATIONS_DATASET_ID], HPD_MAX_PAGE_SIZE)
         self.assertEqual(page_sizes[DOB_JOB_FILINGS_DATASET_ID], 50000)
@@ -213,6 +214,12 @@ class NycWaterSignalsTests(unittest.TestCase):
         )
         self.assertTrue(
             all("boro='" not in where for where in hpd_wheres if "HOT WATER" not in where)
+        )
+        self.assertTrue(
+            all(page_size == HPD_HEAVY_TERM_PAGE_SIZE for _, page_size, where in hpd_calls if "HOT WATER" in where)
+        )
+        self.assertTrue(
+            all(page_size == HPD_MAX_PAGE_SIZE for _, page_size, where in hpd_calls if "HOT WATER" not in where)
         )
         self.assertLessEqual(HPD_MAX_PAGE_SIZE, 10000)
 
