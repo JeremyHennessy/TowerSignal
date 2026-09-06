@@ -64,10 +64,32 @@ async function assertIphoneSingleFlow(page: import('@playwright/test').Page) {
         const rect = child.getBoundingClientRect()
         return { left: rect.left, right: rect.right, width: rect.width }
       })
-    return { display: panelStyle.display, bodyWidth, viewportWidth, children }
+    const offenders = [...document.querySelectorAll<HTMLElement>('body *')]
+      .map(element => {
+        const rect = element.getBoundingClientRect()
+        const style = getComputedStyle(element)
+        const className = typeof element.className === 'string' ? element.className : ''
+        return {
+          tag: element.tagName.toLowerCase(),
+          id: element.id,
+          className,
+          left: Math.round(rect.left * 10) / 10,
+          right: Math.round(rect.right * 10) / 10,
+          width: Math.round(rect.width * 10) / 10,
+          scrollWidth: element.scrollWidth,
+          clientWidth: element.clientWidth,
+          overflowX: style.overflowX,
+          whiteSpace: style.whiteSpace,
+          text: (element.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 140),
+        }
+      })
+      .filter(item => item.right > viewportWidth + 1 || item.left < -1 || item.scrollWidth > item.clientWidth + 2)
+      .sort((a, b) => Math.max(b.right - viewportWidth, b.scrollWidth - b.clientWidth) - Math.max(a.right - viewportWidth, a.scrollWidth - a.clientWidth))
+      .slice(0, 25)
+    return { display: panelStyle.display, bodyWidth, viewportWidth, children, offenders }
   })
   expect(result.display).toBe('block')
-  expect(result.bodyWidth).toBeLessThanOrEqual(result.viewportWidth + 2)
+  expect(result.bodyWidth, `Horizontal overflow diagnostics:\n${JSON.stringify(result.offenders, null, 2)}`).toBeLessThanOrEqual(result.viewportWidth + 2)
   expect(result.children.length).toBeGreaterThan(8)
   for (const child of result.children) {
     expect(child.left).toBeGreaterThanOrEqual(-1)
@@ -105,10 +127,9 @@ for (const cohort of [
       await expect(detail.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
       await expect(detail.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
 
+      await capture(page, testInfo, `${testInfo.project.name}-${cohort.name}-${account.id}-top`)
       if (testInfo.project.name === 'desktop-chromium') await assertDesktopSingleFlow(page)
       else await assertIphoneSingleFlow(page)
-
-      await capture(page, testInfo, `${testInfo.project.name}-${cohort.name}-${account.id}-top`)
     }
 
     expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
