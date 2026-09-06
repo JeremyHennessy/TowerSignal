@@ -16,7 +16,6 @@ from towersignal.nyc_water_signals import (  # noqa: E402
     DOB_APPROVED_PERMITS_DATASET_ID,
     DOB_JOB_FILINGS_DATASET_ID,
     HPD_BOROUGHS,
-    HPD_HEAVY_TERM_PAGE_SIZE,
     HPD_MAX_PAGE_SIZE,
     HPD_VIOLATIONS_DATASET_ID,
     HPD_WATER_TERMS,
@@ -100,7 +99,7 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertIsNone(multi["property_key"])
         self.assertEqual(multi["bbls"], ["1000010001", "1000020002"])
 
-    def test_build_payload_uses_uppercase_hpd_keyword_partitions(self) -> None:
+    def test_build_payload_uses_hpd_borough_or_partitions(self) -> None:
         calls: list[tuple[str, int, str]] = []
         hpd_wheres: list[str] = []
         request_wheres: list[str] = []
@@ -161,7 +160,7 @@ class NycWaterSignalsTests(unittest.TestCase):
                 hpd_wheres.append(where)
                 self.assertNotIn("lower(", where)
                 self.assertRegex(where, r"novdescription like '%[A-Z ]+%'")
-                rows = [hpd_row]
+                rows = [hpd_row] if "MANHATTAN" in where else []
             else:
                 rows = []
             return SourceSnapshot(
@@ -185,13 +184,13 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(payload["summary"]["water_311_source_partition_record_count"], 2)
         self.assertEqual(payload["summary"]["water_311_duplicate_partition_request_count"], 1)
         self.assertEqual(payload["summary"]["hpd_open_water_violation_count"], 1)
-        self.assertEqual(payload["summary"]["hpd_source_fetch_strategy"], "UPPERCASE_KEYWORD_PARTITIONS")
-        expected_hpd_partitions = len(HPD_WATER_TERMS) - 1 + len(HPD_BOROUGHS)
+        self.assertEqual(payload["summary"]["hpd_source_fetch_strategy"], "BOROUGH_OR_PARTITIONS")
+        expected_hpd_partitions = len(HPD_BOROUGHS)
         self.assertEqual(payload["summary"]["hpd_source_partition_count"], expected_hpd_partitions)
-        self.assertEqual(payload["summary"]["hpd_source_partition_record_count"], expected_hpd_partitions)
+        self.assertEqual(payload["summary"]["hpd_source_partition_record_count"], 1)
         self.assertEqual(
             payload["summary"]["hpd_duplicate_partition_violation_count"],
-            expected_hpd_partitions - 1,
+            0,
         )
         page_sizes = {dataset_id: page_size for dataset_id, page_size, _ in calls}
         self.assertEqual(page_sizes[NYC_311_DATASET_ID], 50000)
@@ -206,22 +205,17 @@ class NycWaterSignalsTests(unittest.TestCase):
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
         self.assertEqual(len(hpd_calls), expected_hpd_partitions)
         self.assertEqual(len(hpd_wheres), expected_hpd_partitions)
-        hot_water_wheres = [where for where in hpd_wheres if "HOT WATER" in where]
-        self.assertEqual(len(hot_water_wheres), len(HPD_BOROUGHS))
         self.assertEqual(
-            {where.split("boro='", 1)[1].split("'", 1)[0] for where in hot_water_wheres},
+            {where.split("boro='", 1)[1].split("'", 1)[0] for where in hpd_wheres},
             set(HPD_BOROUGHS),
         )
-        self.assertTrue(
-            all("boro='" not in where for where in hpd_wheres if "HOT WATER" not in where)
-        )
-        self.assertTrue(
-            all(page_size == HPD_HEAVY_TERM_PAGE_SIZE for _, page_size, where in hpd_calls if "HOT WATER" in where)
-        )
-        self.assertTrue(
-            all(page_size == HPD_MAX_PAGE_SIZE for _, page_size, where in hpd_calls if "HOT WATER" not in where)
-        )
-        self.assertLessEqual(HPD_MAX_PAGE_SIZE, 10000)
+        for where in hpd_wheres:
+            self.assertIn("(", where)
+            self.assertIn(" OR ", where)
+            for term in HPD_WATER_TERMS:
+                self.assertIn(f"novdescription like '%{term.upper()}%'", where)
+        self.assertTrue(all(page_size == HPD_MAX_PAGE_SIZE for _, page_size, _ in hpd_calls))
+        self.assertLessEqual(HPD_MAX_PAGE_SIZE, 5000)
 
     def test_snapshot_reduces_page_size_after_repeated_source_timeout(self) -> None:
         rows = [{"id": str(index)} for index in range(5)]
