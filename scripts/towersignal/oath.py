@@ -11,9 +11,11 @@ OATH_DATASET_ID = "jz4z-kudi"
 OATH_SOURCE_URL = "https://data.cityofnewyork.us/City-Government/OATH-Hearings-Division-Case-Status/jz4z-kudi"
 MATCH_BASIS = "SUMMONS_NUMBER_EXACT"
 MIN_EXPECTED_MATCH_RATIO = 0.90
-DEFAULT_BATCH_SIZE = 100
+DEFAULT_BATCH_SIZE = 25
 DEFAULT_MAX_WORKERS = 2
-OATH_RATE_LIMIT_RETRIES = 3
+OATH_RATE_LIMIT_RETRIES = 4
+OATH_REQUEST_RETRIES = 1
+OATH_REQUEST_TIMEOUT_SECONDS = 30
 
 OATH_SELECT = ",".join([
     "ticket_number", "issuing_agency", "violation_date",
@@ -133,8 +135,9 @@ def validate_match_coverage(requested_count: int, matched_count: int, minimum_ra
         )
 
 
-def _is_rate_limit_error(exc: SourceFetchError) -> bool:
-    return "429" in str(exc) or "Too Many Requests" in str(exc)
+def _is_transient_oath_error(exc: SourceFetchError) -> bool:
+    message = str(exc).lower()
+    return "429" in message or "too many requests" in message or "timeout" in message or "timed out" in message
 
 
 def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
@@ -146,17 +149,18 @@ def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[st
             rows = fetch_where(
                 OATH_DATASET_ID,
                 where,
-                order_by="ticket_number",
                 select=OATH_SELECT,
+                request_retries=OATH_REQUEST_RETRIES,
+                request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
             )
             return batch, rows
         except SourceFetchError as exc:
             last_error = exc
-            if not _is_rate_limit_error(exc) or attempt + 1 >= OATH_RATE_LIMIT_RETRIES:
+            if not _is_transient_oath_error(exc) or attempt + 1 >= OATH_RATE_LIMIT_RETRIES:
                 raise
-            delay = 15 * (attempt + 1)
+            delay = 10 * (attempt + 1)
             print(
-                f"[oath] OATH rate limit while fetching {len(batch):,} exact tickets; "
+                f"[oath] Transient OATH source error while fetching {len(batch):,} exact tickets; "
                 f"retrying in {delay}s",
                 flush=True,
             )
