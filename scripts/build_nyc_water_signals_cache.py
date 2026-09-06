@@ -11,10 +11,17 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from towersignal.nyc_water_signals import build_payload  # noqa: E402
 
 
+def log_step(message: str) -> None:
+    print(f"[build_nyc_water_signals_cache] {message}", flush=True)
+
+
 def build(output: Path, *, page_size: int) -> dict:
+    log_step(f"building payload with page size {page_size:,}")
     payload = build_payload(page_size=page_size)
+    log_step("writing NYC building-water signal cache")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    log_step("wrote NYC building-water signal cache")
     return payload
 
 
