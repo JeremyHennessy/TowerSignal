@@ -293,9 +293,18 @@ def fetch_snapshot(
 
     source_record_count = expected_count if expected_count is not None else len(rows)
     if expected_count is not None and len(rows) < expected_count:
-        raise DomesticWaterSourceError(
-            f"Dataset {dataset_id} pagination incomplete: expected {expected_count:,} rows, fetched {len(rows):,}. Refusing partial snapshot."
-        )
+        final_count = fetch_count(dataset_id, api_root=api_root, where=where)
+        if len(rows) < final_count:
+            raise DomesticWaterSourceError(
+                f"Dataset {dataset_id} pagination incomplete: expected {final_count:,} rows, fetched {len(rows):,}. Refusing partial snapshot."
+            )
+        source_record_count = len(rows)
+        if progress_label:
+            print(
+                f"{progress_label}: source count shrank during pagination; fetched {len(rows):,} rows from initial count {expected_count:,}",
+                file=sys.stderr,
+                flush=True,
+            )
     if expected_count is not None and len(rows) > expected_count:
         source_record_count = len(rows)
         if progress_label:
