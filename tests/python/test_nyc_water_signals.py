@@ -226,6 +226,35 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(snapshot.source_record_count, 5)
         self.assertEqual(page_offsets, [0, 2, 4])
 
+    def test_snapshot_accepts_live_source_growth_during_pagination(self) -> None:
+        rows = [{"id": str(index)} for index in range(6)]
+        page_offsets: list[int] = []
+
+        def fake_query(dataset_id: str, *, api_root: str, params):
+            self.assertEqual(dataset_id, "growing-source-demo")
+            self.assertEqual(api_root, "https://example.test")
+            limit = int(params["$limit"])
+            offset = int(params["$offset"])
+            page_offsets.append(offset)
+            return rows[offset:offset + limit]
+
+        with (
+            patch("towersignal.domestic_water_market.fetch_metadata", return_value={"name": "Growing source demo", "source_last_updated_at": None, "fields": ("id",)}),
+            patch("towersignal.domestic_water_market.fetch_count", return_value=5),
+            patch("towersignal.domestic_water_market._query", side_effect=fake_query),
+        ):
+            snapshot = fetch_source_snapshot(
+                "growing-source-demo",
+                api_root="https://example.test",
+                order_by="id",
+                required_fields=("id",),
+                page_size=3,
+            )
+
+        self.assertEqual([row["id"] for row in snapshot.rows], ["0", "1", "2", "3", "4", "5"])
+        self.assertEqual(snapshot.source_record_count, 6)
+        self.assertEqual(page_offsets, [0, 3])
+
     def test_snapshot_can_seek_page_by_numeric_identity_without_offsets(self) -> None:
         rows = [{"id": str(index)} for index in (10, 20, 30, 40, 50)]
         wheres: list[str] = []
