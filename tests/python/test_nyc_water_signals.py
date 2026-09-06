@@ -15,6 +15,7 @@ from towersignal.domestic_water_market import DomesticWaterSourceError, SourceSn
 from towersignal.nyc_water_signals import (  # noqa: E402
     DOB_APPROVED_PERMITS_DATASET_ID,
     DOB_JOB_FILINGS_DATASET_ID,
+    HPD_BOROUGHS,
     HPD_MAX_PAGE_SIZE,
     HPD_VIOLATIONS_DATASET_ID,
     HPD_WATER_TERMS,
@@ -184,11 +185,12 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(payload["summary"]["water_311_duplicate_partition_request_count"], 1)
         self.assertEqual(payload["summary"]["hpd_open_water_violation_count"], 1)
         self.assertEqual(payload["summary"]["hpd_source_fetch_strategy"], "UPPERCASE_KEYWORD_PARTITIONS")
-        self.assertEqual(payload["summary"]["hpd_source_partition_count"], len(HPD_WATER_TERMS))
-        self.assertEqual(payload["summary"]["hpd_source_partition_record_count"], len(HPD_WATER_TERMS))
+        expected_hpd_partitions = len(HPD_WATER_TERMS) - 1 + len(HPD_BOROUGHS)
+        self.assertEqual(payload["summary"]["hpd_source_partition_count"], expected_hpd_partitions)
+        self.assertEqual(payload["summary"]["hpd_source_partition_record_count"], expected_hpd_partitions)
         self.assertEqual(
             payload["summary"]["hpd_duplicate_partition_violation_count"],
-            len(HPD_WATER_TERMS) - 1,
+            expected_hpd_partitions - 1,
         )
         page_sizes = dict(calls)
         self.assertEqual(page_sizes[NYC_311_DATASET_ID], 50000)
@@ -201,8 +203,17 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(len(request_wheres), payload["summary"]["water_311_source_partition_count"])
         self.assertEqual(len(set(request_wheres)), payload["summary"]["water_311_source_partition_count"])
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
-        self.assertEqual(len(hpd_calls), len(HPD_WATER_TERMS))
-        self.assertEqual(len(hpd_wheres), len(HPD_WATER_TERMS))
+        self.assertEqual(len(hpd_calls), expected_hpd_partitions)
+        self.assertEqual(len(hpd_wheres), expected_hpd_partitions)
+        hot_water_wheres = [where for where in hpd_wheres if "HOT WATER" in where]
+        self.assertEqual(len(hot_water_wheres), len(HPD_BOROUGHS))
+        self.assertEqual(
+            {where.split("boro='", 1)[1].split("'", 1)[0] for where in hot_water_wheres},
+            set(HPD_BOROUGHS),
+        )
+        self.assertTrue(
+            all("boro='" not in where for where in hpd_wheres if "HOT WATER" not in where)
+        )
         self.assertLessEqual(HPD_MAX_PAGE_SIZE, 10000)
 
     def test_snapshot_reduces_page_size_after_repeated_source_timeout(self) -> None:
@@ -471,7 +482,7 @@ class NycWaterSignalsTests(unittest.TestCase):
 
         def fake_fetch_snapshot(dataset_id: str, **kwargs):
             where = str(kwargs.get("where") or "")
-            rows = [hpd_row] if dataset_id == HPD_VIOLATIONS_DATASET_ID and "HOT WATER" in where else []
+            rows = [hpd_row] if dataset_id == HPD_VIOLATIONS_DATASET_ID and "HOT WATER" in where and "MANHATTAN" in where else []
             return SourceSnapshot(
                 dataset_id=dataset_id,
                 name=dataset_id,
