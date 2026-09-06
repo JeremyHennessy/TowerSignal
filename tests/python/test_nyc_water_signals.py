@@ -142,11 +142,12 @@ class NycWaterSignalsTests(unittest.TestCase):
             calls.append((dataset_id, int(kwargs["page_size"])))
             if dataset_id == NYC_311_DATASET_ID:
                 where = str(kwargs.get("where") or "")
-                self.assertEqual(kwargs.get("seek_field"), "unique_key")
-                self.assertIs(kwargs.get("seek_field_is_text"), True)
+                self.assertIsNone(kwargs.get("seek_field"))
+                self.assertEqual(kwargs.get("order_by"), "created_date,unique_key")
                 self.assertIs(kwargs.get("skip_count"), True)
                 self.assertIn("agency='DEP'", where)
                 self.assertIn("created_date >=", where)
+                self.assertIn("created_date <", where)
                 self.assertRegex(where, r"lower\((complaint_type|descriptor|descriptor_2)\) like '%(water|lead)%'")
                 request_wheres.append(where)
                 rows = [request_row] if len(request_wheres) <= 2 else []
@@ -175,8 +176,9 @@ class NycWaterSignalsTests(unittest.TestCase):
             payload = build_payload(page_size=50000)
 
         self.assertEqual(payload["summary"]["water_311_request_count"], 1)
-        self.assertEqual(payload["summary"]["water_311_source_fetch_strategy"], "FIELD_KEYWORD_PARTITIONS")
-        self.assertEqual(payload["summary"]["water_311_source_partition_count"], 6)
+        self.assertEqual(payload["summary"]["water_311_source_fetch_strategy"], "MONTHLY_FIELD_KEYWORD_PARTITIONS")
+        self.assertGreaterEqual(payload["summary"]["water_311_source_partition_count"], 6)
+        self.assertEqual(payload["summary"]["water_311_source_partition_count"] % 6, 0)
         self.assertEqual(payload["summary"]["water_311_source_partition_record_count"], 2)
         self.assertEqual(payload["summary"]["water_311_duplicate_partition_request_count"], 1)
         self.assertEqual(payload["summary"]["hpd_open_water_violation_count"], 1)
@@ -194,9 +196,9 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(page_sizes[DOB_APPROVED_PERMITS_DATASET_ID], 50000)
         self.assertEqual(page_sizes[LL84_DATASET_ID], 50000)
         request_calls = [call for call in calls if call[0] == NYC_311_DATASET_ID]
-        self.assertEqual(len(request_calls), 6)
-        self.assertEqual(len(request_wheres), 6)
-        self.assertEqual(len(set(request_wheres)), 6)
+        self.assertEqual(len(request_calls), payload["summary"]["water_311_source_partition_count"])
+        self.assertEqual(len(request_wheres), payload["summary"]["water_311_source_partition_count"])
+        self.assertEqual(len(set(request_wheres)), payload["summary"]["water_311_source_partition_count"])
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
         self.assertEqual(len(hpd_calls), len(HPD_WATER_TERMS))
         self.assertEqual(len(hpd_wheres), len(HPD_WATER_TERMS))
