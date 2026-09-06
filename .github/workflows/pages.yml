@@ -70,6 +70,7 @@ jobs:
       - name: Validate provider identity review queue
         run: python scripts/validate_provider_resolution_review.py --review public/data/provider-resolution-review.json --require-production-volume
       - name: Build NYC building-water signal cache
+        timeout-minutes: 45
         run: python scripts/build_nyc_water_signals_cache.py --output public/data/nyc-water-signals.json --page-size 50000
       - name: Validate NYC building-water signal cache
         run: python scripts/validate_nyc_water_signals_cache.py --cache public/data/nyc-water-signals.json --max-age-days 1 --require-production-volume
