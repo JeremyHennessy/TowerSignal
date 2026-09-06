@@ -57,6 +57,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm install --no-audit --no-fund
       - name: Fetch, validate and generate current NYC data
+        timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
       - name: Attach exact-BIN domestic-water roof and inspection context
         run: python scripts/build_domestic_water_data.py --output public/data
