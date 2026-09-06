@@ -11,6 +11,7 @@ on:
 permissions:
   contents: read
 
+# Diagnostic-only workflow. Reopened after the no-trace WebKit correction to capture final evidence.
 concurrency:
   group: live-account-report-acceptance-${{ github.ref }}
   cancel-in-progress: true
