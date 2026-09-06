@@ -134,6 +134,8 @@ def _fetch_311_snapshots(*, page_size: int) -> list[SourceSnapshot]:
                     progress_label=label,
                     seek_field="unique_key",
                     seek_field_is_text=True,
+                    skip_count=True,
+                    allow_count_fallback=True,
                 )
             )
     return snapshots
