@@ -26,6 +26,10 @@ jobs:
         with:
           node-version: 22
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Install frontend dependencies
         run: npm install --no-audit --no-fund
 
@@ -47,6 +51,12 @@ jobs:
           test -f public/data/systems.json
           test -f public/data/metadata.json
           echo "Reused verified production data from Pages run 34074004607 / main@5b8eb268ec42e9b6a68ed035b4dd0ee9dfcb7ec1"
+
+      - name: Refresh exact-BIN domestic-water firms and laboratories
+        run: python scripts/build_domestic_water_data.py --output public/data
+
+      - name: Verify refreshed domestic-water attachment
+        run: python scripts/verify_live_domestic_water.py --output public/data --sample-size 3
 
       - name: Lint frontend
         run: npm run lint
