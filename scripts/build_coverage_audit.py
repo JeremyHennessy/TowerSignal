@@ -16,6 +16,7 @@ ARTIFACT_CONTRACTS = [
     ("domestic_water_market", "domestic-water-market.json", "BIN/source asset for observed service; source-native provider/lab identities", ["WHO_TO_PURSUE", "WHY_ACCOUNT_MATTERS"]),
     ("provider_resolution_review", "provider-resolution-review.json", "Review-only deterministic provider-name candidates; no automatic fuzzy merge", ["WHO_TO_PURSUE"]),
     ("nyc_building_water_signals", "nyc-water-signals.json", "Exact source BBL/BIN where published; context-only records remain unlinked", ["WHEN_TO_ACT", "WHY_ACCOUNT_MATTERS"]),
+    ("legacy_dob_projects", "legacy-dob-projects.json", "Exact canonical BBL; bounded explicit cooling-tower and recent relevant legacy project evidence; recorded roles only", ["WHEN_TO_ACT", "WHY_ACCOUNT_MATTERS"]),
     ("nyc_distribution_water", "nyc-distribution-water.json", "Source sample-site identity; no building crosswalk inferred", ["WHY_ACCOUNT_MATTERS"]),
     ("elap_source_probe", "elap-source-probe.json", "Official ELAP public-search contract probe only; no guessed laboratory IDs", ["WHO_TO_PURSUE"]),
     ("city_record_procurement", "procurement-city-record.json", "Source procurement identity; no property assignment without an exact source link", ["WHO_TO_PURSUE", "WHEN_TO_ACT"]),
