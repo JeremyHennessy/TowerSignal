@@ -37,12 +37,11 @@ jobs:
           npm run typecheck
           npm test -- --run
           npm run build
-      - name: Commit validated integration and remove temporary patch machinery
+      - name: Commit validated non-workflow integration
         run: |
-          rm .github/workflows/patch-historical-311-context.yml
-          rm scripts/_patch_historical_311_integration.py
+          git checkout origin/agent/historical-311-context-production-20260907 -- .github/workflows/pages.yml
           git config user.name 'TowerSignal Release Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add .github/workflows/pages.yml scripts/towersignal/historical_311_context.py scripts/build_historical_311_context.py scripts/validate_historical_311_context.py scripts/attach_historical_311_context.py scripts/build_coverage_audit.py scripts/validate_coverage_audit.py tests/python/test_historical_311_context.py tests/python/test_coverage_audit.py src/types/data.ts src/components/HistoricalWaterContextSection.tsx src/components/DetailPanel.tsx src/components/AccountSectionNavigator.tsx .github/workflows/patch-historical-311-context.yml scripts/_patch_historical_311_integration.py
+          git add scripts/build_coverage_audit.py scripts/validate_coverage_audit.py tests/python/test_coverage_audit.py src/types/data.ts src/components/DetailPanel.tsx src/components/AccountSectionNavigator.tsx
           git commit -m 'Integrate bounded historical NYC 311 context'
           git push origin HEAD:agent/historical-311-context-production-20260907
