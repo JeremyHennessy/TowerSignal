@@ -9,4 +9,7 @@
 /* Keep account search reachable even on the narrowest supported iPhone widths. */
 @media(max-width:430px){
   .reference-mobile-search-trigger{display:grid!important}
+
+  /* Long source-backed history tokens must wrap instead of widening the report. */
+  .account-profile-page .history-timeline small{overflow-wrap:anywhere}
 }
