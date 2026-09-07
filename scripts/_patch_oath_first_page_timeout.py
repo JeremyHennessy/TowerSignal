@@ -1,0 +1,143 @@
+from pathlib import Path
+
+
+oath_path = Path('scripts/towersignal/oath.py')
+text = oath_path.read_text()
+text = text.replace('OATH_AGENCY_PAGE_SIZE = 50000', 'OATH_AGENCY_PAGE_SIZE = 25000', 1)
+text = text.replace(
+    '"after the agency slice failed to stabilize",',
+    '"after the agency-slice scan could not produce a stable complete snapshot",',
+    1,
+)
+
+old_count = """    for snapshot_attempt in range(1, OATH_AGENCY_SNAPSHOT_ATTEMPTS + 1):
+        expected_count = _fetch_agency_count(where)
+        print(
+"""
+new_count = """    for snapshot_attempt in range(1, OATH_AGENCY_SNAPSHOT_ATTEMPTS + 1):
+        try:
+            expected_count = _fetch_agency_count(where)
+        except SourceFetchError as exc:
+            if not _is_transient_oath_error(exc):
+                raise
+            print(
+                f"[oath] Transient OATH agency-count failure ({exc}); "
+                "using exact-ticket fallback instead of abandoning the lifecycle build",
+                flush=True,
+            )
+            cases, query_row_count = _fetch_exact_ticket_fallback(requested)
+            return cases, query_row_count, True
+        print(
+"""
+if old_count not in text:
+    raise SystemExit('agency count patch target not found')
+text = text.replace(old_count, new_count, 1)
+
+old_page = """            rows = fetch_where(
+                OATH_DATASET_ID,
+                page_where,
+                order_by="ticket_number",
+                select=OATH_SELECT,
+                request_retries=OATH_RATE_LIMIT_RETRIES,
+                request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
+                limit=OATH_AGENCY_PAGE_SIZE,
+            )
+            if not rows:
+"""
+new_page = """            try:
+                rows = fetch_where(
+                    OATH_DATASET_ID,
+                    page_where,
+                    order_by="ticket_number",
+                    select=OATH_SELECT,
+                    request_retries=OATH_RATE_LIMIT_RETRIES,
+                    request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
+                    limit=OATH_AGENCY_PAGE_SIZE,
+                )
+            except SourceFetchError as exc:
+                if not _is_transient_oath_error(exc):
+                    raise
+                print(
+                    f"[oath] Transient OATH agency-page failure ({exc}); "
+                    "using exact-ticket fallback instead of abandoning the lifecycle build",
+                    flush=True,
+                )
+                fallback_cases, query_row_count = _fetch_exact_ticket_fallback(requested)
+                return fallback_cases, query_row_count, True
+            if not rows:
+"""
+if old_page not in text:
+    raise SystemExit('agency page patch target not found')
+text = text.replace(old_page, new_page, 1)
+
+old_final = """        final_count = _fetch_agency_count(where)
+        last_counts = (expected_count, fetched_count, final_count)
+"""
+new_final = """        try:
+            final_count = _fetch_agency_count(where)
+        except SourceFetchError as exc:
+            if not _is_transient_oath_error(exc):
+                raise
+            print(
+                f"[oath] Transient OATH agency-final-count failure ({exc}); "
+                "using exact-ticket fallback instead of publishing an unverifiable agency snapshot",
+                flush=True,
+            )
+            fallback_cases, query_row_count = _fetch_exact_ticket_fallback(requested)
+            return fallback_cases, query_row_count, True
+        last_counts = (expected_count, fetched_count, final_count)
+"""
+if old_final not in text:
+    raise SystemExit('agency final count patch target not found')
+text = text.replace(old_final, new_final, 1)
+oath_path.write_text(text)
+
+test_path = Path('tests/python/test_oath_fetch.py')
+tests = test_path.read_text()
+tests = tests.replace('self.assertEqual(limit, 50000)', 'self.assertEqual(limit, 25000)', 1)
+marker = '\n\nif __name__ == "__main__":\n'
+addition = '''
+    @patch("towersignal.oath._fetch_exact_ticket_batch")
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_large_ticket_set_falls_back_when_first_agency_page_times_out(
+        self, fetch_where_mock, _fetch_metadata_mock, exact_batch_mock
+    ):
+        requested = [f"{index:010d}" for index in range(1000)]
+        fetch_where_mock.side_effect = [
+            [{"count": "1000"}],
+            SourceFetchError("The read operation timed out"),
+        ]
+
+        def exact_side_effect(batch):
+            return batch, [{"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in batch]
+
+        exact_batch_mock.side_effect = exact_side_effect
+        cases, metadata = fetch_oath_cases(requested)
+
+        self.assertEqual(set(cases), set(requested))
+        self.assertEqual(fetch_where_mock.call_count, 2)
+        self.assertEqual(exact_batch_mock.call_count, 4)
+        self.assertEqual(metadata["matched_ticket_count"], 1000)
+        self.assertIn("fell back to exact ticket_number batches", metadata["source_query_scope"])
+
+    @patch("towersignal.oath._fetch_exact_ticket_batch")
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_large_ticket_set_does_not_hide_nontransient_agency_page_failure(
+        self, fetch_where_mock, _fetch_metadata_mock, exact_batch_mock
+    ):
+        requested = [f"{index:010d}" for index in range(1000)]
+        fetch_where_mock.side_effect = [
+            [{"count": "1000"}],
+            SourceFetchError("OATH agency response schema invalid"),
+        ]
+
+        with self.assertRaises(SourceFetchError):
+            fetch_oath_cases(requested)
+        exact_batch_mock.assert_not_called()
+'''
+if marker not in tests:
+    raise SystemExit('test insertion marker not found')
+tests = tests.replace(marker, '\n' + addition + marker, 1)
+test_path.write_text(tests)
