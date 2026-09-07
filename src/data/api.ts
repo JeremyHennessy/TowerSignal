@@ -4,6 +4,7 @@ import type { NysChangesPayload, NysSystemsPayload } from '../types/nys'
 import type { CheckbookProcurementPayload, CityRecordProcurementPayload, NysAuthorityProcurementPayload, NychaWaterPayload, OpenBookWaterPayload, ProcurementBundle } from '../types/procurement'
 import type { CompanyIntelligencePayload } from '../types/company'
 import type { DomesticWaterMarketPayload, ElapProbePayload, NysLsliDetailPayload, NysPublicWaterPayload, NysServiceLineInventorySummaryPayload, NycDistributionWaterPayload, NycWaterSignalsPayload, ProviderResolutionPayload } from '../types/water'
+import type { CoverageAuditPayload } from '../types/coverage'
 
 const base = import.meta.env.BASE_URL
 
@@ -178,6 +179,14 @@ export async function loadElapProbe(): Promise<ElapProbePayload | null> {
     'elap-source-probe.json',
     'ELAP source probe',
     payload => typeof payload?.search_url === 'string' && typeof payload?.lab_selector === 'object',
+  )
+}
+
+export async function loadCoverageAudit(): Promise<CoverageAuditPayload | null> {
+  return loadOptionalJson<CoverageAuditPayload>(
+    'coverage-audit.json',
+    'TowerSignal coverage audit',
+    payload => payload?.schema_version === '1.0' && Array.isArray(payload.standardized_coverage_sources) && Array.isArray(payload.gap_analysis),
   )
 }
 
