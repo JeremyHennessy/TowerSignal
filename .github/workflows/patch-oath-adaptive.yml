@@ -28,82 +28,78 @@ jobs:
           oath = Path('scripts/towersignal/oath.py')
           text = oath.read_text()
           constants_old = 'OATH_RATE_LIMIT_RETRIES = 4\nOATH_REQUEST_RETRIES = 1'
-          constants_new = (
-              'OATH_RATE_LIMIT_RETRIES = 4\n'
-              'OATH_TIMEOUT_SPLIT_AFTER_ATTEMPTS = 2\n'
-              'OATH_MIN_SPLIT_BATCH_SIZE = 25\n'
-              'OATH_REQUEST_RETRIES = 1'
-          )
+          constants_new = 'OATH_RATE_LIMIT_RETRIES = 4\nOATH_TIMEOUT_SPLIT_AFTER_ATTEMPTS = 2\nOATH_MIN_SPLIT_BATCH_SIZE = 25\nOATH_REQUEST_RETRIES = 1'
           if constants_old not in text:
               raise SystemExit('expected OATH constants anchor not found')
           text = text.replace(constants_old, constants_new, 1)
 
           start = text.index('def _fetch_exact_ticket_batch(')
           end = text.index('\ndef _merge_exact_ticket_batch', start)
-          new_block = '''def _is_timeout_oath_error(exc: SourceFetchError) -> bool:
-              message = str(exc).lower()
-              return "timeout" in message or "timed out" in message
-
-
-          def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
-              quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
-              where = f"ticket_number in ({quoted})"
-              last_error: SourceFetchError | None = None
-              for attempt in range(OATH_RATE_LIMIT_RETRIES):
-                  try:
-                      rows = fetch_where(
-                          OATH_DATASET_ID,
-                          where,
-                          select=OATH_SELECT,
-                          request_retries=OATH_REQUEST_RETRIES,
-                          request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
-                      )
-                      return batch, rows
-                  except SourceFetchError as exc:
-                      last_error = exc
-                      if not _is_transient_oath_error(exc):
-                          raise
-                      if (
-                          _is_timeout_oath_error(exc)
-                          and len(batch) > OATH_MIN_SPLIT_BATCH_SIZE
-                          and attempt + 1 >= OATH_TIMEOUT_SPLIT_AFTER_ATTEMPTS
-                      ):
-                          raise
-                      if attempt + 1 >= OATH_RATE_LIMIT_RETRIES:
-                          raise
-                      delay = 10 * (attempt + 1)
-                      print(
-                          f"[oath] Transient OATH source error while fetching {len(batch):,} exact tickets; "
-                          f"retrying in {delay}s",
-                          flush=True,
-                      )
-                      time.sleep(delay)
-              raise last_error or SourceFetchError("OATH exact-ticket batch failed")
-
-
-          def _fetch_exact_ticket_batch_resilient(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
-              try:
-                  return _fetch_exact_ticket_batch(batch)
-              except SourceFetchError as exc:
-                  if not _is_timeout_oath_error(exc) or len(batch) <= OATH_MIN_SPLIT_BATCH_SIZE:
-                      raise
-                  midpoint = len(batch) // 2
-                  left = batch[:midpoint]
-                  right = batch[midpoint:]
-                  if not left or not right:
-                      raise
-                  print(
-                      f"[oath] Exact-ticket query for {len(batch):,} tickets timed out repeatedly; "
-                      f"splitting into {len(left):,} + {len(right):,} tickets",
-                      flush=True,
-                  )
-                  _, left_rows = _fetch_exact_ticket_batch_resilient(left)
-                  _, right_rows = _fetch_exact_ticket_batch_resilient(right)
-                  return batch, [*left_rows, *right_rows]
-          '''
-          # Normalize indentation from the YAML-embedded Python string only.
-          new_block = '\n'.join(line[10:] if line.startswith('          ') else line for line in new_block.splitlines()) + '\n'
-          text = text[:start] + new_block + text[end + 1:]
+          lines = [
+              'def _is_timeout_oath_error(exc: SourceFetchError) -> bool:',
+              '    message = str(exc).lower()',
+              '    return "timeout" in message or "timed out" in message',
+              '',
+              '',
+              'def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:',
+              '    quoted = ",".join("\\\'" + ticket.replace("\\\'", "\\\'\\\'") + "\\\'" for ticket in batch)',
+              '    where = f"ticket_number in ({quoted})"',
+              '    last_error: SourceFetchError | None = None',
+              '    for attempt in range(OATH_RATE_LIMIT_RETRIES):',
+              '        try:',
+              '            rows = fetch_where(',
+              '                OATH_DATASET_ID,',
+              '                where,',
+              '                select=OATH_SELECT,',
+              '                request_retries=OATH_REQUEST_RETRIES,',
+              '                request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,',
+              '            )',
+              '            return batch, rows',
+              '        except SourceFetchError as exc:',
+              '            last_error = exc',
+              '            if not _is_transient_oath_error(exc):',
+              '                raise',
+              '            if (',
+              '                _is_timeout_oath_error(exc)',
+              '                and len(batch) > OATH_MIN_SPLIT_BATCH_SIZE',
+              '                and attempt + 1 >= OATH_TIMEOUT_SPLIT_AFTER_ATTEMPTS',
+              '            ):',
+              '                raise',
+              '            if attempt + 1 >= OATH_RATE_LIMIT_RETRIES:',
+              '                raise',
+              '            delay = 10 * (attempt + 1)',
+              '            print(',
+              '                f"[oath] Transient OATH source error while fetching {len(batch):,} exact tickets; "',
+              '                f"retrying in {delay}s",',
+              '                flush=True,',
+              '            )',
+              '            time.sleep(delay)',
+              '    raise last_error or SourceFetchError("OATH exact-ticket batch failed")',
+              '',
+              '',
+              'def _fetch_exact_ticket_batch_resilient(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:',
+              '    try:',
+              '        return _fetch_exact_ticket_batch(batch)',
+              '    except SourceFetchError as exc:',
+              '        if not _is_timeout_oath_error(exc) or len(batch) <= OATH_MIN_SPLIT_BATCH_SIZE:',
+              '            raise',
+              '        midpoint = len(batch) // 2',
+              '        left = batch[:midpoint]',
+              '        right = batch[midpoint:]',
+              '        if not left or not right:',
+              '            raise',
+              '        print(',
+              '            f"[oath] Exact-ticket query for {len(batch):,} tickets timed out repeatedly; "',
+              '            f"splitting into {len(left):,} + {len(right):,} tickets",',
+              '            flush=True,',
+              '        )',
+              '        _, left_rows = _fetch_exact_ticket_batch_resilient(left)',
+              '        _, right_rows = _fetch_exact_ticket_batch_resilient(right)',
+              '        return batch, [*left_rows, *right_rows]',
+              '',
+          ]
+          new_block = '\n'.join(lines)
+          text = text[:start] + new_block + text[end:]
           submit_old = 'executor.submit(_fetch_exact_ticket_batch, batch)'
           if text.count(submit_old) != 2:
               raise SystemExit(f'expected two exact-ticket submit sites, found {text.count(submit_old)}')
