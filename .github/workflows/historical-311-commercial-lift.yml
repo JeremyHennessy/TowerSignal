@@ -1,0 +1,65 @@
+name: Diagnose historical NYC 311 commercial lift
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/historical-311-commercial-lift-20260907
+    paths:
+      - '.github/workflows/historical-311-commercial-lift.yml'
+      - 'scripts/diagnose_historical_311_lift.py'
+      - 'scripts/towersignal/historical_311_lift.py'
+      - 'tests/python/test_historical_311_lift.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: historical-311-commercial-lift-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run historical 311 lift unit tests
+        run: python -m unittest tests.python.test_historical_311_lift -v
+      - name: Measure exact-BBL historical 311 commercial lift
+        run: >-
+          python scripts/diagnose_historical_311_lift.py
+          --output historical-311-lift/report.json
+          --bbl-batch-size 60
+          --page-size 5000
+      - name: Assert diagnostic governance boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('historical-311-lift/report.json').read_text())
+          lift = payload['commercial_lift']
+          governance = lift['governance']
+          assert governance['priority_score_1_0_changed'] is False
+          assert governance['ui_changed'] is False
+          assert governance['durable_history_changed'] is False
+          assert governance['fuzzy_matching_used'] is False
+          assert governance['provider_or_incumbent_inference'] is False
+          assert governance['historical_311_authorized_for_production'] is False
+          assert payload['baseline']['canonical_bbl_count'] >= 3000
+          print(json.dumps({
+              'tower_bbl_count': lift['tower_bbl_count'],
+              'historical_only_tower_bbl_count': lift['historical_only_tower_bbl_count'],
+              'recurring_historical_only_tower_bbl_count': lift['recurring_historical_only_tower_bbl_count'],
+              'historical_only_with_2024_activity_count': lift['historical_only_with_2024_activity_count'],
+          }, indent=2))
+          PY
+      - name: Upload historical 311 lift report
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-historical-311-commercial-lift
+          path: historical-311-lift/report.json
+          retention-days: 30
