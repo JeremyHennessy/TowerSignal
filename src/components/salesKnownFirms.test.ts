@@ -88,4 +88,29 @@ describe('collectKnownAccountFirms', () => {
     expect(firms.some(firm => firm.name === 'Building Owner LLC')).toBe(false)
     expect(firms.some(firm => firm.name === 'N/A')).toBe(false)
   })
+
+  it('orders source MM/DD/YYYY dates chronologically instead of lexicographically', () => {
+    const detail = {
+      domestic_water: {
+        self_report_history: [
+          {
+            inspection_by_firm: 'Rosenwach Tank Co. LLC',
+            lab_name: 'EMSL',
+            inspection_date: '10/06/2025',
+            reporting_year: '2025',
+          },
+          {
+            inspection_by_firm: 'Rosenwach Tank Co. LLC',
+            lab_name: 'EMSL',
+            inspection_date: '10/11/2023',
+            reporting_year: '2023',
+          },
+        ],
+      },
+    } as unknown as SystemDetailWithDomesticWater
+
+    const firms = collectKnownAccountFirms(detail)
+    expect(firms.find(firm => firm.key === 'ROSENWACH TANK CO. LLC')?.latestObservedDate).toBe('10/06/2025')
+    expect(firms.find(firm => firm.key === 'EMSL')?.latestObservedDate).toBe('10/06/2025')
+  })
 })
