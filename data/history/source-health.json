@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-07T01:47:56.931738Z",
+  "generated_at": "2026-09-07T16:01:42.297920Z",
   "sources": [
     {
       "source_key": "registrations",
@@ -49,8 +49,8 @@
       "attached_entity_count": 3974,
       "displayed_entity_count": 3974,
       "coverage_percentage": 98.75,
-      "previous_coverage_percentage": 99.47,
-      "coverage_change_percentage_points": -0.72,
+      "previous_coverage_percentage": 98.75,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact NYC Health summons_number to OATH ticket_number match coverage.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -150,15 +150,15 @@
       "dataset_id": "5zhs-2jue",
       "name": "BUILDING",
       "entity_unit": "current cooling-tower BINs with current NYC building footprints",
-      "retrieved_record_count": 3882,
+      "retrieved_record_count": 3881,
       "requested_entity_count": 3935,
-      "normalized_entity_count": 3877,
-      "matched_entity_count": 3877,
-      "attached_entity_count": 4827,
-      "displayed_entity_count": 4827,
-      "coverage_percentage": 98.53,
+      "normalized_entity_count": 3876,
+      "matched_entity_count": 3876,
+      "attached_entity_count": 4825,
+      "displayed_entity_count": 4825,
+      "coverage_percentage": 98.5,
       "previous_coverage_percentage": 98.53,
-      "coverage_change_percentage_points": 0.0,
+      "coverage_change_percentage_points": -0.03,
       "coverage_note": "Coverage is exact BIN attachment of the current NYC OTI building-footprint layer. The footprint is used as roof/building context and does not change cooling-tower identity, compliance status, or Priority Score.",
       "status": "HEALTHY",
       "status_reasons": []
