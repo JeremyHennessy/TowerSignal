@@ -1,0 +1,109 @@
+name: Deploy Pages UI Hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pages-ui-hotfix.yml'
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-ui-hotfix
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Download last fully verified production Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 34074004607
+          name: github-pages
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .verified-pages
+
+      - name: Reuse verified production data only
+        run: |
+          mkdir -p .verified-site public/data
+          tar -xf .verified-pages/artifact.tar -C .verified-site
+          rm -rf public/data
+          cp -R .verified-site/data public/data
+          test -f public/data/systems.json
+          test -f public/data/metadata.json
+          echo "Reused verified production data from Pages run 34074004607 / main@5b8eb268ec42e9b6a68ed035b4dd0ee9dfcb7ec1"
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Typecheck frontend
+        run: npm run typecheck
+
+      - name: Frontend tests
+        run: npm test
+
+      - name: Production build with verified data
+        run: npm run build
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy UI hotfix to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install hosted-test browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Verify deployed Sales pack in desktop and iPhone browser contexts
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+          REQUIRE_ACRIS: false
+        run: npm run test:e2e
+      - name: Upload browser verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sales-firms-ui-hotfix-browser-verification
+          path: playwright-report
+          retention-days: 14
