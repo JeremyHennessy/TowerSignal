@@ -128,8 +128,8 @@ class CoverageAuditTests(unittest.TestCase):
             self.assertEqual(sources["hpd_registrations"]["borough_breakdown"], None)
 
             gaps = {item["gap_key"]: item for item in report["gap_analysis"]}
-            self.assertEqual(gaps["CMS"]["classification"], "NOT_INTEGRATED_SOURCE_CONTRACT_REQUIRED")
-            self.assertFalse(gaps["CMS"]["observed"]["integrated"])
+            self.assertEqual(gaps["CMS"]["classification"], "BOUNDED_EXACT_PROPERTY_CONTEXT_INTEGRATED")
+            self.assertTrue(gaps["CMS"]["observed"]["integrated"])
             self.assertEqual(gaps["NYC_311_HISTORICAL"]["classification"], "BOUNDED_HISTORICAL_CONTEXT_INTEGRATED")
             self.assertTrue(gaps["NYC_311_HISTORICAL"]["observed"]["integrated"])
             self.assertEqual(gaps["ELAP"]["observed"]["probe_status"], "SOURCE_UNAVAILABLE")
@@ -137,13 +137,13 @@ class CoverageAuditTests(unittest.TestCase):
             self.assertFalse(report["governance"]["opportunity_score_authorized"])
             self.assertGreater(report["storage_footprint"]["public_data_total_bytes"], 0)
 
-    def test_validator_rejects_cms_promotion_without_source_contract(self):
+    def test_validator_rejects_cms_semantic_drift(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp) / "data"
             self._write_fixture(output)
             report = build(output)
             cms = next(item for item in report["gap_analysis"] if item["gap_key"] == "CMS")
-            cms["classification"] = "INTEGRATED"
+            cms["classification"] = "UNBOUNDED_CMS_PROSPECTS"
             cms["observed"]["integrated"] = True
             with self.assertRaisesRegex(RuntimeError, "CMS"):
                 validate(report)
