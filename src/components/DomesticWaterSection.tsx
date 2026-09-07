@@ -44,6 +44,7 @@ type DwtSelfReportRecord = {
   reporting_year: string | null
   tank_num: string | null
   inspection_by_firm: string | null
+  lab_name: string | null
   inspection_performed: string | null
   inspection_date: string | null
   sediment_result: string | null
