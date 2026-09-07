@@ -63,6 +63,7 @@ class PlanimetricInventoryDiagnosticTests(unittest.TestCase):
         self.assertEqual(report["borough_breakdown"]["physical_only_bins"], {"Brooklyn": 1})
         self.assertEqual(report["mismatch_examples"]["regulatory_only_bins"], ["2000002"])
         self.assertEqual(report["mismatch_examples"]["physical_only_bins"], ["3000003"])
+        self.assertNotIn("0", report["mismatch_examples"]["physical_only_bins"])
 
     def test_diagnostic_preserves_non_scoring_evidence_boundaries(self):
         report = build_diagnostic(
