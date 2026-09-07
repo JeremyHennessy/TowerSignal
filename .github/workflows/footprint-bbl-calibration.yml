@@ -1,0 +1,32 @@
+name: Calibrate Building Footprints BBL semantics
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/calibrate_footprint_bbl_semantics.py'
+      - 'tests/python/test_footprint_bbl_calibration.py'
+      - '.github/workflows/footprint-bbl-calibration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  calibration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run calibration tests
+        run: python -m unittest tests.python.test_footprint_bbl_calibration -v
+      - name: Compare BASE_BBL and MapPLUTO BBL to known registry BBLs
+        run: python scripts/calibrate_footprint_bbl_semantics.py --output footprint-bbl-calibration.json
+      - name: Upload calibration artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: footprint-bbl-calibration
+          path: footprint-bbl-calibration.json
+          retention-days: 30
