@@ -1,0 +1,54 @@
+name: Verify OATH lifecycle source
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/towersignal/oath.py'
+      - 'tests/python/test_oath_fetch.py'
+      - '.github/workflows/oath-source-reliability.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  oath-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run focused OATH regressions
+        run: python -m unittest tests.python.test_oath_fetch -v
+      - name: Verify current cooling-tower summons lifecycle against OATH
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          sys.path.insert(0, 'scripts')
+          from towersignal.fetch import fetch_dataset
+          from towersignal.inspections import aggregate_inspections
+          from towersignal.oath import fetch_oath_cases, summons_numbers_from_inspections
+
+          inspections = fetch_dataset('f9wb-g8mb', 'system_id,inspection_date')
+          by_system = aggregate_inspections(inspections.rows)
+          tickets = summons_numbers_from_inspections(by_system)
+          cases, metadata = fetch_oath_cases(tickets)
+          ratio = metadata['matched_ticket_count'] / metadata['requested_ticket_count'] if metadata['requested_ticket_count'] else 1.0
+          result = {
+              'inspection_source_rows': inspections.source_record_count,
+              'requested_ticket_count': metadata['requested_ticket_count'],
+              'matched_ticket_count': metadata['matched_ticket_count'],
+              'match_ratio': ratio,
+              'oath_query_row_count': metadata['source_record_count'],
+              'source_query_scope': metadata['source_query_scope'],
+              'source_last_updated_at': metadata['source_last_updated_at'],
+          }
+          print(json.dumps(result, indent=2))
+          if ratio < 0.90:
+              raise SystemExit(f'OATH lifecycle match ratio below production floor: {ratio:.1%}')
+          if metadata['matched_case_count'] != len(cases):
+              raise SystemExit('OATH metadata matched_case_count does not reconcile')
+          PY
