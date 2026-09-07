@@ -114,7 +114,7 @@ class OathBatchFetchTests(unittest.TestCase):
 
     @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
     @patch("towersignal.oath.fetch_where")
-    def test_large_ticket_set_uses_cooling_tower_agency_slice(self, fetch_where_mock, _fetch_metadata_mock):
+    def test_large_ticket_set_uses_stable_cooling_tower_agency_slice(self, fetch_where_mock, _fetch_metadata_mock):
         requested = [f"{index:010d}" for index in range(1000)]
         extra_agency_ticket = "9999999999"
 
@@ -155,7 +155,43 @@ class OathBatchFetchTests(unittest.TestCase):
         self.assertEqual(metadata["matched_ticket_count"], len(requested))
         self.assertEqual(metadata["source_record_count"], len(requested) + 1)
         self.assertIn("issuing_agency='COOLING TOWERS - DOHMH'", metadata["source_query_scope"])
-        self.assertEqual(fetch_where_mock.call_count, 2)
+        self.assertEqual(fetch_where_mock.call_count, 3)
+
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_large_ticket_set_restarts_when_agency_slice_changes_mid_scan(self, fetch_where_mock, _fetch_metadata_mock):
+        requested = [f"{index:010d}" for index in range(1000)]
+        stable_rows = [{"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in requested]
+        responses = [
+            [{"count": "1001"}],
+            stable_rows,
+            [{"count": "1000"}],
+            [{"count": "1000"}],
+            stable_rows,
+            [{"count": "1000"}],
+        ]
+        fetch_where_mock.side_effect = responses
+
+        cases, metadata = fetch_oath_cases(requested)
+
+        self.assertEqual(set(cases), set(requested))
+        self.assertEqual(metadata["source_record_count"], 1000)
+        self.assertEqual(metadata["matched_ticket_count"], 1000)
+        self.assertEqual(fetch_where_mock.call_count, 6)
+
+    @patch("towersignal.oath.fetch_where")
+    def test_large_ticket_set_fails_closed_when_agency_slice_never_stabilizes(self, fetch_where_mock):
+        requested = [f"{index:010d}" for index in range(1000)]
+        rows = [{"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in requested]
+        fetch_where_mock.side_effect = [
+            [{"count": "1001"}], rows, [{"count": "1000"}],
+            [{"count": "1000"}], rows[:-1], [{"count": "999"}],
+        ]
+
+        with self.assertRaisesRegex(SourceFetchError, "did not stabilize"):
+            fetch_oath_cases(requested)
+
+        self.assertEqual(fetch_where_mock.call_count, 6)
 
 
 if __name__ == "__main__":
