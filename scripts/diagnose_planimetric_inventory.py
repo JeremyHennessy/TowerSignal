@@ -40,6 +40,13 @@ def _text(value: Any) -> str | None:
     return text or None
 
 
+def _inventory_bin(value: Any) -> str | None:
+    bin_value = normalize_bin(value)
+    if not bin_value or len(bin_value) != 7 or bin_value[0] not in BOROUGH_BY_BIN_PREFIX:
+        return None
+    return bin_value
+
+
 def fetch_complete_planimetric_inventory() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     expected = fetch_count(PLANIMETRIC_DATASET_ID)
     metadata = fetch_metadata(PLANIMETRIC_DATASET_ID)
@@ -89,7 +96,7 @@ def build_diagnostic(
     regulatory_by_bin: dict[str, list[dict[str, Any]]] = {}
     systems_without_bin = 0
     for system in systems:
-        bin_value = normalize_bin(system.get("bin"))
+        bin_value = _inventory_bin(system.get("bin"))
         if not bin_value:
             systems_without_bin += 1
             continue
@@ -110,7 +117,7 @@ def build_diagnostic(
         seen_global_ids.add(global_id)
         sub_feature_counts[_text(row.get("sub_featur")) or "UNKNOWN"] += 1
         status_counts[_text(row.get("status")) or "UNKNOWN"] += 1
-        bin_value = normalize_bin(row.get("bin"))
+        bin_value = _inventory_bin(row.get("bin"))
         if not bin_value:
             physical_without_bin += 1
             continue

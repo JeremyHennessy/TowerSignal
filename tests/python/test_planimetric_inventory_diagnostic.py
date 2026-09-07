@@ -33,7 +33,7 @@ class PlanimetricInventoryDiagnosticTests(unittest.TestCase):
             {"globalid": "g-1", "bin": "1000001", "sub_featur": "212000", "status": "Unchanged"},
             {"globalid": "g-2", "bin": "1000001", "sub_featur": "212010", "status": "Unchanged"},
             {"globalid": "g-3", "bin": "3000003", "sub_featur": "212000", "status": "Unchanged"},
-            {"globalid": "g-4", "bin": None, "sub_featur": "212000", "status": "Unchanged"},
+            {"globalid": "g-4", "bin": "0", "sub_featur": "212000", "status": "Unchanged"},
         ]
 
         report = build_diagnostic(
