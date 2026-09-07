@@ -14,6 +14,8 @@ MIN_EXPECTED_MATCH_RATIO = 0.90
 DEFAULT_BATCH_SIZE = 250
 DEFAULT_MAX_WORKERS = 2
 OATH_RATE_LIMIT_RETRIES = 4
+OATH_TIMEOUT_SPLIT_AFTER_ATTEMPTS = 2
+OATH_MIN_SPLIT_BATCH_SIZE = 25
 OATH_REQUEST_RETRIES = 1
 OATH_REQUEST_TIMEOUT_SECONDS = 30
 OATH_AGENCY_SLICE_MIN_REQUESTED = 1000
@@ -144,8 +146,13 @@ def _is_transient_oath_error(exc: SourceFetchError) -> bool:
     return "429" in message or "too many requests" in message or "timeout" in message or "timed out" in message
 
 
+def _is_timeout_oath_error(exc: SourceFetchError) -> bool:
+    message = str(exc).lower()
+    return "timeout" in message or "timed out" in message
+
+
 def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
-    quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
+    quoted = ",".join("\'" + ticket.replace("\'", "\'\'") + "\'" for ticket in batch)
     where = f"ticket_number in ({quoted})"
     last_error: SourceFetchError | None = None
     for attempt in range(OATH_RATE_LIMIT_RETRIES):
@@ -160,7 +167,15 @@ def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[st
             return batch, rows
         except SourceFetchError as exc:
             last_error = exc
-            if not _is_transient_oath_error(exc) or attempt + 1 >= OATH_RATE_LIMIT_RETRIES:
+            if not _is_transient_oath_error(exc):
+                raise
+            if (
+                _is_timeout_oath_error(exc)
+                and len(batch) > OATH_MIN_SPLIT_BATCH_SIZE
+                and attempt + 1 >= OATH_TIMEOUT_SPLIT_AFTER_ATTEMPTS
+            ):
+                raise
+            if attempt + 1 >= OATH_RATE_LIMIT_RETRIES:
                 raise
             delay = 10 * (attempt + 1)
             print(
@@ -171,6 +186,26 @@ def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[st
             time.sleep(delay)
     raise last_error or SourceFetchError("OATH exact-ticket batch failed")
 
+
+def _fetch_exact_ticket_batch_resilient(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
+    try:
+        return _fetch_exact_ticket_batch(batch)
+    except SourceFetchError as exc:
+        if not _is_timeout_oath_error(exc) or len(batch) <= OATH_MIN_SPLIT_BATCH_SIZE:
+            raise
+        midpoint = len(batch) // 2
+        left = batch[:midpoint]
+        right = batch[midpoint:]
+        if not left or not right:
+            raise
+        print(
+            f"[oath] Exact-ticket query for {len(batch):,} tickets timed out repeatedly; "
+            f"splitting into {len(left):,} + {len(right):,} tickets",
+            flush=True,
+        )
+        _, left_rows = _fetch_exact_ticket_batch_resilient(left)
+        _, right_rows = _fetch_exact_ticket_batch_resilient(right)
+        return batch, [*left_rows, *right_rows]
 
 def _merge_exact_ticket_batch(cases: dict[str, dict[str, Any]], batch: list[str], rows: list[dict[str, Any]]) -> None:
     expected = set(batch)
@@ -222,7 +257,7 @@ def _fetch_exact_ticket_fallback(requested: set[str]) -> tuple[dict[str, dict[st
     )
     if batches:
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
-            futures = [executor.submit(_fetch_exact_ticket_batch, batch) for batch in batches]
+            futures = [executor.submit(_fetch_exact_ticket_batch_resilient, batch) for batch in batches]
             for completed_count, future in enumerate(as_completed(futures), start=1):
                 batch, rows = future.result()
                 query_row_count += len(rows)
@@ -353,7 +388,7 @@ def fetch_oath_cases(
                 flush=True,
             )
             with ThreadPoolExecutor(max_workers=worker_count) as executor:
-                futures = [executor.submit(_fetch_exact_ticket_batch, batch) for batch in batches]
+                futures = [executor.submit(_fetch_exact_ticket_batch_resilient, batch) for batch in batches]
                 for completed_count, future in enumerate(as_completed(futures), start=1):
                     batch, rows = future.result()
                     query_row_count += len(rows)
