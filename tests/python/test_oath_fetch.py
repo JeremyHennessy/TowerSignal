@@ -112,6 +112,56 @@ class OathBatchFetchTests(unittest.TestCase):
         self.assertEqual(fetch_where_mock.call_count, 2)
         sleep_mock.assert_called_once_with(10)
 
+    @patch("towersignal.oath.OATH_MIN_SPLIT_BATCH_SIZE", 2)
+    @patch("towersignal.oath.time.sleep")
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_repeated_large_batch_timeout_splits_until_queries_succeed(
+        self, fetch_where_mock, _fetch_metadata_mock, sleep_mock
+    ):
+        requested = [f"{index:010d}" for index in range(8)]
+        calls_by_size = {}
+
+        def fetch_side_effect(
+            dataset_id,
+            where,
+            order_by=None,
+            select=None,
+            api_root=None,
+            request_retries=None,
+            request_timeout=None,
+        ):
+            tickets = re.findall(r"'([^']+)'", where)
+            size = len(tickets)
+            calls_by_size[size] = calls_by_size.get(size, 0) + 1
+            if size > 2:
+                raise SourceFetchError("The read operation timed out")
+            return [{"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in tickets]
+
+        fetch_where_mock.side_effect = fetch_side_effect
+        cases, metadata = fetch_oath_cases(requested, batch_size=8, max_workers=1)
+
+        self.assertEqual(set(cases), set(requested))
+        self.assertEqual(metadata["matched_ticket_count"], 8)
+        self.assertEqual(calls_by_size[8], 2)
+        self.assertEqual(calls_by_size[4], 4)
+        self.assertEqual(calls_by_size[2], 4)
+        self.assertEqual(sleep_mock.call_count, 3)
+
+    @patch("towersignal.oath.OATH_MIN_SPLIT_BATCH_SIZE", 2)
+    @patch("towersignal.oath.time.sleep")
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_smallest_timeout_batch_still_fails_closed(
+        self, fetch_where_mock, _fetch_metadata_mock, sleep_mock
+    ):
+        requested = ["0880900460", "0880900470"]
+        fetch_where_mock.side_effect = SourceFetchError("The read operation timed out")
+        with self.assertRaises(SourceFetchError):
+            fetch_oath_cases(requested, batch_size=2, max_workers=1)
+        self.assertEqual(fetch_where_mock.call_count, 4)
+        self.assertEqual(sleep_mock.call_count, 3)
+
     @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
     @patch("towersignal.oath.fetch_where")
     def test_large_ticket_set_uses_stable_cooling_tower_agency_slice(self, fetch_where_mock, _fetch_metadata_mock):
