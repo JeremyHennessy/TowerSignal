@@ -33,7 +33,7 @@ jobs:
         run: >-
           python scripts/diagnose_historical_311_lift.py
           --output historical-311-lift/report.json
-          --bbl-batch-size 60
+          --bbl-batch-size 200
           --page-size 5000
       - name: Assert diagnostic governance boundaries
         run: |
