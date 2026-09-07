@@ -79,6 +79,12 @@ export interface Metadata {
   nyc_lead_service_line_matched_bbl_count?: number
   nyc_lead_service_line_matched_record_count?: number
   nyc_lead_service_line_match_basis?: 'BBL_EXACT'
+  nyc_historical_311_context_available?: boolean
+  nyc_historical_311_match_basis?: 'BBL_EXACT'
+  nyc_historical_311_requested_bbl_count?: number
+  nyc_historical_311_matched_bbl_count?: number
+  nyc_historical_311_systems_attached?: number
+  nyc_historical_311_attached_request_count?: number
   rules_version: string
   priority_model_version: string
 }
@@ -152,6 +158,7 @@ export interface SystemsPayload {
     systems_with_planimetric_bin_match?: number
     systems_with_building_footprint_match?: number
     systems_with_nyc_building_water_signals?: number
+    systems_with_nyc_historical_water_context?: number
     systems_with_nyc_lead_service_line_records?: number
   }
   systems: SystemSummary[]
@@ -382,6 +389,33 @@ export interface NycBuildingWaterSignalsContext {
   }
 }
 
+export interface NycHistoricalWaterContext {
+  summary: {
+    bbl: string
+    request_count: number
+    category_counts: Record<string, number>
+    years: string[]
+    year_count: number
+    first_reported_date: string | null
+    latest_reported_date: string | null
+    recurrent_history: boolean
+    has_2024_activity: boolean
+    property_link_confidence: 'CONFIRMED_SOURCE_BBL'
+    evidence_semantics: 'REPORTED_SERVICE_REQUEST'
+  }
+  evidence_boundaries: {
+    historical_not_current: string
+    property_link: string
+    raw_rows: string
+    provider: string
+  }
+  source: {
+    dataset_ids: string[]
+    generated_at: string
+    query_boundaries: Record<string, unknown>
+  }
+}
+
 export interface HistoricalProfile {
   registration_date: string | null
   registration_age_days: number | null
@@ -424,6 +458,7 @@ export interface SystemDetail {
   planimetric_building_tower_features?: PlanimetricBuildingTowerFeature[]
   building_footprints?: BuildingFootprintFeature[]
   nyc_building_water_signals?: NycBuildingWaterSignalsContext | null
+  nyc_historical_water_context?: NycHistoricalWaterContext | null
   nyc_lead_service_lines?: NycLeadServiceLineContext | null
   sample_history: {
     source_raw: string
