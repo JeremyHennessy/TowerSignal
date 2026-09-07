@@ -63,8 +63,8 @@ def validate(report: dict[str, Any]) -> None:
     if cms.get("classification") != "NOT_INTEGRATED_SOURCE_CONTRACT_REQUIRED" or (cms.get("observed") or {}).get("integrated") is not False:
         raise RuntimeError("CMS must remain explicitly not integrated until an authoritative source/join contract is proven")
     historical_311 = gap_by_key["NYC_311_HISTORICAL"]
-    if historical_311.get("classification") != "DIAGNOSTIC_NOT_PRODUCTION_SCOPE":
-        raise RuntimeError("Historical 311 must remain diagnostic until commercial lift is measured")
+    if historical_311.get("classification") != "BOUNDED_HISTORICAL_CONTEXT_INTEGRATED" or (historical_311.get("observed") or {}).get("integrated") is not True:
+        raise RuntimeError("Historical 311 must remain a bounded exact-BBL context integration after measured commercial lift")
 
     governance = report.get("governance") or {}
     required_false = (

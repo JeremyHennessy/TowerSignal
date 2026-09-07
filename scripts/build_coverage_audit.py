@@ -16,6 +16,7 @@ ARTIFACT_CONTRACTS = [
     ("domestic_water_market", "domestic-water-market.json", "BIN/source asset for observed service; source-native provider/lab identities", ["WHO_TO_PURSUE", "WHY_ACCOUNT_MATTERS"]),
     ("provider_resolution_review", "provider-resolution-review.json", "Review-only deterministic provider-name candidates; no automatic fuzzy merge", ["WHO_TO_PURSUE"]),
     ("nyc_building_water_signals", "nyc-water-signals.json", "Exact source BBL/BIN where published; context-only records remain unlinked", ["WHEN_TO_ACT", "WHY_ACCOUNT_MATTERS"]),
+    ("nyc_historical_311_context", "historical-311-context.json", "2010-2024 DEP building-water requests aggregated by current exact TowerSignal BBL; raw events omitted", ["WHY_ACCOUNT_MATTERS"]),
     ("nyc_distribution_water", "nyc-distribution-water.json", "Source sample-site identity; no building crosswalk inferred", ["WHY_ACCOUNT_MATTERS"]),
     ("elap_source_probe", "elap-source-probe.json", "Official ELAP public-search contract probe only; no guessed laboratory IDs", ["WHO_TO_PURSUE"]),
     ("city_record_procurement", "procurement-city-record.json", "Source procurement identity; no property assignment without an exact source link", ["WHO_TO_PURSUE", "WHEN_TO_ACT"]),
@@ -259,10 +260,10 @@ def _gap_analysis(metadata: dict[str, Any], source_health_by_key: dict[str, dict
         },
         {
             "gap_key": "NYC_311_HISTORICAL",
-            "classification": "DIAGNOSTIC_NOT_PRODUCTION_SCOPE",
-            "observed": {"current_production_window": "2025+", "historical_proof_pr": 106, "historical_candidate_window": "2010+"},
-            "interpretation": "PR #106 proves a broader 2010+ source history than the current production 2025+ commercial window. The extra depth is not equivalent to a current-source defect.",
-            "next_action": "Quantify whether older 311 history materially changes who to pursue, when to act, or why an account matters before accepting its runtime/storage cost.",
+            "classification": "BOUNDED_HISTORICAL_CONTEXT_INTEGRATED",
+            "observed": {"integrated": True, "current_signal_window": "2025+", "historical_context_window": "2010-2024", "commercial_lift_run": 34158852047, "historical_only_tower_bbl_count": 1908},
+            "interpretation": "Measured exact-BBL lift justified compact 2010-2024 building-water context for why an account matters. Historical requests remain explicitly separate from current signals and are not current-condition or timing evidence.",
+            "next_action": "Retain compact per-BBL counts/categories/years/dates only; no raw historical events, score changes, current trigger, fuzzy matching, or provider inference.",
         },
         {
             "gap_key": "ELAP",
