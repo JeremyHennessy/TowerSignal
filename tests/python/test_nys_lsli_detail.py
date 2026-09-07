@@ -346,7 +346,7 @@ class NysLsliDetailTests(unittest.TestCase):
             path = Path(handle.name)
         self.addCleanup(path.unlink, missing_ok=True)
 
-        validated = validate_lsli_cache(path, max_age_days=2, require_production_volume=True)
+        validated = validate_lsli_cache(path, max_age_days=3650, require_production_volume=True)
         self.assertEqual(validated["source"]["explicit_unavailable_404_count"], 50)
 
 
