@@ -29,8 +29,12 @@ async function capturePage(page: import('@playwright/test').Page, project: strin
   const geometry = await page.evaluate(() => ({
     height: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight),
     viewport: window.innerHeight,
+    devicePixelRatio: window.devicePixelRatio || 1,
   }))
-  if (geometry.height <= 30_000) {
+  // WebKit rejects any bitmap dimension above 32,767 physical pixels. Keep the
+  // full-page path well below that ceiling even on high-DPR iPhone contexts.
+  const safeFullPageCssHeight = Math.floor(24_000 / Math.max(1, geometry.devicePixelRatio))
+  if (geometry.height <= safeFullPageCssHeight) {
     await page.screenshot({ path: screenshotPath(project, name), fullPage: true })
     return
   }
