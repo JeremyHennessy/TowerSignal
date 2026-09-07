@@ -113,23 +113,57 @@ def _borough_counts(systems: list[dict[str, Any]], predicate: Callable[[dict[str
 
 def _identifier_gap(systems: list[dict[str, Any]]) -> dict[str, Any]:
     total = len(systems)
-    usable_bbl = [str(row.get("bbl")) for row in systems if row.get("bbl")]
+
+    def registry_bbl(row: dict[str, Any]) -> str | None:
+        value = row.get("registry_bbl") if "registry_bbl" in row else row.get("bbl")
+        return str(value) if value else None
+
+    registry_bbls = [value for row in systems if (value := registry_bbl(row))]
+    canonical_bbls = [str(row.get("bbl")) for row in systems if row.get("bbl")]
     usable_bin = [str(row.get("bin")) for row in systems if row.get("bin")]
+    recovered = [row for row in systems if row.get("bbl_identity_status") == "RECOVERED_EXACT_BIN_MAPPLUTO_BBL"]
+
     by_borough: dict[str, dict[str, int]] = {}
     for row in systems:
         borough = str(row.get("borough") or "UNKNOWN")
-        bucket = by_borough.setdefault(borough, {"systems": 0, "with_bbl": 0, "with_bin": 0})
+        bucket = by_borough.setdefault(
+            borough,
+            {
+                "systems": 0,
+                "with_bbl": 0,
+                "with_registry_source_bbl": 0,
+                "with_canonical_bbl": 0,
+                "recovered_bbl": 0,
+                "with_bin": 0,
+            },
+        )
+        source_bbl = registry_bbl(row)
         bucket["systems"] += 1
-        bucket["with_bbl"] += int(bool(row.get("bbl")))
+        bucket["with_bbl"] += int(bool(source_bbl))
+        bucket["with_registry_source_bbl"] += int(bool(source_bbl))
+        bucket["with_canonical_bbl"] += int(bool(row.get("bbl")))
+        bucket["recovered_bbl"] += int(row.get("bbl_identity_status") == "RECOVERED_EXACT_BIN_MAPPLUTO_BBL")
         bucket["with_bin"] += int(bool(row.get("bin")))
+
     return {
         "systems": total,
-        "with_bbl": len(usable_bbl),
-        "missing_bbl": total - len(usable_bbl),
-        "unique_bbl": len(set(usable_bbl)),
+        "with_bbl": len(registry_bbls),
+        "missing_bbl": total - len(registry_bbls),
+        "unique_bbl": len(set(registry_bbls)),
+        "with_registry_source_bbl": len(registry_bbls),
+        "missing_registry_source_bbl": total - len(registry_bbls),
+        "with_canonical_bbl": len(canonical_bbls),
+        "missing_canonical_bbl": total - len(canonical_bbls),
+        "unique_canonical_bbl": len(set(canonical_bbls)),
+        "recovered_bbl_count": len(recovered),
         "with_bin": len(usable_bin),
         "missing_bin": total - len(usable_bin),
         "unique_bin": len(set(usable_bin)),
+        "bbl_semantics": {
+            "with_bbl": "Registry-source BBL coverage; recovered identifiers do not inflate source completeness.",
+            "with_canonical_bbl": "Canonical BBL available for exact downstream joins after conservative identity recovery.",
+            "recovery": "Exact BIN to one unique published MapPLUTO BBL with borough-prefix reconciliation; no address or fuzzy matching.",
+        },
         "by_borough": dict(sorted(by_borough.items())),
     }
 
