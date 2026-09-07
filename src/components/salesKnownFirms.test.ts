@@ -41,7 +41,7 @@ describe('collectKnownAccountFirms', () => {
       },
       dob_activity_history: [
         {
-          applicant_business_name: 'Mechanical Project Co.',
+          applicant_business_name: 'Mechanical Project Co',
           owner_business_name: 'Building Owner LLC',
           explicit_cooling_tower_mention: true,
           mechanical_systems: true,
@@ -59,7 +59,7 @@ describe('collectKnownAccountFirms', () => {
     expect(firms.map(firm => firm.name)).toEqual([
       'Example Environmental Lab',
       'Example Water Services LLC',
-      'Mechanical Project Co.',
+      'Mechanical Project Co',
     ])
 
     const inspectionFirm = firms.find(firm => firm.key === 'EXAMPLE WATER SERVICES LLC')
@@ -76,7 +76,7 @@ describe('collectKnownAccountFirms', () => {
     })
     expect(laboratory?.roles).toContain('Drinking-water testing laboratory')
 
-    const dobFirm = firms.find(firm => firm.key === 'MECHANICAL PROJECT CO.')
+    const dobFirm = firms.find(firm => firm.key === 'MECHANICAL PROJECT CO')
     expect(dobFirm?.relationship).toBe('RECORDED_ROLE')
     expect(dobFirm?.latestObservedDate).toBe('2026-05-01')
     expect(dobFirm?.roles).toEqual(expect.arrayContaining([
@@ -87,5 +87,30 @@ describe('collectKnownAccountFirms', () => {
 
     expect(firms.some(firm => firm.name === 'Building Owner LLC')).toBe(false)
     expect(firms.some(firm => firm.name === 'N/A')).toBe(false)
+  })
+
+  it('orders source MM/DD/YYYY dates chronologically instead of lexicographically', () => {
+    const detail = {
+      domestic_water: {
+        self_report_history: [
+          {
+            inspection_by_firm: 'Rosenwach Tank Co. LLC',
+            lab_name: 'EMSL',
+            inspection_date: '10/06/2025',
+            reporting_year: '2025',
+          },
+          {
+            inspection_by_firm: 'Rosenwach Tank Co. LLC',
+            lab_name: 'EMSL',
+            inspection_date: '10/11/2023',
+            reporting_year: '2023',
+          },
+        ],
+      },
+    } as unknown as SystemDetailWithDomesticWater
+
+    const firms = collectKnownAccountFirms(detail)
+    expect(firms.find(firm => firm.key === 'ROSENWACH TANK CO LLC')?.latestObservedDate).toBe('10/06/2025')
+    expect(firms.find(firm => firm.key === 'EMSL')?.latestObservedDate).toBe('10/06/2025')
   })
 })
