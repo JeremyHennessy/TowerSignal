@@ -56,11 +56,13 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
     hpd_registration_systems = int(summary.get("systems_with_hpd_registration") or 0)
     planimetric_systems = sum(1 for row in systems if bool(row.get("planimetric_bin_match")))
     building_footprint_systems = sum(1 for row in systems if bool(row.get("building_footprint_bin_match")))
+    legacy_dob_systems = sum(1 for row in systems if int(row.get("legacy_dob_project_record_count") or 0) > 0)
 
     reg = sources.get("y4fw-iqfr", {})
     insp = sources.get("f9wb-g8mb", {})
     oath = sources.get("jz4z-kudi", {})
     dob = sources.get("w9ak-ipjd", {})
+    legacy_dob = sources.get("ic3t-wcy2", {})
     planimetric = sources.get("x748-37q7", {})
     building_footprints = sources.get("5zhs-2jue", {})
     pluto = next((value for key, value in sources.items() if key not in {"y4fw-iqfr", "f9wb-g8mb", "jz4z-kudi", "w9ak-ipjd", "tesw-yqqr", "feu5-w2e2", "x748-37q7", "5zhs-2jue"} and "PLUTO" in str(value.get("name", "")).upper()), {})
@@ -73,6 +75,23 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
         health_entry(source_key="oath", dataset_id=str(oath.get("dataset_id") or "jz4z-kudi"), name=str(oath.get("name") or "OATH Hearings Division Case Status"), entity_unit="summons/ticket identifiers", retrieved_record_count=int(oath.get("source_record_count") or 0), requested_entity_count=int(metadata.get("oath_requested_ticket_count") or 0), normalized_entity_count=int(metadata.get("oath_matched_ticket_count") or 0), matched_entity_count=int(metadata.get("oath_matched_ticket_count") or 0), attached_entity_count=oath_systems, displayed_entity_count=oath_systems, previous_coverage_percentage=previous_coverage("oath"), coverage_note="Coverage is exact NYC Health summons_number to OATH ticket_number match coverage."),
         health_entry(source_key="pluto", dataset_id=str(pluto.get("dataset_id") or "PLUTO"), name=str(pluto.get("name") or "NYC DCP PLUTO"), entity_unit="BBLs", retrieved_record_count=int(pluto.get("source_record_count") or 0), requested_entity_count=int(metadata.get("pluto_requested_bbl_count") or 0), normalized_entity_count=int(metadata.get("pluto_matched_bbl_count") or 0), matched_entity_count=int(metadata.get("pluto_matched_bbl_count") or 0), attached_entity_count=pluto_systems, displayed_entity_count=pluto_systems, previous_coverage_percentage=previous_coverage("pluto"), coverage_note="Coverage is exact BBL match coverage; one BBL can attach to more than one cooling-tower system."),
         health_entry(source_key="dob_now_jobs", dataset_id=str(dob.get("dataset_id") or "w9ak-ipjd"), name=str(dob.get("name") or "DOB NOW: Build – Job Application Filings"), entity_unit="BBLs with DOB NOW job filings", retrieved_record_count=int(dob.get("source_record_count") or 0), requested_entity_count=int(metadata.get("dob_requested_bbl_count") or 0), normalized_entity_count=int(metadata.get("dob_matched_bbl_count") or 0), matched_entity_count=int(metadata.get("dob_matched_bbl_count") or 0), attached_entity_count=dob_systems, displayed_entity_count=dob_systems, previous_coverage_percentage=previous_coverage("dob_now_jobs"), coverage_note="Coverage is exact BBL job-filing coverage. A missing DOB NOW match means no matching DOB NOW job filing was returned; it is not evidence that no construction or mechanical work ever occurred."),
+        health_entry(
+            source_key="legacy_dob_jobs",
+            dataset_id=str(legacy_dob.get("dataset_id") or "ic3t-wcy2"),
+            name=str(legacy_dob.get("name") or "DOB Job Application Filings"),
+            entity_unit="canonical BBLs with bounded legacy project evidence",
+            retrieved_record_count=int(metadata.get("legacy_dob_project_exact_bbl_job_count") or 0),
+            requested_entity_count=int(metadata.get("legacy_dob_project_requested_bbl_count") or 0),
+            normalized_entity_count=int(metadata.get("legacy_dob_project_retained_record_count") or 0),
+            matched_entity_count=int(metadata.get("legacy_dob_project_retained_bbl_count") or 0),
+            attached_entity_count=legacy_dob_systems,
+            displayed_entity_count=legacy_dob_systems,
+            previous_coverage_percentage=previous_coverage("legacy_dob_jobs"),
+            coverage_note=(
+                "Coverage is prevalence of bounded exact-BBL legacy DOB/BIS evidence: all explicit cooling-tower text plus recent mechanical/boiler/plumbing/equipment project records. "
+                "It is not expected-completeness coverage and recorded applicants/owners are project roles, not service-provider claims."
+            ),
+        ),
         health_entry(source_key="hpd_registrations", dataset_id=str(hpd_reg.get("dataset_id") or "tesw-yqqr"), name=str(hpd_reg.get("name") or "NYC HPD Multiple Dwelling Registrations"), entity_unit="BBLs", retrieved_record_count=int(hpd_reg.get("source_record_count") or 0), requested_entity_count=int(metadata.get("hpd_requested_bbl_count") or 0), normalized_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), matched_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), attached_entity_count=hpd_registration_systems, displayed_entity_count=hpd_registration_systems, previous_coverage_percentage=previous_coverage("hpd_registrations"), coverage_note="Coverage is exact BBL registration match coverage. HPD registration applies only to qualifying properties, so low absolute coverage is not itself a failure."),
         health_entry(source_key="hpd_contacts", dataset_id=str(hpd_contacts.get("dataset_id") or "feu5-w2e2"), name=str(hpd_contacts.get("name") or "NYC HPD Registration Contacts"), entity_unit="matched HPD registration BBLs", retrieved_record_count=int(hpd_contacts.get("source_record_count") or 0), requested_entity_count=int(metadata.get("hpd_matched_registration_bbl_count") or 0), normalized_entity_count=int(metadata.get("hpd_matched_contact_bbl_count") or 0), matched_entity_count=int(metadata.get("hpd_matched_contact_bbl_count") or 0), attached_entity_count=hpd_contact_systems, displayed_entity_count=hpd_contact_systems, previous_coverage_percentage=previous_coverage("hpd_contacts"), coverage_note="Coverage is the share of exact-matched HPD registration BBLs with public contact rows."),
         health_entry(
