@@ -9,6 +9,7 @@ HISTORY_STORAGE_VERSION = "2.0"
 SEGMENT_HARD_MAX_BYTES = 8 * 1024 * 1024
 SEGMENT_GROWTH_RATIO_LIMIT = 1.75
 SEGMENT_GROWTH_ABSOLUTE_ALLOWANCE = 1 * 1024 * 1024
+OATH_SHARD_NAMES = ("oath_0", "oath_1")
 
 CORE_FIELDS = (
     "system_id", "bin", "bbl", "address", "borough", "zip", "date_registered",
@@ -22,7 +23,6 @@ HPD_FIELDS = ("hpd_registration_id", "hpd_last_registration_date", "hpd_contacts
 SYSTEM_SEGMENTS = {
     "core": CORE_FIELDS,
     "inspections": ("system_id", *INSPECTION_FIELDS),
-    "oath": ("system_id", *OATH_FIELDS),
     "property": ("system_id", *PROPERTY_FIELDS),
     "hpd": ("system_id", *HPD_FIELDS),
 }
@@ -60,6 +60,24 @@ def _system_ids(rows: list[dict[str, Any]]) -> list[str]:
     return ids
 
 
+def _write_system_segment(
+    history_dir: Path,
+    name: str,
+    rows: list[dict[str, Any]],
+    snapshot: dict[str, Any],
+) -> dict[str, Any]:
+    payload = {
+        "history_storage_version": HISTORY_STORAGE_VERSION,
+        "history_schema_version": snapshot.get("history_schema_version"),
+        "observed_at": snapshot.get("observed_at"),
+        "segment": name,
+        "systems": rows,
+    }
+    relative = f"segments/{name}.json"
+    size, digest = _write_json(history_dir / relative, payload)
+    return _segment_entry(relative, size, digest, len(rows))
+
+
 def write_segmented_snapshot(history_dir: Path, snapshot: dict[str, Any]) -> dict[str, Any]:
     systems = snapshot.get("systems")
     if not isinstance(systems, list):
@@ -89,16 +107,28 @@ def write_segmented_snapshot(history_dir: Path, snapshot: dict[str, Any]) -> dic
             else:
                 segment_row = {key: row.get(key) for key in fields}
             rows.append(segment_row)
-        payload = {
-            "history_storage_version": HISTORY_STORAGE_VERSION,
-            "history_schema_version": snapshot.get("history_schema_version"),
-            "observed_at": snapshot.get("observed_at"),
-            "segment": name,
-            "systems": rows,
-        }
-        relative = f"segments/{name}.json"
-        size, digest = _write_json(history_dir / relative, payload)
-        segment_entries[name] = _segment_entry(relative, size, digest, len(rows))
+        segment_entries[name] = _write_system_segment(history_dir, name, rows, snapshot)
+
+    # OATH is the largest current source-owned state. Keep every System ID in
+    # each shard, but split each system's ordered case list by stable list index.
+    # The index is retained in the storage representation so reconstruction can
+    # reproduce the exact original list order without changing history meaning.
+    oath_shard_rows: dict[str, list[dict[str, Any]]] = {name: [] for name in OATH_SHARD_NAMES}
+    for row in system_rows:
+        cases = row.get("oath_cases") or []
+        if not isinstance(cases, list):
+            raise RuntimeError(f"History oath_cases must be a list for {row.get('system_id')}")
+        indexed_by_shard: dict[str, list[list[Any]]] = {name: [] for name in OATH_SHARD_NAMES}
+        for index, case in enumerate(cases):
+            shard = OATH_SHARD_NAMES[index % len(OATH_SHARD_NAMES)]
+            indexed_by_shard[shard].append([index, case])
+        for shard in OATH_SHARD_NAMES:
+            oath_shard_rows[shard].append({
+                "system_id": row["system_id"],
+                "oath_cases_indexed": indexed_by_shard[shard],
+            })
+    for shard in OATH_SHARD_NAMES:
+        segment_entries[shard] = _write_system_segment(history_dir, shard, oath_shard_rows[shard], snapshot)
 
     dob_payload = {
         "history_storage_version": HISTORY_STORAGE_VERSION,
@@ -155,13 +185,26 @@ def _load_verified_segment(history_dir: Path, name: str, entry: dict[str, Any]) 
     return payload
 
 
+def _validated_system_rows(name: str, payload: dict[str, Any], ids: list[str]) -> list[dict[str, Any]]:
+    rows = payload.get("systems")
+    if not isinstance(rows, list):
+        raise RuntimeError(f"History {name} segment systems must be a list")
+    segment_rows = [dict(row) for row in rows if isinstance(row, dict)]
+    if len(segment_rows) != len(rows):
+        raise RuntimeError(f"History {name} segment systems must contain objects only")
+    segment_ids = _system_ids(segment_rows)
+    if set(segment_ids) != set(ids):
+        raise RuntimeError(f"History {name} segment system IDs do not reconcile to core")
+    return segment_rows
+
+
 def reconstruct_segmented_snapshot(history_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
     if manifest.get("history_storage_version") != HISTORY_STORAGE_VERSION:
         raise RuntimeError(f"Unsupported history storage version: {manifest.get('history_storage_version')}")
     segment_entries = manifest.get("segments")
     if not isinstance(segment_entries, dict):
         raise RuntimeError("Segmented history manifest is missing segments")
-    required = set(SYSTEM_SEGMENTS) | {"dob", "source_health"}
+    required = set(SYSTEM_SEGMENTS) | set(OATH_SHARD_NAMES) | {"dob", "source_health"}
     missing = sorted(required - set(segment_entries))
     if missing:
         raise RuntimeError(f"Segmented history manifest missing segments: {missing}")
@@ -179,17 +222,32 @@ def reconstruct_segmented_snapshot(history_dir: Path, manifest: dict[str, Any]) 
         raise RuntimeError("Segmented history manifest system_count does not match core segment")
     by_id = {row["system_id"]: row for row in core}
 
-    for name in ("inspections", "oath", "property", "hpd"):
-        rows = loaded[name].get("systems")
-        if not isinstance(rows, list):
-            raise RuntimeError(f"History {name} segment systems must be a list")
-        segment_rows = [dict(row) for row in rows if isinstance(row, dict)]
-        segment_ids = _system_ids(segment_rows)
-        if set(segment_ids) != set(ids):
-            raise RuntimeError(f"History {name} segment system IDs do not reconcile to core")
-        for row in segment_rows:
+    for name in ("inspections", "property", "hpd"):
+        for row in _validated_system_rows(name, loaded[name], ids):
             system_id = row.pop("system_id")
             by_id[system_id].update(row)
+
+    oath_indexed_by_system: dict[str, dict[int, Any]] = {system_id: {} for system_id in ids}
+    for shard in OATH_SHARD_NAMES:
+        for row in _validated_system_rows(shard, loaded[shard], ids):
+            system_id = str(row.get("system_id"))
+            indexed = row.get("oath_cases_indexed")
+            if not isinstance(indexed, list):
+                raise RuntimeError(f"History {shard} oath_cases_indexed must be a list for {system_id}")
+            for item in indexed:
+                if not isinstance(item, list) or len(item) != 2 or not isinstance(item[0], int) or item[0] < 0:
+                    raise RuntimeError(f"History {shard} has invalid OATH index record for {system_id}")
+                index, case = item
+                if index in oath_indexed_by_system[system_id]:
+                    raise RuntimeError(f"Duplicate OATH list index {index} across shards for {system_id}")
+                oath_indexed_by_system[system_id][index] = case
+    for system_id in ids:
+        indexed = oath_indexed_by_system[system_id]
+        expected_indexes = list(range(len(indexed)))
+        actual_indexes = sorted(indexed)
+        if actual_indexes != expected_indexes:
+            raise RuntimeError(f"OATH shard indexes are not contiguous for {system_id}: {actual_indexes[:10]}")
+        by_id[system_id]["oath_cases"] = [indexed[index] for index in expected_indexes]
 
     dob = loaded["dob"]
     health = loaded["source_health"]
