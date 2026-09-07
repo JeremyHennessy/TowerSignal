@@ -71,8 +71,19 @@ function humanize(value: string | null): string | null {
   return value.replaceAll('_', ' ').toLowerCase().replace(/^./, letter => letter.toUpperCase())
 }
 
+function sortableDate(value: string): string | null {
+  const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(value)
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`
+  const us = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(value)
+  if (us) return `${us[3]}-${us[1].padStart(2, '0')}-${us[2].padStart(2, '0')}`
+  return null
+}
+
 function observationSortKey(observation: FirmObservation): string {
-  if (observation.date) return observation.date
+  if (observation.date) {
+    const normalized = sortableDate(observation.date)
+    if (normalized) return normalized
+  }
   if (observation.year) return `${observation.year}-00-00`
   return ''
 }
