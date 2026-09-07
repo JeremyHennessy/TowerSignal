@@ -1,22 +1,23 @@
 import { expect, test } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { signInForProject } from './auth.helpers'
 
 const authenticatedRoutes = [
-  ['home', '#/home'],
-  ['prospect', '#/prospect'],
-  ['monitor', '#/monitor'],
-  ['map', '#/map'],
-  ['opportunities', '#/opportunities'],
-  ['nys-market', '#/nys'],
-  ['nys-changes', '#/nys-changes'],
-  ['companies', '#/companies'],
-  ['water-quality', '#/water-quality'],
-  ['portfolios', '#/portfolios'],
-  ['workflow', '#/workflow'],
-  ['source-health', '#/source-health'],
-  ['nyc-account-2000012577', '#/account/2000012577'],
-  ['my-account', '#/my-account'],
+  ['home', '#/home', 'Move from signal to action.'],
+  ['prospect', '#/prospect', 'Prospect workspace'],
+  ['monitor', '#/monitor', 'Monitor workspace'],
+  ['map', '#/map', 'Map workspace'],
+  ['opportunities', '#/opportunities', 'Opportunities workspace'],
+  ['nys-market', '#/nys', 'NYS Market'],
+  ['nys-changes', '#/nys-changes', 'NYS Changes'],
+  ['companies', '#/companies', 'Company & vendor intelligence'],
+  ['water-quality', '#/water-quality', 'Water Quality'],
+  ['portfolios', '#/portfolios', 'Portfolios'],
+  ['workflow', '#/workflow', 'Workflow'],
+  ['source-health', '#/source-health', 'Source Health & Coverage'],
+  ['nyc-account-2000012577', '#/account/2000012577', '2000012577'],
+  ['my-account', '#/my-account', 'E2E Verification'],
 ] as const
 
 function screenshotPath(project: string, name: string) {
@@ -79,6 +80,11 @@ async function auditPage(page: import('@playwright/test').Page, project: string,
   page.off('pageerror', onPageError)
 }
 
+async function assertAuthenticatedWorkspace(page: import('@playwright/test').Page, expectedText: string) {
+  await expect(page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })).toHaveCount(0)
+  await expect(page.locator('body')).toContainText(expectedText)
+}
+
 async function dataId(page: import('@playwright/test').Page, file: string, arrayKey: string, idKeys: string[]): Promise<string> {
   return page.evaluate(async ({ file, arrayKey, idKeys }) => {
     const base = window.location.href.split('#')[0]
@@ -110,26 +116,31 @@ test.describe('public live pages', () => {
 })
 
 test.describe('authenticated live workspaces', () => {
-  for (const [name, hash] of authenticatedRoutes) {
+  for (const [name, hash, expectedText] of authenticatedRoutes) {
     test(`${name} screenshot`, async ({ page }, testInfo) => {
-      await page.goto(`./${hash}`, { waitUntil: 'networkidle' })
+      await signInForProject(page, testInfo.project.name, hash)
+      await assertAuthenticatedWorkspace(page, expectedText)
       await auditPage(page, testInfo.project.name, name)
     })
   }
 
   test('company profile screenshot', async ({ page }, testInfo) => {
-    await page.goto('./#/companies', { waitUntil: 'networkidle' })
+    await signInForProject(page, testInfo.project.name, '#/companies')
+    await assertAuthenticatedWorkspace(page, 'Company & vendor intelligence')
     const companyId = await dataId(page, 'companies.json', 'companies', ['company_id'])
     await page.goto(`./#/company/${encodeURIComponent(companyId)}`, { waitUntil: 'networkidle' })
     await expect(page).toHaveURL(/#\/company\//)
+    await assertAuthenticatedWorkspace(page, 'Company profile')
     await auditPage(page, testInfo.project.name, 'company-profile')
   })
 
   test('nys equipment profile screenshot', async ({ page }, testInfo) => {
-    await page.goto('./#/nys', { waitUntil: 'networkidle' })
+    await signInForProject(page, testInfo.project.name, '#/nys')
+    await assertAuthenticatedWorkspace(page, 'NYS Market')
     const equipmentId = await dataId(page, 'nys-systems.json', 'systems', ['system_id', 'source_equipment_id'])
     await page.goto(`./#/nys-account/${encodeURIComponent(equipmentId)}`, { waitUntil: 'networkidle' })
     await expect(page).toHaveURL(/#\/nys-account\//)
+    await assertAuthenticatedWorkspace(page, equipmentId)
     await auditPage(page, testInfo.project.name, 'nys-equipment-profile')
   })
 })
