@@ -206,7 +206,38 @@ def _fetch_agency_count(where: str) -> int:
         raise SourceFetchError("OATH cooling-tower agency count returned an unexpected payload") from exc
 
 
-def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, dict[str, Any]], int]:
+def _fetch_exact_ticket_fallback(requested: set[str]) -> tuple[dict[str, dict[str, Any]], int]:
+    requested_list = sorted(requested)
+    batches = [
+        requested_list[start : start + DEFAULT_BATCH_SIZE]
+        for start in range(0, len(requested_list), DEFAULT_BATCH_SIZE)
+    ]
+    cases: dict[str, dict[str, Any]] = {}
+    query_row_count = 0
+    worker_count = max(1, min(DEFAULT_MAX_WORKERS, len(batches))) if batches else 1
+    print(
+        f"[oath] Falling back to {len(batches):,} exact-ticket batches with {worker_count} worker(s) "
+        "after the agency slice failed to stabilize",
+        flush=True,
+    )
+    if batches:
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            futures = [executor.submit(_fetch_exact_ticket_batch, batch) for batch in batches]
+            for completed_count, future in enumerate(as_completed(futures), start=1):
+                batch, rows = future.result()
+                query_row_count += len(rows)
+                _merge_exact_ticket_batch(cases, batch, rows)
+                if completed_count % 25 == 0 or completed_count == len(batches):
+                    print(
+                        f"[oath] Exact-ticket fallback completed {completed_count:,}/{len(batches):,} batches; "
+                        f"matched {len(cases):,}/{len(requested_list):,} tickets",
+                        flush=True,
+                    )
+    validate_match_coverage(len(requested_list), len(cases))
+    return cases, query_row_count
+
+
+def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, dict[str, Any]], int, bool]:
     where = _cooling_tower_agency_where()
     last_counts: tuple[int, int, int] | None = None
 
@@ -214,23 +245,43 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
         expected_count = _fetch_agency_count(where)
         print(
             f"[oath] Fetching {expected_count:,} {OATH_COOLING_TOWER_AGENCY} cases "
-            f"(snapshot attempt {snapshot_attempt}/{OATH_AGENCY_SNAPSHOT_ATTEMPTS}); "
+            f"(snapshot attempt {snapshot_attempt}/{OATH_AGENCY_SNAPSHOT_ATTEMPTS}) with seek pagination; "
             f"intersecting with {len(requested):,} exact summons tickets",
             flush=True,
         )
         cases: dict[str, dict[str, Any]] = {}
         fetched_count = 0
-        for offset in range(0, expected_count, OATH_AGENCY_PAGE_SIZE):
+        cursor: str | None = None
+        while True:
+            page_where = where
+            if cursor is not None:
+                escaped_cursor = cursor.replace("'", "''")
+                page_where = f"{where} AND ticket_number > '{escaped_cursor}'"
             rows = fetch_where(
                 OATH_DATASET_ID,
-                where,
+                page_where,
                 order_by="ticket_number",
                 select=OATH_SELECT,
                 request_retries=OATH_RATE_LIMIT_RETRIES,
                 request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
                 limit=OATH_AGENCY_PAGE_SIZE,
-                offset=offset,
             )
+            if not rows:
+                break
+            raw_tickets = [str(row.get("ticket_number") or "").strip() for row in rows]
+            if any(not ticket for ticket in raw_tickets):
+                raise SourceFetchError("OATH agency seek page returned a row without ticket_number")
+            if raw_tickets != sorted(raw_tickets):
+                raise SourceFetchError("OATH agency seek page violated ticket_number ordering")
+            if cursor is not None and raw_tickets[0] <= cursor:
+                raise SourceFetchError(
+                    f"OATH agency seek pagination did not advance beyond ticket_number {cursor}"
+                )
+            next_cursor = raw_tickets[-1]
+            if cursor is not None and next_cursor <= cursor:
+                raise SourceFetchError(
+                    f"OATH agency seek cursor did not advance: {cursor} -> {next_cursor}"
+                )
             fetched_count += len(rows)
             for row in rows:
                 case = normalize_case(row)
@@ -242,9 +293,10 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
                 existing = cases.get(ticket)
                 if existing is None or _completeness(case) > _completeness(existing):
                     cases[ticket] = case
+            cursor = next_cursor
             print(
                 f"[oath] Read {fetched_count:,}/{expected_count:,} agency-slice cases; "
-                f"matched {len(cases):,}/{len(requested):,} requested tickets",
+                f"matched {len(cases):,}/{len(requested):,} requested tickets; cursor={cursor}",
                 flush=True,
             )
             if len(rows) < OATH_AGENCY_PAGE_SIZE:
@@ -253,21 +305,24 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
         final_count = _fetch_agency_count(where)
         last_counts = (expected_count, fetched_count, final_count)
         if expected_count == fetched_count == final_count:
-            return cases, fetched_count
+            return cases, fetched_count, False
 
         if snapshot_attempt < OATH_AGENCY_SNAPSHOT_ATTEMPTS:
             print(
-                f"[oath] OATH agency slice changed during pagination: start count {expected_count:,}, "
-                f"fetched {fetched_count:,}, end count {final_count:,}; restarting from offset 0",
+                f"[oath] OATH agency slice changed during seek pagination: start count {expected_count:,}, "
+                f"fetched {fetched_count:,}, end count {final_count:,}; restarting from the first key",
                 flush=True,
             )
 
     start_count, fetched_count, end_count = last_counts or (0, 0, 0)
-    raise SourceFetchError(
-        f"OATH cooling-tower agency snapshot did not stabilize after {OATH_AGENCY_SNAPSHOT_ATTEMPTS} attempts: "
+    print(
+        f"[oath] OATH agency slice did not stabilize after {OATH_AGENCY_SNAPSHOT_ATTEMPTS} seek attempts: "
         f"start count {start_count:,}, fetched {fetched_count:,}, end count {end_count:,}. "
-        "Refusing to publish a partial lifecycle snapshot."
+        "Using exact-ticket fallback rather than publishing a mixed agency snapshot.",
+        flush=True,
     )
+    cases, query_row_count = _fetch_exact_ticket_fallback(requested)
+    return cases, query_row_count, True
 
 
 def fetch_oath_cases(
@@ -281,11 +336,13 @@ def fetch_oath_cases(
     query_scope = "Exact ticket_number queries for summonses present in NYC Cooling Tower System Inspection Results"
 
     if len(requested) >= OATH_AGENCY_SLICE_MIN_REQUESTED:
-        cases, query_row_count = _fetch_cooling_tower_agency_cases(set(requested))
+        cases, query_row_count, used_exact_fallback = _fetch_cooling_tower_agency_cases(set(requested))
         query_scope = (
             f"OATH issuing_agency='{OATH_COOLING_TOWER_AGENCY}' rows intersected by exact "
             "NYC Health summons_number values"
         )
+        if used_exact_fallback:
+            query_scope += "; unstable agency snapshot fell back to exact ticket_number batches"
     else:
         batches = [requested[start : start + batch_size] for start in range(0, len(requested), batch_size)]
         worker_count = max(1, min(max_workers, len(batches))) if batches else 1
