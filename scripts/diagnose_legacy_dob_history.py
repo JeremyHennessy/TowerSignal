@@ -110,10 +110,16 @@ def _source_bbl(row: dict[str, Any]) -> str | None:
     borough = BOROUGH_CODES.get(borough_raw)
     if borough is None and borough_raw in BOROUGH_NAMES:
         borough = borough_raw
-    block = "".join(ch for ch in str(row.get("block") or "") if ch.isdigit()).zfill(5)
-    lot = "".join(ch for ch in str(row.get("lot") or "") if ch.isdigit()).zfill(4)
-    if borough not in BOROUGH_NAMES or len(block) != 5 or len(lot) != 4:
+    block_digits = "".join(ch for ch in str(row.get("block") or "") if ch.isdigit())
+    lot_digits = "".join(ch for ch in str(row.get("lot") or "") if ch.isdigit())
+    if borough not in BOROUGH_NAMES or not block_digits or not lot_digits:
         return None
+    block_number = int(block_digits)
+    lot_number = int(lot_digits)
+    if block_number <= 0 or lot_number <= 0 or block_number > 99999 or lot_number > 9999:
+        return None
+    block = str(block_number).zfill(5)
+    lot = str(lot_number).zfill(4)
     return normalize_bbl(f"{borough}{block}{lot}")
 
 
@@ -190,7 +196,8 @@ def _exact_where(chunk: list[str]) -> str:
         if not components:
             continue
         borough, block, lot = components
-        clauses.append(f"(borough='{borough}' AND block='{block}' AND lot='{lot}')")
+        source_lot = str(int(lot)).zfill(5)
+        clauses.append(f"(borough='{borough}' AND block='{block}' AND lot='{source_lot}')")
     if not clauses:
         raise ValueError("No valid BBLs for legacy DOB query")
     return " OR ".join(clauses)
