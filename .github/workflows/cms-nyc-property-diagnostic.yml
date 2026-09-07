@@ -1,0 +1,60 @@
+name: Diagnose CMS NYC property identity
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/cms-nyc-property-diagnostic-20260907
+    paths:
+      - '.github/workflows/cms-nyc-property-diagnostic.yml'
+      - 'scripts/diagnose_cms_nyc_facilities.py'
+      - 'tests/python/test_cms_nyc_facility_diagnostic.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cms-nyc-property-diagnostic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run exact-property identity regressions
+        run: python -m unittest tests.python.test_cms_nyc_facility_diagnostic -v
+      - name: Measure CMS NYC facility property identity and TowerSignal overlap
+        run: >-
+          python scripts/diagnose_cms_nyc_facilities.py
+          --output cms-nyc-diagnostic/report.json
+          --geosearch-workers 4
+      - name: Assert diagnostic governance boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('cms-nyc-diagnostic/report.json').read_text())
+          governance = payload['governance']
+          assert governance['diagnostic_only'] is True
+          assert governance['priority_score_1_0_changed'] is False
+          assert governance['ui_changed'] is False
+          assert governance['durable_history_changed'] is False
+          assert governance['fuzzy_matching_used'] is False
+          assert governance['provider_or_incumbent_inference'] is False
+          assert governance['cms_authorized_for_production'] is False
+          assert payload['cms_source_counts']['hospital_all_rows'] >= 5000
+          assert payload['cms_source_counts']['nursing_home_all_rows'] >= 14000
+          assert payload['towersignal_baseline']['canonical_bbl_count'] >= 3000
+          print(json.dumps(payload['property_resolution'], indent=2))
+          PY
+      - name: Upload CMS NYC diagnostic report
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-cms-nyc-property-diagnostic
+          path: cms-nyc-diagnostic/report.json
+          retention-days: 30
