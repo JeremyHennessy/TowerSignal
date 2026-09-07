@@ -2,16 +2,31 @@ import { expect, test } from './fixtures'
 
 test.setTimeout(180_000)
 
+type ElementMeasurement = {
+  name: string
+  text: string
+  left: number
+  right: number
+  width: number
+  clientWidth: number
+  scrollWidth: number
+  minWidth: string
+  widthCss: string
+  display: string
+  overflowX: string
+  overflowWrap: string
+  wordBreak: string
+  whiteSpace: string
+  flex: string
+}
+
 type MetricMeasurement = {
   viewport: number
   body: number
   document: number
   gridClient: number
   gridScroll: number
-  valueClient: number
-  valueScroll: number
-  valueText: string
-  valueOverflowWrap: string
+  elements: ElementMeasurement[]
 }
 
 async function measure(page: import('@playwright/test').Page): Promise<MetricMeasurement> {
@@ -19,17 +34,47 @@ async function measure(page: import('@playwright/test').Page): Promise<MetricMea
     const grid = document.querySelector<HTMLElement>('.reference-metric-grid')
     const value = [...document.querySelectorAll<HTMLElement>('.reference-metric-grid strong')]
       .find(element => element.textContent?.includes('$6,475,380,412'))
-    if (!grid || !value) throw new Error('Expected Opportunities metric grid/value not found')
+    const content = value?.parentElement as HTMLElement | null
+    const article = content?.parentElement as HTMLElement | null
+    const label = content?.querySelector<HTMLElement>('small') ?? null
+    const subtitle = content?.querySelector<HTMLElement>('span') ?? null
+    if (!grid || !value || !content || !article || !label || !subtitle) throw new Error('Expected Opportunities metric card not found')
+
+    const record = (name: string, element: HTMLElement): ElementMeasurement => {
+      const rect = element.getBoundingClientRect()
+      const style = getComputedStyle(element)
+      return {
+        name,
+        text: (element.textContent || '').replace(/\s+/g, ' ').trim(),
+        left: Math.round(rect.left * 10) / 10,
+        right: Math.round(rect.right * 10) / 10,
+        width: Math.round(rect.width * 10) / 10,
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        minWidth: style.minWidth,
+        widthCss: style.width,
+        display: style.display,
+        overflowX: style.overflowX,
+        overflowWrap: style.overflowWrap,
+        wordBreak: style.wordBreak,
+        whiteSpace: style.whiteSpace,
+        flex: style.flex,
+      }
+    }
+
     return {
       viewport: window.innerWidth,
       body: document.body.scrollWidth,
       document: document.documentElement.scrollWidth,
       gridClient: grid.clientWidth,
       gridScroll: grid.scrollWidth,
-      valueClient: value.clientWidth,
-      valueScroll: value.scrollWidth,
-      valueText: value.textContent || '',
-      valueOverflowWrap: getComputedStyle(value).overflowWrap,
+      elements: [
+        record('article', article),
+        record('content', content),
+        record('label', label),
+        record('value', value),
+        record('subtitle', subtitle),
+      ],
     }
   })
 }
@@ -81,31 +126,19 @@ async function reachOpportunities(page: import('@playwright/test').Page) {
   await expect(page.getByText('$6,475,380,412', { exact: true })).toBeVisible({ timeout: 90_000 })
 }
 
-test('prove wrapping the long Opportunities metric fixes the exact iPhone overflow', async ({ page }, testInfo) => {
+test('measure the exact overflowing Opportunities metric card on iPhone', async ({ page }, testInfo) => {
   await reachOpportunities(page)
-
-  const before = await measure(page)
-  console.log('OPPORTUNITIES_METRIC_WRAP_BEFORE', JSON.stringify(before))
-  expect(before.body).toBe(409)
-  expect(before.gridScroll).toBeGreaterThan(before.gridClient + 2)
-  expect(before.valueScroll).toBeGreaterThan(before.valueClient + 2)
-
-  await page.addStyleTag({ content: '@media(max-width:520px){.reference-metric-grid strong{overflow-wrap:anywhere}}' })
-  await page.waitForTimeout(150)
-
-  const after = await measure(page)
-  console.log('OPPORTUNITIES_METRIC_WRAP_AFTER', JSON.stringify(after))
-  await testInfo.attach('opportunities-metric-wrap-proof.json', {
-    body: Buffer.from(JSON.stringify({ before, after }, null, 2)),
+  const measurement = await measure(page)
+  console.log('OPPORTUNITIES_METRIC_CARD_MEASUREMENT', JSON.stringify(measurement))
+  await testInfo.attach('opportunities-metric-card-measurement.json', {
+    body: Buffer.from(JSON.stringify(measurement, null, 2)),
     contentType: 'application/json',
   })
-  await testInfo.attach('opportunities-metric-wrap-after.png', {
+  await testInfo.attach('opportunities-metric-card.png', {
     body: await page.screenshot({ fullPage: false }),
     contentType: 'image/png',
   })
 
-  expect(after.body).toBeLessThanOrEqual(392)
-  expect(after.document).toBeLessThanOrEqual(392)
-  expect(after.gridScroll).toBeLessThanOrEqual(after.gridClient + 2)
-  expect(after.valueScroll).toBeLessThanOrEqual(after.valueClient + 2)
+  expect(measurement.body).toBe(409)
+  expect(measurement.gridScroll).toBeGreaterThan(measurement.gridClient + 2)
 })
