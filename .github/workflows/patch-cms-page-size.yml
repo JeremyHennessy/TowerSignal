@@ -1,0 +1,43 @@
+name: Patch CMS API batch ceiling
+
+on:
+  push:
+    branches:
+      - agent/cms-nyc-property-diagnostic-20260907
+    paths:
+      - '.github/workflows/patch-cms-page-size.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/cms-nyc-property-diagnostic-20260907
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply current CMS batch ceiling
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/diagnose_cms_nyc_facilities.py')
+          text = path.read_text()
+          old = 'CMS_PAGE_SIZE = 2000'
+          if old not in text:
+              raise SystemExit('CMS page-size patch target not found')
+          path.write_text(text.replace(old, 'CMS_PAGE_SIZE = 1500', 1))
+          PY
+      - name: Run CMS identity regressions
+        run: python -m unittest tests.python.test_cms_nyc_facility_diagnostic -v
+      - name: Commit and remove temporary workflow
+        run: |
+          rm .github/workflows/patch-cms-page-size.yml
+          git config user.name 'TowerSignal Diagnostic Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add scripts/diagnose_cms_nyc_facilities.py .github/workflows/patch-cms-page-size.yml
+          git commit -m 'Use current CMS API batch ceiling'
+          git push origin HEAD:agent/cms-nyc-property-diagnostic-20260907
