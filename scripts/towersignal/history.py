@@ -205,6 +205,8 @@ def build_observation(system: dict[str, Any], summary_row: dict[str, Any], inspe
         dob_records[key] = _compact_dob_event(item)
     return {
         "system_id": system["system_id"], "bin": system.get("bin"), "bbl": system.get("bbl"),
+        "registry_bbl": system.get("registry_bbl"), "bbl_identity_status": system.get("bbl_identity_status"),
+        "bbl_identity_basis": system.get("bbl_identity_basis"),
         "address": system.get("address"), "borough": system.get("borough"), "zip": system.get("zip"),
         "date_registered": system.get("date_registered"), "active_equipment": system.get("active_equipment", 0),
         "sample_dates": system.get("sample_dates", []), "latest_sample_date": system.get("latest_sample_date"),
@@ -324,6 +326,14 @@ def _detect_dob_changes(previous: dict[str, Any], current: dict[str, Any], detec
 
 def detect_changes(previous: dict[str, Any], current: dict[str, Any], detected_at: str) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
+    # A newly recovered canonical BBL can expose years of historical property evidence in one build.
+    # That is an identity/enrichment backfill, not a real-world event observed on detected_at. Suppress
+    # BBL-derived PLUTO/HPD/DOB events for this one transition only. Core SYSTEM_ID evidence remains live.
+    identity_backfill = (
+        current.get("bbl_identity_status") == "RECOVERED_EXACT_BIN_MAPPLUTO_BBL"
+        and not previous.get("bbl")
+        and bool(current.get("bbl"))
+    )
     if previous.get("active_equipment") != current.get("active_equipment"):
         events.append(_event("ACTIVE_EQUIPMENT_CHANGED", current, detected_at, "NYC_COOLING_TOWER_REGISTRATIONS", "SYSTEM_ID_EXACT", previous.get("active_equipment"), current.get("active_equipment")))
 
@@ -357,17 +367,17 @@ def detect_changes(previous: dict[str, Any], current: dict[str, Any], detected_a
                 events.append(_event(event_type, current, detected_at, "NYC_OATH_HEARINGS_DIVISION_CASE_STATUS", "SUMMONS_TICKET_EXACT", {"ticket_number": ticket, field: old.get(field)}, {"ticket_number": ticket, field: case.get(field)}, case.get("decision_date") or case.get("hearing_date")))
 
     # Enrichment disappearance alone is not evidence of a real owner/contact change.
-    if current.get("building_context") and previous.get("pluto_owner") != current.get("pluto_owner"):
+    if not identity_backfill and current.get("building_context") and previous.get("pluto_owner") != current.get("pluto_owner"):
         events.append(_event("PLUTO_OWNER_CHANGED", current, detected_at, "NYC_DCP_PLUTO", "BBL_EXACT", previous.get("pluto_owner"), current.get("pluto_owner")))
 
     current_hpd_present = bool(current.get("hpd_registration_id"))
     registration_fields = ("hpd_registration_id", "hpd_last_registration_date")
-    if current_hpd_present and any(previous.get(field) != current.get(field) for field in registration_fields):
+    if not identity_backfill and current_hpd_present and any(previous.get(field) != current.get(field) for field in registration_fields):
         events.append(_event("HPD_REGISTRATION_CHANGED", current, detected_at, "NYC_HPD_MULTIPLE_DWELLING_REGISTRATION", "BBL_EXACT", {field: previous.get(field) for field in registration_fields}, {field: current.get(field) for field in registration_fields}, current.get("hpd_last_registration_date")))
 
     previous_contacts = {_contact_key(item): item for item in previous.get("hpd_contacts") or []}
     current_contacts = {_contact_key(item): item for item in current.get("hpd_contacts") or []}
-    if current_hpd_present:
+    if current_hpd_present and not identity_backfill:
         for key, contact in current_contacts.items():
             if key not in previous_contacts:
                 events.append(_event("HPD_CONTACT_ADDED", current, detected_at, "NYC_HPD_REGISTRATION_CONTACTS", "REGISTRATION_ID_EXACT", None, contact, current.get("hpd_last_registration_date")))
@@ -379,7 +389,8 @@ def detect_changes(previous: dict[str, Any], current: dict[str, Any], detected_a
         if old_managers != new_managers:
             events.append(_event("HPD_MANAGING_AGENT_CHANGED", current, detected_at, "NYC_HPD_REGISTRATION_CONTACTS", "REGISTRATION_ID_EXACT", _managing_contacts(previous.get("hpd_contacts") or []), _managing_contacts(current.get("hpd_contacts") or []), current.get("hpd_last_registration_date")))
 
-    events.extend(_detect_dob_changes(previous, current, detected_at))
+    if not identity_backfill:
+        events.extend(_detect_dob_changes(previous, current, detected_at))
     return events
 
 

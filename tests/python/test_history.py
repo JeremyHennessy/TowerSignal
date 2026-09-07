@@ -238,6 +238,57 @@ class HistoryTests(unittest.TestCase):
         self.assertNotIn("HPD_CONTACT_REMOVED", event_types)
         self.assertNotIn("HPD_MANAGING_AGENT_CHANGED", event_types)
 
+    def test_recovered_bbl_backfill_does_not_emit_synthetic_property_events(self):
+        previous = full_observation(
+            system={"bbl": None},
+            building_context=None,
+            hpd_registration=None,
+            dob_activity=[],
+        )
+        current = full_observation(
+            system={
+                "bbl": "3000017501",
+                "registry_bbl": None,
+                "bbl_identity_status": "RECOVERED_EXACT_BIN_MAPPLUTO_BBL",
+                "bbl_identity_basis": "EXACT_BIN_UNIQUE_MAPPLUTO_BBL",
+                "active_equipment": 3,
+            },
+            building_context={"owner_name": "HISTORICAL OWNER LLC"},
+            hpd_registration={
+                "registration_id": "R-BACKFILL",
+                "last_registration_date": "2024-08-01",
+                "contacts": [{
+                    "registration_contact_id": "C-BACKFILL",
+                    "type": "Managing Agent",
+                    "description": "Managing Agent",
+                    "corporation_name": "HISTORICAL MANAGEMENT LLC",
+                }],
+            },
+            dob_activity=[dob_job(
+                filing_date="2023-06-01",
+                first_permit_date="2023-07-01",
+                approved_date="2023-06-15",
+                job_description="Historical cooling tower work",
+                explicit_cooling_tower_mention=True,
+            )],
+        )
+        events = detect_changes(previous, current, "2026-09-07T17:00:00Z")
+        event_types = {event["event_type"] for event in events}
+        self.assertIn("ACTIVE_EQUIPMENT_CHANGED", event_types)
+        self.assertNotIn("PLUTO_OWNER_CHANGED", event_types)
+        self.assertFalse(any(event_type.startswith("HPD_") for event_type in event_types))
+        self.assertFalse(any(event_type.startswith("DOB_") for event_type in event_types))
+
+        snapshot, changes = build_history(
+            [current],
+            "2026-09-07T17:00:00Z",
+            history_snapshot(previous),
+            [],
+        )
+        self.assertEqual(snapshot["systems"][0]["bbl"], "3000017501")
+        self.assertEqual(snapshot["systems"][0]["bbl_identity_status"], "RECOVERED_EXACT_BIN_MAPPLUTO_BBL")
+        self.assertFalse(any(event["event_type"].startswith(("PLUTO_", "HPD_", "DOB_")) for event in changes["events"]))
+
     def test_removed_system_wording_is_snapshot_presence_not_decommissioning(self):
         previous_obs = full_observation()
         previous = history_snapshot(previous_obs)
