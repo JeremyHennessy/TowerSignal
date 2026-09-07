@@ -27,38 +27,20 @@ jobs:
 
           oath = Path('scripts/towersignal/oath.py')
           text = oath.read_text()
-          text = text.replace(
-              'OATH_RATE_LIMIT_RETRIES = 4\nOATH_REQUEST_RETRIES = 1',
-              'OATH_RATE_LIMIT_RETRIES = 4\nOATH_TIMEOUT_SPLIT_AFTER_ATTEMPTS = 2\nOATH_MIN_SPLIT_BATCH_SIZE = 25\nOATH_REQUEST_RETRIES = 1',
+          constants_old = 'OATH_RATE_LIMIT_RETRIES = 4\nOATH_REQUEST_RETRIES = 1'
+          constants_new = (
+              'OATH_RATE_LIMIT_RETRIES = 4\n'
+              'OATH_TIMEOUT_SPLIT_AFTER_ATTEMPTS = 2\n'
+              'OATH_MIN_SPLIT_BATCH_SIZE = 25\n'
+              'OATH_REQUEST_RETRIES = 1'
           )
-          old = '''def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
-              quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
-              where = f"ticket_number in ({quoted})"
-              last_error: SourceFetchError | None = None
-              for attempt in range(OATH_RATE_LIMIT_RETRIES):
-                  try:
-                      rows = fetch_where(
-                          OATH_DATASET_ID,
-                          where,
-                          select=OATH_SELECT,
-                          request_retries=OATH_REQUEST_RETRIES,
-                          request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
-                      )
-                      return batch, rows
-                  except SourceFetchError as exc:
-                      last_error = exc
-                      if not _is_transient_oath_error(exc) or attempt + 1 >= OATH_RATE_LIMIT_RETRIES:
-                          raise
-                      delay = 10 * (attempt + 1)
-                      print(
-                          f"[oath] Transient OATH source error while fetching {len(batch):,} exact tickets; "
-                          f"retrying in {delay}s",
-                          flush=True,
-                      )
-                      time.sleep(delay)
-              raise last_error or SourceFetchError("OATH exact-ticket batch failed")
-          '''.replace('              ', '')
-          new = '''def _is_timeout_oath_error(exc: SourceFetchError) -> bool:
+          if constants_old not in text:
+              raise SystemExit('expected OATH constants anchor not found')
+          text = text.replace(constants_old, constants_new, 1)
+
+          start = text.index('def _fetch_exact_ticket_batch(')
+          end = text.index('\ndef _merge_exact_ticket_batch', start)
+          new_block = '''def _is_timeout_oath_error(exc: SourceFetchError) -> bool:
               message = str(exc).lower()
               return "timeout" in message or "timed out" in message
 
@@ -119,20 +101,18 @@ jobs:
                   _, right_rows = _fetch_exact_ticket_batch_resilient(right)
                   return batch, [*left_rows, *right_rows]
           '''.replace('          ', '')
-          if old not in text:
-              raise SystemExit('expected OATH exact-ticket block not found')
-          text = text.replace(old, new)
-          text = text.replace(
-              'executor.submit(_fetch_exact_ticket_batch, batch)',
-              'executor.submit(_fetch_exact_ticket_batch_resilient, batch)',
-          )
+          text = text[:start] + new_block + text[end:]
+          submit_old = 'executor.submit(_fetch_exact_ticket_batch, batch)'
+          if text.count(submit_old) != 2:
+              raise SystemExit(f'expected two exact-ticket submit sites, found {text.count(submit_old)}')
+          text = text.replace(submit_old, 'executor.submit(_fetch_exact_ticket_batch_resilient, batch)')
           oath.write_text(text)
 
           tests = Path('tests/python/test_oath_fetch.py')
           test_text = tests.read_text()
-          anchor = '''    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
-              @patch("towersignal.oath.fetch_where")
-              def test_large_ticket_set_uses_stable_cooling_tower_agency_slice'''.replace('              ', '')
+          anchor = '    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})\n    @patch("towersignal.oath.fetch_where")\n    def test_large_ticket_set_uses_stable_cooling_tower_agency_slice'
+          if anchor not in test_text:
+              raise SystemExit('expected OATH test anchor not found')
           added = '''    @patch("towersignal.oath.OATH_MIN_SPLIT_BATCH_SIZE", 2)
               @patch("towersignal.oath.time.sleep")
               @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
@@ -183,9 +163,7 @@ jobs:
                   self.assertEqual(fetch_where_mock.call_count, 4)
 
           '''.replace('              ', '')
-          if anchor not in test_text:
-              raise SystemExit('expected OATH test anchor not found')
-          test_text = test_text.replace(anchor, added + anchor)
+          test_text = test_text.replace(anchor, added + anchor, 1)
           tests.write_text(test_text)
           PY
       - name: Run focused OATH tests
