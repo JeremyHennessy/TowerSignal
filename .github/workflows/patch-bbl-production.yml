@@ -21,6 +21,8 @@ jobs:
       - name: Integrate exact-BIN BBL recovery into production build
         run: python scripts/patch_bbl_production.py
       - name: Run focused BBL identity tests
+        env:
+          PYTHONPATH: scripts
         run: python -m unittest tests.python.test_bbl_identity -v
       - name: Remove temporary patch machinery
         run: rm scripts/patch_bbl_production.py .github/workflows/patch-bbl-production.yml
