@@ -1,4 +1,5 @@
 name: Apply CMS institutional context integration
+# Re-run from the post-Pages branch head so the validated commit can fast-forward cleanly.
 
 on:
   push:
