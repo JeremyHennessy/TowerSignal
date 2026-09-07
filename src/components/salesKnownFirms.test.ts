@@ -57,9 +57,9 @@ describe('collectKnownAccountFirms', () => {
     const firms = collectKnownAccountFirms(detail)
 
     expect(firms.map(firm => firm.name)).toEqual([
+      'Example Environmental Lab',
       'Example Water Services LLC',
       'Mechanical Project Co.',
-      'Example Environmental Lab',
     ])
 
     const inspectionFirm = firms.find(firm => firm.key === 'EXAMPLE WATER SERVICES LLC')
