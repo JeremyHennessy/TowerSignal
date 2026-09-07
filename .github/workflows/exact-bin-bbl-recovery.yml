@@ -1,0 +1,32 @@
+name: Diagnose exact-BIN BBL recovery
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/diagnose_exact_bin_bbl_recovery.py'
+      - 'tests/python/test_exact_bin_bbl_recovery.py'
+      - '.github/workflows/exact-bin-bbl-recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run exact-identity regression tests
+        run: python -m unittest tests.python.test_exact_bin_bbl_recovery -v
+      - name: Measure exact-BIN recovery against authoritative Building Footprints
+        run: python scripts/diagnose_exact_bin_bbl_recovery.py --output exact-bin-bbl-recovery.json
+      - name: Upload recovery diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: exact-bin-bbl-recovery
+          path: exact-bin-bbl-recovery.json
+          retention-days: 30
