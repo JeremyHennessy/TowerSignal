@@ -22,25 +22,30 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           path = Path('.github/workflows/pages.yml')
-          text = path.read_text(encoding='utf-8')
-          artifact_old = '''            public/data/history/latest.json
-            public/data/history/events.json'''
-          artifact_new = '''            public/data/history/latest.json
-            public/data/history/segments/**
-            public/data/history/events.json'''
-          persist_old = '''          cp .verified-history/history/latest.json data/history/latest.json
-          cp .verified-history/history/events.json data/history/events.json'''
-          persist_new = '''          cp .verified-history/history/latest.json data/history/latest.json
-          rm -rf data/history/segments
-          cp -R .verified-history/history/segments data/history/segments
-          cp .verified-history/history/events.json data/history/events.json'''
-          if text.count(artifact_old) != 1:
-              raise SystemExit(f'Expected exactly one history artifact block, found {text.count(artifact_old)}')
-          if text.count(persist_old) != 1:
-              raise SystemExit(f'Expected exactly one history persistence block, found {text.count(persist_old)}')
-          text = text.replace(artifact_old, artifact_new)
-          text = text.replace(persist_old, persist_new)
-          path.write_text(text, encoding='utf-8')
+          lines = path.read_text(encoding='utf-8').splitlines()
+
+          latest_indexes = [i for i, line in enumerate(lines) if line.strip() == 'public/data/history/latest.json']
+          if len(latest_indexes) != 1:
+              raise SystemExit(f'Expected one artifact latest.json line, found {len(latest_indexes)}')
+          i = latest_indexes[0]
+          indent = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
+          if i + 1 >= len(lines) or lines[i + 1].strip() != 'public/data/history/segments/**':
+              lines.insert(i + 1, indent + 'public/data/history/segments/**')
+
+          copy_indexes = [i for i, line in enumerate(lines) if line.strip() == 'cp .verified-history/history/latest.json data/history/latest.json']
+          if len(copy_indexes) != 1:
+              raise SystemExit(f'Expected one persistence latest.json copy, found {len(copy_indexes)}')
+          i = copy_indexes[0]
+          indent = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
+          required = [
+              indent + 'rm -rf data/history/segments',
+              indent + 'cp -R .verified-history/history/segments data/history/segments',
+          ]
+          existing = lines[i + 1:i + 3]
+          if existing != required:
+              lines[i + 1:i + 1] = required
+
+          path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
           PY
       - name: Commit the workflow patch and remove this one-shot helper
         run: |
