@@ -1,0 +1,32 @@
+name: Audit cooling-tower registration BBL quality
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/diagnose_registration_bbl_quality.py'
+      - 'tests/python/test_registration_bbl_quality.py'
+      - '.github/workflows/registration-bbl-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run focused identity tests
+        run: python -m unittest tests.python.test_registration_bbl_quality -v
+      - name: Audit current registry BBL quality by borough
+        run: python scripts/diagnose_registration_bbl_quality.py --output registration-bbl-quality.json
+      - name: Upload identity-quality artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: registration-bbl-quality
+          path: registration-bbl-quality.json
+          retention-days: 30
