@@ -1,5 +1,5 @@
 name: Diagnose CMS NYC property identity
-# Re-run after validating the corrected NYC-only ZIP boundary.
+# Re-run after validating the NYC-only ZIP boundary and current 1,500-row CMS API ceiling.
 
 on:
   workflow_dispatch:
