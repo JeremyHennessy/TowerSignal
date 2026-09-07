@@ -1,4 +1,5 @@
 name: Diagnose CMS NYC property identity
+# Re-run after validating the corrected NYC-only ZIP boundary.
 
 on:
   workflow_dispatch:
