@@ -39,14 +39,13 @@ def _borough(value: Any) -> str:
     return aliases.get(text, text)
 
 
-def _footprint_bbl_candidates(footprints: list[dict[str, Any]]) -> set[str]:
-    candidates: set[str] = set()
+def _normalized_bbls(footprints: list[dict[str, Any]], field: str) -> set[str]:
+    values: set[str] = set()
     for footprint in footprints:
-        for field in ("base_bbl", "mappluto_bbl"):
-            value = normalize_bbl(footprint.get(field))
-            if value:
-                candidates.add(value.zfill(10))
-    return candidates
+        value = normalize_bbl(footprint.get(field))
+        if value:
+            values.add(value.zfill(10))
+    return values
 
 
 def classify_recovery(
@@ -54,23 +53,28 @@ def classify_recovery(
 ) -> dict[str, Any]:
     borough = _borough(system.get("borough"))
     bin_value = normalize_bin(system.get("bin"))
-    candidates = _footprint_bbl_candidates(footprints)
+    base_bbls = _normalized_bbls(footprints, "base_bbl")
+    mappluto_bbls = _normalized_bbls(footprints, "mappluto_bbl")
     expected_prefix = BOROUGH_CODE_BY_NAME.get(borough)
+    recovery_bbl: str | None = None
 
     if not bin_value:
         status = "NO_VALID_BIN"
     elif not footprints:
         status = "NO_FOOTPRINT_MATCH"
-    elif not candidates:
-        status = "NO_PUBLISHED_FOOTPRINT_BBL"
-    elif len(candidates) > 1:
-        status = "CONFLICTING_FOOTPRINT_BBLS"
-    else:
-        candidate = next(iter(candidates))
+    elif len(mappluto_bbls) > 1:
+        status = "CONFLICTING_MAPPLUTO_BBLS"
+    elif len(mappluto_bbls) == 1:
+        candidate = next(iter(mappluto_bbls))
         if expected_prefix and candidate[0] != expected_prefix:
-            status = "BOROUGH_PREFIX_CONFLICT"
+            status = "MAPPLUTO_BOROUGH_PREFIX_CONFLICT"
         else:
-            status = "UNAMBIGUOUS_EXACT_BIN_RECOVERY"
+            status = "UNAMBIGUOUS_EXACT_BIN_MAPPLUTO_RECOVERY"
+            recovery_bbl = candidate
+    elif base_bbls:
+        status = "BASE_BBL_ONLY_REVIEW"
+    else:
+        status = "NO_PUBLISHED_FOOTPRINT_BBL"
 
     return {
         "system_id": system.get("system_id"),
@@ -78,9 +82,11 @@ def classify_recovery(
         "bin": bin_value,
         "address": system.get("address"),
         "status": status,
-        "candidate_bbls": sorted(candidates),
+        "recovery_bbl": recovery_bbl,
+        "mappluto_bbl_candidates": sorted(mappluto_bbls),
+        "base_bbl_context": sorted(base_bbls),
         "footprint_feature_count": len(footprints),
-        "evidence_basis": "NYC_OTI_BUILDING_FOOTPRINTS; BIN_EXACT; PUBLISHED_BASE_BBL_OR_MAPPLUTO_BBL",
+        "evidence_basis": "NYC_OTI_BUILDING_FOOTPRINTS; BIN_EXACT; PUBLISHED_MAPPLUTO_BBL_PRIMARY; BASE_BBL_CONTEXT_ONLY",
     }
 
 
@@ -98,11 +104,11 @@ def build_report(
     for row in rows:
         borough_status.setdefault(row["borough"], Counter())[row["status"]] += 1
 
-    recoverable = [row for row in rows if row["status"] == "UNAMBIGUOUS_EXACT_BIN_RECOVERY"]
-    unresolved = [row for row in rows if row["status"] != "UNAMBIGUOUS_EXACT_BIN_RECOVERY"]
+    recoverable = [row for row in rows if row["status"] == "UNAMBIGUOUS_EXACT_BIN_MAPPLUTO_RECOVERY"]
+    unresolved = [row for row in rows if row["status"] != "UNAMBIGUOUS_EXACT_BIN_MAPPLUTO_RECOVERY"]
     return {
         "missing_registry_bbl_system_count": len(rows),
-        "unambiguous_exact_bin_recovery_count": len(recoverable),
+        "unambiguous_exact_bin_mappluto_recovery_count": len(recoverable),
         "unresolved_count": len(unresolved),
         "recovery_percentage": round(len(recoverable) / len(rows) * 100.0, 2) if rows else 100.0,
         "status_counts": dict(sorted(status_counts.items())),
@@ -114,19 +120,22 @@ def build_report(
         "unresolved_examples": unresolved[:100],
         "identity_contract": {
             "join_key": "BIN_EXACT",
-            "recovery_value": "UNIQUE_PUBLISHED_BUILDING_FOOTPRINT_BASE_BBL_OR_MAPPLUTO_BBL",
+            "recovery_value": "UNIQUE_PUBLISHED_BUILDING_FOOTPRINT_MAPPLUTO_BBL",
+            "calibration_basis": "MapPLUTO BBL matched 3624/3791 (95.59%) known registry BBL systems with an exact-BIN footprint; BASE_BBL matched 2725/3791 (71.88%).",
+            "base_bbl_role": "PHYSICAL_TAX_LOT_CONTEXT_ONLY",
             "address_matching_used": False,
             "fuzzy_matching_used": False,
             "borough_prefix_must_reconcile": True,
             "conflicts_remain_unresolved": True,
+            "base_only_rows_remain_unresolved": True,
         },
         "recommendation": {
             "production_identity_repair_candidate": bool(recoverable),
             "priority_score_change": False,
             "ui_change": False,
             "rule": (
-                "Promote only UNAMBIGUOUS_EXACT_BIN_RECOVERY rows into canonical BBL identity. "
-                "Never choose among conflicting footprint BBLs and never substitute address matching."
+                "Promote only a unique published MapPLUTO BBL from an exact-BIN Building Footprints match when the borough prefix reconciles. "
+                "Retain BASE_BBL as physical-lot context only; never choose among multiple MapPLUTO BBLs and never substitute address matching."
             ),
         },
     }
@@ -161,7 +170,7 @@ def run(output: Path) -> dict[str, Any]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Diagnose exact-BIN recovery of missing cooling-tower registry BBLs")
+    parser = argparse.ArgumentParser(description="Diagnose exact-BIN MapPLUTO recovery of missing cooling-tower registry BBLs")
     parser.add_argument("--output", type=Path, default=Path("exact-bin-bbl-recovery.json"))
     args = parser.parse_args()
     run(args.output)
