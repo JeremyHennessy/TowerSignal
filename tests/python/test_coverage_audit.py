@@ -130,7 +130,8 @@ class CoverageAuditTests(unittest.TestCase):
             gaps = {item["gap_key"]: item for item in report["gap_analysis"]}
             self.assertEqual(gaps["CMS"]["classification"], "NOT_INTEGRATED_SOURCE_CONTRACT_REQUIRED")
             self.assertFalse(gaps["CMS"]["observed"]["integrated"])
-            self.assertEqual(gaps["NYC_311_HISTORICAL"]["observed"]["historical_proof_pr"], 106)
+            self.assertEqual(gaps["NYC_311_HISTORICAL"]["classification"], "BOUNDED_HISTORICAL_CONTEXT_INTEGRATED")
+            self.assertTrue(gaps["NYC_311_HISTORICAL"]["observed"]["integrated"])
             self.assertEqual(gaps["ELAP"]["observed"]["probe_status"], "SOURCE_UNAVAILABLE")
             self.assertFalse(report["governance"]["priority_score_1_0_changed"])
             self.assertFalse(report["governance"]["opportunity_score_authorized"])
