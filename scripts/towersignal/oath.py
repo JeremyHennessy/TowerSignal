@@ -19,7 +19,7 @@ OATH_MIN_SPLIT_BATCH_SIZE = 25
 OATH_REQUEST_RETRIES = 1
 OATH_REQUEST_TIMEOUT_SECONDS = 30
 OATH_AGENCY_SLICE_MIN_REQUESTED = 1000
-OATH_AGENCY_PAGE_SIZE = 50000
+OATH_AGENCY_PAGE_SIZE = 25000
 OATH_AGENCY_SNAPSHOT_ATTEMPTS = 2
 OATH_COOLING_TOWER_AGENCY = "COOLING TOWERS - DOHMH"
 
@@ -252,7 +252,7 @@ def _fetch_exact_ticket_fallback(requested: set[str]) -> tuple[dict[str, dict[st
     worker_count = max(1, min(DEFAULT_MAX_WORKERS, len(batches))) if batches else 1
     print(
         f"[oath] Falling back to {len(batches):,} exact-ticket batches with {worker_count} worker(s) "
-        "after the agency slice failed to stabilize",
+        "after the agency-slice scan could not produce a stable complete snapshot",
         flush=True,
     )
     if batches:
@@ -277,7 +277,18 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
     last_counts: tuple[int, int, int] | None = None
 
     for snapshot_attempt in range(1, OATH_AGENCY_SNAPSHOT_ATTEMPTS + 1):
-        expected_count = _fetch_agency_count(where)
+        try:
+            expected_count = _fetch_agency_count(where)
+        except SourceFetchError as exc:
+            if not _is_transient_oath_error(exc):
+                raise
+            print(
+                f"[oath] Transient OATH agency-count failure ({exc}); "
+                "using exact-ticket fallback instead of abandoning the lifecycle build",
+                flush=True,
+            )
+            cases, query_row_count = _fetch_exact_ticket_fallback(requested)
+            return cases, query_row_count, True
         print(
             f"[oath] Fetching {expected_count:,} {OATH_COOLING_TOWER_AGENCY} cases "
             f"(snapshot attempt {snapshot_attempt}/{OATH_AGENCY_SNAPSHOT_ATTEMPTS}) with seek pagination; "
@@ -292,15 +303,26 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
             if cursor is not None:
                 escaped_cursor = cursor.replace("'", "''")
                 page_where = f"{where} AND ticket_number > '{escaped_cursor}'"
-            rows = fetch_where(
-                OATH_DATASET_ID,
-                page_where,
-                order_by="ticket_number",
-                select=OATH_SELECT,
-                request_retries=OATH_RATE_LIMIT_RETRIES,
-                request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
-                limit=OATH_AGENCY_PAGE_SIZE,
-            )
+            try:
+                rows = fetch_where(
+                    OATH_DATASET_ID,
+                    page_where,
+                    order_by="ticket_number",
+                    select=OATH_SELECT,
+                    request_retries=OATH_RATE_LIMIT_RETRIES,
+                    request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
+                    limit=OATH_AGENCY_PAGE_SIZE,
+                )
+            except SourceFetchError as exc:
+                if not _is_transient_oath_error(exc):
+                    raise
+                print(
+                    f"[oath] Transient OATH agency-page failure ({exc}); "
+                    "using exact-ticket fallback instead of abandoning the lifecycle build",
+                    flush=True,
+                )
+                fallback_cases, query_row_count = _fetch_exact_ticket_fallback(requested)
+                return fallback_cases, query_row_count, True
             if not rows:
                 break
             raw_tickets = [str(row.get("ticket_number") or "").strip() for row in rows]
@@ -337,7 +359,18 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
             if len(rows) < OATH_AGENCY_PAGE_SIZE:
                 break
 
-        final_count = _fetch_agency_count(where)
+        try:
+            final_count = _fetch_agency_count(where)
+        except SourceFetchError as exc:
+            if not _is_transient_oath_error(exc):
+                raise
+            print(
+                f"[oath] Transient OATH agency-final-count failure ({exc}); "
+                "using exact-ticket fallback instead of publishing an unverifiable agency snapshot",
+                flush=True,
+            )
+            fallback_cases, query_row_count = _fetch_exact_ticket_fallback(requested)
+            return fallback_cases, query_row_count, True
         last_counts = (expected_count, fetched_count, final_count)
         if expected_count == fetched_count == final_count:
             return cases, fetched_count, False
