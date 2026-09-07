@@ -25,6 +25,27 @@ function screenshotPath(project: string, name: string) {
   return join(dir, `${name}.png`)
 }
 
+async function capturePage(page: import('@playwright/test').Page, project: string, name: string) {
+  const geometry = await page.evaluate(() => ({
+    height: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight),
+    viewport: window.innerHeight,
+  }))
+  if (geometry.height <= 30_000) {
+    await page.screenshot({ path: screenshotPath(project, name), fullPage: true })
+    return
+  }
+
+  const step = Math.max(500, geometry.viewport - 100)
+  let part = 1
+  for (let y = 0; y < geometry.height; y += step) {
+    await page.evaluate(scrollY => window.scrollTo(0, scrollY), y)
+    await page.waitForTimeout(75)
+    await page.screenshot({ path: screenshotPath(project, `${name}-part-${String(part).padStart(2, '0')}`), fullPage: false })
+    part += 1
+  }
+  await page.evaluate(() => window.scrollTo(0, 0))
+}
+
 async function auditPage(page: import('@playwright/test').Page, project: string, name: string) {
   const errors: string[] = []
   const onConsole = (message: import('@playwright/test').ConsoleMessage) => {
@@ -47,11 +68,28 @@ async function auditPage(page: import('@playwright/test').Page, project: string,
   expect(geometry.bodyTextLength, `${name} should render meaningful content`).toBeGreaterThan(80)
   expect(Math.max(geometry.bodyScrollWidth, geometry.docScrollWidth), `${name} should not overflow horizontally`).toBeLessThanOrEqual(geometry.innerWidth + 2)
 
-  await page.screenshot({ path: screenshotPath(project, name), fullPage: true })
+  await capturePage(page, project, name)
   expect(errors, `${name} emitted browser errors: ${errors.join(' | ')}`).toEqual([])
 
   page.off('console', onConsole)
   page.off('pageerror', onPageError)
+}
+
+async function dataId(page: import('@playwright/test').Page, file: string, arrayKey: string, idKeys: string[]): Promise<string> {
+  return page.evaluate(async ({ file, arrayKey, idKeys }) => {
+    const base = window.location.href.split('#')[0]
+    const response = await fetch(new URL(`data/${file}`, base).toString(), { cache: 'no-store' })
+    if (!response.ok) throw new Error(`${file} HTTP ${response.status}`)
+    const payload = await response.json() as Record<string, unknown>
+    const rows = payload[arrayKey]
+    if (!Array.isArray(rows) || rows.length === 0) throw new Error(`${file} has no ${arrayKey}`)
+    const first = rows[0] as Record<string, unknown>
+    for (const key of idKeys) {
+      const value = first[key]
+      if (typeof value === 'string' && value.trim()) return value
+    }
+    throw new Error(`${file} first ${arrayKey} row has no usable ID`)
+  }, { file, arrayKey, idKeys })
 }
 
 test.describe('public live pages', () => {
@@ -77,29 +115,17 @@ test.describe('authenticated live workspaces', () => {
 
   test('company profile screenshot', async ({ page }, testInfo) => {
     await page.goto('./#/companies', { waitUntil: 'networkidle' })
-    const companyLink = page.locator('a[href*="#/company/"]').first()
-    if (await companyLink.count()) {
-      await companyLink.click()
-    } else {
-      const row = page.locator('tbody tr').first()
-      await expect(row).toBeVisible()
-      await row.click()
-    }
-    await page.waitForURL(/#\/company\//)
+    const companyId = await dataId(page, 'companies.json', 'companies', ['company_id'])
+    await page.goto(`./#/company/${encodeURIComponent(companyId)}`, { waitUntil: 'networkidle' })
+    await expect(page).toHaveURL(/#\/company\//)
     await auditPage(page, testInfo.project.name, 'company-profile')
   })
 
   test('nys equipment profile screenshot', async ({ page }, testInfo) => {
     await page.goto('./#/nys', { waitUntil: 'networkidle' })
-    const accountLink = page.locator('a[href*="#/nys-account/"]').first()
-    if (await accountLink.count()) {
-      await accountLink.click()
-    } else {
-      const row = page.locator('tbody tr').first()
-      await expect(row).toBeVisible()
-      await row.click()
-    }
-    await page.waitForURL(/#\/nys-account\//)
+    const equipmentId = await dataId(page, 'nys-systems.json', 'systems', ['system_id', 'source_equipment_id'])
+    await page.goto(`./#/nys-account/${encodeURIComponent(equipmentId)}`, { waitUntil: 'networkidle' })
+    await expect(page).toHaveURL(/#\/nys-account\//)
     await auditPage(page, testInfo.project.name, 'nys-equipment-profile')
   })
 })
