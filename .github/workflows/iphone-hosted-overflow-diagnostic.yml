@@ -28,10 +28,10 @@ jobs:
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
         run: npx playwright test tests/e2e/live.spec.ts --project=iphone
-      - name: Sample Opportunities containment over time
+      - name: Sample Opportunities containment after exact sequence
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-        run: npx playwright test tests/e2e/iphone-hosted-overflow-diagnostic.spec.ts --project=iphone
+        run: npx playwright test tests/e2e/iphone-hosted-overflow-diagnostic.spec.ts --project=iphone --no-deps
       - name: Upload diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
