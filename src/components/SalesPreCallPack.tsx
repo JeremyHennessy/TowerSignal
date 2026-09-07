@@ -3,6 +3,7 @@ import type { AcrisPropertyActivity, AcrisSummaryFields } from '../types/acris'
 import type { SystemSummary } from '../types/data'
 import type { SystemDetailWithDomesticWater } from './DomesticWaterSection'
 import { AccountSectionNavigator } from './AccountSectionNavigator'
+import { collectKnownAccountFirms, type SalesKnownFirm } from './salesKnownFirms'
 
 type SalesTone = 'ready' | 'attention' | 'verify' | 'missing'
 
@@ -200,6 +201,20 @@ function factCard(point: SalesFact) {
   </article>
 }
 
+function firmCard(firm: SalesKnownFirm) {
+  const recency = firm.latestObservedDate
+    ? formatDate(firm.latestObservedDate)
+    : firm.latestObservedYear
+      ? `reporting year ${firm.latestObservedYear}`
+      : 'date not published'
+  const tone: SalesTone = firm.relationship === 'OBSERVED_SERVICE' ? 'ready' : 'verify'
+  return <article key={firm.key} className={`sales-fact sales-fact-${tone}`}>
+    <span>{firm.roles.join(' · ')}</span>
+    <strong>{firm.name}</strong>
+    <small>Most recent source observation: {recency}. {firm.evidence.join(' ')}</small>
+  </article>
+}
+
 export function SalesPreCallPack({ row, detail }: { row: SystemSummary; detail: SystemDetailWithDomesticWater }) {
   const enrichedDetail = detail as SalesDetail
   const towers = enrichedDetail.planimetric_building_tower_features ?? []
@@ -210,6 +225,7 @@ export function SalesPreCallPack({ row, detail }: { row: SystemSummary; detail: 
   const points = talkingPoints(row, enrichedDetail)
   const primaryPoints = points.slice(0, 3)
   const additionalPoints = points.slice(3)
+  const knownFirms = collectKnownAccountFirms(enrichedDetail)
 
   return <div className="sales-precall-pack" aria-labelledby="sales-precall-pack-title">
     <AccountSectionNavigator />
@@ -242,6 +258,12 @@ export function SalesPreCallPack({ row, detail }: { row: SystemSummary; detail: 
           <strong>Top source-backed talking points</strong>
           <div className="sales-primary-fact-grid">{primaryPoints.map(factCard)}</div>
         </div>
+        <details className="sales-pack-expand sales-known-firms" open={knownFirms.length > 0 && knownFirms.length <= 4}>
+          <summary><strong>Known firms / observed roles</strong><span>{knownFirms.length}</span></summary>
+          {knownFirms.length > 0
+            ? <div className="sales-expanded-facts">{knownFirms.map(firmCard)}</div>
+            : <p className="microcopy">No source-named service, inspection, testing or relevant DOB applicant business is attached to this account through the current exact BIN/BBL evidence paths.</p>}
+        </details>
         {additionalPoints.length > 0 && <details className="sales-pack-expand">
           <summary><strong>More account talking points</strong><span>{additionalPoints.length}</span></summary>
           <div className="sales-expanded-facts">{additionalPoints.map(factCard)}</div>
@@ -264,9 +286,9 @@ export function SalesPreCallPack({ row, detail }: { row: SystemSummary; detail: 
 
     <details className="sales-pack-evidence">
       <summary>How this sales brief was assembled</summary>
-      <p>The brief uses the same account-level public evidence shown below: cooling-tower registration, reported sampling dates, NYC Health inspections, exact-matched building/contact/project/property activity when available, physical planimetric evidence and domestic-water context. It does not infer an incumbent vendor, contract renewal date, procurement authority, current compliance state or current equipment configuration when those facts are not published.</p>
+      <p>The brief uses the same account-level public evidence shown below: cooling-tower registration, reported sampling dates, NYC Health inspections, exact-matched building/contact/project/property activity when available, physical planimetric evidence, domestic-water context, source-named drinking-water inspection/testing firms and exact-BBL DOB applicant roles. It does not infer an incumbent vendor, contract renewal date, procurement authority, current compliance state or current equipment configuration when those facts are not published.</p>
     </details>
 
-    <p className="microcopy">This pack is a sales-research aid. It separates public facts, TowerSignal commercial timing signals and questions that still require confirmation. Verify current service responsibility, operating status and decision-maker authority before relying on the brief in outreach.</p>
+    <p className="microcopy">This pack is a sales-research aid. It separates public facts, source-observed service/testing relationships, recorded project roles, TowerSignal commercial timing signals and questions that still require confirmation. Verify current service responsibility, operating status and decision-maker authority before relying on the brief in outreach.</p>
   </div>
 }
