@@ -23,7 +23,12 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Install WebKit browser
         run: npx playwright install --with-deps webkit
-      - name: Diagnose hosted iPhone overflow surfaces
+      - name: Retry exact hosted iPhone acceptance path
+        continue-on-error: true
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/live.spec.ts --project=iphone
+      - name: Sample Opportunities containment over time
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
         run: npx playwright test tests/e2e/iphone-hosted-overflow-diagnostic.spec.ts --project=iphone
