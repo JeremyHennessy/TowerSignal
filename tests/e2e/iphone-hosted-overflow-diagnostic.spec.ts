@@ -36,9 +36,10 @@ async function measure(page: import('@playwright/test').Page): Promise<MetricMea
       .find(element => element.textContent?.includes('$6,475,380,412'))
     const content = value?.parentElement as HTMLElement | null
     const article = content?.parentElement as HTMLElement | null
+    const icon = article?.querySelector<HTMLElement>('.reference-metric-icon') ?? null
     const label = content?.querySelector<HTMLElement>('small') ?? null
     const subtitle = content?.querySelector<HTMLElement>('span') ?? null
-    if (!grid || !value || !content || !article || !label || !subtitle) throw new Error('Expected Opportunities metric card not found')
+    if (!grid || !value || !content || !article || !icon || !label || !subtitle) throw new Error('Expected Opportunities metric card not found')
 
     const record = (name: string, element: HTMLElement): ElementMeasurement => {
       const rect = element.getBoundingClientRect()
@@ -70,6 +71,7 @@ async function measure(page: import('@playwright/test').Page): Promise<MetricMea
       gridScroll: grid.scrollWidth,
       elements: [
         record('article', article),
+        record('icon', icon),
         record('content', content),
         record('label', label),
         record('value', value),
@@ -126,19 +128,30 @@ async function reachOpportunities(page: import('@playwright/test').Page) {
   await expect(page.getByText('$6,475,380,412', { exact: true })).toBeVisible({ timeout: 90_000 })
 }
 
-test('measure the exact overflowing Opportunities metric card on iPhone', async ({ page }, testInfo) => {
+test('prove decorative metric icons are the Opportunities iPhone overflow layer', async ({ page }, testInfo) => {
   await reachOpportunities(page)
-  const measurement = await measure(page)
-  console.log('OPPORTUNITIES_METRIC_CARD_MEASUREMENT', JSON.stringify(measurement))
-  await testInfo.attach('opportunities-metric-card-measurement.json', {
-    body: Buffer.from(JSON.stringify(measurement, null, 2)),
+  const before = await measure(page)
+  console.log('OPPORTUNITIES_ICON_HIDE_BEFORE', JSON.stringify(before))
+  expect(before.body).toBe(409)
+  expect(before.gridScroll).toBeGreaterThan(before.gridClient + 2)
+
+  await page.addStyleTag({ content: '@media(max-width:520px){.reference-metric-grid .reference-metric-icon{display:none}}' })
+  await page.waitForTimeout(150)
+
+  const after = await measure(page)
+  console.log('OPPORTUNITIES_ICON_HIDE_AFTER', JSON.stringify(after))
+  await testInfo.attach('opportunities-icon-hide-proof.json', {
+    body: Buffer.from(JSON.stringify({ before, after }, null, 2)),
     contentType: 'application/json',
   })
-  await testInfo.attach('opportunities-metric-card.png', {
+  await testInfo.attach('opportunities-icon-hide-after.png', {
     body: await page.screenshot({ fullPage: false }),
     contentType: 'image/png',
   })
 
-  expect(measurement.body).toBe(409)
-  expect(measurement.gridScroll).toBeGreaterThan(measurement.gridClient + 2)
+  const iconAfter = after.elements.find(element => element.name === 'icon')
+  expect(iconAfter?.display).toBe('none')
+  expect(after.body).toBeLessThanOrEqual(392)
+  expect(after.document).toBeLessThanOrEqual(392)
+  expect(after.gridScroll).toBeLessThanOrEqual(after.gridClient + 2)
 })
