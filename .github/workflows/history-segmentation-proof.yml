@@ -1,0 +1,71 @@
+name: Prove NYC history segmentation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/towersignal/history_store.py'
+      - 'scripts/build_history.py'
+      - 'scripts/validate_history_store.py'
+      - 'tests/python/test_history_segmentation.py'
+      - '.github/workflows/history-segmentation-proof.yml'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-snapshot-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out current verified durable history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run segmentation tests
+        run: python -m unittest tests.python.test_history_segmentation tests.python.test_validate_history_store -v
+      - name: Round-trip current production history through segments
+        run: |
+          python - <<'PY'
+          import json
+          import tempfile
+          from pathlib import Path
+          import sys
+
+          sys.path.insert(0, 'scripts')
+          from towersignal.history_store import load_history_snapshot, validate_segmented_storage, write_segmented_snapshot
+
+          source = Path('.history-store/data/history/latest.json')
+          original = json.loads(source.read_text(encoding='utf-8'))
+          if original.get('history_storage_version'):
+              original = load_history_snapshot(source)
+          original_bytes = source.stat().st_size
+
+          with tempfile.TemporaryDirectory() as tmp:
+              history_dir = Path(tmp) / 'history'
+              manifest = write_segmented_snapshot(history_dir, original)
+              reconstructed = load_history_snapshot(history_dir / 'latest.json')
+              if reconstructed != original:
+                  raise SystemExit('Segmented history reconstruction differs from current verified logical snapshot')
+              validation = validate_segmented_storage(history_dir / 'latest.json')
+              manifest_bytes = (history_dir / 'latest.json').stat().st_size
+              print(json.dumps({
+                  'legacy_snapshot_bytes': original_bytes,
+                  'manifest_bytes': manifest_bytes,
+                  'storage_version': manifest['history_storage_version'],
+                  'history_schema_version': manifest['history_schema_version'],
+                  'system_count': manifest['system_count'],
+                  'segments': validation['segments'],
+                  'total_segment_bytes': validation['total_segment_bytes'],
+                  'logical_round_trip_equal': True,
+              }, indent=2))
+          PY

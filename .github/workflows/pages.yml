@@ -241,6 +241,7 @@ jobs:
           name: towersignal-history-state
           path: |
             public/data/history/latest.json
+            public/data/history/segments/**
             public/data/history/events.json
             public/data/history/nys/latest.json
             public/data/history/nys/events.json
@@ -313,6 +314,8 @@ jobs:
         run: |
           mkdir -p data/history/nys
           cp .verified-history/history/latest.json data/history/latest.json
+          rm -rf data/history/segments
+          cp -R .verified-history/history/segments data/history/segments
           cp .verified-history/history/events.json data/history/events.json
           cp .verified-history/history/nys/latest.json data/history/nys/latest.json
           cp .verified-history/history/nys/events.json data/history/nys/events.json
