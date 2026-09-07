@@ -1,0 +1,36 @@
+name: Diagnose hosted iPhone overflow surfaces
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/iphone-hosted-overflow-diagnostic.yml'
+      - 'tests/e2e/iphone-hosted-overflow-diagnostic.spec.ts'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose-hosted-iphone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install WebKit browser
+        run: npx playwright install --with-deps webkit
+      - name: Diagnose hosted iPhone overflow surfaces
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/iphone-hosted-overflow-diagnostic.spec.ts --project=iphone
+      - name: Upload diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iphone-hosted-overflow-diagnostic
+          path: playwright-report
+          retention-days: 14
