@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from scripts.towersignal.bbl_identity import apply_bbl_identity_recovery, resolve_system_bbl_identity
+from scripts.towersignal.scoring import priority_score
 
 
 class BblIdentityRecoveryTests(unittest.TestCase):
@@ -12,6 +13,8 @@ class BblIdentityRecoveryTests(unittest.TestCase):
             "borough": "Brooklyn",
             "bin": "3000001",
             "bbl": None,
+            "latest_sample_date": "2026-08-01",
+            "active_equipment": 3,
         }
         row.update(overrides)
         return row
@@ -77,6 +80,23 @@ class BblIdentityRecoveryTests(unittest.TestCase):
         self.assertEqual(systems[0]["registry_bbl"], "3000010001")
         self.assertEqual(systems[1]["bbl"], "3000027501")
         self.assertIsNone(systems[2]["bbl"])
+
+    def test_priority_score_is_invariant_to_bbl_recovery(self):
+        system = self.system(bbl=None)
+        signal_state = {
+            "recent_confirmed_violation": False,
+            "confirmed_violation": False,
+            "days_since_latest_sample": 37,
+            "signals": [{"type": "POTENTIAL_SAMPLING_GAP"}],
+        }
+        before = priority_score(dict(system), signal_state)
+        apply_bbl_identity_recovery(
+            [system],
+            {"3000001": [{"mappluto_bbl": "3000017501", "base_bbl": "3000010044"}]},
+        )
+        after = priority_score(system, signal_state)
+        self.assertEqual(before, after)
+        self.assertEqual(system["bbl"], "3000017501")
 
 
 if __name__ == "__main__":
