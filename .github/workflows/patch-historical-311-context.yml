@@ -1,0 +1,48 @@
+name: Wire historical 311 context production integration
+
+on:
+  push:
+    branches:
+      - agent/historical-311-context-production-20260907
+    paths:
+      - '.github/workflows/patch-historical-311-context.yml'
+      - 'scripts/_patch_historical_311_integration.py'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/historical-311-context-production-20260907
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply integration patch
+        run: python scripts/_patch_historical_311_integration.py
+      - name: Run historical context and coverage regressions
+        run: python -m unittest tests.python.test_historical_311_context tests.python.test_coverage_audit -v
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify frontend integration
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test -- --run
+          npm run build
+      - name: Commit validated integration and remove temporary patch machinery
+        run: |
+          rm .github/workflows/patch-historical-311-context.yml
+          rm scripts/_patch_historical_311_integration.py
+          git config user.name 'TowerSignal Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .github/workflows/pages.yml scripts/towersignal/historical_311_context.py scripts/build_historical_311_context.py scripts/validate_historical_311_context.py scripts/attach_historical_311_context.py scripts/build_coverage_audit.py scripts/validate_coverage_audit.py tests/python/test_historical_311_context.py tests/python/test_coverage_audit.py src/types/data.ts src/components/HistoricalWaterContextSection.tsx src/components/DetailPanel.tsx src/components/AccountSectionNavigator.tsx .github/workflows/patch-historical-311-context.yml scripts/_patch_historical_311_integration.py
+          git commit -m 'Integrate bounded historical NYC 311 context'
+          git push origin HEAD:agent/historical-311-context-production-20260907
