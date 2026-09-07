@@ -1,0 +1,52 @@
+name: Patch history segment persistence
+
+on:
+  push:
+    branches:
+      - agent/history-segmentation-20260907
+    paths:
+      - '.github/workflows/patch-history-segment-persistence.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/history-segmentation-20260907
+      - name: Add segmented history to verified artifact and persistence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/pages.yml')
+          text = path.read_text(encoding='utf-8')
+          artifact_old = '''            public/data/history/latest.json
+            public/data/history/events.json'''
+          artifact_new = '''            public/data/history/latest.json
+            public/data/history/segments/**
+            public/data/history/events.json'''
+          persist_old = '''          cp .verified-history/history/latest.json data/history/latest.json
+          cp .verified-history/history/events.json data/history/events.json'''
+          persist_new = '''          cp .verified-history/history/latest.json data/history/latest.json
+          rm -rf data/history/segments
+          cp -R .verified-history/history/segments data/history/segments
+          cp .verified-history/history/events.json data/history/events.json'''
+          if text.count(artifact_old) != 1:
+              raise SystemExit(f'Expected exactly one history artifact block, found {text.count(artifact_old)}')
+          if text.count(persist_old) != 1:
+              raise SystemExit(f'Expected exactly one history persistence block, found {text.count(persist_old)}')
+          text = text.replace(artifact_old, artifact_new)
+          text = text.replace(persist_old, persist_new)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit the workflow patch and remove this one-shot helper
+        run: |
+          git config user.name "TowerSignal History Migration Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/patch-history-segment-persistence.yml
+          git add .github/workflows/pages.yml
+          git commit -m "Persist segmented NYC history after hosted verification"
+          git push origin HEAD:agent/history-segmentation-20260907
