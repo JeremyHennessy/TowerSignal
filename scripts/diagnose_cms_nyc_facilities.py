@@ -70,7 +70,8 @@ def is_nyc_zip(value: Any) -> bool:
         or 11004 <= number <= 11005
         or 11101 <= number <= 11109
         or 11201 <= number <= 11256
-        or 11351 <= number <= 11697
+        or 11351 <= number <= 11451
+        or 11691 <= number <= 11697
     )
 
 
