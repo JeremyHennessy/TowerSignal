@@ -27,7 +27,7 @@ GEOSEARCH_URL = "https://geosearch.planninglabs.nyc/v2/search"
 HOSPITAL_DATASET = "xubh-q36u"
 NURSING_HOME_DATASET = "4pq5-n9py"
 REGISTRATION_DATASET = "y4fw-iqfr"
-CMS_PAGE_SIZE = 2000
+CMS_PAGE_SIZE = 1500
 USER_AGENT = "TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)"
 
 
