@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.history import build_history, build_observation, load_json, write_history_outputs  # noqa: E402
+from towersignal.history_store import load_history_snapshot, write_segmented_snapshot  # noqa: E402
 
 
 def safe_detail_path(base: Path, system_id: str) -> Path:
@@ -120,7 +121,7 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
         raise RuntimeError(f"Generated systems payload does not exist: {systems_path}")
     payload = json.loads(systems_path.read_text(encoding="utf-8"))
     detected_at = payload.get("metadata", {}).get("generated_at") or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    previous_snapshot = load_json(previous_snapshot_path, None)
+    previous_snapshot = load_history_snapshot(previous_snapshot_path, None)
 
     observations = []
     for row in payload.get("systems", []):
@@ -152,7 +153,19 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
     snapshot["source_health"] = payload.get("metadata", {}).get("source_health", [])
     suppress_unsupported_disappearance_events(changes, observations, previous_snapshot, detected_at)
     suppress_pluto_attachment_recovery_events(changes, observations, previous_snapshot, detected_at)
+
+    # Preserve all existing browser/event outputs, then replace only the durable
+    # monolithic baseline with a checksum-verified segmented manifest. Keeping
+    # source_health in the small manifest preserves backward compatibility for
+    # the existing source-health delta builders that read latest.json directly.
     write_history_outputs(output_dir, snapshot, changes)
+    manifest = write_segmented_snapshot(output_dir / "history", snapshot)
+    manifest["source_health"] = snapshot.get("source_health", [])
+    (output_dir / "history" / "latest.json").write_text(
+        json.dumps(manifest, separators=(",", ":")),
+        encoding="utf-8",
+    )
+
     print(json.dumps({
         "history_started_at": changes["history_started_at"],
         "baseline_initialized": changes["baseline_initialized"],
@@ -163,6 +176,8 @@ def build(output_dir: Path, previous_snapshot_path: Path | None, previous_events
         "suppressed_data_repair_event_count": changes.get("suppressed_data_repair_event_count", 0),
         "pluto_attachment_recovery_baselined": changes.get("pluto_attachment_recovery_baselined", False),
         "source_health_count": len(snapshot.get("source_health", [])),
+        "history_storage_version": manifest.get("history_storage_version"),
+        "history_segment_count": len(manifest.get("segments") or {}),
     }, indent=2))
     return changes
 
