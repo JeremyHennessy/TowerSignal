@@ -44,7 +44,12 @@ function cleanText(value: unknown): string | null {
 }
 
 function firmKey(value: string): string {
-  return value.toUpperCase()
+  return value
+    .toUpperCase()
+    .replace(/&/g, ' AND ')
+    .replace(/[^A-Z0-9]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
 }
 
 function looksLikeFirm(value: string | null): value is string {
