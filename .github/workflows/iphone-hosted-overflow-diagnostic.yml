@@ -23,15 +23,10 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Install WebKit browser
         run: npx playwright install --with-deps webkit
-      - name: Retry exact hosted iPhone acceptance path
-        continue-on-error: true
+      - name: Identify Opportunities iPhone overflow after exact sequence
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-        run: npx playwright test tests/e2e/live.spec.ts --project=iphone
-      - name: Sample Opportunities containment after exact sequence
-        env:
-          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-        run: npx playwright test tests/e2e/iphone-hosted-overflow-diagnostic.spec.ts --project=iphone --no-deps
+        run: npx playwright test tests/e2e/iphone-hosted-overflow-diagnostic.spec.ts --project=iphone
       - name: Upload diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
