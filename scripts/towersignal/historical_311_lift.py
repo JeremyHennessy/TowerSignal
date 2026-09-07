@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from collections import Counter, defaultdict
-from datetime import date
+from collections import Counter
 from typing import Any, Iterable, Mapping, Sequence
 
-from towersignal.domestic_water_market import NYC_API_ROOT, fetch_metadata, fetch_snapshot, normalize_space
-from towersignal.nyc_water_signals import normalize_311
+from .domestic_water_market import NYC_API_ROOT, fetch_metadata, fetch_snapshot, normalize_space
+from .nyc_water_signals import normalize_311
 
 HISTORICAL_2010_2019_DATASET = "76ig-c548"
 CURRENT_2020_PRESENT_DATASET = "erm2-nwe9"
@@ -52,7 +51,7 @@ def period_where(bbls: Sequence[str], start: str, end: str | None) -> str:
     if not bbls:
         raise ValueError("At least one BBL is required")
     bbl_clause = ",".join(_quote(value) for value in bbls)
-    parts = [f"agency='DEP'", f"bbl in ({bbl_clause})", f"created_date >= '{start}'"]
+    parts = ["agency='DEP'", f"bbl in ({bbl_clause})", f"created_date >= '{start}'"]
     if end:
         parts.append(f"created_date < '{end}'")
     parts.append(WATER_CLAUSE)
@@ -75,18 +74,18 @@ def fetch_period_rows(
     if missing:
         raise RuntimeError(f"NYC 311 dataset {dataset_id} missing required fields: {', '.join(missing)}")
     selected = [field for field in DESIRED_FIELDS if field in fields]
+    requested_bbls = set(bbls)
     rows_by_key: dict[str, dict[str, Any]] = {}
     source_rows = 0
     partitions = 0
-    for bbl_batch in _chunks(sorted(set(bbls)), batch_size):
+    for bbl_batch in _chunks(sorted(requested_bbls), batch_size):
         partitions += 1
-        where = period_where(bbl_batch, start, end)
         snapshot = fetch_snapshot(
             dataset_id,
             api_root=NYC_API_ROOT,
             order_by="unique_key",
             required_fields=REQUIRED_FIELDS,
-            where=where,
+            where=period_where(bbl_batch, start, end),
             select=",".join(selected),
             page_size=page_size,
             minimum_page_size=250,
@@ -100,7 +99,7 @@ def fetch_period_rows(
             request_id = str(normalized.get("request_id") or normalize_space(raw.get("unique_key")))
             if request_id in rows_by_key:
                 continue
-            if normalized.get("bbl") not in bbls:
+            if normalized.get("bbl") not in requested_bbls:
                 raise RuntimeError(f"NYC 311 exact-BBL query returned unexpected BBL {normalized.get('bbl')!r}")
             rows_by_key[request_id] = normalized
     rows = sorted(rows_by_key.values(), key=lambda row: (str(row.get("created_date") or ""), str(row.get("request_id") or "")))
@@ -108,7 +107,7 @@ def fetch_period_rows(
         "period": period_name,
         "dataset_id": dataset_id,
         "source_last_updated_at": metadata.get("source_last_updated_at"),
-        "requested_bbl_count": len(set(bbls)),
+        "requested_bbl_count": len(requested_bbls),
         "partition_count": partitions,
         "source_row_count": source_rows,
         "deduped_row_count": len(rows),
@@ -126,12 +125,7 @@ def _profile(rows: Iterable[Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
             continue
         profile = profiles.setdefault(
             bbl,
-            {
-                "request_count": 0,
-                "category_counts": Counter(),
-                "years": set(),
-                "latest_date": None,
-            },
+            {"request_count": 0, "category_counts": Counter(), "years": set(), "latest_date": None},
         )
         profile["request_count"] += 1
         profile["category_counts"][str(row.get("category") or "UNKNOWN")] += 1
@@ -160,13 +154,11 @@ def summarize_lift(
     recent_set = set(recent) & tower_set
     historical_only = historical_set - recent_set
     recurring_historical_only = {
-        bbl
-        for bbl in historical_only
+        bbl for bbl in historical_only
         if historical[bbl]["request_count"] >= 3 and len(historical[bbl]["years"]) >= 2
     }
     recentish_historical_only = {
-        bbl
-        for bbl in historical_only
+        bbl for bbl in historical_only
         if str(historical[bbl].get("latest_date") or "") >= "2024-01-01"
     }
     category_counts: Counter[str] = Counter()
@@ -176,27 +168,23 @@ def summarize_lift(
         borough_counts[str(borough_by_bbl.get(bbl) or "UNKNOWN")] += 1
 
     denominator = len(tower_set)
-    examples = []
     ranked = sorted(
         historical_only,
-        key=lambda bbl: (
-            str(historical[bbl].get("latest_date") or ""),
-            int(historical[bbl].get("request_count") or 0),
-        ),
+        key=lambda bbl: (str(historical[bbl].get("latest_date") or ""), int(historical[bbl].get("request_count") or 0)),
         reverse=True,
     )
-    for bbl in ranked[:30]:
-        examples.append(
-            {
-                "bbl": bbl,
-                "borough": borough_by_bbl.get(bbl),
-                "historical_request_count": historical[bbl]["request_count"],
-                "historical_years": historical[bbl]["years"],
-                "latest_historical_date": historical[bbl]["latest_date"],
-                "category_counts": historical[bbl]["category_counts"],
-                "recent_2025_plus_building_signal_count": 0,
-            }
-        )
+    examples = [
+        {
+            "bbl": bbl,
+            "borough": borough_by_bbl.get(bbl),
+            "historical_request_count": historical[bbl]["request_count"],
+            "historical_years": historical[bbl]["years"],
+            "latest_historical_date": historical[bbl]["latest_date"],
+            "category_counts": historical[bbl]["category_counts"],
+            "recent_2025_plus_building_signal_count": 0,
+        }
+        for bbl in ranked[:30]
+    ]
 
     return {
         "tower_bbl_count": denominator,
