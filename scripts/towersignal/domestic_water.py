@@ -327,6 +327,7 @@ def normalize_self_report_row(row: dict[str, Any]) -> dict[str, Any]:
         "reporting_year": _string_or_none(row.get("reporting_year")),
         "tank_num": _string_or_none(row.get("tank_num")),
         "inspection_by_firm": _string_or_none(row.get("inspection_by_firm")),
+        "lab_name": _string_or_none(row.get("lab_name")),
         "inspection_performed": _string_or_none(row.get("inspection_performed")),
         "inspection_date": _string_or_none(row.get("inspection_date")),
         "sediment_result": _string_or_none(row.get("si_result_sediment")),

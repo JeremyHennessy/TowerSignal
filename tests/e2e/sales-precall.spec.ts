@@ -37,6 +37,7 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
       'Timing evidence',
       'Call objective',
       'Before the call',
+      'Known firms / observed roles',
       'During the call',
       'Qualification questions',
       'Verify before asserting',
@@ -57,6 +58,7 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
     await expect(sales.getByText('Timing evidence', { exact: true })).toBeVisible()
     await expect(sales.getByText('Call objective', { exact: true })).toBeVisible()
     await expect(sales.getByRole('heading', { name: 'Before the call', exact: true })).toBeVisible()
+    await expect(sales.getByText('Known firms / observed roles', { exact: true })).toBeVisible()
     await expect(sales.getByRole('heading', { name: 'During the call', exact: true })).toBeVisible()
     await expect(sales.getByText('Qualification questions', { exact: true })).toBeVisible()
     await expect(sales.getByText('Verify before asserting', { exact: true })).toBeVisible()
