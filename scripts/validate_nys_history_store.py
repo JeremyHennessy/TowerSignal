@@ -4,6 +4,9 @@ import argparse
 import json
 from pathlib import Path
 
+from build_coverage_audit import build as build_coverage_audit
+from validate_coverage_audit import validate as validate_coverage_audit
+
 HARD_MAX_BYTES = 8 * 1024 * 1024
 GROWTH_RATIO_LIMIT = 1.75
 GROWTH_ABSOLUTE_ALLOWANCE = 1 * 1024 * 1024
@@ -46,12 +49,34 @@ def validate_history_size(current_path: Path, previous_path: Path | None = None)
     return result
 
 
+def build_release_coverage_audit(current_path: Path) -> dict | None:
+    # Normal Pages passes public/data/history/nys/latest.json. Keep unit/history-only
+    # callers unaffected by requiring the generated product spine before auditing.
+    try:
+        output_dir = current_path.parents[2]
+    except IndexError:
+        return None
+    if not (output_dir / "systems.json").exists() or not (output_dir / "source-health.json").exists():
+        return None
+
+    report = build_coverage_audit(output_dir)
+    validate_coverage_audit(report)
+    print(json.dumps({
+        "coverage_audit": "validated",
+        "report": str(output_dir / "coverage-audit.json"),
+        "standardized_sources": len(report.get("standardized_coverage_sources") or []),
+        "source_artifacts": len(report.get("source_artifacts") or []),
+    }, indent=2))
+    return report
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate TowerSignal NYS durable history size")
     parser.add_argument("--current", type=Path, required=True)
     parser.add_argument("--previous", type=Path)
     args = parser.parse_args()
     validate_history_size(args.current, args.previous)
+    build_release_coverage_audit(args.current)
 
 
 if __name__ == "__main__":
