@@ -1,0 +1,42 @@
+name: Patch legacy DOB BBL format
+
+on:
+  push:
+    branches:
+      - agent/legacy-dob-bis-diagnostic-20260907
+    paths:
+      - '.github/workflows/patch-legacy-dob-bbl-format.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/legacy-dob-bis-diagnostic-20260907
+      - name: Normalize BIS five-character lot fields to BBL lot components
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/diagnose_legacy_dob_history.py')
+          text = path.read_text(encoding='utf-8')
+          old_source = '''    block = "".join(ch for ch in str(row.get("block") or "") if ch.isdigit()).zfill(5)\n    lot = "".join(ch for ch in str(row.get("lot") or "") if ch.isdigit()).zfill(4)\n    if borough not in BOROUGH_NAMES or len(block) != 5 or len(lot) != 4:\n        return None\n    return normalize_bbl(f"{borough}{block}{lot}")'''
+          new_source = '''    block_digits = "".join(ch for ch in str(row.get("block") or "") if ch.isdigit())\n    lot_digits = "".join(ch for ch in str(row.get("lot") or "") if ch.isdigit())\n    if borough not in BOROUGH_NAMES or not block_digits or not lot_digits:\n        return None\n    block_number = int(block_digits)\n    lot_number = int(lot_digits)\n    if block_number <= 0 or lot_number <= 0 or block_number > 99999 or lot_number > 9999:\n        return None\n    block = str(block_number).zfill(5)\n    lot = str(lot_number).zfill(4)\n    return normalize_bbl(f"{borough}{block}{lot}")'''
+          old_where = '''        borough, block, lot = components\n        clauses.append(f"(borough='{borough}' AND block='{block}' AND lot='{lot}')")'''
+          new_where = '''        borough, block, lot = components\n        source_lot = str(int(lot)).zfill(5)\n        clauses.append(f"(borough='{borough}' AND block='{block}' AND lot='{source_lot}')")'''
+          if text.count(old_source) != 1 or text.count(old_where) != 1:
+              raise SystemExit('Unexpected legacy DOB BBL source format; refusing blind patch')
+          text = text.replace(old_source, new_source).replace(old_where, new_where)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit correction and remove helper
+        run: |
+          git config user.name "TowerSignal Diagnostic Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/patch-legacy-dob-bbl-format.yml
+          git add scripts/diagnose_legacy_dob_history.py
+          git commit -m "Normalize legacy DOB lot text for exact BBL joins"
+          git push origin HEAD:agent/legacy-dob-bis-diagnostic-20260907
