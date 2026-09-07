@@ -33,7 +33,8 @@ async function capturePage(page: import('@playwright/test').Page, project: strin
     devicePixelRatio: window.devicePixelRatio || 1,
   }))
   const safeFullPageCssHeight = Math.floor(24_000 / Math.max(1, geometry.devicePixelRatio))
-  if (geometry.height <= safeFullPageCssHeight) {
+  const isIphoneProject = project.toLowerCase().includes('iphone')
+  if (!isIphoneProject && geometry.height <= safeFullPageCssHeight) {
     await page.screenshot({ path: screenshotPath(project, name), fullPage: true })
     return
   }
