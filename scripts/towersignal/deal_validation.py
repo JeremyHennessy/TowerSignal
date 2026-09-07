@@ -4,6 +4,7 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from typing import Any, Iterable, Mapping, Sequence
 
+from .company_identity import source_identity_keys
 from .procurement import normalize_company_name, normalize_space, parse_iso_date
 
 DEAL_VALIDATION_SCHEMA_VERSION = "1.0"
@@ -119,6 +120,13 @@ def relationship_metrics(rows: Sequence[Mapping[str, Any]], *, cutoff: date) -> 
     }
 
 
+def _identity_keys_for_rows(rows: Sequence[Mapping[str, Any]]) -> frozenset[str]:
+    keys: set[str] = set()
+    for row in rows:
+        keys.update(source_identity_keys(str(row.get("vendor_raw") or "")))
+    return frozenset(keys)
+
+
 def build_deal_validation(
     procurement_rows: Iterable[Mapping[str, Any]],
     cohort: Mapping[str, Any],
@@ -155,8 +163,26 @@ def build_deal_validation(
                 raise ValueError(f"Exact cohort alias is assigned to multiple targets: {alias_key}")
             alias_to_target[alias_key] = target_id
 
-        matched_aliases = sorted(alias_keys & set(grouped))
-        matched_rows = [row for alias_key in matched_aliases for row in grouped[alias_key]]
+        matched_rows: list[dict[str, Any]] = []
+        matched_aliases: set[str] = set()
+        exact_raw_match = False
+        explicit_dba_match = False
+        matched_source_vendor_labels: set[str] = set()
+        for row in rows:
+            vendor_raw = normalize_space(str(row.get("vendor_raw") or ""))
+            identity_keys = source_identity_keys(vendor_raw)
+            intersection = alias_keys & identity_keys
+            if not intersection:
+                continue
+            matched_rows.append(row)
+            matched_aliases.update(intersection)
+            matched_source_vendor_labels.add(vendor_raw)
+            raw_key = strict_vendor_key(vendor_raw)
+            if raw_key in intersection:
+                exact_raw_match = True
+            if any(alias_key != raw_key for alias_key in intersection):
+                explicit_dba_match = True
+
         source_scope_relation = normalize_space(str(raw_target.get("source_scope_relation") or ""))
         if matched_aliases:
             coverage_status = "OBSERVED_IN_CURRENT_SOURCES"
@@ -166,6 +192,11 @@ def build_deal_validation(
             coverage_status = "OUTSIDE_CURRENT_NYC_PROCUREMENT_SCOPE"
 
         target_metrics = relationship_metrics(matched_rows, cutoff=outcome_date)
+        identity_match_methods = []
+        if exact_raw_match:
+            identity_match_methods.append("EXACT_SOURCE_VENDOR_LABEL")
+        if explicit_dba_match:
+            identity_match_methods.append("EXPLICIT_SOURCE_DBA_ALIAS")
         target = {
             "id": target_id,
             "canonical_name": canonical_name,
@@ -175,7 +206,9 @@ def build_deal_validation(
             "primary_source_url": normalize_space(str(raw_target.get("primary_source_url") or "")) or None,
             "source_scope_relation": source_scope_relation,
             "market": normalize_space(str(raw_target.get("market") or "")) or None,
-            "matched_alias_keys": matched_aliases,
+            "matched_alias_keys": sorted(matched_aliases),
+            "matched_source_vendor_labels": sorted(matched_source_vendor_labels),
+            "identity_match_methods": identity_match_methods,
             "coverage_status": coverage_status,
             "exact_source_observation_count": len(matched_rows),
             "external_pre_outcome_evidence": list(raw_target.get("external_pre_outcome_evidence") or []),
@@ -193,9 +226,20 @@ def build_deal_validation(
         vendor_metrics = relationship_metrics(vendor_rows, cutoff=screen_cutoff)
         if not vendor_metrics["relationship_density_screen_pass"]:
             continue
-        target_id = alias_to_target.get(vendor_key)
+        identity_keys = _identity_keys_for_rows(vendor_rows)
+        matched_target_ids = sorted({
+            alias_to_target[identity_key]
+            for identity_key in identity_keys
+            if identity_key in alias_to_target
+        })
+        if len(matched_target_ids) > 1:
+            raise ValueError(
+                f"Source-declared identity aliases map one vendor group to multiple curated targets: {vendor_key}"
+            )
+        target_id = matched_target_ids[0] if matched_target_ids else None
         screen_hits.append({
             "strict_vendor_key": vendor_key,
+            "source_identity_keys": sorted(identity_keys),
             "curated_acquisition_target_id": target_id,
             "classification": (
                 "CURATED_ACQUISITION_OUTCOME"
@@ -217,10 +261,23 @@ def build_deal_validation(
     gate = cohort.get("validation_gate") or {}
     min_observed = int(gate.get("min_observed_outcome_targets") or 3)
     min_screened = int(gate.get("min_screened_outcome_targets") or 2)
-    gate_passed = observed_outcomes >= min_observed and observed_screened_outcomes >= min_screened
+    coverage_thresholds_passed = observed_outcomes >= min_observed and observed_screened_outcomes >= min_screened
+    score_authorization_locked = gate.get("score_authorization_locked") is True
+    score_authorization_lock_reason = normalize_space(str(gate.get("score_authorization_lock_reason") or "")) or None
+    gate_passed = coverage_thresholds_passed and not score_authorization_locked
 
     in_market_misses = sum(target["coverage_status"] == "IN_MARKET_NOT_OBSERVED" for target in targets)
     outside_scope = sum(target["coverage_status"] == "OUTSIDE_CURRENT_NYC_PROCUREMENT_SCOPE" for target in targets)
+
+    if coverage_thresholds_passed and score_authorization_locked:
+        conclusion = "COVERAGE_THRESHOLDS_MET_HOLDOUT_REQUIRED"
+        recommended_next_step = "RUN_INDEPENDENT_HOLDOUT_VALIDATION"
+    elif gate_passed:
+        conclusion = "VALIDATED_FOR_SCORE_EXPERIMENT"
+        recommended_next_step = "BUILD_SCORE_EXPERIMENT"
+    else:
+        conclusion = "NOT_VALIDATED_CURRENT_SOURCE_COVERAGE"
+        recommended_next_step = "EXPAND_PROCUREMENT_SOURCE_COVERAGE_BEFORE_SCORING"
 
     return {
         "schema_version": DEAL_VALIDATION_SCHEMA_VERSION,
@@ -232,7 +289,7 @@ def build_deal_validation(
                 "Current procurement snapshots are filtered by source-reported dates; this does not prove "
                 "TowerSignal possessed each record on that historical date."
             ),
-            "entity_match": "EXACT_CURATED_ALIAS_ONLY_NO_FUZZY_MATCHING",
+            "entity_match": "EXACT_CURATED_ALIAS_OR_EXPLICIT_SOURCE_DBA_ALIAS_ONLY_NO_FUZZY_MATCHING",
             "monetary_values_used_in_screen": False,
             "specialized_categories": sorted(SPECIALIZED_DEAL_CATEGORIES),
             "relationship_density_screen": {
@@ -262,19 +319,14 @@ def build_deal_validation(
         "validation_gate": {
             "min_observed_outcome_targets": min_observed,
             "min_screened_outcome_targets": min_screened,
+            "coverage_thresholds_passed": coverage_thresholds_passed,
+            "score_authorization_locked": score_authorization_locked,
+            "score_authorization_lock_reason": score_authorization_lock_reason,
             "passed": gate_passed,
-            "conclusion": (
-                "VALIDATED_FOR_SCORE_EXPERIMENT"
-                if gate_passed
-                else "NOT_VALIDATED_CURRENT_SOURCE_COVERAGE"
-            ),
+            "conclusion": conclusion,
             "opportunity_score_2_allowed": gate_passed,
             "home_deal_model_allowed": gate_passed,
-            "recommended_next_step": (
-                "BUILD_SCORE_EXPERIMENT"
-                if gate_passed
-                else "EXPAND_PROCUREMENT_SOURCE_COVERAGE_BEFORE_SCORING"
-            ),
+            "recommended_next_step": recommended_next_step,
         },
         "targets": targets,
         "screen_experiment": {
