@@ -19,7 +19,11 @@ OATH_MIN_SPLIT_BATCH_SIZE = 25
 OATH_REQUEST_RETRIES = 1
 OATH_REQUEST_TIMEOUT_SECONDS = 30
 OATH_AGENCY_SLICE_MIN_REQUESTED = 1000
-OATH_AGENCY_PAGE_SIZE = 25000
+OATH_AGENCY_PAGE_SIZE = 10000
+OATH_AGENCY_MIN_PAGE_SIZE = 500
+OATH_AGENCY_PAGE_RETRIES = 3
+OATH_AGENCY_PAGE_REQUEST_RETRIES = 1
+OATH_AGENCY_PAGE_TIMEOUT_SECONDS = 20
 OATH_AGENCY_SNAPSHOT_ATTEMPTS = 2
 OATH_COOLING_TOWER_AGENCY = "COOLING TOWERS - DOHMH"
 
@@ -241,6 +245,46 @@ def _fetch_agency_count(where: str) -> int:
         raise SourceFetchError("OATH cooling-tower agency count returned an unexpected payload") from exc
 
 
+def _fetch_agency_seek_page(page_where: str, page_size: int) -> tuple[list[dict[str, Any]], int]:
+    current_size = max(OATH_AGENCY_MIN_PAGE_SIZE, min(page_size, OATH_AGENCY_PAGE_SIZE))
+    transient_attempt = 0
+    while True:
+        try:
+            rows = fetch_where(
+                OATH_DATASET_ID,
+                page_where,
+                order_by="ticket_number",
+                select=OATH_SELECT,
+                request_retries=OATH_AGENCY_PAGE_REQUEST_RETRIES,
+                request_timeout=OATH_AGENCY_PAGE_TIMEOUT_SECONDS,
+                limit=current_size,
+            )
+            return rows, current_size
+        except SourceFetchError as exc:
+            if not _is_transient_oath_error(exc):
+                raise
+            if _is_timeout_oath_error(exc) and current_size > OATH_AGENCY_MIN_PAGE_SIZE:
+                next_size = max(OATH_AGENCY_MIN_PAGE_SIZE, current_size // 2)
+                print(
+                    f"[oath] OATH agency seek page timed out at {current_size:,} rows; "
+                    f"retrying the same cursor at {next_size:,} rows",
+                    flush=True,
+                )
+                current_size = next_size
+                transient_attempt = 0
+                continue
+            transient_attempt += 1
+            if transient_attempt >= OATH_AGENCY_PAGE_RETRIES:
+                raise
+            delay = 5 * transient_attempt
+            print(
+                f"[oath] Transient OATH agency-page error at {current_size:,} rows; "
+                f"retrying the same cursor in {delay}s",
+                flush=True,
+            )
+            time.sleep(delay)
+
+
 def _fetch_exact_ticket_fallback(requested: set[str]) -> tuple[dict[str, dict[str, Any]], int]:
     requested_list = sorted(requested)
     batches = [
@@ -298,26 +342,19 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
         cases: dict[str, dict[str, Any]] = {}
         fetched_count = 0
         cursor: str | None = None
+        page_size = OATH_AGENCY_PAGE_SIZE
         while True:
             page_where = where
             if cursor is not None:
                 escaped_cursor = cursor.replace("'", "''")
                 page_where = f"{where} AND ticket_number > '{escaped_cursor}'"
             try:
-                rows = fetch_where(
-                    OATH_DATASET_ID,
-                    page_where,
-                    order_by="ticket_number",
-                    select=OATH_SELECT,
-                    request_retries=OATH_RATE_LIMIT_RETRIES,
-                    request_timeout=OATH_REQUEST_TIMEOUT_SECONDS,
-                    limit=OATH_AGENCY_PAGE_SIZE,
-                )
+                rows, page_size = _fetch_agency_seek_page(page_where, page_size)
             except SourceFetchError as exc:
                 if not _is_transient_oath_error(exc):
                     raise
                 print(
-                    f"[oath] Transient OATH agency-page failure ({exc}); "
+                    f"[oath] OATH agency seek page still failed at the minimum adaptive page size ({exc}); "
                     "using exact-ticket fallback instead of abandoning the lifecycle build",
                     flush=True,
                 )
@@ -356,7 +393,7 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
                 f"matched {len(cases):,}/{len(requested):,} requested tickets; cursor={cursor}",
                 flush=True,
             )
-            if len(rows) < OATH_AGENCY_PAGE_SIZE:
+            if len(rows) < page_size:
                 break
 
         try:
