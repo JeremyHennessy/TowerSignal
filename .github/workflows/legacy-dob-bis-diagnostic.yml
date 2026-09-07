@@ -1,0 +1,49 @@
+name: Diagnose legacy DOB BIS history
+
+on:
+  push:
+    branches:
+      - agent/legacy-dob-bis-diagnostic-20260907
+  pull_request:
+    paths:
+      - 'scripts/diagnose_legacy_dob_history.py'
+      - 'tests/python/test_legacy_dob_bis_diagnostic.py'
+      - '.github/workflows/legacy-dob-bis-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run focused exact-join tests
+        run: python -m unittest tests.python.test_legacy_dob_bis_diagnostic -v
+      - name: Compare legacy BIS history with DOB NOW on current TowerSignal BBL universe
+        run: python scripts/diagnose_legacy_dob_history.py --as-of 2026-09-07 --output legacy-dob-bis-diagnostic.json
+      - name: Show commercial-lift summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('legacy-dob-bis-diagnostic.json').read_text(encoding='utf-8'))
+          print(json.dumps({
+              'sources': report['sources'],
+              'summary': report['summary'],
+              'borough_breakdown': report['borough_breakdown'],
+              'storage_diagnostic': report['storage_diagnostic'],
+              'recommendation': report['recommendation'],
+          }, indent=2))
+          PY
+      - name: Upload diagnostic artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-dob-bis-diagnostic
+          path: legacy-dob-bis-diagnostic.json
+          retention-days: 30
