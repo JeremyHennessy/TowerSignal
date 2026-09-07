@@ -14,6 +14,7 @@ const targets: AccountSectionTarget[] = [
   { label: 'Tower location', selector: '.account-profile-page section.planimetric-section' },
   { label: 'Domestic water', selector: '.account-profile-page section.domestic-water-section' },
   { label: 'Water history', heading: 'Historical water context' },
+  { label: 'Institutional', heading: 'Institutional facility context' },
   { label: 'Property & contacts', selector: '.account-profile-page section.property-context-section' },
   { label: 'Current signals', heading: 'Current TowerSignal signals' },
   { label: 'Samples', heading: 'Sample history' },

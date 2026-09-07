@@ -85,6 +85,12 @@ export interface Metadata {
   nyc_historical_311_matched_bbl_count?: number
   nyc_historical_311_systems_attached?: number
   nyc_historical_311_attached_request_count?: number
+  cms_institutional_context_available?: boolean
+  cms_institutional_match_basis?: 'PAD_EXACT_ADDRESS_BBL'
+  cms_institutional_exact_resolved_facility_count?: number
+  cms_institutional_tower_overlap_facility_count?: number
+  cms_institutional_systems_attached?: number
+  cms_institutional_resolved_non_tower_bbl_count?: number
   rules_version: string
   priority_model_version: string
 }
@@ -138,6 +144,8 @@ export interface SystemSummary {
   nyc_building_water_signal_types?: string[]
   nyc_lead_service_line_record_count?: number
   nyc_lead_service_line_materials?: string[]
+  cms_institutional_facility_count?: number
+  cms_institutional_facility_types?: string[]
 }
 
 export interface SystemsPayload {
@@ -159,6 +167,7 @@ export interface SystemsPayload {
     systems_with_building_footprint_match?: number
     systems_with_nyc_building_water_signals?: number
     systems_with_nyc_historical_water_context?: number
+    systems_with_cms_institutional_context?: number
     systems_with_nyc_lead_service_line_records?: number
   }
   systems: SystemSummary[]
@@ -416,6 +425,32 @@ export interface NycHistoricalWaterContext {
   }
 }
 
+export interface CmsInstitutionalContext {
+  facilities: Array<{
+    source_dataset_id: string
+    source_facility_id: string
+    source_kind: 'HOSPITAL' | 'NURSING_HOME'
+    facility_name: string | null
+    facility_type: string | null
+    ownership_type: string | null
+    chain_name: string | null
+    bbl: string
+    bin: string | null
+    property_link_confidence: 'CONFIRMED_PAD_EXACT_ADDRESS_BBL'
+  }>
+  evidence_boundaries: {
+    property_link: string
+    facility: string
+    non_tower: string
+    provider: string
+  }
+  source: {
+    datasets: Array<{ dataset_id: string; name: string; source_record_count: number }>
+    property_resolution: string
+  }
+  generated_at: string
+}
+
 export interface HistoricalProfile {
   registration_date: string | null
   registration_age_days: number | null
@@ -459,6 +494,7 @@ export interface SystemDetail {
   building_footprints?: BuildingFootprintFeature[]
   nyc_building_water_signals?: NycBuildingWaterSignalsContext | null
   nyc_historical_water_context?: NycHistoricalWaterContext | null
+  cms_institutional_context?: CmsInstitutionalContext | null
   nyc_lead_service_lines?: NycLeadServiceLineContext | null
   sample_history: {
     source_raw: string

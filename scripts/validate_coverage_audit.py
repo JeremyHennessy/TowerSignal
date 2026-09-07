@@ -60,8 +60,8 @@ def validate(report: dict[str, Any]) -> None:
     if missing_gaps:
         raise RuntimeError("Coverage audit missing required gap classifications: " + ", ".join(missing_gaps))
     cms = gap_by_key["CMS"]
-    if cms.get("classification") != "NOT_INTEGRATED_SOURCE_CONTRACT_REQUIRED" or (cms.get("observed") or {}).get("integrated") is not False:
-        raise RuntimeError("CMS must remain explicitly not integrated until an authoritative source/join contract is proven")
+    if cms.get("classification") != "BOUNDED_EXACT_PROPERTY_CONTEXT_INTEGRATED" or (cms.get("observed") or {}).get("integrated") is not True:
+        raise RuntimeError("CMS must remain bounded exact-property context after the authoritative source/join contract was proven")
     historical_311 = gap_by_key["NYC_311_HISTORICAL"]
     if historical_311.get("classification") != "BOUNDED_HISTORICAL_CONTEXT_INTEGRATED" or (historical_311.get("observed") or {}).get("integrated") is not True:
         raise RuntimeError("Historical 311 must remain a bounded exact-BBL context integration after measured commercial lift")

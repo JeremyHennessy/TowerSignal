@@ -18,6 +18,7 @@ ARTIFACT_CONTRACTS = [
     ("nyc_building_water_signals", "nyc-water-signals.json", "Exact source BBL/BIN where published; context-only records remain unlinked", ["WHEN_TO_ACT", "WHY_ACCOUNT_MATTERS"]),
     ("legacy_dob_projects", "legacy-dob-projects.json", "Exact canonical BBL; bounded explicit cooling-tower and recent relevant legacy project evidence; recorded roles only", ["WHEN_TO_ACT", "WHY_ACCOUNT_MATTERS"]),
     ("nyc_historical_311_context", "historical-311-context.json", "2010-2024 DEP building-water requests aggregated by current exact TowerSignal BBL; raw events omitted", ["WHY_ACCOUNT_MATTERS"]),
+    ("cms_institutional_context", "cms-institutional-context.json", "CMS facility/provider identity joined only through exact NYC PAD address reconciliation to one BBL; tower-overlap accounts only", ["WHO_TO_PURSUE", "WHY_ACCOUNT_MATTERS"]),
     ("nyc_distribution_water", "nyc-distribution-water.json", "Source sample-site identity; no building crosswalk inferred", ["WHY_ACCOUNT_MATTERS"]),
     ("elap_source_probe", "elap-source-probe.json", "Official ELAP public-search contract probe only; no guessed laboratory IDs", ["WHO_TO_PURSUE"]),
     ("city_record_procurement", "procurement-city-record.json", "Source procurement identity; no property assignment without an exact source link", ["WHO_TO_PURSUE", "WHEN_TO_ACT"]),
@@ -254,10 +255,10 @@ def _gap_analysis(metadata: dict[str, Any], source_health_by_key: dict[str, dict
         },
         {
             "gap_key": "CMS",
-            "classification": "NOT_INTEGRATED_SOURCE_CONTRACT_REQUIRED",
-            "observed": {"integrated": False},
-            "interpretation": "No authoritative CMS dataset and exact TowerSignal join contract is currently integrated in the repository.",
-            "next_action": "Before ingestion, identify the exact CMS dataset, authoritative entity key, incremental matched population, freshness/runtime footprint, and a concrete who/when/why decision it improves. No fuzzy name/address attachment.",
+            "classification": "BOUNDED_EXACT_PROPERTY_CONTEXT_INTEGRATED",
+            "observed": {"integrated": True, "live_diagnostic_run": 34160957127, "nyc_candidate_facility_count": 210, "exact_resolved_facility_count": 116, "tower_overlap_facility_count": 47, "resolved_non_tower_bbl_count": 70},
+            "interpretation": "CMS hospitals and nursing homes are retained only when source facility identity resolves through exact NYC GeoSearch/PAD house number, normalized street, ZIP and one published BBL that overlaps the current TowerSignal tower universe.",
+            "next_action": "Use facility type, ownership and chain for who/why account qualification only. CMS-only resolved properties remain market-expansion context and cannot become tower prospects without independent tower evidence.",
         },
         {
             "gap_key": "NYC_311_HISTORICAL",
