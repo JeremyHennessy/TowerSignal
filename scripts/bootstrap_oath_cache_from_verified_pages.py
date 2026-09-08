@@ -160,12 +160,18 @@ def build(base_url: str, source_health_path: Path, output: Path, *, workers: int
         source_record_count=inspection_source.get("source_record_count"),
         source_last_updated_at=inspection_source.get("source_last_updated_at"),
     )
+    scoped_requested_count = len(requested_tickets)
+    scoped_matched_count = len(cases_by_ticket)
     oath_metadata = {
         **oath_source,
-        "requested_ticket_count": int(hosted_metadata.get("oath_requested_ticket_count") or 0),
-        "matched_ticket_count": int(hosted_metadata.get("oath_matched_ticket_count") or 0),
-        "unmatched_ticket_count": int(hosted_metadata.get("oath_unmatched_ticket_count") or 0),
-        "matched_case_count": int(hosted_metadata.get("oath_matched_ticket_count") or 0),
+        "source_query_scope": (
+            str(oath_source.get("source_query_scope") or "OATH exact summons lifecycle")
+            + "; bootstrap restricted to summons attached to the verified current TowerSignal registry systems"
+        ),
+        "requested_ticket_count": scoped_requested_count,
+        "matched_ticket_count": scoped_matched_count,
+        "unmatched_ticket_count": scoped_requested_count - scoped_matched_count,
+        "matched_case_count": scoped_matched_count,
     }
     payload = build_cache_payload(
         inspection_snapshot=inspection_snapshot,
