@@ -147,7 +147,13 @@ def validate_match_coverage(requested_count: int, matched_count: int, minimum_ra
 
 def _is_transient_oath_error(exc: SourceFetchError) -> bool:
     message = str(exc).lower()
-    return "429" in message or "too many requests" in message or "timeout" in message or "timed out" in message
+    return (
+        "429" in message
+        or "too many requests" in message
+        or "http error 503" in message
+        or "timeout" in message
+        or "timed out" in message
+    )
 
 
 def _is_timeout_oath_error(exc: SourceFetchError) -> bool:
