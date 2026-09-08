@@ -1,0 +1,82 @@
+name: Bootstrap verified OATH cache
+
+on:
+  push:
+    branches:
+      - agent/oath-durable-cache-20260908
+    paths:
+      - '.github/workflows/oath-cache-bootstrap.yml'
+      - 'scripts/bootstrap_oath_cache_from_verified_pages.py'
+      - 'scripts/towersignal/oath_cache.py'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/oath-cache-bootstrap.yml'
+      - 'scripts/bootstrap_oath_cache_from_verified_pages.py'
+      - 'scripts/towersignal/oath_cache.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: towersignal-oath-cache-bootstrap-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out persisted verified TowerSignal history checkpoint
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Bootstrap full-fidelity OATH cache from verified hosted release
+        run: >-
+          python scripts/bootstrap_oath_cache_from_verified_pages.py
+          --source-health .history-store/data/history/source-health.json
+          --output .verified-oath/oath-cache.json.gz
+          --workers 1
+      - name: Revalidate production OATH cache contract
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
+          from towersignal.oath_cache import validate_cache
+          result = validate_cache(
+              Path('.verified-oath/oath-cache.json.gz'),
+              max_age_days=2,
+              require_production_volume=True,
+          )
+          print(json.dumps({
+              'status': result['status'],
+              'age_days': result['age_days'],
+              'match_ratio': result['match_ratio'],
+              'ticket_universe': result['ticket_universe'],
+              'size_bytes': result['size_bytes'],
+          }, indent=2))
+          PY
+      - name: Persist verified OATH cache beside durable history
+        if: ${{ github.event_name == 'push' }}
+        working-directory: .history-store
+        run: |
+          cp ../.verified-oath/oath-cache.json.gz data/history/oath-cache.json.gz
+          git config user.name "TowerSignal OATH Cache Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history/oath-cache.json.gz
+          if git diff --cached --quiet; then
+            echo "Verified OATH cache unchanged"
+          else
+            git commit -m "data: persist verified OATH lifecycle cache [skip ci]"
+            git push origin HEAD:data/towersignal-history
+          fi
