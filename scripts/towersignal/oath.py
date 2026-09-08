@@ -281,6 +281,16 @@ def _fetch_agency_seek_page(page_where: str, page_size: int) -> tuple[list[dict[
                 continue
             transient_attempt += 1
             if transient_attempt >= OATH_AGENCY_PAGE_RETRIES:
+                if current_size > OATH_AGENCY_MIN_PAGE_SIZE:
+                    next_size = max(OATH_AGENCY_MIN_PAGE_SIZE, current_size // 2)
+                    print(
+                        f"[oath] OATH agency seek page remained unavailable after {transient_attempt} transient attempts "
+                        f"at {current_size:,} rows; retrying the same cursor at {next_size:,} rows",
+                        flush=True,
+                    )
+                    current_size = next_size
+                    transient_attempt = 0
+                    continue
                 raise
             delay = 5 * transient_attempt
             print(
