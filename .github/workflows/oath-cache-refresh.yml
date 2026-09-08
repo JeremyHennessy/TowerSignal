@@ -1,0 +1,46 @@
+name: Refresh verified OATH cache
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */6 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: towersignal-oath-cache-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out durable TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and validate current OATH lifecycle cache
+        run: python scripts/build_oath_cache.py --output .verified-oath/oath-cache.json.gz
+      - name: Persist only the verified cache
+        working-directory: .history-store
+        run: |
+          git pull --rebase origin data/towersignal-history
+          cp ../.verified-oath/oath-cache.json.gz data/history/oath-cache.json.gz
+          git config user.name "TowerSignal OATH Cache Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history/oath-cache.json.gz
+          if git diff --cached --quiet; then
+            echo "Verified OATH cache unchanged"
+          else
+            git commit -m "data: refresh verified OATH lifecycle cache [skip ci]"
+            git push origin HEAD:data/towersignal-history
+          fi
