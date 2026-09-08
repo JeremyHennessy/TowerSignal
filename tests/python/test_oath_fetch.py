@@ -347,6 +347,41 @@ class OathBatchFetchTests(unittest.TestCase):
         self.assertEqual(sleep_mock.call_count, 1)
         self.assertIn("fell back to exact ticket_number batches", metadata["source_query_scope"])
 
+    @patch("towersignal.oath.OATH_AGENCY_MIN_PAGE_SIZE", 1)
+    @patch("towersignal.oath.OATH_AGENCY_PAGE_SIZE", 2)
+    @patch("towersignal.oath._fetch_exact_ticket_batch")
+    @patch("towersignal.oath._fetch_agency_seek_page")
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_page_transport_failure_reuses_partial_agency_matches_and_queries_only_unresolved(
+        self, fetch_where_mock, _fetch_metadata_mock, agency_page_mock, exact_batch_mock
+    ):
+        requested = [f"{index:010d}" for index in range(1000)]
+        fetch_where_mock.return_value = [{"count": "1000"}]
+        agency_page_mock.side_effect = [
+            ([
+                {"ticket_number": requested[0], "hearing_status": "HEARING COMPLETED"},
+                {"ticket_number": requested[1], "hearing_status": "HEARING COMPLETED"},
+            ], 2),
+            SourceFetchError("The read operation timed out"),
+        ]
+
+        queried: list[str] = []
+        def exact_side_effect(batch):
+            queried.extend(batch)
+            return batch, [{"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in batch]
+
+        exact_batch_mock.side_effect = exact_side_effect
+        cases, metadata = fetch_oath_cases(requested)
+
+        self.assertEqual(set(cases), set(requested))
+        self.assertNotIn(requested[0], queried)
+        self.assertNotIn(requested[1], queried)
+        self.assertEqual(len(queried), 998)
+        self.assertEqual(metadata["source_record_count"], 1000)
+        self.assertIn("fell back to exact ticket_number batches", metadata["source_query_scope"])
+
+
     @patch("towersignal.oath._fetch_exact_ticket_batch")
     @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
     @patch("towersignal.oath.fetch_where")

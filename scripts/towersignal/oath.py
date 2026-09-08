@@ -285,18 +285,24 @@ def _fetch_agency_seek_page(page_where: str, page_size: int) -> tuple[list[dict[
             time.sleep(delay)
 
 
-def _fetch_exact_ticket_fallback(requested: set[str]) -> tuple[dict[str, dict[str, Any]], int]:
+def _fetch_exact_ticket_fallback(
+    requested: set[str],
+    *,
+    seed_cases: dict[str, dict[str, Any]] | None = None,
+    seed_query_row_count: int = 0,
+) -> tuple[dict[str, dict[str, Any]], int]:
     requested_list = sorted(requested)
+    cases: dict[str, dict[str, Any]] = dict(seed_cases or {})
+    unresolved = [ticket for ticket in requested_list if ticket not in cases]
     batches = [
-        requested_list[start : start + DEFAULT_BATCH_SIZE]
-        for start in range(0, len(requested_list), DEFAULT_BATCH_SIZE)
+        unresolved[start : start + DEFAULT_BATCH_SIZE]
+        for start in range(0, len(unresolved), DEFAULT_BATCH_SIZE)
     ]
-    cases: dict[str, dict[str, Any]] = {}
-    query_row_count = 0
+    query_row_count = seed_query_row_count
     worker_count = max(1, min(DEFAULT_MAX_WORKERS, len(batches))) if batches else 1
     print(
-        f"[oath] Falling back to {len(batches):,} exact-ticket batches with {worker_count} worker(s) "
-        "after the agency-slice scan could not produce a stable complete snapshot",
+        f"[oath] Falling back to {len(batches):,} exact-ticket batches for {len(unresolved):,} unresolved "
+        f"tickets with {worker_count} worker(s) after the agency-slice scan could not produce a stable complete snapshot",
         flush=True,
     )
     if batches:
@@ -358,7 +364,11 @@ def _fetch_cooling_tower_agency_cases(requested: set[str]) -> tuple[dict[str, di
                     "using exact-ticket fallback instead of abandoning the lifecycle build",
                     flush=True,
                 )
-                fallback_cases, query_row_count = _fetch_exact_ticket_fallback(requested)
+                fallback_cases, query_row_count = _fetch_exact_ticket_fallback(
+                    requested,
+                    seed_cases=cases,
+                    seed_query_row_count=fetched_count,
+                )
                 return fallback_cases, query_row_count, True
             if not rows:
                 break
