@@ -1,0 +1,45 @@
+name: Live page visual audit
+
+on:
+  push:
+    branches:
+      - agent/permanent-hosted-page-audit-20260908
+    paths:
+      - '.github/workflows/live-page-visual-audit.yml'
+      - 'tests/e2e/live-page-audit.spec.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install desktop and iPhone browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Screenshot and audit every live page on desktop and iPhone
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CI: 'true'
+        run: npx playwright test tests/e2e/live-page-audit.spec.ts
+      - name: Upload all live screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-page-screenshots
+          path: test-results/live-page-audit
+          retention-days: 30
+      - name: Upload browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-page-audit-report
+          path: playwright-report
+          retention-days: 30
