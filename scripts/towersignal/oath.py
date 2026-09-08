@@ -162,7 +162,7 @@ def _is_timeout_oath_error(exc: SourceFetchError) -> bool:
 
 
 def _fetch_exact_ticket_batch(batch: list[str]) -> tuple[list[str], list[dict[str, Any]]]:
-    quoted = ",".join("'" + ticket.replace("'", "''") + "'" for ticket in batch)
+    quoted = ",".join("\'" + ticket.replace("\'", "\'\'") + "\'" for ticket in batch)
     where = f"ticket_number in ({quoted})"
     last_error: SourceFetchError | None = None
     for attempt in range(OATH_RATE_LIMIT_RETRIES):
@@ -216,7 +216,6 @@ def _fetch_exact_ticket_batch_resilient(batch: list[str]) -> tuple[list[str], li
         _, left_rows = _fetch_exact_ticket_batch_resilient(left)
         _, right_rows = _fetch_exact_ticket_batch_resilient(right)
         return batch, [*left_rows, *right_rows]
-
 
 def _merge_exact_ticket_batch(cases: dict[str, dict[str, Any]], batch: list[str], rows: list[dict[str, Any]]) -> None:
     expected = set(batch)
