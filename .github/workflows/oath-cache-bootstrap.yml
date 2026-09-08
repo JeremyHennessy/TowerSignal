@@ -44,7 +44,7 @@ jobs:
           python scripts/bootstrap_oath_cache_from_verified_pages.py
           --source-health .history-store/data/history/source-health.json
           --output .verified-oath/oath-cache.json.gz
-          --workers 16
+          --workers 1
       - name: Revalidate production OATH cache contract
         run: |
           python - <<'PY'
