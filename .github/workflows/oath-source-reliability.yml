@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   oath-source:
+    # Release reliability gate: the current live source must finish within this bound.
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:

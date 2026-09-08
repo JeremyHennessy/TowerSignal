@@ -181,15 +181,17 @@ class OathBatchFetchTests(unittest.TestCase):
         ):
             self.assertEqual(dataset_id, "jz4z-kudi")
             self.assertIn("COOLING TOWERS - DOHMH", where)
-            self.assertEqual(request_retries, 4)
-            self.assertEqual(request_timeout, 30)
             if select == "count(*) as count":
+                self.assertEqual(request_retries, 4)
+                self.assertEqual(request_timeout, 30)
                 self.assertEqual(limit, 1)
                 self.assertIsNone(order_by)
                 self.assertIsNone(offset)
                 return [{"count": str(len(requested) + 1)}]
+            self.assertEqual(request_retries, 1)
+            self.assertEqual(request_timeout, 20)
             self.assertEqual(order_by, "ticket_number")
-            self.assertEqual(limit, 25000)
+            self.assertEqual(limit, 10000)
             self.assertIsNone(offset)
             return [
                 *({"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in requested),
@@ -255,6 +257,7 @@ class OathBatchFetchTests(unittest.TestCase):
         self.assertEqual(metadata["source_record_count"], len(requested))
 
     @patch("towersignal.oath.validate_match_coverage")
+    @patch("towersignal.oath.OATH_AGENCY_MIN_PAGE_SIZE", 1)
     @patch("towersignal.oath.OATH_AGENCY_PAGE_SIZE", 2)
     @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
     @patch("towersignal.oath.fetch_where")
@@ -288,12 +291,47 @@ class OathBatchFetchTests(unittest.TestCase):
     @patch("towersignal.oath._fetch_exact_ticket_batch")
     @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
     @patch("towersignal.oath.fetch_where")
-    def test_large_ticket_set_falls_back_when_first_agency_page_times_out(
+    def test_large_ticket_set_shrinks_agency_page_after_timeout_before_fallback(
         self, fetch_where_mock, _fetch_metadata_mock, exact_batch_mock
+    ):
+        requested = [f"{index:010d}" for index in range(1000)]
+        page_limits = []
+        count_calls = 0
+
+        def side_effect(dataset_id, where, order_by=None, select=None, **kwargs):
+            nonlocal count_calls
+            if select == "count(*) as count":
+                count_calls += 1
+                return [{"count": "1000"}]
+            page_limits.append(kwargs.get("limit"))
+            if len(page_limits) == 1:
+                raise SourceFetchError("The read operation timed out")
+            return [{"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in requested]
+
+        fetch_where_mock.side_effect = side_effect
+        cases, metadata = fetch_oath_cases(requested)
+
+        self.assertEqual(set(cases), set(requested))
+        self.assertEqual(page_limits, [10000, 5000])
+        self.assertEqual(count_calls, 2)
+        exact_batch_mock.assert_not_called()
+        self.assertEqual(metadata["matched_ticket_count"], 1000)
+        self.assertNotIn("fell back to exact ticket_number batches", metadata["source_query_scope"])
+
+    @patch("towersignal.oath.OATH_AGENCY_PAGE_RETRIES", 2)
+    @patch("towersignal.oath.OATH_AGENCY_MIN_PAGE_SIZE", 2)
+    @patch("towersignal.oath.OATH_AGENCY_PAGE_SIZE", 2)
+    @patch("towersignal.oath.time.sleep")
+    @patch("towersignal.oath._fetch_exact_ticket_batch")
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_large_ticket_set_falls_back_only_after_minimum_agency_page_retries_exhausted(
+        self, fetch_where_mock, _fetch_metadata_mock, exact_batch_mock, sleep_mock
     ):
         requested = [f"{index:010d}" for index in range(1000)]
         fetch_where_mock.side_effect = [
             [{"count": "1000"}],
+            SourceFetchError("The read operation timed out"),
             SourceFetchError("The read operation timed out"),
         ]
 
@@ -304,10 +342,45 @@ class OathBatchFetchTests(unittest.TestCase):
         cases, metadata = fetch_oath_cases(requested)
 
         self.assertEqual(set(cases), set(requested))
-        self.assertEqual(fetch_where_mock.call_count, 2)
+        self.assertEqual(fetch_where_mock.call_count, 3)
         self.assertEqual(exact_batch_mock.call_count, 4)
-        self.assertEqual(metadata["matched_ticket_count"], 1000)
+        self.assertEqual(sleep_mock.call_count, 1)
         self.assertIn("fell back to exact ticket_number batches", metadata["source_query_scope"])
+
+    @patch("towersignal.oath.OATH_AGENCY_MIN_PAGE_SIZE", 1)
+    @patch("towersignal.oath.OATH_AGENCY_PAGE_SIZE", 2)
+    @patch("towersignal.oath._fetch_exact_ticket_batch")
+    @patch("towersignal.oath._fetch_agency_seek_page")
+    @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
+    @patch("towersignal.oath.fetch_where")
+    def test_page_transport_failure_reuses_partial_agency_matches_and_queries_only_unresolved(
+        self, fetch_where_mock, _fetch_metadata_mock, agency_page_mock, exact_batch_mock
+    ):
+        requested = [f"{index:010d}" for index in range(1000)]
+        fetch_where_mock.return_value = [{"count": "1000"}]
+        agency_page_mock.side_effect = [
+            ([
+                {"ticket_number": requested[0], "hearing_status": "HEARING COMPLETED"},
+                {"ticket_number": requested[1], "hearing_status": "HEARING COMPLETED"},
+            ], 2),
+            SourceFetchError("The read operation timed out"),
+        ]
+
+        queried: list[str] = []
+        def exact_side_effect(batch):
+            queried.extend(batch)
+            return batch, [{"ticket_number": ticket, "hearing_status": "HEARING COMPLETED"} for ticket in batch]
+
+        exact_batch_mock.side_effect = exact_side_effect
+        cases, metadata = fetch_oath_cases(requested)
+
+        self.assertEqual(set(cases), set(requested))
+        self.assertNotIn(requested[0], queried)
+        self.assertNotIn(requested[1], queried)
+        self.assertEqual(len(queried), 998)
+        self.assertEqual(metadata["source_record_count"], 1000)
+        self.assertIn("fell back to exact ticket_number batches", metadata["source_query_scope"])
+
 
     @patch("towersignal.oath._fetch_exact_ticket_batch")
     @patch("towersignal.oath.fetch_metadata", return_value={"name": "OATH test", "source_last_updated_at": "2026-09-06T00:00:00Z"})
