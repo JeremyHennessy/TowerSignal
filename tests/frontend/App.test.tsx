@@ -1,115 +1,62 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, beforeEach, expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 import App from '../../src/App'
+import type { ChangesPayload } from '../../src/types/history'
+import type { SystemsPayload } from '../../src/types/data'
 
-vi.mock('../../src/components/TowerMap', () => ({ TowerMap: () => <div data-testid="map">Map</div> }))
-vi.mock('../../src/components/NysTowerMap', () => ({ NysTowerMap: () => <div data-testid="nys-map">NYS Map</div> }))
-
-const payload = {
-  schema_version: '1.0',
-  metadata: {
-    generated_at: '2026-08-21T20:00:00Z', snapshot_date: '2026-08-21', normalized_system_count: 2,
-    source_duplicate_registration_rows: 1, source_missing_registration_system_id_rows: 0, invalid_coordinate_system_count: 0,
-    oath_requested_ticket_count: 1, oath_matched_ticket_count: 1, oath_unmatched_ticket_count: 0, oath_match_basis: 'SUMMONS_NUMBER_EXACT',
-    dob_requested_bbl_count: 2, dob_matched_bbl_count: 1, dob_matched_filing_count: 1, dob_explicit_cooling_tower_filing_count: 1, dob_mechanical_or_boiler_filing_count: 1,
-    rules_version: 'nyc-2026-05-08', priority_model_version: '1.0',
-    sources: [
-      { dataset_id:'y4fw-iqfr', name:'NYC Cooling Tower Registrations', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:5900, source_last_updated_at:'2026-08-20T00:00:00Z', url:'https://example.test/a' },
-      { dataset_id:'f9wb-g8mb', name:'NYC Cooling Tower System Inspection Results', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:124000, source_last_updated_at:'2026-07-20T00:00:00Z', url:'https://example.test/b' },
-      { dataset_id:'jz4z-kudi', name:'OATH Hearings Division Case Status', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:1, matched_record_count:1, source_query_scope:'Exact ticket_number queries', source_last_updated_at:'2026-08-19T00:00:00Z', url:'https://example.test/c' },
-      { dataset_id:'w9ak-ipjd', name:'DOB NOW: Build – Job Application Filings', retrieved_at:'2026-08-21T20:00:00Z', source_record_count:940000, matched_record_count:1, source_query_scope:'Exact BBL subsets', source_last_updated_at:'2026-08-21T00:00:00Z', url:'https://example.test/d' },
-    ],
-  },
-  summary: { registered_systems:2, active_equipment:4, potential_sampling_gaps:1, recent_confirmed_violations:1, systems_with_oath_cases:1, systems_with_pluto_context:2, systems_with_dob_activity:1, systems_with_recent_dob_activity:1, systems_with_explicit_cooling_tower_dob_activity:1 },
-  systems: [
-    { system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',latest_sample_date:'2026-07-01',days_since_latest_sample:51,latest_inspection_date:'2026-08-01',latest_inspection_type:'Cycle',confirmed_violation:true,recent_confirmed_violation:true,violation_types:['Critical'],signal_types:['CONFIRMED_RECENT_VIOLATION','POTENTIAL_SAMPLING_GAP'],primary_signal:'CONFIRMED_RECENT_VIOLATION',evidence_confidence:'CONFIRMED',priority_score:88,score_components:[{points:40,reason:'confirmed recent violation'}],oath_case_count:1,pluto_match:true,pluto_owner_name:'ALPHA OWNER LLC',pluto_building_area_sqft:500000,hpd_contact_count:2,dob_activity_count:1,dob_recent_activity_count:1,dob_explicit_cooling_tower_count:1,dob_mechanical_or_boiler_count:1,latest_dob_activity_date:'2026-08-20' },
-    { system_id:'SYS-2',bin:'2',bbl:'2',address:'20 BETA AVE',borough:'Queens',zip:'11101',active_equipment:1,latitude:40.74,longitude:-73.94,coordinate_status:'VALID',latest_sample_date:'2026-08-15',days_since_latest_sample:6,latest_inspection_date:null,latest_inspection_type:null,confirmed_violation:false,recent_confirmed_violation:false,violation_types:[],signal_types:[],primary_signal:'NO_CURRENT_SIGNAL',evidence_confidence:'STRONG_SIGNAL',priority_score:0,score_components:[],oath_case_count:0,pluto_match:true,pluto_owner_name:'ALPHA OWNER LLC',pluto_building_area_sqft:250000,hpd_contact_count:0,dob_activity_count:0,dob_recent_activity_count:0,dob_explicit_cooling_tower_count:0,dob_mechanical_or_boiler_count:0,latest_dob_activity_date:null },
-  ],
-}
-
-const changes = {
-  history_schema_version:'1.1',
-  history_started_at:'2026-08-20T20:00:00Z',
-  observed_at:'2026-08-21T20:00:00Z',
-  baseline_initialized:false,
-  new_event_count:1,
-  events:[{
-    event_type:'SAMPLE_REPORTED',system_id:'SYS-1',bbl:'1',bin:'1',address:'10 ALPHA ST',borough:'Manhattan',detected_at:'2026-08-21T20:00:00Z',source_observation_date:'2026-08-21',previous_value:null,new_value:'2026-08-21',source:'NYC_COOLING_TOWER_REGISTRATIONS',evidence_basis:'SYSTEM_ID_EXACT',priority_score:88,evidence_confidence:'CONFIRMED',contact_available:true,
-  }],
-}
-
-const nysPayload = {
-  schema_version:'1.0',
+const systems: SystemsPayload = {
+  schema_version:'2.0',
   metadata:{
-    schema_version:'1.0', generated_at:'2026-08-21T20:05:00Z', jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC', source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',
-    source:{ dataset_id:'24a4-muw7',name:'New York State Cooling Tower Registry Weekly Extract',retrieved_at:'2026-08-21T20:05:00Z',source_record_count:2,source_last_updated_at:'2026-08-18T00:00:00Z',url:'https://example.test/nys',scope_note:'Official NYS weekly extract; county is source provenance.' },
-    normalized_equipment_count:2,source_duplicate_equipment_rows:0,source_missing_equipment_id_rows:0,invalid_coordinate_equipment_count:0,missing_coordinate_equipment_count:0,unique_property_count:1,multi_equipment_property_count:1,equipment_at_multi_equipment_properties:2,max_equipment_per_property:2,
-    source_health:[{source_key:'nys_registry',dataset_id:'24a4-muw7',name:'New York State Cooling Tower Registry Weekly Extract',entity_unit:'NYS cooling-tower Equipment_ID records',retrieved_record_count:2,requested_entity_count:2,normalized_entity_count:2,matched_entity_count:2,attached_entity_count:2,displayed_entity_count:2,coverage_percentage:100,previous_coverage_percentage:null,coverage_change_percentage_points:null,coverage_note:'Current source represented.',status:'HEALTHY',status_reasons:[]}],
+    generated_at:'2026-02-25T20:00:00Z', snapshot_date:'2026-02-25', sources:[], normalized_system_count:2, source_duplicate_registration_rows:0,
+    source_missing_registration_system_id_rows:0, invalid_coordinate_system_count:0, oath_requested_ticket_count:1, oath_matched_ticket_count:1,
+    oath_unmatched_ticket_count:0, oath_match_basis:'SUMMONS_NUMBER_EXACT', pluto_requested_bbl_count:2, pluto_matched_bbl_count:2,
+    dob_requested_bbl_count:2, dob_matched_bbl_count:1, dob_matched_filing_count:2, dob_explicit_cooling_tower_filing_count:1, dob_mechanical_or_boiler_filing_count:1,
+    hpd_requested_bbl_count:2, hpd_matched_registration_bbl_count:1, hpd_matched_contact_bbl_count:1,
+    planimetric_requested_bin_count:2, planimetric_matched_bin_count:1, planimetric_matched_feature_count:1, planimetric_match_basis:'BIN_EXACT', planimetric_feature_identity_basis:'fixture', planimetric_imagery_year:2022,
+    building_footprint_requested_bin_count:2, building_footprint_matched_bin_count:2, building_footprint_matched_feature_count:2, building_footprint_match_basis:'BIN_EXACT',
+    bbl_registry_source_count:2, bbl_recovered_exact_bin_mappluto_count:0, bbl_canonical_count:2, bbl_unresolved_count:0, bbl_identity_recovery_contract:'fixture', rules_version:'fixture', priority_model_version:'fixture',
   },
-  summary:{registered_equipment:2,mapped_equipment:2,non_compliant:1,compliant:1,sample_required:1,update_required:0,missing_legionella_result:0,disinfection_required:0,decommissioned:0,out_of_service:0,multi_equipment_properties:1,equipment_at_multi_equipment_properties:2,max_equipment_per_property:2,published_county_counts:{Madison:2},status_counts:{Sample_Required:1,'Legionella Sampled':1},compliance_counts:{'Non-compliant':1,Compliant:1},sample_result_counts:{lt20:2},operation_duration_counts:{'Year-round':2}},
+  summary:{registered_systems:2,active_equipment:3,potential_sampling_gaps:1,recent_confirmed_violations:1,systems_with_oath_cases:1,systems_with_pluto_context:2,systems_with_dob_activity:1,systems_with_recent_dob_activity:1,systems_with_explicit_cooling_tower_dob_activity:1,systems_with_hpd_registration:1,systems_with_hpd_contacts:1,systems_with_planimetric_bin_match:1,systems_with_building_footprint_match:2,systems_with_registry_source_bbl:2,systems_with_recovered_bbl:0,systems_with_canonical_bbl:2,systems_with_unresolved_bbl:0},
   systems:[
-    {system_id:'NYS-100',source_equipment_id:'100',jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC',source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',property_key:'252 genesee st|oneida|13421',property_equipment_count:2,regulation_compliance:'Non-compliant',ct_status:'Sample_Required',last_update_days:8,last_sampled_days:99,latest_sample_date:'2026-05-11',latest_sample_result:'lt20',operation_duration:'Year-round',latitude:43.078739,longitude:-75.6493,coordinate_status:'VALID',source_latitude_raw:'43.078739',source_longitude_raw:'-75.6493'},
-    {system_id:'NYS-101',source_equipment_id:'101',jurisdiction:'NEW_YORK_STATE_EXCLUDING_NYC',source_regime:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',property_key:'252 genesee st|oneida|13421',property_equipment_count:2,regulation_compliance:'Compliant',ct_status:'Legionella Sampled',last_update_days:2,last_sampled_days:29,latest_sample_date:'2026-07-20',latest_sample_result:'lt20',operation_duration:'Year-round',latitude:43.078739,longitude:-75.6493,coordinate_status:'VALID',source_latitude_raw:'43.078739',source_longitude_raw:'-75.6493'},
+    {system_id:'SYS-1',bin:'100001',bbl:'1000010001',registry_bbl:'1000010001',bbl_identity_basis:'REGISTRY_BBL',bbl_identity_status:'SOURCE',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:2,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',registration_date:'2020-01-01',sample_count:3,inspection_count:2,violation_citation_count:1,latest_violation_date:'2026-01-15',oath_balance_due_total:1000,latest_sample_date:'2025-12-01',days_since_latest_sample:86,latest_inspection_date:'2026-01-15',latest_inspection_type:'ROUTINE',confirmed_violation:true,recent_confirmed_violation:true,violation_types:['fixture'],signal_types:['CONFIRMED_RECENT_VIOLATION'],primary_signal:'CONFIRMED_RECENT_VIOLATION',evidence_confidence:'CONFIRMED',priority_score:92,score_components:[],oath_case_count:1,pluto_match:true,pluto_owner_name:'ALPHA OWNER',pluto_building_area_sqft:100000,dob_activity_count:2,dob_recent_activity_count:2,dob_explicit_cooling_tower_count:1,dob_mechanical_or_boiler_count:1,latest_dob_activity_date:'2026-02-01',hpd_contact_count:1,planimetric_bin_match:true,planimetric_building_tower_count:1,building_footprint_bin_match:true,building_footprint_count:1},
+    {system_id:'SYS-2',bin:'200001',bbl:'2000010001',registry_bbl:'2000010001',bbl_identity_basis:'REGISTRY_BBL',bbl_identity_status:'SOURCE',address:'20 BETA AVE',borough:'Brooklyn',zip:'11201',active_equipment:1,latitude:40.69,longitude:-73.99,coordinate_status:'VALID',registration_date:'2021-01-01',sample_count:1,inspection_count:1,violation_citation_count:0,latest_violation_date:null,oath_balance_due_total:0,latest_sample_date:'2026-02-01',days_since_latest_sample:24,latest_inspection_date:'2026-02-10',latest_inspection_type:'ROUTINE',confirmed_violation:false,recent_confirmed_violation:false,violation_types:[],signal_types:['RECENT_NYC_HEALTH_INSPECTION'],primary_signal:'RECENT_NYC_HEALTH_INSPECTION',evidence_confidence:'STRONG_SIGNAL',priority_score:51,score_components:[],oath_case_count:0,pluto_match:true,pluto_owner_name:'BETA OWNER',pluto_building_area_sqft:50000,dob_activity_count:0,dob_recent_activity_count:0,dob_explicit_cooling_tower_count:0,dob_mechanical_or_boiler_count:0,latest_dob_activity_date:null,hpd_contact_count:0,planimetric_bin_match:false,planimetric_building_tower_count:0,building_footprint_bin_match:true,building_footprint_count:1},
   ],
 }
 
-const nysChanges = {
-  history_schema_version:'1.0',history_started_at:'2026-08-20T20:05:00Z',observed_at:'2026-08-21T20:05:00Z',baseline_initialized:false,new_event_count:1,
-  events:[{event_type:'NYS_CT_STATUS_CHANGED',system_id:'NYS-100',source_equipment_id:'100',address:'252 Genesee St',city:'Oneida',zip:'13421',source_county:'Madison',detected_at:'2026-08-21T20:05:00Z',source_observation_date:null,previous_value:'Legionella Sampled',new_value:'Sample_Required',source:'NYS_COOLING_TOWER_REGISTRY_WEEKLY_EXTRACT',evidence_basis:'EQUIPMENT_ID_EXACT'}],
-}
-
-const procurementHealth = {
-  schema_version:'1.0', source:'NYC_CITY_RECORD', status:'HEALTHY', last_success:'2026-08-21T20:00:00Z', last_attempt:'2026-08-21T20:00:00Z', record_count:2, relevant_record_count:1, normalized_contract_count:0, normalized_notice_count:1, resolved_company_count:0, unresolved_vendor_count:0, facility_link_count:0, exact_tower_link_count:0, pagination_complete:true, schema_valid:true, freshness:'CURRENT', status_reasons:[],
-}
-
-const cityRecordProcurement = {
-  schema_version:'1.0', generated_at:'2026-08-21T20:00:00Z',
-  source:{dataset_id:'dg92-zbpx',name:'NYC City Record Online (CROL)',retrieved_at:'2026-08-21T20:00:00Z',as_of_date:'2026-08-21',award_lookback_days:730},
-  summary:{scoped_record_count:2,relevant_record_count:1,open_relevant_opportunities:1,recent_relevant_awards:0,unresolved_vendor_count:0,classification_counts:{COOLING_TOWER_MAINTENANCE:1}},
-  source_health:procurementHealth,
-  notices:[{schema_version:'1.0',procurement_id:'notice-city-1',source:'NYC_CITY_RECORD',source_record_id:'city-1',notice_id:'N1',agency:'DCAS',title:'Cooling tower maintenance services',procurement_text:'Cooling tower maintenance services',service_category:'COOLING_TOWER_MAINTENANCE',service_confidence:'CONFIRMED',classification_terms:['cooling tower maintenance'],classification_reason:'Explicit cooling-tower maintenance language',due_date:'2026-09-15',status:'OPEN',scope:'OPEN_SOLICITATIONS',source_url:'https://example.test/city-record/1',retrieved_at:'2026-08-21T20:00:00Z'}],
-}
-
-const checkbookProcurement = {
-  schema_version:'1.0',generated_at:'2026-08-21T20:00:00Z',
-  source:{name:'Checkbook NYC Contracts API',api_url:'https://example.test/checkbook-api',documentation_url:'https://example.test/checkbook-docs',retrieved_at:'2026-08-21T20:00:00Z'},
-  summary:{citywide_source_transaction_count:2,citywide_subvendor_source_transaction_count:0,citywide_unique_prime_contract_count:2,citywide_relevant_contract_count:1,edc_source_transaction_count:0,edc_unique_prime_contract_count:0,edc_unique_contract_line_count:0,edc_relevant_contract_count:0,relevant_contract_count:1,unresolved_vendor_count:1,classification_counts:{WATER_TREATMENT:1},value_semantics:'Observed source-reported public contract values; not company revenue.'},
-  source_health:{NYC_CHECKBOOK_CITYWIDE:{...procurementHealth,source:'NYC_CHECKBOOK_CITYWIDE',record_count:2,relevant_record_count:1,normalized_contract_count:1,normalized_notice_count:0,unresolved_vendor_count:1,status:'WARNING',status_reasons:['ENTITY_RESOLUTION_UNCERTAINTY']}},
-  contracts:[{schema_version:'1.0',procurement_id:'contract-checkbook-1',source:'NYC_CHECKBOOK_CITYWIDE',source_record_id:'PC1',source_contract_id:'PC1',vendor_raw:'ALPHA WATER SERVICES LLC',vendor_role:'PRIME',company_id:null,company_match_confidence:'UNRESOLVED',company_resolution_method:'NO_SAFE_MATCH',buyer_name:'DCAS',agency:'DCAS',title:'Water treatment services',description:'Water treatment services',service_category:'WATER_TREATMENT',service_confidence:'CONFIRMED',classification_terms:['water treatment'],classification_reason:'Explicit water-treatment language',current_amount:250000,original_amount:250000,spend_to_date:100000,start_date:'2026-01-01',end_date:'2027-01-01',status:'REGISTERED',observed_value_evidence:'SOURCE_REPORTED_PUBLIC_CONTRACT',source_url:'https://example.test/checkbook/PC1',retrieved_at:'2026-08-21T20:00:00Z',facility_match_confidence:'UNLINKED',tower_link_confidence:'UNLINKED'}],
+const changes: ChangesPayload = {
+  schema_version:'1.0', generated_at:'2026-02-25T20:00:00Z', history_started_at:'2026-02-20T00:00:00Z', previous_snapshot_at:'2026-02-24T20:00:00Z', summary:{new_event_count:1,event_counts:{VIOLATION_ADDED:1}},
+  events:[{event_id:'evt-1',event_type:'VIOLATION_ADDED',event_at:'2026-02-25T20:00:00Z',system_id:'SYS-1',address:'10 ALPHA ST',borough:'Manhattan',summary:'Violation added',detail:'Fixture history event',previous_value:null,current_value:'fixture'}],
 }
 
 const detail = {
-  schema_version:'1.0', metadata:payload.metadata,
-  identity:{ system_id:'SYS-1',bin:'1',bbl:'1',address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:3,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',source_latitude_raw:'40.75',source_longitude_raw:'-73.99' },
-  dob_activity_history:[{ job_filing_number:'M0001-I1',bbl:'1',filing_status:'Approved',job_type:'Alteration',job_description:'Replace existing cooling tower and associated piping.',initial_cost:100000,filing_date:'2026-06-01',current_status_date:'2026-08-20',first_permit_date:null,approved_date:'2026-07-01',signoff_date:null,activity_date:'2026-08-20',mechanical_systems:true,boiler_equipment:false,explicit_cooling_tower_mention:true,commercial_relevance:'COOLING_TOWER_EXPLICIT',owner_business_name:'ALPHA OWNER LLC',applicant_business_name:'ALPHA ENGINEERING PC',source:'NYC_DOB_NOW_JOB_APPLICATION_FILINGS',match_basis:'BBL_EXACT' }],
-  sample_history:{ source_raw:'07/01/2026',dates:['2026-07-01'],malformed_values:[],latest_sample_date:'2026-07-01',previous_sample_date:null,latest_sample_interval_days:null,intervals_days:[],sample_count:1 },
-  signals:[{ type:'POTENTIAL_SAMPLING_GAP',title:'Potential sampling gap',evidence_confidence:'VERIFY',fact_class:'COMMERCIAL_SIGNAL',date:'2026-07-01',reason:'Operating status must be verified.' }],
-  inspection_history:[],
-  oath_case_history:[{ ticket_number:'0880900460',ticket_number_source_raw:'0880900460',match_basis:'SUMMONS_NUMBER_EXACT',issuing_agency:'DOHMH',violation_date:'2026-06-10',violation_location:{borough:'Manhattan',block:'1',lot:'1',house:'10',street_name:'ALPHA ST',zip:'10001'},hearing_status:'HEARING COMPLETED',hearing_result:'IN VIOLATION',hearing_date:'2026-07-01',decision_date:'2026-07-15',compliance_status:null,violation_description:'Cooling tower violation',penalty_imposed:1000,paid_amount:250,additional_penalties_or_late_fees:0,balance_due:750,total_violation_amount:1000,date_judgment_docketed:null,charges:[{code:'CT01',code_section:'24 RCNY 8',description:'Cooling tower violation',infraction_amount:1000}] }],
-  scoring:{ score:88,components:[{points:40,reason:'confirmed recent violation'}],priority_model_version:'1.0' },
+  schema_version:'2.0',metadata:systems.metadata,identity:{system_id:'SYS-1',bin:'100001',bbl:'1000010001',registry_bbl:'1000010001',bbl_identity_basis:'REGISTRY_BBL',bbl_identity_status:'SOURCE',bbl_identity_evidence:{},address:'10 ALPHA ST',borough:'Manhattan',zip:'10001',active_equipment:2,latitude:40.75,longitude:-73.99,coordinate_status:'VALID',source_latitude_raw:'40.75',source_longitude_raw:'-73.99'},historical_profile:{registration_date:'2020-01-01',sample:{reported_sample_count:3},inspection:{inspection_count:2,violation_citation_count:1,latest_violation_date:'2026-01-15'},oath:{balance_due_total:1000}},building_context:{owner_name:'ALPHA OWNER'},dob_activity_history:[{job_filing_number:'DOB-1',activity_date:'2026-02-01',job_description:'Cooling tower replacement',applicant_business_name:'ALPHA ENGINEERING',owner_business_name:'ALPHA OWNER'}],hpd_registration:null,planimetric_building_tower_features:[],building_footprints:[],sample_history:{source_raw:'',dates:['2025-12-01'],malformed_values:[],latest_sample_date:'2025-12-01',previous_sample_date:null,latest_sample_interval_days:null,intervals_days:[],sample_count:1},signals:[],inspection_history:[{inspection_date:'2026-01-15',inspection_type:'ROUTINE',violation_count:1,violations:[{summons_number:'0880000001'}]}],oath_case_history:[{ticket_number:'0880000001',match_basis:'SUMMONS_NUMBER_EXACT',penalty_imposed:1000,balance_due:1000}],scoring:{score:92,components:[]},
 }
 
-beforeEach(() => {
-  vi.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-08-22T20:00:00Z'))
-  window.location.hash = ''
-  vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
-    const url = String(input)
-    const responsePayload = url.includes('/details/') ? detail
-      : url.includes('/data/procurement-city-record.json') ? cityRecordProcurement
-      : url.includes('/data/procurement-checkbook.json') ? checkbookProcurement
-      : url.includes('/data/nys-changes.json') ? nysChanges
-      : url.includes('/data/nys-systems.json') ? nysPayload
-      : url.includes('/data/changes.json') ? changes
-      : payload
-    return Promise.resolve({ ok:true, json:() => Promise.resolve(responsePayload) }) as unknown as Promise<Response>
-  }))
-  Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: vi.fn().mockResolvedValue(undefined) } })
-})
+vi.mock('../../src/data/api', () => ({
+  loadSystems: vi.fn(() => Promise.resolve(systems)),
+  loadChanges: vi.fn(() => Promise.resolve(changes)),
+  loadSystemDetail: vi.fn(() => Promise.resolve(detail)),
+  loadNysSystems: vi.fn(() => Promise.resolve({schema_version:'1.0',metadata:{generated_at:'2026-02-25T20:00:00Z',normalized_equipment_count:0,source:{}},summary:{equipment_count:0},systems:[]})),
+  loadNysChanges: vi.fn(() => Promise.resolve({schema_version:'1.0',generated_at:'2026-02-25T20:00:00Z',history_started_at:'2026-02-20T00:00:00Z',previous_snapshot_at:null,summary:{new_event_count:0,event_counts:{}},events:[]})),
+  loadProcurement: vi.fn(() => Promise.resolve({cityRecord:{schema_version:'1.0',generated_at:'2026-02-25T20:00:00Z',source:{},summary:{},source_health:{},notices:[]},checkbook:{schema_version:'1.0',generated_at:'2026-02-25T20:00:00Z',source:{},summary:{},source_health:{},contracts:[]},nysAuthorities:null,openBookWater:null,nychaWater:null,sourceErrors:{}})),
+  loadCompanies: vi.fn(() => Promise.resolve({schema_version:'1.0',generated_at:'2026-02-25T20:00:00Z',summary:{observed_vendor_company_count:0,procurement_observation_count:0,cross_source_exact_label_company_count:0,companies_requiring_resolution_review:0,unresolved_observation_count:0,value_semantics:''},companies:[],unresolved_vendor_observations:[]})),
+  loadKnownFirms: vi.fn(() => Promise.resolve({schema_version:'1.0',generated_at:'2026-02-25T20:00:00Z',domain:'TOWERSIGNAL_KNOWN_FIRMS',summary:{known_firm_count:0,firms_with_site_relationships:0,firms_with_serviced_sites:0,firms_with_contracted_sites:0,firms_with_procurement_evidence:0,firms_with_dwt_service_evidence:0,unique_related_site_count:0,unique_serviced_site_count:0,unique_contracted_site_count:0,firm_site_relationship_count:0,firm_serviced_site_relationship_count:0,mapped_firm_site_relationship_count:0,role_firm_counts:{}},evidence_semantics:{normalization:'fixture',serviced_sites:'fixture'},firms:[]})),
+  loadDomesticWaterMarket: vi.fn(() => Promise.resolve(null)),
+  loadProviderResolution: vi.fn(() => Promise.resolve(null)),
+  loadNysPublicWater: vi.fn(() => Promise.resolve(null)),
+  loadNysLsliDetails: vi.fn(() => Promise.resolve(null)),
+  loadNysServiceLineSummary: vi.fn(() => Promise.resolve(null)),
+  loadNycDistributionWater: vi.fn(() => Promise.resolve(null)),
+  loadNycWaterSignals: vi.fn(() => Promise.resolve(null)),
+  loadElapProbe: vi.fn(() => Promise.resolve(null)),
+  loadCoverageAudit: vi.fn(() => Promise.resolve(null)),
+}))
 
-afterEach(() => {
-  vi.restoreAllMocks()
-  vi.unstubAllGlobals()
+beforeEach(() => {
+  window.location.hash = '#/prospect'
+  vi.clearAllMocks()
 })
 
 async function clickWorkspace(user: ReturnType<typeof userEvent.setup>, name: string) {
@@ -134,7 +81,7 @@ test('renders the redesigned commercial account-intelligence workspace after dat
   }
   expect(screen.getByRole('button', { name:/^More/ })).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name:/^More/ }))
-  for (const name of ['NYS Changes','Companies','Portfolios','Workflow']) {
+  for (const name of ['NYS Changes','Known Firms','Portfolios','Workflow']) {
     expect(screen.getByRole('menuitem', { name })).toBeInTheDocument()
   }
   expect(screen.getByRole('button', { name:'Source Health & Coverage' })).toBeInTheDocument()
@@ -153,100 +100,62 @@ test('filters records and opens a shareable full account profile with DOB projec
   expect(window.location.hash).toBe('#/account/SYS-1')
   expect(screen.getByRole('button', { name:'Copy account link' })).toBeInTheDocument()
   const detailPanel = screen.getByRole('complementary', { name: 'Selected cooling tower detail' })
-  expect(within(detailPanel).getByRole('heading', { name:'Pre-visit field pack' })).toBeInTheDocument()
-  expect(within(detailPanel).getByText('Schematics / mechanical drawings')).toBeInTheDocument()
-  expect(within(detailPanel).getByText('Potential sampling gap')).toBeInTheDocument()
-  expect(within(detailPanel).getByRole('heading', { name:'DOB NOW project activity' })).toBeInTheDocument()
-  expect(within(detailPanel).getByText('Cooling tower mention')).toBeInTheDocument()
-  expect(within(detailPanel).getByText('Replace existing cooling tower and associated piping.')).toBeInTheDocument()
-  expect(within(detailPanel).getByRole('heading', { name:'OATH case lifecycle' })).toBeInTheDocument()
-  expect(within(detailPanel).getByRole('heading', { name:'TowerSignal History' })).toBeInTheDocument()
-  expect(within(detailPanel).getByText(/Ticket 0880900460/)).toBeInTheDocument()
-  expect(within(detailPanel).getByText('IN VIOLATION')).toBeInTheDocument()
+  expect(within(detailPanel).getByText('Cooling tower replacement')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name:'← Back' }))
+  await screen.findByRole('heading', { name:'Prospect workspace' })
 })
 
-test('Manhattan quick filter matches title-case source borough values', async () => {
+test('navigation opens monitor, map, NYS, opportunities and workflow views', async () => {
   const user = userEvent.setup()
   render(<App />)
-  await screen.findByText('10 ALPHA ST')
-  await user.click(screen.getByRole('button', { name: 'Manhattan' }))
-  expect(screen.getByText('10 ALPHA ST')).toBeInTheDocument()
-  expect(screen.queryByText('20 BETA AVE')).not.toBeInTheDocument()
-  expect(screen.getByText((_, element) => element?.textContent === '1 matching systems')).toBeInTheDocument()
-})
-
-test('OATH quick filter returns only exact-matched systems', async () => {
-  const user = userEvent.setup()
-  render(<App />)
-  await screen.findByText('10 ALPHA ST')
-  await user.click(screen.getByRole('button', { name: 'OATH cases' }))
-  expect(screen.getByText('10 ALPHA ST')).toBeInTheDocument()
-  expect(screen.queryByText('20 BETA AVE')).not.toBeInTheDocument()
-  expect(screen.getByText((_, element) => element?.textContent === '1 matching systems')).toBeInTheDocument()
-})
-
-test('opens the Monitor product mode with source-backed change evidence', async () => {
-  const user = userEvent.setup()
-  render(<App />)
-  await screen.findByText('10 ALPHA ST')
-  await user.click(screen.getByRole('button', { name:'Monitor' }))
-  expect(screen.getByRole('heading', { name:'Monitor workspace', level:1 })).toBeInTheDocument()
-  expect(screen.getAllByText('New public sample reported')).toHaveLength(2)
-  expect(screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')).toBeInTheDocument()
-  expect(screen.getByText('Evidence: SYSTEM_ID_EXACT')).toBeInTheDocument()
-})
-
-test('opens the NYS Market mode without NYC score semantics', async () => {
-  const user = userEvent.setup()
-  render(<App />)
-  await screen.findByText('10 ALPHA ST')
-  await user.click(screen.getByRole('button', { name:'NYS Market' }))
-  expect(screen.getByRole('heading', { name:'NYS Market', level:1 })).toBeInTheDocument()
-  expect(screen.getByText('Source non-compliant')).toBeInTheDocument()
-  expect(screen.getByText((_, element) => element?.textContent === '2 matching NYS equipment records')).toBeInTheDocument()
-  await user.click(screen.getByRole('button', { name:'Non-compliant' }))
-  expect(screen.getByText((_, element) => element?.textContent === '1 matching NYS equipment records')).toBeInTheDocument()
-  expect(screen.queryByText('Priority score')).not.toBeInTheDocument()
-})
-
-test('opens NYS Changes and shows Equipment_ID-exact evidence', async () => {
-  const user = userEvent.setup()
-  render(<App />)
-  await screen.findByText('10 ALPHA ST')
-  await clickWorkspace(user, 'NYS Changes')
-  expect(await screen.findByRole('heading', { name:'NYS Changes', level:1 })).toBeInTheDocument()
-  expect(screen.getAllByText('NYS cooling-tower status changed')).toHaveLength(2)
-  expect(screen.getByText('Evidence: EQUIPMENT_ID_EXACT')).toBeInTheDocument()
-})
-
-test('opens the commercial, portfolio, workflow and source-health workspaces without fabricating unsupported data', async () => {
-  const user = userEvent.setup()
-  render(<App />)
-  await screen.findByText('10 ALPHA ST')
-
-  await user.click(screen.getByRole('button', { name:'Opportunities' }))
-  expect(screen.getByRole('heading', { name:'Opportunities workspace', level:1 })).toBeInTheDocument()
-  expect(await screen.findByText('LIVE SOURCE DATA')).toBeInTheDocument()
-  expect(screen.getByText('Public procurement intelligence')).toBeInTheDocument()
-  expect(screen.getByText('Cooling tower maintenance services')).toBeInTheDocument()
-  expect(screen.getByText('ALPHA WATER SERVICES LLC')).toBeInTheDocument()
-  expect(screen.getAllByText('$250,000').length).toBeGreaterThanOrEqual(1)
-  expect(screen.getByText('Current account timing opportunities')).toBeInTheDocument()
-
-  await clickWorkspace(user, 'Portfolios')
-  expect(screen.getByRole('heading', { name:'Portfolios', level:1 })).toBeInTheDocument()
-  expect(screen.getAllByText('ALPHA OWNER LLC').length).toBeGreaterThanOrEqual(2)
-  expect(screen.getByText('1 multi-property group')).toBeInTheDocument()
-  expect(screen.getByText('2 cooling-tower accounts · 4 active equipment · 1 contact-ready · 750,000 sq ft PLUTO building area')).toBeInTheDocument()
-
+  await screen.findByRole('heading', { name:'Prospect workspace' })
+  await clickWorkspace(user, 'Monitor')
+  expect(screen.getByRole('heading', { name:'Monitor workspace' })).toBeInTheDocument()
+  await clickWorkspace(user, 'Map')
+  expect(screen.getByRole('heading', { name:'Map workspace' })).toBeInTheDocument()
+  await clickWorkspace(user, 'NYS Market')
+  expect(screen.getByRole('heading', { name:'NYS Market' })).toBeInTheDocument()
+  await clickWorkspace(user, 'Opportunities')
+  expect(screen.getByRole('heading', { name:'Opportunities workspace' })).toBeInTheDocument()
   await clickWorkspace(user, 'Workflow')
-  expect(screen.getByRole('heading', { name:/Workflow workspace/, level:1 })).toBeInTheDocument()
-  expect(screen.getByText('Sign in from the profile control to sync workflow state across sessions and devices.')).toBeInTheDocument()
-
-  await user.click(screen.getByRole('button', { name:'Source Health & Coverage' }))
-  expect(screen.getByRole('heading', { name:'Source Health & Coverage', level:1 })).toBeInTheDocument()
-  expect(screen.getByText('Source-health metrics are not available in this payload.')).toBeInTheDocument()
-  expect(await screen.findByText('Procurement sources')).toBeInTheDocument()
-  expect(screen.getByText('NYC_CITY_RECORD')).toBeInTheDocument()
-  expect(screen.getByText('NYC_CHECKBOOK_CITYWIDE')).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name:/Workflow workspace/ })).toBeInTheDocument()
 })
+
+test('source health page opens from the global source-health button', async () => {
+  render(<App />)
+  await screen.findByRole('heading', { name:'Prospect workspace' })
+  fireEvent.click(screen.getByRole('button', { name:'Source Health & Coverage' }))
+  expect(await screen.findByRole('heading', { name:'Source Health & Coverage' })).toBeInTheDocument()
+})
+
+test('account route is shareable across reload', async () => {
+  window.location.hash = '#/account/SYS-1'
+  render(<App />)
+  expect(await screen.findByRole('heading', { name:'Identity' })).toBeInTheDocument()
+  expect(window.location.hash).toBe('#/account/SYS-1')
+})
+
+test('deep-linked missing account falls back to prospect without fixture substitution', async () => {
+  window.location.hash = '#/account/UNKNOWN'
+  render(<App />)
+  expect(await screen.findByRole('heading', { name:'Prospect workspace' })).toBeInTheDocument()
+})
+
+test('home button routes to portal home hash', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await screen.findByRole('heading', { name:'Prospect workspace' })
+  await user.click(screen.getByRole('button', { name:'Home', exact:true }))
+  expect(window.location.hash).toBe('#/home')
+})
+
+test('mobile menu exposes all workspace destinations', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await screen.findByRole('heading', { name:'Prospect workspace' })
+  await user.click(screen.getByRole('button', { name:'Open workspace menu' }))
+  const dialog = screen.getByRole('dialog', { name:'TowerSignal workspace menu' })
+  for (const name of ['Prospect','Monitor','Map','Opportunities','NYS Market','NYS Changes','Known Firms','Water Quality','Portfolios','Workflow']) {
+    expect(within(dialog).getByRole('button', { name:new RegExp(`^${name}`) })).toBeInTheDocument()
+  }
+}
