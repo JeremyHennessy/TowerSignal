@@ -159,6 +159,10 @@ jobs:
           --extra-procurement public/data/procurement-nys-authorities.json
           --extra-procurement public/data/procurement-openbook-water.json
           --extra-procurement public/data/procurement-nycha-water.json
+      - name: Build normalized known-firm intelligence
+        run: python scripts/build_known_firms.py --output public/data
+      - name: Validate normalized known-firm intelligence
+        run: python scripts/validate_known_firms.py --input public/data/known-firms.json --max-age-days 1 --require-production-volume
       - name: Build empirical Deal Intelligence validation
         run: >-
           python scripts/build_deal_validation.py
