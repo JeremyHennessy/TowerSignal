@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { CompaniesPage } from '../../src/components/CompaniesPage'
@@ -22,11 +22,26 @@ const rmcFirm = {
   tower_account_count:0, mapped_site_count:0, observed_contract_value:0, detail_path:'firm-details/ob/observed-company-rmc.json',
 }
 
+const extraFirms = Array.from({ length: 101 }, (_, index) => {
+  const n = String(index + 1).padStart(3, '0')
+  return {
+    ...rmcFirm,
+    firm_id:`observed-company-fixture-${n}`,
+    canonical_name:`FIRM ${n}`,
+    strict_name:`FIRM ${n}`,
+    normalized_name:`FIRM ${n}`,
+    identity_confidence:'STRONG',
+    resolution_method:'EXACT_SOURCE_LABEL_SUFFIX_PRESERVED',
+    procurement_company_id:`observed-company-fixture-${n}`,
+    detail_path:`firm-details/fi/observed-company-fixture-${n}.json`,
+  }
+})
+
 const knownFirmsPayload = {
   schema_version:'1.0', generated_at:'2026-08-21T20:00:00Z', domain:'TOWERSIGNAL_KNOWN_FIRMS',
-  summary:{known_firm_count:2,firms_with_site_relationships:1,firms_with_serviced_sites:1,firms_with_contracted_sites:1,firms_with_procurement_evidence:2,firms_with_dwt_service_evidence:1,unique_related_site_count:3,unique_serviced_site_count:2,unique_contracted_site_count:1,firm_site_relationship_count:3,firm_serviced_site_relationship_count:2,mapped_firm_site_relationship_count:2,role_firm_counts:{DWT_INSPECTION_PROVIDER:1,PROCUREMENT_VENDOR:2}},
+  summary:{known_firm_count:103,firms_with_site_relationships:1,firms_with_serviced_sites:1,firms_with_contracted_sites:1,firms_with_procurement_evidence:103,firms_with_dwt_service_evidence:1,unique_related_site_count:3,unique_serviced_site_count:2,unique_contracted_site_count:1,firm_site_relationship_count:3,firm_serviced_site_relationship_count:2,mapped_firm_site_relationship_count:2,role_firm_counts:{DWT_INSPECTION_PROVIDER:1,PROCUREMENT_VENDOR:103}},
   evidence_semantics:{normalization:'Legal suffixes are preserved and ambiguous labels remain separate.',serviced_sites:'A serviced site requires explicit DWT inspection-provider or laboratory evidence.',related_sites:'Related does not mean serviced.',last_active:'Latest public-record observation.',procurement_value:'Observed public procurement value is not company revenue.'},
-  firms:[alphaFirm, rmcFirm],
+  firms:[alphaFirm, ...extraFirms, rmcFirm],
 }
 
 const alphaDetail = {
@@ -54,20 +69,36 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
-test('Known Firms shows service metrics, public-value semantics and keeps RMC in VERIFY review', async () => {
+test('Known Firms is filterable, sortable and genuinely paginated while preserving source semantics', async () => {
   const user = userEvent.setup()
   render(<CompaniesPage onOpenCompany={vi.fn()} />)
 
   expect(await screen.findByRole('heading', { name:'Known firms', level:1 })).toBeInTheDocument()
-  expect(screen.getByText('ALPHA WATER SERVICES LLC')).toBeInTheDocument()
-  expect(screen.getByText('RMC')).toBeInTheDocument()
-  expect(screen.getAllByText('VERIFY').length).toBeGreaterThanOrEqual(1)
-  expect(screen.getByText('2', { selector:'.known-firms-table tbody tr:first-child td:nth-child(3) strong' })).toBeInTheDocument()
-  expect(screen.getByText('public values · not revenue')).toBeInTheDocument()
+  expect(screen.getByLabelText('Known firm search')).toBeInTheDocument()
+  expect(screen.getByLabelText('Known firm role')).toBeInTheDocument()
+  expect(screen.getByLabelText('Known firm relationship')).toBeInTheDocument()
+  expect(screen.getByLabelText('Known firm activity')).toBeInTheDocument()
+  expect(screen.getByLabelText('Known firm identity confidence')).toBeInTheDocument()
+  expect(screen.getAllByText('public values · not revenue').length).toBeGreaterThanOrEqual(1)
   expect(screen.getByText('$250,000')).toBeInTheDocument()
   expect(screen.queryByText('Invalid Date')).not.toBeInTheDocument()
 
-  await user.click(screen.getAllByRole('button', { name:'Open firm →' })[0])
+  const table = screen.getByRole('table')
+  expect(within(table).getAllByRole('row')).toHaveLength(101)
+  await user.click(screen.getByRole('button', { name:'Firm' }))
+  expect(within(table).getAllByRole('row')[1]).toHaveTextContent('ALPHA WATER SERVICES LLC')
+
+  expect(screen.getByText('Page 1 of 2')).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name:'Next →' }))
+  expect(screen.getByText('Page 2 of 2')).toBeInTheDocument()
+  expect(screen.getByText('RMC')).toBeInTheDocument()
+
+  await user.type(screen.getByLabelText('Known firm search'), 'ALPHA')
+  expect(screen.getByText('ALPHA WATER SERVICES LLC')).toBeInTheDocument()
+  expect(screen.queryByText('RMC')).not.toBeInTheDocument()
+  expect(screen.getAllByText('VERIFY').length).toBeGreaterThanOrEqual(0)
+
+  await user.click(screen.getByRole('button', { name:'Open firm →' }))
   expect(window.location.hash).toBe('#/company/observed-company-alpha')
 })
 
