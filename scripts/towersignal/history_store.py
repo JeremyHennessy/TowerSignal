@@ -264,12 +264,63 @@ def reconstruct_segmented_snapshot(history_dir: Path, manifest: dict[str, Any]) 
     return snapshot
 
 
-def load_history_snapshot(path: Path | None) -> dict[str, Any] | None:
+def load_history_snapshot(path: Path | None, default: Any = None) -> Any:
     if path is None or not path.exists():
-        return None
+        return default
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise RuntimeError(f"History snapshot must be an object: {path}")
-    if payload.get("history_storage_version") == HISTORY_STORAGE_VERSION:
+    if isinstance(payload, dict) and payload.get("history_storage_version") == HISTORY_STORAGE_VERSION:
         return reconstruct_segmented_snapshot(path.parent, payload)
     return payload
+
+
+def validate_segmented_storage(current_path: Path, previous_path: Path | None = None) -> dict[str, Any]:
+    manifest = json.loads(current_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict) or manifest.get("history_storage_version") != HISTORY_STORAGE_VERSION:
+        raise RuntimeError("Current history snapshot is not a segmented-history manifest")
+    # Full reconstruction validates checksums, segment identities and system-ID reconciliation.
+    reconstructed = reconstruct_segmented_snapshot(current_path.parent, manifest)
+    previous_manifest: dict[str, Any] | None = None
+    if previous_path and previous_path.exists():
+        candidate = json.loads(previous_path.read_text(encoding="utf-8"))
+        if isinstance(candidate, dict) and candidate.get("history_storage_version") == HISTORY_STORAGE_VERSION:
+            previous_manifest = candidate
+
+    segments: dict[str, Any] = {}
+    for name, raw_entry in (manifest.get("segments") or {}).items():
+        entry = dict(raw_entry)
+        size = int(entry.get("bytes") or 0)
+        if size <= 0:
+            raise RuntimeError(f"History segment {name} is empty")
+        if size > SEGMENT_HARD_MAX_BYTES:
+            raise RuntimeError(
+                f"History segment {name} {size:,} bytes exceeds per-segment ceiling {SEGMENT_HARD_MAX_BYTES:,} bytes"
+            )
+        previous_size = None
+        growth_ratio = None
+        if previous_manifest:
+            previous_entry = (previous_manifest.get("segments") or {}).get(name)
+            if isinstance(previous_entry, dict):
+                previous_size = int(previous_entry.get("bytes") or 0)
+                if previous_size > 0:
+                    growth_ratio = size / previous_size
+                    if (
+                        size > previous_size + SEGMENT_GROWTH_ABSOLUTE_ALLOWANCE
+                        and growth_ratio > SEGMENT_GROWTH_RATIO_LIMIT
+                    ):
+                        raise RuntimeError(
+                            f"History segment {name} growth anomaly: {previous_size:,} -> {size:,} bytes ({growth_ratio:.2f}x)"
+                        )
+        segments[name] = {
+            "current_bytes": size,
+            "previous_bytes": previous_size,
+            "growth_ratio": growth_ratio,
+            "hard_max_bytes": SEGMENT_HARD_MAX_BYTES,
+        }
+
+    return {
+        "storage_version": HISTORY_STORAGE_VERSION,
+        "system_count": len(reconstructed.get("systems") or []),
+        "segment_count": len(segments),
+        "segments": segments,
+        "total_segment_bytes": sum(item["current_bytes"] for item in segments.values()),
+    }
