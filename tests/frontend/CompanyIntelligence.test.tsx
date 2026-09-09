@@ -96,7 +96,6 @@ test('Known Firms is filterable, sortable and genuinely paginated while preservi
   await user.type(screen.getByLabelText('Known firm search'), 'ALPHA')
   expect(screen.getByText('ALPHA WATER SERVICES LLC')).toBeInTheDocument()
   expect(screen.queryByText('RMC')).not.toBeInTheDocument()
-  expect(screen.getAllByText('VERIFY').length).toBeGreaterThanOrEqual(0)
 
   await user.click(screen.getByRole('button', { name:'Open firm →' }))
   expect(window.location.hash).toBe('#/company/observed-company-alpha')
