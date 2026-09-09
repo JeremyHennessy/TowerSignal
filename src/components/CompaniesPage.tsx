@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadKnownFirms } from '../data/api'
+import type { CompanyIntelligenceRecord } from '../types/company'
 import type { KnownFirmPayload, KnownFirmRole, KnownFirmSummaryRecord } from '../types/firm'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
@@ -54,7 +55,8 @@ function exportKnownFirms(rows: KnownFirmSummaryRecord[]) {
   URL.revokeObjectURL(url)
 }
 
-export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (firm: KnownFirmSummaryRecord) => void }) {
+export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: CompanyIntelligenceRecord) => void }) {
+  void onOpenCompany
   const [payload, setPayload] = useState<KnownFirmPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -90,8 +92,8 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (firm: KnownFi
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   useEffect(() => { if (page > pageCount) setPage(pageCount) }, [page, pageCount])
   const visible = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page])
-
   const jsonUrl = `${import.meta.env.BASE_URL}data/known-firms.json`
+  const openFirm = (firm: KnownFirmSummaryRecord) => { window.location.hash = `#/company/${encodeURIComponent(firm.firm_id)}` }
 
   return <section className="product-page companies-page known-firms-page">
     <div className="product-page-heading">
@@ -140,7 +142,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (firm: KnownFi
             <select aria-label="Known firm identity confidence" value={confidence} onChange={event => setConfidence(event.target.value)}><option value="ALL">All identity states</option><option value="CONFIRMED">Confirmed</option><option value="STRONG">Strong</option><option value="VERIFY">Verify</option></select>
           </div>
         </div>
-        <div className="reference-table-scroll"><table className="reference-table companies-table known-firms-table"><thead><tr><th>Firm</th><th>Roles</th><th>Serviced sites</th><th>Related sites</th><th>Tower accounts</th><th>Last active</th><th>Contracts</th><th>Public buyers</th><th>Observed value</th><th>Identity</th><th>Action</th></tr></thead><tbody>{visible.map(firm => <tr key={firm.firm_id} onClick={() => onOpenCompany(firm)}>
+        <div className="reference-table-scroll"><table className="reference-table companies-table known-firms-table"><thead><tr><th>Firm</th><th>Roles</th><th>Serviced sites</th><th>Related sites</th><th>Tower accounts</th><th>Last active</th><th>Contracts</th><th>Public buyers</th><th>Observed value</th><th>Identity</th><th>Action</th></tr></thead><tbody>{visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)}>
           <td><strong>{firm.canonical_name}</strong><small>{number.format(firm.observation_count)} observations · {firm.source_classes.slice(0, 2).map(label).join(' · ') || 'Source observed'}</small></td>
           <td><strong>{firm.roles.slice(0, 2).map(roleLabel).join(' · ')}</strong><small>{firm.roles.length > 2 ? `+${firm.roles.length - 2} more roles` : firm.primary_role !== firm.roles[0] ? roleLabel(firm.primary_role) : ''}</small></td>
           <td><strong>{number.format(firm.serviced_site_count)}</strong><small>explicit DWT service</small></td>
@@ -151,7 +153,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (firm: KnownFi
           <td><strong>{number.format(firm.observed_customer_count)}</strong><small>{number.format(firm.repeat_buyer_count)} repeat buyers</small></td>
           <td><strong>{firm.observed_contract_value ? currency.format(firm.observed_contract_value) : '—'}</strong><small>public values · not revenue</small></td>
           <td><span className={`health-badge health-${firm.identity_confidence === 'VERIFY' || firm.identity_confidence === 'UNRESOLVED' ? 'warning' : 'healthy'}`}>{firm.identity_confidence}</span><small>{label(firm.resolution_method)}</small></td>
-          <td><button className="table-link" onClick={event => { event.stopPropagation(); onOpenCompany(firm) }}>Open firm →</button></td>
+          <td><button className="table-link" onClick={event => { event.stopPropagation(); openFirm(firm) }}>Open firm →</button></td>
         </tr>)}</tbody></table></div>
         {filtered.length > PAGE_SIZE && <div className="known-firm-pagination"><button onClick={() => setPage(value => Math.max(1, value - 1))} disabled={page === 1}>← Previous</button><span>Page {number.format(page)} of {number.format(pageCount)} · rows {number.format((page - 1) * PAGE_SIZE + 1)}–{number.format(Math.min(page * PAGE_SIZE, filtered.length))}</span><button onClick={() => setPage(value => Math.min(pageCount, value + 1))} disabled={page === pageCount}>Next →</button></div>}
       </div>
