@@ -34,6 +34,7 @@ export function FirmSiteMap({
 
   useEffect(() => {
     if (!container.current || mapRef.current) return
+    const markerMap = markerRef.current
     const map = L.map(container.current, { zoomControl: true }).setView([40.7128, -74.006], 10)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -47,7 +48,7 @@ export function FirmSiteMap({
       map.remove()
       mapRef.current = null
       clusterRef.current = null
-      markerRef.current.clear()
+      markerMap.clear()
     }
   }, [])
 
