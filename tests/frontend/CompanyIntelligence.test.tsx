@@ -4,68 +4,83 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { CompaniesPage } from '../../src/components/CompaniesPage'
 import { CompanyProfilePage } from '../../src/components/CompanyProfilePage'
 
-const alphaCompany = {
-  schema_version:'1.0', company_id:'observed-company-alpha', canonical_name:'ALPHA WATER SERVICES LLC', company_type:'OBSERVED_PROCUREMENT_VENDOR', status:'UNKNOWN', current_parent_company_id:null, current_sponsor_company_id:null,
-  identity_confidence:'STRONG', first_seen:'2026-01-01', last_seen:'2026-08-21', identity_scope:'OBSERVED_PUBLIC_PROCUREMENT_VENDOR_LABEL', identity_basis:'CASE_AND_PUNCTUATION_NORMALIZED_LEGAL_SUFFIX_PRESERVED', strict_vendor_key:'ALPHA WATER SERVICES LLC', normalized_base_name:'ALPHA WATER SERVICES', cross_source_resolution_confidence:'STRONG', cross_source_resolution_method:'EXACT_SOURCE_LABEL_SUFFIX_PRESERVED', candidate_related_company_ids:[],
-  aliases:[{company_id:'observed-company-alpha',alias:'ALPHA WATER SERVICES LLC',normalized_alias:'ALPHA WATER SERVICES',source:'NYC_CHECKBOOK_CITYWIDE',confidence:'STRONG',resolution_method:'EXACT_SOURCE_LABEL_SUFFIX_PRESERVED'}], observed_sources:['NYC_CHECKBOOK_CITYWIDE'], observed_buyers:['DCAS'], service_categories:['WATER_TREATMENT'], procurement_ids:['contract-checkbook-1'], procurement_observation_count:1, city_record_observation_count:0, city_record_recent_award_count:0,
-  metrics:{observed_contract_count:1,active_contract_count:1,historical_contract_count:0,observed_contract_value:250000,active_observed_contract_value:250000,observed_spend_to_date:100000,observed_customer_count:1,active_customer_count:1,cooling_tower_related_contract_count:0,water_treatment_contract_count:1,legionella_contract_count:0,mechanical_contract_count:0,median_contract_duration:365,average_contract_duration:365,contracts_expiring_12m:1,contracts_expiring_24m:1,contracts_expiring_36m:1,geographic_state_count:0,geographic_market_count:0,largest_observed_customer_value:250000,top_5_customer_value:250000,observed_customer_concentration:1,repeat_customer_count:0,observable_customer_retention:0},
-  value_semantics:'Observed source-reported public contract values and spend-to-date; not company revenue, enterprise value, or a complete customer book.',
+const alphaFirm = {
+  firm_id:'observed-company-alpha', canonical_name:'ALPHA WATER SERVICES LLC', strict_name:'ALPHA WATER SERVICES LLC', normalized_name:'ALPHA WATER SERVICES',
+  identity_confidence:'STRONG', resolution_method:'EXACT_SOURCE_LABEL_SUFFIX_PRESERVED', candidate_related_company_ids:[], procurement_company_id:'observed-company-alpha',
+  roles:['DWT_INSPECTION_PROVIDER','PROCUREMENT_VENDOR'], primary_role:'DWT_INSPECTION_PROVIDER', role_counts:{DWT_INSPECTION_PROVIDER:4,PROCUREMENT_VENDOR:1},
+  source_classes:['NYC_DWT_TANK_INSPECTIONS','NYC_CHECKBOOK_CITYWIDE'], observation_count:5, observed_site_count:3, serviced_site_count:2, contracted_site_count:1,
+  project_site_count:0, tower_account_count:2, mapped_site_count:2, first_observed_date:'2026-01-01', latest_observed_date:'2026-08-21', active_last_12m:true,
+  qualification_count:0, active_qualification_count:0, observed_contract_count:1, active_contract_count:1, observed_customer_count:1, repeat_buyer_count:0,
+  observed_contract_value:250000, service_categories:['WATER_TREATMENT'], detail_path:'firm-details/ob/observed-company-alpha.json',
 }
 
-const rmcCompany = {
-  ...alphaCompany,
-  company_id:'observed-company-rmc', canonical_name:'RMC', identity_confidence:'VERIFY', strict_vendor_key:'RMC', normalized_base_name:'RMC', cross_source_resolution_confidence:'VERIFY', cross_source_resolution_method:'AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL',
-  aliases:[{company_id:'observed-company-rmc',alias:'RMC',normalized_alias:'RMC',source:'NYC_CHECKBOOK_CITYWIDE',confidence:'VERIFY',resolution_method:'AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL'}], procurement_ids:['contract-rmc-1'],
+const rmcFirm = {
+  ...alphaFirm,
+  firm_id:'observed-company-rmc', canonical_name:'RMC', strict_name:'RMC', normalized_name:'RMC', identity_confidence:'VERIFY',
+  resolution_method:'AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL', procurement_company_id:'observed-company-rmc', roles:['PROCUREMENT_VENDOR'], primary_role:'PROCUREMENT_VENDOR',
+  role_counts:{PROCUREMENT_VENDOR:1}, source_classes:['NYC_CHECKBOOK_CITYWIDE'], observation_count:1, observed_site_count:0, serviced_site_count:0, contracted_site_count:0,
+  tower_account_count:0, mapped_site_count:0, observed_contract_value:0, detail_path:'firm-details/ob/observed-company-rmc.json',
 }
 
-const companiesPayload = {
-  schema_version:'1.0', generated_at:'2026-08-21T20:00:00Z',
-  summary:{observed_vendor_company_count:2,procurement_observation_count:2,cross_source_exact_label_company_count:0,companies_requiring_resolution_review:1,unresolved_observation_count:1,value_semantics:'Observed source-reported public contract values; not company revenue, enterprise value, or a complete customer book.'},
-  companies:[alphaCompany, rmcCompany],
-  unresolved_vendor_observations:[{procurement_id:'contract-rmc-1',source:'NYC_CHECKBOOK_CITYWIDE',vendor_raw:'RMC',observed_company_id:'observed-company-rmc',normalized_base_name:'RMC',resolution_confidence:'VERIFY',resolution_method:'AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL',candidate_company_ids:[]}],
+const knownFirmsPayload = {
+  schema_version:'1.0', generated_at:'2026-08-21T20:00:00Z', domain:'TOWERSIGNAL_KNOWN_FIRMS',
+  summary:{known_firm_count:2,firms_with_site_relationships:1,firms_with_serviced_sites:1,firms_with_contracted_sites:1,firms_with_procurement_evidence:2,firms_with_dwt_service_evidence:1,unique_related_site_count:3,unique_serviced_site_count:2,unique_contracted_site_count:1,firm_site_relationship_count:3,firm_serviced_site_relationship_count:2,mapped_firm_site_relationship_count:2,role_firm_counts:{DWT_INSPECTION_PROVIDER:1,PROCUREMENT_VENDOR:2}},
+  evidence_semantics:{normalization:'Legal suffixes are preserved and ambiguous labels remain separate.',serviced_sites:'A serviced site requires explicit DWT inspection-provider or laboratory evidence.',related_sites:'Related does not mean serviced.',last_active:'Latest public-record observation.',procurement_value:'Observed public procurement value is not company revenue.'},
+  firms:[alphaFirm, rmcFirm],
+}
+
+const alphaDetail = {
+  schema_version:'1.0', generated_at:'2026-08-21T20:00:00Z', domain:'TOWERSIGNAL_KNOWN_FIRM_DETAIL', firm:alphaFirm,
+  aliases:[{name:'ALPHA WATER SERVICES LLC',source_class:'NYC_CHECKBOOK_CITYWIDE',role:'PROCUREMENT_VENDOR',observation_count:1},{name:'Alpha Water Services LLC',source_class:'NYC_DWT_TANK_INSPECTIONS',role:'DWT_INSPECTION_PROVIDER',observation_count:4}],
+  site_relationships:[], qualifications:[],
+  procurement:{company_id:'observed-company-alpha',canonical_name:'ALPHA WATER SERVICES LLC',observed_sources:['NYC_CHECKBOOK_CITYWIDE'],observed_buyers:['DCAS'],service_categories:['WATER_TREATMENT'],procurement_ids:['contract-checkbook-1'],metrics:{observed_contract_count:1,active_contract_count:1,observed_contract_value:250000,observed_customer_count:1,repeat_buyer_count:0},value_semantics:'Observed public procurement values; not company revenue.'},
+  evidence_boundaries:{identity:'Firm identities normalize source-reported names conservatively. Legal suffixes are preserved.',serviced_site:'Serviced-site counts include only DWT source rows that explicitly name an inspection firm or laboratory at a building/tank.',contracted_site:'A confirmed public contract relationship is not represented as proof that work was completed.',project_roles:'DOB applicant/owner business names are project roles, not incumbent provider claims.',qualification:'DEC Category 7G registration supports qualification only.'},
 }
 
 const procurement = {
   cityRecord:{schema_version:'1.0',generated_at:'2026-08-21T20:00:00Z',source:{},summary:{},source_health:{},notices:[]},
   checkbook:{schema_version:'1.0',generated_at:'2026-08-21T20:00:00Z',source:{},summary:{},source_health:{},contracts:[{schema_version:'1.0',procurement_id:'contract-checkbook-1',source:'NYC_CHECKBOOK_CITYWIDE',source_record_id:'PC1',source_contract_id:'PC1',vendor_raw:'ALPHA WATER SERVICES LLC',vendor_role:'PRIME',buyer_name:'DCAS',agency:'DCAS',title:'Water treatment services',description:'Water treatment services',service_category:'WATER_TREATMENT',service_confidence:'CONFIRMED',classification_terms:['water treatment'],classification_reason:'Explicit water-treatment language',current_amount:250000,original_amount:250000,spend_to_date:100000,start_date:'2026-01-01',end_date:'2027-01-01',status:'REGISTERED',observed_value_evidence:'SOURCE_REPORTED_PUBLIC_CONTRACT',source_url:'https://example.test/checkbook/PC1',retrieved_at:'2026-08-21T20:00:00Z'}]},
+  nysAuthorities:null, openBookWater:null, nychaWater:null, sourceErrors:{},
 }
 
 vi.mock('../../src/data/api', () => ({
-  loadCompanies: vi.fn(() => Promise.resolve(companiesPayload)),
-  loadDomesticWaterMarket: vi.fn(() => Promise.resolve(null)),
-  loadElapProbe: vi.fn(() => Promise.resolve(null)),
-  loadProviderResolution: vi.fn(() => Promise.resolve(null)),
+  loadKnownFirms: vi.fn(() => Promise.resolve(knownFirmsPayload)),
+  loadKnownFirmDetail: vi.fn(() => Promise.resolve(alphaDetail)),
   loadProcurement: vi.fn(() => Promise.resolve(procurement)),
 }))
 
-beforeEach(() => vi.clearAllMocks())
+beforeEach(() => {
+  window.location.hash = '#/companies'
+  vi.clearAllMocks()
+})
 
-test('Companies shows observed value semantics and keeps RMC in VERIFY review', async () => {
+test('Known Firms shows service metrics, public-value semantics and keeps RMC in VERIFY review', async () => {
   const user = userEvent.setup()
-  const openCompany = vi.fn()
-  render(<CompaniesPage onOpenCompany={openCompany} />)
+  render(<CompaniesPage onOpenCompany={vi.fn()} />)
 
-  expect(await screen.findByRole('heading', { name:'Companies', level:1 })).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name:'Known firms', level:1 })).toBeInTheDocument()
   expect(screen.getByText('ALPHA WATER SERVICES LLC')).toBeInTheDocument()
   expect(screen.getByText('RMC')).toBeInTheDocument()
   expect(screen.getAllByText('VERIFY').length).toBeGreaterThanOrEqual(1)
-  expect(screen.getAllByText('not company revenue').length).toBeGreaterThanOrEqual(1)
-  expect(screen.getAllByText('$250,000')).toHaveLength(2)
+  expect(screen.getByText('2', { selector:'.known-firms-table tbody tr:first-child td:nth-child(3) strong' })).toBeInTheDocument()
+  expect(screen.getByText('public values · not revenue')).toBeInTheDocument()
+  expect(screen.getByText('$250,000')).toBeInTheDocument()
   expect(screen.queryByText('Invalid Date')).not.toBeInTheDocument()
 
-  await user.click(screen.getAllByRole('button', { name:'Open company →' })[0])
-  expect(openCompany).toHaveBeenCalledWith(alphaCompany)
+  await user.click(screen.getAllByRole('button', { name:'Open firm →' })[0])
+  expect(window.location.hash).toBe('#/company/observed-company-alpha')
 })
 
-test('Company Profile renders shareable source-backed identity, value and procurement evidence', async () => {
+test('Known Firm Profile renders source-backed identity, value, procurement and service boundaries', async () => {
   render(<CompanyProfilePage companyId="observed-company-alpha" onBack={vi.fn()} onOpenCompany={vi.fn()} />)
 
   expect(await screen.findByRole('heading', { name:'ALPHA WATER SERVICES LLC', level:1 })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name:'Copy company link' })).toBeInTheDocument()
-  expect(screen.getByText('STRONG · exact source label suffix preserved')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name:'Copy firm link' })).toBeInTheDocument()
+  expect(screen.getByText('STRONG')).toBeInTheDocument()
+  expect(screen.getByText('Exact Source Label Suffix Preserved')).toBeInTheDocument()
   expect(screen.getAllByText('$250,000').length).toBeGreaterThanOrEqual(1)
-  expect(screen.getByText('Public source value · not revenue')).toBeInTheDocument()
   expect(screen.getByText('Water treatment services')).toBeInTheDocument()
   expect(screen.getByRole('link', { name:'Open source ↗' })).toHaveAttribute('href', 'https://example.test/checkbook/PC1')
-  expect(screen.getByText(/No parent, sponsor, acquisition or private-company financial claims/)).toBeInTheDocument()
+  expect(screen.getByText(/Serviced-site counts include only DWT source rows/)).toBeInTheDocument()
+  expect(screen.getByText(/not represented as proof that work was completed/)).toBeInTheDocument()
 })
