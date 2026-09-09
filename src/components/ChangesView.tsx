@@ -42,6 +42,9 @@ const QUICK_GROUPS: Array<{ label: string; types: ChangeEventType[] | null }> = 
   { label: 'Property / contact', types: ['PLUTO_OWNER_CHANGED', 'HPD_REGISTRATION_CHANGED', 'HPD_CONTACT_ADDED', 'HPD_CONTACT_REMOVED', 'HPD_MANAGING_AGENT_CHANGED'] },
 ]
 
+type SortKey = 'detected_at' | 'address' | 'event_type' | 'priority_score' | 'source' | 'evidence_confidence'
+type SortDirection = 'asc' | 'desc'
+
 function compactValue(value: unknown): string {
   if (value == null) return '—'
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value)
@@ -56,6 +59,11 @@ function eventTone(event: ChangeEvent): string {
   return 'neutral'
 }
 
+function compareValues(left: unknown, right: unknown): number {
+  if (typeof left === 'number' && typeof right === 'number') return left - right
+  return String(left ?? '').localeCompare(String(right ?? ''), undefined, { numeric: true, sensitivity: 'base' })
+}
+
 export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPayload; onSelectSystem: (systemId: string) => void }) {
   const [days, setDays] = useState('7')
   const [borough, setBorough] = useState('')
@@ -67,6 +75,7 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
   const [quickTypes, setQuickTypes] = useState<ChangeEventType[] | null>(null)
   const [customStart, setCustomStart] = useState('')
   const [customEnd, setCustomEnd] = useState('')
+  const [sort, setSort] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'detected_at', direction: 'desc' })
   const [page, setPage] = useState(0)
 
   const filtered = useMemo(() => payload.events.filter(event => {
@@ -86,12 +95,17 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
     return true
   }), [payload.events, days, borough, eventType, quickLabel, quickTypes, minimumPriority, confidence, contactOnly, customStart, customEnd])
 
+  const sorted = useMemo(() => [...filtered].sort((a, b) => {
+    const result = compareValues(a[sort.key], b[sort.key]) || a.system_id.localeCompare(b.system_id)
+    return sort.direction === 'asc' ? result : -result
+  }), [filtered, sort])
+
   const boroughs = [...new Set(payload.events.map(event => event.borough).filter(Boolean))] as string[]
   const eventTypes = [...new Set(payload.events.map(event => event.event_type))]
   const pageSize = 50
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const pageCount = Math.max(1, Math.ceil(sorted.length / pageSize))
   const safePage = Math.min(page, pageCount - 1)
-  const pageRows = filtered.slice(safePage * pageSize, safePage * pageSize + pageSize)
+  const pageRows = sorted.slice(safePage * pageSize, safePage * pageSize + pageSize)
 
   const chooseQuick = (label: string, types: ChangeEventType[] | null) => {
     setQuickLabel(label)
@@ -101,6 +115,13 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
     setEventType('')
     setPage(0)
   }
+  const changeSort = (key: SortKey) => {
+    setSort(current => current.key === key
+      ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' }
+      : { key, direction: key === 'detected_at' || key === 'priority_score' ? 'desc' : 'asc' })
+    setPage(0)
+  }
+  const sortIndicator = (key: SortKey) => sort.key === key ? (sort.direction === 'asc' ? ' ↑' : ' ↓') : ''
 
   return <section className="changes-view changes-table-view" aria-label="TowerSignal changes">
     {payload.baseline_initialized && <div className="disclaimer"><strong>Historical baseline initialized.</strong> Existing systems are not being mislabeled as newly registered. Later source snapshots are compared with this preserved baseline.</div>}
@@ -123,8 +144,16 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
         <div className="change-tabs" role="tablist" aria-label="Change categories">{QUICK_GROUPS.map(group => <button key={group.label} className={quickLabel === group.label ? 'active' : ''} onClick={() => chooseQuick(group.label, group.types)}>{group.label}<span>{group.label === 'All changes' ? payload.events.length : ''}</span></button>)}</div>
 
         <div className="reference-table-card monitor-change-table-card">
-          <div className="reference-table-heading"><div><strong>{filtered.length.toLocaleString()} new events</strong><span>{pageRows.length ? `Showing ${safePage * pageSize + 1}–${safePage * pageSize + pageRows.length}` : 'No matching events'} · preserved source-backed history</span></div></div>
-          {pageRows.length === 0 ? <div className="reference-empty-state compact"><strong>No observed changes match these filters.</strong><span>Adjust the period or evidence filters to inspect retained history.</span></div> : <div className="reference-table-scroll"><table className="reference-table change-reference-table"><thead><tr><th>Time</th><th>Account</th><th>Change</th><th>Previous → New</th><th>Priority</th><th>Source</th><th>Evidence</th><th>Action</th></tr></thead><tbody>{pageRows.map((event, index) => <ChangeRow key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} onSelectSystem={onSelectSystem} />)}</tbody></table></div>}
+          <div className="reference-table-heading"><div><strong>{sorted.length.toLocaleString()} new events</strong><span>{pageRows.length ? `Showing ${safePage * pageSize + 1}–${safePage * pageSize + pageRows.length}` : 'No matching events'} · preserved source-backed history</span></div></div>
+          {pageRows.length === 0 ? <div className="reference-empty-state compact"><strong>No observed changes match these filters.</strong><span>Adjust the period or evidence filters to inspect retained history.</span></div> : <div className="reference-table-scroll"><table className="reference-table change-reference-table"><thead><tr>
+            <th><button onClick={() => changeSort('detected_at')}>Time{sortIndicator('detected_at')}</button></th>
+            <th><button onClick={() => changeSort('address')}>Account{sortIndicator('address')}</button></th>
+            <th><button onClick={() => changeSort('event_type')}>Change{sortIndicator('event_type')}</button></th>
+            <th>Previous → New</th>
+            <th><button onClick={() => changeSort('priority_score')}>Priority{sortIndicator('priority_score')}</button></th>
+            <th><button onClick={() => changeSort('source')}>Source{sortIndicator('source')}</button></th>
+            <th><button onClick={() => changeSort('evidence_confidence')}>Evidence{sortIndicator('evidence_confidence')}</button></th><th>Action</th>
+          </tr></thead><tbody>{pageRows.map((event, index) => <ChangeRow key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} onSelectSystem={onSelectSystem} />)}</tbody></table></div>}
           {pageCount > 1 && <div className="reference-pagination"><span>Page {safePage + 1} of {pageCount}</span><div><button disabled={safePage === 0} onClick={() => setPage(Math.max(0, safePage - 1))}>Previous</button><button disabled={safePage >= pageCount - 1} onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))}>Next</button></div></div>}
         </div>
       </div>
