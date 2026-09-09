@@ -88,9 +88,9 @@ test('Known Firms is filterable, sortable and genuinely paginated while preservi
   await user.click(screen.getByRole('button', { name:'Firm' }))
   expect(within(table).getAllByRole('row')[1]).toHaveTextContent('ALPHA WATER SERVICES LLC')
 
-  expect(screen.getByText('Page 1 of 2')).toBeInTheDocument()
+  expect(screen.getByText(/Page 1 of 2/)).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name:'Next →' }))
-  expect(screen.getByText('Page 2 of 2')).toBeInTheDocument()
+  expect(screen.getByText(/Page 2 of 2/)).toBeInTheDocument()
   expect(screen.getByText('RMC')).toBeInTheDocument()
 
   await user.type(screen.getByLabelText('Known firm search'), 'ALPHA')
