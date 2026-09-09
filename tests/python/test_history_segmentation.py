@@ -24,6 +24,9 @@ def system(system_id: str = "CT-1") -> dict:
         "system_id": system_id,
         "bin": "1000001",
         "bbl": "1000010001",
+        "registry_bbl": None,
+        "bbl_identity_basis": "BIN_EXACT_UNIQUE_MAPPLUTO_BBL",
+        "bbl_identity_status": "RECOVERED_EXACT_BIN_MAPPLUTO_BBL",
         "address": "1 TEST ST",
         "borough": "Manhattan",
         "zip": "10001",
@@ -68,6 +71,11 @@ class HistorySegmentationTests(unittest.TestCase):
             manifest = write_segmented_snapshot(history_dir, original)
             self.assertEqual(manifest["history_storage_version"], HISTORY_STORAGE_VERSION)
             self.assertLess((history_dir / "latest.json").stat().st_size, 20_000)
+            core_payload = json.loads((history_dir / manifest["segments"]["core"]["path"]).read_text(encoding="utf-8"))
+            core_system = core_payload["systems"][0]
+            self.assertIsNone(core_system["registry_bbl"])
+            self.assertEqual(core_system["bbl_identity_basis"], "BIN_EXACT_UNIQUE_MAPPLUTO_BBL")
+            self.assertEqual(core_system["bbl_identity_status"], "RECOVERED_EXACT_BIN_MAPPLUTO_BBL")
             reconstructed = load_history_snapshot(history_dir / "latest.json")
             self.assertEqual(reconstructed, original)
             validation = validate_history_size(history_dir / "latest.json")
