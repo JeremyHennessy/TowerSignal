@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from towersignal.checkbook import CheckbookSourceError  # noqa: E402
 from towersignal.checkbook_nycha import (  # noqa: E402
     build_payload,
     classify_nycha_water,
@@ -116,6 +117,76 @@ class CheckbookNychaTests(unittest.TestCase):
         self.assertEqual(partition.expected_count, 0)
         self.assertEqual(calls[0]["fiscal_year"], "2026")
         self.assertEqual(calls[0]["purpose"], "water")
+
+    def test_fetch_partition_retries_transient_non_xml_transport_body(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        calls = 0
+        sleeps: list[int] = []
+
+        def api(_payload: bytes) -> bytes:
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                return b"upstream service temporarily unavailable"
+            response = ET.Element("response")
+            status = ET.SubElement(response, "status")
+            ET.SubElement(status, "result").text = "success"
+            records = ET.SubElement(response, "result_records")
+            ET.SubElement(records, "record_count").text = "0"
+            ET.SubElement(records, "nycha_contract_transactions")
+            return ET.tostring(response, encoding="utf-8")
+
+        partition = fetch_partition(
+            2026,
+            purpose_query="plumbing",
+            request_xml=api,
+            page_size=10,
+            sleep=sleeps.append,
+        )
+        self.assertEqual(partition.expected_count, 0)
+        self.assertEqual(calls, 2)
+        self.assertEqual(sleeps, [1])
+
+    def test_fetch_partition_retries_html_transport_body_then_fails_closed(self) -> None:
+        calls = 0
+        sleeps: list[int] = []
+
+        def api(_payload: bytes) -> bytes:
+            nonlocal calls
+            calls += 1
+            return b"<!doctype html><html><body>Bad Gateway</body></html>"
+
+        with self.assertRaisesRegex(CheckbookSourceError, "non-XML transport body after 3 attempts"):
+            fetch_partition(
+                2026,
+                purpose_query="plumbing",
+                request_xml=api,
+                page_size=10,
+                sleep=sleeps.append,
+            )
+        self.assertEqual(calls, 3)
+        self.assertEqual(sleeps, [1, 2])
+
+    def test_fetch_partition_does_not_retry_xml_shaped_malformed_source_body(self) -> None:
+        calls = 0
+        sleeps: list[int] = []
+
+        def api(_payload: bytes) -> bytes:
+            nonlocal calls
+            calls += 1
+            return b"<response"
+
+        with self.assertRaisesRegex(CheckbookSourceError, "returned malformed XML"):
+            fetch_partition(
+                2026,
+                purpose_query="plumbing",
+                request_xml=api,
+                page_size=10,
+                sleep=sleeps.append,
+            )
+        self.assertEqual(calls, 1)
+        self.assertEqual(sleeps, [])
 
     def test_build_payload_dedupes_overlapping_purpose_query_rows(self) -> None:
         import xml.etree.ElementTree as ET

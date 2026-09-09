@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 import xml.etree.ElementTree as ET
 from collections import Counter
 from dataclasses import dataclass
@@ -29,6 +30,8 @@ from .procurement import (
 SCHEMA_VERSION = "1.0"
 SOURCE = "NYC_CHECKBOOK_NYCHA"
 DEFAULT_FISCAL_YEAR_COUNT = 5
+NYCHA_NON_XML_RETRIES = 3
+NYCHA_NON_XML_PREVIEW_CHARS = 120
 
 NYCHA_COLUMNS = (
     "year",
@@ -158,6 +161,32 @@ def _text(node: ET.Element | None) -> str | None:
     return value or None
 
 
+def _payload_text(payload: bytes | str) -> str:
+    if isinstance(payload, bytes):
+        return payload.decode("utf-8", errors="replace")
+    if isinstance(payload, str):
+        return payload
+    return ""
+
+
+def _is_transient_non_xml_payload(payload: bytes | str) -> bool:
+    text = _payload_text(payload).lstrip("\ufeff \t\r\n").lower()
+    if not text:
+        return True
+    return (
+        not text.startswith("<")
+        or text.startswith("<!doctype html")
+        or text.startswith("<html")
+    )
+
+
+def _safe_payload_preview(payload: bytes | str) -> str:
+    text = normalize_space(_payload_text(payload))
+    if len(text) <= NYCHA_NON_XML_PREVIEW_CHARS:
+        return text
+    return f"{text[:NYCHA_NON_XML_PREVIEW_CHARS]}…"
+
+
 def parse_nycha_response(payload: bytes | str) -> tuple[int, tuple[dict[str, str], ...]]:
     try:
         root = ET.fromstring(payload)
@@ -216,6 +245,7 @@ def fetch_partition(
     purpose_query: str | None = None,
     page_size: int = PAGE_SIZE,
     request_xml=_default_request_xml,
+    sleep=time.sleep,
 ) -> NychaPartition:
     if page_size <= 0 or page_size > PAGE_SIZE:
         raise ValueError(f"page_size must be between 1 and {PAGE_SIZE}")
@@ -233,13 +263,33 @@ def fetch_partition(
             max_records=page_size,
             extra_criteria=criteria,
         )
-        try:
-            page_count, page_rows = parse_nycha_response(request_xml(request))
-        except CheckbookSourceError as exc:
-            raise CheckbookSourceError(
-                f"Checkbook NYCHA FY{fiscal_year} {purpose_query or 'all'} "
-                f"records_from={records_from} max_records={page_size}: {exc}"
-            ) from exc
+        context = (
+            f"Checkbook NYCHA FY{fiscal_year} {purpose_query or 'all'} "
+            f"records_from={records_from} max_records={page_size}"
+        )
+        non_xml_attempt = 0
+        while True:
+            try:
+                payload = request_xml(request)
+            except CheckbookSourceError as exc:
+                raise CheckbookSourceError(f"{context}: {exc}") from exc
+
+            if _is_transient_non_xml_payload(payload):
+                non_xml_attempt += 1
+                if non_xml_attempt >= NYCHA_NON_XML_RETRIES:
+                    preview = _safe_payload_preview(payload)
+                    raise CheckbookSourceError(
+                        f"{context}: Checkbook NYCHA returned a non-XML transport body after "
+                        f"{NYCHA_NON_XML_RETRIES} attempts; preview={preview!r}"
+                    )
+                sleep(2 ** (non_xml_attempt - 1))
+                continue
+
+            try:
+                page_count, page_rows = parse_nycha_response(payload)
+            except CheckbookSourceError as exc:
+                raise CheckbookSourceError(f"{context}: {exc}") from exc
+            break
         if expected_count is None:
             expected_count = page_count
         elif page_count != expected_count:
