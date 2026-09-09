@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadKnownFirmDetail, loadProcurement } from '../data/api'
+import type { CompanyIntelligenceRecord } from '../types/company'
 import type { KnownFirmDetailPayload, KnownFirmRole, KnownFirmSiteRelationship } from '../types/firm'
 import type { ProcurementBundle, ProcurementRecord } from '../types/procurement'
 import { formatDate } from '../domain/labels'
@@ -59,8 +60,9 @@ export function CompanyProfilePage({
 }: {
   companyId: string
   onBack: () => void
-  onOpenCompany: (firmId: string) => void
+  onOpenCompany: (company: CompanyIntelligenceRecord) => void
 }) {
+  void onOpenCompany
   const [detail, setDetail] = useState<KnownFirmDetailPayload | null>(null)
   const [procurement, setProcurement] = useState<ProcurementBundle | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -117,6 +119,7 @@ export function CompanyProfilePage({
       .sort((a, b) => (recordDate(b) ?? '').localeCompare(recordDate(a) ?? ''))
   }, [detail, procurement])
   const visibleRecords = useMemo(() => records.slice(0, PROFILE_RECORD_LIMIT), [records])
+  const openFirmId = (firmId: string) => { window.location.hash = `#/company/${encodeURIComponent(firmId)}` }
 
   if (error) return <section className="product-page company-profile-page"><div className="account-profile-toolbar"><button className="breadcrumb-back" onClick={onBack}>← Back to Known firms</button></div><div className="reference-empty-state"><strong>Known-firm profile evidence is unavailable.</strong><span>{error}</span></div></section>
   if (!detail) return <section className="product-page company-profile-page"><div className="account-profile-toolbar"><button className="breadcrumb-back" onClick={onBack}>← Back to Known firms</button></div><div className="reference-empty-state"><strong>Loading source-backed firm profile…</strong></div></section>
@@ -155,7 +158,7 @@ export function CompanyProfilePage({
 
     <div className="reference-table-card"><div className="reference-table-heading"><div><strong>Observed names &amp; aliases</strong><span>Source labels retained with role and count</span></div></div><div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Observed label</th><th>Role</th><th>Source class</th><th>Observations</th></tr></thead><tbody>{detail.aliases.slice(0, 200).map((alias, index) => <tr key={`${alias.source_class}-${alias.role}-${alias.name}-${index}`}><td><strong>{alias.name}</strong></td><td>{roleLabel(alias.role)}</td><td>{label(alias.source_class)}</td><td>{number.format(alias.observation_count)}</td></tr>)}</tbody></table></div></div>
 
-    {firm.candidate_related_company_ids.length > 0 && <div className="reference-table-card"><div className="reference-table-heading"><div><strong>Identity candidates requiring review</strong><span>Similar or ambiguous observed labels; not a confirmed corporate relationship.</span></div></div><div className="candidate-company-list">{firm.candidate_related_company_ids.map(candidateId => <button key={candidateId} onClick={() => onOpenCompany(candidateId)}><strong>{candidateId}</strong><span>Open separate known-firm entity →</span></button>)}</div></div>}
+    {firm.candidate_related_company_ids.length > 0 && <div className="reference-table-card"><div className="reference-table-heading"><div><strong>Identity candidates requiring review</strong><span>Similar or ambiguous observed labels; not a confirmed corporate relationship.</span></div></div><div className="candidate-company-list">{firm.candidate_related_company_ids.map(candidateId => <button key={candidateId} onClick={() => openFirmId(candidateId)}><strong>{candidateId}</strong><span>Open separate known-firm entity →</span></button>)}</div></div>}
 
     {detail.procurement && <div className="reference-table-card"><div className="reference-table-heading"><div><strong>Public procurement observations</strong><span>{procurement ? `${number.format(visibleRecords.length)} shown · ${number.format(records.length)} source-backed records` : 'Loading retained procurement records…'}</span></div></div>{procurementError ? <div className="reference-empty-state compact"><strong>Procurement record detail is unavailable.</strong><span>{procurementError}</span><span>The known-firm identity and site evidence above remain available from the generated firm dataset.</span></div> : procurement ? <div className="reference-table-scroll"><table className="reference-table company-procurement-table"><thead><tr><th>Record</th><th>Source</th><th>Buyer</th><th>Service</th><th>Observed value</th><th>Date</th><th>Source evidence</th></tr></thead><tbody>{visibleRecords.map(row => <tr key={row.procurement_id}><td><strong>{row.title ?? row.description ?? row.source_record_id}</strong><small>{row.source_contract_id ?? row.notice_id ?? row.source_record_id}</small></td><td>{sourceLabel(row)}<small>{row.vendor_role ?? row.scope ?? 'source observation'}</small></td><td>{row.buyer_name ?? row.agency ?? '—'}</td><td>{label(row.service_category)}<small>{row.service_confidence}</small></td><td>{recordAmount(row) == null ? '—' : currency.format(recordAmount(row) ?? 0)}<small>{row.observed_value_evidence ?? row.amount_evidence ?? 'No amount published'}</small></td><td>{recordDate(row) ? formatDate(recordDate(row) ?? '') : '—'}</td><td>{row.source_url ? <a className="table-link" href={row.source_url} target="_blank" rel="noreferrer">Open source ↗</a> : '—'}<small>{row.facility_match_confidence ?? row.tower_link_confidence ?? 'UNLINKED'} facility/account</small></td></tr>)}</tbody></table></div> : <div className="reference-empty-state compact"><strong>Loading procurement evidence…</strong></div>}</div>}
 
