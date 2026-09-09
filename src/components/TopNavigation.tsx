@@ -18,7 +18,7 @@ const primaryNavigation: NavigationItem[] = [
 
 const secondaryNavigation: NavigationItem[] = [
   { mode: 'nys-changes', label: 'NYS Changes' },
-  { mode: 'companies', label: 'Companies' },
+  { mode: 'companies', label: 'Known Firms' },
   { mode: 'water-quality', label: 'Water Quality' },
   { mode: 'portfolios', label: 'Portfolios' },
   { mode: 'workflow', label: 'Workflow' },
