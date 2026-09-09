@@ -101,6 +101,13 @@ jobs:
       - name: Generate current NYC data
         timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
+      - name: Build bounded legacy DOB/BIS project context
+        timeout-minutes: 15
+        run: python scripts/build_legacy_dob_project_cache.py --output public/data
+      - name: Validate bounded legacy DOB/BIS project context
+        run: python scripts/validate_legacy_dob_project_cache.py --cache public/data/legacy-dob-projects.json --max-age-days 1 --require-production-volume
+      - name: Attach exact-BBL legacy DOB/BIS project context
+        run: python scripts/attach_legacy_dob_project_context.py --output public/data --cache public/data/legacy-dob-projects.json
       - name: Attach verified ACRIS cache
         run: python scripts/attach_acris.py --output public/data --cache .verified-acris/cache.json
       - name: Require canonical ACRIS cache universe alignment
