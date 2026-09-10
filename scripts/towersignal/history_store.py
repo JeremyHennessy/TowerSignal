@@ -12,7 +12,8 @@ SEGMENT_GROWTH_ABSOLUTE_ALLOWANCE = 1 * 1024 * 1024
 OATH_SHARD_NAMES = ("oath_0", "oath_1")
 
 CORE_FIELDS = (
-    "system_id", "bin", "bbl", "address", "borough", "zip", "date_registered",
+    "system_id", "bin", "bbl", "registry_bbl", "bbl_identity_basis", "bbl_identity_status",
+    "address", "borough", "zip", "date_registered",
     "active_equipment", "sample_dates", "latest_sample_date", "primary_signal",
     "signal_types", "priority_score", "evidence_confidence", "first_seen_at", "last_seen_at",
 )
