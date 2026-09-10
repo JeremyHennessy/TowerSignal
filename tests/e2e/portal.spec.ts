@@ -16,7 +16,7 @@ test('authenticated Home and Account pages are linkable, responsive and signout 
     const menu = page.getByRole('dialog', { name: 'TowerSignal workspace menu', exact: true })
     await expect(menu).toBeVisible()
     await expect(menu.getByRole('button', { name: 'Prospect', exact: true })).toBeVisible()
-    await expect(menu.getByRole('button', { name: 'Companies', exact: true })).toBeVisible()
+    await expect(menu.getByRole('button', { name: 'Known Firms', exact: true })).toBeVisible()
     await menu.getByRole('button', { name: 'Close workspace menu', exact: true }).click()
     await page.getByRole('button', { name: 'Open TowerSignal account', exact: true }).click()
   } else {
