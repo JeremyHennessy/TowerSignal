@@ -23,5 +23,7 @@ import './styles/account-report.css'
 import './styles/ui-polish.css'
 import './styles/ui-polish-mobile-fix.css'
 import './styles/account-report-density-final.css'
+import './styles/known-firms.css'
+import './styles/table-standard.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AuthGate /></React.StrictMode>)

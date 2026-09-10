@@ -1,0 +1,102 @@
+name: Verify Known Firms production dataset
+
+on:
+  push:
+    branches:
+      - agent/known-firms-workspace-20260909
+    paths:
+      - '.github/workflows/known-firms-production-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: known-firms-production-proof
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out durable TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+      - name: Check out last verified Checkbook NYC cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-checkbook
+          path: .checkbook-store
+          fetch-depth: 1
+          sparse-checkout: data/checkbook
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build current NYC account/detail spine
+        timeout-minutes: 45
+        run: python scripts/build_data.py --output .known-firms-proof/data
+      - name: Build bounded legacy DOB/BIS context
+        timeout-minutes: 15
+        run: python scripts/build_legacy_dob_project_cache.py --output .known-firms-proof/data
+      - name: Validate legacy DOB/BIS context
+        run: python scripts/validate_legacy_dob_project_cache.py --cache .known-firms-proof/data/legacy-dob-projects.json --max-age-days 1 --require-production-volume
+      - name: Attach legacy DOB/BIS context to account details
+        run: python scripts/attach_legacy_dob_project_context.py --output .known-firms-proof/data --cache .known-firms-proof/data/legacy-dob-projects.json
+      - name: Build domestic-water provider/lab/DEC market cache
+        run: python scripts/build_domestic_water_market_cache.py --output .known-firms-proof/data/domestic-water-market.json --page-size 50000
+      - name: Validate domestic-water provider/lab/DEC market cache
+        run: python scripts/validate_domestic_water_market_cache.py --cache .known-firms-proof/data/domestic-water-market.json --max-age-days 1 --require-production-volume
+      - name: Build NYC City Record procurement
+        run: python scripts/build_city_record_procurement.py --output .known-firms-proof/data/procurement-city-record.json
+      - name: Attach verified Checkbook NYC procurement
+        run: |
+          python scripts/validate_checkbook_cache.py --cache .checkbook-store/data/checkbook/cache.json --max-age-days 2 --require-production-volume
+          cp .checkbook-store/data/checkbook/cache.json .known-firms-proof/data/procurement-checkbook.json
+      - name: Build statewide NYS authority procurement
+        run: python scripts/build_nys_authority_procurement.py --output .known-firms-proof/data/procurement-nys-authorities.json --cohort data/fixtures/deal-validation-cohort.json
+      - name: Validate statewide NYS authority procurement
+        run: python scripts/validate_nys_authority_procurement.py --input .known-firms-proof/data/procurement-nys-authorities.json
+      - name: Build Open Book NY water procurement
+        run: python scripts/build_openbook_water_cache.py --output .known-firms-proof/data/procurement-openbook-water.json
+      - name: Validate Open Book NY water procurement
+        run: python scripts/validate_openbook_water_cache.py --cache .known-firms-proof/data/procurement-openbook-water.json --max-age-days 1 --require-production-volume
+      - name: Build NYCHA water-contract release-line cache
+        run: python scripts/build_nycha_water_cache.py --output .known-firms-proof/data/procurement-nycha-water.json --fiscal-year-count 5 --page-size 5000
+      - name: Validate NYCHA water-contract release-line cache
+        run: python scripts/validate_nycha_water_cache.py --cache .known-firms-proof/data/procurement-nycha-water.json --max-age-days 1 --require-production-volume
+      - name: Build procurement company intelligence
+        run: >-
+          python scripts/build_company_intelligence.py
+          --city-record .known-firms-proof/data/procurement-city-record.json
+          --checkbook .known-firms-proof/data/procurement-checkbook.json
+          --extra-procurement .known-firms-proof/data/procurement-nys-authorities.json
+          --extra-procurement .known-firms-proof/data/procurement-openbook-water.json
+          --extra-procurement .known-firms-proof/data/procurement-nycha-water.json
+          --output .known-firms-proof/data/companies.json
+      - name: Validate procurement company intelligence
+        run: >-
+          python scripts/validate_company_intelligence.py
+          --companies .known-firms-proof/data/companies.json
+          --city-record .known-firms-proof/data/procurement-city-record.json
+          --checkbook .known-firms-proof/data/procurement-checkbook.json
+          --extra-procurement .known-firms-proof/data/procurement-nys-authorities.json
+          --extra-procurement .known-firms-proof/data/procurement-openbook-water.json
+          --extra-procurement .known-firms-proof/data/procurement-nycha-water.json
+      - name: Build normalized Known Firms dataset
+        run: python scripts/build_known_firms.py --output .known-firms-proof/data
+      - name: Validate production Known Firms dataset
+        run: python scripts/validate_known_firms.py --input .known-firms-proof/data/known-firms.json --max-age-days 1 --require-production-volume
+      - name: Upload Known Firms production proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: known-firms-production-proof
+          path: |
+            .known-firms-proof/data/known-firms.json
+            .known-firms-proof/data/firm-details/**
+          retention-days: 14

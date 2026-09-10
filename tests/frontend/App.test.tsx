@@ -134,7 +134,7 @@ test('renders the redesigned commercial account-intelligence workspace after dat
   }
   expect(screen.getByRole('button', { name:/^More/ })).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name:/^More/ }))
-  for (const name of ['NYS Changes','Companies','Portfolios','Workflow']) {
+  for (const name of ['NYS Changes','Known Firms','Portfolios','Workflow']) {
     expect(screen.getByRole('menuitem', { name })).toBeInTheDocument()
   }
   expect(screen.getByRole('button', { name:'Source Health & Coverage' })).toBeInTheDocument()

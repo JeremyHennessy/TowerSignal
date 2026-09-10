@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test'
+import { installCandidateRoutes } from './candidate-routes'
 
 const PASSWORD = 'TowerSignal-E2E-2026!'
 const AUTH_STATE_DIR = 'test-results/.auth'
@@ -61,6 +62,7 @@ export async function submitSignIn(page: Page, projectName: string): Promise<voi
 }
 
 export async function signInForProject(page: Page, projectName: string, targetHash: string): Promise<void> {
+  await installCandidateRoutes(page)
   await gotoHosted(page, targetHash)
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
   if (await loginHeading.isVisible().catch(() => false)) {

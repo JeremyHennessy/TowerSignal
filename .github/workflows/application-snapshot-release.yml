@@ -1,0 +1,172 @@
+name: Release verified Companies application snapshot
+
+# One controlled application release. Normal scheduled source refresh stays in pages.yml.
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/application-snapshot-release.yml']
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    # Claim the existing deployment lock after the ordinary push workflow starts.
+    # No second publisher may race the tested artifact or its rollback.
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require exact tested tree and successful snapshot proof
+        id: proof
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = (await github.rest.pulls.get({...context.repo, pull_number: 213})).data;
+            if (!pr.merged || pr.merge_commit_sha !== context.sha) throw new Error('Only the exact PR 213 merge may promote this artifact');
+            const ref = (await github.rest.git.getRef({...context.repo, ref:'heads/main'})).data;
+            if (ref.object.sha !== context.sha) throw new Error('Main moved before snapshot promotion');
+            const source = (await github.rest.git.getCommit({...context.repo, commit_sha:pr.head.sha})).data;
+            const merged = (await github.rest.git.getCommit({...context.repo, commit_sha:context.sha})).data;
+            if (source.tree.sha !== merged.tree.sha) throw new Error('Merge tree differs from tested source tree');
+            const runs = (await github.rest.actions.listWorkflowRuns({...context.repo, workflow_id:355123804, head_sha:pr.head.sha, event:'push', status:'success', per_page:10})).data.workflow_runs;
+            const run = runs.find(r => r.head_sha === pr.head.sha && r.conclusion === 'success');
+            if (!run) throw new Error('No successful exact-head deployed-snapshot proof');
+            const artifacts = (await github.rest.actions.listWorkflowRunArtifacts({...context.repo, run_id:run.id})).data.artifacts;
+            if (!artifacts.some(a => a.name === 'firm-candidate' && !a.expired)) throw new Error('Verified candidate is missing');
+            core.setOutput('run_id',String(run.id));
+            core.info(`Promoting tested source ${pr.head.sha}, proof ${run.id}, merge ${context.sha}`);
+      - uses: actions/download-artifact@v4
+        with:
+          name: firm-candidate
+          run-id: ${{ steps.proof.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: .candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34489354285
+          github-token: ${{ github.token }}
+          path: .rollback
+      - name: Verify archive integrity and preserve rollback
+        run: |
+          (cd .candidate && sha256sum --check firm-candidate.tar.sha256)
+          mkdir -p dist .rollback/site
+          tar -xf .candidate/firm-candidate.tar -C dist
+          tar -xf .rollback/artifact.tar -C .rollback/site
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          old=Path('.rollback/site/data')
+          new=Path('dist/data')
+          for p in old.rglob('*'):
+              if p.is_file():
+                  q=new/p.relative_to(old)
+                  assert q.is_file() and hashlib.sha256(p.read_bytes()).digest()==hashlib.sha256(q.read_bytes()).digest(), 'Source payload changed: '+str(p)
+          release=json.loads((new/'companies-release.json').read_text())
+          assert release['source_run_id']==34489354285
+          print('Every pre-existing data payload is byte-for-byte preserved. No source freshness or durable history is advanced by this application-only release.')
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install hosted acceptance browsers
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Check hosted snapshot has not changed before promotion
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          from urllib.request import urlopen
+          for name in ['index.html','data/systems.json','data/companies.json']:
+              expected=(Path('.rollback/site')/name).read_bytes()
+              with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name,timeout=90) as response:
+                  actual=response.read()
+              assert hashlib.sha256(actual).digest()==hashlib.sha256(expected).digest(), 'Hosted snapshot moved: '+name
+          PY
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy the exact verified candidate
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify exact hosted artifact bytes
+        id: bytes
+        run: |
+          python - <<'PY'
+          import hashlib,re,time
+          from pathlib import Path
+          from urllib.request import urlopen
+          names=['index.html','data/systems.json','data/known-firms.json','data/companies-release.json']
+          names += [x.lstrip('/').removeprefix('TowerSignal/') for x in re.findall(r'(?:src|href)="([^"]+\.(?:js|css))"',Path('dist/index.html').read_text())]
+          for name in names:
+              expected=(Path('dist')/name).read_bytes()
+              for attempt in range(6):
+                  with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?release='+str(time.time_ns()),timeout=90) as response:
+                      actual=response.read()
+                  if hashlib.sha256(actual).digest()==hashlib.sha256(expected).digest(): break
+                  if attempt==5: raise SystemExit('Hosted artifact mismatch: '+name)
+                  time.sleep(5)
+          print('Hosted HTML, JS, CSS and company/source payloads match the exact tested artifact.')
+          PY
+      - name: Full hosted desktop and iPhone acceptance
+        id: suite
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Verify company filters exports map sites and linked accounts
+        id: companies
+        run: node scripts/verify_firm_workspace.mjs hosted
+      - name: Retain hosted screenshots and browser reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: companies-release-evidence
+          path: |
+            firm-proof/hosted
+            playwright-report
+            dist/data/companies-release.json
+          retention-days: 30
+      - name: Stage exact prior artifact if acceptance fails
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: companies-rollback
+          path: .rollback/site
+      - name: Roll back failed application release
+        if: failure() && steps.deploy.outcome == 'success'
+        id: rollback
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: companies-rollback
+      - name: Verify rollback identity
+        if: failure() && steps.rollback.outcome == 'success'
+        run: |
+          python - <<'PY'
+          import hashlib,time
+          from pathlib import Path
+          from urllib.request import urlopen
+          for name in ['index.html','data/systems.json','data/companies.json']:
+              expected=(Path('.rollback/site')/name).read_bytes()
+              for attempt in range(6):
+                  with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?rollback='+str(time.time_ns()),timeout=90) as response: actual=response.read()
+                  if hashlib.sha256(actual).digest()==hashlib.sha256(expected).digest(): break
+                  if attempt==5: raise SystemExit('Rollback mismatch: '+name)
+                  time.sleep(5)
+          print('Prior deployed snapshot restored and byte-verified.')
+          PY

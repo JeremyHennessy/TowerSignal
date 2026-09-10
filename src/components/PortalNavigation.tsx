@@ -16,7 +16,7 @@ const primaryItems: PortalNavItem[] = [
 
 const secondaryItems: PortalNavItem[] = [
   { label: 'NYS Changes', hash: '#/nys-changes' },
-  { label: 'Companies', hash: '#/companies' },
+  { label: 'Known Firms', hash: '#/companies' },
   { label: 'Water Quality', hash: '#/water-quality' },
   { label: 'Portfolios', hash: '#/portfolios' },
   { label: 'Workflow', hash: '#/workflow' },

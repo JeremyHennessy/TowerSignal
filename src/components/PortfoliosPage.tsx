@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { SystemSummary, SystemsPayload } from '../types/data'
 import type { AcrisSummaryFields } from '../types/acris'
 import { ShareButton } from './ShareButton'
@@ -13,7 +13,12 @@ type OwnerGroup = {
   contactReady: number
 }
 
+type SortDirection = 'asc' | 'desc'
+type PropertySortKey = 'address' | 'borough' | 'priority' | 'towers' | 'area' | 'contacts'
+type CandidateSortKey = 'address' | 'owner' | 'borough' | 'towers' | 'priority' | 'contacts'
+
 const number = new Intl.NumberFormat('en-US')
+const PAGE_SIZE = 30
 const PLACEHOLDER_OWNER_NAMES = new Set([
   'UNAVAILABLE OWNER',
   'OWNER UNAVAILABLE',
@@ -55,20 +60,99 @@ function ownerKeyFromHash(): string | null {
   return new URLSearchParams(query).get('owner')
 }
 
+function compareValues(left: unknown, right: unknown): number {
+  if (typeof left === 'number' && typeof right === 'number') return left - right
+  return String(left ?? '').localeCompare(String(right ?? ''), undefined, { numeric: true, sensitivity: 'base' })
+}
+
+function PageControls({ page, total, onPage }: { page: number; total: number; onPage: (page: number) => void }) {
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  if (pages <= 1) return null
+  const safe = Math.min(page, pages)
+  return <div className="reference-pagination"><span>Page {safe} of {pages}</span><div><button disabled={safe <= 1} onClick={() => onPage(safe - 1)}>Previous</button><button disabled={safe >= pages} onClick={() => onPage(safe + 1)}>Next</button></div></div>
+}
+
 export function PortfoliosPage({ payload, watchedSystemIds, onOpenAccount }: { payload: SystemsPayload; watchedSystemIds: Set<string>; onOpenAccount: (row: SystemSummary) => void }) {
   const rows = payload.systems
   const groups = ownerGroups(rows)
   const [selectedKey, setSelectedKey] = useState<string | null>(ownerKeyFromHash)
+  const [propertySearch, setPropertySearch] = useState('')
+  const [propertySort, setPropertySort] = useState<{ key: PropertySortKey; direction: SortDirection }>({ key: 'priority', direction: 'desc' })
+  const [propertyPage, setPropertyPage] = useState(1)
+  const [candidateSearch, setCandidateSearch] = useState('')
+  const [candidateMinTowers, setCandidateMinTowers] = useState('1')
+  const [candidateSort, setCandidateSort] = useState<{ key: CandidateSortKey; direction: SortDirection }>({ key: 'towers', direction: 'desc' })
+  const [candidatePage, setCandidatePage] = useState(1)
+
   const plutoContext = rows.filter(row => row.pluto_match).length
   const contactReady = rows.filter(row => (row.hpd_contact_count ?? 0) > 0).length
   const acrisContext = rows.filter(row => ((row as SystemSummary & AcrisSummaryFields).acris_recent_document_count ?? 0) > 0).length
-  const candidates = [...rows].filter(row => row.pluto_match && normalizedOwnerName(row.pluto_owner_name)).sort((a, b) => b.active_equipment - a.active_equipment || b.priority_score - a.priority_score).slice(0, 12)
   const selectedGroup = groups.find(group => group.key === selectedKey) ?? groups[0]
+
+  const selectedRows = useMemo(() => {
+    const query = propertySearch.trim().toLowerCase()
+    const source = selectedGroup?.rows ?? []
+    return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))
+  }, [selectedGroup, propertySearch])
+  const sortedSelectedRows = useMemo(() => [...selectedRows].sort((a, b) => {
+    const value = (row: SystemSummary): unknown => {
+      if (propertySort.key === 'address') return row.address ?? row.system_id
+      if (propertySort.key === 'borough') return row.borough
+      if (propertySort.key === 'priority') return row.priority_score
+      if (propertySort.key === 'towers') return row.active_equipment
+      if (propertySort.key === 'area') return row.pluto_building_area_sqft ?? 0
+      return row.hpd_contact_count ?? 0
+    }
+    const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)
+    return propertySort.direction === 'asc' ? result : -result
+  }), [selectedRows, propertySort])
+  const propertyPageCount = Math.max(1, Math.ceil(sortedSelectedRows.length / PAGE_SIZE))
+  const safePropertyPage = Math.min(propertyPage, propertyPageCount)
+  const visibleSelectedRows = sortedSelectedRows.slice((safePropertyPage - 1) * PAGE_SIZE, safePropertyPage * PAGE_SIZE)
+
+  const candidateRows = useMemo(() => {
+    const query = candidateSearch.trim().toLowerCase()
+    const minTowers = Number(candidateMinTowers)
+    return rows.filter(row => {
+      const owner = normalizedOwnerName(row.pluto_owner_name)
+      if (!row.pluto_match || !owner) return false
+      if (row.active_equipment < minTowers) return false
+      if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false
+      return true
+    })
+  }, [rows, candidateSearch, candidateMinTowers])
+  const sortedCandidates = useMemo(() => [...candidateRows].sort((a, b) => {
+    const value = (row: SystemSummary): unknown => {
+      if (candidateSort.key === 'address') return row.address ?? row.system_id
+      if (candidateSort.key === 'owner') return row.pluto_owner_name
+      if (candidateSort.key === 'borough') return row.borough
+      if (candidateSort.key === 'towers') return row.active_equipment
+      if (candidateSort.key === 'priority') return row.priority_score
+      return row.hpd_contact_count ?? 0
+    }
+    const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)
+    return candidateSort.direction === 'asc' ? result : -result
+  }), [candidateRows, candidateSort])
+  const candidatePageCount = Math.max(1, Math.ceil(sortedCandidates.length / PAGE_SIZE))
+  const safeCandidatePage = Math.min(candidatePage, candidatePageCount)
+  const visibleCandidates = sortedCandidates.slice((safeCandidatePage - 1) * PAGE_SIZE, safeCandidatePage * PAGE_SIZE)
 
   const selectGroup = (group: OwnerGroup) => {
     setSelectedKey(group.key)
+    setPropertyPage(1)
+    setPropertySearch('')
     window.location.hash = `#/portfolios?owner=${encodeURIComponent(group.key)}`
   }
+  const changePropertySort = (key: PropertySortKey) => {
+    setPropertySort(current => current.key === key ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: key === 'address' || key === 'borough' ? 'asc' : 'desc' })
+    setPropertyPage(1)
+  }
+  const changeCandidateSort = (key: CandidateSortKey) => {
+    setCandidateSort(current => current.key === key ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: key === 'address' || key === 'owner' || key === 'borough' ? 'asc' : 'desc' })
+    setCandidatePage(1)
+  }
+  const propertyIndicator = (key: PropertySortKey) => propertySort.key === key ? (propertySort.direction === 'asc' ? ' ↑' : ' ↓') : ''
+  const candidateIndicator = (key: CandidateSortKey) => candidateSort.key === key ? (candidateSort.direction === 'asc' ? ' ↑' : ' ↓') : ''
 
   return <section className="product-page portfolios-page">
     <div className="product-page-heading">
@@ -89,12 +173,13 @@ export function PortfoliosPage({ payload, watchedSystemIds, onOpenAccount }: { p
       <div className="portfolio-evidence-card"><span className="page-kicker">Portfolio evidence rule</span><h3>Grouping is context, not corporate-parent proof.</h3><p>Build 015 groups only identical PLUTO owner names after whitespace/case normalization. Placeholder owner values are excluded. HPD registration/contact and ACRIS party evidence should strengthen future confidence; similar names alone are not enough.</p><div className="evidence-pill-row"><span>PLUTO · exact BBL</span><span>HPD · exact registration</span><span>ACRIS · exact document</span></div></div>
     </div> : <div className="portfolio-layout">
       <aside className="portfolio-list"><div className="portfolio-list-heading"><span className="page-kicker">Ownership groups</span><strong>{groups.length} multi-property {groups.length === 1 ? 'group' : 'groups'}</strong></div>{groups.slice(0, 20).map(group => <article key={group.key} className={selectedGroup?.key === group.key ? 'active' : ''}><button className="portfolio-group-button" onClick={() => selectGroup(group)}><div><strong>{group.name}</strong><span>PLUTO owner-name context</span></div><dl><div><dt>Accounts</dt><dd>{group.rows.length}</dd></div><div><dt>Towers</dt><dd>{group.towers}</dd></div><div><dt>High priority</dt><dd>{group.highPriority}</dd></div></dl></button></article>)}</aside>
-      {selectedGroup && <div className="portfolio-detail"><div className="portfolio-detail-heading"><div><span className="confidence-chip">CONTEXT · PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts · {selectedGroup.towers} active equipment · {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` · ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className="reference-table-card"><div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Property</th><th>Borough</th><th>Priority</th><th>Towers</th><th>Building area</th><th>Contacts</th><th>Action</th></tr></thead><tbody>{selectedGroup.rows.slice(0, 30).map(row => <tr key={row.system_id} onClick={() => onOpenAccount(row)}><td><strong>{row.address ?? row.system_id}</strong><small>{row.bbl ? `BBL ${row.bbl}` : row.system_id}</small></td><td>{row.borough ?? '—'}</td><td>{row.priority_score}</td><td>{row.active_equipment}</td><td>{row.pluto_building_area_sqft ? `${number.format(Math.round(row.pluto_building_area_sqft))} sq ft` : '—'}</td><td>{row.hpd_contact_count ?? 0}</td><td><button className="table-link" onClick={event => { event.stopPropagation(); onOpenAccount(row) }}>Open →</button></td></tr>)}</tbody></table></div></div></div>}
+      {selectedGroup && <div className="portfolio-detail"><div className="portfolio-detail-heading"><div><span className="confidence-chip">CONTEXT · PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts · {selectedGroup.towers} active equipment · {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` · ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className="reference-table-card"><div className="reference-table-heading"><div><strong>Portfolio properties</strong><span>{number.format(sortedSelectedRows.length)} matching · {number.format(visibleSelectedRows.length)} shown</span></div><div className="page-actions"><input aria-label="Search portfolio properties" value={propertySearch} onChange={event => { setPropertySearch(event.target.value); setPropertyPage(1) }} placeholder="Address, borough, BBL…" /></div></div><div className="reference-table-scroll"><table className="reference-table"><thead><tr><th><button onClick={() => changePropertySort('address')}>Property{propertyIndicator('address')}</button></th><th><button onClick={() => changePropertySort('borough')}>Borough{propertyIndicator('borough')}</button></th><th><button onClick={() => changePropertySort('priority')}>Priority{propertyIndicator('priority')}</button></th><th><button onClick={() => changePropertySort('towers')}>Towers{propertyIndicator('towers')}</button></th><th><button onClick={() => changePropertySort('area')}>Building area{propertyIndicator('area')}</button></th><th><button onClick={() => changePropertySort('contacts')}>Contacts{propertyIndicator('contacts')}</button></th><th>Action</th></tr></thead><tbody>{visibleSelectedRows.map(row => <tr key={row.system_id} onClick={() => onOpenAccount(row)}><td><strong>{row.address ?? row.system_id}</strong><small>{row.bbl ? `BBL ${row.bbl}` : row.system_id}</small></td><td>{row.borough ?? '—'}</td><td>{row.priority_score}</td><td>{row.active_equipment}</td><td>{row.pluto_building_area_sqft ? `${number.format(Math.round(row.pluto_building_area_sqft))} sq ft` : '—'}</td><td>{row.hpd_contact_count ?? 0}</td><td><button className="table-link" onClick={event => { event.stopPropagation(); onOpenAccount(row) }}>Open →</button></td></tr>)}</tbody></table></div><PageControls page={safePropertyPage} total={sortedSelectedRows.length} onPage={setPropertyPage} /></div></div>}
     </div>}
 
     <div className="reference-table-card portfolio-candidates">
-      <div className="reference-table-heading"><div><strong>Portfolio research candidates</strong><span>Large multi-equipment properties with meaningful exact PLUTO owner context; these are individual accounts, not inferred portfolios.</span></div></div>
-      <div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Account</th><th>Owner context</th><th>Borough</th><th>Towers</th><th>Priority</th><th>HPD contacts</th><th>Action</th></tr></thead><tbody>{candidates.map(row => <tr key={row.system_id}><td><strong>{row.address ?? row.system_id}</strong><small>{row.bbl ? `BBL ${row.bbl}` : row.system_id}</small></td><td>{row.pluto_owner_name ?? '—'}</td><td>{row.borough ?? '—'}</td><td>{row.active_equipment}</td><td>{row.priority_score}</td><td>{row.hpd_contact_count ?? 0}</td><td><button className="table-link" onClick={() => onOpenAccount(row)}>Research →</button></td></tr>)}</tbody></table></div>
+      <div className="reference-table-heading"><div><strong>Portfolio research candidates</strong><span>{number.format(sortedCandidates.length)} matching exact-PLUTO owner-context accounts · {number.format(visibleCandidates.length)} shown</span></div><div className="page-actions"><input aria-label="Search portfolio candidates" value={candidateSearch} onChange={event => { setCandidateSearch(event.target.value); setCandidatePage(1) }} placeholder="Account, owner, borough…" /><select aria-label="Minimum portfolio candidate towers" value={candidateMinTowers} onChange={event => { setCandidateMinTowers(event.target.value); setCandidatePage(1) }}><option value="1">1+ active units</option><option value="2">2+ active units</option><option value="3">3+ active units</option></select></div></div>
+      <div className="reference-table-scroll"><table className="reference-table"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndicator('towers')}</button></th><th><button onClick={() => changeCandidateSort('priority')}>Priority{candidateIndicator('priority')}</button></th><th><button onClick={() => changeCandidateSort('contacts')}>HPD contacts{candidateIndicator('contacts')}</button></th><th>Action</th></tr></thead><tbody>{visibleCandidates.map(row => <tr key={row.system_id}><td><strong>{row.address ?? row.system_id}</strong><small>{row.bbl ? `BBL ${row.bbl}` : row.system_id}</small></td><td>{row.pluto_owner_name ?? '—'}</td><td>{row.borough ?? '—'}</td><td>{row.active_equipment}</td><td>{row.priority_score}</td><td>{row.hpd_contact_count ?? 0}</td><td><button className="table-link" onClick={() => onOpenAccount(row)}>Research →</button></td></tr>)}</tbody></table></div>
+      <PageControls page={safeCandidatePage} total={sortedCandidates.length} onPage={setCandidatePage} />
     </div>
   </section>
 }

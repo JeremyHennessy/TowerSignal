@@ -1,0 +1,131 @@
+name: Verify Companies against deployed snapshot
+
+on:
+  push:
+    branches: [agent/known-firms-workspace-20260909]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: known-firms-snapshot-proof
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retain exact source for review
+        run: git archive --format=zip --output=firm-source.zip HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firm-source
+          path: firm-source.zip
+          retention-days: 7
+      - name: Verify pinned snapshot and completed baseline acceptance
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = (await github.rest.actions.getWorkflowRun({...context.repo, run_id:34489354285})).data;
+            if (run.head_sha !== '44d61da1007daf4bc0d2cac2e5599a6976a94c82') throw new Error('Unexpected snapshot source commit');
+            const jobs = (await github.rest.actions.listJobsForWorkflowRun({...context.repo, run_id:run.id})).data.jobs;
+            for (const name of ['build','deploy']) if (!jobs.some(j => j.name === name && j.conclusion === 'success')) throw new Error(`Snapshot ${name} did not pass`);
+            const artifact = (await github.rest.actions.getArtifact({...context.repo, artifact_id:10162288576})).data;
+            if (artifact.digest !== 'sha256:5037d513800aface08457267ce1f2980a572fac3aacb5257953881033fe595db') throw new Error('Unexpected snapshot digest');
+            // This immutable baseline was fully retested with main@26b7799.
+            // Its later candidate-only selector failure does not erase that separate result.
+            const baseline = (await github.rest.actions.getWorkflowRun({...context.repo, run_id:34507846939})).data;
+            if (baseline.head_sha !== 'cc73c3a7069eacdacb6ad9c045bea72747aabcdf') throw new Error('Unexpected baseline proof source');
+            const baselineJobs = (await github.rest.actions.listJobsForWorkflowRun({...context.repo, run_id:baseline.id})).data.jobs;
+            const passed = baselineJobs.some(j => j.steps?.some(s => s.name === 'Complete current hosted baseline acceptance with corrected fixture' && s.conclusion === 'success'));
+            if (!passed) throw new Error('Full hosted baseline acceptance is not proven');
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34489354285
+          github-token: ${{ github.token }}
+          path: .snapshot
+      - name: Restore immutable production data
+        run: |
+          mkdir -p .snapshot/site public/data
+          tar -xf .snapshot/artifact.tar -C .snapshot/site
+          cp -a .snapshot/site/data/. public/data/
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          from urllib.request import urlopen
+          root=Path('.snapshot/site')
+          for name in ['index.html','data/systems.json','data/companies.json']:
+              expected=(root/name).read_bytes()
+              with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name,timeout=90) as response: actual=response.read()
+              if hashlib.sha256(actual).digest()!=hashlib.sha256(expected).digest(): raise SystemExit('Hosted snapshot changed: '+name)
+          manifest={str(p.relative_to(Path('public/data'))):hashlib.sha256(p.read_bytes()).hexdigest() for p in Path('public/data').rglob('*') if p.is_file()}
+          Path('.snapshot/source-data-sha256.json').write_text(json.dumps(manifest,sort_keys=True))
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies and browsers
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Capture actual current Companies UI
+        run: node scripts/verify_firm_workspace.mjs baseline
+      - name: Generate and validate all known firms from preserved source payloads
+        run: |
+          python scripts/build_known_firms.py --output public/data
+          python scripts/validate_known_firms.py --input public/data/known-firms.json --max-age-days 1 --require-production-volume
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          manifest=json.loads(Path('.snapshot/source-data-sha256.json').read_text())
+          for name,digest in manifest.items():
+              assert hashlib.sha256((Path('public/data')/name).read_bytes()).hexdigest()==digest, 'Existing source payload changed: '+name
+          Path('public/data/companies-release.json').write_text(json.dumps({'application_source_sha':os.environ['GITHUB_SHA'],'source_run_id':34489354285,'source_commit':'44d61da1007daf4bc0d2cac2e5599a6976a94c82','source_artifact_digest':'sha256:5037d513800aface08457267ce1f2980a572fac3aacb5257953881033fe595db','baseline_acceptance_run_id':34507846939,'source_observation_dates_preserved':True}))
+          PY
+      - name: Repository checks and production build
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          python -m unittest discover -s tests/python -p 'test_*.py'
+          npm run build
+      - name: Verify exact candidate UI in desktop and iPhone browsers
+        run: node scripts/verify_firm_workspace.mjs candidate
+      - name: Full candidate browser regression suite
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: dist
+          GITHUB_RUN_ID: ${{ github.run_id }}-candidate-suite
+          DEBUG: pw:browser
+        run: npm run test:e2e
+      - name: Archive exact candidate
+        run: |
+          tar -cf firm-candidate.tar -C dist .
+          sha256sum firm-candidate.tar > firm-candidate.tar.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firm-candidate
+          path: |
+            firm-candidate.tar
+            firm-candidate.tar.sha256
+            .snapshot/source-data-sha256.json
+          retention-days: 7
+      - name: Retain browser evidence and summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firm-browser-proof
+          path: |
+            firm-proof
+            playwright-report
+            public/data/known-firms.json
+            public/data/companies-release.json
+          retention-days: 14
