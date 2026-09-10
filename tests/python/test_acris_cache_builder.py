@@ -1,3 +1,4 @@
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -11,6 +12,16 @@ from build_acris_cache import tower_bbls_from_current_registrations
 
 
 class AcrisCacheBuilderTests(unittest.TestCase):
+    def test_integration_budget_allows_bounded_source_steps_and_validation(self):
+        workflow = (ROOT / ".github/workflows/acris-cache.yml").read_text(encoding="utf-8")
+        integration = workflow.split("\n  integration:\n", 1)[1].split("\n  persist-cache:\n", 1)[0]
+        job_budget = int(re.search(r"^    timeout-minutes: (\d+)$", integration, re.MULTILINE).group(1))
+        source_budgets = [int(value) for value in re.findall(r"^        timeout-minutes: (\d+)$", integration, re.MULTILINE)]
+        self.assertEqual(source_budgets, [45, 15])
+        self.assertGreaterEqual(job_budget, sum(source_budgets) + 15)
+        self.assertNotIn("continue-on-error", integration)
+        self.assertIn("Require canonical ACRIS cache universe alignment", integration)
+
     def test_current_cache_universe_uses_canonical_bbl_recovery(self):
         systems = [
             {

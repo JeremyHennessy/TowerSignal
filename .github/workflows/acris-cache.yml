@@ -75,7 +75,8 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs: build-cache
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    # Preserve the 45m NYC and 15m legacy-DOB step limits, plus verification time.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - name: Check out durable TowerSignal history

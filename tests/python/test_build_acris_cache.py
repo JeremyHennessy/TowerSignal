@@ -23,11 +23,13 @@ class BuildAcrisCacheTests(unittest.TestCase):
                 return_value=SimpleNamespace(rows=[{"system_id": "source-row"}]),
             ) as fetch,
             patch.object(build_acris_cache, "normalize_registrations", return_value=(systems, {})) as normalize,
+            patch.object(build_acris_cache, "fetch_building_footprints_by_bin", return_value=({}, {})) as footprints,
         ):
             bbls = build_acris_cache.tower_bbls_from_current_registrations()
 
         fetch.assert_called_once_with(build_acris_cache.REGISTRATION_DATASET_ID, "system_id")
         normalize.assert_called_once_with([{"system_id": "source-row"}])
+        footprints.assert_called_once_with(set())
         self.assertEqual(len(bbls), 1500)
         self.assertIn("1000000000", bbls)
 
