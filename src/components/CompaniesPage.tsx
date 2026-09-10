@@ -185,16 +185,16 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
       </div>
 
       {sorted.length === 0 ? <div className="empty-state"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className="table-scroll"><table className="account-table known-firms-master-table"><thead><tr>
-        <th><button onClick={() => changeSort('canonical_name')}>Company / firm{sortIndicator('canonical_name')}</button></th>
-        <th>Role</th>
-        <th><button onClick={() => changeSort('serviced_site_count')}>Service footprint{sortIndicator('serviced_site_count')}</button></th>
-        <th><button onClick={() => changeSort('tower_account_count')}>Tower accounts{sortIndicator('tower_account_count')}</button></th>
-        <th><button onClick={() => changeSort('latest_observed_date')}>Last active{sortIndicator('latest_observed_date')}</button></th>
-        <th><button onClick={() => changeSort('observed_contract_count')}>Public contracts{sortIndicator('observed_contract_count')}</button></th>
-        <th><button onClick={() => changeSort('observed_customer_count')}>Buyers{sortIndicator('observed_customer_count')}</button></th>
-        <th><button onClick={() => changeSort('active_qualification_count')}>7G{sortIndicator('active_qualification_count')}</button></th>
-        <th><button onClick={() => changeSort('identity_confidence')}>Identity{sortIndicator('identity_confidence')}</button></th>
-        <th aria-label="Open firm" />
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('canonical_name')}>Company / firm{sortIndicator('canonical_name')}</button></th>
+        <th scope="col" role="columnheader">Role</th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('serviced_site_count')}>Service footprint{sortIndicator('serviced_site_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('tower_account_count')}>Tower accounts{sortIndicator('tower_account_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('latest_observed_date')}>Last active{sortIndicator('latest_observed_date')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('observed_contract_count')}>Public contracts{sortIndicator('observed_contract_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('observed_customer_count')}>Buyers{sortIndicator('observed_customer_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('active_qualification_count')}>7G{sortIndicator('active_qualification_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('identity_confidence')}>Identity{sortIndicator('identity_confidence')}</button></th>
+        <th scope="col" role="columnheader" aria-label="Open firm" />
       </tr></thead><tbody>{visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') openFirm(firm) }}>
         <td className="account-cell firm-name-cell">
           <strong>{firm.canonical_name}</strong>
