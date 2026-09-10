@@ -58,4 +58,15 @@ test('Known Companies master table and Prospect-style site drillthrough are sour
   await expect(page.getByRole('heading', { name: 'Everything TowerSignal knows about this firm', exact: true })).toBeVisible()
   await expect(page.getByText('Intelligence workspace unavailable', { exact: true })).toHaveCount(0)
   await expectContained(page)
+
+  const evidence = page.locator('.known-firm-evidence-grid')
+  await expect(evidence).toHaveCSS('display', 'grid')
+  await expect(evidence.locator('.company-evidence-card')).toHaveCount(2)
+  await expect(evidence.locator('.detail-grid').first()).toHaveCSS('display', 'grid')
+  await expect(evidence.locator('.detail-grid dd').first()).toHaveCSS('margin-left', '0px')
+  const expectedColumns = (page.viewportSize()?.width ?? 1440) <= 820 ? 1 : 2
+  await expect.poll(() => evidence.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(expectedColumns)
+  await page.locator('.firm-evidence-heading').scrollIntoViewIfNeeded()
+  await testInfo.attach('firm-evidence-layout', { body: await page.screenshot(), contentType: 'image/png' })
+  await expectContained(page)
 })
