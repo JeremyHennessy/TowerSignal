@@ -25,16 +25,22 @@ async function selectMappedFirm(page: import('@playwright/test').Page): Promise<
   })
 }
 
-test('Known Companies master table and Prospect-style site drillthrough are source-backed and linkable', async ({ page }) => {
+test('Known Companies master table and Prospect-style site drillthrough are source-backed and linkable', async ({ page }, testInfo) => {
   await page.evaluate(() => { window.location.hash = '#/companies' })
   await expect(page.getByRole('heading', { name: 'Known companies & firms', exact: true })).toBeVisible()
   await expect(page.getByLabel('Known firm search')).toBeVisible()
   await expect(page.getByLabel('Known firm role')).toBeVisible()
   await expect(page.getByLabel('Known firm relationship')).toBeVisible()
   await expect(page.locator('.known-firms-master-table tbody tr').first()).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: /Company \/ firm/ })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: /Service footprint/ })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: /Tower accounts/ })).toBeVisible()
+  await testInfo.attach('company-table-accessibility', {
+    body: await page.locator('.known-firms-master-table').ariaSnapshot(),
+    contentType: 'text/plain',
+  })
+  // WebKit exposes CSS text-transform: uppercase in the accessible name.
+  // Require the same semantic column headers without depending on casing.
+  await expect(page.getByRole('columnheader', { name: /Company \/ firm/i })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: /Service footprint/i })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: /Tower accounts/i })).toBeVisible()
   await expectContained(page)
 
   const firm = await selectMappedFirm(page)
@@ -44,11 +50,11 @@ test('Known Companies master table and Prospect-style site drillthrough are sour
   await expect(page.getByText(`Sites connected to ${firm.canonical_name}`, { exact: true })).toBeVisible()
   await expect(page.getByRole('region', { name: 'Known firm site relationship map', exact: true })).toBeVisible()
   await expect(page.locator('.firm-prospect-sites-table tbody tr').first()).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: /Priority/ })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Timing signal', exact: true })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Contact', exact: true })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: /Sampling/ })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: /Activity/ })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: /Priority/i })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: /^Timing signal$/i })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: /^Contact$/i })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: /Sampling/i })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: /Activity/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Everything TowerSignal knows about this firm', exact: true })).toBeVisible()
   await expect(page.getByText('Intelligence workspace unavailable', { exact: true })).toHaveCount(0)
   await expectContained(page)
