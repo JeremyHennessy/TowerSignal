@@ -71,9 +71,9 @@ export function FirmSiteMap({
     const bounds: L.LatLngExpression[] = []
     for (const site of sites) {
       if (site.latitude == null || site.longitude == null) continue
-      const latLng: L.LatLngExpression[] = [site.latitude, site.longitude]
-      bounds.push(latLng as L.LatLngTuple)
-      const marker = L.marker(latLng as L.LatLngTuple, {
+      const latLng: L.LatLngExpression = [site.latitude, site.longitude]
+      bounds.push(latLng)
+      const marker = L.marker(latLng, {
         icon: L.divIcon({
           className: 'firm-site-marker-wrap',
           html: `<span class="${markerClass(site)}"></span>`,
