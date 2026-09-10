@@ -1,8 +1,21 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { signInForProject } from './auth.helpers'
 import { expectAccountDetailHydrated, expectContained, expectElementContained, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(120_000)
+
+async function currentUnresolvedBblSystemId(page: Page, baseURL: string): Promise<string> {
+  const response = await page.request.get(new URL('data/systems.json', baseURL).toString())
+  expect(response.ok(), `systems.json HTTP ${response.status()}`).toBeTruthy()
+  const payload = await response.json() as {
+    systems?: Array<{ system_id?: string; bbl?: string | null; bbl_identity_status?: string | null }>
+  }
+  const selected = (payload.systems ?? [])
+    .filter(row => row.system_id && !row.bbl && String(row.bbl_identity_status ?? '').startsWith('UNRESOLVED'))
+    .sort((left, right) => String(left.system_id).localeCompare(String(right.system_id)))[0]
+  if (!selected?.system_id) throw new Error('Current hosted systems payload contains no unresolved-BBL cooling-tower account')
+  return selected.system_id
+}
 
 test('full account report groups missing-BBL property evidence and keeps provenance expandable', async ({ page }, testInfo) => {
   const isIphone = isIphoneProject(testInfo)
@@ -18,8 +31,10 @@ test('full account report groups missing-BBL property evidence and keeps provena
     } catch { /* ignore non-URL diagnostics */ }
   })
 
-  await signInForProject(page, testInfo.project.name, '#/account/2000012577')
-  await expect(page).toHaveURL(/#\/account\/2000012577$/)
+  const baseURL = testInfo.project.use.baseURL as string
+  const unresolvedSystemId = await currentUnresolvedBblSystemId(page, baseURL)
+  await signInForProject(page, testInfo.project.name, `#/account/${encodeURIComponent(unresolvedSystemId)}`)
+  await expect(page).toHaveURL(new RegExp(`#\\/account\\/${unresolvedSystemId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`))
   if (isIphone) await expectAccountDetailHydrated(page)
 
   const detail = page.locator('.account-profile-page .detail-panel')
@@ -39,7 +54,7 @@ test('full account report groups missing-BBL property evidence and keeps provena
 
   const provenance = detail.locator('section.source-provenance-section')
   await expect(provenance.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
-  await expect(provenance).toContainText(/source datasets?/) 
+  await expect(provenance).toContainText(/source datasets?/)
   const provenanceDetails = provenance.locator('details.account-provenance-details')
   await expect(provenanceDetails).toBeVisible()
   await expect(provenanceDetails).not.toHaveAttribute('open', '')
@@ -52,7 +67,7 @@ test('full account report groups missing-BBL property evidence and keeps provena
   await expectElementContained(page, 'section.source-provenance-section')
 
   const propertyScreenshot = await property.screenshot()
-  await testInfo.attach(`account-property-boundary-2000012577-${testInfo.project.name}.png`, { body: propertyScreenshot, contentType: 'image/png' })
+  await testInfo.attach(`account-property-boundary-${unresolvedSystemId}-${testInfo.project.name}.png`, { body: propertyScreenshot, contentType: 'image/png' })
 
   expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
   expect(consoleErrors, `Console errors:\n${consoleErrors.join('\n')}`).toEqual([])
