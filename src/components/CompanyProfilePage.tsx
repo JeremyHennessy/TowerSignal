@@ -328,16 +328,16 @@ export function CompanyProfilePage({
       </div> : <div className="reference-empty-state compact"><strong>No mapped site relationships match these filters.</strong><span>Unmapped source relationships remain available in the table.</span></div>}
 
       {sortedSites.length === 0 ? <div className="empty-state"><strong>No sites match these filters.</strong><span>Widen the relationship, borough or search criteria.</span></div> : <div className="table-scroll"><table className="account-table firm-prospect-sites-table"><thead><tr>
-        <th><button onClick={() => changeSiteSort('address')}>Site{siteSortIndicator('address')}</button></th>
-        <th>Relationship</th>
-        <th><button onClick={() => changeSiteSort('priority')}>Priority{siteSortIndicator('priority')}</button></th>
-        <th>Timing signal</th>
-        <th><button onClick={() => changeSiteSort('scale')}>Scale{siteSortIndicator('scale')}</button></th>
-        <th>Contact</th>
-        <th><button onClick={() => changeSiteSort('sampling')}>Sampling{siteSortIndicator('sampling')}</button></th>
-        <th><button onClick={() => changeSiteSort('activity')}>Activity{siteSortIndicator('activity')}</button></th>
-        <th>Evidence</th>
-        <th aria-label="Open account" />
+        <th scope="col" role="columnheader"><button onClick={() => changeSiteSort('address')}>Site{siteSortIndicator('address')}</button></th>
+        <th scope="col" role="columnheader">Relationship</th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSiteSort('priority')}>Priority{siteSortIndicator('priority')}</button></th>
+        <th scope="col" role="columnheader">Timing signal</th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSiteSort('scale')}>Scale{siteSortIndicator('scale')}</button></th>
+        <th scope="col" role="columnheader">Contact</th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSiteSort('sampling')}>Sampling{siteSortIndicator('sampling')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSiteSort('activity')}>Activity{siteSortIndicator('activity')}</button></th>
+        <th scope="col" role="columnheader">Evidence</th>
+        <th scope="col" role="columnheader" aria-label="Open account" />
       </tr></thead><tbody>{visibleSites.map(row => {
         const site = row.relationship
         return <tr key={site.site_id} className={selectedSiteId === site.site_id ? 'selected-row' : ''} onClick={() => setSelectedSiteId(site.site_id)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') setSelectedSiteId(site.site_id) }}>
