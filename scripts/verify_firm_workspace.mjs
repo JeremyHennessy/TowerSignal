@@ -109,10 +109,16 @@ for (const family of ['desktop', 'iphone']) {
     await expect(siteTable.locator('tbody tr').first()).toBeVisible()
     await siteTable.locator('tbody tr').first().locator('td').first().click()
     await expect(page.locator('.firm-selected-site').getByText('Selected site', { exact: true })).toBeVisible()
-    const marker = page.locator('.firm-site-map .firm-site-marker-wrap').first()
+    const selectedAddress = await page.locator('.firm-selected-site > strong').innerText()
+    const map = page.getByRole('region', { name: 'Known firm site relationship map', exact: true })
+    await map.scrollIntoViewIfNeeded()
+    // Leaflet retains markers outside the visible map bounds. The first DOM
+    // marker is not necessarily clickable after selecting a table row.
+    // Click the actual selected site's marker, which the UI must bring into view.
+    const marker = map.getByRole('button', { name: selectedAddress, exact: true }).first()
     await expect(marker).toBeVisible()
     await marker.click()
-    await expect(page.locator('.firm-selected-site > strong')).not.toBeEmpty()
+    await expect(page.locator('.firm-selected-site > strong')).toHaveText(selectedAddress)
     await siteTable.evaluate(element => element.scrollIntoView({ block: 'start' }))
     await page.screenshot({ path: path.join(output, `firm-sites-${family}.png`) })
     await fs.writeFile(path.join(output, `firm-profile-${family}.txt`), await page.locator('body').innerText())
