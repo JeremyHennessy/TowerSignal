@@ -77,6 +77,10 @@
 
 /* Prospect-style firm site drillthrough */
 .firm-profile-heading{margin-bottom:10px}
+.known-firm-profile-page .company-identity-card{display:grid;justify-items:start;align-content:start;gap:5px;flex:0 0 270px;width:270px;max-width:100%;padding:12px 14px;border:1px solid var(--ref-border);border-radius:9px;background:#fff;line-height:1.4;overflow-wrap:anywhere}
+.known-firm-profile-page .company-identity-card>small{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--ref-muted)}
+.known-firm-profile-page .company-identity-card>strong{display:block;font-size:11px;color:#263944}
+.known-firm-profile-page .company-identity-card>span:not(.health-badge){display:block;font-size:9px;color:var(--ref-muted)}
 .firm-site-workspace{margin:12px 0;overflow:hidden}
 .firm-site-workspace-heading{align-items:flex-start;gap:12px;flex-wrap:wrap}
 .firm-site-controls{display:grid;grid-template-columns:minmax(235px,1.7fr) minmax(160px,1fr) minmax(140px,.8fr);gap:7px;min-width:min(100%,650px)}
@@ -111,6 +115,7 @@
 
 @media(max-width:820px){
   .known-firms-page .product-page-heading,.known-firm-profile-page .product-page-heading{align-items:flex-start;flex-direction:column;gap:10px}
+  .known-firm-profile-page .company-identity-card{flex:0 0 auto;width:100%}
   .known-firms-page .page-actions{width:100%;flex-wrap:wrap}
   .known-firm-metrics,.known-firm-profile-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
   .known-firm-boundary-grid{grid-template-columns:1fr}
