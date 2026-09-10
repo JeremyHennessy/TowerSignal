@@ -21,6 +21,9 @@ const QUICK_GROUPS: Array<{ label: string; types: NysChangeEventType[] | null }>
   { label: 'Operation', types: ['NYS_OPERATION_DURATION_CHANGED'] },
 ]
 
+type SortKey = 'address' | 'city' | 'source_county' | 'event_type' | 'detected_at' | 'ct_status' | 'regulation_compliance' | 'evidence_basis'
+type SortDirection = 'asc' | 'desc'
+
 function compactValue(value: unknown): string {
   if (value == null) return '—'
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value)
@@ -35,6 +38,10 @@ function tone(type: NysChangeEventType): string {
   return 'neutral'
 }
 
+function compareValues(left: unknown, right: unknown): number {
+  return String(left ?? '').localeCompare(String(right ?? ''), undefined, { numeric: true, sensitivity: 'base' })
+}
+
 export function NysChangesView({ payload, systems, onSelect }: { payload: NysChangesPayload; systems: NysSystem[]; onSelect: (row: NysSystem | null) => void }) {
   const [days, setDays] = useState('30')
   const [eventType, setEventType] = useState('')
@@ -46,6 +53,7 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
   const [quickTypes, setQuickTypes] = useState<NysChangeEventType[] | null>(null)
   const [customStart, setCustomStart] = useState('')
   const [customEnd, setCustomEnd] = useState('')
+  const [sort, setSort] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'detected_at', direction: 'desc' })
   const [page, setPage] = useState(0)
 
   const systemsById = useMemo(() => new Map(systems.map(row => [row.system_id, row])), [systems])
@@ -66,20 +74,43 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
     return true
   }), [payload.events, systemsById, days, eventType, sourceCounty, city, quickTypes, compliance, status, customStart, customEnd])
 
+  const sorted = useMemo(() => [...filtered].sort((a, b) => {
+    const value = (event: NysChangeEvent): unknown => {
+      const current = systemsById.get(event.system_id)
+      if (sort.key === 'address') return event.address ?? event.system_id
+      if (sort.key === 'city') return event.city
+      if (sort.key === 'source_county') return event.source_county
+      if (sort.key === 'event_type') return event.event_type
+      if (sort.key === 'detected_at') return event.detected_at
+      if (sort.key === 'ct_status') return current?.ct_status
+      if (sort.key === 'regulation_compliance') return current?.regulation_compliance
+      return event.evidence_basis
+    }
+    const result = compareValues(value(a), value(b)) || compareValues(a.system_id, b.system_id)
+    return sort.direction === 'asc' ? result : -result
+  }), [filtered, systemsById, sort])
+
   const eventTypes = [...new Set(payload.events.map(event => event.event_type))]
   const counties = [...new Set(payload.events.map(event => event.source_county).filter(Boolean))].sort() as string[]
   const cities = [...new Set(payload.events.map(event => event.city).filter(Boolean))].sort() as string[]
   const complianceValues = [...new Set(systems.map(row => row.regulation_compliance).filter(Boolean))].sort() as string[]
   const statusValues = [...new Set(systems.map(row => row.ct_status).filter(Boolean))].sort() as string[]
   const pageSize = 50
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const pageCount = Math.max(1, Math.ceil(sorted.length / pageSize))
   const safePage = Math.min(page, pageCount - 1)
-  const pageRows = filtered.slice(safePage * pageSize, safePage * pageSize + pageSize)
+  const pageRows = sorted.slice(safePage * pageSize, safePage * pageSize + pageSize)
 
   const clear = () => {
     setDays('30'); setEventType(''); setSourceCounty(''); setCity(''); setCompliance(''); setStatus('');
     setQuickLabel('All changes'); setQuickTypes(null); setPage(0)
   }
+  const changeSort = (key: SortKey) => {
+    setSort(current => current.key === key
+      ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' }
+      : { key, direction: key === 'detected_at' ? 'desc' : 'asc' })
+    setPage(0)
+  }
+  const sortIndicator = (key: SortKey) => sort.key === key ? (sort.direction === 'asc' ? ' ↑' : ' ↓') : ''
 
   return <section className="changes-view changes-table-view nys-dense-changes" aria-label="TowerSignal NYS changes">
     {payload.baseline_initialized && <div className="disclaimer"><strong>NYS historical baseline initialized.</strong> Existing Equipment_ID records are not being mislabeled as new. Later weekly snapshots are compared with this preserved statewide baseline.</div>}
@@ -102,8 +133,18 @@ export function NysChangesView({ payload, systems, onSelect }: { payload: NysCha
         <div className="change-tabs" role="tablist" aria-label="NYS change categories">{QUICK_GROUPS.map(group => <button key={group.label} className={quickLabel === group.label ? 'active' : ''} onClick={() => { setQuickLabel(group.label); setQuickTypes(group.types); setEventType(''); setPage(0) }}>{group.label}<span>{group.label === 'All changes' ? payload.events.length : ''}</span></button>)}</div>
 
         <div className="reference-table-card monitor-change-table-card">
-          <div className="reference-table-heading"><div><strong>{filtered.length.toLocaleString()} NYS changes</strong><span>{pageRows.length ? `Showing ${safePage * pageSize + 1}–${safePage * pageSize + pageRows.length}` : 'No matching changes'} · source-native statewide history</span></div></div>
-          {pageRows.length === 0 ? <div className="reference-empty-state compact"><strong>No observed NYS changes match these filters.</strong><span>Adjust the period or source-native status filters to inspect retained NYS history.</span></div> : <div className="reference-table-scroll"><table className="reference-table nys-change-reference-table"><thead><tr><th>Facility / equipment</th><th>City</th><th>County</th><th>Change</th><th>Prior value</th><th>New value</th><th>Date observed</th><th>Current tower status</th><th>Current compliance</th><th>Evidence</th><th>Action</th></tr></thead><tbody>{pageRows.map((event, index) => <NysChangeRow key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} current={systemsById.get(event.system_id) ?? null} onSelect={onSelect} />)}</tbody></table></div>}
+          <div className="reference-table-heading"><div><strong>{sorted.length.toLocaleString()} NYS changes</strong><span>{pageRows.length ? `Showing ${safePage * pageSize + 1}–${safePage * pageSize + pageRows.length}` : 'No matching changes'} · source-native statewide history</span></div></div>
+          {pageRows.length === 0 ? <div className="reference-empty-state compact"><strong>No observed NYS changes match these filters.</strong><span>Adjust the period or source-native status filters to inspect retained NYS history.</span></div> : <div className="reference-table-scroll"><table className="reference-table nys-change-reference-table"><thead><tr>
+            <th><button onClick={() => changeSort('address')}>Facility / equipment{sortIndicator('address')}</button></th>
+            <th><button onClick={() => changeSort('city')}>City{sortIndicator('city')}</button></th>
+            <th><button onClick={() => changeSort('source_county')}>County{sortIndicator('source_county')}</button></th>
+            <th><button onClick={() => changeSort('event_type')}>Change{sortIndicator('event_type')}</button></th>
+            <th>Prior value</th><th>New value</th>
+            <th><button onClick={() => changeSort('detected_at')}>Date observed{sortIndicator('detected_at')}</button></th>
+            <th><button onClick={() => changeSort('ct_status')}>Current tower status{sortIndicator('ct_status')}</button></th>
+            <th><button onClick={() => changeSort('regulation_compliance')}>Current compliance{sortIndicator('regulation_compliance')}</button></th>
+            <th><button onClick={() => changeSort('evidence_basis')}>Evidence{sortIndicator('evidence_basis')}</button></th><th>Action</th>
+          </tr></thead><tbody>{pageRows.map((event, index) => <NysChangeRow key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} current={systemsById.get(event.system_id) ?? null} onSelect={onSelect} />)}</tbody></table></div>}
           {pageCount > 1 && <div className="reference-pagination"><span>Page {safePage + 1} of {pageCount}</span><div><button disabled={safePage === 0} onClick={() => setPage(Math.max(0, safePage - 1))}>Previous</button><button disabled={safePage >= pageCount - 1} onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))}>Next</button></div></div>}
         </div>
       </div>

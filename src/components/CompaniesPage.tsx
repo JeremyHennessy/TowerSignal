@@ -1,184 +1,225 @@
 import { useEffect, useMemo, useState } from 'react'
-import { loadCompanies, loadDomesticWaterMarket, loadElapProbe, loadProviderResolution } from '../data/api'
-import type { CompanyIntelligencePayload, CompanyIntelligenceRecord } from '../types/company'
-import type { DomesticWaterMarketPayload, ElapProbePayload, ProviderCompanyObservation, ProviderResolutionPayload } from '../types/water'
-import { formatTimestamp } from '../domain/labels'
+import { loadKnownFirms } from '../data/api'
+import type { CompanyIntelligenceRecord } from '../types/company'
+import type { KnownFirmPayload, KnownFirmRole, KnownFirmSummaryRecord } from '../types/firm'
+import { formatDate, formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
 
 const number = new Intl.NumberFormat('en-US')
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+const PAGE_SIZE = 50
 
-function categoryLabel(value: string): string {
+type SortKey =
+  | 'canonical_name'
+  | 'serviced_site_count'
+  | 'tower_account_count'
+  | 'latest_observed_date'
+  | 'observed_contract_count'
+  | 'observed_customer_count'
+  | 'active_qualification_count'
+  | 'identity_confidence'
+type SortDirection = 'asc' | 'desc'
+
+function label(value: string): string {
   return value.replaceAll('_', ' ').toLowerCase().replace(/(^|\s)\S/g, match => match.toUpperCase())
 }
 
-function waterObservationType(value: ProviderCompanyObservation['type']): string {
-  if (value === 'DWT_PROVIDER') return 'DWT provider'
-  if (value === 'DWT_LAB') return 'DWT laboratory'
-  return 'DEC 7G'
+function roleLabel(value: KnownFirmRole): string {
+  const overrides: Record<string, string> = {
+    DWT_INSPECTION_PROVIDER: 'DWT service provider',
+    DWT_LABORATORY: 'DWT laboratory',
+    PROCUREMENT_VENDOR: 'Procurement vendor',
+    DEC_7G_REGISTERED_BUSINESS: 'DEC 7G business',
+    DOB_NOW_APPLICANT_BUSINESS: 'DOB applicant business',
+    DOB_NOW_OWNER_BUSINESS: 'DOB owner business',
+    LEGACY_DOB_OWNER_BUSINESS: 'Legacy DOB owner business',
+  }
+  return overrides[value] ?? label(value)
 }
 
-function marketObservationRows(payload: DomesticWaterMarketPayload | null): ProviderCompanyObservation[] {
-  if (!payload) return []
-  return [
-    ...payload.providers.map(provider => ({
-      id: provider.provider_id,
-      label: provider.aliases[0]?.name ?? provider.provider_key,
-      type: 'DWT_PROVIDER' as const,
-      observedBuildings: provider.observed_building_count,
-      observationCount: provider.inspection_count,
-      confidence: 'VERIFY' as const,
-      evidence: 'NYC drinking-water tank inspection provider field',
-    })),
-    ...payload.laboratories.map(lab => ({
-      id: lab.lab_id,
-      label: lab.aliases[0]?.name ?? lab.lab_key,
-      type: 'DWT_LAB' as const,
-      observedBuildings: lab.observed_building_count,
-      observationCount: lab.inspection_count,
-      confidence: 'VERIFY' as const,
-      evidence: 'NYC drinking-water tank inspection laboratory field',
-    })),
-    ...payload.dec_7g_businesses.map((business, index) => ({
-      id: business.qualification_id || `dec-7g-${index}`,
-      label: business.provider_name ?? business.provider_key,
-      type: 'DEC_7G' as const,
-      observedBuildings: null,
-      observationCount: 1,
-      confidence: 'VERIFY' as const,
-      evidence: [business.qualification_scope, business.registration_number].filter(Boolean).join(' · ') || 'DEC 7G qualified business registration',
-    })),
-  ].sort((a, b) => (b.observedBuildings ?? 0) - (a.observedBuildings ?? 0) || (b.observationCount ?? 0) - (a.observationCount ?? 0) || a.label.localeCompare(b.label))
+function csvCell(value: unknown): string {
+  const text = String(value ?? '')
+  return `"${text.replaceAll('"', '""')}"`
+}
+
+function exportKnownFirms(rows: KnownFirmSummaryRecord[]) {
+  const header = [
+    'firm_id', 'canonical_name', 'roles', 'serviced_site_count', 'contracted_site_count', 'observed_site_count',
+    'tower_account_count', 'observation_count', 'latest_observed_date', 'active_last_12m', 'observed_contract_count',
+    'observed_customer_count', 'observed_contract_value', 'active_qualification_count', 'identity_confidence',
+    'resolution_method', 'source_classes',
+  ]
+  const lines = [
+    header.map(csvCell).join(','),
+    ...rows.map(row => [
+      row.firm_id, row.canonical_name, row.roles.join('|'), row.serviced_site_count, row.contracted_site_count,
+      row.observed_site_count, row.tower_account_count, row.observation_count, row.latest_observed_date ?? '',
+      row.active_last_12m, row.observed_contract_count, row.observed_customer_count, row.observed_contract_value,
+      row.active_qualification_count, row.identity_confidence, row.resolution_method, row.source_classes.join('|'),
+    ].map(csvCell).join(',')),
+  ]
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = 'towersignal-known-firms.csv'
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
+function compareValues(left: unknown, right: unknown): number {
+  if (typeof left === 'number' && typeof right === 'number') return left - right
+  if (typeof left === 'boolean' && typeof right === 'boolean') return Number(left) - Number(right)
+  return String(left ?? '').localeCompare(String(right ?? ''), undefined, { numeric: true, sensitivity: 'base' })
 }
 
 export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: CompanyIntelligenceRecord) => void }) {
-  const [payload, setPayload] = useState<CompanyIntelligencePayload | null>(null)
-  const [market, setMarket] = useState<DomesticWaterMarketPayload | null>(null)
-  const [resolutionReview, setResolutionReview] = useState<ProviderResolutionPayload | null>(null)
-  const [elapProbe, setElapProbe] = useState<ElapProbePayload | null>(null)
+  void onOpenCompany
+  const [payload, setPayload] = useState<KnownFirmPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [marketError, setMarketError] = useState<string | null>(null)
-  const [resolutionError, setResolutionError] = useState<string | null>(null)
-  const [elapError, setElapError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('ALL')
-  const [resolution, setResolution] = useState('ALL')
+  const [role, setRole] = useState('ALL')
+  const [relationship, setRelationship] = useState('ALL')
+  const [confidence, setConfidence] = useState('ALL')
+  const [activity, setActivity] = useState('ALL')
+  const [sort, setSort] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'serviced_site_count', direction: 'desc' })
+  const [page, setPage] = useState(0)
 
   useEffect(() => {
     let cancelled = false
-    Promise.allSettled([loadCompanies(), loadDomesticWaterMarket(), loadProviderResolution(), loadElapProbe()])
-      .then(([companiesResult, marketResult, resolutionResult, elapResult]) => {
-        if (cancelled) return
-        if (companiesResult.status === 'fulfilled') {
-          setPayload(companiesResult.value)
-        } else {
-          setError(companiesResult.reason instanceof Error ? companiesResult.reason.message : 'Unable to load company intelligence')
-        }
-        if (marketResult.status === 'fulfilled') {
-          setMarket(marketResult.value)
-        } else {
-          setMarketError(marketResult.reason instanceof Error ? marketResult.reason.message : 'Domestic-water provider intelligence is unavailable')
-        }
-        if (resolutionResult.status === 'fulfilled') {
-          setResolutionReview(resolutionResult.value)
-        } else {
-          setResolutionError(resolutionResult.reason instanceof Error ? resolutionResult.reason.message : 'Provider identity review is unavailable')
-        }
-        if (elapResult.status === 'fulfilled') {
-          setElapProbe(elapResult.value)
-        } else {
-          setElapError(elapResult.reason instanceof Error ? elapResult.reason.message : 'ELAP source probe is unavailable')
-        }
-      })
+    loadKnownFirms()
+      .then(value => { if (!cancelled) setPayload(value) })
+      .catch(err => { if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load known-firm intelligence') })
     return () => { cancelled = true }
   }, [])
 
-  const categories = useMemo(() => payload ? [...new Set(payload.companies.flatMap(company => company.service_categories))].sort() : [], [payload])
-  const companies = useMemo(() => payload ? payload.companies.filter(company => {
+  const roles = useMemo(() => payload ? [...new Set(payload.firms.flatMap(firm => firm.roles))].sort() : [], [payload])
+  const filtered = useMemo(() => payload ? payload.firms.filter(firm => {
     const query = search.trim().toLowerCase()
-    if (query && ![company.canonical_name, ...company.aliases.map(alias => alias.alias), ...company.observed_buyers].join(' ').toLowerCase().includes(query)) return false
-    if (category !== 'ALL' && !company.service_categories.includes(category)) return false
-    if (resolution !== 'ALL' && company.cross_source_resolution_confidence !== resolution) return false
+    const haystack = [
+      firm.canonical_name,
+      firm.normalized_name,
+      ...firm.roles,
+      ...firm.source_classes,
+      ...firm.service_categories,
+    ].join(' ').toLowerCase()
+    if (query && !haystack.includes(query)) return false
+    if (role !== 'ALL' && !firm.roles.includes(role)) return false
+    if (relationship === 'SERVICED' && firm.serviced_site_count === 0) return false
+    if (relationship === 'CONTRACTED' && firm.contracted_site_count === 0) return false
+    if (relationship === 'TOWER' && firm.tower_account_count === 0) return false
+    if (relationship === 'RELATED' && firm.observed_site_count === 0) return false
+    if (confidence !== 'ALL' && firm.identity_confidence !== confidence) return false
+    if (activity === 'RECENT' && !firm.active_last_12m) return false
     return true
-  }).slice(0, 200) : [], [payload, search, category, resolution])
+  }) : [], [payload, search, role, relationship, confidence, activity])
 
-  const totalObservedValue = payload?.companies.reduce((sum, company) => sum + company.metrics.observed_contract_value, 0) ?? 0
-  const repeatRelationshipCompanies = payload?.companies.filter(company => company.metrics.repeat_customer_count > 0).length ?? 0
-  const waterObservations = useMemo(() => marketObservationRows(market), [market])
-  const visibleWaterObservations = useMemo(() => {
-    const query = search.trim().toLowerCase()
-    return waterObservations.filter(row => !query || `${row.label} ${row.evidence}`.toLowerCase().includes(query)).slice(0, 80)
-  }, [waterObservations, search])
+  const sorted = useMemo(() => [...filtered].sort((a, b) => {
+    const result = compareValues(a[sort.key], b[sort.key]) || a.canonical_name.localeCompare(b.canonical_name)
+    return sort.direction === 'asc' ? result : -result
+  }), [filtered, sort])
 
-  return <section className="product-page companies-page">
-    <div className="product-page-heading">
-      <div><span className="page-kicker">New York City · observed vendor intelligence</span><h1>Companies</h1><p>Explore source-observed procurement vendors and their public customer/contract footprint. Company identities are conservative observed vendor labels; legal parentage, sponsor ownership and complete customer books are not inferred.</p></div>
-      <div className="page-actions"><ShareButton label="Share this view" /></div>
+  useEffect(() => { setPage(0) }, [search, role, relationship, confidence, activity, sort])
+  const maxPage = Math.max(0, Math.ceil(sorted.length / PAGE_SIZE) - 1)
+  const activePage = Math.min(page, maxPage)
+  const visible = useMemo(
+    () => sorted.slice(activePage * PAGE_SIZE, activePage * PAGE_SIZE + PAGE_SIZE),
+    [sorted, activePage],
+  )
+  const jsonUrl = `${import.meta.env.BASE_URL}data/known-firms.json`
+  const openFirm = (firm: KnownFirmSummaryRecord) => { window.location.hash = `#/company/${encodeURIComponent(firm.firm_id)}` }
+  const changeSort = (key: SortKey) => setSort(current => current.key === key
+    ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' }
+    : { key, direction: key === 'canonical_name' ? 'asc' : 'desc' })
+  const sortIndicator = (key: SortKey) => sort.key === key ? (sort.direction === 'asc' ? ' ↑' : ' ↓') : ''
+
+  return <section className="product-page companies-page known-firms-page">
+    <div className="product-page-heading compact-heading">
+      <div>
+        <span className="page-kicker">New York · company and service-market intelligence</span>
+        <h1>Known companies &amp; firms</h1>
+        <p>One normalized list of every company or firm TowerSignal can support from public evidence: service providers, laboratories, procurement vendors, DEC 7G businesses and DOB project-role firms.</p>
+      </div>
     </div>
 
-    {error && <div className="reference-empty-state"><strong>Company intelligence is unavailable.</strong><span>{error}</span><span>TowerSignal will not fabricate company relationships when the generated company payload is unavailable.</span></div>}
-    {!payload && !error && <div className="reference-empty-state"><strong>Loading observed-vendor company intelligence…</strong></div>}
+    {error && <div className="reference-empty-state"><strong>Known-company intelligence is unavailable.</strong><span>{error}</span><span>TowerSignal will not substitute disconnected provider or vendor lists when the normalized dataset is missing.</span></div>}
+    {!payload && !error && <div className="reference-empty-state"><strong>Loading normalized company intelligence…</strong></div>}
 
-    {payload && <>
-      <div className="reference-metric-grid">
-        <article><span className="reference-metric-icon success">◎</span><div><small>Observed vendors</small><strong>{number.format(payload.summary.observed_vendor_company_count)}</strong><span>Exact source-label entities</span></div></article>
-        <article><span className="reference-metric-icon">▤</span><div><small>Procurement observations</small><strong>{number.format(payload.summary.procurement_observation_count)}</strong><span>Relevant City Record + Checkbook records</span></div></article>
-        <article><span className="reference-metric-icon warning">?</span><div><small>Resolution review</small><strong>{number.format(payload.summary.companies_requiring_resolution_review)}</strong><span>Potential legal-suffix/source variants</span></div></article>
-        <article><span className="reference-metric-icon">↻</span><div><small>Repeat-customer evidence</small><strong>{number.format(repeatRelationshipCompanies)}</strong><span>Companies with 2+ observations for a buyer</span></div></article>
-        <article><span className="reference-metric-icon">$</span><div><small>Observed contract value</small><strong>{currency.format(totalObservedValue)}</strong><span>Public Checkbook values · not revenue</span></div></article>
-        <article><span className="reference-metric-icon">WT</span><div><small>DWT provider observations</small><strong>{market ? number.format(market.summary.observed_provider_count) : '—'}</strong><span>{market ? 'NYC tank inspection source labels' : 'Optional cache unavailable'}</span></div></article>
-        <article><span className="reference-metric-icon">LAB</span><div><small>DWT labs observed</small><strong>{market ? number.format(market.summary.observed_laboratory_count) : '—'}</strong><span>{elapProbe ? `ELAP selector ${number.format(elapProbe.lab_selector.populated_option_count)}` : 'ELAP scope claims gated'}</span></div></article>
-      </div>
-
-      <div className="company-profile-grid water-company-evidence-grid">
-        <section className="reference-table-card company-evidence-card">
-          <div className="reference-table-heading"><div><strong>Domestic-water provider and lab observations</strong><span>{number.format(visibleWaterObservations.length)} shown · provider, lab and DEC labels are not merged into procurement companies automatically</span></div></div>
-          {marketError ? <div className="reference-empty-state compact"><strong>Domestic-water market cache unavailable.</strong><span>{marketError}</span></div> : !market ? <div className="reference-empty-state compact"><strong>Domestic-water provider cache not loaded.</strong><span>The Companies table remains limited to public procurement vendors.</span></div> : <div className="reference-table-scroll"><table className="reference-table provider-observation-table"><thead><tr><th>Name</th><th>Evidence type</th><th>Buildings</th><th>Observations</th><th>Confidence</th><th>Evidence</th></tr></thead><tbody>{visibleWaterObservations.map(row => <tr key={`${row.type}-${row.id}`}>
-            <td><strong>{row.label}</strong><small>{row.id}</small></td>
-            <td>{waterObservationType(row.type)}</td>
-            <td>{row.observedBuildings == null ? '—' : number.format(row.observedBuildings)}</td>
-            <td>{row.observationCount == null ? '—' : number.format(row.observationCount)}</td>
-            <td><span className="health-badge health-warning">{row.confidence}</span></td>
-            <td>{row.evidence}</td>
-          </tr>)}</tbody></table></div>}
-        </section>
-        <section className="reference-table-card company-evidence-card">
-          <div className="reference-table-heading"><div><strong>Provider identity review and ELAP gate</strong><span>Review signals only; no provider or lab accreditation merge is inferred</span></div></div>
-          {resolutionError && <div className="reference-empty-state compact"><strong>Provider review cache unavailable.</strong><span>{resolutionError}</span></div>}
-          {resolutionReview && <dl className="detail-grid company-review-summary">
-            <div><dt>Alias review candidates</dt><dd>{number.format(resolutionReview.summary.alias_review_candidate_count)}</dd></div>
-            <div><dt>High-priority candidates</dt><dd>{number.format(resolutionReview.summary.high_priority_alias_candidate_count)}</dd></div>
-            <div><dt>DEC name matches</dt><dd>{number.format(resolutionReview.summary.dec_name_match_count)}</dd></div>
-            <div><dt>Merges applied</dt><dd>{number.format(resolutionReview.summary.merge_applied_count)}</dd></div>
-          </dl>}
-          {resolutionReview && resolutionReview.dec_name_matches.length > 0 && <div className="evidence-list"><strong>Top DEC name matches</strong>{resolutionReview.dec_name_matches.slice(0, 8).map(match => <div key={match.match_id}><span>{match.provider_key}</span><small>{match.dec_provider_name ?? 'DEC name unavailable'} · {match.identity_confidence} · {match.relationship_evidence}</small></div>)}</div>}
-          {elapError && <div className="reference-empty-state compact"><strong>ELAP source probe unavailable.</strong><span>{elapError}</span></div>}
-          {elapProbe && <div className="source-row"><strong>ELAP public search contract</strong><span>{number.format(elapProbe.lab_selector.populated_option_count)} populated lab options · {elapProbe.detail_resolution_probe.detail_resolution_status}</span><small>Scope/accreditation assertions stay disabled until a deterministic potable-water scope crawler is built.</small></div>}
-        </section>
-      </div>
-
-      <div className="reference-table-card">
-        <div className="reference-table-heading">
-          <div><strong>Company &amp; vendor intelligence</strong><span>{number.format(companies.length)} shown · generated {formatTimestamp(payload.generated_at)}</span></div>
-          <div className="page-actions company-filter-actions">
-            <input aria-label="Company search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Company, alias or public buyer…" />
-            <select aria-label="Company service category" value={category} onChange={event => setCategory(event.target.value)}><option value="ALL">All services</option>{categories.map(value => <option key={value} value={value}>{categoryLabel(value)}</option>)}</select>
-            <select aria-label="Company resolution confidence" value={resolution} onChange={event => setResolution(event.target.value)}><option value="ALL">All resolution states</option><option value="STRONG">Strong</option><option value="VERIFY">Verify</option></select>
-          </div>
+    {payload && <div className="table-card account-table-card known-firms-master-card">
+      <div className="firm-master-toolbar">
+        <div className="firm-master-summary">
+          <strong>{number.format(sorted.length)} of {number.format(payload.summary.known_firm_count)} known firms</strong>
+          <span>Generated {formatTimestamp(payload.generated_at)} · click any row for the complete firm profile and site map</span>
         </div>
-        <div className="reference-table-scroll"><table className="reference-table companies-table"><thead><tr><th>Company / vendor</th><th>Identity</th><th>Services</th><th>Contracts</th><th>Public buyers</th><th>Repeat buyers</th><th>Observed value</th><th>Active</th><th>Action</th></tr></thead><tbody>{companies.map(company => <tr key={company.company_id} onClick={() => onOpenCompany(company)}>
-          <td><strong>{company.canonical_name}</strong><small>{company.observed_sources.join(' · ')}</small></td>
-          <td><span className={`health-badge health-${company.cross_source_resolution_confidence === 'VERIFY' ? 'warning' : 'healthy'}`}>{company.cross_source_resolution_confidence}</span><small>{company.identity_scope.replaceAll('_', ' ').toLowerCase()}</small></td>
-          <td><strong>{company.service_categories.slice(0, 2).map(categoryLabel).join(' · ') || '—'}</strong><small>{company.service_categories.length > 2 ? `+${company.service_categories.length - 2} more` : ''}</small></td>
-          <td>{number.format(company.metrics.observed_contract_count)}<small>{number.format(company.procurement_observation_count)} total observations</small></td>
-          <td>{number.format(company.metrics.observed_customer_count)}<small>{company.observed_buyers.slice(0, 2).join(' · ') || 'No buyer published'}</small></td>
-          <td>{number.format(company.metrics.repeat_customer_count)}<small>{company.metrics.observable_customer_retention == null ? 'retention proxy unavailable' : `${Math.round(company.metrics.observable_customer_retention * 100)}% repeat-buyer proxy`}</small></td>
-          <td>{currency.format(company.metrics.observed_contract_value)}<small>not company revenue</small></td>
-          <td>{number.format(company.metrics.active_contract_count)}<small>{number.format(company.metrics.contracts_expiring_12m)} expiring ≤12m</small></td>
-          <td><button className="table-link" onClick={event => { event.stopPropagation(); onOpenCompany(company) }}>Open company →</button></td>
-        </tr>)}</tbody></table></div>
+        <div className="page-actions firm-master-actions">
+          <a className="secondary-link-button" href={jsonUrl} target="_blank" rel="noreferrer">Dataset ↗</a>
+          <button onClick={() => exportKnownFirms(sorted)} disabled={sorted.length === 0}>Export {number.format(sorted.length)}</button>
+          <ShareButton label="Share view" />
+        </div>
       </div>
-      <div className="source-health-footnote">Observed vendor entities are built from exact public procurement labels with legal suffixes preserved. Similar base names are surfaced as VERIFY candidates rather than silently merged.</div>
-    </>}
+
+      <div className="firm-master-filters" aria-label="Known company filters">
+        <input aria-label="Known firm search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search company, role, service or source…" />
+        <select aria-label="Known firm role" value={role} onChange={event => setRole(event.target.value)}>
+          <option value="ALL">All roles</option>
+          {roles.map(value => <option key={value} value={value}>{roleLabel(value)}</option>)}
+        </select>
+        <select aria-label="Known firm relationship" value={relationship} onChange={event => setRelationship(event.target.value)}>
+          <option value="ALL">All site relationships</option>
+          <option value="SERVICED">Observed service sites</option>
+          <option value="TOWER">Linked tower accounts</option>
+          <option value="CONTRACTED">Confirmed contract sites</option>
+          <option value="RELATED">Any related site</option>
+        </select>
+        <select aria-label="Known firm activity" value={activity} onChange={event => setActivity(event.target.value)}>
+          <option value="ALL">Any activity date</option>
+          <option value="RECENT">Observed in last 12 months</option>
+        </select>
+        <select aria-label="Known firm identity confidence" value={confidence} onChange={event => setConfidence(event.target.value)}>
+          <option value="ALL">All identity states</option>
+          <option value="CONFIRMED">Confirmed</option>
+          <option value="STRONG">Strong</option>
+          <option value="VERIFY">Verify</option>
+          <option value="UNRESOLVED">Unresolved</option>
+        </select>
+      </div>
+
+      {sorted.length === 0 ? <div className="empty-state"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className="table-scroll"><table className="account-table known-firms-master-table"><thead><tr>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('canonical_name')}>Company / firm{sortIndicator('canonical_name')}</button></th>
+        <th scope="col" role="columnheader">Role</th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('serviced_site_count')}>Service footprint{sortIndicator('serviced_site_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('tower_account_count')}>Tower accounts{sortIndicator('tower_account_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('latest_observed_date')}>Last active{sortIndicator('latest_observed_date')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('observed_contract_count')}>Public contracts{sortIndicator('observed_contract_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('observed_customer_count')}>Buyers{sortIndicator('observed_customer_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('active_qualification_count')}>7G{sortIndicator('active_qualification_count')}</button></th>
+        <th scope="col" role="columnheader"><button onClick={() => changeSort('identity_confidence')}>Identity{sortIndicator('identity_confidence')}</button></th>
+        <th scope="col" role="columnheader" aria-label="Open firm" />
+      </tr></thead><tbody>{visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') openFirm(firm) }}>
+        <td className="account-cell firm-name-cell">
+          <strong>{firm.canonical_name}</strong>
+          <span>{number.format(firm.observation_count)} public-record observation{firm.observation_count === 1 ? '' : 's'}</span>
+          <small>{firm.source_classes.slice(0, 3).map(label).join(' · ') || 'Source observed'}</small>
+        </td>
+        <td><strong>{roleLabel(firm.primary_role)}</strong><small>{firm.roles.length > 1 ? `${firm.roles.length} observed roles` : 'Primary observed role'}</small></td>
+        <td><strong>{number.format(firm.serviced_site_count)} serviced</strong><small>{number.format(firm.observed_site_count)} related · {number.format(firm.contracted_site_count)} contracted · {number.format(firm.project_site_count)} project</small></td>
+        <td><strong>{number.format(firm.tower_account_count)}</strong><small>{number.format(firm.mapped_site_count)} mapped relationships</small></td>
+        <td><strong>{firm.latest_observed_date ? formatDate(firm.latest_observed_date) : '—'}</strong><small>{firm.active_last_12m ? 'Observed ≤12 months' : firm.first_observed_date ? `First ${formatDate(firm.first_observed_date)}` : 'No dated observation'}</small></td>
+        <td><strong>{number.format(firm.observed_contract_count)}</strong><small>{number.format(firm.active_contract_count)} active · {firm.observed_contract_value ? currency.format(firm.observed_contract_value) : 'no published value'}</small></td>
+        <td><strong>{number.format(firm.observed_customer_count)}</strong><small>{number.format(firm.repeat_buyer_count)} repeat buyer{firm.repeat_buyer_count === 1 ? '' : 's'}</small></td>
+        <td><strong>{number.format(firm.active_qualification_count)}</strong><small>{number.format(firm.qualification_count)} observed registration{firm.qualification_count === 1 ? '' : 's'}</small></td>
+        <td><span className={`health-badge health-${firm.identity_confidence === 'VERIFY' || firm.identity_confidence === 'UNRESOLVED' ? 'warning' : 'healthy'}`}>{firm.identity_confidence}</span><small>{label(firm.resolution_method)}</small></td>
+        <td className="row-arrow">›</td>
+      </tr>)}</tbody></table></div>}
+
+      <div className="firm-master-footer">
+        <span><strong>Serviced</strong> requires explicit DWT provider/laboratory evidence. <strong>Related</strong> can also include procurement or exact-property project roles and is not an incumbent-service claim.</span>
+        <div className="pagination">
+          <button disabled={activePage === 0} onClick={() => setPage(value => Math.max(0, value - 1))}>Previous</button>
+          <span>Page {activePage + 1} of {maxPage + 1} · {visible.length ? activePage * PAGE_SIZE + 1 : 0}–{Math.min((activePage + 1) * PAGE_SIZE, sorted.length)}</span>
+          <button disabled={activePage === maxPage} onClick={() => setPage(value => Math.min(maxPage, value + 1))}>Next</button>
+        </div>
+      </div>
+    </div>}
   </section>
 }

@@ -3,6 +3,7 @@ import type { ChangesPayload } from '../types/history'
 import type { NysChangesPayload, NysSystemsPayload } from '../types/nys'
 import type { CheckbookProcurementPayload, CityRecordProcurementPayload, NysAuthorityProcurementPayload, NychaWaterPayload, OpenBookWaterPayload, ProcurementBundle } from '../types/procurement'
 import type { CompanyIntelligencePayload } from '../types/company'
+import type { KnownFirmDetailPayload, KnownFirmPayload } from '../types/firm'
 import type { DomesticWaterMarketPayload, ElapProbePayload, NysLsliDetailPayload, NysPublicWaterPayload, NysServiceLineInventorySummaryPayload, NycDistributionWaterPayload, NycWaterSignalsPayload, ProviderResolutionPayload } from '../types/water'
 import type { CoverageAuditPayload } from '../types/coverage'
 
@@ -114,6 +115,30 @@ export async function loadCompanies(): Promise<CompanyIntelligencePayload> {
   const payload = await loadJson<CompanyIntelligencePayload>('companies.json', 'TowerSignal company intelligence')
   if (!payload?.summary || !Array.isArray(payload?.companies) || !Array.isArray(payload?.unresolved_vendor_observations)) {
     throw new Error('TowerSignal company intelligence dataset is malformed')
+  }
+  return payload
+}
+
+export async function loadKnownFirms(): Promise<KnownFirmPayload> {
+  const payload = await loadJson<KnownFirmPayload>('known-firms.json', 'TowerSignal known-firm intelligence')
+  if (payload?.domain !== 'TOWERSIGNAL_KNOWN_FIRMS' || !payload?.summary || !Array.isArray(payload?.firms)) {
+    throw new Error('TowerSignal known-firm intelligence dataset is malformed')
+  }
+  return payload
+}
+
+export function knownFirmDetailUrl(firmId: string): string {
+  const safe = [...firmId].filter((ch) => /[A-Za-z0-9_-]/.test(ch)).join('')
+  const prefix = (safe.slice(0, 2) || 'xx').toLowerCase()
+  return `${base}data/firm-details/${prefix}/${encodeURIComponent(safe)}.json`
+}
+
+export async function loadKnownFirmDetail(firmId: string): Promise<KnownFirmDetailPayload> {
+  const response = await fetch(knownFirmDetailUrl(firmId), { cache: 'no-store' })
+  if (!response.ok) throw new Error(`Known-firm detail request failed: HTTP ${response.status}`)
+  const payload = await response.json() as KnownFirmDetailPayload
+  if (payload?.domain !== 'TOWERSIGNAL_KNOWN_FIRM_DETAIL' || payload?.firm?.firm_id !== firmId || !Array.isArray(payload?.site_relationships)) {
+    throw new Error('TowerSignal known-firm detail dataset is malformed')
   }
   return payload
 }
