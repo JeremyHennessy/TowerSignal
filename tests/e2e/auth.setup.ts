@@ -2,8 +2,10 @@ import { expect, test as setup } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { authStatePath, testCredentials } from './auth.helpers'
+import { installCandidateRoutes } from './candidate-routes'
 
 setup('create hosted TowerSignal test account and prove signed-out route gate', async ({ page }, testInfo) => {
+  await installCandidateRoutes(page)
   await page.goto('./#/companies', { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Known companies & firms', exact: true })).toHaveCount(0)
