@@ -75,11 +75,10 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs: build-cache
     runs-on: ubuntu-latest
-    # Preserve the 45m NYC and 15m legacy-DOB step limits, plus verification time.
-    timeout-minutes: 90
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - name: Check out durable TowerSignal history
+      - name: Check out durable TowerSignal history for the verified OATH cache
         uses: actions/checkout@v4
         with:
           ref: data/towersignal-history
@@ -89,27 +88,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Download verified ACRIS cache
+      - name: Download freshly verified ACRIS cache
         uses: actions/download-artifact@v4
         with:
           name: towersignal-acris-cache
           path: .verified-acris
-      - name: Install frontend dependencies
-        run: npm install --no-audit --no-fund
-      - name: Generate current NYC data
+      - name: Generate current NYC canonical property universe
         timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
-      - name: Build bounded legacy DOB/BIS project context
-        timeout-minutes: 15
-        run: python scripts/build_legacy_dob_project_cache.py --output public/data
-      - name: Validate bounded legacy DOB/BIS project context
-        run: python scripts/validate_legacy_dob_project_cache.py --cache public/data/legacy-dob-projects.json --max-age-days 1 --require-production-volume
-      - name: Attach exact-BBL legacy DOB/BIS project context
-        run: python scripts/attach_legacy_dob_project_context.py --output public/data --cache public/data/legacy-dob-projects.json
-      - name: Attach verified ACRIS cache
+      - name: Attach freshly verified ACRIS cache
         run: python scripts/attach_acris.py --output public/data --cache .verified-acris/cache.json
       - name: Require canonical ACRIS cache universe alignment
         run: |
@@ -129,34 +116,6 @@ jobs:
               'acris_cache_universe_aligned': metadata.get('acris_cache_universe_aligned'),
           }, indent=2))
           PY
-      - name: Generate current NYS data
-        run: python scripts/build_nys_data.py --output public/data
-      - name: Build source health
-        run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
-      - name: Attach ACRIS source health
-        run: python scripts/attach_acris_health.py --output public/data
-      - name: Build NYC history
-        run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
-      - name: Build NYS history
-        run: python scripts/build_nys_history.py --output public/data --previous-snapshot .history-store/data/history/nys/latest.json --previous-events .history-store/data/history/nys/events.json
-      - name: Validate NYC history size
-        run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
-      - name: Validate NYS history size
-        run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
-      - name: Independently verify NYC sources
-        run: python scripts/verify_live_data.py --sample-size 5
-      - name: Independently verify NYS source
-        run: python scripts/verify_live_nys.py --sample-size 5
-      - name: Python tests
-        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
-      - name: Lint frontend
-        run: npm run lint
-      - name: Typecheck frontend
-        run: npm run typecheck
-      - name: Frontend tests
-        run: npm test
-      - name: Production build
-        run: npm run build
 
   persist-cache:
     if: ${{ github.event_name != 'pull_request' }}

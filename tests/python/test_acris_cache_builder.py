@@ -12,15 +12,32 @@ from build_acris_cache import tower_bbls_from_current_registrations
 
 
 class AcrisCacheBuilderTests(unittest.TestCase):
-    def test_integration_budget_allows_bounded_source_steps_and_validation(self):
+    def test_pr_integration_is_acris_specific_and_keeps_alignment_fail_closed(self):
         workflow = (ROOT / ".github/workflows/acris-cache.yml").read_text(encoding="utf-8")
         integration = workflow.split("\n  integration:\n", 1)[1].split("\n  persist-cache:\n", 1)[0]
         job_budget = int(re.search(r"^    timeout-minutes: (\d+)$", integration, re.MULTILINE).group(1))
         source_budgets = [int(value) for value in re.findall(r"^        timeout-minutes: (\d+)$", integration, re.MULTILINE)]
-        self.assertEqual(source_budgets, [45, 15])
-        self.assertGreaterEqual(job_budget, sum(source_budgets) + 15)
-        self.assertNotIn("continue-on-error", integration)
+
+        self.assertEqual(source_budgets, [45])
+        self.assertGreaterEqual(job_budget, source_budgets[0] + 10)
+        self.assertIn("Check out durable TowerSignal history for the verified OATH cache", integration)
+        self.assertIn("Attach freshly verified ACRIS cache", integration)
         self.assertIn("Require canonical ACRIS cache universe alignment", integration)
+        self.assertNotIn("continue-on-error", integration)
+
+        # Full release validation belongs to pages.yml, where all prerequisite
+        # artifacts are actually generated. The ACRIS PR gate must not maintain
+        # a stale partial copy of that pipeline.
+        for unrelated_release_step in (
+            "Generate current NYS data",
+            "Build source health",
+            "Build NYC history",
+            "Build NYS history",
+            "Validate NYS history size",
+            "Frontend tests",
+            "Production build",
+        ):
+            self.assertNotIn(unrelated_release_step, integration)
 
     def test_current_cache_universe_uses_canonical_bbl_recovery(self):
         systems = [

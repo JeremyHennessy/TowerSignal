@@ -1,0 +1,66 @@
+name: Check Azure Blob connection (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azure-storage-connection-check
+  cancel-in-progress: false
+
+jobs:
+  check-storage:
+    if: github.ref == 'refs/heads/main'
+    name: Verify storage credentials without changing blobs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: azure-production
+    steps:
+      # No checkout, application build, upload, delete or permission change.
+      - name: Validate settings and test an authenticated listing
+        shell: bash
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_PREFIX: ${{ vars.AZURE_STORAGE_PREFIX }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          AZURE_CORE_COLLECT_TELEMETRY: "false"
+        run: |
+          set -euo pipefail
+          : "${AZURE_STORAGE_ACCOUNT:?Missing AZURE_STORAGE_ACCOUNT in azure-production}"
+          : "${AZURE_STORAGE_CONTAINER:?Missing AZURE_STORAGE_CONTAINER in azure-production}"
+          : "${AZURE_STORAGE_PREFIX:?Missing AZURE_STORAGE_PREFIX in azure-production}"
+          : "${AZURE_STORAGE_KEY:?Missing AZURE_STORAGE_KEY in azure-production}"
+
+          if [[ "$AZURE_STORAGE_ACCOUNT" != "pharm3r" ||
+                "$AZURE_STORAGE_CONTAINER" != "data" ||
+                "$AZURE_STORAGE_PREFIX" != "towersignal-data" ]]; then
+            echo "::error::Destination does not match the approved pharm3r/data/towersignal-data prefix."
+            exit 1
+          fi
+
+          if ! command -v az >/dev/null 2>&1; then
+            echo "::error::Azure CLI is unavailable on this runner."
+            exit 1
+          fi
+
+          # An empty prefix can pass. Suppress all returned object details.
+          az storage blob list \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --prefix "${AZURE_STORAGE_PREFIX}/" \
+            --auth-mode key \
+            --num-results 1 \
+            --timeout 30 \
+            --only-show-errors \
+            --output none
+
+          echo "Authenticated storage listing request succeeded."
+          {
+            echo "## Azure Blob connection check"
+            echo "Authenticated listing succeeded for the approved TowerSignal prefix."
+            echo "No blobs, access policies, DNS records or application deployments were changed."
+            echo "This does not verify uploads, browser access, CORS or the Static Web Apps token."
+          } >> "$GITHUB_STEP_SUMMARY"
