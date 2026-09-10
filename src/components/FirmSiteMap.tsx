@@ -31,6 +31,8 @@ export function FirmSiteMap({
   const mapRef = useRef<L.Map | null>(null)
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
   const markerRef = useRef(new Map<string, L.Marker>())
+  const renderedSites = useRef<KnownFirmSiteRelationship[] | null>(null)
+  const selectRef = useRef(onSelect)
 
   useEffect(() => {
     if (!container.current || mapRef.current) return
@@ -49,6 +51,7 @@ export function FirmSiteMap({
       mapRef.current = null
       clusterRef.current = null
       markerMap.clear()
+      renderedSites.current = null
     }
   }, [])
 
@@ -56,14 +59,21 @@ export function FirmSiteMap({
     const map = mapRef.current
     const cluster = clusterRef.current
     if (!map || !cluster) return
+    selectRef.current = onSelect
+    // Selecting a site re-renders the parent with a new array and callback.
+    // Retain the existing marker layers when their source records are unchanged;
+    // rebuilding here races the selected-site zoom and detaches clicked markers.
+    if (renderedSites.current?.length === sites.length
+      && sites.every((site, index) => renderedSites.current?.[index] === site)) return
+    renderedSites.current = sites
     cluster.clearLayers()
     markerRef.current.clear()
     const bounds: L.LatLngExpression[] = []
     for (const site of sites) {
       if (site.latitude == null || site.longitude == null) continue
-      const latLng: L.LatLngExpression = [site.latitude, site.longitude]
-      bounds.push(latLng)
-      const marker = L.marker(latLng, {
+      const latLng: L.LatLngExpression[] = [site.latitude, site.longitude]
+      bounds.push(latLng as L.LatLngTuple)
+      const marker = L.marker(latLng as L.LatLngTuple, {
         icon: L.divIcon({
           className: 'firm-site-marker-wrap',
           html: `<span class="${markerClass(site)}"></span>`,
@@ -74,7 +84,7 @@ export function FirmSiteMap({
       })
       const relationship = site.serviced ? 'Observed service' : site.contracted ? 'Confirmed contract link' : 'Related evidence'
       marker.bindTooltip(`${escapeHtml(site.address ?? site.site_id)} · ${escapeHtml(relationship)}`)
-      marker.on('click', () => onSelect(site))
+      marker.on('click', () => selectRef.current(site))
       cluster.addLayer(marker)
       markerRef.current.set(site.site_id, marker)
     }
