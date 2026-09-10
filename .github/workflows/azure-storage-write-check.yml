@@ -1,0 +1,134 @@
+name: Check Azure Blob write path (reversible)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/azure-storage-write-check.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azure-storage-write-check
+  cancel-in-progress: false
+
+jobs:
+  check-storage-write:
+    if: github.ref == 'refs/heads/main'
+    name: Verify Blob upload, readback, and cleanup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: azure-production
+    steps:
+      - name: Upload one probe, verify it, then delete it
+        shell: bash
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_PREFIX: ${{ vars.AZURE_STORAGE_PREFIX }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          AZURE_CORE_COLLECT_TELEMETRY: "false"
+        run: |
+          set -euo pipefail
+
+          : "${AZURE_STORAGE_ACCOUNT:?Missing AZURE_STORAGE_ACCOUNT in azure-production}"
+          : "${AZURE_STORAGE_CONTAINER:?Missing AZURE_STORAGE_CONTAINER in azure-production}"
+          : "${AZURE_STORAGE_PREFIX:?Missing AZURE_STORAGE_PREFIX in azure-production}"
+          : "${AZURE_STORAGE_KEY:?Missing AZURE_STORAGE_KEY in azure-production}"
+
+          if [[ "$AZURE_STORAGE_ACCOUNT" != "pharm3r" ||
+                "$AZURE_STORAGE_CONTAINER" != "data" ||
+                "$AZURE_STORAGE_PREFIX" != "towersignal-data" ]]; then
+            echo "::error::Destination does not match the approved pharm3r/data/towersignal-data prefix."
+            exit 1
+          fi
+
+          if ! command -v az >/dev/null 2>&1; then
+            echo "::error::Azure CLI is unavailable on this runner."
+            exit 1
+          fi
+
+          workdir="$(mktemp -d)"
+          probe_blob="${AZURE_STORAGE_PREFIX}/_migration-probes/write-check-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.json"
+          probe_file="$workdir/probe.json"
+          downloaded_file="$workdir/downloaded.json"
+
+          cleanup() {
+            az storage blob delete \
+              --account-name "$AZURE_STORAGE_ACCOUNT" \
+              --container-name "$AZURE_STORAGE_CONTAINER" \
+              --name "$probe_blob" \
+              --auth-mode key \
+              --timeout 30 \
+              --only-show-errors \
+              --output none >/dev/null 2>&1 || true
+            rm -rf "$workdir"
+          }
+          trap cleanup EXIT
+
+          printf '{"purpose":"TowerSignal Azure migration write probe","run_id":"%s","commit":"%s"}\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_SHA" > "$probe_file"
+
+          az storage blob upload \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "$probe_blob" \
+            --file "$probe_file" \
+            --auth-mode key \
+            --overwrite false \
+            --content-type application/json \
+            --timeout 30 \
+            --only-show-errors \
+            --output none
+
+          az storage blob download \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "$probe_blob" \
+            --file "$downloaded_file" \
+            --auth-mode key \
+            --overwrite true \
+            --timeout 30 \
+            --only-show-errors \
+            --output none
+
+          cmp --silent "$probe_file" "$downloaded_file" || {
+            echo "::error::Blob readback did not match the uploaded probe."
+            exit 1
+          }
+
+          az storage blob delete \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "$probe_blob" \
+            --auth-mode key \
+            --timeout 30 \
+            --only-show-errors \
+            --output none
+
+          exists="$(az storage blob exists \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "$probe_blob" \
+            --auth-mode key \
+            --timeout 30 \
+            --query exists \
+            --output tsv \
+            --only-show-errors)"
+
+          if [[ "$exists" != "false" ]]; then
+            echo "::error::Probe cleanup could not be verified."
+            exit 1
+          fi
+
+          trap - EXIT
+          rm -rf "$workdir"
+
+          echo "Authenticated Blob upload, exact readback, and cleanup succeeded."
+          {
+            echo "## Azure Blob reversible write check"
+            echo "A unique probe was uploaded under the approved TowerSignal prefix, downloaded byte-for-byte, deleted, and confirmed absent."
+            echo "No production TowerSignal payloads, access policies, CORS rules, DNS records or application deployments were changed."
+          } >> "$GITHUB_STEP_SUMMARY"
