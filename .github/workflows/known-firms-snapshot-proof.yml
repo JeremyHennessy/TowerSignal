@@ -104,6 +104,7 @@ jobs:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
           CANDIDATE_ROOT: dist
           GITHUB_RUN_ID: ${{ github.run_id }}-candidate-suite
+          DEBUG: pw:browser
         run: npm run test:e2e
       - name: Archive exact candidate
         run: |
