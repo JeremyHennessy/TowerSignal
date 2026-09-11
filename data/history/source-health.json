@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T22:04:46.939530Z",
+  "generated_at": "2026-09-11T00:03:33.353223Z",
   "sources": [
     {
       "source_key": "registrations",
@@ -49,8 +49,8 @@
       "attached_entity_count": 3975,
       "displayed_entity_count": 3975,
       "coverage_percentage": 99.51,
-      "previous_coverage_percentage": 98.75,
-      "coverage_change_percentage_points": 0.76,
+      "previous_coverage_percentage": 99.51,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact NYC Health summons_number to OATH ticket_number match coverage.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -67,8 +67,8 @@
       "attached_entity_count": 4694,
       "displayed_entity_count": 4694,
       "coverage_percentage": 96.71,
-      "previous_coverage_percentage": 95.86,
-      "coverage_change_percentage_points": 0.85,
+      "previous_coverage_percentage": 96.71,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact BBL match coverage; one BBL can attach to more than one cooling-tower system.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -85,8 +85,8 @@
       "attached_entity_count": 4422,
       "displayed_entity_count": 4422,
       "coverage_percentage": 90.45,
-      "previous_coverage_percentage": 91.74,
-      "coverage_change_percentage_points": -1.29,
+      "previous_coverage_percentage": 90.45,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact BBL job-filing coverage. A missing DOB NOW match means no matching DOB NOW job filing was returned; it is not evidence that no construction or mechanical work ever occurred.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -103,8 +103,8 @@
       "attached_entity_count": 2086,
       "displayed_entity_count": 2086,
       "coverage_percentage": 38.53,
-      "previous_coverage_percentage": null,
-      "coverage_change_percentage_points": null,
+      "previous_coverage_percentage": 38.53,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is prevalence of bounded exact-BBL legacy DOB/BIS evidence: all explicit cooling-tower text plus recent mechanical/boiler/plumbing/equipment project records. It is not expected-completeness coverage and recorded applicants/owners are project roles, not service-provider claims.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -121,8 +121,8 @@
       "attached_entity_count": 2089,
       "displayed_entity_count": 2089,
       "coverage_percentage": 47.24,
-      "previous_coverage_percentage": 49.93,
-      "coverage_change_percentage_points": -2.69,
+      "previous_coverage_percentage": 47.24,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is exact BBL registration match coverage. HPD registration applies only to qualifying properties, so low absolute coverage is not itself a failure.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -139,8 +139,8 @@
       "attached_entity_count": 2066,
       "displayed_entity_count": 2066,
       "coverage_percentage": 99.28,
-      "previous_coverage_percentage": 99.33,
-      "coverage_change_percentage_points": -0.05,
+      "previous_coverage_percentage": 99.28,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is the share of exact-matched HPD registration BBLs with public contact rows.",
       "status": "HEALTHY",
       "status_reasons": []
@@ -157,8 +157,8 @@
       "attached_entity_count": 3435,
       "displayed_entity_count": 3435,
       "coverage_percentage": 67.24,
-      "previous_coverage_percentage": 67.27,
-      "coverage_change_percentage_points": -0.03,
+      "previous_coverage_percentage": 67.24,
+      "coverage_change_percentage_points": 0.0,
       "coverage_note": "Coverage is the share of current registry BINs with at least one exact-BIN 2022 aerial-derived Planimetric cooling-tower feature. A missing physical match is not evidence that a registered tower does not exist, and a building-level physical feature is not a one-to-one System ID identity claim.",
       "status": "HEALTHY",
       "status_reasons": []
