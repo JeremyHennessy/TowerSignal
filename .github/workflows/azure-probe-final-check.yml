@@ -1,0 +1,42 @@
+name: Verify failed Azure probe cleanup and error code
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    environment: azure-production
+    steps:
+      - name: Confirm probe absence and inspect anonymous response
+        shell: bash
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_PREFIX: ${{ vars.AZURE_STORAGE_PREFIX }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          AZURE_CORE_COLLECT_TELEMETRY: "false"
+        run: |
+          set -euo pipefail
+          : "${AZURE_STORAGE_KEY:?Missing storage key}"
+          [[ "$AZURE_STORAGE_ACCOUNT" == pharm3r && "$AZURE_STORAGE_CONTAINER" == data && "$AZURE_STORAGE_PREFIX" == towersignal-data ]] || { echo '::error::Unexpected destination'; exit 1; }
+          blob='towersignal-data/_migration-probes/browser-check-34589788524-1.json'
+          exists="$(az storage blob exists --account-name "$AZURE_STORAGE_ACCOUNT" --container-name "$AZURE_STORAGE_CONTAINER" --name "$blob" --auth-mode key --timeout 30 --query exists --output tsv --only-show-errors)"
+          [[ "$exists" == false ]] || { echo '::error::The failed probe is still present or absence could not be verified. No objects were changed.'; exit 1; }
+          echo 'Confirmed the failed browser probe is absent using authenticated Blob existence check.'
+          workdir="$(mktemp -d)"
+          trap 'rm -rf "$workdir"' EXIT
+          http_status="$(curl --silent --show-error --connect-timeout 10 --max-time 30 --header 'Origin: https://towersignal.pharm3r.com' --output "$workdir/response.xml" --write-out '%{http_code}' "https://pharm3r.blob.core.windows.net/data/$blob")"
+          error_code="$(python3 -c 'import sys,xml.etree.ElementTree as E; root=E.parse(sys.argv[1]).getroot(); code=root.findtext("Code") or "NoAzureErrorCode"; print(code if code.isalnum() else "UnrecognizedAzureErrorCode")' "$workdir/response.xml")"
+          printf 'Anonymous HTTP status: %s; Azure error code: %s\n' "$http_status" "$error_code"
+          {
+            echo '## Failed Azure browser probe: final read-only checks'
+            echo 'Authenticated existence check confirms the temporary probe is absent.'
+            printf 'Anonymous request HTTP status: %s. Azure error code: %s.\n' "$http_status" "$error_code"
+            echo 'No uploads, deletions, policy changes, CORS changes, DNS changes, or deployments were performed by this check.'
+          } >> "$GITHUB_STEP_SUMMARY"
