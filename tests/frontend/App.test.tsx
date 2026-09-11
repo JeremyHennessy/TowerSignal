@@ -164,7 +164,9 @@ test('filters records and opens a shareable full account profile with DOB projec
   await user.click(within(detailPanel).getByRole('button', { name: /^Field/ }))
   await waitFor(() => expect(within(detailPanel).getByRole('heading', { name:'Pre-visit field pack' })).toBeInTheDocument())
   expect(within(detailPanel).getByText('Schematics / mechanical drawings')).toBeInTheDocument()
-  expect(within(detailPanel).getByRole('heading', { name:'OATH case lifecycle' })).toBeInTheDocument()
+
+  await user.click(within(detailPanel).getByRole('button', { name: /^History/ }))
+  await waitFor(() => expect(within(detailPanel).getByRole('heading', { name:'OATH case lifecycle' })).toBeInTheDocument())
   expect(within(detailPanel).getByRole('heading', { name:'TowerSignal History' })).toBeInTheDocument()
   expect(within(detailPanel).getByText(/Ticket 0880900460/)).toBeInTheDocument()
   expect(within(detailPanel).getByText('IN VIOLATION')).toBeInTheDocument()
