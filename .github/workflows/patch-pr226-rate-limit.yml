@@ -1,0 +1,88 @@
+name: Patch PR 226 rate-aware DOB throttling
+
+on:
+  push:
+    branches: [agent/patch-pr226-rate-limit-20260911]
+    paths: [.github/workflows/patch-pr226-rate-limit.yml]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const repo={owner:'JeremyHennessy',repo:'TowerSignal'};
+            const target='agent/legacy-dob-budget-fix-20260911';
+            const expected='c7c7013887f91733b4c03381887474a005fc30ef';
+            const ref=(await github.rest.git.getRef({...repo,ref:'heads/'+target})).data;
+            if(ref.object.sha!==expected) throw new Error('PR 226 head moved; refusing patch');
+            const commit=(await github.rest.git.getCommit({...repo,commit_sha:expected})).data;
+            async function read(path){
+              const f=(await github.rest.repos.getContent({...repo,path,ref:expected})).data;
+              if(Array.isArray(f)||f.type!=='file') throw new Error('Not a file: '+path);
+              return Buffer.from(f.content,'base64').toString('utf8');
+            }
+            function replaceOne(text,oldText,newText,label){
+              const first=text.indexOf(oldText);
+              if(first<0||text.indexOf(oldText,first+1)>=0) throw new Error('Expected exactly one '+label);
+              return text.slice(0,first)+newText+text.slice(first+oldText.length);
+            }
+            let builder=await read('scripts/build_legacy_dob_project_cache.py');
+            builder=replaceOne(builder,
+              'import sys\nimport time\n',
+              'import sys\nimport threading\nimport time\n','threading import');
+            builder=replaceOne(builder,
+              'MAX_CONCURRENT_REQUESTS = 4\n',
+              'MAX_CONCURRENT_REQUESTS = 3\nREQUEST_START_INTERVAL_SECONDS = 5.0\nREQUEST_ATTEMPTS = 4\nRATE_LIMIT_BACKOFF_SECONDS = (30.0, 60.0, 120.0)\nTRANSIENT_BACKOFF_SECONDS = (1.0, 2.0, 4.0)\n','throttle constants');
+            const oldBlock=`    def fetch_batch(batch_index: int, chunk: list[str]) -> tuple[int, list[dict[str, Any]], float]:\n        query_started = time.monotonic()\n        print(f"[legacy_dob] Batch {batch_index}/{total_batches}: querying {len(chunk)} BBLs", file=sys.stderr, flush=True)\n        rows = fetch_where(\n            DATASET_ID,\n            where=_exact_where(chunk),\n            order_by="borough,block,lot,job_s1_no",\n            select=SELECT,\n            limit=FETCH_CAP,\n            request_timeout=120,\n        )\n        if len(rows) >= FETCH_CAP:\n            raise SourceFetchError(\n                f"Legacy DOB exact-property query reached the {FETCH_CAP:,}-row cap for {len(chunk)} BBLs; refusing possibly truncated evidence"\n            )\n        elapsed = time.monotonic() - query_started\n        print(f"[legacy_dob] Batch {batch_index}/{total_batches}: {len(rows):,} rows in {elapsed:.1f}s", file=sys.stderr, flush=True)\n        return batch_index, rows, elapsed\n`;
+            const newBlock=`    throttle_lock = threading.Lock()\n    next_request_start = 0.0\n\n    def reserve_request_start() -> None:\n        nonlocal next_request_start\n        while True:\n            with throttle_lock:\n                now = time.monotonic()\n                delay = next_request_start - now\n                if delay <= 0:\n                    next_request_start = now + REQUEST_START_INTERVAL_SECONDS\n                    return\n            time.sleep(min(delay, 1.0))\n\n    def extend_global_cooldown(seconds: float) -> None:\n        nonlocal next_request_start\n        with throttle_lock:\n            next_request_start = max(next_request_start, time.monotonic() + seconds)\n\n    def fetch_batch(batch_index: int, chunk: list[str]) -> tuple[int, list[dict[str, Any]], float]:\n        query_started = time.monotonic()\n        where = _exact_where(chunk)\n        last_error: SourceFetchError | None = None\n        for attempt in range(1, REQUEST_ATTEMPTS + 1):\n            reserve_request_start()\n            print(\n                f"[legacy_dob] Batch {batch_index}/{total_batches}: querying {len(chunk)} BBLs "\n                f"(attempt {attempt}/{REQUEST_ATTEMPTS})",\n                file=sys.stderr,\n                flush=True,\n            )\n            try:\n                rows = fetch_where(\n                    DATASET_ID,\n                    where=where,\n                    order_by="borough,block,lot,job_s1_no",\n                    select=SELECT,\n                    limit=FETCH_CAP,\n                    request_retries=1,\n                    request_timeout=120,\n                )\n            except SourceFetchError as error:\n                last_error = error\n                message = str(error)\n                retryable_transport = message.startswith("Failed to retrieve authoritative source after")\n                if not retryable_transport or attempt >= REQUEST_ATTEMPTS:\n                    raise\n                rate_limited = "429" in message or "Too Many Requests" in message\n                delays = RATE_LIMIT_BACKOFF_SECONDS if rate_limited else TRANSIENT_BACKOFF_SECONDS\n                delay = delays[attempt - 1]\n                if rate_limited:\n                    extend_global_cooldown(delay)\n                else:\n                    time.sleep(delay)\n                print(\n                    f"[legacy_dob] Batch {batch_index}/{total_batches}: "\n                    f"{'rate limited' if rate_limited else 'transient source failure'}; "\n                    f"retrying after {delay:.0f}s",\n                    file=sys.stderr,\n                    flush=True,\n                )\n                continue\n            if len(rows) >= FETCH_CAP:\n                raise SourceFetchError(\n                    f"Legacy DOB exact-property query reached the {FETCH_CAP:,}-row cap for {len(chunk)} BBLs; refusing possibly truncated evidence"\n                )\n            elapsed = time.monotonic() - query_started\n            print(f"[legacy_dob] Batch {batch_index}/{total_batches}: {len(rows):,} rows in {elapsed:.1f}s", file=sys.stderr, flush=True)\n            return batch_index, rows, elapsed\n        raise last_error or SourceFetchError(f"Legacy DOB batch {batch_index} exhausted retries")\n`;
+            builder=replaceOne(builder,oldBlock,newBlock,'fetch batch block');
+            builder=replaceOne(builder,
+              'f"with at most {MAX_CONCURRENT_REQUESTS} concurrent requests",\n',
+              'f"with at most {MAX_CONCURRENT_REQUESTS} concurrent requests and "\n        f"{REQUEST_START_INTERVAL_SECONDS:.0f}s minimum request-start spacing",\n','startup log');
+
+            let workflow=await read('.github/workflows/azure-data-refresh.yml');
+            workflow=replaceOne(workflow,
+              '      - name: Build bounded legacy DOB/BIS project context\n        timeout-minutes: 90\n',
+              '      - name: Build bounded legacy DOB/BIS project context\n        timeout-minutes: 150\n','DOB timeout');
+
+            let tests=await read('tests/python/test_legacy_dob_project_cache.py');
+            tests=replaceOne(tests,'def test_build_uses_max_four_concurrent_exact_queries_and_deterministic_merge(self):','def test_build_uses_max_three_staggered_exact_queries_and_deterministic_merge(self):','test name');
+            tests=replaceOne(tests,
+              '            with patch.object(builder, "fetch_where", side_effect=fake_fetch), \\\n                 patch.object(builder, "fetch_metadata", return_value={"name": "DOB", "source_last_updated_at": "2026-09-10T00:00:00Z"}), \\\n',
+              '            with patch.object(builder, "REQUEST_START_INTERVAL_SECONDS", 0.0), \\\n                 patch.object(builder, "fetch_where", side_effect=fake_fetch), \\\n                 patch.object(builder, "fetch_metadata", return_value={"name": "DOB", "source_last_updated_at": "2026-09-10T00:00:00Z"}), \\\n','test interval patch');
+            tests=replaceOne(tests,'            self.assertEqual(builder.MAX_CONCURRENT_REQUESTS, 4)\n            self.assertLessEqual(peak, 4)\n','            self.assertEqual(builder.MAX_CONCURRENT_REQUESTS, 3)\n            self.assertLessEqual(peak, 3)\n','max concurrency assertions');
+            tests=replaceOne(tests,
+              '                    "limit": builder.FETCH_CAP,\n                    "request_timeout": 120,\n',
+              '                    "limit": builder.FETCH_CAP,\n                    "request_retries": 1,\n                    "request_timeout": 120,\n','exact query args');
+            tests=replaceOne(tests,'            self.assertIn("at most 4 concurrent requests", stderr.getvalue())\n','            self.assertIn("at most 3 concurrent requests", stderr.getvalue())\n            self.assertIn("minimum request-start spacing", stderr.getvalue())\n','startup assertions');
+            const marker='    def test_count_failure_after_concurrent_collection_prevents_publication(self):\n';
+            const rateTest=`    def test_http_429_retries_same_exact_query_with_rate_aware_policy(self):\n        with tempfile.TemporaryDirectory() as tmp:\n            output = Path(tmp)\n            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}], "metadata": {"snapshot_date": "2026-09-11"}}))\n            calls = []\n\n            def fake_fetch(dataset_id, **kwargs):\n                calls.append((dataset_id, kwargs.copy()))\n                if len(calls) == 1:\n                    raise builder.SourceFetchError(\n                        "Failed to retrieve authoritative source after 1 attempts: url: HTTP Error 429: Too Many Requests"\n                    )\n                return [self.base_row()]\n\n            stderr = io.StringIO()\n            with patch.object(builder, "REQUEST_START_INTERVAL_SECONDS", 0.0), \\\n                 patch.object(builder, "RATE_LIMIT_BACKOFF_SECONDS", (0.0, 0.0, 0.0)), \\\n                 patch.object(builder, "fetch_where", side_effect=fake_fetch), \\\n                 patch.object(builder, "fetch_metadata", return_value={"name": "DOB", "source_last_updated_at": "2026-09-10T00:00:00Z"}), \\\n                 patch.object(builder, "fetch_count", return_value=2700000), \\\n                 redirect_stderr(stderr), redirect_stdout(io.StringIO()):\n                result = builder.build(output)\n\n            self.assertEqual(len(calls), 2)\n            expected_where = builder._exact_where(["3000010001"])\n            for dataset_id, kwargs in calls:\n                self.assertEqual(dataset_id, builder.DATASET_ID)\n                self.assertEqual(kwargs["where"], expected_where)\n                self.assertEqual(kwargs["order_by"], "borough,block,lot,job_s1_no")\n                self.assertEqual(kwargs["select"], builder.SELECT)\n                self.assertEqual(kwargs["limit"], builder.FETCH_CAP)\n                self.assertEqual(kwargs["request_retries"], 1)\n                self.assertEqual(kwargs["request_timeout"], 120)\n            self.assertEqual(result["summary"]["retained_record_count"], 1)\n            self.assertIn("rate limited", stderr.getvalue())\n\n`;
+            tests=replaceOne(tests,marker,rateTest+marker,'429 regression insertion');
+
+            let refreshTests=await read('tests/python/test_blob_data_refresh.py');
+            refreshTests=replaceOne(refreshTests,"legacy_step.replace(': 15', ': 90')","legacy_step.replace(': 15', ': 150')",'refresh timeout assertion');
+
+            const files={
+              'scripts/build_legacy_dob_project_cache.py':builder,
+              '.github/workflows/azure-data-refresh.yml':workflow,
+              'tests/python/test_legacy_dob_project_cache.py':tests,
+              'tests/python/test_blob_data_refresh.py':refreshTests,
+            };
+            const tree=[];
+            for(const [path,content] of Object.entries(files)){
+              const blob=(await github.rest.git.createBlob({...repo,content,encoding:'utf-8'})).data;
+              tree.push({path,mode:'100644',type:'blob',sha:blob.sha});
+            }
+            const newTree=(await github.rest.git.createTree({...repo,base_tree:commit.tree.sha,tree})).data;
+            const newCommit=(await github.rest.git.createCommit({...repo,message:'Handle Socrata throttling in legacy DOB collection',tree:newTree.sha,parents:[expected]})).data;
+            const current=(await github.rest.git.getRef({...repo,ref:'heads/'+target})).data;
+            if(current.object.sha!==expected) throw new Error('PR 226 moved during patch');
+            await github.rest.git.updateRef({...repo,ref:'heads/'+target,sha:newCommit.sha,force:false});
+            core.info('Updated PR 226 head to '+newCommit.sha);
