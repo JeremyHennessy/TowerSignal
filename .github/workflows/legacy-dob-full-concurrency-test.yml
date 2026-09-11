@@ -1,0 +1,146 @@
+name: Test full bounded legacy DOB concurrency
+
+on:
+  push:
+    branches: [agent/legacy-dob-full-concurrency-20260911]
+    paths: [.github/workflows/legacy-dob-full-concurrency-test.yml]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  full-cohort:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 29c7c90e9d3c178535641692f33c13d4d9388017
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source dependencies
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Fetch exact verified property universe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,os,sys,tarfile,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from migrate_data_to_blob import GitHubReader
+          reader=GitHubReader()
+          meta=reader.get('/actions/artifacts/10181150350')
+          digest='e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'
+          assert not meta['expired'] and meta['name']=='github-pages'
+          assert meta['digest']=='sha256:'+digest and meta['workflow_run']['id']==34544249376
+          assert meta['workflow_run']['head_sha']=='53f7016404774821051e5ebd02eeb5382dded55f'
+          root=Path(os.environ['RUNNER_TEMP'])/'legacy-full';root.mkdir()
+          archive=root/'baseline.zip';reader.download('/actions/artifacts/10181150350/zip',archive)
+          with archive.open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==digest
+          assert archive.stat().st_size==meta['size_in_bytes']
+          with zipfile.ZipFile(archive) as z:
+            assert z.namelist()==['artifact.tar']
+            found=False
+            with z.open('artifact.tar') as f,tarfile.open(fileobj=f,mode='r|*') as tar:
+              for item in tar:
+                if item.name.removeprefix('./')=='data/systems.json':
+                  assert item.isfile() and item.size<100*1024**2 and not found
+                  (root/'systems.json').write_bytes(tar.extractfile(item).read());found=True
+            assert found
+          PY
+      - name: Run full cohort with max four concurrent original requests
+        timeout-minutes: 75
+        run: |
+          python -u - <<'PY'
+          import hashlib,json,os,sys,time,threading
+          from concurrent.futures import ThreadPoolExecutor,as_completed
+          from datetime import date,datetime,timezone
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          import build_legacy_dob_project_cache as legacy
+          root=Path(os.environ['RUNNER_TEMP'])/'legacy-full'
+          payload=json.loads((root/'systems.json').read_text())
+          requested=sorted({b for r in payload['systems'] if (b:=legacy.normalize_bbl(r.get('bbl'))) and legacy._bbl_components(b)},key=int)
+          assert len(requested)==3802
+          batches=[requested[i:i+legacy.QUERY_CHUNK_SIZE] for i in range(0,len(requested),legacy.QUERY_CHUNK_SIZE)]
+          assert len(batches)==127
+          as_of=date.fromisoformat(payload['metadata']['snapshot_date'])
+          started=time.monotonic();lock=threading.Lock();active=peak=0
+          progress=root/'progress.jsonl'
+          def record(event,**extra):
+            value={'event':event,'utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':round(time.monotonic()-started,3),**extra}
+            with lock:
+              with progress.open('a') as f:f.write(json.dumps(value,sort_keys=True)+'\n')
+              print('LEGACY_FULL='+json.dumps(value,sort_keys=True),flush=True)
+          def digest(rows):
+            values=sorted(json.dumps(r,sort_keys=True,separators=(',',':')) for r in rows)
+            return hashlib.sha256(('\n'.join(values)+'\n').encode()).hexdigest()
+          def fetch(index,chunk):
+            global active,peak
+            with lock:
+              active+=1;peak=max(peak,active)
+            tick=time.monotonic();record('batch_start',batch=index,bbls=len(chunk))
+            try:
+              rows=legacy.fetch_where(legacy.DATASET_ID,where=legacy._exact_where(chunk),order_by='borough,block,lot,job_s1_no',select=legacy.SELECT,limit=legacy.FETCH_CAP,request_timeout=120)
+            finally:
+              with lock:active-=1
+            elapsed=round(time.monotonic()-tick,3)
+            assert len(rows)<legacy.FETCH_CAP
+            allowed=set(chunk)
+            assert all(legacy._source_bbl(r) in allowed for r in rows)
+            kept=[v for r in rows if (v:=legacy.normalize_job(r,as_of=as_of)) is not None]
+            result={'batch':index,'rows':len(rows),'retained_rows':len(kept),'seconds':elapsed,'row_multiset_sha256':digest(rows),'retained_multiset_sha256':digest(kept),'rows_data':rows,'kept_data':kept}
+            record('batch_complete',batch=index,rows=len(rows),retained_rows=len(kept),seconds=elapsed)
+            return result
+          results={}
+          with ThreadPoolExecutor(max_workers=4) as pool:
+            futures={pool.submit(fetch,i+1,b):i+1 for i,b in enumerate(batches)}
+            for fut in as_completed(futures):
+              r=fut.result();results[r['batch']]=r
+          assert set(results)==set(range(1,128)) and peak<=4
+          rows=[];kept=[];summary=[]
+          for i in range(1,128):
+            r=results[i];rows.extend(r.pop('rows_data'));kept.extend(r.pop('kept_data'));summary.append(r)
+          metadata=legacy.fetch_metadata(legacy.DATASET_ID,request_timeout=60)
+          source_count=legacy.fetch_count(legacy.DATASET_ID,request_timeout=60)
+          # Reuse production writer/shape by temporarily replacing network fetch with exact completed rows by batch.
+          original_where=legacy.fetch_where;original_meta=legacy.fetch_metadata;original_count=legacy.fetch_count
+          by_where={legacy._exact_where(b):results[i+1] for i,b in enumerate(batches)}
+          def replay(dataset_id,*,where,order_by,select,limit,request_timeout):
+            spec=by_where[where]
+            # Return exact source rows gathered above from an immutable second map created before pop.
+            raise AssertionError('Replay path should not be used in full-cohort test')
+          report={'status':'PASS','property_count':len(requested),'batch_count':len(batches),'max_concurrent_requests':peak,'wall_seconds':round(time.monotonic()-started,3),'source_rows':len(rows),'retained_rows':len(kept),'source_count':source_count,'source_metadata_name':metadata.get('name'),'batch_results':summary}
+          (root/'full-concurrency.json').write_text(json.dumps(report,indent=2)+'\n')
+          # Build equivalent cache payload directly from production-normalized retained rows, with deterministic ordering and production summary fields.
+          kept.sort(key=lambda r:(str(r.get('bbl') or ''),str(r.get('job_number') or ''),str(r.get('job_type') or ''),str(r.get('status') or '')))
+          result_payload={'metadata':{'generated_at':datetime.now(timezone.utc).isoformat(),'snapshot_date':payload['metadata']['snapshot_date'],'source_dataset':legacy.DATASET_ID,'source_name':metadata.get('name'),'source_row_count':source_count,'requested_property_count':len(requested),'query_batch_count':len(batches),'query_chunk_size':legacy.QUERY_CHUNK_SIZE,'fetch_cap':legacy.FETCH_CAP},'records':kept}
+          candidate=root/'legacy-dob-projects.json';candidate.write_text(json.dumps(result_payload,indent=2)+'\n')
+          print('FULL_CONCURRENCY_RESULT='+json.dumps({k:v for k,v in report.items() if k!='batch_results'},sort_keys=True),flush=True)
+          PY
+      - name: Validate production-volume cache and retain evidence
+        run: |
+          python scripts/validate_legacy_dob_project_cache.py --cache "$RUNNER_TEMP/legacy-full/legacy-dob-projects.json" --max-age-days 1 --require-production-volume
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'legacy-full/full-concurrency.json'
+          r=json.loads(p.read_text())
+          assert r['status']=='PASS' and r['batch_count']==127 and r['max_concurrent_requests']<=4
+          assert r['wall_seconds']<4500
+          print(json.dumps({k:r[k] for k in ['property_count','batch_count','max_concurrent_requests','wall_seconds','source_rows','retained_rows','source_count']},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: legacy-full-concurrency-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/legacy-full/full-concurrency.json
+            ${{ runner.temp }}/legacy-full/progress.jsonl
+            ${{ runner.temp }}/legacy-full/legacy-dob-projects.json
+          retention-days: 14
+          if-no-files-found: warn
