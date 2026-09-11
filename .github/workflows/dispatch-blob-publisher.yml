@@ -51,12 +51,20 @@ jobs:
             }
             const runs = (await github.rest.actions.listWorkflowRuns({...repo, workflow_id: workflow,
               head_sha: mainSha, event: 'workflow_dispatch', per_page: 100})).data;
-            if (runs.total_count > 0) {
-              core.info('An acceptance run already exists for this exact merge; no duplicate requested');
+            const bootstrap = (await github.rest.actions.getWorkflowRun({...repo, run_id: 34599806414})).data;
+            if (bootstrap.head_sha !== mainSha || bootstrap.path !== '.github/workflows/' + workflow ||
+                bootstrap.status !== 'completed' || bootstrap.conclusion !== 'success') {
+              throw new Error('The exact live bootstrap has not succeeded');
+            }
+            if (runs.total_count > 1) {
+              core.info('Second acceptance run already requested; no duplicate');
               return;
+            }
+            if (runs.total_count !== 1 || runs.workflow_runs[0].id !== 34599806414) {
+              throw new Error('Unexpected manual publication run history');
             }
             const current = (await github.rest.git.getRef({...repo, ref: 'heads/main'})).data;
             if (current.object.sha !== mainSha) throw new Error('Main moved during validation');
             await github.rest.actions.createWorkflowDispatch({...repo, workflow_id: workflow,
-              ref: 'main', inputs: {operation: 'bootstrap'}});
-            core.info('Requested reviewed bootstrap only. This is not an Azure success result.');
+              ref: 'main', inputs: {operation: 'publish', source_run_id: '34544249376'}});
+            core.info('Requested actual artifact staging and idempotent publication of the same verified release. No new Pages build or deployment.');
