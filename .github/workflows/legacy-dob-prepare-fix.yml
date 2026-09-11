@@ -1,0 +1,79 @@
+name: Prepare reviewed legacy DOB timeout fix
+on:
+  push:
+    branches: [agent/legacy-dob-timeout-diagnostic-20260911]
+    paths: [.github/workflows/legacy-dob-prepare-fix.yml]
+permissions:
+  contents: write
+concurrency:
+  group: towersignal-prepare-legacy-timeout-fix
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: bab9c2f90e72b684604706b49db8847ab60137c8
+          persist-credentials: false
+      - name: Preserve exact locally tested patch
+        run: |
+          cp .github/diagnostics/legacy-dob-timeout-fix.patch "$RUNNER_TEMP/legacy_fix.patch"
+          echo "3fe6cb249d471e5e25a0a2e2e97475b103ab7f1a5b8ab3d91b7228723ea35921  $RUNNER_TEMP/legacy_fix.patch" | sha256sum --check
+      - uses: actions/checkout@v4
+        with:
+          ref: 29c7c90e9d3c178535641692f33c13d4d9388017
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply the tested patch to the pinned source only
+        run: |
+          test "$(git rev-parse HEAD)" = 29c7c90e9d3c178535641692f33c13d4d9388017
+          git apply --check "$RUNNER_TEMP/legacy_fix.patch"
+          git apply "$RUNNER_TEMP/legacy_fix.patch"
+          git diff --check
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          expected={
+            '.github/workflows/azure-data-refresh.yml':'06d10dbead752f60ac3ec1e4433e3f294df938bb',
+            'scripts/build_legacy_dob_project_cache.py':'eef6ef352f234311983154ba2e9bfeec6416af8c',
+            'tests/python/test_blob_data_refresh.py':'768bfca8265464356afbe2b4b172f632cd496061',
+            'tests/python/test_legacy_dob_project_cache.py':'27fe098a97212907406c8eb6c226a6e9d0e88703'
+          }
+          changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()
+          assert set(changed)==set(expected)
+          for name,sha in expected.items():
+              value=Path(name).read_bytes()
+              assert hashlib.sha1(f'blob {len(value)}\0'.encode()+value).hexdigest()==sha,name
+              print(name,sha)
+          PY
+      - name: Run complete Python regression suite
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Stage only the four checksum-pinned Git blobs for separate PR review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const repo = {owner:'JeremyHennessy',repo:'TowerSignal'};
+            if(context.ref !== 'refs/heads/agent/legacy-dob-timeout-diagnostic-20260911') throw new Error('Wrong branch');
+            const main=(await github.rest.git.getRef({...repo,ref:'heads/main'})).data;
+            if(main.object.sha!=='29c7c90e9d3c178535641692f33c13d4d9388017') throw new Error('Main changed; re-review');
+            const expected={
+              '.github/workflows/azure-data-refresh.yml':'06d10dbead752f60ac3ec1e4433e3f294df938bb',
+              'scripts/build_legacy_dob_project_cache.py':'eef6ef352f234311983154ba2e9bfeec6416af8c',
+              'tests/python/test_blob_data_refresh.py':'768bfca8265464356afbe2b4b172f632cd496061',
+              'tests/python/test_legacy_dob_project_cache.py':'27fe098a97212907406c8eb6c226a6e9d0e88703'
+            };
+            for(const [path,sha] of Object.entries(expected)) {
+              const value=fs.readFileSync(path);
+              const actual=crypto.createHash('sha1').update(Buffer.from('blob '+value.length+'\0')).update(value).digest('hex');
+              if(actual!==sha) throw new Error('Code differs from tested patch');
+              const blob=(await github.rest.git.createBlob({...repo,content:value.toString('base64'),encoding:'base64'})).data;
+              if(blob.sha!==sha) throw new Error('Stored Git blob differs');
+              core.info(path+' '+sha);
+            }
+            core.info('Four tested Git objects stored. No commit, branch update, merge, deployment, Blob data write, or Azure credential was used by this job.');
