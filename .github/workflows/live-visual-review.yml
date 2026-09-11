@@ -1,0 +1,43 @@
+name: Live visual review screenshots
+
+on:
+  push:
+    branches: [agent/live-visual-review-20260911]
+    paths:
+      - .github/workflows/live-visual-review.yml
+      - tests/e2e/live-review-screenshots.spec.ts
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Capture full live screenshots
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/live-review-screenshots.spec.ts --project=desktop-chromium
+      - name: Upload live visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-visual-review-${{ github.run_id }}
+          path: |
+            review-artifacts/
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: warn
