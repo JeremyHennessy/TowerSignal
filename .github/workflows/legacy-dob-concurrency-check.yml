@@ -1,0 +1,84 @@
+name: Verify bounded legacy DOB concurrency
+on:
+  push:
+    branches: [agent/legacy-dob-timeout-diagnostic-20260911]
+    paths: [.github/workflows/legacy-dob-concurrency-check.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  pilot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 29c7c90e9d3c178535641692f33c13d4d9388017
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Read verified baseline and original query fingerprints
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,os,sys,tarfile,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from migrate_data_to_blob import GitHubReader
+          r=GitHubReader();out=Path(os.environ['RUNNER_TEMP'])/'concurrency';out.mkdir()
+          for aid,digest,run,filename in [(10181150350,'e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c',34544249376,'pages.zip'),(10274370503,'6555cdcddc8a33c7e2d2e3627f2c869bd6518497c9549e3e2454f5314233197b',34623649690,'oracle.zip')]:
+              m=r.get(f'/actions/artifacts/{aid}');assert not m['expired'] and m['digest']=='sha256:'+digest and m['workflow_run']['id']==run
+              p=out/filename;r.download(f'/actions/artifacts/{aid}/zip',p)
+              with p.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==digest
+          with zipfile.ZipFile(out/'oracle.zip') as z:(out/'oracle.json').write_bytes(z.read('result.json'))
+          with zipfile.ZipFile(out/'pages.zip') as z:
+              with z.open('artifact.tar') as f,tarfile.open(fileobj=f,mode='r|*') as t:
+                  found=0
+                  for m in t:
+                      if m.name.removeprefix('./')=='data/systems.json':
+                          assert m.isfile() and m.size<100*1024**2
+                          (out/'systems.json').write_bytes(t.extractfile(m).read());found+=1
+                  assert found==1
+          PY
+      - name: Four original queries with bounded simultaneous reads
+        timeout-minutes: 10
+        run: |
+          python -u - <<'PY'
+          from concurrent.futures import ThreadPoolExecutor
+          import hashlib,json,os,sys,time
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          import build_legacy_dob_project_cache as c
+          out=Path(os.environ['RUNNER_TEMP'])/'concurrency'
+          payload=json.loads((out/'systems.json').read_text());oracle=json.loads((out/'oracle.json').read_text())
+          bbls=sorted({b for s in payload['systems'] if (b:=c.normalize_bbl(s.get('bbl'))) and c._bbl_components(b)},key=int)
+          refs={r['batch']:r for r in oracle['comparisons']}
+          def one(number):
+              chunk=bbls[(number-1)*30:number*30];where=c._exact_where(chunk);tick=time.monotonic()
+              rows=c.fetch_where(c.DATASET_ID,where=where,order_by='borough,block,lot,job_s1_no',select=c.SELECT,limit=c.FETCH_CAP,request_timeout=120)
+              elapsed=time.monotonic()-tick;assert len(rows)<c.FETCH_CAP
+              digest=hashlib.sha256(('\n'.join(sorted(json.dumps(r,sort_keys=True,separators=(',',':')) for r in rows))+'\n').encode()).hexdigest()
+              result={'batch':number,'seconds':elapsed,'rows':len(rows),'row_multiset_sha256':digest,'where_sha256':hashlib.sha256(where.encode()).hexdigest()}
+              if number in refs:
+                  ref=refs[number];original=next(v for v in ref['variants'] if v['server_sort'])
+                  assert result['where_sha256']==ref['where_sha256']
+                  assert digest==original['row_multiset_sha256'] and len(rows)==original['rows']
+                  result['original_full_row_parity']=True
+              print(json.dumps(result),flush=True);return result
+          tick=time.monotonic()
+          with ThreadPoolExecutor(max_workers=4) as pool:rows=list(pool.map(one,[1,2,12,21]))
+          wall=time.monotonic()-tick
+          assert sum(r['seconds'] for r in rows)>wall*2,'No sufficient concurrency gain observed'
+          report={'status':'PASS','max_workers':4,'query_predicates_changed':False,'server_order_changed':False,'wall_seconds':wall,'sum_request_seconds':sum(r['seconds'] for r in rows),'cases':rows}
+          (out/'result.json').write_text(json.dumps(report,indent=2));print('CONCURRENCY_PILOT='+json.dumps(report),flush=True)
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-dob-concurrency-${{ github.run_id }}
+          path: ${{ runner.temp }}/concurrency/result.json
+          if-no-files-found: warn
+          retention-days: 14
