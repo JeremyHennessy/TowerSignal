@@ -89,7 +89,7 @@ jobs:
         timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
       - name: Build bounded legacy DOB/BIS project context
-        timeout-minutes: 30
+        timeout-minutes: 90
         run: python scripts/build_legacy_dob_project_cache.py --output public/data
       - name: Validate bounded legacy DOB/BIS project context
         run: python scripts/validate_legacy_dob_project_cache.py --cache public/data/legacy-dob-projects.json --max-age-days 1 --require-production-volume
