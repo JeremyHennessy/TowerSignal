@@ -159,7 +159,7 @@ test('filters records and opens a shareable full account profile with DOB projec
   await waitFor(() => expect(within(detailPanel).getByRole('heading', { name:'Identity' })).toBeInTheDocument())
   expect(within(detailPanel).getByRole('heading', { name:'DOB NOW project activity' })).toBeInTheDocument()
   expect(within(detailPanel).getByText('Cooling tower mention')).toBeInTheDocument()
-  expect(within(detailPanel).getByText('Replace existing cooling tower and associated piping.')).toBeInTheDocument()
+  expect(within(detailPanel).getAllByText('Replace existing cooling tower and associated piping.').length).toBeGreaterThan(0)
 
   await user.click(within(detailPanel).getByRole('button', { name: /^Field/ }))
   await waitFor(() => expect(within(detailPanel).getByRole('heading', { name:'Pre-visit field pack' })).toBeInTheDocument())
