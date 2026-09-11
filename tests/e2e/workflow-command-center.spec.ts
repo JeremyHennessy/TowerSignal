@@ -14,7 +14,7 @@ import {
 
 test.setTimeout(120_000)
 
-test('workflow command center groups current intelligence and one future-evidence disclosure on desktop and iPhone', async ({ page }, testInfo) => {
+test('workflow command center scales account monitoring across desktop and iPhone', async ({ page }, testInfo) => {
   const isIphone = isIphoneProject(testInfo)
   if (isIphone) testInfo.setTimeout(240_000)
   const consoleErrors: string[] = []
@@ -39,6 +39,7 @@ test('workflow command center groups current intelligence and one future-evidenc
     await expect(workflowAccount).toBeVisible()
     await workflowAccount.getByLabel('Status').selectOption('investigate')
   }
+
   const today = new Date().toISOString().slice(0, 10)
   const note = 'Review roof and domestic-water evidence before outreach.'
   if (isIphone) {
@@ -55,58 +56,54 @@ test('workflow command center groups current intelligence and one future-evidenc
 
   await page.evaluate(() => { window.location.hash = '#/workflow' })
   const workflow = page.locator('section.workflow-workspace-page')
-  const categories = ['Compliance & timing', 'Ownership, access & property', 'Field & physical', 'Domestic water', 'Monitoring & change', 'Commercial readiness']
+
   if (isIphone) {
     await expectDomAttribute(page, 'section.workflow-workspace-page h1', 'aria-label', 'Workflow workspace')
     await expectDomText(page, [
-      'What matters now',
+      'Workflow scope',
       'NYC market',
+      'Due / overdue',
+      'Changed · 7d',
+      'High priority',
+      'Needs a date',
+      'Contact-ready',
+      'Pipeline',
+      'Accounts',
+      'Changes',
+      'Actions',
       '16 E 39TH ST',
-      'Action due today',
       'Investigate',
-      ...categories,
-      'Cooling-tower roof geometry',
-      'DOHMH oversight',
-      'Recent ACRIS activity',
-      'Future evidence lanes',
-      'Planned extensions',
-      'Review roof and domestic-water evidence before outreach.',
-      'Field service operations',
-      'Documents & system topology',
-      'Relationships & contracts',
+      'Portfolio evidence coverage',
     ], 'section.workflow-workspace-page')
   } else {
     await expect(workflow).toBeVisible()
     await expect(workflow.getByRole('heading', { name: 'Workflow workspace', exact: true })).toBeVisible()
+    await expect(workflow.locator('.workflow-command-strip')).toContainText('Due / overdue')
+    await expect(workflow.locator('.workflow-command-strip')).toContainText('Changed · 7d')
+    await expect(workflow.locator('.workflow-command-strip')).toContainText('High priority')
+    await expect(workflow.locator('.workflow-pipeline-strip')).toContainText('Investigate')
+    await expect(workflow.locator('.workflow-command-tabs')).toContainText('Accounts')
+    await expect(workflow.locator('.workflow-command-tabs')).toContainText('Changes')
+    await expect(workflow.locator('.workflow-command-tabs')).toContainText('Actions')
+    await expect(workflow.locator('.workflow-command-table-card')).toContainText('16 E 39TH ST')
+    await expect(workflow).not.toContainText('Invalid Date')
 
-    const summary = workflow.locator('.workflow-command-summary')
-    await expect(summary.getByRole('heading', { name: 'What matters now', exact: true })).toBeVisible()
-    await expect(summary).toContainText('NYC market')
-    await expect(summary).not.toContainText('Invalid Date')
+    const accountRow = workflow.locator('.workflow-command-table tbody tr', { hasText: '16 E 39TH ST' }).first()
+    await accountRow.click()
+    const inspector = workflow.locator('.workflow-account-inspector')
+    await expect(inspector).toContainText('16 E 39TH ST')
+    await expect(inspector).toContainText('Investigate')
+    await expect(inspector).toContainText(note)
+    await expect(inspector.getByRole('button', { name: 'Open account to manage →' })).toBeVisible()
 
-    const attention = workflow.locator('.workflow-attention-list')
-    await expect(attention).toContainText('16 E 39TH ST')
-    await expect(attention).toContainText('Action due today')
-    await expect(attention).toContainText('Investigate')
-
-    for (const category of categories) {
-      await expect(workflow.locator('.workflow-intelligence-card', { hasText: category })).toBeVisible()
-    }
-    await expect(workflow).toContainText('Cooling-tower roof geometry')
-    await expect(workflow).toContainText('DOHMH oversight')
-    await expect(workflow).toContainText('Recent ACRIS activity')
-    await expect(workflow.getByText('Future evidence lanes', { exact: true })).toBeVisible()
-    await expect(workflow.getByText('Planned extensions', { exact: true })).toBeVisible()
-    await expect(workflow.getByText('Future-ready', { exact: true })).toHaveCount(0)
-
-    const future = workflow.locator('details.workflow-future-details')
-    await future.locator('summary').click()
-    await expect(future).toContainText('Field service operations')
-    await expect(future).toContainText('Documents & system topology')
-    await expect(future).toContainText('Relationships & contracts')
-
-    await expect(workflow.locator('.workflow-next-actions')).toContainText('Review roof and domestic-water evidence before outreach.')
-    await expect(workflow.locator('.workflow-kanban')).toContainText('16 E 39TH ST')
+    const coverage = workflow.locator('details.workflow-coverage-details')
+    await coverage.locator('summary').click()
+    await expect(coverage).toContainText('Compliance & timing')
+    await expect(coverage).toContainText('Ownership & access')
+    await expect(coverage).toContainText('Domestic water')
+    await expect(coverage).toContainText('Monitoring & change')
+    await expect(coverage).toContainText('Field service operations')
+    await expect(coverage).toContainText('Relationships & contracts')
   }
 
   await expectContained(page)
@@ -117,14 +114,9 @@ test('workflow command center groups current intelligence and one future-evidenc
     const workflowBox = await workflow.boundingBox()
     expect(workflowBox).not.toBeNull()
     expect(workflowBox!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
-  }
 
-  if (!isIphone) {
-    const summary = workflow.locator('.workflow-command-summary')
-    const summaryShot = await summary.screenshot()
-    await testInfo.attach(`workflow-summary-${testInfo.project.name}.png`, { body: summaryShot, contentType: 'image/png' })
-    const groupsShot = await workflow.locator('.workflow-intelligence-block').screenshot()
-    await testInfo.attach(`workflow-groups-${testInfo.project.name}.png`, { body: groupsShot, contentType: 'image/png' })
+    const commandShot = await workflow.locator('.workflow-command-center').screenshot()
+    await testInfo.attach(`workflow-command-center-${testInfo.project.name}.png`, { body: commandShot, contentType: 'image/png' })
   }
 
   expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])

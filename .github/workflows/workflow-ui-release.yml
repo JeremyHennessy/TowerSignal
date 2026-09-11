@@ -1,0 +1,197 @@
+name: Release Workflow redesign with verified data
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/workflow-ui-release.yml
+      - src/components/WorkflowScaleWorkspace.tsx
+      - src/components/WorkflowWorkspacePage.tsx
+      - src/styles/workflow-scale-command-center.css
+      - tests/frontend/WorkflowScaleWorkspace.test.tsx
+      - tests/e2e/workflow-command-center.spec.ts
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: workflow-ui-release
+  cancel-in-progress: true
+
+env:
+  VERIFIED_PAGES_ARTIFACT_ID: '10181150350'
+  VERIFIED_PAGES_ZIP_SHA256: e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c
+  VERIFIED_APPLICATION_SHA: 53f7016404774821051e5ebd02eeb5382dded55f
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Validate candidate frontend
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+      - name: Download exact last verified Pages artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-all-errors \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${VERIFIED_PAGES_ARTIFACT_ID}/zip" \
+            --output baseline-pages.zip
+          printf '%s  %s\n' "${VERIFIED_PAGES_ZIP_SHA256}" baseline-pages.zip | sha256sum -c -
+          mkdir -p .baseline-package .baseline-site
+          unzip -q baseline-pages.zip -d .baseline-package
+          test -f .baseline-package/artifact.tar
+          tar -xf .baseline-package/artifact.tar -C .baseline-site
+          test -f .baseline-site/data/systems.json
+          test -f .baseline-site/data/changes.json
+      - name: Overlay candidate frontend onto verified runtime data
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, shutil
+
+          baseline = Path('.baseline-site/data')
+          target = Path('dist/data')
+
+          def digest_tree(root: Path):
+              h = hashlib.sha256()
+              files = 0
+              for path in sorted(p for p in root.rglob('*') if p.is_file()):
+                  rel = path.relative_to(root).as_posix().encode()
+                  h.update(rel + b'\0')
+                  with path.open('rb') as handle:
+                      while chunk := handle.read(1024 * 1024):
+                          h.update(chunk)
+                  files += 1
+              return h.hexdigest(), files
+
+          before, count = digest_tree(baseline)
+          if target.exists():
+              shutil.rmtree(target)
+          shutil.copytree(baseline, target)
+          after, copied_count = digest_tree(target)
+          if before != after or count != copied_count:
+              raise SystemExit('Verified runtime data changed while assembling UI-only release')
+          if count < 100:
+              raise SystemExit(f'Unexpectedly small verified data payload: {count} files')
+          manifest = {
+              'candidate_sha': '${{ github.sha }}',
+              'verified_application_sha': '${{ env.VERIFIED_APPLICATION_SHA }}',
+              'verified_data_tree_sha256': before,
+              'verified_data_file_count': count,
+          }
+          Path('dist/workflow-ui-release.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
+          print(json.dumps(manifest, indent=2))
+          PY
+          grep -R -q "Needs a date" dist/assets
+          grep -R -q "Open account to manage" dist/assets
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload candidate Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy candidate to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify:
+    needs: deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify deployed candidate bytes and Workflow bundle
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, re, time, urllib.request
+          base = os.environ['BASE_URL'].rstrip('/') + '/'
+          expected = '${{ github.sha }}'
+          for attempt in range(30):
+              try:
+                  with urllib.request.urlopen(base + 'workflow-ui-release.json?attempt=' + str(attempt), timeout=15) as response:
+                      manifest = json.load(response)
+                  if manifest.get('candidate_sha') != expected:
+                      raise RuntimeError(f"candidate SHA mismatch: {manifest.get('candidate_sha')} != {expected}")
+                  with urllib.request.urlopen(base + '?workflow-release=' + str(attempt), timeout=15) as response:
+                      html = response.read().decode('utf-8')
+                  scripts = re.findall(r'<script[^>]+src="([^"]+)"', html)
+                  bundle = ''
+                  for src in scripts:
+                      url = src if src.startswith('http') else base + src.lstrip('./')
+                      with urllib.request.urlopen(url, timeout=30) as response:
+                          bundle += response.read().decode('utf-8', errors='ignore')
+                  for marker in ('Needs a date', 'Open account to manage', 'Portfolio evidence coverage'):
+                      if marker not in bundle:
+                          raise RuntimeError(f'missing deployed Workflow marker: {marker}')
+                  print(json.dumps(manifest, indent=2))
+                  break
+              except Exception:
+                  if attempt == 29:
+                      raise
+                  time.sleep(5)
+          PY
+      - name: Install frontend dependencies and hosted-test browsers
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Full hosted desktop and iPhone acceptance
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: npm run test:e2e
+      - name: Retain live Workflow screenshots and Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-redesign-live-verification-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 30
+          if-no-files-found: warn
