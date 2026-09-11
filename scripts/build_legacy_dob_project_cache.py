@@ -4,6 +4,7 @@ import argparse
 import json
 import re
 import sys
+import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -94,16 +95,24 @@ def _bbl_components(value: Any) -> tuple[str, str, str] | None:
 
 def _exact_where(chunk: list[str]) -> str:
     clauses: list[str] = []
+    domains: list[set[str]] = [set(), set(), set()]
     for bbl in chunk:
         components = _bbl_components(bbl)
         if not components:
             continue
         borough, block, lot = components
+        for values, value in zip(domains, (borough, block, str(int(lot)).zfill(5))):
+            values.add(value)
         # BIS publishes lot as a five-character text field even though BBL lot is four digits.
         clauses.append(f"(borough='{borough}' AND block='{block}' AND lot='{str(int(lot)).zfill(5)}')")
     if not clauses:
         raise ValueError("No valid BBLs for legacy DOB query")
-    return " OR ".join(clauses)
+    # Redundant single-column bounds let the source narrow candidates before
+    # evaluating the exact disjunction. Keep that disjunction: IN sets alone
+    # would create false borough/block/lot combinations.
+    guards = [key + " in(" + ",".join("'" + value + "'" for value in sorted(values)) + ")"
+              for key, values in zip(("borough", "block", "lot"), domains)]
+    return " AND ".join(guards) + " AND (" + " OR ".join(clauses) + ")"
 
 
 def _applicant(row: dict[str, Any]) -> str | None:
@@ -196,8 +205,13 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
     retained_by_bbl: dict[str, dict[str, dict[str, Any]]] = {}
     source_matched_bbls: set[str] = set()
     fetched_job_count = 0
+    started = time.monotonic()
+    total_batches = (len(requested) + QUERY_CHUNK_SIZE - 1) // QUERY_CHUNK_SIZE
     for start in range(0, len(requested), QUERY_CHUNK_SIZE):
         chunk = requested[start:start + QUERY_CHUNK_SIZE]
+        batch = start // QUERY_CHUNK_SIZE + 1
+        tick = time.monotonic()
+        print(f"[legacy_dob] Batch {batch}/{total_batches}: querying {len(chunk)} exact BBLs", file=sys.stderr, flush=True)
         rows = fetch_where(
             DATASET_ID,
             where=_exact_where(chunk),
@@ -211,6 +225,8 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
                 f"Legacy DOB exact-property query reached the {FETCH_CAP:,}-row cap for {len(chunk)} BBLs; refusing possibly truncated evidence"
             )
         fetched_job_count += len(rows)
+        print(f"[legacy_dob] Batch {batch}/{total_batches}: {len(rows):,} rows in {time.monotonic() - tick:.1f}s; "
+              f"elapsed {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
         for source_row in rows:
             source_bbl = _source_bbl(source_row)
             if source_bbl not in requested_set:
@@ -247,7 +263,9 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
             "records": records,
         }
 
+    print("[legacy_dob] Exact-property queries complete; fetching source metadata", file=sys.stderr, flush=True)
     metadata = fetch_metadata(DATASET_ID)
+    print("[legacy_dob] Metadata received; fetching total source count", file=sys.stderr, flush=True)
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     result = {
         "schema_version": SCHEMA_VERSION,
@@ -285,6 +303,7 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
     }
     target = output_file or output_dir / "legacy-dob-projects.json"
     target.write_text(json.dumps(result, separators=(",", ":")), encoding="utf-8")
+    print(f"[legacy_dob] Complete in {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
     print(json.dumps(result["summary"], indent=2))
     return result
 
