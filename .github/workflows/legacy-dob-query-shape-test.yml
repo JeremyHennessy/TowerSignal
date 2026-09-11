@@ -1,0 +1,114 @@
+name: Compare exact legacy DOB query shapes
+on:
+  push:
+    branches: [agent/legacy-dob-timeout-diagnostic-20260911]
+    paths: [.github/workflows/legacy-dob-query-shape-test.yml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: towersignal-legacy-dob-query-shape-test
+  cancel-in-progress: false
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 29c7c90e9d3c178535641692f33c13d4d9388017
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare GET-only artifact reader
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Extract digest-verified baseline property cohort
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,sys,tarfile,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from migrate_data_to_blob import GitHubReader
+          reader=GitHubReader()
+          meta=reader.get('/actions/artifacts/10181150350')
+          digest='e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'
+          assert not meta['expired'] and meta['name']=='github-pages'
+          assert meta['digest']=='sha256:'+digest and meta['workflow_run']['id']==34544249376
+          assert meta['workflow_run']['head_sha']=='53f7016404774821051e5ebd02eeb5382dded55f'
+          archive=Path(os.environ['RUNNER_TEMP'])/'legacy-query-shape-source.zip'
+          reader.download('/actions/artifacts/10181150350/zip',archive)
+          with archive.open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==digest
+          assert archive.stat().st_size==meta['size_in_bytes']
+          out=Path(os.environ['RUNNER_TEMP'])/'legacy-query-shape';out.mkdir()
+          with zipfile.ZipFile(archive) as z:
+              assert z.namelist()==['artifact.tar']
+              found=False
+              with z.open('artifact.tar') as f,tarfile.open(fileobj=f,mode='r|*') as tar:
+                  for item in tar:
+                      if item.name.removeprefix('./')=='data/systems.json':
+                          assert item.isfile() and item.size<100*1024**2 and not found
+                          (out/'systems.json').write_bytes(tar.extractfile(item).read());found=True
+              assert found
+          PY
+      - name: Compare full row multisets and elapsed time for four representative query pairs
+        timeout-minutes: 22
+        run: |
+          python -u - <<'PY'
+          import hashlib,json,os,sys,time
+          from datetime import date,datetime,timezone
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          import build_legacy_dob_project_cache as legacy
+          out=Path(os.environ['RUNNER_TEMP'])/'legacy-query-shape'
+          payload=json.loads((out/'systems.json').read_text())
+          requested=sorted({b for r in payload['systems'] if (b:=legacy.normalize_bbl(r.get('bbl'))) and legacy._bbl_components(b)},key=int)
+          chunks=[requested[i:i+30] for i in range(0,len(requested),30)]
+          samples=[0,len(chunks)//3,(2*len(chunks))//3,len(chunks)-1]
+          as_of=date.fromisoformat(payload['metadata']['snapshot_date'])
+          results=[]
+          def digest(rows):
+              encoded=sorted(json.dumps(r,sort_keys=True,separators=(',',':')) for r in rows)
+              return hashlib.sha256(('\n'.join(encoded)+'\n').encode()).hexdigest()
+          def prefix(chunk):
+              components=[legacy._bbl_components(b) for b in chunk]
+              boroughs=','.join("'"+x+"'" for x in sorted({v[0] for v in components}))
+              blocks=','.join("'"+x+"'" for x in sorted({v[1] for v in components}))
+              return f'borough in({boroughs}) AND block in({blocks}) AND ('+legacy._exact_where(chunk)+')'
+          for sequence,index in enumerate(samples):
+              chunk=chunks[index]
+              shapes={'original':legacy._exact_where(chunk),'prefilter':prefix(chunk)}
+              values={};metrics={}
+              order=['original','prefilter'] if sequence%2==0 else ['prefilter','original']
+              for shape in order:
+                  print('QUERY_SHAPE_START='+json.dumps({'batch':index+1,'shape':shape,'utc':datetime.now(timezone.utc).isoformat()}),flush=True)
+                  start=time.monotonic()
+                  rows=legacy.fetch_where(legacy.DATASET_ID,where=shapes[shape],order_by='borough,block,lot,job_s1_no',
+                       select=legacy.SELECT,limit=legacy.FETCH_CAP,request_timeout=120)
+                  assert len(rows)<legacy.FETCH_CAP,'Possibly truncated query'
+                  assert all(legacy._source_bbl(r) in set(chunk) for r in rows),'Query broadened property scope'
+                  values[shape]=rows
+                  kept=[v for r in rows if (v:=legacy.normalize_job(r,as_of=as_of)) is not None]
+                  metrics[shape]={'seconds':round(time.monotonic()-start,3),'rows':len(rows),'row_multiset_sha256':digest(rows),
+                                  'retained_rows':len(kept),'retained_multiset_sha256':digest(kept)}
+                  print('QUERY_SHAPE_RESULT='+json.dumps({'batch':index+1,'shape':shape,**metrics[shape]}),flush=True)
+              assert metrics['original']['row_multiset_sha256']==metrics['prefilter']['row_multiset_sha256'],'Source rows differ'
+              assert metrics['original']['retained_multiset_sha256']==metrics['prefilter']['retained_multiset_sha256'],'Normalized rows differ'
+              results.append({'batch':index+1,'bbls':len(chunk),'boroughs':sorted({legacy._bbl_components(b)[0] for b in chunk}),
+                              'same_source_rows':True,'same_normalized_rows':True,'metrics':metrics})
+              (out/'comparison.json').write_text(json.dumps({'status':'IN_PROGRESS','total_batches':len(chunks),'results':results},indent=2)+'\n')
+          final={'status':'PASS','source_sha':'29c7c90e9d3c178535641692f33c13d4d9388017','total_batches':len(chunks),
+                 'property_count':len(requested),'results':results,'production_changed':False,'azure_accessed':False}
+          (out/'comparison.json').write_text(json.dumps(final,indent=2)+'\n')
+          print('QUERY_SHAPE_COMPARISON='+json.dumps(final),flush=True)
+          PY
+      - name: Retain complete parity and timing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-query-shape-${{ github.run_id }}
+          path: ${{ runner.temp }}/legacy-query-shape/comparison.json
+          retention-days: 14
+          if-no-files-found: warn
