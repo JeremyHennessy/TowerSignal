@@ -2,7 +2,7 @@ name: Release Workflow redesign with verified data
 
 on:
   push:
-    branches: [agent/workflow-scale-command-center-20260911]
+    branches: [main]
     paths:
       - .github/workflows/workflow-ui-release.yml
       - src/components/WorkflowScaleWorkspace.tsx
@@ -18,7 +18,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: workflow-ui-release
   cancel-in-progress: true
 
 env:
@@ -153,7 +153,6 @@ jobs:
           import json, os, re, time, urllib.request
           base = os.environ['BASE_URL'].rstrip('/') + '/'
           expected = '${{ github.sha }}'
-          last = None
           for attempt in range(30):
               try:
                   with urllib.request.urlopen(base + 'workflow-ui-release.json?attempt=' + str(attempt), timeout=15) as response:
@@ -173,8 +172,7 @@ jobs:
                           raise RuntimeError(f'missing deployed Workflow marker: {marker}')
                   print(json.dumps(manifest, indent=2))
                   break
-              except Exception as exc:
-                  last = exc
+              except Exception:
                   if attempt == 29:
                       raise
                   time.sleep(5)
