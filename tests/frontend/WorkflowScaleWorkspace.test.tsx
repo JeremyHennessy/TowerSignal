@@ -56,7 +56,7 @@ test('keeps map table filters and selected account inspector synchronized', () =
   expect(within(inspector).getByText('Call facilities before Friday')).toBeInTheDocument()
   expect(within(inspector).getByText('Priority outreach')).toBeInTheDocument()
 
-  fireEvent.click(within(inspector).getByRole('button', { name: 'Open account to manage →' }))
+  fireEvent.click(within(inspector).getByRole('button', { name: 'Open full account →' }))
   expect(onOpenAccount).toHaveBeenCalledWith(expect.objectContaining({ system_id: 'SYS-1' }))
 })
 

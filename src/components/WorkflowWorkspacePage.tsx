@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import type { AcrisSummaryFields } from '../types/acris'
 import type { ChangeEvent, ChangesPayload } from '../types/history'
 import type { SystemSummary } from '../types/data'
-import type { WorkflowAccountState, WorkflowMembership, WorkflowSavedView, WorkflowUser, WorkflowWatchlist } from '../types/workflow'
+import type { WorkflowAccountPatch, WorkflowAccountState, WorkflowMembership, WorkflowSavedView, WorkflowUser, WorkflowWatchlist } from '../types/workflow'
+import type { WorkflowSaveResult } from '../workflow/useWorkflow'
 import { loadChanges } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
@@ -43,19 +44,25 @@ function isPropertyProjectChange(event: ChangeEvent) {
 
 export function WorkflowWorkspacePage({
   user,
+  busy,
   systems,
   accounts,
   watchlists,
   memberships,
   savedViews,
+  onSaveAccount,
+  onToggleMembership,
   onOpenAccount,
 }: {
   user: WorkflowUser | null
+  busy: boolean
   systems: WorkflowSystem[]
   accounts: WorkflowAccountState[]
   watchlists: WorkflowWatchlist[]
   memberships: WorkflowMembership[]
   savedViews: WorkflowSavedView[]
+  onSaveAccount: (systemId: string, patch: WorkflowAccountPatch) => Promise<WorkflowSaveResult>
+  onToggleMembership: (systemId: string, watchlistId: string, enabled: boolean) => Promise<void>
   onOpenAccount: (row: WorkflowSystem) => void
 }) {
   const [changes, setChanges] = useState<ChangesPayload | null>(null)
@@ -127,7 +134,7 @@ export function WorkflowWorkspacePage({
 
     {!user && <div className="workflow-login-callout"><div><span className="roadmap-status">PRIVATE WORKSPACE</span><strong>Sign in from the profile control to sync workflow state across sessions and devices.</strong><p>Saved prospect views can remain local, but account notes, status, watchlists and next actions require an authenticated private workspace.</p></div></div>}
 
-    <WorkflowScaleWorkspace systems={scopedRows} marketCount={systems.length} accounts={accounts} watchlists={watchlists} memberships={memberships} savedViews={savedViews} recentEvents={recentEvents.filter(event => scopeIds.has(event.system_id))} eventsBySystem={eventsBySystem} today={today} onOpenAccount={onOpenAccount} />
+    <WorkflowScaleWorkspace systems={scopedRows} marketCount={systems.length} accounts={accounts} watchlists={watchlists} memberships={memberships} savedViews={savedViews} recentEvents={recentEvents.filter(event => scopeIds.has(event.system_id))} eventsBySystem={eventsBySystem} today={today} signedIn={Boolean(user)} busy={busy} onSaveAccount={onSaveAccount} onToggleMembership={onToggleMembership} onOpenAccount={onOpenAccount} />
 
     <details className="workflow-coverage-details"><summary><div><strong>Portfolio evidence coverage</strong><p>The former intelligence-card grid is retained as a compact reference instead of occupying the primary workflow. Operational work stays in the command workspace above.</p></div><span>{coverageGroups.length} evidence groups</span></summary><div className="workflow-coverage-matrix">{coverageGroups.map(group => <article key={group.title}><strong>{group.title}</strong><dl>{group.metrics.map(metric => <div key={metric.label}><dt>{metric.label}</dt><dd>{number.format(metric.value)}</dd></div>)}</dl></article>)}</div><div className="workflow-coverage-roadmap"><span className="page-kicker">Planned evidence extensions</span><div>{futureLanes.map(([title, fields]) => <article key={title}><strong>{title}</strong><p>{fields}</p></article>)}</div></div></details>
   </section>

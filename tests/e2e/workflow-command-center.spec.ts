@@ -94,7 +94,7 @@ test('workflow command center scales account monitoring across desktop and iPhon
     await expect(inspector).toContainText('16 E 39TH ST')
     await expect(inspector).toContainText('Investigate')
     await expect(inspector).toContainText(note)
-    await expect(inspector.getByRole('button', { name: 'Open account to manage →' })).toBeVisible()
+    await expect(inspector.getByRole('button', { name: 'Open full account →' })).toBeVisible()
 
     const coverage = workflow.locator('details.workflow-coverage-details')
     await coverage.locator('summary').click()
