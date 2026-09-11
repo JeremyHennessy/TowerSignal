@@ -1,0 +1,135 @@
+name: Restore exact verified TowerSignal Pages artifact
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  restore:
+    if: github.repository == 'JeremyHennessy/TowerSignal' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Require exact known-good source artifact and switch Pages to workflow publishing
+        id: proof
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifactId = 10181150350;
+            const sourceRun = 34544249376;
+            const sourceSha = '53f7016404774821051e5ebd02eeb5382dded55f';
+            const expectedDigest = 'sha256:e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c';
+            const artifact = (await github.rest.actions.getArtifact({...context.repo, artifact_id: artifactId})).data;
+            if (artifact.name !== 'github-pages' || artifact.expired || artifact.digest !== expectedDigest ||
+                artifact.workflow_run?.id !== sourceRun || artifact.workflow_run?.head_sha !== sourceSha) {
+              throw new Error('Verified Pages artifact identity no longer matches the approved recovery baseline');
+            }
+            await github.request('PUT /repos/{owner}/{repo}/pages', {
+              ...context.repo,
+              build_type: 'workflow',
+              headers: {'X-GitHub-Api-Version':'2022-11-28'}
+            });
+            const pages = await github.request('GET /repos/{owner}/{repo}/pages', {
+              ...context.repo,
+              headers: {'X-GitHub-Api-Version':'2022-11-28'}
+            });
+            if (pages.data.build_type !== 'workflow') throw new Error('Pages publishing source did not switch to workflow');
+            core.setOutput('source_run', String(sourceRun));
+            core.info(`Recovery artifact ${artifactId} verified; Pages build_type=${pages.data.build_type}`);
+
+      - name: Download exact previously verified Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: ${{ steps.proof.outputs.source_run }}
+          github-token: ${{ github.token }}
+          path: .verified-pages
+
+      - name: Extract and validate recovery site
+        run: |
+          test -f .verified-pages/artifact.tar
+          mkdir -p site
+          tar -xf .verified-pages/artifact.tar -C site
+          test -s site/index.html
+          test -s site/data/systems.json
+          test -s site/data/known-firms.json
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path('site')
+          systems=json.loads((root/'data/systems.json').read_text())
+          assert len(systems.get('systems') or []) == 4894
+          files=[p for p in root.rglob('*') if p.is_file()]
+          print(json.dumps({
+            'files':len(files),
+            'bytes':sum(p.stat().st_size for p in files),
+            'index_sha256':hashlib.sha256((root/'index.html').read_bytes()).hexdigest(),
+            'systems_sha256':hashlib.sha256((root/'data/systems.json').read_bytes()).hexdigest(),
+            'known_firms_sha256':hashlib.sha256((root/'data/known-firms.json').read_bytes()).hexdigest(),
+            'systems':len(systems['systems'])
+          },indent=2))
+          PY
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy exact recovery artifact
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: Verify hosted bytes match recovery artifact
+        run: |
+          python - <<'PY'
+          import hashlib,time
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          base='https://jeremyhennessy.github.io/TowerSignal/'
+          for name in ['index.html','data/systems.json','data/known-firms.json']:
+              expected=(Path('site')/name).read_bytes()
+              expected_hash=hashlib.sha256(expected).hexdigest()
+              for attempt in range(12):
+                  try:
+                      req=Request(base+name+'?restore='+str(time.time_ns()),headers={'Cache-Control':'no-cache','User-Agent':'TowerSignal-recovery-check'})
+                      with urlopen(req,timeout=90) as response:
+                          actual=response.read(); status=response.status
+                      if status == 200 and hashlib.sha256(actual).hexdigest()==expected_hash:
+                          print(name,'verified',expected_hash)
+                          break
+                  except Exception:
+                      if attempt == 11: raise
+                  if attempt == 11:
+                      raise SystemExit('Hosted recovery artifact mismatch: '+name)
+                  time.sleep(5)
+          PY
+
+      - name: Retain recovery receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pages-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            site/index.html
+            site/data/source-health.json
+          retention-days: 14
+          if-no-files-found: warn
