@@ -146,7 +146,7 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["applicant_name"], "Jane Engineer")
             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["relationship_boundary"], "RECORDED_DOB_APPLICANT_NOT_PROOF_OF_SERVICE_CONTRACT")
 
-    def test_build_uses_max_four_concurrent_exact_queries_and_deterministic_merge(self):
+    def test_build_uses_max_three_staggered_exact_queries_and_deterministic_merge(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
             bbls = [f"3{lot:05d}0001" for lot in range(1, 122)]
@@ -184,14 +184,15 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
                         active -= 1
 
             stderr = io.StringIO()
-            with patch.object(builder, "fetch_where", side_effect=fake_fetch), \
+            with patch.object(builder, "REQUEST_START_INTERVAL_SECONDS", 0.0), \
+                 patch.object(builder, "fetch_where", side_effect=fake_fetch), \
                  patch.object(builder, "fetch_metadata", return_value={"name": "DOB", "source_last_updated_at": "2026-09-10T00:00:00Z"}), \
                  patch.object(builder, "fetch_count", return_value=2700000), \
                  redirect_stderr(stderr), redirect_stdout(io.StringIO()):
                 result = builder.build(output)
 
-            self.assertEqual(builder.MAX_CONCURRENT_REQUESTS, 4)
-            self.assertLessEqual(peak, 4)
+            self.assertEqual(builder.MAX_CONCURRENT_REQUESTS, 3)
+            self.assertLessEqual(peak, 3)
             self.assertGreaterEqual(peak, 2)
             self.assertEqual(len(calls), len(chunks))
             self.assertEqual({index for index, _ in calls}, set(range(1, len(chunks) + 1)))
@@ -201,13 +202,15 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
                     "order_by": "borough,block,lot,job_s1_no",
                     "select": builder.SELECT,
                     "limit": builder.FETCH_CAP,
+                    "request_retries": 1,
                     "request_timeout": 120,
                 })
             expected_bbl_order = [builder.normalize_bbl(chunk[0]) for chunk in chunks]
             self.assertEqual(list(result["by_bbl"]), expected_bbl_order)
             self.assertEqual(result["summary"]["exact_bbl_job_count"], len(chunks))
             self.assertEqual(result["summary"]["retained_record_count"], len(chunks))
-            self.assertIn("at most 4 concurrent requests", stderr.getvalue())
+            self.assertIn("at most 3 concurrent requests", stderr.getvalue())
+            self.assertIn("minimum request-start spacing", stderr.getvalue())
             self.assertIn("merging", stderr.getvalue())
             self.assertEqual(json.loads((output / "legacy-dob-projects.json").read_text()), result)
 
@@ -245,6 +248,42 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
                  self.assertRaisesRegex(builder.SourceFetchError, "source timeout"):
                 builder.build(output)
             self.assertFalse((output / "legacy-dob-projects.json").exists())
+
+    def test_http_429_retries_same_exact_query_with_rate_aware_policy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}], "metadata": {"snapshot_date": "2026-09-11"}}))
+            calls = []
+
+            def fake_fetch(dataset_id, **kwargs):
+                calls.append((dataset_id, kwargs.copy()))
+                if len(calls) == 1:
+                    raise builder.SourceFetchError(
+                        "Failed to retrieve authoritative source after 1 attempts: url: HTTP Error 429: Too Many Requests"
+                    )
+                return [self.base_row()]
+
+            stderr = io.StringIO()
+            with patch.object(builder, "REQUEST_START_INTERVAL_SECONDS", 0.0), \
+                 patch.object(builder, "RATE_LIMIT_BACKOFF_SECONDS", (0.0, 0.0, 0.0)), \
+                 patch.object(builder, "fetch_where", side_effect=fake_fetch), \
+                 patch.object(builder, "fetch_metadata", return_value={"name": "DOB", "source_last_updated_at": "2026-09-10T00:00:00Z"}), \
+                 patch.object(builder, "fetch_count", return_value=2700000), \
+                 redirect_stderr(stderr), redirect_stdout(io.StringIO()):
+                result = builder.build(output)
+
+            self.assertEqual(len(calls), 2)
+            expected_where = builder._exact_where(["3000010001"])
+            for dataset_id, kwargs in calls:
+                self.assertEqual(dataset_id, builder.DATASET_ID)
+                self.assertEqual(kwargs["where"], expected_where)
+                self.assertEqual(kwargs["order_by"], "borough,block,lot,job_s1_no")
+                self.assertEqual(kwargs["select"], builder.SELECT)
+                self.assertEqual(kwargs["limit"], builder.FETCH_CAP)
+                self.assertEqual(kwargs["request_retries"], 1)
+                self.assertEqual(kwargs["request_timeout"], 120)
+            self.assertEqual(result["summary"]["retained_record_count"], 1)
+            self.assertIn("rate limited", stderr.getvalue())
 
     def test_count_failure_after_concurrent_collection_prevents_publication(self):
         with tempfile.TemporaryDirectory() as tmp:

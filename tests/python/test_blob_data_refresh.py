@@ -333,7 +333,7 @@ class DataRefreshTests(unittest.TestCase):
         legacy_step = ('      - name: Build bounded legacy DOB/BIS project context\n'
                        '        timeout-minutes: 15\n')
         self.assertEqual(segment.count(legacy_step), 1)
-        expected = segment.replace(legacy_step, legacy_step.replace(': 15', ': 90'), 1)
+        expected = segment.replace(legacy_step, legacy_step.replace(': 15', ': 150'), 1)
         self.assertIn(expected,workflow)
         self.assertIn("- cron: '17 10 * * *'",workflow)
         self.assertIn('needs: generate',workflow)
