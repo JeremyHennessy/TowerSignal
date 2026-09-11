@@ -2,18 +2,11 @@ import { useEffect, useState } from 'react'
 import type { AcrisSummaryFields } from '../types/acris'
 import type { ChangeEvent, ChangesPayload } from '../types/history'
 import type { SystemSummary } from '../types/data'
-import type {
-  WorkflowAccountPatch,
-  WorkflowAccountState,
-  WorkflowMembership,
-  WorkflowSavedView,
-  WorkflowUser,
-  WorkflowWatchlist,
-} from '../types/workflow'
+import type { WorkflowAccountState, WorkflowMembership, WorkflowSavedView, WorkflowUser, WorkflowWatchlist } from '../types/workflow'
 import { loadChanges } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
-import { WorkflowCommandCenter } from './WorkflowCommandCenter'
+import { WorkflowScaleWorkspace } from './WorkflowScaleWorkspace'
 
 const RECENT_CHANGE_WINDOW_MS = 7 * 86400000
 const number = new Intl.NumberFormat('en-US')
@@ -55,9 +48,6 @@ export function WorkflowWorkspacePage({
   watchlists,
   memberships,
   savedViews,
-  busy,
-  onSaveAccount,
-  onToggleMembership,
   onOpenAccount,
 }: {
   user: WorkflowUser | null
@@ -66,9 +56,6 @@ export function WorkflowWorkspacePage({
   watchlists: WorkflowWatchlist[]
   memberships: WorkflowMembership[]
   savedViews: WorkflowSavedView[]
-  busy: boolean
-  onSaveAccount: (systemId: string, patch: WorkflowAccountPatch) => Promise<'synced' | 'session-only'>
-  onToggleMembership: (systemId: string, watchlistId: string, enabled: boolean) => Promise<void>
   onOpenAccount: (row: WorkflowSystem) => void
 }) {
   const [changes, setChanges] = useState<ChangesPayload | null>(null)
@@ -117,60 +104,12 @@ export function WorkflowWorkspacePage({
   const highPriority = scopedRows.filter(row => row.priority_score >= 70)
 
   const coverageGroups: CoverageGroup[] = [
-    {
-      title: 'Compliance & timing',
-      metrics: [
-        { label: 'Sampling follow-up', value: samplingFollowUp.length },
-        { label: 'Recent confirmed violations', value: recentViolations.length },
-        { label: 'OATH case evidence', value: oathEvidence.length },
-        { label: 'Recent DOB activity', value: recentDob.length },
-      ],
-    },
-    {
-      title: 'Ownership & access',
-      metrics: [
-        { label: 'Owner context', value: ownerKnown.length },
-        { label: 'Contact-ready', value: contactReady.length },
-        { label: 'Recent ACRIS activity', value: recentAcris.length },
-        { label: 'Building outline', value: buildingMapped.length },
-      ],
-    },
-    {
-      title: 'Field & physical',
-      metrics: [
-        { label: 'Cooling-tower roof geometry', value: roofMapped.length },
-        { label: 'Multi-equipment sites', value: multiEquipment.length },
-        { label: 'Mapped DWT roof tanks', value: dwtPhysical.length },
-        { label: 'Building footprint context', value: buildingMapped.length },
-      ],
-    },
-    {
-      title: 'Domestic water',
-      metrics: [
-        { label: 'Any DWT context', value: dwtAny.length },
-        { label: 'DOHMH oversight', value: dwtOversight.length },
-        { label: 'Self-reported inspections', value: dwtSelfReports.length },
-        { label: 'DWT violation records', value: dwtViolation.length },
-      ],
-    },
-    {
-      title: 'Monitoring & change',
-      metrics: [
-        { label: 'Accounts changed · 7d', value: eventsBySystem.size },
-        { label: 'Change events · 7d', value: scopedEvents.length },
-        { label: 'Compliance changes · 7d', value: scopedEvents.filter(isComplianceChange).length },
-        { label: 'Property/project changes · 7d', value: scopedEvents.filter(isPropertyProjectChange).length },
-      ],
-    },
-    {
-      title: 'Commercial readiness',
-      metrics: [
-        { label: 'High priority', value: highPriority.length },
-        { label: 'Contact-ready', value: contactReady.length },
-        { label: 'Private account states', value: accounts.length },
-        { label: 'Watchlisted accounts', value: new Set(memberships.map(item => item.system_id)).size },
-      ],
-    },
+    { title: 'Compliance & timing', metrics: [{ label: 'Sampling follow-up', value: samplingFollowUp.length }, { label: 'Recent confirmed violations', value: recentViolations.length }, { label: 'OATH case evidence', value: oathEvidence.length }, { label: 'Recent DOB activity', value: recentDob.length }] },
+    { title: 'Ownership & access', metrics: [{ label: 'Owner context', value: ownerKnown.length }, { label: 'Contact-ready', value: contactReady.length }, { label: 'Recent ACRIS activity', value: recentAcris.length }, { label: 'Building outline', value: buildingMapped.length }] },
+    { title: 'Field & physical', metrics: [{ label: 'Cooling-tower roof geometry', value: roofMapped.length }, { label: 'Multi-equipment sites', value: multiEquipment.length }, { label: 'Mapped DWT roof tanks', value: dwtPhysical.length }, { label: 'Building footprint context', value: buildingMapped.length }] },
+    { title: 'Domestic water', metrics: [{ label: 'Any DWT context', value: dwtAny.length }, { label: 'DOHMH oversight', value: dwtOversight.length }, { label: 'Self-reported inspections', value: dwtSelfReports.length }, { label: 'DWT violation records', value: dwtViolation.length }] },
+    { title: 'Monitoring & change', metrics: [{ label: 'Accounts changed · 7d', value: eventsBySystem.size }, { label: 'Change events · 7d', value: scopedEvents.length }, { label: 'Compliance changes · 7d', value: scopedEvents.filter(isComplianceChange).length }, { label: 'Property/project changes · 7d', value: scopedEvents.filter(isPropertyProjectChange).length }] },
+    { title: 'Commercial readiness', metrics: [{ label: 'High priority', value: highPriority.length }, { label: 'Contact-ready', value: contactReady.length }, { label: 'Private account states', value: accounts.length }, { label: 'Watchlisted accounts', value: new Set(memberships.map(item => item.system_id)).size }] },
   ]
 
   const futureLanes = [
@@ -182,45 +121,14 @@ export function WorkflowWorkspacePage({
 
   return <section className="product-page workflow-workspace-page">
     <div className="product-page-heading workflow-page-heading">
-      <div>
-        <span className="page-kicker">New York City · private operating workspace</span>
-        <h1 aria-label="Workflow workspace">Workflow <span className="private-chip">Private</span></h1>
-        <p>Monitor a large account portfolio, triage source changes and due actions, and update private workflow state without opening every account profile.</p>
-        <div className="workflow-summary-meta">
-          <span>Workflow scope <strong>{number.format(scopedRows.length)}</strong></span>
-          <span>NYC market <strong>{number.format(systems.length)}</strong></span>
-          {changes?.observed_at && <span>Data observed <strong>{formatTimestamp(changes.observed_at)}</strong></span>}
-          {changes?.history_started_at && <span>History since <strong>{formatDate(changes.history_started_at)}</strong></span>}
-          {changeLoadFailed && <span className="workflow-meta-warning">Monitor history unavailable in this view</span>}
-          {missingScopeCount > 0 && <span className="workflow-meta-warning"><strong>{missingScopeCount}</strong> saved account{missingScopeCount === 1 ? '' : 's'} not in current snapshot</span>}
-        </div>
-      </div>
+      <div><span className="page-kicker">New York City · private operating workspace</span><h1 aria-label="Workflow workspace">Workflow <span className="private-chip">Private</span></h1><p>Monitor a large account portfolio, triage source changes and due actions, and update private workflow state without treating cards or Kanban columns as the source of truth.</p><div className="workflow-summary-meta"><span>Workflow scope <strong>{number.format(scopedRows.length)}</strong></span><span>NYC market <strong>{number.format(systems.length)}</strong></span>{changes?.observed_at && <span>Data observed <strong>{formatTimestamp(changes.observed_at)}</strong></span>}{changes?.history_started_at && <span>History since <strong>{formatDate(changes.history_started_at)}</strong></span>}{changeLoadFailed && <span className="workflow-meta-warning">Monitor history unavailable in this view</span>}{missingScopeCount > 0 && <span className="workflow-meta-warning"><strong>{missingScopeCount}</strong> saved account{missingScopeCount === 1 ? '' : 's'} not in current snapshot</span>}</div></div>
       <div className="page-actions"><ShareButton label="Share public page link" /></div>
     </div>
 
     {!user && <div className="workflow-login-callout"><div><span className="roadmap-status">PRIVATE WORKSPACE</span><strong>Sign in from the profile control to sync workflow state across sessions and devices.</strong><p>Saved prospect views can remain local, but account notes, status, watchlists and next actions require an authenticated private workspace.</p></div></div>}
 
-    <WorkflowCommandCenter
-      user={user}
-      systems={scopedRows}
-      marketCount={systems.length}
-      accounts={accounts}
-      watchlists={watchlists}
-      memberships={memberships}
-      savedViews={savedViews}
-      recentEvents={recentEvents.filter(event => scopeIds.has(event.system_id))}
-      eventsBySystem={eventsBySystem}
-      today={today}
-      busy={busy}
-      onSaveAccount={onSaveAccount}
-      onToggleMembership={onToggleMembership}
-      onOpenAccount={onOpenAccount}
-    />
+    <WorkflowScaleWorkspace systems={scopedRows} marketCount={systems.length} accounts={accounts} watchlists={watchlists} memberships={memberships} savedViews={savedViews} recentEvents={recentEvents.filter(event => scopeIds.has(event.system_id))} eventsBySystem={eventsBySystem} today={today} onOpenAccount={onOpenAccount} />
 
-    <details className="workflow-coverage-details">
-      <summary><div><strong>Portfolio evidence coverage</strong><p>The former six intelligence cards are retained as a compact reference instead of occupying the primary workflow. Operational work stays in the command workspace above.</p></div><span>{coverageGroups.length} evidence groups</span></summary>
-      <div className="workflow-coverage-matrix">{coverageGroups.map(group => <article key={group.title}><strong>{group.title}</strong><dl>{group.metrics.map(metric => <div key={metric.label}><dt>{metric.label}</dt><dd>{number.format(metric.value)}</dd></div>)}</dl></article>)}</div>
-      <div className="workflow-coverage-roadmap"><span className="page-kicker">Planned evidence extensions</span><div>{futureLanes.map(([title, fields]) => <article key={title}><strong>{title}</strong><p>{fields}</p></article>)}</div></div>
-    </details>
+    <details className="workflow-coverage-details"><summary><div><strong>Portfolio evidence coverage</strong><p>The former intelligence-card grid is retained as a compact reference instead of occupying the primary workflow. Operational work stays in the command workspace above.</p></div><span>{coverageGroups.length} evidence groups</span></summary><div className="workflow-coverage-matrix">{coverageGroups.map(group => <article key={group.title}><strong>{group.title}</strong><dl>{group.metrics.map(metric => <div key={metric.label}><dt>{metric.label}</dt><dd>{number.format(metric.value)}</dd></div>)}</dl></article>)}</div><div className="workflow-coverage-roadmap"><span className="page-kicker">Planned evidence extensions</span><div>{futureLanes.map(([title, fields]) => <article key={title}><strong>{title}</strong><p>{fields}</p></article>)}</div></div></details>
   </section>
 }
