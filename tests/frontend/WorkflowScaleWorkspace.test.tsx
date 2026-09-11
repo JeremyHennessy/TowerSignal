@@ -47,6 +47,7 @@ test('keeps map table filters and selected account inspector synchronized', () =
 
   fireEvent.change(screen.getByLabelText('Workflow status filter'), { target: { value: 'investigate' } })
   expect(screen.getByTestId('workflow-map')).toHaveTextContent('1 mapped')
+  expect(screen.getByText('16 E 39TH ST')).toBeInTheDocument()
   expect(screen.queryByText('100 BROADWAY')).not.toBeInTheDocument()
 
   fireEvent.click(screen.getByRole('button', { name: 'Select first marker' }))
@@ -66,10 +67,12 @@ test('uses scalable quick views for changes actions status and watchlists', () =
   expect(screen.getByRole('tab', { name: /Changes/i })).toHaveAttribute('aria-selected', 'true')
   expect(screen.getByText('Violation Added')).toBeInTheDocument()
 
-  fireEvent.click(screen.getByRole('tab', { name: /Actions/i }))
+  fireEvent.click(screen.getByRole('button', { name: /Needs a date/i }))
+  expect(screen.getByRole('tab', { name: /Actions/i })).toHaveAttribute('aria-selected', 'true')
   expect(screen.getByText('Need owner contact')).toBeInTheDocument()
   expect(screen.getByText('Needs date')).toBeInTheDocument()
 
+  fireEvent.click(screen.getByRole('button', { name: 'Clear' }))
   fireEvent.click(screen.getByRole('tab', { name: /Accounts/i }))
   fireEvent.change(screen.getByLabelText('Workflow watchlist filter'), { target: { value: 'priority' } })
   expect(screen.getByTestId('workflow-map')).toHaveTextContent('1 mapped')
