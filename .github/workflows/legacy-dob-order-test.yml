@@ -1,0 +1,113 @@
+name: Test legacy DOB remote-sort cost
+on:
+  push:
+    branches: [agent/legacy-dob-timeout-diagnostic-20260911]
+    paths: [.github/workflows/legacy-dob-order-test.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 29c7c90e9d3c178535641692f33c13d4d9388017
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Restore pinned property cohort and actual ordered-query reference hashes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,sys,tarfile,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from migrate_data_to_blob import GitHubReader
+          reader=GitHubReader();out=Path(os.environ['RUNNER_TEMP'])/'legacy-order';out.mkdir()
+          sources=[(10181150350,'github-pages',34544249376,'53f7016404774821051e5ebd02eeb5382dded55f',
+                    'e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'),
+                   (10269522018,'legacy-query-shape-34612691664',34612691664,'35313f8ced8e792064f6d43b3e85275221ae409c',
+                    'f8c73ae97bb90e3efd3773e6d4a063ae4fad82f23cd80ce210eb85ec953efa1c')]
+          for aid,name,run,sha,digest in sources:
+              meta=reader.get(f'/actions/artifacts/{aid}')
+              assert not meta['expired'] and meta['name']==name and meta['digest']=='sha256:'+digest
+              assert meta['workflow_run']['id']==run and meta['workflow_run']['head_sha']==sha
+              archive=out/f'{aid}.zip';reader.download(f'/actions/artifacts/{aid}/zip',archive)
+              with archive.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==digest
+              assert archive.stat().st_size==meta['size_in_bytes']
+              with zipfile.ZipFile(archive) as z:
+                  if name=='github-pages':
+                      assert z.namelist()==['artifact.tar'];found=False
+                      with z.open('artifact.tar') as f,tarfile.open(fileobj=f,mode='r|*') as tar:
+                          for item in tar:
+                              if item.name.removeprefix('./')=='data/systems.json':
+                                  assert item.isfile() and item.size<100*1024**2 and not found
+                                  (out/'systems.json').write_bytes(tar.extractfile(item).read());found=True
+                      assert found
+                  else:
+                      assert z.namelist()==['comparison.json']
+                      (out/'reference.json').write_bytes(z.read('comparison.json'))
+          PY
+      - name: Change only remote ordering and compare all fields with measured ordered references
+        timeout-minutes: 9
+        run: |
+          python -u - <<'PY'
+          import hashlib,json,os,sys,time
+          from datetime import date
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          import build_legacy_dob_project_cache as legacy
+          out=Path(os.environ['RUNNER_TEMP'])/'legacy-order'
+          data=json.loads((out/'systems.json').read_text());ref=json.loads((out/'reference.json').read_text())
+          assert ref['status']=='PASS' and ref['source_sha']=='29c7c90e9d3c178535641692f33c13d4d9388017'
+          requested=sorted({b for r in data['systems'] if (b:=legacy.normalize_bbl(r.get('bbl'))) and legacy._bbl_components(b)},key=int)
+          assert len(requested)==ref['property_count'];as_of=date.fromisoformat(data['metadata']['snapshot_date'])
+          def digest(rows):
+              values=sorted(json.dumps(r,sort_keys=True,separators=(',',':')) for r in rows)
+              return hashlib.sha256(('\n'.join(values)+'\n').encode()).hexdigest()
+          results=[]
+          for spec in ref['results']:
+              start=(spec['batch']-1)*30;chunk=requested[start:start+30];assert len(chunk)==spec['bbls']
+              before=spec['metrics']['original'];tick=time.monotonic()
+              print('UNORDERED_QUERY_START='+str(spec['batch']),flush=True)
+              rows=legacy.fetch_where(legacy.DATASET_ID,where=legacy._exact_where(chunk),
+                   select=legacy.SELECT,limit=legacy.FETCH_CAP,request_timeout=120)
+              elapsed=round(time.monotonic()-tick,3)
+              assert len(rows)<legacy.FETCH_CAP
+              assert all(legacy._source_bbl(r) in set(chunk) for r in rows)
+              kept=[v for r in rows if (v:=legacy.normalize_job(r,as_of=as_of)) is not None]
+              actual={'seconds':elapsed,'rows':len(rows),'row_multiset_sha256':digest(rows),
+                      'retained_rows':len(kept),'retained_multiset_sha256':digest(kept)}
+              parity=all(actual[k]==before[k] for k in ['rows','row_multiset_sha256','retained_rows','retained_multiset_sha256'])
+              seen={};ambiguous=set()
+              for record in kept:
+                  identity=record.get('source_row_id') or f"{record.get('job_number')}:{record.get('document_number')}"
+                  key=(record['bbl'],identity)
+                  if key in seen and seen[key]!=record:ambiguous.add(key)
+                  seen[key]=record
+              result={'batch':spec['batch'],'original':before,'unordered':actual,'same_complete_row_multiset':parity,
+                      'order_sensitive_retained_identities':len(ambiguous)}
+              results.append(result)
+              report={'status':'IN_PROGRESS','results':results,'production_changed':False,'azure_accessed':False}
+              (out/'order-comparison.json').write_text(json.dumps(report,indent=2)+'\n')
+              print('UNORDERED_QUERY_RESULT='+json.dumps(result),flush=True)
+              assert parity,'Unordered query changed source records; do not accept'
+              if len(results)==1 and elapsed>=20:
+                  report['status']='NO_USEFUL_SPEEDUP';(out/'order-comparison.json').write_text(json.dumps(report,indent=2)+'\n')
+                  raise SystemExit('First complete batch did not achieve useful speedup; stop instead of running more expensive probes')
+          report['status']='PARITY_PASS';(out/'order-comparison.json').write_text(json.dumps(report,indent=2)+'\n')
+          print('ORDER_COMPARISON='+json.dumps(report),flush=True)
+          PY
+      - name: Retain actual comparison even when a hypothesis fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-order-comparison-${{ github.run_id }}
+          path: ${{ runner.temp }}/legacy-order/order-comparison.json
+          retention-days: 14
+          if-no-files-found: warn
