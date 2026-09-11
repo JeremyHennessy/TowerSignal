@@ -5,57 +5,60 @@ on:
     paths: [.github/workflows/data-only-acceptance-control.yml]
 permissions:
   contents: read
-  actions: read
+  pull-requests: read
+  actions: write
+concurrency:
+  group: data-only-acceptance-dispatch
+  cancel-in-progress: false
 jobs:
-  browser-baseline:
+  dispatch:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      # This unmerged control branch has no Azure environment/key and no data-writing steps.
+      - uses: actions/github-script@v7
         with:
-          ref: 94adcdae8cc21fd8741d5bdd89599fef14832616
-          persist-credentials: false
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Prepare read-only artifact tools
-        run: python -m pip install azure-storage-blob==12.25.1
-      - name: Stage exact verified production runtime for browser contract checks
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python - <<'PY'
-          import hashlib,sys
-          from pathlib import Path
-          sys.path.insert(0,'scripts')
-          from migrate_data_to_blob import GitHubReader,extract_runtime
-          from publish_pages_to_blob import successful_source
-          reader=GitHubReader()
-          source,_=successful_source(reader,34544249376)
-          assert source['source_sha']=='53f7016404774821051e5ebd02eeb5382dded55f'
-          info=reader.get('/actions/artifacts/10181150350')
-          digest='e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'
-          assert not info['expired'] and info['name']=='github-pages'
-          assert info['digest']=='sha256:'+digest and info['workflow_run']['id']==34544249376
-          out=Path('/tmp/data-browser-baseline.zip')
-          reader.download('/actions/artifacts/10181150350/zip',out)
-          with out.open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==digest
-          assert out.stat().st_size==info['size_in_bytes']
-          print('Verified baseline artifact digest. Runtime counts:',extract_runtime(out,Path('dist/data')))
-          PY
-      - name: Install frontend test dependencies
-        run: npm install --no-audit --no-fund
-      - name: Install browser runtimes
-        run: npx playwright install --with-deps chromium webkit
-      - name: Check actual baseline data through both browser engines
-        run: npx playwright test --config playwright.data-only.config.ts
-      - name: Retain browser proof
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: data-only-browser-baseline-${{ github.run_id }}
-          path: data-browser-report
-          retention-days: 14
+          script: |
+            const repo = {owner: 'JeremyHennessy', repo: 'TowerSignal'};
+            const mainSha = '29c7c90e9d3c178535641692f33c13d4d9388017';
+            const candidate = '94adcdae8cc21fd8741d5bdd89599fef14832616';
+            const workflow = 'azure-data-refresh.yml';
+            if (context.repo.owner !== repo.owner || context.repo.repo !== repo.repo ||
+                context.ref !== 'refs/heads/agent/data-only-control-20260911') {
+              throw new Error('Unexpected data-only acceptance context');
+            }
+            const main = (await github.rest.git.getRef({...repo, ref: 'heads/main'})).data;
+            if (main.object.sha !== mainSha) throw new Error('Main moved before controlled dispatch');
+            const pr = (await github.rest.pulls.get({...repo, pull_number: 225})).data;
+            if (!pr.merged || pr.head.sha !== candidate || pr.merge_commit_sha !== mainSha) {
+              throw new Error('PR 225 is not the exact tested merge');
+            }
+            const ci = (await github.rest.actions.getWorkflowRun({...repo, run_id: 34603958297})).data;
+            if (ci.head_sha !== candidate || ci.status !== 'completed' || ci.conclusion !== 'success') {
+              throw new Error('Exact candidate repository CI has not passed');
+            }
+            const browser = (await github.rest.actions.getWorkflowRun({...repo, run_id: 34604029778})).data;
+            if (browser.head_sha !== '715de6e7b82a674028e53bf2b7b1958c59448bd9' ||
+                browser.status !== 'completed' || browser.conclusion !== 'success') {
+              throw new Error('Pinned baseline Chromium/WebKit acceptance has not passed');
+            }
+            for (const [path, sha] of [
+              ['.github/workflows/' + workflow, '3b4a654d5b50a09a086be6835b9a4f766ac9e305'],
+              ['scripts/blob_data_refresh.py', '8a149d00525f0c0e33385c42e73a6e2177a5459b'],
+              ['playwright.data-only.config.ts', '95aaa133f2ea923063c4b131d3e219848b88485a'],
+              ['tests/data-only/runtime.spec.ts', '6f55b782c8cbf3707457b1eb29aec7bd1b3679d4']
+            ]) {
+              const file = (await github.rest.repos.getContent({...repo, path, ref: mainSha})).data;
+              if (file.type !== 'file' || file.sha !== sha) throw new Error('Reviewed data-only file differs');
+            }
+            const runs = (await github.rest.actions.listWorkflowRuns({...repo, workflow_id: workflow,
+              head_sha: mainSha, event: 'workflow_dispatch', per_page: 100})).data;
+            if (runs.total_count > 0) {
+              core.info('The first data refresh was already requested; no duplicate run.');
+              return;
+            }
+            const checked = (await github.rest.git.getRef({...repo, ref: 'heads/main'})).data;
+            if (checked.object.sha !== mainSha) throw new Error('Main moved during dispatch checks');
+            await github.rest.actions.createWorkflowDispatch({...repo, workflow_id: workflow,
+              ref: 'main', inputs: {require_acris: 'false'}});
+            core.info('Started only the reviewed data-only refresh. This is not a data freshness or publication result.');
