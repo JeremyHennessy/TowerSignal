@@ -1,0 +1,102 @@
+name: Profile legacy DOB source latency
+on:
+  push:
+    branches: [agent/legacy-dob-timeout-diagnostic-20260911]
+    paths: [.github/workflows/legacy-dob-latency-profile.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  profile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 29c7c90e9d3c178535641692f33c13d4d9388017
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Restore exact baseline cohort
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,os,sys,tarfile,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from migrate_data_to_blob import GitHubReader
+          reader=GitHubReader();out=Path(os.environ['RUNNER_TEMP'])/'legacy-latency';out.mkdir()
+          meta=reader.get('/actions/artifacts/10181150350')
+          digest='e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'
+          assert not meta['expired'] and meta['name']=='github-pages' and meta['digest']=='sha256:'+digest
+          assert meta['workflow_run']['id']==34544249376 and meta['workflow_run']['head_sha']=='53f7016404774821051e5ebd02eeb5382dded55f'
+          archive=out/'source.zip';reader.download('/actions/artifacts/10181150350/zip',archive)
+          with archive.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==digest
+          assert archive.stat().st_size==meta['size_in_bytes']
+          with zipfile.ZipFile(archive) as z:
+              assert z.namelist()==['artifact.tar'];found=False
+              with z.open('artifact.tar') as f,tarfile.open(fileobj=f,mode='r|*') as tar:
+                  for item in tar:
+                      if item.name.removeprefix('./')=='data/systems.json':
+                          assert item.isfile() and item.size<100*1024**2 and not found
+                          (out/'systems.json').write_bytes(tar.extractfile(item).read());found=True
+              assert found
+          PY
+      - name: Profile DNS, time to response headers, body transfer, and parsing
+        timeout-minutes: 7
+        run: |
+          python -u - <<'PY'
+          import hashlib,json,os,socket,sys,time
+          from pathlib import Path
+          from urllib.parse import urlencode
+          from urllib.request import Request,urlopen
+          sys.path.insert(0,'scripts')
+          import build_legacy_dob_project_cache as legacy
+          from towersignal.fetch import API_ROOT,USER_AGENT
+          out=Path(os.environ['RUNNER_TEMP'])/'legacy-latency'
+          source=json.loads((out/'systems.json').read_text())
+          bbls=sorted({b for r in source['systems'] if (b:=legacy.normalize_bbl(r.get('bbl'))) and legacy._bbl_components(b)},key=int)
+          start=time.monotonic();addresses=socket.getaddrinfo('data.cityofnewyork.us',443,type=socket.SOCK_STREAM)
+          report={'dns_seconds':time.monotonic()-start,'address_families':sorted({int(a[0]) for a in addresses}),
+                  'proxy_variables_present':[k for k in ('HTTP_PROXY','HTTPS_PROXY','http_proxy','https_proxy') if os.environ.get(k)],
+                  'queries':[],'production_changed':False,'azure_accessed':False}
+          queries=[('metadata',API_ROOT+'/api/views/'+legacy.DATASET_ID),
+                   ('thirty_property_count',API_ROOT+'/resource/'+legacy.DATASET_ID+'.json?'+urlencode({'$select':'count(*) as count','$where':legacy._exact_where(bbls[:30])})),
+                   ('single_exact_property',API_ROOT+'/resource/'+legacy.DATASET_ID+'.json?'+urlencode({'$limit':50000,'$where':legacy._exact_where(bbls[:1]),'$order':'borough,block,lot,job_s1_no','$select':legacy.SELECT}))]
+          for name,url in queries:
+              tick=time.monotonic();row={'name':name,'attempts':1};print('LATENCY_START='+name,flush=True)
+              try:
+                  req=Request(url,headers={'User-Agent':USER_AGENT,'Accept':'application/json'})
+                  with urlopen(req,timeout=120) as resp:
+                      row['headers_seconds']=round(time.monotonic()-tick,3)
+                      row['status']=resp.status
+                      allowed=('server','content-type','content-length','content-encoding','age','x-cache','x-soda2-timing','x-soda2-row-count','x-soda2-truth-last-modified','x-soda2-secondary-last-modified')
+                      row['headers']={k:v for k,v in resp.headers.items() if k.lower() in allowed}
+                      body=resp.read(100*1024**2+1);assert len(body)<=100*1024**2
+                  body_at=time.monotonic();row['body_seconds']=round(body_at-tick-row['headers_seconds'],3);row['body_bytes']=len(body)
+                  value=json.loads(body);row['parse_seconds']=round(time.monotonic()-body_at,3)
+                  if name=='metadata':
+                      row['rows_updated_at']=value.get('rowsUpdatedAt')
+                      row['columns']=[{'field':c.get('fieldName'),'type':c.get('dataTypeName'),'flags':c.get('flags')} for c in value['columns']]
+                  elif name=='thirty_property_count':row['rows']=value
+                  else:
+                      row['rows']=len(value);row['bbl']=bbls[0]
+                      assert all(legacy._source_bbl(r)==bbls[0] for r in value)
+                  row['success']=True
+              except Exception as error:
+                  row.update({'success':False,'error_type':type(error).__name__,'http_status':getattr(error,'code',None)})
+              row['total_seconds']=round(time.monotonic()-tick,3);report['queries'].append(row)
+              (out/'latency.json').write_text(json.dumps(report,indent=2)+'\n')
+              print('LATENCY_RESULT='+json.dumps(row),flush=True)
+          PY
+      - name: Preserve source-only measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-latency-${{ github.run_id }}
+          path: ${{ runner.temp }}/legacy-latency/latency.json
+          retention-days: 14
+          if-no-files-found: warn
