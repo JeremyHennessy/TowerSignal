@@ -413,6 +413,18 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(self.store.data[b.POINTER], old_bytes)
         self.assertEqual(self.store.writes, writes)
 
+    def test_same_run_with_different_payload_is_not_idempotent(self):
+        work, plan = self.application_plan(1)
+        p.apply(self.store, FakeReader(source(1)), plan, work)
+        before = self.store.data[b.POINTER]
+        writes = list(self.store.writes)
+        (work / 'runtime/systems.json').write_bytes(b'{"changed":true}')
+        plan['runtime'] = b.local_records(work / 'runtime')
+        with self.assertRaisesRegex(b.PublishError, 'Same-run runtime payload differs'):
+            p.apply(self.store, FakeReader(source(1)), plan, work)
+        self.assertEqual(self.store.data[b.POINTER], before)
+        self.assertEqual(self.store.writes, writes)
+
     def test_full_bootstrap_adopts_both_without_payload_writes(self):
         work,plan = self.application_plan(1)
         for kind, local, prefix in [('runtime', work/'runtime', p.BASELINE+'/runtime'),

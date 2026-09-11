@@ -264,6 +264,10 @@ def apply(store, reader, plan, work, *, bootstrap=False):
         for kind in ('runtime', 'history'):
             validate_descriptor(store, old[kind], kind, source)
             manifest, _ = checked_json(store, old[kind]['manifest'])
+            validate_records(plan[kind])
+            expected = {(r['path'], r['bytes'], r['sha256']) for r in plan[kind]}
+            existing = {(r['path'], r['bytes'], r['sha256']) for r in manifest['records']}
+            require(existing == expected, f'Same-run {kind} payload differs from current release')
             verify_dataset(store, old[kind]['data_prefix'], manifest['records'])
         result = {'status': 'ALREADY_CURRENT', 'source': source, 'current': old, 'payloads_uploaded': False}
     else:
