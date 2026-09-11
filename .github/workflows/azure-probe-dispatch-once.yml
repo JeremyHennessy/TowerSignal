@@ -1,4 +1,4 @@
-name: Dispatch approved Azure browser probe once
+name: Dispatch approved Azure probe verification once
 
 on:
   push:
@@ -25,35 +25,35 @@ jobs:
         with:
           script: |
             const repo = { owner: 'JeremyHennessy', repo: 'TowerSignal' };
-            const expectedMain = '11f8bca62b5d7b11fe2d26ee0fb0a4316f919874';
-            const expectedHead = '3531d6be5d59041cae9196dff7820339e8c2c860';
-            const workflow = 'azure-blob-browser-check.yml';
+            const expectedMain = '21fd66dabf0bc41eb282baa7b38dd835efb9422c';
+            const expectedHead = '0392d90d095663c43340fb6723e1b0fe3cbefe1e';
+            const workflow = 'azure-probe-final-check.yml';
             if (context.repo.owner !== repo.owner || context.repo.repo !== repo.repo ||
                 context.ref !== 'refs/heads/agent/azure-probe-dispatch-20260911') {
               throw new Error('Unexpected repository or dispatch branch');
             }
             const main = (await github.rest.git.getRef({ ...repo, ref: 'heads/main' })).data;
             if (main.object.sha !== expectedMain) throw new Error('Main moved; stop before dispatch');
-            const pr = (await github.rest.pulls.get({ ...repo, pull_number: 220 })).data;
+            const pr = (await github.rest.pulls.get({ ...repo, pull_number: 221 })).data;
             if (!pr.merged || pr.head.sha !== expectedHead || pr.merge_commit_sha !== expectedMain) {
-              throw new Error('PR 220 is not the exact approved merge');
+              throw new Error('PR 221 is not the exact approved merge');
             }
-            for (const [run_id, head_sha] of [[34544249376, '53f7016404774821051e5ebd02eeb5382dded55f'], [34545099426, expectedHead]]) {
+            for (const [run_id, head_sha] of [[34544249376, '53f7016404774821051e5ebd02eeb5382dded55f'], [34590118080, expectedHead]]) {
               const run = (await github.rest.actions.getWorkflowRun({ ...repo, run_id })).data;
               if (run.head_sha !== head_sha || run.status !== 'completed' || run.conclusion !== 'success') {
                 throw new Error('Required exact-head verification has not succeeded');
               }
             }
             const file = (await github.rest.repos.getContent({ ...repo, path: '.github/workflows/' + workflow, ref: expectedMain })).data;
-            if (file.type !== 'file' || file.sha !== '71988f67dba68d381d8eee4c327e9c80e9b88b3a') {
-              throw new Error('Browser probe differs from reviewed contents');
+            if (file.type !== 'file' || file.sha !== '8fd01de365e558c69882f7b6ce31fd06cce16af9') {
+              throw new Error('Final read-only check differs from reviewed contents');
             }
             const runs = (await github.rest.actions.listWorkflowRuns({ ...repo, workflow_id: workflow, head_sha: expectedMain, event: 'workflow_dispatch', per_page: 100 })).data;
             if (runs.total_count > 0) {
-              core.info('Browser probe already dispatched for this exact merge; no duplicate created');
+              core.info('Final read-only check already dispatched for this exact merge; no duplicate created');
               return;
             }
             const current = (await github.rest.git.getRef({ ...repo, ref: 'heads/main' })).data;
             if (current.object.sha !== expectedMain) throw new Error('Main moved during checks');
             await github.rest.actions.createWorkflowDispatch({ ...repo, workflow_id: workflow, ref: 'main' });
-            core.info('Requested the reviewed browser probe on main. This is not a success result for the probe.');
+            core.info('Requested the reviewed read-only cleanup check on main. This is not a success result for the probe.');
