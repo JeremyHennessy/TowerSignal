@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import io
 import json
+import threading
+import time
 from contextlib import redirect_stderr, redirect_stdout
 import tempfile
 import unittest
@@ -144,44 +146,72 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["applicant_name"], "Jane Engineer")
             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["relationship_boundary"], "RECORDED_DOB_APPLICANT_NOT_PROOF_OF_SERVICE_CONTRACT")
 
-
-    def test_build_keeps_exact_query_contract_and_reports_each_batch(self):
+    def test_build_uses_max_four_concurrent_exact_queries_and_deterministic_merge(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
-            bbls = [f"300001{lot:04d}" for lot in range(1, 32)]
+            bbls = [f"3{lot:05d}0001" for lot in range(1, 122)]
             source = {"metadata": {"snapshot_date": "2026-09-11"},
                       "systems": [{"bbl": bbl} for bbl in reversed(bbls)]}
             (output / "systems.json").write_text(json.dumps(source))
-            first = self.base_row()
-            second = self.base_row(job_s1_no="300000031", lot="00031",
-                                   job_description="Replace cooling tower")
+            requested = sorted(bbls, key=int)
+            chunks = [requested[i:i + builder.QUERY_CHUNK_SIZE] for i in range(0, len(requested), builder.QUERY_CHUNK_SIZE)]
+            where_to_index = {builder._exact_where(chunk): index for index, chunk in enumerate(chunks, 1)}
+            calls = []
+            lock = threading.Lock()
+            active = 0
+            peak = 0
+
+            def fake_fetch(dataset_id, **kwargs):
+                nonlocal active, peak
+                self.assertEqual(dataset_id, builder.DATASET_ID)
+                index = where_to_index[kwargs["where"]]
+                with lock:
+                    calls.append((index, kwargs.copy()))
+                    active += 1
+                    peak = max(peak, active)
+                try:
+                    time.sleep(0.01 * (6 - index))
+                    borough, block, lot = builder._bbl_components(chunks[index - 1][0])
+                    return [self.base_row(
+                        job_s1_no=f"row-{index}",
+                        borough=borough,
+                        block=block,
+                        lot=str(int(lot)).zfill(5),
+                        job_description=f"Replace cooling tower batch {index}",
+                    )]
+                finally:
+                    with lock:
+                        active -= 1
+
             stderr = io.StringIO()
-            with patch.object(builder, "fetch_where", side_effect=[[first], [second]]) as fetch, \
+            with patch.object(builder, "fetch_where", side_effect=fake_fetch), \
                  patch.object(builder, "fetch_metadata", return_value={"name": "DOB", "source_last_updated_at": "2026-09-10T00:00:00Z"}), \
                  patch.object(builder, "fetch_count", return_value=2700000), \
                  redirect_stderr(stderr), redirect_stdout(io.StringIO()):
                 result = builder.build(output)
-            self.assertEqual(fetch.call_count, 2)
-            for call, chunk in zip(fetch.call_args_list, [bbls[:30], bbls[30:]]):
-                self.assertEqual(call.args, (builder.DATASET_ID,))
-                self.assertEqual(call.kwargs, {"where": builder._exact_where(chunk),
-                                 "order_by": "borough,block,lot,job_s1_no", "select": builder.SELECT,
-                                 "limit": 50000, "request_timeout": 120})
-            self.assertEqual(result["summary"]["requested_bbl_count"], 31)
-            self.assertEqual(result["summary"]["exact_bbl_job_count"], 2)
-            self.assertEqual(result["summary"]["retained_record_count"], 2)
-            self.assertEqual(result["summary"]["explicit_cooling_tower_record_count"], 1)
-            self.assertEqual(result["source"]["source_last_updated_at"], "2026-09-10T00:00:00Z")
-            self.assertEqual(result["by_bbl"][bbls[-1]]["records"][0]["applicant_name"], "Jane Engineer")
-            self.assertEqual(json.loads((output / "legacy-dob-projects.json").read_text()), result)
-            self.assertIn("Batch 1/2: querying 30 BBLs", stderr.getvalue())
-            self.assertIn("Batch 2/2: querying 1 BBLs", stderr.getvalue())
-            self.assertIn("rows total; elapsed", stderr.getvalue())
-            self.assertIn("fetching total source count", stderr.getvalue())
-            self.assertIn("Complete: 2 batches", stderr.getvalue())
-            self.assertNotIn("elapsed", result)
 
-    def test_capped_query_still_fails_without_replacing_existing_cache(self):
+            self.assertEqual(builder.MAX_CONCURRENT_REQUESTS, 4)
+            self.assertLessEqual(peak, 4)
+            self.assertGreaterEqual(peak, 2)
+            self.assertEqual(len(calls), len(chunks))
+            self.assertEqual({index for index, _ in calls}, set(range(1, len(chunks) + 1)))
+            for index, kwargs in calls:
+                self.assertEqual(kwargs, {
+                    "where": builder._exact_where(chunks[index - 1]),
+                    "order_by": "borough,block,lot,job_s1_no",
+                    "select": builder.SELECT,
+                    "limit": builder.FETCH_CAP,
+                    "request_timeout": 120,
+                })
+            expected_bbl_order = [builder.normalize_bbl(chunk[0]) for chunk in chunks]
+            self.assertEqual(list(result["by_bbl"]), expected_bbl_order)
+            self.assertEqual(result["summary"]["exact_bbl_job_count"], len(chunks))
+            self.assertEqual(result["summary"]["retained_record_count"], len(chunks))
+            self.assertIn("at most 4 concurrent requests", stderr.getvalue())
+            self.assertIn("merging", stderr.getvalue())
+            self.assertEqual(json.loads((output / "legacy-dob-projects.json").read_text()), result)
+
+    def test_capped_concurrent_query_fails_without_replacing_existing_cache(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
             (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
@@ -193,32 +223,39 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
                 builder.build(output)
             self.assertEqual(cache.read_bytes(), b"previous verified cache")
 
-    def test_failed_query_logs_start_but_does_not_publish_partial_cache(self):
+    def test_concurrent_source_error_propagates_and_does_not_publish_partial_cache(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
-            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
-            stderr = io.StringIO()
-            with patch.object(builder, "fetch_where", side_effect=builder.SourceFetchError("source timeout")), \
-                 redirect_stderr(stderr), redirect_stdout(io.StringIO()), \
+            bbls = [f"3{lot:05d}0001" for lot in range(1, 32)]
+            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": b} for b in bbls]}))
+            calls = 0
+            lock = threading.Lock()
+
+            def fake_fetch(*args, **kwargs):
+                nonlocal calls
+                with lock:
+                    calls += 1
+                    current = calls
+                if current == 1:
+                    raise builder.SourceFetchError("source timeout")
+                return []
+
+            with patch.object(builder, "fetch_where", side_effect=fake_fetch), \
+                 redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()), \
                  self.assertRaisesRegex(builder.SourceFetchError, "source timeout"):
                 builder.build(output)
-            self.assertIn("Batch 1/1: querying", stderr.getvalue())
-            self.assertNotIn("Complete:", stderr.getvalue())
             self.assertFalse((output / "legacy-dob-projects.json").exists())
 
-    def test_count_failure_still_prevents_cache_publication(self):
+    def test_count_failure_after_concurrent_collection_prevents_publication(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp)
             (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
-            stderr = io.StringIO()
             with patch.object(builder, "fetch_where", return_value=[self.base_row()]), \
                  patch.object(builder, "fetch_metadata", return_value={"name": "DOB"}), \
                  patch.object(builder, "fetch_count", side_effect=builder.SourceFetchError("count unavailable")), \
-                 redirect_stderr(stderr), redirect_stdout(io.StringIO()), \
+                 redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()), \
                  self.assertRaisesRegex(builder.SourceFetchError, "count unavailable"):
                 builder.build(output)
-            self.assertIn("fetching total source count", stderr.getvalue())
-            self.assertNotIn("Complete:", stderr.getvalue())
             self.assertFalse((output / "legacy-dob-projects.json").exists())
 
 
