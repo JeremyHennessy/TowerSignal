@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import re
 import sys
@@ -23,6 +24,7 @@ SCHEMA_VERSION = "1.0"
 QUERY_CHUNK_SIZE = 30
 FETCH_CAP = 50000
 RECENT_RELEVANT_DAYS = 1095
+MAX_CONCURRENT_REQUESTS = 4
 COOLING_TOWER_RE = re.compile(r"\bcooling\s+towers?\b", re.IGNORECASE)
 BOROUGH_NAMES = {
     "1": "MANHATTAN",
@@ -100,7 +102,6 @@ def _exact_where(chunk: list[str]) -> str:
         if not components:
             continue
         borough, block, lot = components
-        # BIS publishes lot as a five-character text field even though BBL lot is four digits.
         clauses.append(f"(borough='{borough}' AND block='{block}' AND lot='{str(int(lot)).zfill(5)}')")
     if not clauses:
         raise ValueError("No valid BBLs for legacy DOB query")
@@ -146,10 +147,7 @@ def normalize_job(row: dict[str, Any], *, as_of: date) -> dict[str, Any] | None:
     recent_relevant = _is_recent(activity_date, as_of) and (mechanical or boiler or plumbing or equipment)
     if not explicit_ct and not recent_relevant:
         return None
-    if explicit_ct:
-        relevance = "COOLING_TOWER_EXPLICIT"
-    else:
-        relevance = "RECENT_MECHANICAL_BOILER_PLUMBING_OR_EQUIPMENT"
+    relevance = "COOLING_TOWER_EXPLICIT" if explicit_ct else "RECENT_MECHANICAL_BOILER_PLUMBING_OR_EQUIPMENT"
     return {
         "source_row_id": _text(row.get("job_s1_no")),
         "job_number": _text(row.get("job__")),
@@ -198,13 +196,18 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
     source_matched_bbls: set[str] = set()
     fetched_job_count = 0
     started = time.monotonic()
-    total_batches = (len(requested) + QUERY_CHUNK_SIZE - 1) // QUERY_CHUNK_SIZE
-    print(f"[legacy_dob] Fetching {len(requested):,} canonical BBLs in {total_batches} serial batches", file=sys.stderr, flush=True)
-    for start in range(0, len(requested), QUERY_CHUNK_SIZE):
-        chunk = requested[start:start + QUERY_CHUNK_SIZE]
-        batch = start // QUERY_CHUNK_SIZE + 1
+    batches = [requested[start:start + QUERY_CHUNK_SIZE] for start in range(0, len(requested), QUERY_CHUNK_SIZE)]
+    total_batches = len(batches)
+    print(
+        f"[legacy_dob] Fetching {len(requested):,} canonical BBLs in {total_batches} batches "
+        f"with at most {MAX_CONCURRENT_REQUESTS} concurrent requests",
+        file=sys.stderr,
+        flush=True,
+    )
+
+    def fetch_batch(batch_index: int, chunk: list[str]) -> tuple[int, list[dict[str, Any]], float]:
         query_started = time.monotonic()
-        print(f"[legacy_dob] Batch {batch}/{total_batches}: querying {len(chunk)} BBLs", file=sys.stderr, flush=True)
+        print(f"[legacy_dob] Batch {batch_index}/{total_batches}: querying {len(chunk)} BBLs", file=sys.stderr, flush=True)
         rows = fetch_where(
             DATASET_ID,
             where=_exact_where(chunk),
@@ -217,9 +220,37 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
             raise SourceFetchError(
                 f"Legacy DOB exact-property query reached the {FETCH_CAP:,}-row cap for {len(chunk)} BBLs; refusing possibly truncated evidence"
             )
+        elapsed = time.monotonic() - query_started
+        print(f"[legacy_dob] Batch {batch_index}/{total_batches}: {len(rows):,} rows in {elapsed:.1f}s", file=sys.stderr, flush=True)
+        return batch_index, rows, elapsed
+
+    rows_by_batch: dict[int, list[dict[str, Any]]] = {}
+    executor = ThreadPoolExecutor(max_workers=MAX_CONCURRENT_REQUESTS)
+    futures = [executor.submit(fetch_batch, index, chunk) for index, chunk in enumerate(batches, 1)]
+    try:
+        for future in as_completed(futures):
+            batch_index, rows, _ = future.result()
+            rows_by_batch[batch_index] = rows
+    except BaseException:
+        for future in futures:
+            future.cancel()
+        executor.shutdown(wait=True, cancel_futures=True)
+        raise
+    else:
+        executor.shutdown(wait=True)
+
+    if set(rows_by_batch) != set(range(1, total_batches + 1)):
+        raise SourceFetchError("Legacy DOB batch collection completed with an incomplete batch inventory")
+
+    for batch_index, chunk in enumerate(batches, 1):
+        rows = rows_by_batch[batch_index]
         fetched_job_count += len(rows)
-        print(f"[legacy_dob] Batch {batch}/{total_batches}: {len(rows):,} rows in {time.monotonic() - query_started:.1f}s; "
-              f"{fetched_job_count:,} rows total; elapsed {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
+        print(
+            f"[legacy_dob] Batch {batch_index}/{total_batches}: merging {len(rows):,} rows; "
+            f"{fetched_job_count:,} rows total; elapsed {time.monotonic() - started:.1f}s",
+            file=sys.stderr,
+            flush=True,
+        )
         for source_row in rows:
             source_bbl = _source_bbl(source_row)
             if source_bbl not in requested_set:
