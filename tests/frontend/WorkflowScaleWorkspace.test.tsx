@@ -35,7 +35,22 @@ const eventsBySystem = new Map([['SYS-1', recentEvents]])
 
 function renderWorkspace() {
   const onOpenAccount = vi.fn()
-  render(<WorkflowScaleWorkspace systems={systems} marketCount={4894} accounts={accounts} watchlists={watchlists} memberships={memberships} savedViews={[{ id: 'view-1', name: 'Manhattan follow-up', filters: {} as never }]} recentEvents={recentEvents} eventsBySystem={eventsBySystem} today="2026-09-11" onOpenAccount={onOpenAccount} />)
+  render(<WorkflowScaleWorkspace
+    systems={systems}
+    marketCount={4894}
+    accounts={accounts}
+    watchlists={watchlists}
+    memberships={memberships}
+    savedViews={[{ id: 'view-1', name: 'Manhattan follow-up', filters: {} as never }]}
+    recentEvents={recentEvents}
+    eventsBySystem={eventsBySystem}
+    today="2026-09-11"
+    signedIn
+    busy={false}
+    onSaveAccount={async () => 'synced'}
+    onToggleMembership={async () => {}}
+    onOpenAccount={onOpenAccount}
+  />)
   return onOpenAccount
 }
 
