@@ -1,0 +1,30 @@
+name: Apply Workflow Account UX round 2
+
+on:
+  push:
+    branches: [agent/workflow-account-ux-round2-20260911]
+    paths:
+      - scripts/apply_workflow_account_round2.py
+      - .github/workflows/apply-workflow-account-round2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/workflow-account-ux-round2-20260911
+      - name: Apply focused repository patches
+        run: python scripts/apply_workflow_account_round2.py
+      - name: Remove one-shot patch machinery
+        run: git rm scripts/apply_workflow_account_round2.py .github/workflows/apply-workflow-account-round2.yml
+      - name: Commit patched UX
+        run: |
+          git config user.name "TowerSignal Agent"
+          git config user.email "actions@users.noreply.github.com"
+          git add src
+          git commit -m "Implement Workflow and account UX round 2"
+          git push origin HEAD:agent/workflow-account-ux-round2-20260911
