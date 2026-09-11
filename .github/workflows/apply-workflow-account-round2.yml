@@ -77,7 +77,7 @@ jobs:
               test_path.write_text(test_text, encoding='utf-8')
           PY
       - name: Remove one-shot patch machinery
-        run: git rm scripts/apply_workflow_account_round2.py .github/workflows/apply-workflow-account-round2.yml
+        run: git rm -f scripts/apply_workflow_account_round2.py .github/workflows/apply-workflow-account-round2.yml
       - name: Commit patched UX
         run: |
           git config user.name "TowerSignal Agent"
