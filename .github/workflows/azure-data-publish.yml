@@ -1,0 +1,83 @@
+name: Publish verified runtime and history to private Blob
+
+on:
+  workflow_run:
+    workflows: [Deploy GitHub Pages]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Bootstrap existing verified snapshot, or publish a successful Pages run
+        required: true
+        type: choice
+        options: [publish, bootstrap]
+        default: publish
+      source_run_id:
+        description: Successful main Pages run ID (unused for bootstrap)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: towersignal-blob-production-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.repository == 'JeremyHennessy/TowerSignal' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_repository.id == 1342221875))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: azure-production
+    steps:
+      # Trusted publisher code, not the upstream artifact or a pull-request head.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline publisher and failure-path regression tests
+        run: python -m unittest discover -s tests/python -p 'test_blob_release_publisher.py' -v
+      - name: Install isolated Blob transfer tools
+        run: |
+          python -m venv "$RUNNER_TEMP/blob-publisher-tools"
+          "$RUNNER_TEMP/blob-publisher-tools/bin/pip" install --disable-pip-version-check azure-storage-blob==12.25.1
+      - name: Stage the exact successful release and prove GitHub history parity
+        if: github.event_name == 'workflow_run' || inputs.operation == 'publish'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ github.event.workflow_run.id || inputs.source_run_id }}
+        run: |
+          "$RUNNER_TEMP/blob-publisher-tools/bin/python" scripts/publish_pages_to_blob.py stage \
+            --source-run "$SOURCE_RUN" --work "$RUNNER_TEMP/blob-publisher"
+      - name: Verify private data and conditionally publish the matched runtime-history pointer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OPERATION: ${{ inputs.operation || 'publish' }}
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_PREFIX: ${{ vars.AZURE_STORAGE_PREFIX }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+        run: |
+          case "$OPERATION" in publish|bootstrap) ;; *) exit 1;; esac
+          "$RUNNER_TEMP/blob-publisher-tools/bin/python" scripts/publish_pages_to_blob.py "$OPERATION" \
+            --work "$RUNNER_TEMP/blob-publisher"
+      - name: Retain source proof and publication receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/blob-publisher/report/*.json
+          if-no-files-found: warn
+          retention-days: 30
