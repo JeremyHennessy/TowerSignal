@@ -1,0 +1,131 @@
+name: Diagnose legacy DOB collection timeout
+on:
+  push:
+    branches: [agent/legacy-dob-timeout-diagnostic-20260911]
+    paths: [.github/workflows/legacy-dob-timeout-diagnostic.yml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: towersignal-legacy-dob-timeout-diagnostic
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 29c7c90e9d3c178535641692f33c13d4d9388017
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve exact tracked source for offline regression tests
+        run: |
+          test "$(git rev-parse HEAD)" = 29c7c90e9d3c178535641692f33c13d4d9388017
+          mkdir -p "$RUNNER_TEMP/legacy-proof"
+          git archive --format=tar.gz --output="$RUNNER_TEMP/legacy-proof/source-29c7c90.tar.gz" HEAD
+          sha256sum "$RUNNER_TEMP/legacy-proof/source-29c7c90.tar.gz"
+      - name: Retain pinned source
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-dob-pinned-source
+          path: ${{ runner.temp }}/legacy-proof/source-29c7c90.tar.gz
+          retention-days: 2
+      - name: Prepare GET-only source artifact reader
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Extract verified baseline property universe only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,sys,tarfile,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from migrate_data_to_blob import GitHubReader
+          reader=GitHubReader()
+          meta=reader.get('/actions/artifacts/10181150350')
+          digest='e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'
+          assert not meta['expired'] and meta['name']=='github-pages'
+          assert meta['digest']=='sha256:'+digest and meta['workflow_run']['id']==34544249376
+          assert meta['workflow_run']['head_sha']=='53f7016404774821051e5ebd02eeb5382dded55f'
+          archive=Path(os.environ['RUNNER_TEMP'])/'legacy-source.zip'
+          reader.download('/actions/artifacts/10181150350/zip',archive)
+          with archive.open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==digest
+          assert archive.stat().st_size==meta['size_in_bytes']
+          out=Path(os.environ['RUNNER_TEMP'])/'legacy-proof'
+          with zipfile.ZipFile(archive) as z:
+              assert z.namelist()==['artifact.tar']
+              found=False
+              with z.open('artifact.tar') as f,tarfile.open(fileobj=f,mode='r|*') as tar:
+                  for item in tar:
+                      if item.name.removeprefix('./')=='data/systems.json':
+                          assert item.isfile() and item.size<100*1024**2 and not found
+                          (out/'systems.json').write_bytes(tar.extractfile(item).read())
+                          found=True
+              assert found
+          payload=json.loads((out/'systems.json').read_text())
+          bbls=sorted({str(s['bbl']) for s in payload['systems'] if s.get('bbl')})
+          print('BASELINE_UNIVERSE='+json.dumps({'systems':len(payload['systems']),'bbls':len(bbls),
+                'artifact_id':meta['id'],'artifact_sha256':digest,'source_sha':meta['workflow_run']['head_sha']}),flush=True)
+          PY
+      - name: Measure serial exact-property queries without changing collector logic
+        timeout-minutes: 35
+        run: |
+          python -u - <<'PY'
+          import faulthandler,hashlib,json,os,sys,time
+          from datetime import datetime,timezone
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          import build_legacy_dob_project_cache as legacy
+          out=Path(os.environ['RUNNER_TEMP'])/'legacy-proof'
+          progress=out/'query-progress.jsonl'
+          started=time.monotonic()
+          number=0
+          def record(event,**extra):
+              value={'event':event,'utc':datetime.now(timezone.utc).isoformat(),
+                     'elapsed_seconds':round(time.monotonic()-started,3),**extra}
+              with progress.open('a') as f:f.write(json.dumps(value)+'\n')
+              print('LEGACY_DIAGNOSTIC='+json.dumps(value),flush=True)
+          original=legacy.fetch_where
+          def observed(*args,**kwargs):
+              global number
+              number+=1
+              tick=time.monotonic()
+              record('query_start',batch=number,query_sha256=hashlib.sha256(kwargs['where'].encode()).hexdigest())
+              try:rows=original(*args,**kwargs)
+              except Exception as error:
+                  record('query_failure',batch=number,error_type=type(error).__name__,seconds=round(time.monotonic()-tick,3))
+                  raise
+              record('query_complete',batch=number,rows=len(rows),seconds=round(time.monotonic()-tick,3))
+              return rows
+          legacy.fetch_where=observed
+          for name in ['fetch_metadata','fetch_count']:
+              original_fn=getattr(legacy,name)
+              def wrapper(*args,_name=name,_fn=original_fn,**kwargs):
+                  tick=time.monotonic();record(_name+'_start')
+                  result=_fn(*args,**kwargs)
+                  record(_name+'_complete',seconds=round(time.monotonic()-tick,3));return result
+              setattr(legacy,name,wrapper)
+          faulthandler.dump_traceback_later(180,repeat=True)
+          record('collector_start',code_sha='29c7c90e9d3c178535641692f33c13d4d9388017',
+                 unchanged_collector=True,query_chunk_size=legacy.QUERY_CHUNK_SIZE,fetch_cap=legacy.FETCH_CAP)
+          try:
+              result=legacy.build(out)
+              record('collector_complete',batches=number,summary=result['summary'])
+          finally:
+              faulthandler.cancel_dump_traceback_later()
+          PY
+      - name: Validate completed legacy cache without relaxing production thresholds
+        run: python scripts/validate_legacy_dob_project_cache.py --cache "$RUNNER_TEMP/legacy-proof/legacy-dob-projects.json" --max-age-days 1 --require-production-volume
+      - name: Retain actual query timings and resulting cache
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-dob-timeout-proof-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/legacy-proof/query-progress.jsonl
+            ${{ runner.temp }}/legacy-proof/legacy-dob-projects.json
+          retention-days: 14
+          if-no-files-found: warn
