@@ -1,0 +1,96 @@
+name: Compare legacy DOB query sort cost
+on:
+  push:
+    branches: [agent/legacy-dob-timeout-diagnostic-20260911]
+    paths: [.github/workflows/legacy-dob-query-comparison.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 29c7c90e9d3c178535641692f33c13d4d9388017
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare read-only artifact tool
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Load checksum-pinned baseline property universe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,os,sys,tarfile,zipfile
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from migrate_data_to_blob import GitHubReader
+          r=GitHubReader();m=r.get('/actions/artifacts/10181150350')
+          digest='e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'
+          assert not m['expired'] and m['digest']=='sha256:'+digest
+          assert m['workflow_run']['id']==34544249376
+          zpath=Path(os.environ['RUNNER_TEMP'])/'original-pages.zip'
+          r.download('/actions/artifacts/10181150350/zip',zpath)
+          with zpath.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==digest
+          out=Path(os.environ['RUNNER_TEMP'])/'query-comparison';out.mkdir()
+          with zipfile.ZipFile(zpath) as z:
+              assert z.namelist()==['artifact.tar']
+              with z.open('artifact.tar') as f,tarfile.open(fileobj=f,mode='r|*') as t:
+                  found=0
+                  for m in t:
+                      if m.name.removeprefix('./')=='data/systems.json':
+                          assert m.isfile() and m.size<100*1024**2
+                          (out/'systems.json').write_bytes(t.extractfile(m).read());found+=1
+                  assert found==1
+          PY
+      - name: Compare one changed query parameter with full-row multiset parity
+        timeout-minutes: 12
+        run: |
+          python -u - <<'PY'
+          import hashlib,json,os,sys,time
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          import build_legacy_dob_project_cache as c
+          out=Path(os.environ['RUNNER_TEMP'])/'query-comparison'
+          payload=json.loads((out/'systems.json').read_text())
+          bbls=sorted({b for s in payload['systems'] if (b:=c.normalize_bbl(s.get('bbl'))) and c._bbl_components(b)},key=int)
+          report={'original_code_sha':'29c7c90e9d3c178535641692f33c13d4d9388017','bbl_count':len(bbls),'comparisons':[]}
+          def save():
+              (out/'result.json').write_text(json.dumps(report,indent=2))
+          def fingerprint(rows):
+              canonical=sorted(json.dumps(row,sort_keys=True,separators=(',',':')) for row in rows)
+              return hashlib.sha256(('\n'.join(canonical)+'\n').encode()).hexdigest()
+          save()
+          for number in [1,12]:
+              chunk=bbls[(number-1)*30:number*30]
+              common=dict(where=c._exact_where(chunk),select=c.SELECT,limit=c.FETCH_CAP,request_timeout=120)
+              entry={'batch':number,'where_sha256':hashlib.sha256(common['where'].encode()).hexdigest(),'variants':[]}
+              report['comparisons'].append(entry)
+              # First batch: unsorted first; second batch: ordered first, to expose order-of-test effects.
+              variants=[False,True] if number==1 else [True,False]
+              for ordered in variants:
+                  item={'server_sort':ordered,'status':'RUNNING'};entry['variants'].append(item);save()
+                  print(json.dumps({'batch':number,**item}),flush=True)
+                  tick=time.monotonic()
+                  rows=c.fetch_where(c.DATASET_ID,order_by='borough,block,lot,job_s1_no' if ordered else None,**common)
+                  assert len(rows)<c.FETCH_CAP
+                  item.update(status='COMPLETE',seconds=round(time.monotonic()-tick,3),rows=len(rows),row_multiset_sha256=fingerprint(rows))
+                  save();print(json.dumps({'batch':number,**item}),flush=True)
+              assert entry['variants'][0]['row_multiset_sha256']==entry['variants'][1]['row_multiset_sha256'],'Query row multisets differ'
+              assert entry['variants'][0]['rows']==entry['variants'][1]['rows']
+              entry['all_rows_identical']=True;save()
+          report['status']='COMPLETE';save()
+          print('QUERY_SORT_COMPARISON='+json.dumps(report),flush=True)
+          PY
+      - name: Retain measured query result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-dob-query-comparison-${{ github.run_id }}
+          path: ${{ runner.temp }}/query-comparison/result.json
+          if-no-files-found: warn
+          retention-days: 14
