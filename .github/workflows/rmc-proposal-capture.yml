@@ -1,0 +1,37 @@
+name: Capture RMC proposal screenshots
+
+on:
+  push:
+    branches: [capture/rmc-editorial-20260911]
+    paths:
+      - 'tests/e2e/rmc-proposal-capture.spec.ts'
+      - '.github/workflows/rmc-proposal-capture.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Capture live desktop application
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/rmc-proposal-capture.spec.ts --project=desktop-chromium
+      - name: Upload proposal captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rmc-proposal-editorial-captures
+          path: proposal-captures
+          retention-days: 7
