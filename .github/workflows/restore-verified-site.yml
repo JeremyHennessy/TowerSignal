@@ -1,0 +1,115 @@
+name: Restore exact verified TowerSignal site
+on:
+  push:
+    branches: [agent/restore-verified-site-20260911]
+    paths: [.github/workflows/restore-verified-site.yml, scripts/restore_verified_site.py]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Validate successful source release and exact original archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/restore_verified_site.py prepare
+      - name: Preserve exact original Pages tar without rebuilding
+        uses: actions/upload-artifact@v4
+        with:
+          name: recovery-pages
+          path: .site-recovery/archive/artifact.tar
+          compression-level: 6
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recovery-source-proof
+          path: .site-recovery/proof/
+          retention-days: 30
+          if-no-files-found: error
+  restore:
+    needs: prepare
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: recovery-source-proof
+          path: .site-recovery/proof
+      - name: Check exact main and restore Actions publishing setting where authorized
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(ref.object.sha!==context.sha) throw new Error('Main moved; stop recovery');
+            const before=(await github.rest.repos.getPages(context.repo)).data;
+            if(before.cname!==null || before.html_url!=='https://jeremyhennessy.github.io/TowerSignal/') throw new Error('Hosting target changed');
+            let settingsError=null;
+            if(before.build_type==='legacy') {
+              try {await github.request('PUT /repos/{owner}/{repo}/pages',{...context.repo,build_type:'workflow'});}
+              catch(e) {if(e.status!==403) throw e; settingsError=403;core.warning('Repository administrator must select Settings > Pages > Source > GitHub Actions. Deployment will still be attempted on the currently permitted main branch.');}
+            }
+            const after=(await github.rest.repos.getPages(context.repo)).data;
+            fs.writeFileSync('.site-recovery/proof/settings.json',JSON.stringify({before,after,settings_update_http_error:settingsError},null,2));
+      - name: Deploy the checksum-pinned original artifact
+        id: deploy
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: recovery-pages
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Verify hosted HTML bundles data and representative detail bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/restore_verified_site.py verify
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install established hosted acceptance browsers
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Existing hosted desktop and iPhone authentication and route tests
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Retain hosted verification without session files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restored-site-evidence-${{ github.run_id }}
+          path: |
+            .site-recovery/proof/
+            playwright-report/
+          retention-days: 30
+          if-no-files-found: warn
