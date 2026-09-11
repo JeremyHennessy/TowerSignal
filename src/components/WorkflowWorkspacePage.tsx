@@ -6,6 +6,7 @@ import type { AccountDisposition, WorkflowAccountState, WorkflowMembership, Work
 import { loadChanges } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
+import { WorkflowAccountsWorkspace } from './WorkflowAccountsWorkspace'
 
 const columns: Array<{ value: AccountDisposition; label: string }> = [
   { value: 'new', label: 'New' },
@@ -267,6 +268,8 @@ export function WorkflowWorkspacePage({
         return <article className="workflow-attention-card" key={item.row.system_id} onClick={() => onOpenAccount(item.row)}><div className="workflow-attention-main"><div><span className="workflow-account-location">{[item.row.borough, item.row.zip].filter(Boolean).join(' · ') || item.row.system_id}</span><strong>{item.row.address ?? item.row.system_id}</strong></div><span className={item.row.priority_score >= 70 ? 'workflow-priority high' : 'workflow-priority'}>P{item.row.priority_score}</span></div><div className="workflow-attention-reasons">{reasons.map(reason => <span key={reason}>{reason}</span>)}{reasons.length === 0 && <span>Workflow account</span>}</div><footer><span className="status-chip">{statusLabel(item.account?.status)}</span><span>{item.account?.next_action_date ? `Next ${formatDate(item.account.next_action_date)}` : 'No dated next action'}</span><button className="table-link" onClick={event => { event.stopPropagation(); onOpenAccount(item.row) }}>Open account →</button></footer></article>
       })}</div>}
     </section>
+
+    <WorkflowAccountsWorkspace systems={scopedRows} accounts={accounts} watchlists={watchlists} memberships={memberships} eventsBySystem={eventsBySystem} today={today} onOpenAccount={onOpenAccount} />
 
     <section className="workflow-section-block workflow-intelligence-block"><div className="workflow-block-heading"><div><span className="page-kicker">Evidence organized by use</span><h2>Account intelligence groups</h2><p>Current data is grouped by how teams use it. Future fields are collected once below rather than repeated inside every live intelligence card.</p></div><strong>{number.format(scopedRows.length)} scoped</strong></div><div className="workflow-intelligence-grid">{categories.map(category => <article className="workflow-intelligence-card" key={category.title}><header><strong>{category.title}</strong><p>{category.purpose}</p></header><dl>{category.metrics.map(metric => <div key={metric.label}><dt>{metric.label}</dt><dd><strong>{number.format(metric.value)}</strong><span>{metric.note}</span></dd></div>)}</dl></article>)}</div></section>
 
