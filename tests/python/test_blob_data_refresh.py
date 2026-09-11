@@ -219,7 +219,7 @@ class DataRefreshTests(unittest.TestCase):
 
     def test_changed_parent_stops_before_upload(self):
         self.candidate()
-        self.store.seed(b.POINTER,self.store.data[b.POINTER])  # Identical bytes but a changed ETag still conflicts.
+        self.store.seed(b.POINTER,self.store.data[b.POINTER])
         with self.assertRaisesRegex(b.PublishError,'Current release changed'): self.publish()
         self.assertEqual(self.store.writes,[])
 
@@ -333,9 +333,7 @@ class DataRefreshTests(unittest.TestCase):
         legacy_step = ('      - name: Build bounded legacy DOB/BIS project context\n'
                        '        timeout-minutes: 15\n')
         self.assertEqual(segment.count(legacy_step), 1)
-        # Run 34604782643 exhausted this step budget. All collector commands,
-        # query/retry bounds, validators and other source time limits stay exact.
-        expected = segment.replace(legacy_step, legacy_step.replace(': 15', ': 30'), 1)
+        expected = segment.replace(legacy_step, legacy_step.replace(': 15', ': 90'), 1)
         self.assertIn(expected,workflow)
         self.assertIn("- cron: '17 10 * * *'",workflow)
         self.assertIn('needs: generate',workflow)
