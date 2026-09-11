@@ -1,0 +1,101 @@
+name: Inspect TowerSignal live outage read-only
+on:
+  push:
+    branches: [agent/live-outage-probe-20260911-1805]
+    paths: [.github/workflows/live-outage-probe.yml]
+permissions:
+  contents: read
+  actions: read
+  pages: read
+concurrency:
+  group: towersignal-live-outage-readonly
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: be493160abfd6d55c577807b4229af5406bf3e60
+          persist-credentials: false
+      - name: Read hosting configuration and recent deployment metadata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs'); fs.mkdirSync('outage-proof', {recursive:true});
+            const out={observed_at:new Date().toISOString(), read_only:true};
+            for (const [key,path] of Object.entries({pages:'pages', environments:'environments', deployments:'deployments?environment=github-pages&per_page=5',workflows:'actions/workflows?per_page=100'})) {
+              try { out[key]=(await github.request('GET /repos/{owner}/{repo}/'+path,context.repo)).data; }
+              catch(e) { out[key]={http_status:e.status}; }
+            }
+            const r=(await github.rest.repos.get(context.repo)).data;
+            out.repository={private:r.private,has_pages:r.has_pages,updated_at:r.updated_at};
+            fs.writeFileSync('outage-proof/hosting.json',JSON.stringify(out,null,2));
+            core.info(JSON.stringify({repository:out.repository,pages:out.pages}));
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe actual HTTP responses and DNS without credentials
+        run: |
+          python - <<'PY'
+          import concurrent.futures,hashlib,json,socket,time
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          from urllib.error import HTTPError
+          urls=['https://jeremyhennessy.github.io/TowerSignal/','https://jeremyhennessy.github.io/TowerSignal/data/systems.json','https://jeremyhennessy.github.io/TowerSignal/data/known-firms.json','https://towersignal.pharm3r.com/']
+          def fetch(url):
+            row={'url':url}
+            try:
+              request=Request(url+'?outage_probe='+str(time.time_ns()),headers={'Cache-Control':'no-cache','User-Agent':'TowerSignal-readonly-outage-check'})
+              try:r=urlopen(request,timeout=45)
+              except HTTPError as error:r=error
+              with r:
+                data=r.read(64*1024*1024+1)
+                row.update(status=r.status,final_url=r.url,headers={k:v for k,v in r.headers.items() if k.lower() in ['content-type','server','date','last-modified','etag','x-github-request-id']},bytes=len(data),sha256=hashlib.sha256(data).hexdigest(),preview=data[:500].decode(errors='replace'))
+            except Exception as error:row['error']=str(error)
+            return row
+          result={'http':list(concurrent.futures.ThreadPoolExecutor(max_workers=3).map(fetch,urls)),'dns':{}}
+          for host in ['jeremyhennessy.github.io','towersignal.pharm3r.com']:
+            try:result['dns'][host]=sorted({a[4][0] for a in socket.getaddrinfo(host,443)})
+            except Exception as error:result['dns'][host]={'error':str(error)}
+          Path('outage-proof/http.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
+          PY
+      - name: Install isolated screenshot browser
+        run: |
+          python -m pip install --disable-pip-version-check playwright
+          python -m playwright install --with-deps chromium
+      - name: Capture real public pages and browser failures
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          out=[]
+          with sync_playwright() as p:
+            browser=p.chromium.launch()
+            for name,url in [('pages-home','https://jeremyhennessy.github.io/TowerSignal/'),('pages-prospect','https://jeremyhennessy.github.io/TowerSignal/#/prospect'),('azure-custom','https://towersignal.pharm3r.com/')]:
+              context=browser.new_context(viewport={'width':1440,'height':1000})
+              page=context.new_page();row={'name':name,'url':url,'errors':[],'bad_responses':[]}
+              page.on('pageerror',lambda e,row=row:row['errors'].append(str(e)))
+              page.on('response',lambda r,row=row:row['bad_responses'].append({'url':r.url,'status':r.status}) if r.status>=400 else None)
+              try:
+                response=page.goto(url,wait_until='domcontentloaded',timeout=45000)
+                row['status']=response.status if response else None
+                page.wait_for_timeout(5000)
+                row['title']=page.title();row['text']=page.locator('body').inner_text()[:5000]
+              except Exception as error:row['navigation_error']=str(error)
+              try:page.screenshot(path='outage-proof/'+name+'.png',full_page=True)
+              except Exception:pass
+              out.append(row);context.close()
+            browser.close()
+          Path('outage-proof/browser.json').write_text(json.dumps(out,indent=2));print(json.dumps(out,indent=2))
+          PY
+      - name: Retain read-only outage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-outage-proof-${{ github.run_id }}
+          path: outage-proof/
+          retention-days: 14
+          if-no-files-found: error
