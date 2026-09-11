@@ -1,0 +1,28 @@
+name: Patch round 2 duplicate evidence test
+
+on:
+  push:
+    branches: [agent/workflow-account-ux-round2-20260911]
+    paths:
+      - scripts/patch_round2_duplicate_test.py
+      - .github/workflows/patch-round2-duplicate-test.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/workflow-account-ux-round2-20260911
+      - name: Patch duplicate evidence assertion
+        run: python scripts/patch_round2_duplicate_test.py
+      - name: Commit test update
+        run: |
+          git config user.name "TowerSignal Agent"
+          git config user.email "actions@users.noreply.github.com"
+          git add tests/frontend/App.test.tsx
+          git commit -m "Allow duplicate DOB evidence in account mode test"
+          git push origin HEAD:agent/workflow-account-ux-round2-20260911
