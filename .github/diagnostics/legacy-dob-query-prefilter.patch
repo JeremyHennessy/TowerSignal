@@ -1,0 +1,213 @@
+--- a/scripts/build_legacy_dob_project_cache.py
++++ b/scripts/build_legacy_dob_project_cache.py
+@@ -4,6 +4,7 @@
+ import json
+ import re
+ import sys
++import time
+ from datetime import date, datetime, timezone
+ from pathlib import Path
+ from typing import Any
+@@ -94,16 +95,24 @@
+ 
+ def _exact_where(chunk: list[str]) -> str:
+     clauses: list[str] = []
++    boroughs: set[str] = set()
++    blocks: set[str] = set()
+     for bbl in chunk:
+         components = _bbl_components(bbl)
+         if not components:
+             continue
+         borough, block, lot = components
++        boroughs.add(borough)
++        blocks.add(block)
+         # BIS publishes lot as a five-character text field even though BBL lot is four digits.
+         clauses.append(f"(borough='{borough}' AND block='{block}' AND lot='{str(int(lot)).zfill(5)}')")
+     if not clauses:
+         raise ValueError("No valid BBLs for legacy DOB query")
+-    return " OR ".join(clauses)
++    # Redundant coarse predicates expose the common borough/block restrictions;
++    # the original exact triples remain mandatory, so no cross-property rows enter.
++    borough_filter = ",".join(f"'{value}'" for value in sorted(boroughs))
++    block_filter = ",".join(f"'{value}'" for value in sorted(blocks))
++    return f"borough in({borough_filter}) AND block in({block_filter}) AND ({' OR '.join(clauses)})"
+ 
+ 
+ def _applicant(row: dict[str, Any]) -> str | None:
+@@ -196,8 +205,14 @@
+     retained_by_bbl: dict[str, dict[str, dict[str, Any]]] = {}
+     source_matched_bbls: set[str] = set()
+     fetched_job_count = 0
++    started = time.monotonic()
++    total_batches = (len(requested) + QUERY_CHUNK_SIZE - 1) // QUERY_CHUNK_SIZE
++    print(f"[legacy_dob] Fetching {len(requested):,} canonical BBLs in {total_batches} serial batches", file=sys.stderr, flush=True)
+     for start in range(0, len(requested), QUERY_CHUNK_SIZE):
+         chunk = requested[start:start + QUERY_CHUNK_SIZE]
++        batch = start // QUERY_CHUNK_SIZE + 1
++        query_started = time.monotonic()
++        print(f"[legacy_dob] Batch {batch}/{total_batches}: querying {len(chunk)} BBLs", file=sys.stderr, flush=True)
+         rows = fetch_where(
+             DATASET_ID,
+             where=_exact_where(chunk),
+@@ -211,6 +226,8 @@
+                 f"Legacy DOB exact-property query reached the {FETCH_CAP:,}-row cap for {len(chunk)} BBLs; refusing possibly truncated evidence"
+             )
+         fetched_job_count += len(rows)
++        print(f"[legacy_dob] Batch {batch}/{total_batches}: {len(rows):,} rows in {time.monotonic() - query_started:.1f}s; "
++              f"{fetched_job_count:,} rows total; elapsed {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
+         for source_row in rows:
+             source_bbl = _source_bbl(source_row)
+             if source_bbl not in requested_set:
+@@ -247,7 +264,9 @@
+             "records": records,
+         }
+ 
++    print("[legacy_dob] All exact-property batches completed; fetching source metadata", file=sys.stderr, flush=True)
+     metadata = fetch_metadata(DATASET_ID)
++    print("[legacy_dob] Source metadata received; fetching total source count", file=sys.stderr, flush=True)
+     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+     result = {
+         "schema_version": SCHEMA_VERSION,
+@@ -285,6 +304,7 @@
+     }
+     target = output_file or output_dir / "legacy-dob-projects.json"
+     target.write_text(json.dumps(result, separators=(",", ":")), encoding="utf-8")
++    print(f"[legacy_dob] Complete: {total_batches} batches in {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
+     print(json.dumps(result["summary"], indent=2))
+     return result
+ 
+--- a/tests/python/test_legacy_dob_project_cache.py
++++ b/tests/python/test_legacy_dob_project_cache.py
+@@ -1,10 +1,16 @@
+ from __future__ import annotations
+ 
++import io
++import sqlite3
+ import json
++from contextlib import redirect_stderr, redirect_stdout
+ import tempfile
+ import unittest
+ from datetime import date
+ from pathlib import Path
++from unittest.mock import patch
++
++from scripts import build_legacy_dob_project_cache as builder
+ 
+ from scripts.attach_legacy_dob_project_context import attach
+ from scripts.build_legacy_dob_project_cache import normalize_job
+@@ -140,5 +146,115 @@
+             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["relationship_boundary"], "RECORDED_DOB_APPLICANT_NOT_PROOF_OF_SERVICE_CONTRACT")
+ 
+ 
++    def test_query_exposes_common_filters_but_keeps_exact_triples(self):
++        actual = builder._exact_where(["3000010001", "3000020002", "4000010002"])
++        original = ("(borough='BROOKLYN' AND block='00001' AND lot='00001') OR "
++                    "(borough='BROOKLYN' AND block='00002' AND lot='00002') OR "
++                    "(borough='QUEENS' AND block='00001' AND lot='00002')")
++        self.assertEqual(actual, "borough in('BROOKLYN','QUEENS') AND block in('00001','00002') AND (" + original + ")")
++
++    def test_prefilter_has_exact_boolean_equivalence_without_cross_property_matches(self):
++        bbls = ["1000010001", "3000010002", "3000021234", "4000020001"]
++        original = ("(borough='MANHATTAN' AND block='00001' AND lot='00001') OR "
++                    "(borough='BROOKLYN' AND block='00001' AND lot='00002') OR "
++                    "(borough='BROOKLYN' AND block='00002' AND lot='01234') OR "
++                    "(borough='QUEENS' AND block='00002' AND lot='00001')")
++        rows = [(borough, block, lot) for borough in [None, 'MANHATTAN', 'BROOKLYN', 'QUEENS', 'BRONX']
++                for block in [None, '00001', '00002', '00003']
++                for lot in [None, '00001', '00002', '01234', '09999']]
++        with sqlite3.connect(':memory:') as db:
++            db.execute('CREATE TABLE filings (borough TEXT, block TEXT, lot TEXT)')
++            db.executemany('INSERT INTO filings VALUES (?,?,?)', rows)
++            before = set(db.execute('SELECT * FROM filings WHERE ' + original))
++            after = set(db.execute('SELECT * FROM filings WHERE ' + builder._exact_where(bbls)))
++        self.assertEqual(after, before)
++        self.assertEqual(len(after), 4)
++        self.assertNotIn(('BROOKLYN', '00002', '00002'), after)
++        self.assertNotIn(('QUEENS', '00001', '00001'), after)
++
++    def test_prefilter_padding_duplicates_and_invalid_inputs_preserve_contract(self):
++        query = builder._exact_where(['3000010001', 'not-a-bbl', '3000010001'])
++        self.assertTrue(query.startswith("borough in('BROOKLYN') AND block in('00001') AND ("))
++        self.assertEqual(query.count("lot='00001'"), 2)
++        with self.assertRaisesRegex(ValueError, 'No valid BBLs'):
++            builder._exact_where(['not-a-bbl'])
++
++    def test_build_keeps_exact_query_contract_and_reports_each_batch(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            output = Path(tmp)
++            bbls = [f"300001{lot:04d}" for lot in range(1, 32)]
++            source = {"metadata": {"snapshot_date": "2026-09-11"},
++                      "systems": [{"bbl": bbl} for bbl in reversed(bbls)]}
++            (output / "systems.json").write_text(json.dumps(source))
++            first = self.base_row()
++            second = self.base_row(job_s1_no="300000031", lot="00031",
++                                   job_description="Replace cooling tower")
++            stderr = io.StringIO()
++            with patch.object(builder, "fetch_where", side_effect=[[first], [second]]) as fetch, \
++                 patch.object(builder, "fetch_metadata", return_value={"name": "DOB", "source_last_updated_at": "2026-09-10T00:00:00Z"}), \
++                 patch.object(builder, "fetch_count", return_value=2700000), \
++                 redirect_stderr(stderr), redirect_stdout(io.StringIO()):
++                result = builder.build(output)
++            self.assertEqual(fetch.call_count, 2)
++            for call, chunk in zip(fetch.call_args_list, [bbls[:30], bbls[30:]]):
++                self.assertEqual(call.args, (builder.DATASET_ID,))
++                self.assertEqual(call.kwargs, {"where": builder._exact_where(chunk),
++                                 "order_by": "borough,block,lot,job_s1_no", "select": builder.SELECT,
++                                 "limit": 50000, "request_timeout": 120})
++            self.assertEqual(result["summary"]["requested_bbl_count"], 31)
++            self.assertEqual(result["summary"]["exact_bbl_job_count"], 2)
++            self.assertEqual(result["summary"]["retained_record_count"], 2)
++            self.assertEqual(result["summary"]["explicit_cooling_tower_record_count"], 1)
++            self.assertEqual(result["source"]["source_last_updated_at"], "2026-09-10T00:00:00Z")
++            self.assertEqual(result["by_bbl"][bbls[-1]]["records"][0]["applicant_name"], "Jane Engineer")
++            self.assertEqual(json.loads((output / "legacy-dob-projects.json").read_text()), result)
++            self.assertIn("Batch 1/2: querying 30 BBLs", stderr.getvalue())
++            self.assertIn("Batch 2/2: querying 1 BBLs", stderr.getvalue())
++            self.assertIn("rows total; elapsed", stderr.getvalue())
++            self.assertIn("fetching total source count", stderr.getvalue())
++            self.assertIn("Complete: 2 batches", stderr.getvalue())
++            self.assertNotIn("elapsed", result)
++
++    def test_capped_query_still_fails_without_replacing_existing_cache(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            output = Path(tmp)
++            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
++            cache = output / "legacy-dob-projects.json"
++            cache.write_bytes(b"previous verified cache")
++            with patch.object(builder, "fetch_where", return_value=[self.base_row()] * builder.FETCH_CAP), \
++                 redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()), \
++                 self.assertRaisesRegex(builder.SourceFetchError, "refusing possibly truncated evidence"):
++                builder.build(output)
++            self.assertEqual(cache.read_bytes(), b"previous verified cache")
++
++    def test_failed_query_logs_start_but_does_not_publish_partial_cache(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            output = Path(tmp)
++            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
++            stderr = io.StringIO()
++            with patch.object(builder, "fetch_where", side_effect=builder.SourceFetchError("source timeout")), \
++                 redirect_stderr(stderr), redirect_stdout(io.StringIO()), \
++                 self.assertRaisesRegex(builder.SourceFetchError, "source timeout"):
++                builder.build(output)
++            self.assertIn("Batch 1/1: querying", stderr.getvalue())
++            self.assertNotIn("Complete:", stderr.getvalue())
++            self.assertFalse((output / "legacy-dob-projects.json").exists())
++
++    def test_count_failure_still_prevents_cache_publication(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            output = Path(tmp)
++            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
++            stderr = io.StringIO()
++            with patch.object(builder, "fetch_where", return_value=[self.base_row()]), \
++                 patch.object(builder, "fetch_metadata", return_value={"name": "DOB"}), \
++                 patch.object(builder, "fetch_count", side_effect=builder.SourceFetchError("count unavailable")), \
++                 redirect_stderr(stderr), redirect_stdout(io.StringIO()), \
++                 self.assertRaisesRegex(builder.SourceFetchError, "count unavailable"):
++                builder.build(output)
++            self.assertIn("fetching total source count", stderr.getvalue())
++            self.assertNotIn("Complete:", stderr.getvalue())
++            self.assertFalse((output / "legacy-dob-projects.json").exists())
++
++
+ if __name__ == "__main__":
+     unittest.main()
