@@ -1,0 +1,53 @@
+name: Copy verified TowerSignal data to private Blob
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: towersignal-azure-data-copy
+  cancel-in-progress: false
+
+jobs:
+  copy-data:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    environment: azure-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test the isolated migration code before accessing credentials
+        run: python -m unittest discover -s tests/python -p 'test_azure_data_copy.py' -v
+      - name: Install transfer dependencies in an isolated virtual environment
+        run: |
+          python -m venv "$RUNNER_TEMP/towersignal-blob-tools"
+          "$RUNNER_TEMP/towersignal-blob-tools/bin/pip" install --disable-pip-version-check azure-storage-blob==12.25.1
+      - name: Stage all data from pinned successful release and data commits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          "$RUNNER_TEMP/towersignal-blob-tools/bin/python" scripts/migrate_data_to_blob.py stage --work "$RUNNER_TEMP/towersignal-blob-copy"
+      - name: Upload private snapshot and verify every file by authenticated readback
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_PREFIX: ${{ vars.AZURE_STORAGE_PREFIX }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+        run: |
+          "$RUNNER_TEMP/towersignal-blob-tools/bin/python" scripts/migrate_data_to_blob.py upload --work "$RUNNER_TEMP/towersignal-blob-copy"
+      - name: Retain inventory, checksums and transfer receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-data-copy-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/towersignal-blob-copy/report/*.json
+          if-no-files-found: warn
+          retention-days: 30

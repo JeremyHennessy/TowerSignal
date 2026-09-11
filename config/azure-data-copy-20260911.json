@@ -1,0 +1,27 @@
+{
+  "repository": "JeremyHennessy/TowerSignal",
+  "source_run_id": 34544249376,
+  "source_sha": "53f7016404774821051e5ebd02eeb5382dded55f",
+  "artifacts": [
+    {"id": 10181150350, "name": "github-pages", "sha256": "e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c"},
+    {"id": 10181139300, "name": "towersignal-history-state", "sha256": "cf5c1f670f041576aaeb374fc173f00cefe6399c1cc8410dfb50ea275ff3c334"}
+  ],
+  "required_runtime_files": [
+    "systems.json", "metadata.json", "changes.json", "source-health.json",
+    "nys-systems.json", "nys-metadata.json", "nys-changes.json", "companies.json",
+    "known-firms.json", "procurement-city-record.json", "procurement-checkbook.json",
+    "procurement-nys-authorities.json", "procurement-openbook-water.json", "procurement-nycha-water.json",
+    "domestic-water-market.json", "nyc-water-signals.json", "nyc-distribution-water.json",
+    "nys-public-water.json", "nys-lsli-details.json", "nys-service-line-inventory-summary.json",
+    "provider-resolution-review.json", "elap-source-probe.json", "coverage-audit.json",
+    "cms-institutional-context.json", "legacy-dob-projects.json", "deal-validation.json",
+    "history/latest.json", "history/events.json", "history/nys/latest.json", "history/nys/events.json"
+  ],
+  "snapshots": [
+    {"name": "history", "ref": "data/towersignal-history", "sha": "ec888b6bbba931d98efa50cdbef81125d18ec70b", "paths": ["data/history"], "required": true},
+    {"name": "acris", "ref": "data/towersignal-acris", "sha": "53a1ccaffdfc1e840e2af44a50729aa1f8be24e5", "paths": ["data/acris"], "required": true},
+    {"name": "checkbook", "ref": "data/towersignal-checkbook", "sha": "3fa026ae526b84eb4097c78ee81b4301213dbe94", "paths": ["data/checkbook"], "required": true},
+    {"name": "oath", "ref": "data/towersignal-oath", "sha": "993d9dac8206e61198a60e6cad582fc94a0e2e55", "paths": ["data/oath"], "required": false},
+    {"name": "repository", "ref": "main", "sha": "21fd66dabf0bc41eb282baa7b38dd835efb9422c", "paths": ["data", "config", "database"], "required": true}
+  ]
+}
