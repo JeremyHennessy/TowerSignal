@@ -5,22 +5,57 @@ on:
     paths: [.github/workflows/data-only-acceptance-control.yml]
 permissions:
   contents: read
+  actions: read
 jobs:
-  source:
+  browser-baseline:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: bc29f20b4be89989ce7b29c781944e722fc4fd2a
+          ref: 94adcdae8cc21fd8741d5bdd89599fef14832616
           persist-credentials: false
-      - name: Archive exact tracked source without credentials or Git configuration
-        run: |
-          test "$(git rev-parse HEAD)" = bc29f20b4be89989ce7b29c781944e722fc4fd2a
-          git archive --format=tar.gz --output="$RUNNER_TEMP/source-bc29f20.tar.gz" HEAD
-          sha256sum "$RUNNER_TEMP/source-bc29f20.tar.gz"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/setup-python@v5
         with:
-          name: data-only-pinned-source
-          path: ${{ runner.temp }}/source-bc29f20.tar.gz
-          retention-days: 1
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare read-only artifact tools
+        run: python -m pip install azure-storage-blob==12.25.1
+      - name: Stage exact verified production runtime for browser contract checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from migrate_data_to_blob import GitHubReader,extract_runtime
+          from publish_pages_to_blob import successful_source
+          reader=GitHubReader()
+          source,_=successful_source(reader,34544249376)
+          assert source['source_sha']=='53f7016404774821051e5ebd02eeb5382dded55f'
+          info=reader.get('/actions/artifacts/10181150350')
+          digest='e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'
+          assert not info['expired'] and info['name']=='github-pages'
+          assert info['digest']=='sha256:'+digest and info['workflow_run']['id']==34544249376
+          out=Path('/tmp/data-browser-baseline.zip')
+          reader.download('/actions/artifacts/10181150350/zip',out)
+          with out.open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==digest
+          assert out.stat().st_size==info['size_in_bytes']
+          print('Verified baseline artifact digest. Runtime counts:',extract_runtime(out,Path('dist/data')))
+          PY
+      - name: Install frontend test dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install browser runtimes
+        run: npx playwright install --with-deps chromium webkit
+      - name: Check actual baseline data through both browser engines
+        run: npx playwright test --config playwright.data-only.config.ts
+      - name: Retain browser proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-only-browser-baseline-${{ github.run_id }}
+          path: data-browser-report
+          retention-days: 14
