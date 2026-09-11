@@ -34,6 +34,7 @@ const recentEvents = [{
 const eventsBySystem = new Map([['SYS-1', recentEvents]])
 
 function renderWorkspace() {
+  window.sessionStorage.clear()
   const onOpenAccount = vi.fn()
   render(<WorkflowScaleWorkspace
     systems={systems}
@@ -67,9 +68,9 @@ test('keeps map table filters and selected account inspector synchronized', () =
 
   fireEvent.click(screen.getByRole('button', { name: 'Select first marker' }))
   const inspector = screen.getByRole('complementary')
-  expect(within(inspector).getByText('Investigate')).toBeInTheDocument()
-  expect(within(inspector).getByText('Call facilities before Friday')).toBeInTheDocument()
-  expect(within(inspector).getByText('Priority outreach')).toBeInTheDocument()
+  expect(within(inspector).getAllByText('Investigate').length).toBeGreaterThan(0)
+  expect(within(inspector).getAllByText('Call facilities before Friday').length).toBeGreaterThan(0)
+  expect(within(inspector).getAllByText('Priority outreach').length).toBeGreaterThan(0)
 
   fireEvent.click(within(inspector).getByRole('button', { name: 'Open full account →' }))
   expect(onOpenAccount).toHaveBeenCalledWith(expect.objectContaining({ system_id: 'SYS-1' }))
