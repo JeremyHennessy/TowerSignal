@@ -1,0 +1,62 @@
+name: Reconcile existing private Blob data copy
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Inspect only, or finalize only after inventory evidence is reviewed
+        type: choice
+        required: true
+        default: inspect
+        options: [inspect, finalize]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: towersignal-azure-data-copy
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: azure-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline inventory regression tests
+        run: python -m unittest discover -s tests/python -p 'test_blob_inventory_reconcile.py' -v
+      - name: Install isolated transfer tools
+        run: |
+          python -m venv "$RUNNER_TEMP/blob-reconcile-tools"
+          "$RUNNER_TEMP/blob-reconcile-tools/bin/pip" install --disable-pip-version-check azure-storage-blob==12.25.1
+      - name: Recover original checksum manifest from pinned copy report
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          "$RUNNER_TEMP/blob-reconcile-tools/bin/python" scripts/reconcile_blob_copy.py stage --work "$RUNNER_TEMP/blob-reconcile"
+      - name: Inspect inventory or finalize existing copy without reuploading payloads
+        env:
+          OPERATION: ${{ inputs.operation }}
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_PREFIX: ${{ vars.AZURE_STORAGE_PREFIX }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+        run: |
+          case "$OPERATION" in inspect|finalize) ;; *) exit 1;; esac
+          "$RUNNER_TEMP/blob-reconcile-tools/bin/python" scripts/reconcile_blob_copy.py "$OPERATION" --work "$RUNNER_TEMP/blob-reconcile"
+      - name: Retain inventory evidence and final verification receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-data-reconcile-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/blob-reconcile/report/*.json
+          if-no-files-found: warn
+          retention-days: 30
