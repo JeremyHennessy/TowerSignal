@@ -1,3 +1,4 @@
+# Acceptance-only branch. Never merge this workflow to main.
 name: Accept bounded legacy DOB candidate on full verified cohort
 
 on:
