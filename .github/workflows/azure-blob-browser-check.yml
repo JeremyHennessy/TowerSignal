@@ -1,0 +1,135 @@
+name: Check Azure Blob browser access (reversible)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azure-blob-browser-check
+  cancel-in-progress: false
+
+jobs:
+  check-browser-access:
+    if: github.ref == 'refs/heads/main'
+    name: Verify anonymous Blob GET and CORS
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: azure-production
+    steps:
+      - name: Upload probe, test public browser access, then delete it
+        shell: bash
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_PREFIX: ${{ vars.AZURE_STORAGE_PREFIX }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          AZURE_CORE_COLLECT_TELEMETRY: "false"
+          BROWSER_ORIGIN: https://towersignal.pharm3r.com
+        run: |
+          set -euo pipefail
+
+          : "${AZURE_STORAGE_ACCOUNT:?Missing AZURE_STORAGE_ACCOUNT in azure-production}"
+          : "${AZURE_STORAGE_CONTAINER:?Missing AZURE_STORAGE_CONTAINER in azure-production}"
+          : "${AZURE_STORAGE_PREFIX:?Missing AZURE_STORAGE_PREFIX in azure-production}"
+          : "${AZURE_STORAGE_KEY:?Missing AZURE_STORAGE_KEY in azure-production}"
+
+          if [[ "$AZURE_STORAGE_ACCOUNT" != "pharm3r" ||
+                "$AZURE_STORAGE_CONTAINER" != "data" ||
+                "$AZURE_STORAGE_PREFIX" != "towersignal-data" ]]; then
+            echo "::error::Destination does not match the approved pharm3r/data/towersignal-data prefix."
+            exit 1
+          fi
+
+          workdir="$(mktemp -d)"
+          probe_blob="${AZURE_STORAGE_PREFIX}/_migration-probes/browser-check-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.json"
+          probe_file="$workdir/probe.json"
+          public_body="$workdir/public.json"
+          public_headers="$workdir/headers.txt"
+          blob_url="https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/${AZURE_STORAGE_CONTAINER}/${probe_blob}"
+
+          cleanup() {
+            az storage blob delete \
+              --account-name "$AZURE_STORAGE_ACCOUNT" \
+              --container-name "$AZURE_STORAGE_CONTAINER" \
+              --name "$probe_blob" \
+              --auth-mode key \
+              --timeout 30 \
+              --only-show-errors \
+              --output none >/dev/null 2>&1 || true
+            rm -rf "$workdir"
+          }
+          trap cleanup EXIT
+
+          printf '{"purpose":"TowerSignal browser-access probe","run_id":"%s","commit":"%s"}\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_SHA" > "$probe_file"
+
+          az storage blob upload \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "$probe_blob" \
+            --file "$probe_file" \
+            --auth-mode key \
+            --overwrite false \
+            --content-type application/json \
+            --timeout 30 \
+            --only-show-errors \
+            --output none
+
+          http_status="$(curl --silent --show-error --location \
+            --header "Origin: ${BROWSER_ORIGIN}" \
+            --dump-header "$public_headers" \
+            --output "$public_body" \
+            --write-out '%{http_code}' \
+            "$blob_url")"
+
+          if [[ "$http_status" != "200" ]]; then
+            echo "::error::Anonymous browser-style GET returned HTTP ${http_status}; current Blob/container policy is not directly browser-readable."
+            exit 1
+          fi
+
+          cmp --silent "$probe_file" "$public_body" || {
+            echo "::error::Anonymous GET body did not match the uploaded probe."
+            exit 1
+          }
+
+          cors_origin="$(tr -d '\r' < "$public_headers" | awk -F': ' 'tolower($1)=="access-control-allow-origin" {print $2}' | tail -n 1)"
+          if [[ "$cors_origin" != "$BROWSER_ORIGIN" && "$cors_origin" != "*" ]]; then
+            echo "::error::Blob GET succeeded but CORS does not allow ${BROWSER_ORIGIN}."
+            exit 1
+          fi
+
+          az storage blob delete \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "$probe_blob" \
+            --auth-mode key \
+            --timeout 30 \
+            --only-show-errors \
+            --output none
+
+          exists="$(az storage blob exists \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "$probe_blob" \
+            --auth-mode key \
+            --timeout 30 \
+            --query exists \
+            --output tsv \
+            --only-show-errors)"
+
+          if [[ "$exists" != "false" ]]; then
+            echo "::error::Probe cleanup could not be verified."
+            exit 1
+          fi
+
+          trap - EXIT
+          rm -rf "$workdir"
+
+          echo "Anonymous Blob GET, exact-body verification, CORS, and cleanup succeeded."
+          {
+            echo "## Azure Blob browser-access check"
+            echo "The temporary Blob was readable without storage credentials from the TowerSignal browser origin, returned the exact uploaded bytes, supplied a valid CORS allow-origin response, and was deleted afterward."
+            echo "No production TowerSignal payloads, Blob access policies, CORS rules, DNS records or application deployments were changed."
+          } >> "$GITHUB_STEP_SUMMARY"
