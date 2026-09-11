@@ -31,11 +31,10 @@ jobs:
           PY
       - name: Apply focused repository patches
         run: python scripts/apply_workflow_account_round2.py
-      - name: Constrain full-report UX and update release contracts
+      - name: Constrain full-report UX and update browser expectations
         run: |
           python - <<'PY'
           from pathlib import Path
-
           detail = Path('src/components/DetailPanel.tsx')
           text = detail.read_text(encoding='utf-8')
           old = '''      <AccountDecisionSummary row={row} detail={detail} historyEvents={historyEvents} workflowAccount={workflowAccount} />\n      <AccountModeTabs />'''
@@ -49,25 +48,6 @@ jobs:
           text = text.replace(old_timeline, '      {isFullAccountReport && <AccountUnifiedTimeline detail={detail} historyEvents={historyEvents} />}', 1)
           detail.write_text(text, encoding='utf-8')
 
-          release = Path('.github/workflows/workflow-ui-release.yml')
-          text = release.read_text(encoding='utf-8')
-          text = text.replace('Open account to manage', 'Open full account')
-          path_anchor = '      - src/components/WorkflowWorkspacePage.tsx\n'
-          extra = (
-              '      - src/components/AccountDecisionSummary.tsx\n'
-              '      - src/components/AccountModeTabs.tsx\n'
-              '      - src/components/AccountUnifiedTimeline.tsx\n'
-              '      - src/components/DetailPanel.tsx\n'
-              '      - src/components/WorkflowQuickEditor.tsx\n'
-              '      - src/App.tsx\n'
-              '      - src/styles/workflow-account-round2.css\n'
-          )
-          if 'src/components/AccountDecisionSummary.tsx' not in text:
-              if path_anchor not in text:
-                  raise SystemExit('UI-release path anchor not found')
-              text = text.replace(path_anchor, path_anchor + extra, 1)
-          release.write_text(text, encoding='utf-8')
-
           for test_path in [Path('tests/e2e/workflow-command-center.spec.ts'), Path('tests/frontend/WorkflowScaleWorkspace.test.tsx')]:
               if not test_path.exists():
                   continue
@@ -76,12 +56,10 @@ jobs:
               test_text = test_text.replace('Open account to manage', 'Open full account')
               test_path.write_text(test_text, encoding='utf-8')
           PY
-      - name: Remove one-shot patch machinery
-        run: git rm -f scripts/apply_workflow_account_round2.py .github/workflows/apply-workflow-account-round2.yml
-      - name: Commit patched UX
+      - name: Commit product and test changes
         run: |
           git config user.name "TowerSignal Agent"
           git config user.email "actions@users.noreply.github.com"
-          git add src tests .github/workflows/workflow-ui-release.yml
+          git add src tests
           git commit -m "Implement Workflow and account UX round 2"
           git push origin HEAD:agent/workflow-account-ux-round2-20260911
