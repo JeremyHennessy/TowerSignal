@@ -4,6 +4,7 @@ import argparse
 import json
 import re
 import sys
+import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -196,8 +197,14 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
     retained_by_bbl: dict[str, dict[str, dict[str, Any]]] = {}
     source_matched_bbls: set[str] = set()
     fetched_job_count = 0
+    started = time.monotonic()
+    total_batches = (len(requested) + QUERY_CHUNK_SIZE - 1) // QUERY_CHUNK_SIZE
+    print(f"[legacy_dob] Fetching {len(requested):,} canonical BBLs in {total_batches} serial batches", file=sys.stderr, flush=True)
     for start in range(0, len(requested), QUERY_CHUNK_SIZE):
         chunk = requested[start:start + QUERY_CHUNK_SIZE]
+        batch = start // QUERY_CHUNK_SIZE + 1
+        query_started = time.monotonic()
+        print(f"[legacy_dob] Batch {batch}/{total_batches}: querying {len(chunk)} BBLs", file=sys.stderr, flush=True)
         rows = fetch_where(
             DATASET_ID,
             where=_exact_where(chunk),
@@ -211,6 +218,8 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
                 f"Legacy DOB exact-property query reached the {FETCH_CAP:,}-row cap for {len(chunk)} BBLs; refusing possibly truncated evidence"
             )
         fetched_job_count += len(rows)
+        print(f"[legacy_dob] Batch {batch}/{total_batches}: {len(rows):,} rows in {time.monotonic() - query_started:.1f}s; "
+              f"{fetched_job_count:,} rows total; elapsed {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
         for source_row in rows:
             source_bbl = _source_bbl(source_row)
             if source_bbl not in requested_set:
@@ -247,7 +256,9 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
             "records": records,
         }
 
+    print("[legacy_dob] All exact-property batches completed; fetching source metadata", file=sys.stderr, flush=True)
     metadata = fetch_metadata(DATASET_ID)
+    print("[legacy_dob] Source metadata received; fetching total source count", file=sys.stderr, flush=True)
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     result = {
         "schema_version": SCHEMA_VERSION,
@@ -285,6 +296,7 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
     }
     target = output_file or output_dir / "legacy-dob-projects.json"
     target.write_text(json.dumps(result, separators=(",", ":")), encoding="utf-8")
+    print(f"[legacy_dob] Complete: {total_batches} batches in {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
     print(json.dumps(result["summary"], indent=2))
     return result
 

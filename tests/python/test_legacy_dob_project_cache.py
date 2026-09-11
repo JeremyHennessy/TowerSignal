@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import io
 import json
+from contextlib import redirect_stderr, redirect_stdout
 import tempfile
 import unittest
 from datetime import date
 from pathlib import Path
+from unittest.mock import patch
+
+from scripts import build_legacy_dob_project_cache as builder
 
 from scripts.attach_legacy_dob_project_context import attach
 from scripts.build_legacy_dob_project_cache import normalize_job
@@ -138,6 +143,83 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
             self.assertEqual(result["attached_systems"], 1)
             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["applicant_name"], "Jane Engineer")
             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["relationship_boundary"], "RECORDED_DOB_APPLICANT_NOT_PROOF_OF_SERVICE_CONTRACT")
+
+
+    def test_build_keeps_exact_query_contract_and_reports_each_batch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            bbls = [f"300001{lot:04d}" for lot in range(1, 32)]
+            source = {"metadata": {"snapshot_date": "2026-09-11"},
+                      "systems": [{"bbl": bbl} for bbl in reversed(bbls)]}
+            (output / "systems.json").write_text(json.dumps(source))
+            first = self.base_row()
+            second = self.base_row(job_s1_no="300000031", lot="00031",
+                                   job_description="Replace cooling tower")
+            stderr = io.StringIO()
+            with patch.object(builder, "fetch_where", side_effect=[[first], [second]]) as fetch, \
+                 patch.object(builder, "fetch_metadata", return_value={"name": "DOB", "source_last_updated_at": "2026-09-10T00:00:00Z"}), \
+                 patch.object(builder, "fetch_count", return_value=2700000), \
+                 redirect_stderr(stderr), redirect_stdout(io.StringIO()):
+                result = builder.build(output)
+            self.assertEqual(fetch.call_count, 2)
+            for call, chunk in zip(fetch.call_args_list, [bbls[:30], bbls[30:]]):
+                self.assertEqual(call.args, (builder.DATASET_ID,))
+                self.assertEqual(call.kwargs, {"where": builder._exact_where(chunk),
+                                 "order_by": "borough,block,lot,job_s1_no", "select": builder.SELECT,
+                                 "limit": 50000, "request_timeout": 120})
+            self.assertEqual(result["summary"]["requested_bbl_count"], 31)
+            self.assertEqual(result["summary"]["exact_bbl_job_count"], 2)
+            self.assertEqual(result["summary"]["retained_record_count"], 2)
+            self.assertEqual(result["summary"]["explicit_cooling_tower_record_count"], 1)
+            self.assertEqual(result["source"]["source_last_updated_at"], "2026-09-10T00:00:00Z")
+            self.assertEqual(result["by_bbl"][bbls[-1]]["records"][0]["applicant_name"], "Jane Engineer")
+            self.assertEqual(json.loads((output / "legacy-dob-projects.json").read_text()), result)
+            self.assertIn("Batch 1/2: querying 30 BBLs", stderr.getvalue())
+            self.assertIn("Batch 2/2: querying 1 BBLs", stderr.getvalue())
+            self.assertIn("rows total; elapsed", stderr.getvalue())
+            self.assertIn("fetching total source count", stderr.getvalue())
+            self.assertIn("Complete: 2 batches", stderr.getvalue())
+            self.assertNotIn("elapsed", result)
+
+    def test_capped_query_still_fails_without_replacing_existing_cache(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
+            cache = output / "legacy-dob-projects.json"
+            cache.write_bytes(b"previous verified cache")
+            with patch.object(builder, "fetch_where", return_value=[self.base_row()] * builder.FETCH_CAP), \
+                 redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()), \
+                 self.assertRaisesRegex(builder.SourceFetchError, "refusing possibly truncated evidence"):
+                builder.build(output)
+            self.assertEqual(cache.read_bytes(), b"previous verified cache")
+
+    def test_failed_query_logs_start_but_does_not_publish_partial_cache(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
+            stderr = io.StringIO()
+            with patch.object(builder, "fetch_where", side_effect=builder.SourceFetchError("source timeout")), \
+                 redirect_stderr(stderr), redirect_stdout(io.StringIO()), \
+                 self.assertRaisesRegex(builder.SourceFetchError, "source timeout"):
+                builder.build(output)
+            self.assertIn("Batch 1/1: querying", stderr.getvalue())
+            self.assertNotIn("Complete:", stderr.getvalue())
+            self.assertFalse((output / "legacy-dob-projects.json").exists())
+
+    def test_count_failure_still_prevents_cache_publication(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            (output / "systems.json").write_text(json.dumps({"systems": [{"bbl": "3000010001"}]}))
+            stderr = io.StringIO()
+            with patch.object(builder, "fetch_where", return_value=[self.base_row()]), \
+                 patch.object(builder, "fetch_metadata", return_value={"name": "DOB"}), \
+                 patch.object(builder, "fetch_count", side_effect=builder.SourceFetchError("count unavailable")), \
+                 redirect_stderr(stderr), redirect_stdout(io.StringIO()), \
+                 self.assertRaisesRegex(builder.SourceFetchError, "count unavailable"):
+                builder.build(output)
+            self.assertIn("fetching total source count", stderr.getvalue())
+            self.assertNotIn("Complete:", stderr.getvalue())
+            self.assertFalse((output / "legacy-dob-projects.json").exists())
 
 
 if __name__ == "__main__":

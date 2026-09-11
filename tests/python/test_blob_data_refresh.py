@@ -324,13 +324,19 @@ class DataRefreshTests(unittest.TestCase):
         d.DataStore.allow_write(b.ROOT+'/releases/data-1-1/runtime/a.json')
         d.DataStore.allow_write(b.ROOT+'/state/history/data-1-1/files/latest.json')
 
-    def test_workflow_preserves_all_original_source_build_commands_and_limits(self):
+    def test_workflow_preserves_source_commands_with_only_legacy_timeout_override(self):
         root=Path(__file__).resolve().parents[2]
         pages=(root/'.github/workflows/pages.yml').read_text()
         segment=pages[pages.index('      - name: Fetch, validate and generate current NYC data\n'):
                       pages.index('      - name: Stage history state for post-deploy persistence\n')]
         workflow=(root/d.WORKFLOW).read_text()
-        self.assertIn(segment,workflow)
+        legacy_step = ('      - name: Build bounded legacy DOB/BIS project context\n'
+                       '        timeout-minutes: 15\n')
+        self.assertEqual(segment.count(legacy_step), 1)
+        # Run 34604782643 exhausted this step budget. All collector commands,
+        # query/retry bounds, validators and other source time limits stay exact.
+        expected = segment.replace(legacy_step, legacy_step.replace(': 15', ': 30'), 1)
+        self.assertIn(expected,workflow)
         self.assertIn("- cron: '17 10 * * *'",workflow)
         self.assertIn('needs: generate',workflow)
         self.assertIn('contents: read',workflow)
