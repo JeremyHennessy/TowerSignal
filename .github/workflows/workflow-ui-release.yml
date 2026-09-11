@@ -150,7 +150,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json, os, re, time, urllib.request
+          import json, os, re, time, urllib.parse, urllib.request
           base = os.environ['BASE_URL'].rstrip('/') + '/'
           expected = '${{ github.sha }}'
           for attempt in range(30):
@@ -164,7 +164,7 @@ jobs:
                   scripts = re.findall(r'<script[^>]+src="([^"]+)"', html)
                   bundle = ''
                   for src in scripts:
-                      url = src if src.startswith('http') else base + src.lstrip('./')
+                      url = urllib.parse.urljoin(base, src)
                       with urllib.request.urlopen(url, timeout=30) as response:
                           bundle += response.read().decode('utf-8', errors='ignore')
                   for marker in ('Needs a date', 'Open account to manage', 'Portfolio evidence coverage'):
