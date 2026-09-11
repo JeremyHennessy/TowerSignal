@@ -5,8 +5,15 @@ on:
     branches: [main]
     paths:
       - .github/workflows/workflow-ui-release.yml
+      - src/App.tsx
+      - src/components/AccountDecisionSummary.tsx
+      - src/components/AccountModeTabs.tsx
+      - src/components/AccountUnifiedTimeline.tsx
+      - src/components/DetailPanel.tsx
+      - src/components/WorkflowQuickEditor.tsx
       - src/components/WorkflowScaleWorkspace.tsx
       - src/components/WorkflowWorkspacePage.tsx
+      - src/styles/workflow-account-round2.css
       - src/styles/workflow-scale-command-center.css
       - tests/frontend/WorkflowScaleWorkspace.test.tsx
       - tests/e2e/workflow-command-center.spec.ts
@@ -105,7 +112,8 @@ jobs:
           print(json.dumps(manifest, indent=2))
           PY
           grep -R -q "Needs a date" dist/assets
-          grep -R -q "Open account to manage" dist/assets
+          grep -R -q "Open full account" dist/assets
+          grep -R -q "Account decision summary" dist/assets
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
@@ -167,9 +175,9 @@ jobs:
                       url = urllib.parse.urljoin(base, src)
                       with urllib.request.urlopen(url, timeout=30) as response:
                           bundle += response.read().decode('utf-8', errors='ignore')
-                  for marker in ('Needs a date', 'Open account to manage', 'Portfolio evidence coverage'):
+                  for marker in ('Needs a date', 'Open full account', 'Portfolio evidence coverage', 'Account decision summary'):
                       if marker not in bundle:
-                          raise RuntimeError(f'missing deployed Workflow marker: {marker}')
+                          raise RuntimeError(f'missing deployed Workflow/account marker: {marker}')
                   print(json.dumps(manifest, indent=2))
                   break
               except Exception:
