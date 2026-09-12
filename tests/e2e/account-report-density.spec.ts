@@ -38,6 +38,15 @@ test('full account report groups missing-BBL property evidence and keeps provena
   if (isIphone) await expectAccountDetailHydrated(page)
 
   const detail = page.locator('.account-profile-page .detail-panel')
+  const modeTabs = detail.locator('.account-mode-tabs')
+  await expect(modeTabs).toBeVisible()
+  const detailBox = await detail.boundingBox()
+  const tabsBox = await modeTabs.boundingBox()
+  expect(detailBox).not.toBeNull()
+  expect(tabsBox).not.toBeNull()
+  expect(tabsBox!.width).toBeGreaterThanOrEqual(detailBox!.width * 0.9)
+  await modeTabs.getByRole('button', { name: /^Evidence/ }).click()
+
   const property = detail.locator('section.property-context-section')
   await expect(property).toHaveCount(1)
   await expect(property.getByRole('heading', { name: 'Property records', exact: true })).toBeVisible()
