@@ -21,6 +21,7 @@ on:
       - src/styles/workflow-round2-layout-fixes.css
       - tests/frontend/WorkflowScaleWorkspace.test.tsx
       - tests/e2e/workflow-command-center.spec.ts
+      - tests/e2e/account-mode-layout.spec.ts
       - tests/e2e/account-report-density.spec.ts
       - tests/e2e/domestic-water.spec.ts
       - tests/e2e/roof-map.spec.ts
