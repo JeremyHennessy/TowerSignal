@@ -22,10 +22,13 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
 
   await signInForProject(page, testInfo.project.name, '#/account/2000015564')
   await expect(page).toHaveURL(/#\/account\/2000015564$/)
+  if (isIphone) await expectAccountDetailHydrated(page)
+  const modeTabs = page.locator('.account-mode-tabs')
+  await expect(modeTabs).toBeVisible()
+  await modeTabs.getByRole('button', { name: /^Field/ }).click()
 
   const section = page.locator('section.planimetric-section')
   if (isIphone) {
-    await expectAccountDetailHydrated(page)
     await expectDomCount(page, 'section.planimetric-section', 1)
     await expectSectionText(page, testInfo, 'Physical tower location', [
       '1 mapped cooling-tower footprint · 1 building outline',
