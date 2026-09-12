@@ -24,6 +24,7 @@ import './styles/ui-polish.css'
 import './styles/ui-polish-mobile-fix.css'
 import './styles/account-report-density-final.css'
 import './styles/workflow-account-round2.css'
+import './styles/workflow-round2-layout-fixes.css'
 import './styles/known-firms.css'
 import './styles/table-standard.css'
 

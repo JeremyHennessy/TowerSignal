@@ -75,6 +75,28 @@ test('workflow command center scales account monitoring across desktop and iPhon
       'Investigate',
       'Portfolio evidence coverage',
     ], 'section.workflow-workspace-page')
+
+    const viewportWidth = page.viewportSize()?.width ?? 0
+    const layout = await page.evaluate(() => {
+      const grid = document.querySelector('.workflow-command-grid')?.getBoundingClientRect()
+      const primary = document.querySelector('.workflow-command-primary')?.getBoundingClientRect()
+      const map = document.querySelector('.workflow-command-map')?.getBoundingClientRect()
+      const inspector = document.querySelector('.workflow-account-inspector')?.getBoundingClientRect()
+      const table = document.querySelector('.workflow-command-table-card')?.getBoundingClientRect()
+      return { grid, primary, map, inspector, table, bodyWidth: document.body.scrollWidth }
+    })
+    expect(layout.bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)
+    for (const box of [layout.grid, layout.primary, layout.map, layout.inspector, layout.table]) {
+      expect(box?.width ?? 0).toBeGreaterThan(0)
+      expect(box!.width).toBeLessThanOrEqual(viewportWidth + 0.5)
+    }
+    expect(layout.inspector!.top).toBeGreaterThanOrEqual(layout.map!.bottom - 1)
+
+    const row = workflow.locator('.workflow-command-table tbody tr', { hasText: '16 E 39TH ST' }).first()
+    await row.scrollIntoViewIfNeeded()
+    await row.click()
+    await expect(workflow.locator('.workflow-account-inspector')).toContainText('16 E 39TH ST')
+    await expect(workflow.locator('.workflow-account-inspector')).toContainText(note)
   } else {
     await expect(workflow).toBeVisible()
     await expect(workflow.getByRole('heading', { name: 'Workflow workspace', exact: true })).toBeVisible()

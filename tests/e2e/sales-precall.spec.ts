@@ -24,8 +24,14 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
   const isIphone = isIphoneProject(testInfo)
   if (isIphone) await expectAccountDetailHydrated(page)
 
+  const modeTabs = page.locator('.account-mode-tabs')
+  await expect(modeTabs).toBeVisible()
   const sales = page.locator('.sales-precall-pack')
   const technician = page.locator('.technician-field-pack')
+  await modeTabs.getByRole('button', { name: /^Sales/ }).click()
+  await expect(sales).toBeVisible()
+  await expect(technician).toBeHidden()
+
   if (isIphone) {
     await expectDomCount(page, '.sales-precall-pack', 1)
     await expectDomCount(page, '.technician-field-pack', 1)
@@ -43,13 +49,9 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
       'Verify before asserting',
       'incumbent cooling-tower service provider is not established',
       'evidence class is not win probability',
-      'Pre-visit field pack',
-      'Jump to',
-    ], '.detail-panel')
+    ], '.sales-precall-pack')
     await expectDomAttribute(page, '.sales-pack-metrics', 'aria-label', 'Sales pre-call summary')
   } else {
-    await expect(sales).toBeVisible()
-    await expect(technician).toBeVisible()
     await expect(sales.getByRole('heading', { name: 'Pre-call sales brief', exact: true })).toBeVisible()
     await expect(sales.getByLabel('Sales pre-call summary')).toBeVisible()
     await expect(sales.getByText('Why call now', { exact: true })).toBeVisible()
@@ -76,6 +78,12 @@ test('hosted account exposes a source-backed sales pre-call brief before the tec
   })
   expect(order).toBe(true)
 
+  await modeTabs.getByRole('button', { name: /^Field/ }).click()
+  await expect(technician).toBeVisible()
+  await expect(sales).toBeHidden()
+  await expect(technician.getByText('Pre-visit field pack', { exact: true })).toBeVisible()
+
+  await modeTabs.getByRole('button', { name: /^Sales/ }).click()
   const viewportWidth = page.viewportSize()?.width ?? 0
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
   expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 2)

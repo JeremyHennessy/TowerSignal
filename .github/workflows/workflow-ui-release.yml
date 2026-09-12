@@ -7,6 +7,7 @@ on:
       - .github/workflows/workflow-ui-release.yml
       - scripts/materialize_blob_runtime.py
       - tests/python/test_blob_runtime_materializer.py
+      - src/main.tsx
       - src/App.tsx
       - src/components/AccountDecisionSummary.tsx
       - src/components/AccountModeTabs.tsx
@@ -17,8 +18,15 @@ on:
       - src/components/WorkflowWorkspacePage.tsx
       - src/styles/workflow-account-round2.css
       - src/styles/workflow-scale-command-center.css
+      - src/styles/workflow-round2-layout-fixes.css
       - tests/frontend/WorkflowScaleWorkspace.test.tsx
       - tests/e2e/workflow-command-center.spec.ts
+      - tests/e2e/account-mode-layout.spec.ts
+      - tests/e2e/account-report-density.spec.ts
+      - tests/e2e/domestic-water.spec.ts
+      - tests/e2e/roof-map.spec.ts
+      - tests/e2e/sales-precall.spec.ts
+      - tests/e2e/live.spec.ts
 
 permissions:
   contents: read

@@ -17,6 +17,9 @@ test('hosted domestic-water account shows physical, oversight and compact self-r
 
   await signInForProject(page, testInfo.project.name, '#/account/2000010073')
   await expect(page).toHaveURL(/#\/account\/2000010073$/)
+  const modeTabs = page.locator('.account-mode-tabs')
+  await expect(modeTabs).toBeVisible()
+  await modeTabs.getByRole('button', { name: /^Field/ }).click()
 
   const roof = page.locator('section.planimetric-section')
   const domestic = page.locator('section.domestic-water-section')

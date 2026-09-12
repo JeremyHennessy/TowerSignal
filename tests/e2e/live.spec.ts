@@ -32,6 +32,12 @@ async function navigateSourceHealth(page: Page, testInfo: TestInfo) {
   }
 }
 
+async function selectAccountMode(page: Page, name: 'Summary' | 'Sales' | 'Field' | 'Evidence' | 'History') {
+  const tabs = page.locator('.account-mode-tabs')
+  await expect(tabs).toBeVisible()
+  await tabs.getByRole('button', { name: new RegExp(`^${name}`) }).click()
+}
+
 test('hosted TowerSignal redesigned workspace is functional, linkable and source-backed', async ({ page }, testInfo) => {
   const isIphone = isIphoneProject(testInfo)
   if (isIphone) testInfo.setTimeout(240_000)
@@ -80,6 +86,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
     await page.locator('.account-table tbody tr').first().click()
     if (isIphone) await expectAccountDetailHydrated(page)
+    await selectAccountMode(page, 'Evidence')
     await expectSectionText(page, testInfo, 'ACRIS property activity', [
       'relevant recorded document',
       'ACRIS is joined by exact borough/block/lot BBL and exact document ID only',
@@ -112,37 +119,44 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await page.getByRole('button', { name: 'OATH cases', exact: true }).click()
   await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
   await page.locator('.account-table tbody tr').first().click()
+  if (isIphone) await expectAccountDetailHydrated(page)
+  await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
+  await expect(page.locator('.account-decision-summary')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What matters before the next action', exact: true })).toBeVisible()
+
+  await selectAccountMode(page, 'Evidence')
   if (isIphone) {
-    await expectAccountDetailHydrated(page)
     await expectDomText(page, [
       'Selected system',
       'Identity',
-      'Historical profile',
       'Reported samples',
       'NYC Health inspections',
       'OATH penalty imposed',
-      'OATH case lifecycle',
       'DOB NOW project activity',
       'ACRIS property activity',
-      'TowerSignal History',
       'Source & provenance',
       'Copy lead brief',
       'Copy account link',
     ])
   } else {
-    await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
     await expect(page.getByText('Reported samples')).toBeVisible()
     await expect(page.getByText('NYC Health inspections', { exact: true })).toBeVisible()
     await expect(page.getByText('OATH penalty imposed')).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'OATH case lifecycle', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
     await expectHeading(page, testInfo, 'ACRIS property activity')
-    await expect(page.getByRole('heading', { name: 'TowerSignal History', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
     await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
+  }
+
+  await selectAccountMode(page, 'History')
+  if (isIphone) {
+    await expectDomText(page, ['Historical profile', 'OATH case lifecycle', 'TowerSignal History'], '.detail-panel')
+  } else {
+    await expect(page.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'OATH case lifecycle', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'TowerSignal History', exact: true })).toBeVisible()
   }
   await expect(page).toHaveURL(/#\/account\//)
 
@@ -151,10 +165,12 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await page.reload({ waitUntil: 'networkidle' })
     await expect(page).toHaveURL(accountUrl)
     await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
+    await selectAccountMode(page, 'Evidence')
     await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
   } else {
     await page.evaluate(() => window.dispatchEvent(new Event('focus')))
     await page.waitForTimeout(750)
+    await selectAccountMode(page, 'Evidence')
     await expectDomText(page, ['Selected system', 'Identity'])
   }
   if (isIphone) {
@@ -234,9 +250,12 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
 
   await navigateWorkspace(page, testInfo, 'Workflow')
   await expect(page.getByRole('heading', { name: /Workflow workspace/ })).toBeVisible()
-  await expect(page.getByText('New York City · private command workspace', { exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'What matters now', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Account intelligence groups', exact: true })).toBeVisible()
+  await expect(page.locator('.workflow-command-strip')).toContainText('Due / overdue')
+  await expect(page.locator('.workflow-command-strip')).toContainText('Changed · 7d')
+  await expect(page.locator('.workflow-command-strip')).toContainText('Needs a date')
+  await expect(page.locator('.workflow-command-tabs')).toContainText('Accounts')
+  await expect(page.getByLabel('Search workflow accounts')).toBeVisible()
+  await expect(page.getByText('Portfolio evidence coverage', { exact: true })).toBeVisible()
   await expectContained(page)
 
   await navigateSourceHealth(page, testInfo)
