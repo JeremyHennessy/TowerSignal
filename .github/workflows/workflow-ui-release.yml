@@ -86,16 +86,33 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
-          import json, os
+          import json, os, re
 
           proof = json.loads((Path(os.environ['RUNNER_TEMP']) / 'blob-runtime-proof.json').read_text(encoding='utf-8'))
           if proof.get('runtime_files', 0) < 100:
               raise SystemExit('Verified Blob runtime inventory is unexpectedly small')
           source = proof.get('source') or {}
-          if source.get('workflow_id') != 339705737 or not source.get('run_id'):
-              raise SystemExit('Verified Blob pointer is not sourced from a trusted Pages release')
+          contract = proof.get('source_contract')
+          trusted_pages = (
+              contract == 'pages-release-v1'
+              and source.get('kind') is None
+              and source.get('workflow_id') == 339705737
+          )
+          trusted_data = (
+              contract == 'data-refresh-v1'
+              and source.get('kind') == 'data-only'
+              and source.get('workflow_id') == 355813764
+              and source.get('workflow_path') == '.github/workflows/azure-data-refresh.yml'
+              and type(source.get('run_attempt')) is int
+              and source['run_attempt'] > 0
+          )
+          if not (trusted_pages or trusted_data):
+              raise SystemExit('Verified Blob pointer source contract is not trusted')
+          if type(source.get('run_id')) is not int or source['run_id'] <= 0 or not re.fullmatch(r'[0-9a-f]{40}', str(source.get('source_sha', ''))):
+              raise SystemExit('Verified Blob pointer source identity is incomplete')
           manifest = {
               'candidate_sha': '${{ github.sha }}',
+              'verified_data_contract': contract,
               'verified_data_source': source,
               'verified_runtime_manifest': proof.get('runtime_manifest'),
               'verified_data_file_count': proof['runtime_files'],
@@ -162,8 +179,24 @@ jobs:
                   if manifest.get('candidate_sha') != expected:
                       raise RuntimeError(f"candidate SHA mismatch: {manifest.get('candidate_sha')} != {expected}")
                   source = manifest.get('verified_data_source') or {}
-                  if source.get('workflow_id') != 339705737 or manifest.get('verified_data_file_count', 0) < 100:
+                  contract = manifest.get('verified_data_contract')
+                  trusted_pages = (
+                      contract == 'pages-release-v1'
+                      and source.get('kind') is None
+                      and source.get('workflow_id') == 339705737
+                  )
+                  trusted_data = (
+                      contract == 'data-refresh-v1'
+                      and source.get('kind') == 'data-only'
+                      and source.get('workflow_id') == 355813764
+                      and source.get('workflow_path') == '.github/workflows/azure-data-refresh.yml'
+                      and type(source.get('run_attempt')) is int
+                      and source['run_attempt'] > 0
+                  )
+                  if not (trusted_pages or trusted_data) or manifest.get('verified_data_file_count', 0) < 100:
                       raise RuntimeError('deployed release lacks trusted verified-data proof')
+                  if type(source.get('run_id')) is not int or source['run_id'] <= 0 or not re.fullmatch(r'[0-9a-f]{40}', str(source.get('source_sha', ''))):
+                      raise RuntimeError('deployed release source identity is incomplete')
                   with urllib.request.urlopen(base + '?workflow-release=' + str(attempt), timeout=15) as response:
                       html = response.read().decode('utf-8')
                   scripts = re.findall(r'<script[^>]+src="([^"]+)"', html)
