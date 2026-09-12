@@ -1,0 +1,83 @@
+/* Round-two layout corrections found by hosted desktop/iPhone visual acceptance.
+   Keep these overrides after workflow-account-round2.css so its desktop grid does not
+   leak into narrow viewports and non-section account controls span the report grid. */
+
+.account-profile-page .account-mode-tabs {
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+.workflow-command-table-card {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.workflow-command-table-card .table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 980px) {
+  .workflow-command-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .workflow-command-primary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .workflow-account-view-toggle,
+  .workflow-command-map,
+  .workflow-command-table-card,
+  .workflow-account-inspector {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .workflow-account-inspector {
+    position: static;
+  }
+}
+
+@media (max-width: 700px) {
+  .workflow-account-view-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    overflow: visible;
+  }
+
+  .workflow-account-view-toggle > span {
+    flex: 0 0 100%;
+    margin: 0 0 2px;
+    white-space: nowrap;
+  }
+
+  .workflow-command-map {
+    overflow: hidden;
+  }
+
+  .account-profile-page .account-mode-tabs {
+    display: flex;
+    overflow-x: auto;
+  }
+}
