@@ -33,6 +33,19 @@ type ProductMode = WorkspaceMode | 'nys-account' | 'company'
 
 const validModes = new Set<ProductMode>(['prospect','monitor','map','nys','nys-changes','opportunities','companies','company','water-quality','portfolios','workflow','source-health','account','nys-account'])
 const filterKeys = Object.keys(initialFilters) as Array<keyof FilterState>
+const ACCOUNT_RETURN_KEY = 'towersignal.account-return.v1'
+
+function readAccountReturn(): { mode: ProductMode; scrollY: number } | null {
+  try {
+    const value = window.sessionStorage.getItem(ACCOUNT_RETURN_KEY)
+    if (!value) return null
+    const parsed = JSON.parse(value) as { mode?: ProductMode; scrollY?: number }
+    if (!parsed.mode || !validModes.has(parsed.mode)) return null
+    return { mode: parsed.mode, scrollY: typeof parsed.scrollY === 'number' ? parsed.scrollY : 0 }
+  } catch {
+    return null
+  }
+}
 
 function pct(value: number, total: number): string {
   return total > 0 ? `${Math.round((value / total) * 100)}%` : '—'
@@ -82,7 +95,7 @@ export default function App() {
   const [selectedNys, setSelectedNys] = useState<NysSystem | null>(null)
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(initialRoute.mode === 'company' ? initialRoute.id : null)
   const [mode, setMode] = useState<ProductMode>(initialRoute.mode)
-  const [returnMode, setReturnMode] = useState<ProductMode>('prospect')
+  const [returnMode, setReturnMode] = useState<ProductMode>(() => initialRoute.mode === 'account' ? (readAccountReturn()?.mode ?? 'prospect') : 'prospect')
   const [viewName, setViewName] = useState('')
   const [watchedOnly, setWatchedOnly] = useState(false)
   const [globalSearch, setGlobalSearch] = useState(initialRoute.filters.search ?? '')
@@ -137,15 +150,23 @@ export default function App() {
 
   const navigate = useCallback((next: ProductMode) => {
     if (next === 'account' || next === 'nys-account' || next === 'company') return
+    const returnState = next === 'workflow' ? readAccountReturn() : null
     setMode(next)
     setSelected(null)
     setSelectedNys(null)
     setSelectedCompanyId(null)
     window.location.hash = routeHash(next)
+    if (next === 'workflow' && returnState?.mode === 'workflow') {
+      window.setTimeout(() => window.scrollTo({ top: returnState.scrollY, behavior: 'auto' }), 80)
+    }
   }, [])
 
   const openAccount = useCallback((row: SystemSummary) => {
-    setReturnMode(mode === 'account' || mode === 'nys-account' || mode === 'company' ? 'prospect' : mode)
+    const origin = mode === 'account' || mode === 'nys-account' || mode === 'company' ? 'prospect' : mode
+    setReturnMode(origin)
+    if (origin === 'workflow') {
+      window.sessionStorage.setItem(ACCOUNT_RETURN_KEY, JSON.stringify({ mode: 'workflow', scrollY: window.scrollY }))
+    }
     setSelected(row)
     setMode('account')
     window.location.hash = routeHash('account', row.system_id)
@@ -279,10 +300,10 @@ export default function App() {
       {mode === 'company' && !selectedCompanyId && <section className="product-page company-profile-page"><div className="reference-empty-state"><strong>Company ID is missing from this share link.</strong><button onClick={() => navigate('companies')}>Return to Companies</button></div></section>}
       {mode === 'water-quality' && <WaterQualityPage />}
       {mode === 'portfolios' && <PortfoliosPage payload={payload} watchedSystemIds={workflow.watchedSystemIds} onOpenAccount={openAccount} />}
-      {mode === 'workflow' && <WorkflowWorkspacePage user={workflow.user} systems={payload.systems} accounts={workflow.accounts} watchlists={workflow.watchlists} memberships={workflow.memberships} savedViews={workflow.savedViews} onOpenAccount={openAccount} />}
+      {mode === 'workflow' && <WorkflowWorkspacePage user={workflow.user} busy={workflow.busy} systems={payload.systems} accounts={workflow.accounts} watchlists={workflow.watchlists} memberships={workflow.memberships} savedViews={workflow.savedViews} onSaveAccount={workflow.saveAccount} onToggleMembership={workflow.toggleMembership} onOpenAccount={openAccount} />}
       {mode === 'source-health' && <SourceHealthPage payload={payload} />}
 
-      {mode === 'account' && <section className="product-page account-profile-page"><div className="account-profile-toolbar"><div><button className="breadcrumb-back" onClick={() => navigate(returnMode === 'account' || returnMode === 'nys-account' || returnMode === 'company' ? 'prospect' : returnMode)}>← Back</button><span>New York City · account profile</span></div><div className="page-actions"><ShareButton url={currentShareUrl} label="Copy account link" /><button onClick={() => exportCsv(selected ? [selected] : [], payload.metadata)} disabled={!selected}>Export account</button></div></div>{selected ? <DetailPanel row={selected} metadata={payload.metadata} historyEvents={changes.events.filter(event => event.system_id === selected.system_id)} historyStartedAt={changes.history_started_at} workflowSection={<WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} />} onClose={() => navigate(returnMode === 'account' || returnMode === 'nys-account' || returnMode === 'company' ? 'prospect' : returnMode)} /> : <div className="reference-empty-state"><strong>Account not found in the current public snapshot.</strong><span>The share link may refer to an account that is no longer present or whose ID changed upstream.</span><button onClick={() => navigate('prospect')}>Return to Prospect</button></div>}</section>}
+      {mode === 'account' && <section className="product-page account-profile-page"><div className="account-profile-toolbar"><div><button className="breadcrumb-back" onClick={() => navigate(returnMode === 'account' || returnMode === 'nys-account' || returnMode === 'company' ? 'prospect' : returnMode)}>{returnMode === 'workflow' ? '← Back to Workflow' : '← Back'}</button><span>New York City · account profile</span></div><div className="page-actions"><ShareButton url={currentShareUrl} label="Copy account link" /><button onClick={() => exportCsv(selected ? [selected] : [], payload.metadata)} disabled={!selected}>Export account</button></div></div>{selected ? <DetailPanel row={selected} metadata={payload.metadata} historyEvents={changes.events.filter(event => event.system_id === selected.system_id)} historyStartedAt={changes.history_started_at} workflowAccount={workflowAccount} workflowSection={<WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} />} onClose={() => navigate(returnMode === 'account' || returnMode === 'nys-account' || returnMode === 'company' ? 'prospect' : returnMode)} /> : <div className="reference-empty-state"><strong>Account not found in the current public snapshot.</strong><span>The share link may refer to an account that is no longer present or whose ID changed upstream.</span><button onClick={() => navigate('prospect')}>Return to Prospect</button></div>}</section>}
 
       {mode === 'nys-account' && <section className="product-page account-profile-page"><div className="account-profile-toolbar"><div><button className="breadcrumb-back" onClick={() => navigate('nys')}>← Back to NYS Market</button><span>New York State · equipment profile</span></div><div className="page-actions"><ShareButton url={currentShareUrl} label="Copy equipment link" /></div></div>{selectedNys ? <NysDetailPanel row={selectedNys} metadata={nysPayload.metadata} onClose={() => navigate('nys')} /> : <div className="reference-empty-state"><strong>NYS equipment record not found in the current registry snapshot.</strong><button onClick={() => navigate('nys')}>Return to NYS Market</button></div>}</section>}
 
@@ -290,6 +311,6 @@ export default function App() {
       <footer id="data-provenance" className="reference-footer"><div><strong>Data provenance</strong><span>{registered.toLocaleString()} NYC systems · PLUTO {pct(payload.summary.systems_with_pluto_context ?? 0, registered)} · HPD contacts {pct(contactReady, registered)}{acrisAvailable ? ` · recent ACRIS ${pct(recentAcris, registered)}` : ''}</span></div><div><strong>Trust model</strong><span>Rules {payload.metadata.rules_version} · Priority {payload.metadata.priority_model_version} · NYC history {changes.history_schema_version} · NYS history {nysChanges.history_schema_version}</span><button className="link-button" onClick={() => navigate('source-health')}>Open Source Health &amp; Coverage</button></div></footer>
     </div>
 
-    {(mode === 'prospect' || mode === 'monitor' || mode === 'map') && selected && <DetailPanel row={selected} metadata={payload.metadata} historyEvents={changes.events.filter(event => event.system_id === selected.system_id)} historyStartedAt={changes.history_started_at} workflowSection={<WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} />} onClose={() => setSelected(null)} />}
+    {(mode === 'prospect' || mode === 'monitor' || mode === 'map') && selected && <DetailPanel row={selected} metadata={payload.metadata} historyEvents={changes.events.filter(event => event.system_id === selected.system_id)} historyStartedAt={changes.history_started_at} workflowAccount={workflowAccount} workflowSection={<WorkflowAccountSection signedIn={Boolean(workflow.user)} account={workflowAccount} watchlists={workflow.watchlists} membershipIds={workflowMembershipIds} busy={workflow.busy} onSave={patch => workflow.saveAccount(selected.system_id, patch)} onToggleMembership={(watchlistId, enabled) => workflow.toggleMembership(selected.system_id, watchlistId, enabled)} />} onClose={() => setSelected(null)} />}
   </main>
 }

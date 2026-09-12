@@ -34,8 +34,24 @@ const recentEvents = [{
 const eventsBySystem = new Map([['SYS-1', recentEvents]])
 
 function renderWorkspace() {
+  window.sessionStorage.clear()
   const onOpenAccount = vi.fn()
-  render(<WorkflowScaleWorkspace systems={systems} marketCount={4894} accounts={accounts} watchlists={watchlists} memberships={memberships} savedViews={[{ id: 'view-1', name: 'Manhattan follow-up', filters: {} as never }]} recentEvents={recentEvents} eventsBySystem={eventsBySystem} today="2026-09-11" onOpenAccount={onOpenAccount} />)
+  render(<WorkflowScaleWorkspace
+    systems={systems}
+    marketCount={4894}
+    accounts={accounts}
+    watchlists={watchlists}
+    memberships={memberships}
+    savedViews={[{ id: 'view-1', name: 'Manhattan follow-up', filters: {} as never }]}
+    recentEvents={recentEvents}
+    eventsBySystem={eventsBySystem}
+    today="2026-09-11"
+    signedIn
+    busy={false}
+    onSaveAccount={async () => 'synced'}
+    onToggleMembership={async () => {}}
+    onOpenAccount={onOpenAccount}
+  />)
   return onOpenAccount
 }
 
@@ -52,11 +68,11 @@ test('keeps map table filters and selected account inspector synchronized', () =
 
   fireEvent.click(screen.getByRole('button', { name: 'Select first marker' }))
   const inspector = screen.getByRole('complementary')
-  expect(within(inspector).getByText('Investigate')).toBeInTheDocument()
-  expect(within(inspector).getByText('Call facilities before Friday')).toBeInTheDocument()
-  expect(within(inspector).getByText('Priority outreach')).toBeInTheDocument()
+  expect(within(inspector).getAllByText('Investigate').length).toBeGreaterThan(0)
+  expect(within(inspector).getAllByText('Call facilities before Friday').length).toBeGreaterThan(0)
+  expect(within(inspector).getAllByText('Priority outreach').length).toBeGreaterThan(0)
 
-  fireEvent.click(within(inspector).getByRole('button', { name: 'Open account to manage →' }))
+  fireEvent.click(within(inspector).getByRole('button', { name: 'Open full account →' }))
   expect(onOpenAccount).toHaveBeenCalledWith(expect.objectContaining({ system_id: 'SYS-1' }))
 })
 
