@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "domain": "NYC_DOHMH_LEGIONNAIRES_INVESTIGATIONS_REFERENCE",
+  "evidence_boundaries": {
+    "identity": "DOHMH publications identify building addresses, not NYC Cooling Tower Registry System IDs. TowerSignal may attach evidence to exact normalized-address matches for building context, but does not claim a named System ID was the tested tower unless DOHMH publishes that identity.",
+    "pcr": "PCR detects Legionella DNA and can reflect living or dead bacteria. PCR positivity is not evidence that the building caused Legionnaires disease exposure.",
+    "culture": "Culture positivity confirms live Legionella was present in the sampled cooling tower at collection time. DOHMH states a culture-positive cooling tower may or may not be the source of exposure.",
+    "remediation": "Remediation status is represented only when explicitly stated by DOHMH. An order or deadline is not treated as proof that remediation was completed.",
+    "absence": "No published outbreak match is not evidence that a cooling tower was tested negative or was outside an investigation."
+  },
+  "sources": {
+    "health_topic": "https://www.nyc.gov/site/doh/health/health-topics/legionnaires-disease.page",
+    "south_bronx_press_release": "https://www.nyc.gov/site/doh/about/press/pr2026/nyc-health-department-orders-cooling-towers-to-be-cleaned-in-south-bronx.page",
+    "ues_pcr_pdf": "https://www.nyc.gov/assets/doh/downloads/pdf/cd/ues-cluster-2026-pcr-positive-cooling-towers.pdf",
+    "ues_culture_pdf": "https://www.nyc.gov/assets/doh/downloads/pdf/cd/cooling-tower-confirmatory-culture-results.pdf"
+  },
+  "upper_east_side_2026": {
+    "cluster_id": "2026-UPPER-EAST-SIDE",
+    "cluster_name": "Upper East Side Legionnaires' Disease Cluster",
+    "borough": "Manhattan",
+    "status": "CONCLUDED",
+    "source_observation_date": "2026-07-29",
+    "aggregate": {
+      "tested_towers": 183,
+      "tested_buildings": 160,
+      "pcr_positive_towers": 77,
+      "pcr_positive_buildings": 75,
+      "culture_positive_towers": 59,
+      "culture_positive_buildings": 58,
+      "culture_negative_towers": 124
+    },
+    "pcr_positive_buildings_raw_pdf": [
+      "60 East End Avenue", "80 East End Avenue", "90 East End Avenue", "100 East End Avenue", "180 East End Avenue",
+      "1157 Lexington Avenue", "1381 Lexington Avenue", "1025 Madison Avenue", "1150 Madison Avenue", "1239 Madison Avenue", "1275 Madison Avenue",
+      "920 Park Avenue", "1020 Park Avenue", "1249 Park Avenue", "1520 York Avenue", "1750 York Avenue", "1755 York Avenue",
+      "1513 First Avenue", "1660 Second Avenue", "1875 Second Avenue", "1438 Third Avenue", "980 Fifth Avenue", "1000 Fifth Avenue",
+      "1110 Fifth Avenue", "1511 Third Avenue", "1551 Third Avenue", "1001 Fifth Avenue", "1071 Fifth Avenue", "1080 Fifth Avenue", "1130 Fifth Avenue",
+      "153 E 78th Street", "188 E 78th Street", "200 E 78th Street", "124 E 79th Street", "135 E 79th Street", "155 E 79th Street",
+      "201 E 79th Street", "211 E 79th Street", "300 E 79th Street", "40 E 80th Street", "511 E 80th Street", "238 E 81st Street",
+      "240 E 82nd Street", "444 E 82nd Street", "8 E 83rd Street", "25 E 83rd Street", "300 E 83rd Street", "500 E 83rd Street",
+      "13 E 84th Street", "40 E 84th Street", "145 E 84th Street", "160 E 84th Street", "114 E 85th Street", "117 E 85th Street",
+      "7 E 86th Street", "401 E 86th Street", "444 E 86th Street", "445 E 86th Street", "51 E 87th Street", "120 E 87th Street",
+      "125 E 87th Street", "152 E 87th Street", "501 E 87th Street", "160 E 88th Street", "168 E 88th Street", "401 E 88th Street",
+      "108 E 89th Street", "9 E 90th Street", "22 E 91st Street", "333 E 91st Street", "354 E 91st Street", "410 E 92nd Street",
+      "40 E 94th Street", "200 E 95th Street", "235 E 95th Street", "312 E 95th Street"
+    ],
+    "culture_positive_buildings": [
+      "60 East End Avenue", "100 East End Avenue", "180 East End Avenue", "1381 Lexington Avenue", "1486 Lexington Avenue",
+      "1150 Madison Avenue", "1239 Madison Avenue", "1275 Madison Avenue", "920 Park Avenue", "1020 Park Avenue", "1249 Park Avenue",
+      "1507 York Avenue", "1750 York Avenue", "1755 York Avenue", "1875 Second Avenue", "1660 Second Avenue", "1438 Third Avenue",
+      "1551 Third Avenue", "980 Fifth Avenue", "1001 Fifth Avenue", "1130 Fifth Avenue", "1080 Fifth Avenue", "1045 Fifth Avenue",
+      "1071 Fifth Avenue", "1513 First Avenue", "188 E 78th Street", "200 E 78th Street", "124 E 79th Street", "135 E 79th Street",
+      "155 E 79th Street", "201 E 79th Street", "211 E 79th Street", "300 E 79th Street", "301 E 80th Street", "511 E 80th Street",
+      "238 E 81st Street", "240 E 82nd Street", "8 E 83rd Street", "500 E 83rd Street", "13 E 84th Street", "145 E 84th Street",
+      "160 E 84th Street", "7 E 86th Street", "401 E 86th Street", "444 E 86th Street", "445 E 86th Street", "401 E 88th Street",
+      "51 E 87th Street", "120 E 87th Street", "125 E 87th Street", "501 E 87th Street", "168 E 88th Street", "9 E 90th Street",
+      "410 E 92nd Street", "40 E 94th Street", "200 E 95th Street", "235 E 95th Street", "115 E 97th Street"
+    ],
+    "culture_negative_buildings": [
+      "80 East End Avenue", "90 East End Avenue", "1157 Lexington Avenue", "1025 Madison Avenue", "1520 York Avenue", "1511 Third Avenue",
+      "1000 Fifth Avenue", "1110 Fifth Avenue", "153 E 78th Street", "40 E 80th Street", "444 E 82nd Street", "25 E 83rd Street",
+      "300 E 83rd Street", "40 E 84th Street", "114 E 85th Street", "117 E 85th Street", "152 E 87th Street", "160 E 88th Street",
+      "108 E 89th Street", "22 E 91st Street", "333 E 91st Street", "354 E 91st Street", "312 E 95th Street"
+    ],
+    "pcr_negative_culture_positive_buildings": [
+      "1486 Lexington Avenue", "1507 York Avenue", "1045 Fifth Avenue", "301 E 80th Street", "115 E 97th Street"
+    ],
+    "corrected_unregistered_pcr_negative_culture_negative_buildings": ["300 E 83rd Street"]
+  },
+  "south_bronx_2026": {
+    "cluster_id": "2026-SOUTH-BRONX-MELROSE-MORRISANIA",
+    "cluster_name": "South Bronx Melrose and Morrisania Legionnaires' Disease Cluster",
+    "borough": "Bronx",
+    "status": "ACTIVE",
+    "source_observation_date": "2026-09-14",
+    "pcr_positive_buildings": [
+      "820 Concourse Village West", "234 E. 149th St.", "1 E. 161st St.", "470 E. 161st St.", "1265 Franklin Ave.",
+      "567 Melrose Ave.", "3339 Park Ave.", "1160 Teller Ave.", "890 Washington Ave.", "1085 Washington Ave."
+    ],
+    "testing_information_not_provided_as_required": ["820 Concourse Village West", "1265 Franklin Ave."],
+    "remediation_order_date": "2026-09-12",
+    "remediation_deadline": "2026-09-14",
+    "culture_status": "PENDING"
+  }
+}
