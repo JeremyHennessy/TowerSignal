@@ -139,9 +139,6 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     ])
   } else {
     await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
-    await expect(page.getByText('Reported samples', { exact: true })).toBeVisible()
-    await expect(page.getByText('NYC Health inspections', { exact: true })).toBeVisible()
-    await expect(page.getByText('OATH penalty imposed')).toBeVisible()
     await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
@@ -149,6 +146,9 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   }
 
   await selectAccountMode(page, 'History')
+  for (const label of ['Reported samples', 'NYC Health inspections', 'OATH penalty imposed']) {
+    await expect(page.getByText(label, { exact: true })).toBeVisible()
+  }
   if (isIphone) {
     await expectDomText(page, ['Historical profile', 'OATH case lifecycle', 'TowerSignal History', 'ACRIS property activity'], '.detail-panel')
   } else {
@@ -190,7 +190,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
 
   await navigateWorkspace(page, testInfo, 'Monitor')
   await expect(page.getByRole('heading', { name: 'Monitor workspace', exact: true })).toBeVisible()
-  await expect(page.getByText(/new events/)).toBeVisible()
+  await expect(page.getByTestId('monitor-event-count')).toBeVisible()
   await expect(page).toHaveURL(/#\/monitor$/)
   await expectContained(page)
 
