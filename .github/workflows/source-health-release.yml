@@ -1,17 +1,24 @@
 name: Release verified Source Health coverage
-# Merge only after exact-head CI, snapshot proof and screenshot review.
-# A post-merge rerun of that proof triggers promotion. The prior Home release
-# must already be hosted; this release never replaces it with an older UI.
+# Follow the already-verified Home release pattern: merge the reviewed exact
+# head, then promote its successful candidate archive without rebuilding it.
 on:
-  workflow_run:
-    workflows: ['Source Health coverage snapshot proof']
-    types: [completed]
+  pull_request_target:
+    types: [closed]
+    branches: [main]
 permissions:
   contents: read
   actions: read
+  pull-requests: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
 jobs:
   release:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'agent/source-health-coverage-20260915'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.number == 248 &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment:
@@ -20,30 +27,40 @@ jobs:
     permissions:
       contents: read
       actions: read
+      pull-requests: read
       pages: write
       id-token: write
-    concurrency:
-      group: pages
-      cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
-      - name: Require merged exact tested head and unchanged main
+      - name: Require exact merged tree and successful proof before checkout
+        id: gate
         uses: actions/github-script@v7
         with:
           script: |
-            const pr=(await github.rest.pulls.get({...context.repo,pull_number:245})).data;
-            const run=context.payload.workflow_run;
-            if(!pr.merged || pr.head.sha!==run.head_sha || pr.merge_commit_sha!==context.sha) throw new Error('Only the exact tested PR 245 merge may be promoted');
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:248})).data;
+            const expected=context.payload.pull_request.head.sha;
+            if(!/^[a-f0-9]{40}$/.test(expected || '')) throw new Error('Invalid candidate SHA');
+            if(!pr.merged || pr.head.repo.full_name!==`${context.repo.owner}/${context.repo.repo}` || pr.head.ref!=='agent/source-health-auth-pacing-20260915' || pr.head.sha!==expected || pr.merge_commit_sha!==context.sha) throw new Error('Only the exact tested same-repository PR248 merge may be promoted');
             const main=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
             if(main.object.sha!==context.sha) throw new Error('Main moved before promotion');
-            const source=(await github.rest.git.getCommit({...context.repo,commit_sha:pr.head.sha})).data;
+            const source=(await github.rest.git.getCommit({...context.repo,commit_sha:expected})).data;
             const merged=(await github.rest.git.getCommit({...context.repo,commit_sha:context.sha})).data;
             if(source.tree.sha!==merged.tree.sha) throw new Error('Merged tree differs from the tested candidate');
-            core.info(`Promoting source ${pr.head.sha}, proof ${run.id}, merge ${context.sha}`);
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:expected,event:'push',status:'success',per_page:100})).data.workflow_runs;
+            const proof=runs.find(run=>run.path==='.github/workflows/source-health-coverage-proof.yml' && run.head_branch==='agent/source-health-auth-pacing-20260915');
+            if(!proof) throw new Error('No successful exact-head Source Health proof');
+            const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:proof.id})).data;
+            if(run.head_sha!==expected || run.conclusion!=='success' || run.path!=='.github/workflows/source-health-coverage-proof.yml') throw new Error('Proof is not successful for the exact tested head');
+            core.setOutput('proof_run_id',String(run.id));
+            core.setOutput('merged_sha',context.sha);
+            core.info(JSON.stringify({pr:248,candidate_sha:expected,merged_sha:context.sha,tree_sha:merged.tree.sha,proof_run_id:run.id}));
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.gate.outputs.merged_sha }}
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: source-health-candidate
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ steps.gate.outputs.proof_run_id }}
           github-token: ${{ github.token }}
           path: .candidate
       - uses: actions/download-artifact@v4
@@ -75,7 +92,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install hosted acceptance browsers
+      - name: Install hosted acceptance browsers without rebuilding the candidate
         run: |
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium webkit
@@ -107,6 +124,19 @@ jobs:
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
         run: npm run test:e2e
+      - name: Verify release remained unchanged throughout hosted acceptance
+        run: |
+          python - <<'PY'
+          import hashlib,time
+          from pathlib import Path
+          from urllib.request import urlopen
+          root=Path('dist')
+          names=['index.html','data/systems.json','data/metadata.json','data/legionella-alerts.json','data/coverage-audit.json','data/legionella-property-matches.json']
+          names += [str(p.relative_to(root)) for p in (root/'assets').rglob('*') if p.suffix in {'.js','.css'}]
+          for name in names:
+              with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?source-health-final='+str(time.time_ns()),timeout=90) as response: actual=response.read()
+              assert hashlib.sha256(actual).digest()==hashlib.sha256((root/name).read_bytes()).digest(), 'Hosted release changed during acceptance: '+name
+          PY
       - name: Retain hosted acceptance evidence
         if: always()
         uses: actions/upload-artifact@v4
