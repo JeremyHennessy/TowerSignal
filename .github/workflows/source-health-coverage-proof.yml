@@ -1,7 +1,7 @@
 name: Source Health coverage snapshot proof
 on:
   push:
-    branches: [agent/source-health-coverage-20260915]
+    branches: [agent/source-health-auth-pacing-20260915]
 permissions:
   contents: read
   actions: read
@@ -43,8 +43,6 @@ jobs:
           from pathlib import Path
           from urllib.request import urlopen
           root=Path('.baseline/site')
-          # Home's HTML may be deploying independently. The underlying source
-          # payloads must still match before candidate interception is allowed.
           for name in ['data/systems.json','data/legionella-alerts.json']:
               with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name,timeout=90) as response: actual=response.read()
               assert hashlib.sha256(actual).digest()==hashlib.sha256((root/name).read_bytes()).digest(), 'Hosted source baseline moved: '+name
@@ -89,10 +87,16 @@ jobs:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
           CANDIDATE_ROOT: .baseline/site
           SOURCE_HEALTH_BASELINE: '1'
-        # Only the test process receives this suffix; the workflow/run identity
-        # and artifact provenance remain the actual GitHub run. Avoid signing
-        # up the same test users twice in the subsequent acceptance pass.
         run: GITHUB_RUN_ID="${GITHUB_RUN_ID}-baseline" npx playwright test tests/e2e/source-health-coverage.spec.ts
+      - name: Test only the previously throttled paths with CI sign-in spacing
+        id: focused
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: dist
+        run: GITHUB_RUN_ID="${GITHUB_RUN_ID}-focused" npx playwright test tests/e2e/source-health-coverage.spec.ts tests/e2e/workflow-command-center.spec.ts tests/e2e/sales-precall.spec.ts
+      - name: Preserve the focused experiment report separately
+        if: always() && (steps.focused.outcome == 'success' || steps.focused.outcome == 'failure')
+        run: cp -R playwright-report source-health-focused-report
       - name: Full candidate acceptance including Source Health counts and failure states
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
@@ -116,5 +120,6 @@ jobs:
           name: source-health-proof-evidence
           path: |
             source-health-proof
+            source-health-focused-report
             playwright-report
           retention-days: 30
