@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import re
 import sys
+import threading
+import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -22,6 +25,11 @@ SCHEMA_VERSION = "1.0"
 QUERY_CHUNK_SIZE = 30
 FETCH_CAP = 50000
 RECENT_RELEVANT_DAYS = 1095
+MAX_CONCURRENT_REQUESTS = 3
+REQUEST_START_INTERVAL_SECONDS = 5.0
+REQUEST_ATTEMPTS = 4
+RATE_LIMIT_BACKOFF_SECONDS = (30.0, 60.0, 120.0)
+TRANSIENT_BACKOFF_SECONDS = (1.0, 2.0, 4.0)
 COOLING_TOWER_RE = re.compile(r"\bcooling\s+towers?\b", re.IGNORECASE)
 BOROUGH_NAMES = {
     "1": "MANHATTAN",
@@ -99,7 +107,6 @@ def _exact_where(chunk: list[str]) -> str:
         if not components:
             continue
         borough, block, lot = components
-        # BIS publishes lot as a five-character text field even though BBL lot is four digits.
         clauses.append(f"(borough='{borough}' AND block='{block}' AND lot='{str(int(lot)).zfill(5)}')")
     if not clauses:
         raise ValueError("No valid BBLs for legacy DOB query")
@@ -145,10 +152,7 @@ def normalize_job(row: dict[str, Any], *, as_of: date) -> dict[str, Any] | None:
     recent_relevant = _is_recent(activity_date, as_of) and (mechanical or boiler or plumbing or equipment)
     if not explicit_ct and not recent_relevant:
         return None
-    if explicit_ct:
-        relevance = "COOLING_TOWER_EXPLICIT"
-    else:
-        relevance = "RECENT_MECHANICAL_BOILER_PLUMBING_OR_EQUIPMENT"
+    relevance = "COOLING_TOWER_EXPLICIT" if explicit_ct else "RECENT_MECHANICAL_BOILER_PLUMBING_OR_EQUIPMENT"
     return {
         "source_row_id": _text(row.get("job_s1_no")),
         "job_number": _text(row.get("job__")),
@@ -196,21 +200,115 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
     retained_by_bbl: dict[str, dict[str, dict[str, Any]]] = {}
     source_matched_bbls: set[str] = set()
     fetched_job_count = 0
-    for start in range(0, len(requested), QUERY_CHUNK_SIZE):
-        chunk = requested[start:start + QUERY_CHUNK_SIZE]
-        rows = fetch_where(
-            DATASET_ID,
-            where=_exact_where(chunk),
-            order_by="borough,block,lot,job_s1_no",
-            select=SELECT,
-            limit=FETCH_CAP,
-            request_timeout=120,
-        )
-        if len(rows) >= FETCH_CAP:
-            raise SourceFetchError(
-                f"Legacy DOB exact-property query reached the {FETCH_CAP:,}-row cap for {len(chunk)} BBLs; refusing possibly truncated evidence"
+    started = time.monotonic()
+    batches = [requested[start:start + QUERY_CHUNK_SIZE] for start in range(0, len(requested), QUERY_CHUNK_SIZE)]
+    total_batches = len(batches)
+    print(
+        f"[legacy_dob] Fetching {len(requested):,} canonical BBLs in {total_batches} batches "
+        f"with at most {MAX_CONCURRENT_REQUESTS} concurrent requests and "
+        f"{REQUEST_START_INTERVAL_SECONDS:.0f}s minimum request-start spacing",
+        file=sys.stderr,
+        flush=True,
+    )
+
+    throttle_lock = threading.Lock()
+    next_request_start = 0.0
+
+    def reserve_request_start() -> None:
+        nonlocal next_request_start
+        while True:
+            with throttle_lock:
+                now = time.monotonic()
+                delay = next_request_start - now
+                if delay <= 0:
+                    next_request_start = now + REQUEST_START_INTERVAL_SECONDS
+                    return
+            time.sleep(min(delay, 1.0))
+
+    def extend_global_cooldown(seconds: float) -> None:
+        nonlocal next_request_start
+        with throttle_lock:
+            next_request_start = max(next_request_start, time.monotonic() + seconds)
+
+    def fetch_batch(batch_index: int, chunk: list[str]) -> tuple[int, list[dict[str, Any]], float]:
+        query_started = time.monotonic()
+        where = _exact_where(chunk)
+        last_error: SourceFetchError | None = None
+        for attempt in range(1, REQUEST_ATTEMPTS + 1):
+            reserve_request_start()
+            print(
+                f"[legacy_dob] Batch {batch_index}/{total_batches}: querying {len(chunk)} BBLs "
+                f"(attempt {attempt}/{REQUEST_ATTEMPTS})",
+                file=sys.stderr,
+                flush=True,
             )
+            try:
+                rows = fetch_where(
+                    DATASET_ID,
+                    where=where,
+                    order_by="borough,block,lot,job_s1_no",
+                    select=SELECT,
+                    limit=FETCH_CAP,
+                    request_retries=1,
+                    request_timeout=120,
+                )
+            except SourceFetchError as error:
+                last_error = error
+                message = str(error)
+                retryable_transport = message.startswith("Failed to retrieve authoritative source after")
+                if not retryable_transport or attempt >= REQUEST_ATTEMPTS:
+                    raise
+                rate_limited = "429" in message or "Too Many Requests" in message
+                delays = RATE_LIMIT_BACKOFF_SECONDS if rate_limited else TRANSIENT_BACKOFF_SECONDS
+                delay = delays[attempt - 1]
+                if rate_limited:
+                    extend_global_cooldown(delay)
+                else:
+                    time.sleep(delay)
+                print(
+                    f"[legacy_dob] Batch {batch_index}/{total_batches}: "
+                    f"{'rate limited' if rate_limited else 'transient source failure'}; "
+                    f"retrying after {delay:.0f}s",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                continue
+            if len(rows) >= FETCH_CAP:
+                raise SourceFetchError(
+                    f"Legacy DOB exact-property query reached the {FETCH_CAP:,}-row cap for {len(chunk)} BBLs; refusing possibly truncated evidence"
+                )
+            elapsed = time.monotonic() - query_started
+            print(f"[legacy_dob] Batch {batch_index}/{total_batches}: {len(rows):,} rows in {elapsed:.1f}s", file=sys.stderr, flush=True)
+            return batch_index, rows, elapsed
+        raise last_error or SourceFetchError(f"Legacy DOB batch {batch_index} exhausted retries")
+
+    rows_by_batch: dict[int, list[dict[str, Any]]] = {}
+    executor = ThreadPoolExecutor(max_workers=MAX_CONCURRENT_REQUESTS)
+    futures = [executor.submit(fetch_batch, index, chunk) for index, chunk in enumerate(batches, 1)]
+    try:
+        for future in as_completed(futures):
+            batch_index, rows, _ = future.result()
+            rows_by_batch[batch_index] = rows
+    except BaseException:
+        for future in futures:
+            future.cancel()
+        executor.shutdown(wait=True, cancel_futures=True)
+        raise
+    else:
+        executor.shutdown(wait=True)
+
+    if set(rows_by_batch) != set(range(1, total_batches + 1)):
+        raise SourceFetchError("Legacy DOB batch collection completed with an incomplete batch inventory")
+
+    for batch_index, chunk in enumerate(batches, 1):
+        rows = rows_by_batch[batch_index]
         fetched_job_count += len(rows)
+        print(
+            f"[legacy_dob] Batch {batch_index}/{total_batches}: merging {len(rows):,} rows; "
+            f"{fetched_job_count:,} rows total; elapsed {time.monotonic() - started:.1f}s",
+            file=sys.stderr,
+            flush=True,
+        )
         for source_row in rows:
             source_bbl = _source_bbl(source_row)
             if source_bbl not in requested_set:
@@ -247,7 +345,9 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
             "records": records,
         }
 
+    print("[legacy_dob] All exact-property batches completed; fetching source metadata", file=sys.stderr, flush=True)
     metadata = fetch_metadata(DATASET_ID)
+    print("[legacy_dob] Source metadata received; fetching total source count", file=sys.stderr, flush=True)
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     result = {
         "schema_version": SCHEMA_VERSION,
@@ -285,6 +385,7 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
     }
     target = output_file or output_dir / "legacy-dob-projects.json"
     target.write_text(json.dumps(result, separators=(",", ":")), encoding="utf-8")
+    print(f"[legacy_dob] Complete: {total_batches} batches in {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
     print(json.dumps(result["summary"], indent=2))
     return result
 
