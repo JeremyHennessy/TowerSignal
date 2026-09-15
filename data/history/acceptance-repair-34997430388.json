@@ -1,0 +1,6 @@
+{
+  "source_run_id": 34997430388,
+  "source_sha": "7eeb4a47e4be92ee8d9e16640705c97e8b93496b",
+  "acceptance_workflow": "nyc-hosted-acceptance-repair.yml",
+  "note": "Full actual hosted desktop and iPhone acceptance passed after correcting the Historical profile test mode. No data regeneration or application changes."
+}
