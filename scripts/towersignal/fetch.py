@@ -34,7 +34,7 @@ def _request_json(url: str, retries: int = 4, timeout: int = 90) -> Any:
             request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
             with urlopen(request, timeout=timeout) as response:
                 return json.load(response)
-        except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
+        except (HTTPError, URLError, TimeoutError, ConnectionResetError, json.JSONDecodeError) as exc:
             last_error = exc
             if attempt + 1 < retries:
                 time.sleep(2**attempt)
