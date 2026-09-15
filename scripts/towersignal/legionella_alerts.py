@@ -25,6 +25,8 @@ ALLOWED_HOSTS = {
 LEGACY_URL_ALIASES = {
     "https://health.ny.gov/diseases/communicable/legionellosis.htm": "https://www.health.ny.gov/diseases/communicable/legionellosis/",
     "https://www.health.ny.gov/diseases/communicable/legionellosis.htm": "https://www.health.ny.gov/diseases/communicable/legionellosis/",
+    "https://portal.311.nyc.gov/article/KA-02845": "https://portal.311.nyc.gov/article/?kanumber=KA-02845",
+    "https://portal.311.nyc.gov/article/KA-02664": "https://portal.311.nyc.gov/article/?kanumber=KA-02664",
 }
 
 SOURCE_CHANNELS = (
