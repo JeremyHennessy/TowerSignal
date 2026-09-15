@@ -1,0 +1,37 @@
+name: Prepare Monitor assertion text
+on:
+  push:
+    branches: ['agent/nyc-release-dispatch-20260915']
+    paths: ['.github/workflows/prepare-monitor-test-text.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const base='4a1499fab419e0b9f2b3607410d54adcb523ca57';
+            const edits=[
+              ['tests/frontend/App.test.tsx','1a535db82ca41e6645c3e2a4d0f0b9185b2d9ca8',[
+                ["screen.getAllByText('New public sample reported')","screen.getAllByText('Public sample reported')"],
+                ["screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')","screen.getByText('NYC tower registry')"],
+                ["screen.getByText('Evidence: SYSTEM_ID_EXACT')","screen.getByText('Exact system ID')"]]],
+              ['tests/e2e/live.spec.ts','06219df5830e1ff1857bb351ecca2d0a83a146f8',[
+                ["page.getByText(/new events/)","page.getByTestId('monitor-event-count')"]]]
+            ];
+            for(const [path,expected,replacements] of edits){
+              const file=(await github.rest.repos.getContent({...context.repo,path,ref:base})).data;
+              let content=Buffer.from(file.content,'base64').toString('utf8');
+              for(const [before,after] of replacements){
+                if(content.split(before).length!==2) throw new Error('Expected unique assertion: '+path);
+                content=content.replace(before,after);
+              }
+              const hash=require('crypto').createHash('sha1').update(Buffer.concat([Buffer.from('blob '+Buffer.byteLength(content)+'\0'),Buffer.from(content)])).digest('hex');
+              if(hash!==expected) throw new Error('Prepared test differs from locally tested bytes: '+path);
+              const blob=(await github.rest.git.createBlob({...context.repo,content,encoding:'utf-8'})).data;
+              if(blob.sha!==expected) throw new Error('Blob identity mismatch');
+              core.info(path+' '+blob.sha);
+            }
