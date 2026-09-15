@@ -7,21 +7,79 @@ permissions:
 jobs:
   export:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 13711cfe2e8631d88099feac6cc03a0e7e34248f
+          ref: 30422453fd832df2baec74ff5ab10f4ecd3bf959
           persist-credentials: false
-      - name: Export exact candidate and source checksums
-        run: |
-          mkdir -p /tmp/nyc-release-source
-          git archive --format=zip HEAD -o /tmp/nyc-release-source/source.zip
-          git rev-parse HEAD > /tmp/nyc-release-source/commit.txt
-          git rev-parse HEAD^{tree} > /tmp/nyc-release-source/tree.txt
-          git ls-tree -r HEAD > /tmp/nyc-release-source/git-files.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/setup-node@v4
         with:
-          name: nyc-source-13711cfe
-          path: /tmp/nyc-release-source/
-          retention-days: 7
+          node-version: 22
+      - name: Install existing browser tooling
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Write temporary read-only hosted hydration test
+        run: |
+          mkdir -p diagnostics
+          cat > tests/e2e/opportunities-readiness-diagnostic.spec.ts <<'TS'
+          import { mkdirSync, writeFileSync } from 'node:fs'
+          import { expect, test } from './fixtures'
+          import { expectContained } from './iphone.helpers'
+          const source = '62bf803ce92bd469757df63030bac66338572253'
+          test('actual hosted Opportunities completes procurement hydration on desktop and iPhone', async ({page}, info) => {
+            test.setTimeout(240_000)
+            const folder = `diagnostics/${info.project.name}`
+            mkdirSync(folder, {recursive:true})
+            const responses: Array<Record<string,unknown>> = []
+            const failures: Array<Record<string,unknown>> = []
+            const errors: string[] = []
+            page.on('response', r => { if(r.url().includes('/TowerSignal/data/')) responses.push({url:r.url().split('?')[0], status:r.status(), observed_at:new Date().toISOString()}) })
+            page.on('requestfailed', r => {if(r.url().includes('/TowerSignal/data/')) failures.push({url:r.url().split('?')[0], error:r.failure()?.errorText})})
+            page.on('pageerror', e => errors.push(String(e)))
+            const response = await page.request.get(`./nyc-evidence-release.json?readiness=${Date.now()}`)
+            expect(response.ok()).toBe(true)
+            const marker = await response.json()
+            expect(marker.candidate_sha).toBe(source)
+            const started = Date.now()
+            try {
+              await page.evaluate(() => {location.hash = '#/opportunities'})
+              await expect(page.getByRole('heading', {name:'Opportunities workspace', exact:true})).toBeVisible()
+              await expect(page.getByLabel('Procurement source', {exact:true})).toBeVisible({timeout:180_000})
+              await expect(page.locator('.procurement-table tbody tr').first()).toBeVisible()
+              await expect(page.getByText('Loading verified procurement intelligence…', {exact:true})).toHaveCount(0)
+              await expect(page.getByText('Procurement intelligence is unavailable.', {exact:true})).toHaveCount(0)
+              const elapsed = Date.now() - started
+              await expectContained(page)
+              await page.evaluate(() => window.scrollTo(0,0))
+              await page.screenshot({path:`${folder}/opportunities-loaded.png`, scale:'css', animations:'disabled'})
+              await page.getByText('Public procurement intelligence', {exact:true}).scrollIntoViewIfNeeded()
+              await page.screenshot({path:`${folder}/procurement-loaded.png`, scale:'css', animations:'disabled'})
+              const rows = await page.locator('.procurement-table tbody tr').allInnerTexts()
+              writeFileSync(`${folder}/rendered-evidence.json`, JSON.stringify({mode:'ACTUAL_HOSTED_NYC',marker,merged_sha:'30422453fd832df2baec74ff5ab10f4ecd3bf959',project:info.project.name,verified_at:new Date().toISOString(),hydration_ms:elapsed,visible_rows:rows.length,source_options:await page.getByLabel('Procurement source',{exact:true}).locator('option').allTextContents(),source_warnings:await page.locator('.procurement-source-warning').allInnerTexts(),first_rows:rows.slice(0,10),date_values_requiring_separate_review:rows.filter(r=>/9999|2099/.test(r)).length},null,2))
+              await page.getByLabel('Procurement source', {exact:true}).selectOption('CITY_RECORD')
+              await expect(page.locator('.procurement-table tbody tr').first()).toBeVisible()
+              await expect(page.locator('.procurement-table tbody tr').first()).toContainText('City Record')
+              await expectContained(page)
+              const final = await page.request.get(`./nyc-evidence-release.json?readiness-final=${Date.now()}`)
+              expect(await final.json()).toEqual(marker)
+              expect(failures).toEqual([])
+              expect(errors).toEqual([])
+            } finally {
+              writeFileSync(`${folder}/transport.json`,JSON.stringify({responses,failures,errors,elapsed_ms:Date.now()-started},null,2))
+              await page.screenshot({path:`${folder}/final-state.png`,scale:'css',animations:'disabled'}).catch(()=>{})
+            }
+          })
+          TS
+      - name: Verify actual hosted content without candidate interception
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/opportunities-readiness-diagnostic.spec.ts
+      - name: Preserve screenshots and sanitized source-readiness diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nyc-opportunities-hosted-readiness
+          path: diagnostics/
+          retention-days: 30
