@@ -1,0 +1,142 @@
+name: Release tested NYC Home intelligence
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Merged PR whose exact tree passed the candidate proof
+        required: true
+        type: string
+      candidate_sha:
+        description: Exact tested PR head SHA
+        required: true
+        type: string
+      proof_run_id:
+        description: Successful Home intelligence proof run
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  release:
+    # Only an already-merged, same-repository release may execute. Never check
+    # out or execute code from an unmerged PR in a privileged target workflow.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.pull_request.merged == true &&
+        github.event.pull_request.number == 244 &&
+        github.event.pull_request.head.repo.full_name == github.repository))
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Require the exact merged and tested tree before any checkout
+        id: gate
+        uses: actions/github-script@v7
+        env:
+          REQUEST_PR: ${{ inputs.pr_number }}
+          REQUEST_SHA: ${{ inputs.candidate_sha }}
+          REQUEST_PROOF: ${{ inputs.proof_run_id }}
+        with:
+          script: |
+            const number=Number(process.env.REQUEST_PR || context.payload.pull_request?.number);
+            if (number!==244) throw new Error('This release is limited to reviewed PR 244');
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:number})).data;
+            const expected=process.env.REQUEST_SHA || context.payload.pull_request?.head.sha;
+            if (!/^[a-f0-9]{40}$/.test(expected || '')) throw new Error('Invalid candidate SHA');
+            if (!pr.merged || pr.head.repo.full_name!==`${context.repo.owner}/${context.repo.repo}` || pr.head.ref!=='agent/nyc-home-intelligence-20260915' || pr.merge_commit_sha!==context.sha || pr.head.sha!==expected) throw new Error('Not the exact tested same-repository PR merge');
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if (ref.object.sha!==context.sha) throw new Error('Main advanced before release');
+            const original=(await github.rest.git.getCommit({...context.repo,commit_sha:expected})).data;
+            const merged=(await github.rest.git.getCommit({...context.repo,commit_sha:context.sha})).data;
+            if (original.tree.sha!==merged.tree.sha) throw new Error('Merged tree differs from tested tree');
+            let proof=process.env.REQUEST_PROOF;
+            if (!proof) {
+              const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:expected,event:'push',status:'success',per_page:100})).data.workflow_runs;
+              proof=runs.find(run=>run.path==='.github/workflows/home-intelligence-proof.yml')?.id;
+            }
+            if (!proof || !/^\d+$/.test(String(proof))) throw new Error('No successful exact-head candidate proof');
+            const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:Number(proof)})).data;
+            if (run.head_sha!==expected || run.conclusion!=='success' || run.path!=='.github/workflows/home-intelligence-proof.yml') throw new Error('Candidate proof is not successful for this exact head');
+            core.setOutput('proof_run_id',String(run.id));
+            core.setOutput('merged_sha',context.sha);
+            core.info(JSON.stringify({pr:number,candidate_sha:expected,merged_sha:context.sha,tree_sha:merged.tree.sha,proof_run_id:run.id}));
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.gate.outputs.merged_sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: home-intelligence-candidate
+          run-id: ${{ steps.gate.outputs.proof_run_id }}
+          github-token: ${{ github.token }}
+          path: .candidate
+      - name: Verify and unpack tested candidate and rollback
+        run: |
+          (cd .candidate && sha256sum --check home-candidate.tar.sha256 && sha256sum --check home-rollback.tar.sha256)
+          mkdir -p dist .rollback
+          tar -xf .candidate/home-candidate.tar -C dist
+          tar -xf .candidate/home-rollback.tar -C .rollback
+          python scripts/verify_home_intelligence_release.py .rollback
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install hosted acceptance browsers without rebuilding the candidate
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy the exact pretested NYC artifact
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify exact deployed HTML assets and matched-source bytes
+        run: python scripts/verify_home_intelligence_release.py dist --candidate
+      - name: Full actual hosted desktop and iPhone acceptance
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Verify hosted release stayed unchanged throughout acceptance
+        run: python scripts/verify_home_intelligence_release.py dist --candidate
+      - name: Retain hosted evidence and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: home-intelligence-hosted-evidence
+          path: |
+            playwright-report/
+            dist/home-intelligence-release.json
+          retention-days: 30
+      - name: Stage exact prior artifact on failed acceptance
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: home-intelligence-rollback
+          path: .rollback
+      - name: Restore the prior verified deployment
+        if: failure() && steps.deploy.outcome == 'success'
+        id: rollback
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: home-intelligence-rollback
+      - name: Verify restored production identity
+        if: failure() && steps.rollback.outcome == 'success'
+        run: python scripts/verify_home_intelligence_release.py .rollback
