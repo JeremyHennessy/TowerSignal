@@ -10,6 +10,10 @@ on:
       - 'scripts/validate_property_enforcement_cache.py'
       - '.github/workflows/property-enforcement-production-universe-proof.yml'
 
+concurrency:
+  group: property-enforcement-production-universe-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
