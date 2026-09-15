@@ -14,7 +14,7 @@ REQUIRED_CHANNELS = {
     "NYC_DOH_PRESS_RELEASES",
     "NYC_DOH_COOLING_TOWER_REQUIREMENTS",
     "NYC_MAYOR_NEWS",
-    "NYC_NOTIFY_NYC_RSS",
+    "NYC_NOTIFY_NYC",
     "NYC_311_LEGIONNAIRES",
     "NYC_311_COOLING_TOWER",
     "NYSDOH_LEGIONNAIRES_TOPIC",
@@ -64,8 +64,8 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_clean_retrieval: 
             raise RuntimeError(f"Discovered item lacks required relevance terms: {url}")
         if not item.get("content_sha256") or int(item.get("content_bytes") or 0) <= 0:
             raise RuntimeError(f"Discovered item lacks content proof: {url}")
-        if item.get("document_type") == "RSS_ITEM" and item.get("channel_key") != "NYC_NOTIFY_NYC_RSS":
-            raise RuntimeError(f"Unexpected RSS item channel: {item.get('channel_key')}")
+        if item.get("document_type") == "NOTIFY_NYC_ALERT" and item.get("channel_key") != "NYC_NOTIFY_NYC":
+            raise RuntimeError(f"Unexpected Notify NYC alert channel: {item.get('channel_key')}")
 
     errors = payload.get("errors") or []
     if require_clean_retrieval and errors:
