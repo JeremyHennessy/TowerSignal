@@ -14,11 +14,17 @@ REQUIRED_CHANNELS = {
     "NYC_DOH_PRESS_RELEASES",
     "NYC_DOH_COOLING_TOWER_REQUIREMENTS",
     "NYC_MAYOR_NEWS",
+    "NYC_NOTIFY_NYC_RSS",
+    "NYC_311_LEGIONNAIRES",
+    "NYC_311_COOLING_TOWER",
     "NYSDOH_LEGIONNAIRES_TOPIC",
     "NYSDOH_LEGIONELLA_REGULATION",
     "NYSDOH_PROTECTION_AGAINST_LEGIONELLA",
 }
-ALLOWED_HOSTS = {"www.nyc.gov", "nyc.gov", "home4.nyc.gov", "www.health.ny.gov", "health.ny.gov", "regs.health.ny.gov"}
+ALLOWED_HOSTS = {
+    "www.nyc.gov", "nyc.gov", "home4.nyc.gov", "www.health.ny.gov", "health.ny.gov", "regs.health.ny.gov",
+    "a858-nycnotify.nyc.gov", "portal.311.nyc.gov",
+}
 
 
 def validate(path: Path, *, max_age_days: float = 1.0, require_clean_retrieval: bool = False) -> dict:
@@ -42,12 +48,15 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_clean_retrieval: 
             raise RuntimeError(f"Source channel snapshot lacks content proof: {row.get('url')}")
 
     items = payload.get("items") or []
-    seen: set[str] = set()
+    seen_item_ids: set[str] = set()
     for item in items:
+        item_id = str(item.get("item_id") or "")
         url = str(item.get("url") or "")
-        if not url or url in seen:
-            raise RuntimeError(f"Duplicate or missing Legionella item URL: {url!r}")
-        seen.add(url)
+        if not item_id or item_id in seen_item_ids:
+            raise RuntimeError(f"Duplicate or missing Legionella item identity: {item_id!r}")
+        seen_item_ids.add(item_id)
+        if not url:
+            raise RuntimeError(f"Legionella item {item_id} lacks a source URL")
         if urlparse(url).netloc.lower() not in ALLOWED_HOSTS:
             raise RuntimeError(f"Unapproved discovered item host: {url}")
         terms = item.get("match_terms") or {}
@@ -55,6 +64,8 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_clean_retrieval: 
             raise RuntimeError(f"Discovered item lacks required relevance terms: {url}")
         if not item.get("content_sha256") or int(item.get("content_bytes") or 0) <= 0:
             raise RuntimeError(f"Discovered item lacks content proof: {url}")
+        if item.get("document_type") == "RSS_ITEM" and item.get("channel_key") != "NYC_NOTIFY_NYC_RSS":
+            raise RuntimeError(f"Unexpected RSS item channel: {item.get('channel_key')}")
 
     errors = payload.get("errors") or []
     if require_clean_retrieval and errors:
