@@ -30,13 +30,15 @@ jobs:
               assert actual==expected, 'Transferred file differs: '+name+' '+actual
               print('SHA-256 matched',name)
           PY
-      - name: Commit clean source to isolated prepared branch without deploying
+      - name: Preserve prepared source without writing workflow refs with Actions token
         run: |
-          git rm .nyc-transfer-edits.json .nyc-transfer-hashes.json .github/workflows/nyc-transfer.yml
-          git add .github/workflows/pages.yml scripts/towersignal/legionella_alerts.py src tests
+          cp .github/workflows/pages.yml .nyc-prepared-pages.txt
+          git restore .github/workflows/pages.yml
+          git add .nyc-prepared-pages.txt scripts/towersignal/legionella_alerts.py src tests
           git config user.name 'TowerSignal Release Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git commit -m 'Complete NYC source-dated intelligence, exact building evidence and reviewed priority explanations'
-          git push origin HEAD:refs/heads/work/nyc-prepared-20260915
+          git commit -m 'Prepare checksum-verified NYC application source and workflow bytes'
           git rev-parse HEAD
           git rev-parse HEAD^{tree}
+          git rev-parse HEAD:.nyc-prepared-pages.txt
+          git push origin HEAD:refs/heads/work/nyc-prepared-20260915
