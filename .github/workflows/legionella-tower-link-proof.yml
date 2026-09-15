@@ -1,0 +1,65 @@
+name: Prove official Legionella tower matching
+on:
+  push:
+    branches: ['agent/legionella-tower-matching-20260915']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34997430388
+          github-token: ${{ github.token }}
+          path: .baseline
+      - name: Extract exact verified NYC runtime
+        run: |
+          mkdir -p .site
+          tar -xf .baseline/artifact.tar -C .site
+          cp .site/data/systems.json .baseline/systems.json
+          command -v pdftotext || (sudo apt-get update -qq && sudo apt-get install -y poppler-utils)
+      - name: Offline resolver regression tests
+        run: python -m unittest discover -s tests/python -p 'test_legionella_tower_links.py' -v
+      - name: Collect actual official HTML and PDFs and match the full registry
+        run: python scripts/build_legionella_tower_links.py --data .site/data --source-dir .source-documents
+      - name: Verify all original source fields and scores are unchanged
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          old=json.loads(Path('.baseline/systems.json').read_text())
+          new=json.loads(Path('.site/data/systems.json').read_text())
+          for row in new['systems']:
+              for key in ('legionella_event_ids','legionella_named_event_ids','legionella_area_only_event_ids'): row.pop(key)
+          assert old==new, 'Unrelated registry field changed'
+          payload=json.loads(Path('.site/data/legionella-tower-links.json').read_text())
+          assert payload['registry_system_count']==4894
+          bronx=payload['events'][0]
+          assert bronx['published_building_count']==10 and bronx['named_building_count']==10
+          assert bronx['named_system_count']==11
+          assert payload['system_links']['2000003097'][0]['relationship']=='NAMED_BUILDING'
+          assert not payload['system_links']['2000003097'][0]['shares_published_zip']
+          assert '2000015835' not in payload['system_links']
+          print('All original fields and scores preserved. Ten official Bronx addresses resolve to eleven registered systems; Melrose ZIP mismatch is handled without a fuzzy match.')
+          PY
+      - name: Retain actual source bytes and matching proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legionella-tower-link-source-proof
+          path: |
+            .site/data/legionella-tower-links.json
+            .site/data/systems.json
+            .source-documents/
+          include-hidden-files: true
+          retention-days: 30
