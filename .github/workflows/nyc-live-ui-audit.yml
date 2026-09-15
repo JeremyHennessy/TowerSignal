@@ -1,0 +1,50 @@
+name: Audit hosted NYC pages and tabs
+
+on:
+  push:
+    branches: ['agent/nyc-live-ui-audit-20260915']
+    paths:
+      - '.github/workflows/nyc-live-ui-audit.yml'
+      - 'scripts/audit_nyc_live_ui.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nyc-live-ui-audit-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [desktop, iphone]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install existing browser test dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install browser
+        run: npx playwright install --with-deps chromium webkit
+      - name: Capture actual hosted pages and tab states without deploying
+        env:
+          AUDIT_BROWSER: ${{ matrix.browser }}
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: node scripts/audit_nyc_live_ui.mjs
+      - name: Retain screenshots, text, response diagnostics and manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nyc-hosted-ui-audit-${{ matrix.browser }}-${{ github.run_id }}
+          path: ui-audit/${{ matrix.browser }}/
+          retention-days: 30
+          if-no-files-found: error
