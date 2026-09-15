@@ -1,0 +1,107 @@
+name: Verify NYC enforcement release after history assertion repair
+on:
+  push:
+    branches: ['agent/nyc-hosted-acceptance-20260915']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: nyc-hosted-acceptance-repair
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34997430388
+          github-token: ${{ github.token }}
+          path: .source-artifact
+      - name: Retain and identify exact deployed source artifact
+        run: |
+          mkdir -p .source-site
+          tar -xf .source-artifact/artifact.tar -C .source-site
+          python scripts/verify_nyc_release_identity.py .source-site
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Full actual hosted desktop and iPhone acceptance
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Require same hosted release after browser acceptance
+        run: python scripts/verify_nyc_release_identity.py .source-site
+      - name: Retain browser acceptance and repaired test source
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nyc-repaired-hosted-acceptance
+          path: |
+            playwright-report/
+            tests/e2e/live.spec.ts
+          retention-days: 30
+  persist-history:
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          path: .code
+      - uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history
+      - uses: actions/download-artifact@v4
+        with:
+          name: towersignal-history-state
+          run-id: 34997430388
+          github-token: ${{ github.token }}
+          path: .verified
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34997430388
+          github-token: ${{ github.token }}
+          path: .artifact
+      - name: Preserve exact verified history only while source release remains hosted
+        run: |
+          mkdir -p .site
+          tar -xf .artifact/artifact.tar -C .site
+          python .code/scripts/verify_nyc_release_identity.py .site
+          python - <<'PY'
+          import json, pathlib, shutil
+          source=pathlib.Path('.verified')
+          target=pathlib.Path('.history/data/history')
+          candidate=json.loads((source/'history/latest.json').read_text())
+          current=json.loads((target/'latest.json').read_text())
+          def when(value):
+              return str(value.get('generated_at') or value.get('snapshot_generated_at') or (value.get('metadata') or {}).get('generated_at') or value.get('snapshot_date') or '')
+          if when(current) and when(candidate) and when(current)>when(candidate):
+              raise SystemExit('Refusing to replace newer durable history')
+          for name in ('latest.json','events.json','nys/latest.json','nys/events.json'):
+              (target/name).parent.mkdir(parents=True,exist_ok=True)
+              shutil.copy2(source/'history'/name,target/name)
+          if (target/'segments').exists(): shutil.rmtree(target/'segments')
+          shutil.copytree(source/'history/segments',target/'segments')
+          for name in ('source-health.json','legionella-alerts.json'): shutil.copy2(source/name,target/name)
+          (target/'acceptance-repair-34997430388.json').write_text(json.dumps({'source_run_id':34997430388,'source_sha':'7eeb4a47e4be92ee8d9e16640705c97e8b93496b','acceptance_workflow':'nyc-hosted-acceptance-repair.yml','note':'Full actual hosted desktop and iPhone acceptance passed after correcting the Historical profile test mode. No data regeneration or application changes.'},indent=2)+'\n')
+          PY
+          cd .history
+          git config user.name 'TowerSignal History Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add data/history
+          if ! git diff --cached --quiet; then
+            git commit -m 'history: preserve verified NYC enforcement release after hosted acceptance [skip ci]'
+            git push origin HEAD:data/towersignal-history
+          fi
