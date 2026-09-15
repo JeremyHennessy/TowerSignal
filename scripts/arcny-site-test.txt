@@ -1,0 +1,64 @@
+import { expect, test } from '@playwright/test'
+import { signInForProject } from './auth.helpers'
+
+// Browser rendering contract only: synthetic private API reads; real application,
+// real NYC payload and normal test-account authentication. No customer data or
+// database writes are made by this fixture. Actual persistence has separate tests.
+test('private site-lead fixture stays in Monitor alongside registered NYC accounts', async ({ page }, testInfo) => {
+  testInfo.setTimeout(180_000)
+  const errors: string[] = []
+  const diagnostics: string[] = []
+  page.on('console', message => { if (message.type() === 'error') diagnostics.push(message.text()) })
+  page.on('requestfailed', request => diagnostics.push(`${request.method()} ${request.url()} ${request.failure()?.errorText}`))
+  page.on('pageerror', error => errors.push(error.message))
+  const accountIds = ['2000015564', ...Array.from({ length: 10 }, (_, i) => `fixture-site-${i + 1}`)]
+  const rows = accountIds.map((system_id, i) => ({ system_id, status: 'monitor', note: i === 0 ? 'Fixture registered account' : `Example property ${String(i).padStart(2, '0')}\nHistorical association; exact address or equipment match remains unverified.`, next_action_date: null }))
+  const fixtures: Record<string, unknown[]> = {
+    workflow_accounts: rows,
+    workflow_watchlists: [{ watchlist_id: 'site-demo', name: 'Example site demo' }, { watchlist_id: 'existing-demo', name: 'Existing watchlist' }],
+    workflow_watchlist_members: [...accountIds.map(system_id => ({ system_id, watchlist_id: 'site-demo' })), { system_id: accountIds[0], watchlist_id: 'existing-demo' }],
+    workflow_saved_views: [],
+  }
+  await page.route(/\/rest\/v1\/workflow_(accounts|watchlists|watchlist_members|saved_views)(\?|$)/, async route => {
+    const request = route.request()
+    diagnostics.push(`fixture ${request.method()} ${request.url()}`)
+    const headers = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-methods': 'GET, OPTIONS', 'access-control-allow-headers': request.headers()['access-control-request-headers'] ?? 'authorization,content-type' }
+    if (request.method() === 'OPTIONS') { await route.fulfill({ status: 204, headers }); return }
+    if (request.method() !== 'GET') throw new Error('Read-only site rendering fixture attempted a workflow write')
+    const table = new URL(request.url()).pathname.split('/').pop()!
+    await route.fulfill({ status: 200, contentType: 'application/json', headers, body: JSON.stringify(fixtures[table]) })
+  })
+  await signInForProject(page, testInfo.project.name, '#/workflow')
+  const workspace = page.locator('.workflow-workspace-page')
+  await expect(workspace).toBeVisible()
+  const monitor = workspace.getByRole('button', { name: 'Monitor 11', exact: true })
+  try { await expect(monitor).toBeVisible() } catch (error) {
+    await testInfo.attach('site-fixture-diagnostics', { contentType: 'application/json', body: JSON.stringify({ diagnostics, text: await page.locator('body').innerText() }) })
+    throw error
+  }
+  await monitor.click()
+  await page.getByLabel('Workflow watchlist filter').selectOption('site-demo')
+  await expect(page.getByRole('tab', { name: 'Accounts 11', exact: true })).toBeVisible()
+  await expect(page.locator('.workflow-command-table tbody tr')).toHaveCount(1)
+  await expect(page.locator('.workflow-site-lead')).toHaveCount(10)
+  await expect(page.getByRole('option', { name: 'Example site demo (11)', exact: true })).toHaveCount(1)
+  await expect(page.locator('.workflow-site-leads')).toContainText('not included in NYC maps, Priority Scores or source-change totals')
+  const width = page.viewportSize()!.width
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width + 2)
+  await page.screenshot({ path: testInfo.outputPath('site-monitor-fixture.png'), fullPage: true })
+  await page.getByLabel('Search workflow accounts').fill('Example property 03')
+  await expect(page.locator('.workflow-site-lead')).toHaveCount(1)
+  await expect(page.getByText('No workflow accounts match these filters.', { exact: true })).toHaveCount(0)
+  await page.locator('.workflow-site-lead summary').click()
+  await expect(page.locator('.workflow-site-lead textarea')).toContainText('Historical association')
+  await page.getByLabel('Search workflow accounts').fill('')
+  await page.getByLabel('Workflow watchlist filter').selectOption('existing-demo')
+  await expect(page.locator('.workflow-command-table tbody tr')).toHaveCount(1)
+  await expect(page.locator('.workflow-site-lead')).toHaveCount(0)
+  await page.getByLabel('Workflow watchlist filter').selectOption('site-demo')
+  await page.reload({ waitUntil: 'networkidle' })
+  await expect(page.locator('.workflow-site-lead')).toHaveCount(10)
+  await expect(page.getByLabel('Workflow status filter')).toHaveValue('monitor')
+  await expect(page.getByLabel('Workflow watchlist filter')).toHaveValue('site-demo')
+  expect(errors).toEqual([])
+})

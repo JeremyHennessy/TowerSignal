@@ -25,6 +25,12 @@ jobs:
           import gzip,hashlib,json,os,subprocess
           from pathlib import Path
           payload=json.loads(gzip.decompress(Path('driver/scripts/arcny-feature-payload.json.gz').read_bytes()))
+          test_source=Path('driver/scripts/arcny-site-test.txt').read_text()
+          test_path='tests/e2e/workflow-site-leads.spec.ts'
+          test_digest='0c7e91fd06e9783fe45b5cc629660221198d917ba34ae2f13971f53d8fbc9b86'
+          assert hashlib.sha256(test_source.encode()).hexdigest()==test_digest
+          payload['files'][test_path]=test_source
+          payload['postimages'][test_path]=test_digest
           os.chdir('candidate')
           assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='04d2711cde448e8e57909dd0ce9d9152cc8ddf9c'
           for name,digest in payload['preimages'].items():
