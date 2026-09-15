@@ -46,6 +46,10 @@ export async function submitSignIn(page: Page, projectName: string): Promise<voi
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
   const attempts = process.env.CI && family(projectName) === 'iphone' ? 2 : 1
 
+  // Same CI-only pacing proposed in PR #248 after retained HTTP 429 traces.
+  // No production auth changes, disabled assertions or additional retries.
+  if (process.env.CI) await page.waitForTimeout(11_000)
+
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     await page.getByLabel('Email').fill(credentials.email)
     await page.getByLabel('Password', { exact: true }).fill(credentials.password)

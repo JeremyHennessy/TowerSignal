@@ -121,7 +121,7 @@ export interface LegionellaBuildingLink {
   source_title: string
   source_date: string
   date_basis: string
-  event_date?: string
+  event_date?: string | null
   episode_id: string
   episode_status: string
   episode_closed_at: string | null

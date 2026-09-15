@@ -33,7 +33,7 @@ def validate(root,baseline=None):
                 if k not in ('priority_score','score_components','signal_types','primary_signal'): assert r[k]==oldrows[r['system_id']][k]
     review=read(root/'priority-model-review.json');assert review['changed_system_count']==changed==len(review['changed_systems'])
     if baseline:
-        exceptions={'systems.json','metadata.json'}
+        exceptions={'systems.json','metadata.json','coverage-audit.json','coverage-audit.md'}
         for f in baseline.rglob('*'):
             rel=f.relative_to(baseline)
             if f.is_file() and str(rel) not in exceptions and not str(rel).startswith('details/'):

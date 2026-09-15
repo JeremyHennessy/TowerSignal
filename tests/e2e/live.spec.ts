@@ -191,7 +191,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
 
   await navigateWorkspace(page, testInfo, 'Monitor')
   await expect(page.getByRole('heading', { name: 'Monitor workspace', exact: true })).toBeVisible()
-  await expect(page.getByText(/new events/)).toBeVisible()
+  await expect(page.getByTestId('monitor-event-count')).toBeVisible()
   await expect(page).toHaveURL(/#\/monitor$/)
   await expectContained(page)
 

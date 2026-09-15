@@ -47,8 +47,8 @@ def attach(root: Path):
     payload = json.loads(raw)
     matches = read(root/'legionella-property-matches.json')
     assert matches['domain'] == 'LEGIONELLA_PROPERTY_MATCHES'
-    if not payload['metadata'].get('priority_review_source_registry_sha256'):
-        assert matches['registry_sha256'] == hashlib.sha256(raw).hexdigest(), 'Match index is from a different registry snapshot'
+    expected_registry = payload['metadata'].get('priority_review_source_registry_sha256') or hashlib.sha256(raw).hexdigest()
+    assert matches['registry_sha256'] == expected_registry, 'Match index is from a different registry snapshot'
     as_of = date.fromisoformat(payload['metadata']['snapshot_date'])
     before, after, changed = Counter(), Counter(), []
     for row in payload['systems']:

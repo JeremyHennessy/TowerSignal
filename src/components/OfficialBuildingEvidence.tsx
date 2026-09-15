@@ -3,7 +3,7 @@ import { formatDate } from '../domain/labels'
 import '../styles/official-building-evidence.css'
 
 export function resultLabel(value: string): string {
-  const labels: Record<string, string> = { PCR_POSITIVE_REMEDIATION_ORDER: 'PCR positive · remediation ordered', CULTURE_POSITIVE: 'Culture positive', CULTURE_NEGATIVE: 'Culture negative', CULTURE_PENDING: 'Culture result pending', PCR_LIST_CLEANING_COMPLETE: 'PCR list · cleaning complete', UNREGISTERED_BUILDING_LISTED: 'Unregistered building listed' }
+  const labels: Record<string, string> = { PCR_POSITIVE_REMEDIATION_ORDER: 'PCR positive · remediation ordered', PCR_NEGATIVE: 'PCR negative', CULTURE_POSITIVE: 'Culture positive', CULTURE_NEGATIVE: 'Culture negative', CULTURE_PENDING: 'Culture result pending', PCR_LIST_CLEANING_COMPLETE: 'PCR list · cleaning complete', UNREGISTERED_BUILDING_LISTED: 'Unregistered building listed' }
   return labels[value] ?? value.replaceAll('_', ' ').toLowerCase()
 }
 export function OfficialBuildingEvidence({ records }: { records: LegionellaBuildingLink[] }) {
@@ -16,7 +16,7 @@ export function OfficialBuildingEvidence({ records }: { records: LegionellaBuild
       <p>{record.address} · BIN {record.bin}</p>
       <small>{record.event_date ? `Order date ${formatDate(record.event_date)} · ` : ''}{record.date_basis === 'DOCUMENT_REVISION_DATE' ? 'Document revised' : 'Published'} {formatDate(record.source_date)}. Sample collection date is not supplied in this list.</small>
       <a href={record.source_url} target="_blank" rel="noreferrer">Read the named-building source ↗</a>
-      {record.episode_closed_at && <small>Episode closure published {formatDate(record.episode_closed_at)}. <a href={record.closure_source_url ?? undefined} target="_blank" rel="noreferrer">Closure source ↗</a></small>}
+      {record.closure_source_url && <small>{record.episode_closed_at ? `Episode closure published ${formatDate(record.episode_closed_at)}.` : 'Cluster investigation reported closed; closure date is not supplied in this result record.'} <a href={record.closure_source_url} target="_blank" rel="noreferrer">Official closure status ↗</a></small>}
     </article>)}</div>
     <p className="microcopy">PCR positivity is not proof of live bacteria. Culture positivity is not proof that this building caused the outbreak. Historical results and published remediation/closure are retained, not treated as a current positive test.</p>
   </section>

@@ -102,6 +102,6 @@ test('NYC application page and tab visual inventory', async ({ page, browser }, 
   await publicContext.close()
   expect(issues).toEqual([])
   expect(states.some(s=>String(s.name).includes('Map + table'))).toBe(true)
-  expect(states.some(s=>String(s.name).includes('News & alerts'))).toBe(true)
+  expect(states.some(s=>String(s.name).includes('Reference library'))).toBe(true)
   expect(states.some(s=>String(s.name).includes('History'))).toBe(true)
 })

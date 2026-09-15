@@ -9,13 +9,16 @@ export function sourceDay(value: unknown): string | null {
   return Number.isFinite(time) && new Date(time).toISOString().slice(0, 10) === match[1] ? match[1] : null
 }
 export function recordValue(value: unknown): Record<string, unknown> {
+  if (typeof value === 'string' && value.trim().startsWith('{')) {
+    try { return recordValue(JSON.parse(value)) } catch { return {} }
+  }
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
 }
 export function eventDate(event: ChangeEvent): { value: string | null; label: string; note: string } {
   const record = recordValue(event.new_value)
   const direct = (field: string, label: string, useSource = true) => ({ value: sourceDay(record[field]) ?? (useSource ? sourceDay(event.source_observation_date) : null), label, note: '' })
   switch (event.event_type) {
-    case 'VIOLATION_ADDED':
+    case 'VIOLATION_ADDED': case 'VIOLATION_STATUS_CHANGED':
       return sourceDay(record.violation_date) ? direct('violation_date', 'Violation date') : direct('inspection_date', 'Inspection date')
     case 'INSPECTION_ADDED': return direct('inspection_date', 'Inspection date')
     case 'SAMPLE_REPORTED': case 'LATEST_SAMPLE_CHANGED':
@@ -46,6 +49,10 @@ export function inSourceRange(event: ChangeEvent, days: string, start: string, e
 }
 export function readableValue(value: unknown): string {
   if (value == null) return 'Not published'
+  if (typeof value === 'string' && value.trim().startsWith('{')) {
+    const parsed = recordValue(value)
+    return Object.keys(parsed).length ? readableValue(parsed) : 'Source detail unavailable'
+  }
   if (typeof value !== 'object') return typeof value === 'boolean' ? value ? 'Yes' : 'No' : String(value)
   if (Array.isArray(value)) return value.map(readableValue).join(' · ')
   const labels: Record<string, string> = { job_filing_number: 'Job', ticket_number: 'Ticket', inspection_date: 'Inspected', inspection_type: 'Inspection', filing_status: 'Status', hearing_status: 'Case status', hearing_result: 'Result', penalty_imposed: 'Penalty', balance_due: 'Balance', first_permit_date: 'Permit', approved_date: 'Approved', signoff_date: 'Signed off', filing_date: 'Filed', corporation_name: 'Company', person_name: 'Contact', hpd_registration_id: 'Registration' }

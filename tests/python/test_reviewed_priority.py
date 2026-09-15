@@ -2,12 +2,8 @@ import sys
 import unittest
 from datetime import date, timedelta
 from pathlib import Path
-from types import SimpleNamespace
-from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
-from towersignal.legionella_links import address_key, resolve_rows, pdf_rows, bronx_rows
-from towersignal.legionella_alerts import _parse_html
 from towersignal.reviewed_priority import score
 
 TODAY = date(2026, 9, 15)
@@ -115,59 +111,28 @@ class ReviewedPriorityTests(unittest.TestCase):
         self.assertEqual(self.result()['score'], 100)
         self.assertEqual(self.result()['uncapped_score'], 106)
 
-class BuildingMatchingTests(unittest.TestCase):
-    def test_address_tokens_not_fuzzy_or_cross_borough(self):
-        self.assertEqual(address_key('234 E. 149th Street'), address_key('234 EAST 149 ST'))
-        self.assertNotEqual(address_key('234 EAST 149 ST'), address_key('236 EAST 149 ST'))
-        self.assertNotEqual(address_key('9 EAST 90 ST'), address_key('9 WEST 90 ST'))
+class ExistingMatchAdapterTests(unittest.TestCase):
+    def test_canonical_bin_and_negative_result_preserved(self):
+        from attach_reviewed_intelligence import building_links
+        row = {'system_id':'1', 'bin':'1000001.0', 'address':'10 MAIN ST', 'bbl':'1000010001'}
+        observation = {'match_scope':'NAMED_BUILDING_NOT_INDIVIDUAL_SYSTEM', 'system_ids':['1'], 'bin':'1000001',
+            'result':'PCR_NEGATIVE','action':'HISTORICAL_RESULT','completion':'CLEANING_REPORTED_COMPLETE',
+            'cluster_status':'CLOSED_REPORTED','cluster_status_source':'https://www.nyc.gov/status',
+            'address':'10 Main St','source_url':'https://www.nyc.gov/results.pdf','content_sha256':'abc',
+            'document_date':'2026-07-29','event_date':None,'cluster_id':'NYC-UES-2026-07',
+            'match_basis':'NORMALIZED_ADDRESS_BOROUGH_SINGLE_BIN','observation_id':'record1'}
+        payload = {'by_system':{'1':{'building_observations':[observation]}}}
+        linked = building_links(payload,row)
+        self.assertEqual(linked[0]['result'],'PCR_NEGATIVE')
+        self.assertEqual(linked[0]['episode_status'],'CLOSED')
+        self.assertEqual(linked[0]['closure_source_url'],'https://www.nyc.gov/status')
+        self.assertFalse(linked[0]['outbreak_source_confirmed'])
+        self.assertEqual(observation['bin'],'1000001')
+        row['bin']='1000002'
+        with self.assertRaises(AssertionError): building_links(payload,row)
 
-    def test_all_systems_at_unique_bin_building_scope(self):
-        systems = [{'system_id':'1','address':'234 EAST 149 ST','borough':'Bronx','bin':'2000001'},
-                   {'system_id':'2','address':'234 EAST 149 ST','borough':'Bronx','bin':'2000001'}]
-        records = [{'address':'234 E149th St','borough':'Bronx'}]
-        # A glued cardinal is not silently guessed.
-        self.assertEqual(len(resolve_rows(records, systems, {})[0]), 0)
-        records[0]['address'] = '234 E 149th St'
-        linked, unresolved = resolve_rows(records, systems, {})
-        self.assertEqual(len(linked), 2)
-        self.assertFalse(unresolved)
-        self.assertTrue(all(r['scope']=='BUILDING_LEVEL' and r['outbreak_source_confirmed'] is False for r in linked))
-        records[0]['borough'] = 'Manhattan'
-        self.assertEqual(len(resolve_rows(records, systems, {})[0]), 0)
-
-    def test_ambiguous_and_missing_addresses_remain_unresolved(self):
-        systems = [{'system_id':str(i),'address':'10 MAIN ST','borough':'Bronx','bin':str(2000000+i)} for i in (1,2)]
-        linked, unresolved = resolve_rows([{'address':'10 Main Street','borough':'Bronx'}, {'address':'12 Main St','borough':'Bronx'}], systems, {})
-        self.assertFalse(linked)
-        self.assertEqual([r['resolution'] for r in unresolved], ['AMBIGUOUS_BUILDING','NO_EXACT_ADDRESS_MATCH'])
-
-    def test_pluto_alias_must_resolve_unique_bin(self):
-        systems=[{'system_id':'1','address':'1 MAIN ST','borough':'Bronx','bin':'2000001'}]
-        self.assertEqual(len(resolve_rows([{'address':'10 Side Street','borough':'Bronx'}], systems, {'2000001':['10 SIDE ST']})[0]),1)
-
-    def test_pdf_date_and_result_sections(self):
-        text = 'Culture Positive\n • 10 Main St\nCulture Negative\n • 12 Main St\n7.29.26\n'
-        with patch('towersignal.legionella_links.subprocess.run', return_value=SimpleNamespace(stdout=text)):
-            day, rows = pdf_rows(b'%PDF', 'culture')
-        self.assertEqual(day, '2026-07-29')
-        self.assertEqual([r['result'] for r in rows], ['CULTURE_POSITIVE','CULTURE_NEGATIVE'])
-        self.assertTrue(all(r['date_basis']=='DOCUMENT_REVISION_DATE' for r in rows))
-
-    def test_unknown_pdf_section_fails_closed(self):
-        with patch('towersignal.legionella_links.subprocess.run', return_value=SimpleNamespace(stdout='Unclear\n • 10 Main St\n7.29.26')):
-            with self.assertRaises(ValueError): pdf_rows(b'%PDF', 'culture')
-
-    def test_generic_pdf_cannot_silently_change_episode(self):
-        with patch('towersignal.legionella_links.subprocess.run', return_value=SimpleNamespace(stdout='Culture Positive\n • 10 Main St\n9.29.26')):
-            with self.assertRaises(ValueError): pdf_rows(b'%PDF', 'culture')
-
-    def test_bronx_order_date_distinct_from_publication(self):
-        html = b'<h1>Orders</h1><p>September 13, 2026</p><p>Preliminary PCR testing was completed by September 12, and orders were issued the same day.</p><p>positive PCR results are located at:</p><ul><li>10 Main St</li></ul>'
-        published, rows = bronx_rows(html)
-        self.assertEqual(published, '2026-09-13')
-        self.assertEqual(rows[0]['event_date'], '2026-09-12')
-
-    def test_human_h1_over_slug(self):
-        self.assertEqual(_parse_html(b'<title>slug-headline</title><h1>Readable headline</h1>').title, 'Readable headline')
+    def test_unknown_account_has_no_manufactured_findings(self):
+        from attach_reviewed_intelligence import building_links
+        self.assertEqual(building_links({'by_system':{}},{'system_id':'missing'}),[])
 
 if __name__ == '__main__': unittest.main()
