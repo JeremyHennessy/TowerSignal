@@ -1,0 +1,157 @@
+name: Release workflow site records from tested snapshot
+
+# Manual application-only promotion. No source collection, Blob write or history advance.
+on:
+  workflow_dispatch:
+    inputs:
+      expected_main_sha:
+        required: true
+        type: string
+      candidate_sha:
+        required: true
+        type: string
+      proof_run_id:
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Require successful proof and the exact tested main tree
+        uses: actions/github-script@v7
+        env:
+          EXPECTED_MAIN: ${{ inputs.expected_main_sha }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          PROOF_RUN: ${{ inputs.proof_run_id }}
+        with:
+          script: |
+            if (context.ref !== 'refs/heads/main' || context.sha !== process.env.EXPECTED_MAIN) throw new Error('Wrong main release');
+            const main = (await github.rest.git.getRef({...context.repo, ref:'heads/main'})).data.object.sha;
+            if (main !== context.sha) throw new Error('Main moved');
+            const current = (await github.rest.git.getCommit({...context.repo, commit_sha:main})).data;
+            const candidate = (await github.rest.git.getCommit({...context.repo, commit_sha:process.env.CANDIDATE_SHA})).data;
+            if (current.tree.sha !== candidate.tree.sha) throw new Error('Main tree differs from tested candidate');
+            const run = (await github.rest.actions.getWorkflowRun({...context.repo, run_id:Number(process.env.PROOF_RUN)})).data;
+            if (run.conclusion !== 'success' || run.path !== '.github/workflows/arcny-workspace-proof.yml') throw new Error('Required isolated proof did not succeed');
+      - uses: actions/download-artifact@v4
+        with:
+          name: workflow-site-candidate
+          run-id: ${{ inputs.proof_run_id }}
+          github-token: ${{ github.token }}
+          path: .release
+      - name: Check archives, unchanged source payloads and current hosted baseline
+        env:
+          EXPECTED_CANDIDATE: ${{ inputs.candidate_sha }}
+        run: |
+          mkdir -p dist .baseline
+          python - <<'PY'
+          import hashlib,json,os,tarfile
+          from pathlib import Path
+          from urllib.request import urlopen
+          proof=json.loads(Path('.release/proof.json').read_text())
+          assert proof['candidate_sha']==os.environ['EXPECTED_CANDIDATE']
+          for name,directory in [('candidate.tar','dist'),('baseline.tar','.baseline')]:
+              archive=Path('.release')/name
+              assert hashlib.sha256(archive.read_bytes()).hexdigest()==proof[name+'_sha256']
+              with tarfile.open(archive) as t: t.extractall(directory,filter='data')
+          old=Path('.baseline/data'); new=Path('dist/data')
+          old_files={str(p.relative_to(old)) for p in old.rglob('*') if p.is_file()}
+          new_files={str(p.relative_to(new)) for p in new.rglob('*') if p.is_file()}
+          assert old_files==new_files and len(old_files)>100
+          for name in old_files:
+              assert hashlib.sha256((old/name).read_bytes()).digest()==hashlib.sha256((new/name).read_bytes()).digest(),name
+          base='https://jeremyhennessy.github.io/TowerSignal/'
+          for name in ['index.html','data/systems.json','data/nys-systems.json']:
+              with urlopen(base+name,timeout=90) as r: actual=r.read()
+              assert hashlib.sha256(actual).digest()==hashlib.sha256((Path('.baseline')/name).read_bytes()).digest(),'Hosted baseline moved: '+name
+          print('Exact tested application; all source payload bytes unchanged; current hosted baseline matches.')
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install acceptance dependencies before deployment
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy tested application snapshot
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify hosted HTML, assets and registry bytes
+        run: |
+          python - <<'PY'
+          import hashlib,re,time
+          from pathlib import Path
+          from urllib.request import urlopen
+          names=['index.html','data/systems.json','data/nys-systems.json','workflow-site-release.json']
+          names += [x.lstrip('/').removeprefix('TowerSignal/') for x in re.findall(r'(?:src|href)="([^"]+\.(?:js|css))"',Path('dist/index.html').read_text())]
+          for name in names:
+              expected=hashlib.sha256((Path('dist')/name).read_bytes()).digest()
+              for attempt in range(8):
+                  with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?site-release='+str(time.time_ns()),timeout=90) as r: actual=r.read()
+                  if hashlib.sha256(actual).digest()==expected: break
+                  if attempt==7: raise RuntimeError('Hosted mismatch: '+name)
+                  time.sleep(5)
+          print('Hosted application and registry payloads match the exact tested artifact.')
+          PY
+      - name: Hosted desktop and iPhone workflow acceptance
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e -- workflow-command-center.spec.ts workflow-site-leads.spec.ts
+      - name: Retain hosted proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-site-hosted-proof
+          path: |
+            playwright-report/
+            test-results/
+            .release/proof.json
+            dist/workflow-site-release.json
+          retention-days: 30
+      - name: Stage prior deployed snapshot if acceptance fails
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: workflow-site-rollback
+          path: .baseline
+      - name: Roll back a failed promotion
+        if: failure() && steps.deploy.outcome == 'success'
+        id: rollback
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: workflow-site-rollback
+      - name: Verify rollback bytes
+        if: failure() && steps.rollback.outcome == 'success'
+        run: |
+          python - <<'PY'
+          import hashlib,time
+          from pathlib import Path
+          from urllib.request import urlopen
+          for name in ['index.html','data/systems.json']:
+              expected=hashlib.sha256((Path('.baseline')/name).read_bytes()).digest()
+              for attempt in range(8):
+                  with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?rollback='+str(time.time_ns()),timeout=90) as r: actual=r.read()
+                  if hashlib.sha256(actual).digest()==expected: break
+                  if attempt==7: raise RuntimeError('Rollback mismatch: '+name)
+                  time.sleep(5)
+          print('Prior deployed snapshot restored and verified.')
+          PY
