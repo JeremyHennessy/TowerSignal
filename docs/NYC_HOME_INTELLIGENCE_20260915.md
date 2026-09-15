@@ -19,9 +19,9 @@ A Home-only scoped component below the existing summary cards provides date/sour
 
 An official results-list address must match a normalized registry address in the same borough and resolve to exactly one nonempty BIN. All systems at that named building are linked as building context, never individually labeled positive. Ambiguous and unmatched addresses remain unresolved. Town-hall venues and broad Bronx title matches are excluded. Related earlier articles link to a separate later document explicitly, not as a claim that the earlier article names the building. PCR, culture, cleaning and closed-cluster status remain separate.
 
-The South Bronx September 2026 named list and the linked Upper East Side official PDF results are source-specific adapters. Their source hashes, document dates, retrieval times and original address evidence are retained. They do not establish exhaustive matching of every historical news item. PDFs require the `pdftotext` binary; the source proof checks its presence on the same hosted runner family as Pages.
+The South Bronx September 2026 named list and the linked Upper East Side official PDF results are source-specific adapters. Their source hashes, document dates, retrieval times and original address evidence are retained. They do not establish exhaustive matching of every historical news item. Source proof run `35015592838` established that `pdftotext` is absent on the hosted runner. The proof and ordinary Pages workflow explicitly install `poppler-utils` before extraction.
 
-`legionella-property-matches.json` is additive. Every existing published source payload and every existing score is preserved byte-for-byte in this application release. The ordinary alert-builder CLI generates the match index after collecting alerts whenever the NYC registry is present, so the Home data survives the next daily Pages build.
+`legionella-property-matches.json` is additive. Every existing published source payload and every existing score is preserved byte-for-byte in this application release. The original alert collector remains unchanged. The ordinary NYC Pages workflow builds the match index after all registry attachments and history generation, so its recorded registry checksum identifies the final published systems payload. No earlier source builder is repurposed as a matching hook.
 
 ## Release control
 

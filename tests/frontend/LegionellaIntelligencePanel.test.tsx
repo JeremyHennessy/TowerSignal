@@ -39,7 +39,7 @@ describe('Home official intelligence', () => {
     expect(screen.getAllByRole('link', { name: /Earlier notice/ })).toHaveLength(5)
     await user.click(screen.getByRole('button', { name: 'Next intelligence page' }))
     expect(screen.queryByRole('link', { name: /Bronx Legionnaires Update/ })).not.toBeInTheDocument()
-    await user.type(screen.getByLabelText('Search official intelligence'), '149th')
+    await user.type(screen.getByRole('searchbox', { name: 'Search official intelligence' }), '149th')
     await user.click(screen.getByRole('button', { name: /1 building/ }))
     expect(screen.getByRole('link', { name: 'Open tower account 2000000660' })).toHaveAttribute('href', '#/account/2000000660')
     expect(screen.getByText(/does not identify which system tested positive/)).toBeInTheDocument()
