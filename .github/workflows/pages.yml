@@ -259,6 +259,13 @@ jobs:
         run: python scripts/verify_live_domestic_water.py --output public/data --sample-size 3
       - name: Independently verify generated NYS equipment against current NYS source
         run: python scripts/verify_live_nys.py --sample-size 5
+      - name: Install official-results PDF text reader
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
+      - name: Match official Legionnaires findings to the final NYC registry
+        timeout-minutes: 10
+        run: python scripts/build_legionella_matches.py --data public/data
       - name: Python fixture tests
         run: python -m unittest discover -s tests/python -p 'test_*.py' -v
       - name: Lint frontend
