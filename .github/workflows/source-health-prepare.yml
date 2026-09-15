@@ -1,0 +1,50 @@
+name: Prepare isolated Source Health integration
+on:
+  push:
+    branches: [agent/source-health-coverage-20260915]
+    paths: ['.github/workflows/source-health-prepare.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/source-health-coverage-20260915
+      - name: Apply only exact-baseline Source Health and inventory insertions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          page = Path('src/components/SourceHealthPage.tsx')
+          audit = Path('scripts/build_coverage_audit.py')
+          expected = {page: 'eb54897b3698989b5c8bb631bf44692902846998', audit: '232d27771b23d34883ee3ff16dd76c18440932a3'}
+          for path, sha in expected.items():
+              actual = subprocess.check_output(['git', 'hash-object', str(path)], text=True).strip()
+              if actual != sha:
+                  raise SystemExit(f'Baseline moved: {path}: {actual}')
+          text = page.read_text()
+          anchor = "import { ShareButton } from './ShareButton'"
+          assert text.count(anchor) == 1
+          text = text.replace(anchor, anchor + "\nimport { SourceHealthExpansion } from './SourceHealthExpansion'")
+          anchor = '    <div className="reference-table-card">\n      <div className="reference-table-heading"><div><strong>Completeness &amp; identity audit</strong>'
+          assert text.count(anchor) == 1
+          text = text.replace(anchor, '    <SourceHealthExpansion payload={payload} />\n\n' + anchor)
+          text = text.replace('Healthy account sources', 'Healthy diagnostic sources')
+          text = text.replace('Across sources publishing coverage', 'Across sources publishing health diagnostics')
+          text = text.replace('{health.length} account-intelligence sources', '{health.length} sources publishing account-health diagnostics')
+          page.write_text(text)
+          text = audit.read_text()
+          anchor = 'ARTIFACT_CONTRACTS = [\n'
+          assert text.count(anchor) == 1
+          additions = '    ("nyc_property_enforcement", "property-enforcement.json", "Exact canonical BBL for HPD violations; exact BIN for DOB SWO complaint-disposition evidence and Local Law 11 / FISP; not an active-SWO ledger or generic Labor Law feed", ["WHEN_TO_ACT", "WHY_ACCOUNT_MATTERS"]),\n    ("legionella_public_health_alerts", "legionella-alerts.json", "Official NYC/NYS channel snapshots and retained item_id history; ZIP context is not property attribution; no Priority Score change", ["WHY_ACCOUNT_MATTERS"]),\n'
+          audit.write_text(text.replace(anchor, anchor + additions))
+          PY
+          git diff --check
+          git diff --stat
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/components/SourceHealthPage.tsx scripts/build_coverage_audit.py
+          git commit -m 'Connect new source coverage to the existing page and generated inventory'
+          git push origin HEAD:agent/source-health-coverage-20260915
