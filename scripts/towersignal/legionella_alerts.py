@@ -190,8 +190,15 @@ def _relevant(text: str) -> bool:
     return bool(LEGIONELLA_RE.search(text) or COOLING_TOWER_RE.search(text))
 
 
+def _discovery_relevant(text: str) -> bool:
+    # Child-link discovery is intentionally narrower than source-channel relevance.
+    # Generic cooling-tower forms/templates are not public-health news or alerts.
+    return bool(LEGIONELLA_RE.search(text))
+
+
 def _record(*, url: str, channel: dict[str, str], title: str | None, text: str | None, content: bytes, content_type: str, discovered_from: str | None) -> dict[str, Any]:
     is_pdf = "pdf" in content_type.lower() or urlparse(url).path.lower().endswith(".pdf")
+    match_text = f"{title or ''} {text or ''} {url}"
     return {
         "url": _canonical_url(url),
         "title": title,
@@ -199,14 +206,14 @@ def _record(*, url: str, channel: dict[str, str], title: str | None, text: str |
         "channel_key": channel["key"],
         "channel_kind": channel["kind"],
         "document_type": "PDF" if is_pdf else "HTML",
-        "published_date": _published_date(text or "") if text else None,
+        "published_date": _published_date(match_text),
         "discovered_from": discovered_from,
         "content_sha256": hashlib.sha256(content).hexdigest(),
         "content_bytes": len(content),
         "retrieved_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "match_terms": {
-            "legionella": bool(text and LEGIONELLA_RE.search(text)),
-            "cooling_tower": bool(text and COOLING_TOWER_RE.search(text)),
+            "legionella": bool(LEGIONELLA_RE.search(match_text)),
+            "cooling_tower": bool(COOLING_TOWER_RE.search(match_text)),
         },
     }
 
@@ -226,7 +233,7 @@ def collect() -> dict[str, Any]:
             absolute = _canonical_url(urljoin(channel["url"], href))
             if not _allowed(absolute):
                 continue
-            if not _relevant(f"{label} {absolute}"):
+            if not _discovery_relevant(f"{label} {absolute}"):
                 continue
             discovered.setdefault(absolute, (channel, label or None, channel["url"]))
 
@@ -249,7 +256,7 @@ def collect() -> dict[str, Any]:
             parsed = _parse_html(content)
             title = parsed.title or link_label
             text = parsed.text
-        if not _relevant(f"{title or ''} {text}"):
+        if not _relevant(f"{title or ''} {text} {url}"):
             continue
         items[url] = _record(
             url=url, channel=channel, title=title, text=text, content=content,
@@ -278,7 +285,7 @@ def collect() -> dict[str, Any]:
             "mayor_office_item_count": sum(1 for item in ordered_items if item.get("agency") == "NYC Mayor's Office"),
         },
         "evidence_semantics": {
-            "scope": "Official NYC Health, NYC Mayor's Office and NYSDOH public channels only. Relevant child links are discovered when their link text or URL references Legionnaires disease, Legionella, legionellosis or cooling towers.",
+            "scope": "Official NYC Health, NYC Mayor's Office and NYSDOH public channels only. Child-link discovery is restricted to explicit Legionnaires disease, Legionella or legionellosis references so generic cooling-tower forms are not misclassified as news/alerts.",
             "property_link": "This feed is not attached to a TowerSignal property merely because a building lies in an affected ZIP code. Property attribution requires an explicit published building/tower identity and a separate verified resolver.",
             "scoring": "Public-health alerts and news do not modify TowerSignal Priority Score in this build.",
             "failures": "Per-item retrieval failures are recorded and must remain visible; a failed source is never treated as an empty source.",
