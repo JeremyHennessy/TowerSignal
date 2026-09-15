@@ -1,0 +1,25 @@
+name: Desktop demo supplemental views
+on:
+  push:
+    branches: [capture/desktop-demo-20260915]
+    paths: [.github/workflows/desktop-demo-supplement-20260915.yml, scripts/capture_desktop_demo_supplement_20260915.mjs]
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/capture_desktop_demo_supplement_20260915.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: towersignal-desktop-demo-supplement
+          path: desktop-demo-supplement
+          retention-days: 14
