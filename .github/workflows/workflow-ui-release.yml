@@ -92,8 +92,11 @@ jobs:
           if proof.get('runtime_files', 0) < 100:
               raise SystemExit('Verified Blob runtime inventory is unexpectedly small')
           source = proof.get('source') or {}
-          if source.get('workflow_id') != 339705737 or not source.get('run_id'):
-              raise SystemExit('Verified Blob pointer is not sourced from a trusted Pages release')
+          pages_source = source.get('workflow_id') == 339705737 and not source.get('kind')
+          data_source = (source.get('kind') == 'data-only' and
+                         source.get('workflow_path') == '.github/workflows/azure-data-refresh.yml')
+          if not (pages_source or data_source) or not source.get('run_id'):
+              raise SystemExit('Verified Blob pointer is not sourced from a trusted runtime producer')
           manifest = {
               'candidate_sha': '${{ github.sha }}',
               'verified_data_source': source,
@@ -162,7 +165,10 @@ jobs:
                   if manifest.get('candidate_sha') != expected:
                       raise RuntimeError(f"candidate SHA mismatch: {manifest.get('candidate_sha')} != {expected}")
                   source = manifest.get('verified_data_source') or {}
-                  if source.get('workflow_id') != 339705737 or manifest.get('verified_data_file_count', 0) < 100:
+                  pages_source = source.get('workflow_id') == 339705737 and not source.get('kind')
+                  data_source = (source.get('kind') == 'data-only' and
+                                 source.get('workflow_path') == '.github/workflows/azure-data-refresh.yml')
+                  if not (pages_source or data_source) or manifest.get('verified_data_file_count', 0) < 100:
                       raise RuntimeError('deployed release lacks trusted verified-data proof')
                   with urllib.request.urlopen(base + '?workflow-release=' + str(attempt), timeout=15) as response:
                       html = response.read().decode('utf-8')
