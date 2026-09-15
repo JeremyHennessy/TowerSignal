@@ -42,6 +42,11 @@ class Historical311ContextTests(unittest.TestCase):
             ]),
         ]
         payload = build_historical_context(["1011210036"], batch_size=200, page_size=5000)
+        self.assertEqual(snapshot_mock.call_count, 2)
+        for call in snapshot_mock.call_args_list:
+            self.assertTrue(call.kwargs["skip_count"])
+            self.assertEqual(call.kwargs["seek_field"], "unique_key")
+            self.assertFalse(call.kwargs["allow_count_fallback"])
         profile = payload["by_bbl"]["1011210036"]
         self.assertEqual(profile["request_count"], 3)
         self.assertEqual(profile["years"], ["2018", "2024"])

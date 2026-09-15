@@ -137,6 +137,7 @@ def build_historical_context(
                 allow_count_fallback=False,
                 progress_label=f"historical 311 {period_name} exact-BBL batch {index}",
                 seek_field="unique_key",
+                skip_count=True,
             )
             period_source_rows += len(snapshot.rows)
             batch_set = set(bbl_batch)

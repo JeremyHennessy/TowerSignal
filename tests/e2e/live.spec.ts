@@ -139,7 +139,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     ])
   } else {
     await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
-    await expect(page.getByText('Reported samples')).toBeVisible()
+    await expect(page.getByText('Reported samples', { exact: true })).toBeVisible()
     await expect(page.getByText('NYC Health inspections', { exact: true })).toBeVisible()
     await expect(page.getByText('OATH penalty imposed')).toBeVisible()
     await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
