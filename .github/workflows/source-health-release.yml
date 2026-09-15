@@ -1,7 +1,7 @@
 name: Release verified Source Health coverage
-# Merge only after reviewing exact-head CI, snapshot proof and screenshots.
-# A post-merge rerun of that exact proof triggers promotion; normal source refresh
-# and Azure workflows are not dispatched by this UI-only release.
+# Merge only after exact-head CI, snapshot proof and screenshot review.
+# A post-merge rerun of that proof triggers promotion. The prior Home release
+# must already be hosted; this release never replaces it with an older UI.
 on:
   workflow_run:
     workflows: ['Source Health coverage snapshot proof']
@@ -48,16 +48,18 @@ jobs:
           path: .candidate
       - uses: actions/download-artifact@v4
         with:
-          name: github-pages
-          run-id: 34997430388
+          name: home-intelligence-candidate
+          run-id: 35018835198
           github-token: ${{ github.token }}
           path: .rollback/archive
-      - name: Check archive, source preservation and unchanged hosted baseline
+      - name: Check archives, source preservation and exact hosted Home baseline
         run: |
           (cd .candidate && sha256sum --check source-health-candidate.tar.sha256)
+          (cd .rollback/archive && sha256sum --check home-candidate.tar.sha256)
           mkdir -p dist .rollback/site
           tar -xf .candidate/source-health-candidate.tar -C dist
-          tar -xf .rollback/archive/artifact.tar -C .rollback/site
+          tar -xf .rollback/archive/home-candidate.tar -C .rollback/site
+          rm -f .candidate/*.tar .rollback/archive/*.tar
           python - <<'PY'
           import hashlib
           from pathlib import Path
@@ -66,9 +68,9 @@ jobs:
           for p in old.rglob('*'):
               if p.is_file() and str(p.relative_to(old)) not in {'coverage-audit.json','coverage-audit.md'}:
                   assert hashlib.sha256(p.read_bytes()).digest()==hashlib.sha256((new/p.relative_to(old)).read_bytes()).digest(), 'Source payload changed: '+str(p)
-          for name in ['index.html','data/systems.json','data/legionella-alerts.json']:
+          for name in ['index.html','data/systems.json','data/legionella-alerts.json','data/legionella-property-matches.json']:
               with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name,timeout=90) as response: actual=response.read()
-              assert hashlib.sha256(actual).digest()==hashlib.sha256((Path('.rollback/site')/name).read_bytes()).digest(), 'Hosted baseline moved: '+name
+              assert hashlib.sha256(actual).digest()==hashlib.sha256((Path('.rollback/site')/name).read_bytes()).digest(), 'Home baseline not hosted or has moved: '+name
           PY
       - uses: actions/setup-node@v4
         with:
@@ -91,7 +93,7 @@ jobs:
           from pathlib import Path
           from urllib.request import urlopen
           root=Path('dist')
-          names=['index.html','data/systems.json','data/metadata.json','data/legionella-alerts.json','data/coverage-audit.json']
+          names=['index.html','data/systems.json','data/metadata.json','data/legionella-alerts.json','data/coverage-audit.json','data/legionella-property-matches.json']
           names += [str(p.relative_to(root)) for p in (root/'assets').rglob('*') if p.suffix in {'.js','.css'}]
           for name in names:
               expected=hashlib.sha256((root/name).read_bytes()).digest()
@@ -114,13 +116,13 @@ jobs:
             source-health-proof
             playwright-report
           retention-days: 30
-      - name: Stage exact prior site on acceptance failure
+      - name: Stage exact prior Home site on acceptance failure
         if: failure() && steps.deploy.outcome == 'success'
         uses: actions/upload-pages-artifact@v3
         with:
           name: source-health-rollback
           path: .rollback/site
-      - name: Restore prior verified site
+      - name: Restore prior verified Home site
         id: rollback
         if: failure() && steps.deploy.outcome == 'success'
         uses: actions/deploy-pages@v4
@@ -133,7 +135,7 @@ jobs:
           import hashlib,time
           from pathlib import Path
           from urllib.request import urlopen
-          for name in ['index.html','data/systems.json','data/coverage-audit.json']:
+          for name in ['index.html','data/systems.json','data/coverage-audit.json','data/legionella-property-matches.json']:
               expected=hashlib.sha256((Path('.rollback/site')/name).read_bytes()).digest()
               for attempt in range(6):
                   with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?rollback='+str(time.time_ns()),timeout=90) as response: actual=response.read()
