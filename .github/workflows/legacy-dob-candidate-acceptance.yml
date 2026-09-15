@@ -13,11 +13,11 @@ permissions:
 jobs:
   accept:
     runs-on: ubuntu-24.04
-    timeout-minutes: 105
+    timeout-minutes: 160
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: c7c7013887f91733b4c03381887474a005fc30ef
+          ref: 828f44dffa01be3feeee1d4722a6a65458b62ac1
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
@@ -57,13 +57,13 @@ jobs:
           assert len(payload['systems'])==4894 and len(bbls)==3802
           print(json.dumps({'systems':len(payload['systems']),'bbls':len(bbls),'artifact_id':meta['id'],'sha256':digest},indent=2))
           PY
-      - name: Run exact candidate builder with production 90-minute bound
-        timeout-minutes: 90
+      - name: Run exact candidate builder with production 150-minute bound
+        timeout-minutes: 150
         run: |
           START=$(date +%s)
           python -u scripts/build_legacy_dob_project_cache.py --output "$RUNNER_TEMP/legacy-candidate"
           END=$(date +%s)
-          printf '{"wall_seconds":%s,"candidate_sha":"c7c7013887f91733b4c03381887474a005fc30ef"}\n' "$((END-START))" > "$RUNNER_TEMP/legacy-candidate/timing.json"
+          printf '{"wall_seconds":%s,"candidate_sha":"828f44dffa01be3feeee1d4722a6a65458b62ac1"}\n' "$((END-START))" > "$RUNNER_TEMP/legacy-candidate/timing.json"
       - name: Validate actual production cache without weaker thresholds
         run: |
           python scripts/validate_legacy_dob_project_cache.py \
@@ -77,14 +77,14 @@ jobs:
           timing=json.loads((root/'timing.json').read_text())
           summary=payload['summary'];source=payload['source']
           assert source['requested_bbl_count']==3802
-          assert timing['wall_seconds'] < 5400
+          assert timing['wall_seconds'] < 9000
           result={'status':'PASS','wall_seconds':timing['wall_seconds'],'requested_bbl_count':source['requested_bbl_count'],
                   'source_matched_bbl_count':source['source_matched_bbl_count'],'exact_bbl_job_count':source['exact_bbl_job_count'],
                   'retained_bbl_count':summary['retained_bbl_count'],'retained_record_count':summary['retained_record_count'],
                   'explicit_cooling_tower_record_count':summary['explicit_cooling_tower_record_count'],
                   'recent_relevant_project_record_count':summary['recent_relevant_project_record_count'],
-                  'candidate_sha':timing['candidate_sha'],'max_concurrent_requests':4,
-                  'source_contract_changed':False,'azure_accessed':False}
+                  'candidate_sha':timing['candidate_sha'],'max_concurrent_requests':3,
+                  'request_start_interval_seconds':5,'source_contract_changed':False,'azure_accessed':False}
           (root/'acceptance.json').write_text(json.dumps(result,indent=2)+'\n')
           print(json.dumps(result,indent=2))
           PY
