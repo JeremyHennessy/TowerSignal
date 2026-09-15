@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { ChangeEvent, ChangeEventType, ChangesPayload } from '../types/history'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { compareEventDates, eventDate, evidenceLabel, inSourceRange, readableValue, recordValue, sourceLabel } from '../domain/changePresentation'
+import { monitorFields } from '../domain/monitorFields'
 import { StatusBadge } from './StatusBadge'
 import '../styles/monitor-event-table.css'
 
@@ -111,6 +112,13 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
   const sortIndicator = (key: SortKey) => sort.key === key ? (sort.direction === 'asc' ? ' ↑' : ' ↓') : ''
   const ariaSort = (key: SortKey) => sort.key === key ? sort.direction === 'asc' ? 'ascending' as const : 'descending' as const : 'none' as const
 
+  const pagination = (position: 'top' | 'bottom') => pageCount > 1 && <nav className="monitor-pagination" aria-label={`Monitor pagination ${position}`}>
+    <span>Page {safePage + 1} of {pageCount}</span><div>
+      <button disabled={safePage === 0} onClick={() => setPage(Math.max(0, safePage - 1))}>Previous</button>
+      <button disabled={safePage >= pageCount - 1} onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))}>Next</button>
+    </div>
+  </nav>
+
   return <section className="changes-view changes-table-view" aria-label="TowerSignal changes">
     {payload.baseline_initialized && <div className="disclaimer"><strong>Historical baseline initialized.</strong> Existing systems are not being mislabeled as newly registered. Later source snapshots are compared with this preserved baseline.</div>}
     <div className="change-workspace-grid">
@@ -131,15 +139,27 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
         <div className="change-tabs" role="tablist" aria-label="Change categories">{QUICK_GROUPS.map((group, index) => <button key={group.label} role="tab" aria-selected={quickLabel === group.label} className={quickLabel === group.label ? 'active' : ''} onClick={() => chooseQuick(group.label, group.types)}>{group.label}<span>{counts[index].toLocaleString()}</span></button>)}</div>
         <div className="reference-table-card monitor-change-table-card">
           <div className="reference-table-heading"><div><strong data-testid="monitor-event-count">{sorted.length.toLocaleString()} recorded events</strong><span>{pageRows.length ? `Showing ${safePage * pageSize + 1}–${safePage * pageSize + pageRows.length}` : 'No matching events'} · sorted by {sort.key === 'event_date' ? 'source date' : sort.key.replaceAll('_', ' ')}{undatedCount > 0 ? ` · ${undatedCount.toLocaleString()} undated` : ''}</span></div></div>
-          {pageRows.length === 0 ? <div className="reference-empty-state compact"><strong>No recorded events match these filters.</strong><span>Try All retained dates to include older source records and undated changes.</span></div> : <div className="reference-table-scroll monitor-event-scroll"><table className="reference-table change-reference-table"><thead><tr>
+          <div className="monitor-table-tools">
+            <label>Sort events<select aria-label="Sort events" value={`${sort.key}:${sort.direction}`} onChange={event => {
+              const [key, direction] = event.target.value.split(':') as [SortKey, SortDirection]
+              setSort({ key, direction }); setPage(0)
+            }}>
+              <option value="event_date:desc">Event date · newest first</option><option value="event_date:asc">Event date · oldest first</option>
+              <option value="address:asc">Account · A to Z</option><option value="address:desc">Account · Z to A</option>
+              <option value="event_type:asc">Event type · A to Z</option><option value="event_type:desc">Event type · Z to A</option>
+              <option value="priority_score:desc">Priority · highest first</option><option value="priority_score:asc">Priority · lowest first</option>
+              <option value="source:asc">Source · A to Z</option><option value="source:desc">Source · Z to A</option>
+            </select></label>
+            {pagination('top')}
+          </div>
+          {pageRows.length === 0 ? <div className="reference-empty-state compact"><strong>No recorded events match these filters.</strong><span>Try All retained dates to include older source records and undated changes.</span></div> : <div className="reference-table-scroll monitor-event-scroll"><table className="reference-table change-reference-table" aria-label={`${quickLabel} events`}><thead><tr>
             <th scope="col" aria-sort={ariaSort('event_date')}><button onClick={() => changeSort('event_date')}>Event date{sortIndicator('event_date')}</button></th>
             <th scope="col" aria-sort={ariaSort('address')}><button onClick={() => changeSort('address')}>Account{sortIndicator('address')}</button></th>
             <th scope="col" aria-sort={ariaSort('event_type')}><button onClick={() => changeSort('event_type')}>Event & details{sortIndicator('event_type')}</button></th>
             <th scope="col" aria-sort={ariaSort('priority_score')} title="Priority recorded when the change was observed; not retroactively re-scored"><button onClick={() => changeSort('priority_score')}>Priority{sortIndicator('priority_score')}</button></th>
             <th scope="col" aria-sort={ariaSort('source')}><button onClick={() => changeSort('source')}>Source & evidence{sortIndicator('source')}</button></th>
-            <th scope="col">Account link</th>
           </tr></thead><tbody>{pageRows.map((event, index) => <ChangeRow key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} today={today} onSelectSystem={onSelectSystem} />)}</tbody></table></div>}
-          {pageCount > 1 && <div className="reference-pagination"><span>Page {safePage + 1} of {pageCount}</span><div><button disabled={safePage === 0} onClick={() => setPage(Math.max(0, safePage - 1))}>Previous</button><button disabled={safePage >= pageCount - 1} onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))}>Next</button></div></div>}
+          <div className="monitor-pagination-footer">{pagination('bottom')}</div>
         </div>
       </div>
     </div>
@@ -149,16 +169,17 @@ export function ChangesView({ payload, onSelectSystem }: { payload: ChangesPaylo
 function ChangeRow({ event, today, onSelectSystem }: { event: ChangeEvent; today: string; onSelectSystem: (systemId: string) => void }) {
   const date = eventDate(event)
   const record = recordValue(event.new_value)
-  const violation = event.event_type === 'VIOLATION_ADDED'
+  const violation = event.event_type === 'VIOLATION_ADDED' || event.event_type === 'VIOLATION_STATUS_CHANGED'
   return <tr className="change-reference-row" onClick={() => onSelectSystem(event.system_id)}>
-    <td data-label="Event date" className="monitor-source-date"><time dateTime={date.value ?? undefined}>{date.value ? formatDate(date.value) : 'Not published'}</time><small title={date.note}>{date.label}</small>{date.value && date.value > today && <small className="monitor-future-date">Future source date</small>}</td>
-    <td data-label="Account"><strong>{event.address ?? event.system_id}</strong><small>{event.borough ?? 'Borough not published'}</small><small className="mono">{event.system_id}</small>{event.contact_available && <small className="monitor-contact-ready">Contact available</small>}</td>
-    <td data-label="Event & details"><span className={`change-kind change-kind-${eventTone(event)}`}>{EVENT_LABELS[event.event_type] ?? event.event_type}</span>
+    <td data-label="Event date" className="monitor-source-date"><time dateTime={date.value ?? undefined}>{date.value ? formatDate(date.value) : 'Not published'}</time><small title={date.note}>{date.value ? date.label : 'Occurrence date unavailable'}</small>{date.value && date.value > today && <small className="monitor-future-date">Future source date</small>}</td>
+    <td data-label="Account" className="monitor-account-cell"><strong>{event.address ?? event.system_id}</strong><small>{event.borough ?? 'Borough not published'}</small><small className="mono">{event.system_id}</small>{event.contact_available && <small className="monitor-contact-ready">Contact available</small>}<a className="monitor-open-link" href={`#/account/${event.system_id}`} onClick={click => click.stopPropagation()}>Open account <span aria-hidden="true">→</span></a></td>
+    <td data-label="Event & details" className="monitor-detail-cell"><span className={`change-kind change-kind-${eventTone(event)}`}>{EVENT_LABELS[event.event_type] ?? event.event_type}</span>
       {violation ? <div className="monitor-event-detail"><strong>{readableValue(record.description ?? record.violation_text ?? record.citation_text ?? 'Violation description not published')}</strong><span>{[record.violation_code ? `Code ${record.violation_code}` : null, record.law_section, record.violation_type].filter(Boolean).join(' · ')}</span><span>{record.summons_number ? `Summons ${record.summons_number}` : 'No summons number published'}</span></div>
-        : <div className="monitor-event-detail">{event.previous_value != null && <span className="monitor-old-value">Previously: {readableValue(event.previous_value)}</span>}<strong>{event.new_value == null ? 'Record no longer present in source snapshot' : readableValue(event.new_value)}</strong></div>}
+        : <dl className="monitor-field-list">{monitorFields(event).map(field => <div key={field.key} className={field.previous === undefined ? '' : 'monitor-field-changed'}>
+          <dt>{field.label}</dt><dd>{field.previous !== undefined && <span className="monitor-previous-value"><span>Previous</span>{field.previous}</span>}<span className="monitor-current-value">{field.previous !== undefined && <span>New</span>}{field.value}</span></dd>
+        </div>)}</dl>}
     </td>
-    <td data-label="Priority">{event.priority_score == null ? '—' : <strong className={event.priority_score >= 70 ? 'priority-text-high' : ''}>{event.priority_score}</strong>}</td>
-    <td data-label="Source & evidence"><strong className="monitor-source-name" title={event.source}>{sourceLabel(event.source)}</strong>{event.evidence_confidence && <StatusBadge value={event.evidence_confidence} />}<small>{evidenceLabel(event.evidence_basis)}</small><details className="monitor-row-provenance" onClick={click => click.stopPropagation()}><summary>Provenance</summary><p>First seen by TowerSignal: {formatTimestamp(event.detected_at)}. This is a collection timestamp, not the event date.</p>{date.note && <p>{date.note}</p>}<p>{event.source}</p></details></td>
-    <td data-label="Account link"><a className="monitor-open-link" href={`#/account/${event.system_id}`} onClick={click => click.stopPropagation()}>Open account <span aria-hidden="true">→</span></a></td>
+    <td data-label="Priority" className="monitor-priority-cell">{event.priority_score == null ? '—' : <strong className={event.priority_score >= 70 ? 'priority-text-high' : ''}>{event.priority_score}</strong>}</td>
+    <td data-label="Source & evidence" className="monitor-evidence-cell"><strong className="monitor-source-name" title={event.source}>{sourceLabel(event.source)}</strong>{event.evidence_confidence && <StatusBadge value={event.evidence_confidence} />}<small>{evidenceLabel(event.evidence_basis)}</small><details className="monitor-row-provenance" onClick={click => click.stopPropagation()}><summary>Provenance</summary><p>First seen by TowerSignal: {formatTimestamp(event.detected_at)}. This is a collection timestamp, not the event date.</p>{date.note && <p>{date.note}</p>}<p>{event.source}</p></details></td>
   </tr>
 }
