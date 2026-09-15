@@ -44,8 +44,8 @@ def seal(root, proof):
     proof.mkdir(parents=True,exist_ok=True)
     metadata=read(root/'data/metadata.json')
     value={'candidate_sha':os.environ['GITHUB_SHA'],'candidate_tree':tree(),'candidate_run_id':int(os.environ['GITHUB_RUN_ID']),
-           'source_runtime_run_id':35020424389,'source_runtime_sha':'4a1499fab419e0b9f2b3607410d54adcb523ca57',
-           'reconciled_main_sha':'2b19b35871af5f4c0141fd1f2f8e1649d48676fc','source_generated_at':metadata['generated_at'],
+           'source_runtime_run_id':35027760290,'source_runtime_sha':'159fac69eb91e2698e9f7dc3a3d22ecb6c2ad8b1',
+           'reconciled_main_sha':'159fac69eb91e2698e9f7dc3a3d22ecb6c2ad8b1','source_generated_at':metadata['generated_at'],
            'priority_model_version':metadata['priority_model_version'],'scope':'NYC GitHub Pages only',
            'matching':read(root/'data/legionella-property-matches.json')['summary']}
     save(root/MARKER,value)

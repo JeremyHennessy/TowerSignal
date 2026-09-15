@@ -46,8 +46,9 @@ export async function submitSignIn(page: Page, projectName: string): Promise<voi
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
   const attempts = process.env.CI && family(projectName) === 'iphone' ? 2 : 1
 
-  // Same CI-only pacing proposed in PR #248 after retained HTTP 429 traces.
-  // No production auth changes, disabled assertions or additional retries.
+  // CI uses real managed auth. Retained traces showed HTTP 429 with 4-6 second
+  // retry windows. Wait before each test login rather than disabling production
+  // protection or suppressing failures. Existing retries/assertions stay intact.
   if (process.env.CI) await page.waitForTimeout(11_000)
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {

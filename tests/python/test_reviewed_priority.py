@@ -52,7 +52,7 @@ class ReviewedPriorityTests(unittest.TestCase):
     def test_exact_dismissal_only_removes_its_citation(self):
         self.inspection()
         self.detail['oath_case_history'] = [{'ticket_number':'01','hearing_result':'DISMISSED','decision_date':'2026-09-15'}]
-        self.assertEqual(self.result()['score'], 10)  # only non-adverse inspection activity
+        self.assertEqual(self.result()['score'], 10)
         self.detail['inspection_history'][0]['violations'].append({'violation_type':'General','summons_number':'02'})
         self.assertEqual(self.result()['score'], 40)
         self.detail['oath_case_history'][0]['decision_date'] = '2026-09-16'
@@ -134,5 +134,37 @@ class ExistingMatchAdapterTests(unittest.TestCase):
     def test_unknown_account_has_no_manufactured_findings(self):
         from attach_reviewed_intelligence import building_links
         self.assertEqual(building_links({'by_system':{}},{'system_id':'missing'}),[])
+
+class RepeatedAttachmentTests(unittest.TestCase):
+    def test_repeat_attachment_is_byte_identical_after_priority_order_changes(self):
+        import contextlib
+        import hashlib
+        import io
+        import json
+        import tempfile
+        from attach_reviewed_intelligence import attach
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            rows = [
+                {'system_id':sid, 'bin':str(1000000+int(sid)), 'bbl':str(1000000000+int(sid)), 'address':sid+' MAIN ST',
+                 'priority_score':old, 'primary_signal':'NO_CURRENT_SIGNAL', 'signal_types':[],
+                 'latest_sample_date':'2026-09-14', 'active_equipment':units}
+                for sid,old,units in [('10',100,1),('20',0,2)]
+            ]
+            metadata = {'snapshot_date':'2026-09-15', 'generated_at':'2026-09-15T17:00:00Z', 'normalized_system_count':2}
+            raw=json.dumps({'systems':rows,'metadata':metadata,'summary':{}}).encode()
+            (root/'systems.json').write_bytes(raw)
+            (root/'legionella-property-matches.json').write_text(json.dumps({'domain':'LEGIONELLA_PROPERTY_MATCHES',
+                'registry_sha256':hashlib.sha256(raw).hexdigest(),'by_system':{},'summary':{}}))
+            for row in rows:
+                folder=root/'details'/row['system_id'][:2];folder.mkdir(parents=True,exist_ok=True)
+                (folder/(row['system_id']+'.json')).write_text(json.dumps({'metadata':dict(metadata),
+                    'scoring':{'score':row['priority_score'],'components':[],'priority_model_version':'1.0'},
+                    'signals':[],'inspection_history':[],'oath_case_history':[],'dob_activity_history':[]}))
+            with contextlib.redirect_stdout(io.StringIO()): attach(root)
+            first={str(p.relative_to(root)):p.read_bytes() for p in root.rglob('*.json')}
+            with contextlib.redirect_stdout(io.StringIO()): attach(root)
+            second={str(p.relative_to(root)):p.read_bytes() for p in root.rglob('*.json')}
+            self.assertEqual(first,second)
 
 if __name__ == '__main__': unittest.main()

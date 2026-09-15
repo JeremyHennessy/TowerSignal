@@ -88,8 +88,9 @@ test('NYC application page and tab visual inventory', async ({ page, browser }, 
     await capture('Firm '+id)
     await tabs('Firm '+id)
   }
-  // Public marketing and auth form states use an empty context, never another user's session.
-  const publicContext=await browser.newContext({...(testInfo.project.name==='iphone'?devices['iPhone 13']: {viewport:{width:1440,height:1000}}),baseURL:String(testInfo.project.use.baseURL)})
+  // Override the project storage state explicitly: newContext otherwise inherits the
+  // authenticated desktop project state (confirmed in the retained failed trace).
+  const publicContext=await browser.newContext({...(testInfo.project.name==='iphone'?devices['iPhone 13']: {viewport:{width:1440,height:1000}}),baseURL:String(testInfo.project.use.baseURL),storageState:{cookies:[],origins:[]}})
   const publicPage=await publicContext.newPage()
   await installCandidateRoutes(publicPage)
   await publicPage.goto('./',{waitUntil:'domcontentloaded'})
@@ -104,4 +105,5 @@ test('NYC application page and tab visual inventory', async ({ page, browser }, 
   expect(states.some(s=>String(s.name).includes('Map + table'))).toBe(true)
   expect(states.some(s=>String(s.name).includes('Reference library'))).toBe(true)
   expect(states.some(s=>String(s.name).includes('History'))).toBe(true)
-})
+}
+)

@@ -78,9 +78,10 @@ def attach(root: Path):
     payload['metadata']['priority_model_version'] = MODEL
     payload['metadata'].setdefault('priority_review_source_registry_sha256',hashlib.sha256(raw).hexdigest())
     payload['systems'].sort(key=lambda r:(-r['priority_score'],r['system_id']))
+    changed.sort(key=lambda entry: entry['system_id'])
     review = {'model_version':MODEL, 'as_of':as_of.isoformat(), 'systems_reviewed':len(payload['systems']),
         'validation_status':'RULE_BASED_NOT_PREDICTIVELY_CALIBRATED', 'context_note':CONTEXT_NOTE,
-        'before_distribution':dict(before),'after_distribution':dict(after),'changed_system_count':len(changed),'changed_systems':changed,
+        'before_distribution':dict(sorted(before.items())),'after_distribution':dict(sorted(after.items())),'changed_system_count':len(changed),'changed_systems':changed,
         'building_evidence':matches['summary'], 'input_coverage':payload['summary'],
         'boundary':'Scores express research/commercial follow-up priority, not health risk or purchase probability. Source collection clocks are preserved. The existing Home matching evidence is unchanged.'}
     write(root/'systems.json',payload); write(root/'metadata.json',payload['metadata']);write(root/'priority-model-review.json',review)
