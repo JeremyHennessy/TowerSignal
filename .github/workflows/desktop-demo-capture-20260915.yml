@@ -1,0 +1,31 @@
+name: Desktop demo capture 20260915
+on:
+  push:
+    branches: [capture/desktop-demo-20260915]
+    paths:
+      - .github/workflows/desktop-demo-capture-20260915.yml
+      - scripts/capture_desktop_demo_20260915.mjs
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install desktop Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Capture current hosted app and native tabs without changing UI or data
+        run: node scripts/capture_desktop_demo_20260915.mjs
+      - name: Upload desktop screenshots and capture evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-desktop-demo-20260915
+          path: desktop-demo-capture
+          retention-days: 14
