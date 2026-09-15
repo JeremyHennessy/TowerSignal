@@ -11,18 +11,22 @@ from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 
 from blob_release_store import (
     AzureStore,
     POINTER,
     checked_json,
-    current_pointer,
     local_records,
     require,
     validate_descriptor,
     validate_records,
 )
+
+PAGES_WORKFLOW = 339705737
+DATA_WORKFLOW = '.github/workflows/azure-data-refresh.yml'
+DATA_KIND = 'data-only'
 
 REQUIRED = (
     'systems.json',
@@ -31,6 +35,30 @@ REQUIRED = (
     'nys-changes.json',
     'source-health.json',
 )
+
+
+def trusted_runtime_source(source: dict) -> bool:
+    pages = source.get('workflow_id') == PAGES_WORKFLOW and not source.get('kind')
+    data = source.get('kind') == DATA_KIND and source.get('workflow_path') == DATA_WORKFLOW
+    return bool(
+        (pages or data)
+        and re.fullmatch(r'[0-9a-f]{40}', source.get('source_sha', ''))
+        and type(source.get('run_id')) is int
+        and source['run_id'] > 0
+    )
+
+
+def current_runtime_pointer(store):
+    raw, etag = store.read(POINTER, 128 * 1024)
+    pointer = json.loads(raw)
+    source = pointer.get('source') or {}
+    require(
+        pointer.get('schema_version') == 1
+        and pointer.get('domain') == 'TOWERSIGNAL_BLOB_RELEASE'
+        and trusted_runtime_source(source),
+        'Existing current pointer is not a recognized verified runtime release',
+    )
+    return pointer, etag, raw
 
 
 def _download_one(store, prefix: str, record: dict, output: Path) -> None:
@@ -56,8 +84,7 @@ def _download_one(store, prefix: str, record: dict, output: Path) -> None:
 
 
 def materialize(store, output: Path) -> dict:
-    pointer, pointer_etag, _ = current_pointer(store)
-    require(pointer is not None, f'No verified runtime pointer exists at {POINTER}')
+    pointer, pointer_etag, _ = current_runtime_pointer(store)
     source = pointer['source']
     runtime = pointer['runtime']
     validate_descriptor(store, runtime, 'runtime', source)
