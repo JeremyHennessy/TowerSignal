@@ -149,9 +149,9 @@ class RepeatedAttachmentTests(unittest.TestCase):
                 {'system_id':sid, 'bin':str(1000000+int(sid)), 'bbl':str(1000000000+int(sid)), 'address':sid+' MAIN ST',
                  'priority_score':old, 'primary_signal':'NO_CURRENT_SIGNAL', 'signal_types':[],
                  'latest_sample_date':'2026-09-14', 'active_equipment':units}
-                for sid,old,units in [('10',100,1),('20',0,2)]
+                for sid,old,units in [('10',100,1),('20',0,2),('30',0,1)]
             ]
-            metadata = {'snapshot_date':'2026-09-15', 'generated_at':'2026-09-15T17:00:00Z', 'normalized_system_count':2}
+            metadata = {'snapshot_date':'2026-09-15', 'generated_at':'2026-09-15T17:00:00Z', 'normalized_system_count':3}
             raw=json.dumps({'systems':rows,'metadata':metadata,'summary':{}}).encode()
             (root/'systems.json').write_bytes(raw)
             (root/'legionella-property-matches.json').write_text(json.dumps({'domain':'LEGIONELLA_PROPERTY_MATCHES',
@@ -160,8 +160,17 @@ class RepeatedAttachmentTests(unittest.TestCase):
                 folder=root/'details'/row['system_id'][:2];folder.mkdir(parents=True,exist_ok=True)
                 (folder/(row['system_id']+'.json')).write_text(json.dumps({'metadata':dict(metadata),
                     'scoring':{'score':row['priority_score'],'components':[],'priority_model_version':'1.0'},
-                    'signals':[],'inspection_history':[],'oath_case_history':[],'dob_activity_history':[]}))
+                    'signals':[],'inspection_history':[],'oath_case_history':[],
+                    'dob_activity_history':[{'explicit_cooling_tower_mention':True,'filing_date':'2026-09-10',
+                        'job_filing_number':'P1'}] if row['system_id']=='30' else []}))
             with contextlib.redirect_stdout(io.StringIO()): attach(root)
+            project=next(r for r in json.loads((root/'systems.json').read_text())['systems'] if r['system_id']=='30')
+            self.assertEqual(project['priority_score'],15)
+            self.assertEqual(project['primary_signal'],'RECENT_COOLING_TOWER_PROJECT')
+            self.assertEqual(project['signal_types'],['RECENT_COOLING_TOWER_PROJECT'])
+            project_detail=json.loads((root/'details/30/30.json').read_text())
+            self.assertEqual(project_detail['signals'][0]['date'],'2026-09-10')
+            self.assertEqual(project_detail['signals'][0]['reason'],project['score_components'][0]['reason'])
             first={str(p.relative_to(root)):p.read_bytes() for p in root.rglob('*.json')}
             with contextlib.redirect_stdout(io.StringIO()): attach(root)
             second={str(p.relative_to(root)):p.read_bytes() for p in root.rglob('*.json')}

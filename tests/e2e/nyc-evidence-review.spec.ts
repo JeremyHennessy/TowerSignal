@@ -52,4 +52,17 @@ test('Existing Home building links reach reviewed account scoring and source-dat
   await monitor.getByLabel('From', { exact: true }).fill('2026-09-15')
   await monitor.getByLabel('To', { exact: true }).fill('2026-09-15')
   await expect(monitor.getByText('1414 MADISON AVE', { exact: true })).toHaveCount(0)
+
+  // A newly scored project-only account must not still claim there is no signal.
+  await page.evaluate(() => { location.hash = '#/account/2000000164' })
+  await expectAccountDetailHydrated(page)
+  const projectSignal = page.locator('.signal-card').filter({ hasText: 'Recent cooling-tower project' })
+  await expect(projectSignal).toBeVisible()
+  await expect(projectSignal).toContainText('Jul 2, 2026')
+  await expect(projectSignal).toContainText('M01279376-S2')
+  await expect(page.getByLabel('Priority score explanation')).toContainText('15 / 100')
+  await expect(page.getByLabel('Priority score explanation')).toContainText('M01279376-S2')
+  await expectContained(page)
+  await testInfo.attach('project-only-priority-account', { body: await page.screenshot({ scale: 'css', fullPage: true }), contentType: 'image/png' })
+
 })

@@ -1,4 +1,5 @@
 export const signalLabels: Record<string, string> = {
+  RECENT_COOLING_TOWER_PROJECT: 'Cooling-tower project',
   OFFICIAL_BUILDING_FOLLOWUP: 'Official building follow-up',
   CONFIRMED_RECENT_VIOLATION: 'Confirmed violation',
   POTENTIAL_SAMPLING_GAP: 'Potential sampling gap',

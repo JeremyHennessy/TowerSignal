@@ -23,6 +23,13 @@ def validate(root,baseline=None):
         assert revised==d['scoring'] and r['score_components']==revised['components']
         assert r['priority_score']==sum(c['points'] for c in revised['components'])==revised['score']
         assert 0<=r['priority_score']<=100
+        project=next((c for c in revised['components'] if c['source']=='DOB NOW exact BBL'),None)
+        project_signals=[s for s in d['signals'] if s['type']=='RECENT_COOLING_TOWER_PROJECT']
+        assert bool(project)==('RECENT_COOLING_TOWER_PROJECT' in r['signal_types'])
+        assert len(project_signals)==int(bool(project))
+        if project:
+            assert project_signals[0]['date']==project['source_date'] and project_signals[0]['reason']==project['reason']
+            assert r['primary_signal']!='NO_CURRENT_SIGNAL'
         changed+=r['priority_score']!=d['priority_review_baseline']['priority_score']
         if baseline:
             old=read(baseline/rel)

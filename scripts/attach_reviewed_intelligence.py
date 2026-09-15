@@ -62,9 +62,21 @@ def attach(root: Path):
         if revised['score'] != prior['priority_score']:
             changed.append({'system_id': row['system_id'], 'address': row['address'], 'before': prior['priority_score'], 'after': revised['score'], 'components': revised['components']})
         row.update(priority_score=revised['score'], score_components=revised['components'], official_building_evidence_count=len(evidence), official_building_followup=revised['official_building_followup'])
-        row['signal_types'] = [s for s in row['signal_types'] if s != 'OFFICIAL_BUILDING_FOLLOWUP']
+        derived_types = {'OFFICIAL_BUILDING_FOLLOWUP', 'RECENT_COOLING_TOWER_PROJECT'}
+        row['signal_types'] = [s for s in row['signal_types'] if s not in derived_types]
         row['primary_signal'] = prior['primary_signal']
-        detail['signals'] = [s for s in detail['signals'] if s['type'] != 'OFFICIAL_BUILDING_FOLLOWUP']
+        detail['signals'] = [s for s in detail['signals'] if s['type'] not in derived_types]
+        # Use the existing applied component, not a second project eligibility rule.
+        project = next((c for c in revised['components'] if c['source'] == 'DOB NOW exact BBL'), None)
+        if project:
+            row['signal_types'] = [s for s in row['signal_types'] if s != 'NO_CURRENT_SIGNAL']
+            row['signal_types'].append('RECENT_COOLING_TOWER_PROJECT')
+            if row['primary_signal'] == 'NO_CURRENT_SIGNAL':
+                row['primary_signal'] = 'RECENT_COOLING_TOWER_PROJECT'
+            detail['signals'] = [s for s in detail['signals'] if s['type'] != 'NO_CURRENT_SIGNAL']
+            detail['signals'].append({'type':'RECENT_COOLING_TOWER_PROJECT', 'title':'Recent cooling-tower project',
+                'evidence_confidence':'STRONG_SIGNAL', 'fact_class':'COMMERCIAL_SIGNAL',
+                'date':project['source_date'], 'reason':project['reason']})
         if revised['official_building_followup']:
             row['signal_types'].append('OFFICIAL_BUILDING_FOLLOWUP')
             row['primary_signal'] = 'OFFICIAL_BUILDING_FOLLOWUP'
