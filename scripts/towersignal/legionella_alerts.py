@@ -138,8 +138,6 @@ class _PageParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self._in_title = False
-        self._in_h1 = False
-        self._h1_parts: list[str] = []
         self._title_parts: list[str] = []
         self._text_parts: list[str] = []
         self._anchor_href: str | None = None
@@ -149,8 +147,6 @@ class _PageParser(HTMLParser):
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         if tag.lower() == "title":
             self._in_title = True
-        if tag.lower() == "h1":
-            self._in_h1 = True
         if tag.lower() == "a":
             self._anchor_href = next((value for key, value in attrs if key.lower() == "href" and value), None)
             self._anchor_parts = []
@@ -158,8 +154,6 @@ class _PageParser(HTMLParser):
     def handle_endtag(self, tag: str) -> None:
         if tag.lower() == "title":
             self._in_title = False
-        if tag.lower() == "h1":
-            self._in_h1 = False
         if tag.lower() == "a" and self._anchor_href:
             label = " ".join(" ".join(self._anchor_parts).split())
             self.links.append((self._anchor_href, label))
@@ -171,15 +165,13 @@ class _PageParser(HTMLParser):
         if not clean:
             return
         self._text_parts.append(clean)
-        if self._in_h1:
-            self._h1_parts.append(clean)
         if self._in_title:
             self._title_parts.append(clean)
         if self._anchor_href is not None:
             self._anchor_parts.append(clean)
 
     def parsed(self) -> ParsedPage:
-        title = " ".join(self._h1_parts or self._title_parts).strip() or None
+        title = " ".join(self._title_parts).strip() or None
         return ParsedPage(title=title, text="\n".join(self._text_parts), links=self.links)
 
 
@@ -233,7 +225,7 @@ def _relevant(text: str) -> bool:
 
 
 def _discovery_relevant(text: str) -> bool:
-    return bool(LEGIONELLA_RE.search(text) or (COOLING_TOWER_RE.search(text) and re.search(r"culture|pcr", text, re.I)))
+    return bool(LEGIONELLA_RE.search(text))
 
 
 def _record(
@@ -255,7 +247,7 @@ def _record(
         "item_id": item_id or hashlib.sha256(canonical_url.encode("utf-8")).hexdigest(),
         "url": canonical_url,
         "title": title,
-        "agency": "NYC Mayor's Office" if "/mayors-office/" in canonical_url else channel["agency"],
+        "agency": channel["agency"],
         "channel_key": channel["key"],
         "channel_kind": channel["kind"],
         "document_type": "PDF" if is_pdf else "HTML",

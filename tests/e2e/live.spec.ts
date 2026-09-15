@@ -129,9 +129,6 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expectDomText(page, [
       'Selected system',
       'Identity',
-      'Reported samples',
-      'NYC Health inspections',
-      'OATH penalty imposed',
       'DOB NOW project activity',
       'Source & provenance',
       'Copy lead brief',
@@ -146,8 +143,12 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   }
 
   await selectAccountMode(page, 'History')
+  // Historical metrics belong to History, not the mutually exclusive Evidence mode.
+  // Require actual visibility on both browser families rather than hidden DOM text.
+  const historicalProfile = page.locator('.detail-panel > section').filter({ has: page.getByRole('heading', { name: 'Historical profile', exact: true }) })
+  await expect(historicalProfile).toBeVisible()
   for (const label of ['Reported samples', 'NYC Health inspections', 'OATH penalty imposed']) {
-    await expect(page.getByText(label, { exact: true })).toBeVisible()
+    await expect(historicalProfile.getByText(label, { exact: true })).toBeVisible()
   }
   if (isIphone) {
     await expectDomText(page, ['Historical profile', 'OATH case lifecycle', 'TowerSignal History', 'ACRIS property activity'], '.detail-panel')
@@ -190,7 +191,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
 
   await navigateWorkspace(page, testInfo, 'Monitor')
   await expect(page.getByRole('heading', { name: 'Monitor workspace', exact: true })).toBeVisible()
-  await expect(page.getByTestId('monitor-event-count')).toBeVisible()
+  await expect(page.getByText(/new events/)).toBeVisible()
   await expect(page).toHaveURL(/#\/monitor$/)
   await expectContained(page)
 

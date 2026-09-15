@@ -1,0 +1,120 @@
+name: Source Health coverage snapshot proof
+on:
+  push:
+    branches: [agent/source-health-coverage-20260915]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: source-health-coverage-proof
+  cancel-in-progress: true
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require the preserved Home candidate proof
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35018835198})).data;
+            if(run.conclusion!=='success' || run.head_sha!=='fe9445a4b90374799f22d4e9a452d8562a369877') throw new Error('Home baseline proof is not the reviewed exact head');
+      - uses: actions/download-artifact@v4
+        with:
+          name: home-intelligence-candidate
+          run-id: 35018835198
+          github-token: ${{ github.token }}
+          path: .baseline/archive
+      - name: Restore the merged and tested Home baseline without rolling it back
+        run: |
+          (cd .baseline/archive && sha256sum --check home-candidate.tar.sha256)
+          mkdir -p .baseline/site
+          tar -xf .baseline/archive/home-candidate.tar -C .baseline/site
+          rm -f .baseline/archive/*.tar
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          from urllib.request import urlopen
+          root=Path('.baseline/site')
+          # Home's HTML may be deploying independently. The underlying source
+          # payloads must still match before candidate interception is allowed.
+          for name in ['data/systems.json','data/legionella-alerts.json']:
+              with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name,timeout=90) as response: actual=response.read()
+              assert hashlib.sha256(actual).digest()==hashlib.sha256((root/name).read_bytes()).digest(), 'Hosted source baseline moved: '+name
+          data=json.loads((root/'data/systems.json').read_text())
+          alerts=json.loads((root/'data/legionella-alerts.json').read_text())
+          assert len(data['systems'])==4894
+          assert len(alerts['source_channels'])==12
+          print(json.dumps({'baseline_proof':35018835198,'systems':len(data['systems']),'channels':len(alerts['source_channels']),'sources':[s for s in data['metadata']['sources'] if s['dataset_id'] in ['wvxf-dwi5','eabe-havv','xubg-57si']]},indent=2))
+          PY
+          rm -rf public/data
+          cp -R .baseline/site/data public/data
+      - name: Install and test exact candidate
+        run: |
+          npm install --no-audit --no-fund
+          npm run lint
+          npm run typecheck
+          npm test
+          python -m unittest discover -s tests/python -p 'test_*.py'
+          python scripts/build_coverage_audit.py --output public/data
+          npm run build
+      - name: Require all source and account data bytes to remain unchanged
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          old=Path('.baseline/site/data'); new=Path('dist/data')
+          exceptions={'coverage-audit.json','coverage-audit.md'}
+          assert {str(p.relative_to(old)) for p in old.rglob('*') if p.is_file()} == {str(p.relative_to(new)) for p in new.rglob('*') if p.is_file()}, 'Unexpected data file addition or removal'
+          for p in old.rglob('*'):
+              if p.is_file() and str(p.relative_to(old)) not in exceptions:
+                  assert hashlib.sha256(p.read_bytes()).digest()==hashlib.sha256((new/p.relative_to(old)).read_bytes()).digest(), 'Source data changed: '+str(p)
+          audit=json.loads((new/'coverage-audit.json').read_text())
+          for name in ['property-enforcement.json','legionella-alerts.json']:
+              rows=[row for row in audit['source_artifacts'] if row['artifact']==name]
+              assert len(rows)==1 and rows[0]['exists'] and rows[0]['integration_status']=='INTEGRATED'
+          print('All source payloads, account details, scores, Home match index, source dates and history remain byte-identical. Only the coverage audit is regenerated.')
+          PY
+      - name: Install desktop and iPhone browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Capture preserved Source Health baseline with separate test accounts
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: .baseline/site
+          SOURCE_HEALTH_BASELINE: '1'
+        # Only the test process receives this suffix; the workflow/run identity
+        # and artifact provenance remain the actual GitHub run. Avoid signing
+        # up the same test users twice in the subsequent acceptance pass.
+        run: GITHUB_RUN_ID="${GITHUB_RUN_ID}-baseline" npx playwright test tests/e2e/source-health-coverage.spec.ts
+      - name: Full candidate acceptance including Source Health counts and failure states
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: dist
+        run: npm run test:e2e
+      - name: Retain exact candidate archive
+        run: |
+          tar -cf source-health-candidate.tar -C dist .
+          sha256sum source-health-candidate.tar > source-health-candidate.tar.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-health-candidate
+          path: |
+            source-health-candidate.tar
+            source-health-candidate.tar.sha256
+          retention-days: 30
+      - name: Retain screenshots and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-health-proof-evidence
+          path: |
+            source-health-proof
+            playwright-report
+          retention-days: 30

@@ -1,0 +1,145 @@
+name: Release verified Source Health coverage
+# Merge only after exact-head CI, snapshot proof and screenshot review.
+# A post-merge rerun of that proof triggers promotion. The prior Home release
+# must already be hosted; this release never replaces it with an older UI.
+on:
+  workflow_run:
+    workflows: ['Source Health coverage snapshot proof']
+    types: [completed]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  release:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'agent/source-health-coverage-20260915'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require merged exact tested head and unchanged main
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:245})).data;
+            const run=context.payload.workflow_run;
+            if(!pr.merged || pr.head.sha!==run.head_sha || pr.merge_commit_sha!==context.sha) throw new Error('Only the exact tested PR 245 merge may be promoted');
+            const main=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(main.object.sha!==context.sha) throw new Error('Main moved before promotion');
+            const source=(await github.rest.git.getCommit({...context.repo,commit_sha:pr.head.sha})).data;
+            const merged=(await github.rest.git.getCommit({...context.repo,commit_sha:context.sha})).data;
+            if(source.tree.sha!==merged.tree.sha) throw new Error('Merged tree differs from the tested candidate');
+            core.info(`Promoting source ${pr.head.sha}, proof ${run.id}, merge ${context.sha}`);
+      - uses: actions/download-artifact@v4
+        with:
+          name: source-health-candidate
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: .candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: home-intelligence-candidate
+          run-id: 35018835198
+          github-token: ${{ github.token }}
+          path: .rollback/archive
+      - name: Check archives, source preservation and exact hosted Home baseline
+        run: |
+          (cd .candidate && sha256sum --check source-health-candidate.tar.sha256)
+          (cd .rollback/archive && sha256sum --check home-candidate.tar.sha256)
+          mkdir -p dist .rollback/site
+          tar -xf .candidate/source-health-candidate.tar -C dist
+          tar -xf .rollback/archive/home-candidate.tar -C .rollback/site
+          rm -f .candidate/*.tar .rollback/archive/*.tar
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          from urllib.request import urlopen
+          old=Path('.rollback/site/data'); new=Path('dist/data')
+          for p in old.rglob('*'):
+              if p.is_file() and str(p.relative_to(old)) not in {'coverage-audit.json','coverage-audit.md'}:
+                  assert hashlib.sha256(p.read_bytes()).digest()==hashlib.sha256((new/p.relative_to(old)).read_bytes()).digest(), 'Source payload changed: '+str(p)
+          for name in ['index.html','data/systems.json','data/legionella-alerts.json','data/legionella-property-matches.json']:
+              with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name,timeout=90) as response: actual=response.read()
+              assert hashlib.sha256(actual).digest()==hashlib.sha256((Path('.rollback/site')/name).read_bytes()).digest(), 'Home baseline not hosted or has moved: '+name
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install hosted acceptance browsers
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy exact candidate
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify hosted application and source-health bytes
+        run: |
+          python - <<'PY'
+          import hashlib,time
+          from pathlib import Path
+          from urllib.request import urlopen
+          root=Path('dist')
+          names=['index.html','data/systems.json','data/metadata.json','data/legionella-alerts.json','data/coverage-audit.json','data/legionella-property-matches.json']
+          names += [str(p.relative_to(root)) for p in (root/'assets').rglob('*') if p.suffix in {'.js','.css'}]
+          for name in names:
+              expected=hashlib.sha256((root/name).read_bytes()).digest()
+              for attempt in range(6):
+                  with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?source-health='+str(time.time_ns()),timeout=90) as response: actual=response.read()
+                  if hashlib.sha256(actual).digest()==expected: break
+                  if attempt==5: raise SystemExit('Hosted mismatch: '+name)
+                  time.sleep(5)
+          PY
+      - name: Full actual hosted desktop and iPhone acceptance
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Retain hosted acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-health-release-evidence
+          path: |
+            source-health-proof
+            playwright-report
+          retention-days: 30
+      - name: Stage exact prior Home site on acceptance failure
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: source-health-rollback
+          path: .rollback/site
+      - name: Restore prior verified Home site
+        id: rollback
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: source-health-rollback
+      - name: Verify rollback bytes
+        if: failure() && steps.rollback.outcome == 'success'
+        run: |
+          python - <<'PY'
+          import hashlib,time
+          from pathlib import Path
+          from urllib.request import urlopen
+          for name in ['index.html','data/systems.json','data/coverage-audit.json','data/legionella-property-matches.json']:
+              expected=hashlib.sha256((Path('.rollback/site')/name).read_bytes()).digest()
+              for attempt in range(6):
+                  with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?rollback='+str(time.time_ns()),timeout=90) as response: actual=response.read()
+                  if hashlib.sha256(actual).digest()==expected: break
+                  if attempt==5: raise SystemExit('Rollback mismatch: '+name)
+                  time.sleep(5)
+          PY

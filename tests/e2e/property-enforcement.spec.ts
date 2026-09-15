@@ -1,8 +1,11 @@
 import { expect, test } from './fixtures'
 
-test('Home intelligence and NYC Prospect enforcement filters use verified sources', async ({ page }) => {
-  await page.evaluate(() => { window.location.hash = '#/prospect' })
-  await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
+test('NYC Prospect keeps enforcement filters and Home owns official Legionnaires intelligence', async ({ page }) => {
+  await page.evaluate(() => { window.location.hash = '#/home' })
+  const alerts = page.getByRole('region', { name: 'Legionnaires official intelligence' })
+  await expect(alerts).toBeVisible()
+  await expect(alerts).toContainText('official channels')
+  await expect(alerts.locator('.li-headline').first()).toBeVisible()
 
   const alertContract = await page.evaluate(async () => {
     const url = new URL('data/legionella-alerts.json', window.location.href)
@@ -15,13 +18,9 @@ test('Home intelligence and NYC Prospect enforcement filters use verified source
   expect(alertContract.summary.discovered_relevant_item_count).toBeGreaterThan(0)
   expect(alertContract.summary.retrieval_error_count).toBe(0)
 
-  await expect(page.getByLabel('Legionnaires official intelligence')).toHaveCount(0)
-  await page.evaluate(() => { window.location.hash = '#/home' })
-  const alerts = page.getByLabel('Legionnaires official intelligence', { exact: true })
-  await expect(alerts).toBeVisible()
-  await expect(alerts).toContainText('official channels')
-  await expect(alerts.getByRole('link', { name: /^Open official source:/ }).first()).toBeVisible()
   await page.evaluate(() => { window.location.hash = '#/prospect' })
+  await expect(page.getByRole('heading', { name: 'Prospect workspace', exact: true })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Legionnaires official intelligence' })).toHaveCount(0)
   const hpd = page.getByLabel('HPD open violations')
   await hpd.selectOption('true')
   await expect(page.getByLabel('Active filters')).toContainText('HPD open violations: Yes')
@@ -36,6 +35,5 @@ test('Home intelligence and NYC Prospect enforcement filters use verified source
   const swoRow = page.locator('.account-table tbody tr').first()
   await expect(swoRow).toBeVisible()
   await expect(swoRow).toContainText(/SWO evidence · [1-9]/)
-
   await expect(page.getByLabel('FISP / Local Law 11 status').locator('option')).not.toHaveCount(1)
 })

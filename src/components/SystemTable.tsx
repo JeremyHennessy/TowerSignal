@@ -19,6 +19,7 @@ function priorityBand(score: number): string {
 export function SystemTable({ rows, onSelect }: { rows: SystemSummary[]; onSelect: (row: SystemSummary) => void }) {
   const [page, setPage] = useState(0)
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'priority_score', dir: 'desc' })
+
   const sorted = useMemo(() => [...rows].sort((a,b) => {
     const av = a[sort.key] ?? ''; const bv = b[sort.key] ?? ''
     const result = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av).localeCompare(String(bv))

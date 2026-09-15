@@ -331,11 +331,22 @@ class DataRefreshTests(unittest.TestCase):
         pages_only_start=pages.index('      - name: Build NYC property-enforcement cache\n')
         pages_only_end=pages.index('      - name: Build bounded legacy DOB/BIS project context\n')
         shared_end=pages.index('      - name: Stage history state for post-deploy persistence\n')
-        shared_segment=pages[shared_start:pages_only_start] + pages[pages_only_end:shared_end]
+        matching_start=pages.index('      - name: Install official-results PDF text reader\n')
+        matching_end=pages.index('      - name: Python fixture tests\n', matching_start)
+        # These two additions belong only to the NYC Pages product. Preserve the
+        # byte-exact shared source commands/limits without modifying Blob scope.
+        matching_segment=pages[matching_start:matching_end]
+        self.assertIn('sudo apt-get install -y --no-install-recommends poppler-utils', matching_segment)
+        self.assertIn('        timeout-minutes: 10\n        run: python scripts/build_legionella_matches.py --data public/data\n', matching_segment)
+        self.assertLess(pages.index('      - name: Independently verify generated NYS equipment against current NYS source\n'), matching_start)
+        shared_segment=(pages[shared_start:pages_only_start] +
+                        pages[pages_only_end:matching_start] + pages[matching_end:shared_end])
         workflow=(root/d.WORKFLOW).read_text()
         self.assertIn(shared_segment,workflow)
         self.assertNotIn('Build NYC property-enforcement cache', workflow)
         self.assertNotIn('Build official Legionella / Legionnaires intelligence cache', workflow)
+        self.assertNotIn('scripts/build_legionella_matches.py', workflow)
+        self.assertNotIn('poppler-utils', workflow)
         self.assertIn("- cron: '17 10 * * *'",workflow)
         self.assertIn('needs: generate',workflow)
         self.assertIn('contents: read',workflow)

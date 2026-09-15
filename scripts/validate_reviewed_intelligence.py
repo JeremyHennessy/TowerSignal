@@ -1,95 +1,44 @@
-"""Fail closed on mismatched accounts, rewritten dates, or irreconcilable priority explanations."""
+"""Check every revised account and preserve source dates, Home matches, history and other facts."""
 from __future__ import annotations
-import argparse
-import json
-import sys
-from collections import Counter
+import argparse,json,sys
 from datetime import date
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from towersignal.reviewed_priority import MODEL, score
-from towersignal.legionella_links import resolve_rows
-
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from attach_reviewed_intelligence import building_links
+from towersignal.reviewed_priority import score,MODEL
 
 def read(p): return json.loads(p.read_text())
-
-def validate(root: Path, baseline: Path | None = None):
-    payload = read(root/'systems.json')
-    metadata = read(root/'metadata.json')
-    assert metadata == payload['metadata'], 'Summary and root metadata disagree'
-    assert metadata['priority_model_version'] == MODEL
-    assert isinstance(metadata['source_health'], list)
-    rows = {r['system_id']:r for r in payload['systems']}
-    assert len(rows) == len(payload['systems']) == metadata['normalized_system_count']
-    links = read(root/'legionella-tower-links.json')
-    archive = read(root/'legionella-alerts.json')
-    review = read(root/'priority-model-review.json')
-    assert links['domain'] == 'LEGIONELLA_BUILDING_EVIDENCE'
-    assert len({i['item_id'] for i in archive['items']}) == len(archive['items']) == archive['summary']['discovered_relevant_item_count']
-    asof = date.fromisoformat(metadata['snapshot_date'])
-    aliases, actual_linked = {}, set()
-    before, after = Counter(), Counter()
-    baseline_rows = {r['system_id']:r for r in read(baseline/'systems.json')['systems']} if baseline else {}
-    if baseline:
-        assert set(rows) == set(baseline_rows), 'The current account universe changed'
-        assert metadata['generated_at'] == read(baseline/'metadata.json')['generated_at'], 'Rescoring advanced the source clock'
-    for sid, row in rows.items():
-        path = Path('details')/sid[:2]/(sid+'.json')
-        detail = read(root/path)
-        if (detail.get('building_context') or {}).get('address'):
-            aliases.setdefault(row['bin'],[]).append(detail['building_context']['address'])
-        evidence = links['by_system'].get(sid,[])
-        assert detail.get('legionella_building_evidence') == evidence
-        result = score(detail,row,evidence,asof)
-        assert result == detail['scoring'], f'Non-reproducible score: {sid}'
-        assert row['priority_score'] == result['score'] == sum(c['points'] for c in result['components'])
-        assert row['score_components'] == result['components']
-        assert 0 <= row['priority_score'] <= 100
-        assert result['official_building_followup'] == ('OFFICIAL_BUILDING_FOLLOWUP' in row['signal_types'])
-        assert row['official_building_evidence_count'] == len(evidence)
-        before[detail['priority_review_baseline']['priority_score']] += 1
-        after[result['score']] += 1
-        for record in evidence:
-            assert record['system_id'] == sid and record['bin'] == row['bin']
-            assert record['bbl'] == row['bbl'] and record['scope'] == 'BUILDING_LEVEL'
-            assert record['outbreak_source_confirmed'] is False
-            assert record['source_sha256'] and record['source_url'].startswith('https://www.nyc.gov/')
-            actual_linked.add(sid)
+def validate(root,baseline=None):
+    p=read(root/'systems.json'); m=read(root/'metadata.json'); matches=read(root/'legionella-property-matches.json')
+    assert p['metadata']==m and m['priority_model_version']==MODEL
+    rows=p['systems']; assert len({r['system_id'] for r in rows})==len(rows)==m['normalized_system_count']
+    oldrows={r['system_id']:r for r in read(baseline/'systems.json')['systems']} if baseline else {}
+    if baseline: assert set(oldrows)=={r['system_id'] for r in rows}
+    changed=0
+    for r in rows:
+        rel=Path('details')/r['system_id'][:2]/(r['system_id']+'.json');d=read(root/rel)
+        links=building_links(matches,r)
+        assert d['legionella_building_evidence']==links
+        revised=score(d,r,links,date.fromisoformat(m['snapshot_date']))
+        assert revised==d['scoring'] and r['score_components']==revised['components']
+        assert r['priority_score']==sum(c['points'] for c in revised['components'])==revised['score']
+        assert 0<=r['priority_score']<=100
+        changed+=r['priority_score']!=d['priority_review_baseline']['priority_score']
         if baseline:
-            old = read(baseline/path)
-            for key in old:
-                if key in ('scoring','metadata','signals'): continue
-                assert detail[key] == old[key], f'Underlying account fact changed: {sid}/{key}'
-            for key in baseline_rows[sid]:
-                if key in ('priority_score','score_components','primary_signal','signal_types'): continue
-                assert row[key] == baseline_rows[sid][key], f'Underlying summary fact changed: {sid}/{key}'
-            assert detail['metadata']['generated_at'] == old['metadata']['generated_at']
-    relinked, unresolved = resolve_rows(links['records'],list(rows.values()),aliases)
-    key=lambda r:(r['source_url'],r['address'],r.get('system_id',''))
-    assert sorted(relinked,key=key) == sorted(links['linked_records'],key=key), 'Building links do not reproduce'
-    assert sorted(unresolved,key=key) == sorted(links['unresolved'],key=key)
-    assert len(actual_linked) == links['summary']['matched_systems']
-    assert len({r['bin'] for r in relinked}) == links['summary']['matched_buildings']
-    assert len(links['records']) == links['summary']['published_building_observations']
-    assert len(unresolved) == links['summary']['unresolved_building_observations']
-    identities={(r['source_url'],r['system_id'],r['result'],r['source_date']) for r in relinked}
-    for item in archive['items']:
-        for r in item.get('building_links',[]):
-            assert (r['source_url'],r['system_id'],r['result'],r['source_date']) in identities
-            assert r['link_basis'] in ('NAMED_IN_SOURCE','RELATED_EPISODE_UPDATE')
-            if r['link_basis']=='NAMED_IN_SOURCE': assert r['source_url']==item['url']
-    assert dict(sorted((int(k),v) for k,v in review['before_distribution'].items())) == dict(sorted(before.items()))
-    assert dict(sorted((int(k),v) for k,v in review['after_distribution'].items())) == dict(sorted(after.items()))
-    assert review['changed_system_count'] == len(review['changed_systems'])
-    assert len(rows) == review['systems_reviewed']
+            old=read(baseline/rel)
+            for k in old:
+                if k not in ('scoring','metadata','signals'): assert old[k]==d[k], f'Account source fact changed: {r["system_id"]}/{k}'
+            assert {k:v for k,v in old['metadata'].items() if k!='priority_model_version'}=={k:v for k,v in d['metadata'].items() if k!='priority_model_version'}
+            for k in oldrows[r['system_id']]:
+                if k not in ('priority_score','score_components','signal_types','primary_signal'): assert r[k]==oldrows[r['system_id']][k]
+    review=read(root/'priority-model-review.json');assert review['changed_system_count']==changed==len(review['changed_systems'])
     if baseline:
-        assert (root/'changes.json').read_bytes()==(baseline/'changes.json').read_bytes(), 'Source history was rewritten'
-    result={'systems_validated':len(rows),'linked_systems':len(actual_linked),'named_buildings':links['summary']['matched_buildings'],
-            'unresolved_observations':len(unresolved),'changed_scores':review['changed_system_count'],'model':MODEL,
-            'source_dates_preserved':True,'all_score_components_reconcile':True,'building_links_reproduced':True}
-    print(json.dumps(result,indent=2))
-    return result
-
+        exceptions={'systems.json','metadata.json'}
+        for f in baseline.rglob('*'):
+            rel=f.relative_to(baseline)
+            if f.is_file() and str(rel) not in exceptions and not str(rel).startswith('details/'):
+                assert (root/rel).read_bytes()==f.read_bytes(),f'Unrelated source artifact changed: {rel}'
+        assert m['generated_at']==read(baseline/'metadata.json')['generated_at']
+    print(json.dumps({'model':MODEL,'systems_validated':len(rows),'changed_scores':changed,'all_components_reconcile':True,'matches':matches['summary'],'source_dates_preserved':True},indent=2))
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--output',type=Path,default=Path('public/data'));p.add_argument('--baseline',type=Path)
-    a=p.parse_args();validate(a.output,a.baseline)
+    p=argparse.ArgumentParser();p.add_argument('--output',type=Path,default=Path('public/data'));p.add_argument('--baseline',type=Path);a=p.parse_args();validate(a.output,a.baseline)
