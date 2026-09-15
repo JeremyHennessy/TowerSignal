@@ -51,7 +51,7 @@ jobs:
           npm install --no-audit --no-fund
           npm run lint
           npm run typecheck
-          npm test
+          npm test -- --root "$PWD"
           python -m unittest discover -s tests/python -p 'test_*.py' -v
           npm run build
       - uses: actions/download-artifact@v4
