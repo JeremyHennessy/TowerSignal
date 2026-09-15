@@ -27,7 +27,7 @@ jobs:
           payload=json.loads(gzip.decompress(Path('driver/scripts/arcny-feature-payload.json.gz').read_bytes()))
           test_source=Path('driver/scripts/arcny-site-test.txt').read_text()
           test_path='tests/e2e/workflow-site-leads.spec.ts'
-          test_digest='0c7e91fd06e9783fe45b5cc629660221198d917ba34ae2f13971f53d8fbc9b86'
+          test_digest='c0b8b4d5f82e983af2ba49f3b4d2b3d8d3ae54453fc9b5385e2649c364cbb73f'
           assert hashlib.sha256(test_source.encode()).hexdigest()==test_digest
           payload['files'][test_path]=test_source
           payload['postimages'][test_path]=test_digest

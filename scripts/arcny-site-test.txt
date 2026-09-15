@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { signInForProject } from './auth.helpers'
 
+// Establish this read-fixture's session through the normal sign-in UI. Restored
+// WebKit storage state did not issue any private API request in the failed probe.
+test.use({ storageState: { cookies: [], origins: [] } })
+
 // Browser rendering contract only: synthetic private API reads; real application,
 // real NYC payload and normal test-account authentication. No customer data or
 // database writes are made by this fixture. Actual persistence has separate tests.
