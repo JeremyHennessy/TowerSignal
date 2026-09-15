@@ -10,7 +10,8 @@ test('NYC Prospect exposes property enforcement filters and official Legionnaire
   await expect(alerts.getByRole('link', { name: 'Open official source' }).first()).toBeVisible()
 
   const alertContract = await page.evaluate(async () => {
-    const response = await fetch(`${import.meta.env.BASE_URL}data/legionella-alerts.json`, { cache: 'no-store' })
+    const url = new URL('data/legionella-alerts.json', window.location.href)
+    const response = await fetch(url, { cache: 'no-store' })
     if (!response.ok) throw new Error(`Legionella cache HTTP ${response.status}`)
     return response.json() as Promise<{ domain: string; summary: { source_channel_count: number; discovered_relevant_item_count: number; retrieval_error_count: number } }>
   })
