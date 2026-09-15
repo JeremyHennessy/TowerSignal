@@ -59,6 +59,22 @@ jobs:
       - name: Fetch, validate and generate current NYC data
         timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
+      - name: Build NYC property-enforcement cache
+        timeout-minutes: 25
+        run: python scripts/build_property_enforcement_cache.py --systems public/data/systems.json --output public/data/property-enforcement.json
+      - name: Validate NYC property-enforcement cache
+        run: python scripts/validate_property_enforcement_cache.py --cache public/data/property-enforcement.json --max-age-days 1 --require-production-universe
+      - name: Attach exact-key NYC property-enforcement context
+        run: python scripts/attach_property_enforcement.py --output public/data --cache public/data/property-enforcement.json
+      - name: Build official Legionella / Legionnaires intelligence cache
+        run: |
+          if [ -f .history-store/data/history/legionella-alerts.json ]; then
+            python scripts/build_legionella_alert_cache.py --output public/data/legionella-alerts.json --previous-cache .history-store/data/history/legionella-alerts.json
+          else
+            python scripts/build_legionella_alert_cache.py --output public/data/legionella-alerts.json
+          fi
+      - name: Validate official Legionella / Legionnaires intelligence cache
+        run: python scripts/validate_legionella_alert_cache.py --cache public/data/legionella-alerts.json --max-age-days 1 --require-clean-retrieval
       - name: Build bounded legacy DOB/BIS project context
         timeout-minutes: 15
         run: python scripts/build_legacy_dob_project_cache.py --output public/data
@@ -264,6 +280,7 @@ jobs:
             public/data/history/nys/latest.json
             public/data/history/nys/events.json
             public/data/source-health.json
+            public/data/legionella-alerts.json
           retention-days: 7
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -338,6 +355,7 @@ jobs:
           cp .verified-history/history/nys/latest.json data/history/nys/latest.json
           cp .verified-history/history/nys/events.json data/history/nys/events.json
           cp .verified-history/source-health.json data/history/source-health.json
+          cp .verified-history/legionella-alerts.json data/history/legionella-alerts.json
           git config user.name "TowerSignal History Bot"
           git config user.email "actions@users.noreply.github.com"
           git add data/history
