@@ -108,6 +108,35 @@ class MaterializerTests(unittest.TestCase):
         actual = {(r['path'], r['bytes'], r['sha256']) for r in b.local_records(self.output)}
         self.assertEqual(actual, expected)
 
+    def test_materializes_current_data_only_runtime_exactly(self):
+        self.source = {
+            'kind': 'data-only',
+            'workflow_path': '.github/workflows/azure-data-refresh.yml',
+            'workflow_id': 999999999,
+            'run_id': 456,
+            'run_number': 3,
+            'run_attempt': 1,
+            'source_sha': 'c' * 40,
+            'created_at': '2026-09-12T13:00:00Z',
+        }
+        self._seed_release(self.records)
+        proof = m.materialize(self.store, self.output)
+        self.assertEqual(proof['source'], self.source)
+        self.assertEqual(proof['runtime_files'], 100)
+
+    def test_unrecognized_runtime_source_is_rejected(self):
+        self.source = {
+            'kind': 'other-producer',
+            'workflow_path': '.github/workflows/other.yml',
+            'workflow_id': 999999999,
+            'run_id': 789,
+            'source_sha': 'd' * 40,
+        }
+        self._seed_release(self.records)
+        with self.assertRaises(b.PublishError):
+            m.materialize(self.store, self.output)
+        self.assertFalse(self.output.exists())
+
     def test_corrupted_payload_is_rejected(self):
         target = self.prefix + '/systems.json'
         self.store.data[target] += b'corrupt'
