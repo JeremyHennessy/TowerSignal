@@ -1,0 +1,119 @@
+name: Prove NYC Home intelligence and building links
+on:
+  push:
+    branches: ['agent/nyc-home-intelligence-20260915']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: nyc-home-intelligence-proof
+  cancel-in-progress: false
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Preserve exact candidate source
+        run: git archive --format=zip HEAD -o home-intelligence-source.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: home-intelligence-source
+          path: home-intelligence-source.zip
+          retention-days: 14
+      - name: Require verified original NYC release and completed hosted acceptance
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = (await github.rest.actions.getWorkflowRun({...context.repo,run_id:34997430388})).data;
+            if (run.head_sha !== '7eeb4a47e4be92ee8d9e16640705c97e8b93496b') throw new Error('Unexpected original release');
+            const jobs = (await github.rest.actions.listJobsForWorkflowRun({...context.repo,run_id:run.id})).data.jobs;
+            for (const name of ['build','deploy']) if (!jobs.some(j=>j.name===name && j.conclusion==='success')) throw new Error('Original release did not pass '+name);
+            const acceptance = (await github.rest.actions.getWorkflowRun({...context.repo,run_id:35009880669})).data;
+            if (acceptance.head_sha !== '3ba37f707b4803096cfaeddb9ac801456f0658ec' || acceptance.conclusion !== 'success') throw new Error('Exact hosted acceptance and history preservation not proven');
+            const artifact = (await github.rest.actions.getArtifact({...context.repo,artifact_id:10411008631})).data;
+            if (artifact.digest !== 'sha256:d451b1bbb6ca14c240511d6e31d7ff2ff2a325f99ddc3f0e2bc69936ff12f636') throw new Error('Source archive digest mismatch');
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34997430388
+          github-token: ${{ github.token }}
+          path: .baseline
+      - name: Restore the unchanged NYC source snapshot
+        run: |
+          mkdir -p .baseline/site public/data
+          tar -xf .baseline/artifact.tar -C .baseline/site
+          cp -a .baseline/site/data/. public/data/
+          python scripts/verify_home_intelligence_release.py .baseline/site
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Collect and prove official named-building evidence
+        run: |
+          command -v pdftotext
+          python -m unittest tests.python.test_legionella_matching_documents -v
+          python scripts/build_legionella_matches.py --data public/data --source-evidence .source-proof
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          old=Path('.baseline/site/data'); new=Path('public/data')
+          for p in old.rglob('*'):
+              if p.is_file():
+                  q=new/p.relative_to(old)
+                  assert q.is_file() and hashlib.sha256(p.read_bytes()).digest()==hashlib.sha256(q.read_bytes()).digest(), 'Existing source/scoring changed: '+str(p)
+          index=json.loads((new/'legionella-property-matches.json').read_text())
+          assert index['summary']['systems_with_named_building_evidence']>0
+          docs=json.loads(Path('.source-proof/extracted-documents.json').read_text())
+          assert len([r for r in docs['observations'] if r['cluster_id']=='NYC-BRONX-2026-09'])==10
+          assert all(x['score_points']==0 for x in docs['areas'])
+          Path('public/home-intelligence-release.json').write_text(json.dumps({'application_source_sha':os.environ['GITHUB_SHA'],'source_run_id':34997430388,'source_sha':'7eeb4a47e4be92ee8d9e16640705c97e8b93496b','baseline_acceptance_run_id':35009880669,'existing_data_bytes_preserved':True,'priority_model_unchanged':True,'new_match_index':index['summary']},indent=2)+'\n')
+          print(json.dumps(index['summary'],indent=2))
+          PY
+      - name: Install existing dependencies and test browsers
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Repository checks and exact production build
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          python -m unittest discover -s tests/python -p 'test_*.py'
+          npm run build
+      - name: Full predeployment desktop and iPhone candidate acceptance
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: dist
+        run: npm run test:e2e
+      - name: Preserve candidate and byte-identical rollback archives
+        run: |
+          tar -cf home-candidate.tar -C dist .
+          sha256sum home-candidate.tar > home-candidate.tar.sha256
+          cp .baseline/artifact.tar home-rollback.tar
+          sha256sum home-rollback.tar > home-rollback.tar.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: home-intelligence-candidate
+          path: |
+            home-candidate.tar
+            home-candidate.tar.sha256
+            home-rollback.tar
+            home-rollback.tar.sha256
+          retention-days: 14
+      - name: Retain source proof and candidate screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: home-intelligence-proof-evidence
+          path: |
+            playwright-report/
+            .source-proof/
+            public/data/legionella-property-matches.json
+            public/home-intelligence-release.json
+          include-hidden-files: true
+          retention-days: 30

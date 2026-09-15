@@ -107,6 +107,12 @@ def main() -> None:
     )
     args = parser.parse_args()
     build(args.output, args.previous_cache)
+    # The ordinary NYC Pages producer already creates systems.json before this
+    # command. Publish the new additive match index on each real registry build.
+    # Source-only probes without a registry still collect the original alert cache.
+    if (args.output.parent / 'systems.json').exists():
+        from build_legionella_matches import build as build_matches
+        build_matches(args.output.parent)
 
 
 if __name__ == "__main__":

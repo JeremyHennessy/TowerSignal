@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { loadChanges, loadCompanies, loadProcurement, loadSystems } from '../data/api'
 import type { WorkflowUser } from '../types/workflow'
 import { PortalNavigation } from './PortalNavigation'
+import { LegionellaIntelligencePanel } from './LegionellaIntelligencePanel'
 
 interface HomeSummary {
   registeredSystems: number
@@ -75,6 +76,8 @@ export function HomePage({ user }: { user: WorkflowUser }) {
         <article><small>Procurement observations</small><strong>{summary.procurementRecords.toLocaleString()}</strong><span>NYC, statewide authority and water sources</span></article>
         <article><small>Observed vendor companies</small><strong>{summary.observedCompanies.toLocaleString()}</strong><span>Conservative company identities</span></article>
       </div>}
+
+      <LegionellaIntelligencePanel />
 
       <div className="home-section-heading">
         <div><span className="page-kicker">Workspace</span><h2>Move from signal to action.</h2></div>
