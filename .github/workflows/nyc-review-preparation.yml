@@ -1,0 +1,49 @@
+name: Prepare isolated NYC source and test evidence
+on:
+  push:
+    branches: ['agent/nyc-final-review-20260915']
+    paths: ['.github/workflows/nyc-review-preparation.yml']
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Preserve exact installed test dependencies for offline candidate review
+        run: |
+          mkdir -p review-material
+          tar -czf review-material/test-dependencies.tar.gz node_modules
+      - name: Retrieve actual official source bytes, not search-engine PDF text
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib,sys
+          sys.path.insert(0,'scripts')
+          from towersignal.legionella_alerts import _fetch
+          urls=[
+          'https://www.nyc.gov/assets/doh/downloads/pdf/cd/cooling-tower-confirmatory-culture-results.pdf',
+          'https://www.nyc.gov/assets/doh/downloads/pdf/cd/ues-cluster-2026-pcr-positive-cooling-towers.pdf',
+          'https://www.nyc.gov/site/doh/about/press/pr2026/nyc-health-department-orders-cooling-towers-to-be-cleaned-in-south-bronx.page',
+          'https://www.nyc.gov/site/doh/about/press/pr2026/health-department-declares-ues-legionnaires-exposure-has-ended.page',
+          'https://www.nyc.gov/site/doh/health/health-topics/legionnaires-disease.page']
+          rows=[]
+          for u in urls:
+              data,kind=_fetch(u)
+              name=u.rsplit('/',1)[-1]
+              pathlib.Path('review-material',name).write_bytes(data)
+              rows.append({'url':u,'file':name,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'content_type':kind})
+          pathlib.Path('review-material/source-manifest.json').write_text(json.dumps(rows,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nyc-isolated-review-material
+          path: review-material/
+          retention-days: 3
