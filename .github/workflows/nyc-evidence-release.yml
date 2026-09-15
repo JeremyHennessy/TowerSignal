@@ -1,0 +1,134 @@
+name: Release exact tested NYC intelligence candidate
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run_id:
+        description: Successful NYC candidate run containing the exact tested bytes
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Require successful trusted candidate workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_RUN: ${{ inputs.candidate_run_id }}
+        run: |
+          [[ "$CANDIDATE_RUN" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CANDIDATE_RUN" > candidate-run.json
+          python - <<'PY'
+          import json
+          r=json.load(open('candidate-run.json'))
+          assert r['conclusion']=='success' and r['status']=='completed'
+          assert r['path']=='.github/workflows/nyc-evidence-candidate.yml'
+          assert r['head_repository']['full_name']=='JeremyHennessy/TowerSignal'
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: nyc-tested-candidate
+          run-id: ${{ inputs.candidate_run_id }}
+          github-token: ${{ github.token }}
+          path: proof
+      - name: Check exact candidate tree, every byte, and still-hosted rollback baseline
+        run: |
+          mkdir -p dist .source-site
+          tar -xzf proof/candidate.tgz -C dist
+          tar -xzf proof/rollback.tgz -C .source-site
+          python scripts/nyc_evidence_release.py integrity --site dist --proof proof
+          python scripts/nyc_evidence_release.py baseline --site .source-site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: nyc-tested-candidate
+          run-id: ${{ inputs.candidate_run_id }}
+          github-token: ${{ github.token }}
+          path: proof
+      - name: Verify actual hosted candidate and every matched account
+        run: |
+          mkdir -p dist
+          tar -xzf proof/candidate.tgz -C dist
+          python scripts/nyc_evidence_release.py hosted --site dist
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Actual hosted desktop and iPhone acceptance and complete visual inventory
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Require unchanged hosted candidate after acceptance
+        run: python scripts/nyc_evidence_release.py hosted --site dist
+      - name: Retain actual hosted screenshots and acceptance report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nyc-live-visual-acceptance
+          path: |
+            playwright-report/
+            test-results/
+            proof/candidate-integrity.json
+          retention-days: 30
+  rollback:
+    needs: [deploy, verify]
+    if: always() && needs.deploy.result == 'success' && needs.verify.result == 'failure'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: github-pages
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: nyc-tested-candidate
+          run-id: ${{ inputs.candidate_run_id }}
+          github-token: ${{ github.token }}
+          path: proof
+      - run: mkdir -p rollback && tar -xzf proof/rollback.tgz -C rollback
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages-rollback
+          path: rollback
+      - uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-rollback
+      - name: Verify original production bytes restored
+        run: python scripts/nyc_evidence_release.py baseline --site rollback

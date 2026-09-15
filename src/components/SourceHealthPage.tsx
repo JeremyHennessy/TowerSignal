@@ -151,7 +151,8 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
       </tr>)}</tbody></table></div></>}
     </div>
 
-    {coverageAudit && <div className="disclaimer"><strong>Governance lock.</strong> Priority Score 1.0 changed: {coverageAudit.governance.priority_score_1_0_changed ? 'yes' : 'no'} · fuzzy matching used: {coverageAudit.governance.fuzzy_matching_used ? 'yes' : 'no'} · Opportunity Score authorized: {coverageAudit.governance.opportunity_score_authorized ? 'yes' : 'no'}. {coverageAudit.governance.follow_on_rule}</div>}
+    {coverageAudit && <div className="disclaimer"><strong>Earlier coverage-audit governance.</strong> Priority Score 1.0 changed: {coverageAudit.governance.priority_score_1_0_changed ? 'yes' : 'no'} · fuzzy matching used: {coverageAudit.governance.fuzzy_matching_used ? 'yes' : 'no'} · Opportunity Score authorized: {coverageAudit.governance.opportunity_score_authorized ? 'yes' : 'no'}. {coverageAudit.governance.follow_on_rule}</div>}
+    {payload.metadata.priority_model_version === '1.1' && <div className="disclaimer"><strong>Current research-priority model 1.1.</strong> Named-building evidence and revised timing rules are independently validated against every current account. The earlier coverage-audit governance above describes its original baseline, not this model release. <a href="data/priority-model-review.json" target="_blank" rel="noreferrer">Open the current before / after model review</a>.</div>}
     <div className="source-health-footnote">Source health distinguishes expected scope limits from unexpected data loss. Procurement, public-water and other context remain unlinked to cooling-tower accounts until an exact or explicitly reviewed relationship is available.</div>
   </section>
 }

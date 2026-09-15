@@ -10,7 +10,7 @@ const modes: Array<{ value: AccountMode; label: string; detail: string }> = [
   { value: 'history', label: 'History', detail: 'Unified and source-specific chronology' },
 ]
 
-const summaryHeadings = new Set(['Current TowerSignal signals', 'Why this score'])
+const summaryHeadings = new Set(['Current TowerSignal signals', 'Why this score', 'Official Legionella building evidence'])
 const historyHeadings = new Set([
   'Historical profile',
   'Sample history',

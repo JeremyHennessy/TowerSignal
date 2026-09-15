@@ -198,9 +198,9 @@ test('opens the Monitor product mode with source-backed change evidence', async 
   await screen.findByText('10 ALPHA ST')
   await user.click(screen.getByRole('button', { name:'Monitor' }))
   expect(screen.getByRole('heading', { name:'Monitor workspace', level:1 })).toBeInTheDocument()
-  expect(screen.getAllByText('New public sample reported')).toHaveLength(2)
-  expect(screen.getByText('Source: NYC_COOLING_TOWER_REGISTRATIONS')).toBeInTheDocument()
-  expect(screen.getByText('Evidence: SYSTEM_ID_EXACT')).toBeInTheDocument()
+  expect(screen.getAllByText('Public sample reported')).toHaveLength(2)
+  expect(screen.getByText('NYC Health · tower registry')).toBeInTheDocument()
+  expect(screen.getByText('Exact system ID')).toBeInTheDocument()
 })
 
 test('opens the NYS Market mode without NYC score semantics', async () => {
