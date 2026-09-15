@@ -1,0 +1,62 @@
+name: Property enforcement production-universe proof
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/towersignal/property_enforcement.py'
+      - 'scripts/build_property_enforcement_cache.py'
+      - 'scripts/validate_property_enforcement_cache.py'
+      - '.github/workflows/property-enforcement-production-universe-proof.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  production-universe-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate current NYC TowerSignal system universe without publishing
+        timeout-minutes: 45
+        run: python scripts/build_data.py --output "$RUNNER_TEMP/towersignal-data"
+      - name: Build property-enforcement cache against current production-scale universe
+        timeout-minutes: 25
+        run: >-
+          python scripts/build_property_enforcement_cache.py
+          --systems "$RUNNER_TEMP/towersignal-data/systems.json"
+          --output "$RUNNER_TEMP/property-enforcement.json"
+      - name: Validate exact-key property-enforcement coverage
+        run: >-
+          python scripts/validate_property_enforcement_cache.py
+          --cache "$RUNNER_TEMP/property-enforcement.json"
+          --max-age-days 1
+          --require-production-universe
+      - name: Print verified coverage summary
+        run: |
+          python - <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+          cache = json.loads((Path(os.environ['RUNNER_TEMP']) / 'property-enforcement.json').read_text(encoding='utf-8'))
+          print(json.dumps({
+              'source_systems_snapshot': cache.get('source_systems_snapshot'),
+              'summary': cache.get('summary'),
+              'source_counts': {
+                  key: {
+                      'dataset_id': value.get('dataset_id'),
+                      'source_record_count': value.get('source_record_count'),
+                      'matched_record_count': value.get('matched_violation_count') or value.get('matched_event_count') or value.get('matched_filing_count'),
+                  }
+                  for key, value in (cache.get('sources') or {}).items()
+              },
+          }, indent=2))
+          PYTHON
