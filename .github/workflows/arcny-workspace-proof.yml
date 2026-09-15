@@ -3,25 +3,136 @@ on:
   push:
     branches: [agent/arcny-watchlist-20260915]
 permissions:
-  contents: read
+  contents: write
   actions: read
 jobs:
-  source-workspace:
+  candidate-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 04d2711cde448e8e57909dd0ce9d9152cc8ddf9c
+          path: candidate
+      - name: Apply exact locally tested source payload on isolated candidate
+        id: candidate
+        run: |
+          python - <<'PY'
+          import gzip,hashlib,json,os,subprocess
+          from pathlib import Path
+          payload=json.loads(gzip.decompress(Path('scripts/arcny-feature-payload.json.gz').read_bytes()))
+          os.chdir('candidate')
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='04d2711cde448e8e57909dd0ce9d9152cc8ddf9c'
+          for name,digest in payload['preimages'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==digest,'Wrong predecessor: '+name
+          exec(compile(payload['patch_python'],'verified-workflow-patch','exec'))
+          for name,content in payload['files'].items():
+              p=Path(name); p.parent.mkdir(parents=True,exist_ok=True); p.write_text(content)
+          for name,digest in payload['postimages'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==digest,'Wrong candidate: '+name
+          subprocess.run(['git','add','--',*payload['postimages'].keys()],check=True)
+          subprocess.run(['git','-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Keep private site research records visible in workflow Monitor without fabricated tower data'],check=True)
+          sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write('sha='+sha+'\n')
+          print('Exact seven-file candidate',sha)
+          PY
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install --no-audit --no-fund
-      - name: Export source and installed test dependencies without credentials
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Complete isolated CI checks
+        working-directory: candidate
         run: |
-          mkdir -p /tmp/workspace-export
-          git archive --format=tar HEAD src tests scripts .github config database public package.json tsconfig.app.json tsconfig.json tsconfig.node.json vite.config.ts vitest.config.ts eslint.config.js playwright.config.ts playwright.data-only.config.ts README.md | gzip > /tmp/workspace-export/source.tar.gz
-          tar -czf /tmp/workspace-export/node_modules.tar.gz node_modules
+          npm install --no-audit --no-fund
+          npm run lint
+          npm run typecheck
+          npm test
+          python -m unittest discover -s tests/python -p 'test_*.py' -v
+          npm run build
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34997430388
+          github-token: ${{ github.token }}
+          path: .deployed
+      - name: Retain deployed sources and baseline unchanged
+        env:
+          CANDIDATE_SHA: ${{ steps.candidate.outputs.sha }}
+        run: |
+          mkdir -p .baseline
+          tar -xf .deployed/artifact.tar -C .baseline
+          python - <<'PY'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          from urllib.request import urlopen
+          source=Path('.baseline/data'); target=Path('candidate/dist/data')
+          if target.exists(): shutil.rmtree(target)
+          shutil.copytree(source,target)
+          old_files={str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source.rglob('*') if p.is_file()}
+          new_files={str(p.relative_to(target)):hashlib.sha256(p.read_bytes()).hexdigest() for p in target.rglob('*') if p.is_file()}
+          assert old_files==new_files and len(old_files)>100
+          for name in ['index.html','data/systems.json','data/nys-systems.json']:
+              with urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name,timeout=90) as r: data=r.read()
+              assert hashlib.sha256(data).digest()==hashlib.sha256((Path('.baseline')/name).read_bytes()).digest(),'Hosted baseline moved: '+name
+          manifest={'candidate_sha':os.environ['CANDIDATE_SHA'],'source_run_id':34997430388,'baseline_main_sha':'7eeb4a47e4be92ee8d9e16640705c97e8b93496b','preserved_source_files':len(old_files),'source_payload_bytes_unchanged':True,'source_freshness_advanced':False,'scope':'Private workflow rendering only; no customer records in public assets'}
+          Path('candidate/dist/workflow-site-release.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          print(json.dumps(manifest))
+          PY
+      - name: Install desktop and iPhone acceptance browsers
+        working-directory: candidate
+        run: npx playwright install --with-deps chromium webkit
+      - name: Prove existing workflow behavior against deployed baseline
+        working-directory: candidate
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e -- workflow-command-center.spec.ts
+      - name: Prove candidate workflow persistence and site-lead rendering
+        working-directory: candidate
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/candidate/dist
+        run: npm run test:e2e -- workflow-command-center.spec.ts workflow-site-leads.spec.ts
+      - name: Preserve exact candidate and prior artifact
+        env:
+          CANDIDATE_SHA: ${{ steps.candidate.outputs.sha }}
+        run: |
+          mkdir -p .release
+          tar -cf .release/candidate.tar -C candidate/dist .
+          tar -cf .release/baseline.tar -C .baseline .
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          proof={'candidate_sha':os.environ['CANDIDATE_SHA'],'source_run_id':34997430388,'baseline_main_sha':'7eeb4a47e4be92ee8d9e16640705c97e8b93496b','proof_run_id':os.environ['GITHUB_RUN_ID'],'verification':'CI plus actual private workflow persistence and synthetic site rendering in desktop Chromium and iPhone WebKit'}
+          for name in ['candidate.tar','baseline.tar']:
+              digest=hashlib.sha256()
+              with (Path('.release')/name).open('rb') as f:
+                  for block in iter(lambda:f.read(4*1024*1024),b''): digest.update(block)
+              proof[name+'_sha256']=digest.hexdigest()
+          Path('.release/proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
+          PY
+      - name: Fast-forward only the isolated release branch
+        working-directory: candidate
+        run: |
+          test "$(git ls-remote origin refs/heads/agent/arcny-site-leads-release-20260915 | cut -f1)" = 04d2711cde448e8e57909dd0ce9d9152cc8ddf9c
+          git push origin HEAD:refs/heads/agent/arcny-site-leads-release-20260915
       - uses: actions/upload-artifact@v4
         with:
-          name: arcny-source-workspace
-          path: /tmp/workspace-export
-          retention-days: 2
+          name: workflow-site-candidate
+          path: .release
+          retention-days: 3
+      - name: Retain browser reports and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-site-isolated-proof
+          path: |
+            candidate/playwright-report/
+            candidate/test-results/
+            candidate/dist/workflow-site-release.json
+          retention-days: 14
