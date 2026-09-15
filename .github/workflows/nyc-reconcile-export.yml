@@ -3,7 +3,7 @@ on:
   push:
     branches: [work/nyc-reconcile-20260915]
 permissions:
-  contents: write
+  contents: read
 jobs:
   export:
     runs-on: ubuntu-24.04
@@ -11,36 +11,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: .transfer
+          ref: 13711cfe2e8631d88099feac6cc03a0e7e34248f
           persist-credentials: false
-      - uses: actions/checkout@v4
-        with:
-          ref: c0ca9a8d75c3ce89173bce2d2ad81444fbe59e28
-          path: .code
-          persist-credentials: false
-      - name: Verify local edits and create immutable source blobs without moving any application ref
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Export exact candidate and source checksums
         run: |
-          python - <<'PY'
-          import base64,hashlib,json,os,pathlib
-          from urllib.request import Request,urlopen
-          plan=json.load(open('.transfer/.nyc-verified-edits.json'))
-          rows=[]
-          for e in plan:
-              path=pathlib.Path('.code')/e['path']; text=path.read_text()
-              assert hashlib.sha256(text.encode()).hexdigest()==e['before'], 'Unexpected base '+e['path']
-              for start,end,value in sorted(e['edits'],reverse=True): text=text[:start]+value+text[end:]
-              assert hashlib.sha256(text.encode()).hexdigest()==e['after'], 'Transfer mismatch '+e['path']
-              body=json.dumps({'content':base64.b64encode(text.encode()).decode(),'encoding':'base64'}).encode()
-              request=Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/git/blobs',data=body,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
-              with urlopen(request,timeout=30) as response: blob=json.load(response)
-              rows.append({'path':e['path'],'sha':blob['sha'],'sha256':e['after']})
-          pathlib.Path('verified-blobs.json').write_text(json.dumps(rows,indent=2))
-          print(json.dumps(rows))
-          PY
+          mkdir -p /tmp/nyc-release-source
+          git archive --format=zip HEAD -o /tmp/nyc-release-source/source.zip
+          git rev-parse HEAD > /tmp/nyc-release-source/commit.txt
+          git rev-parse HEAD^{tree} > /tmp/nyc-release-source/tree.txt
+          git ls-tree -r HEAD > /tmp/nyc-release-source/git-files.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: nyc-verified-source-blobs
-          path: verified-blobs.json
+          name: nyc-source-13711cfe
+          path: /tmp/nyc-release-source/
           retention-days: 7
