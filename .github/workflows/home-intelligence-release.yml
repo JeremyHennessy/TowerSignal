@@ -1,5 +1,8 @@
 name: Release tested NYC Home intelligence
 on:
+  pull_request_target:
+    types: [closed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -17,12 +20,20 @@ on:
 permissions:
   contents: read
   actions: read
+  pull-requests: read
 concurrency:
   group: pages
   cancel-in-progress: false
 jobs:
   release:
-    if: github.ref == 'refs/heads/main'
+    # Only an already-merged, same-repository release may execute. Never check
+    # out or execute code from an unmerged PR in a privileged target workflow.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.pull_request.merged == true &&
+        github.event.pull_request.number == 244 &&
+        github.event.pull_request.head.repo.full_name == github.repository))
     runs-on: ubuntu-latest
     timeout-minutes: 25
     environment:
@@ -31,31 +42,49 @@ jobs:
     permissions:
       contents: read
       actions: read
+      pull-requests: read
       pages: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-      - name: Require the exact merged and tested tree
+      - name: Require the exact merged and tested tree before any checkout
+        id: gate
         uses: actions/github-script@v7
+        env:
+          REQUEST_PR: ${{ inputs.pr_number }}
+          REQUEST_SHA: ${{ inputs.candidate_sha }}
+          REQUEST_PROOF: ${{ inputs.proof_run_id }}
         with:
           script: |
-            const pr=(await github.rest.pulls.get({...context.repo,pull_number:Number('${{ inputs.pr_number }}')})).data;
-            const expected='${{ inputs.candidate_sha }}';
-            if (!pr.merged || pr.merge_commit_sha!==context.sha || pr.head.sha!==expected) throw new Error('Not the exact tested PR merge');
+            const number=Number(process.env.REQUEST_PR || context.payload.pull_request?.number);
+            if (number!==244) throw new Error('This release is limited to reviewed PR 244');
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:number})).data;
+            const expected=process.env.REQUEST_SHA || context.payload.pull_request?.head.sha;
+            if (!/^[a-f0-9]{40}$/.test(expected || '')) throw new Error('Invalid candidate SHA');
+            if (!pr.merged || pr.head.repo.full_name!==`${context.repo.owner}/${context.repo.repo}` || pr.head.ref!=='agent/nyc-home-intelligence-20260915' || pr.merge_commit_sha!==context.sha || pr.head.sha!==expected) throw new Error('Not the exact tested same-repository PR merge');
             const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
             if (ref.object.sha!==context.sha) throw new Error('Main advanced before release');
             const original=(await github.rest.git.getCommit({...context.repo,commit_sha:expected})).data;
             const merged=(await github.rest.git.getCommit({...context.repo,commit_sha:context.sha})).data;
             if (original.tree.sha!==merged.tree.sha) throw new Error('Merged tree differs from tested tree');
-            const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:Number('${{ inputs.proof_run_id }}')})).data;
+            let proof=process.env.REQUEST_PROOF;
+            if (!proof) {
+              const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:expected,event:'push',status:'success',per_page:100})).data.workflow_runs;
+              proof=runs.find(run=>run.path==='.github/workflows/home-intelligence-proof.yml')?.id;
+            }
+            if (!proof || !/^\d+$/.test(String(proof))) throw new Error('No successful exact-head candidate proof');
+            const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:Number(proof)})).data;
             if (run.head_sha!==expected || run.conclusion!=='success' || run.path!=='.github/workflows/home-intelligence-proof.yml') throw new Error('Candidate proof is not successful for this exact head');
+            core.setOutput('proof_run_id',String(run.id));
+            core.setOutput('merged_sha',context.sha);
+            core.info(JSON.stringify({pr:number,candidate_sha:expected,merged_sha:context.sha,tree_sha:merged.tree.sha,proof_run_id:run.id}));
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.gate.outputs.merged_sha }}
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: home-intelligence-candidate
-          run-id: ${{ inputs.proof_run_id }}
+          run-id: ${{ steps.gate.outputs.proof_run_id }}
           github-token: ${{ github.token }}
           path: .candidate
       - name: Verify and unpack tested candidate and rollback

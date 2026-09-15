@@ -25,7 +25,9 @@ The South Bronx September 2026 named list and the linked Upper East Side officia
 
 ## Release control
 
-The branch proof must pass source extraction, all repository checks, exact-source preservation and the full candidate desktop/iPhone suite. Inspect the attached candidate screenshots before merging. Merge only the exact tested head with `[skip ci]` to avoid starting a second ordinary publisher. Dispatch `home-intelligence-release.yml` with the exact PR/head/proof. That workflow checks tree identity, promotes the pretested artifact, verifies hosted bytes and runs the full browser suite. Failed acceptance restores and verifies the original artifact.
+The branch proof must pass source extraction, all repository checks, exact-source preservation and the full candidate desktop/iPhone suite. Inspect the attached candidate screenshots before merging. Merge only the exact tested head with `[skip ci]` to avoid starting another ordinary publisher.
+
+`home-intelligence-release.yml` handles the already-merged PR 244 closed event on the default branch. Before checkout it requires a same-repository reviewed branch, exact merged main SHA, identical tested/merged trees and a successful exact-head Home proof. It then promotes the pretested archive, verifies hosted bytes and runs the full browser suite. It never executes unmerged PR code. Failed acceptance restores and verifies the original artifact. Manual dispatch is also available for the same exact merged release.
 
 ## Separate work still pending
 
