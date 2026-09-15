@@ -14,6 +14,7 @@ jobs:
   accept:
     runs-on: ubuntu-24.04
     timeout-minutes: 160
+    environment: azure-production
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,40 +23,65 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install source dependency
-        run: python -m pip install --disable-pip-version-check requests
-      - name: Restore exact verified production property cohort
+      - name: Install source and read-only Blob dependencies
+        run: python -m pip install --disable-pip-version-check requests azure-storage-blob==12.25.1
+      - name: Restore exact verified production property cohort from immutable Blob release
         env:
-          GH_TOKEN: ${{ github.token }}
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_PREFIX: ${{ vars.AZURE_STORAGE_PREFIX }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
         run: |
           python - <<'PY'
-          import hashlib,json,os,sys,tarfile,zipfile
+          import hashlib,json,os
           from pathlib import Path
-          sys.path.insert(0,'scripts')
-          from migrate_data_to_blob import GitHubReader
-          reader=GitHubReader()
-          meta=reader.get('/actions/artifacts/10181150350')
-          digest='e1672458b40c4b77d92b0f47b7fe84a32ef54920a7fa4af1cb70e4c1bb8f975c'
-          assert not meta['expired'] and meta['name']=='github-pages'
-          assert meta['digest']=='sha256:'+digest and meta['workflow_run']['id']==34544249376
-          assert meta['workflow_run']['head_sha']=='53f7016404774821051e5ebd02eeb5382dded55f'
-          root=Path(os.environ['RUNNER_TEMP'])/'legacy-candidate';root.mkdir()
-          archive=root/'baseline.zip';reader.download('/actions/artifacts/10181150350/zip',archive)
-          with archive.open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==digest
-          assert archive.stat().st_size==meta['size_in_bytes']
-          with zipfile.ZipFile(archive) as z:
-            assert z.namelist()==['artifact.tar']
-            found=False
-            with z.open('artifact.tar') as f,tarfile.open(fileobj=f,mode='r|*') as tar:
-              for item in tar:
-                if item.name.removeprefix('./')=='data/systems.json':
-                  assert item.isfile() and item.size<100*1024**2 and not found
-                  (root/'systems.json').write_bytes(tar.extractfile(item).read());found=True
-            assert found
-          payload=json.loads((root/'systems.json').read_text())
+          from azure.storage.blob import BlobServiceClient
+
+          expected_source_run=34544249376
+          expected_source_sha='53f7016404774821051e5ebd02eeb5382dded55f'
+          expected_runtime_prefix='towersignal-data/migrations/github-34593386563-1/runtime'
+          expected_systems_sha='c18196cc1459878d36e27aa33cec81a906bda7304ba1e5a9b37864bd36ce5aff'
+          expected_runtime_manifest_sha='e47e6d3c84c772926572769aade742732b596ec5f2fc4f70cc8dd8ce8052056a'
+          expected_runtime_complete_sha='1061e5fc4c535a3cd1691f038eae93215d9989d903d71b83d5f33426b994f001'
+
+          account=os.environ['AZURE_STORAGE_ACCOUNT']
+          container=os.environ['AZURE_STORAGE_CONTAINER']
+          prefix=os.environ['AZURE_STORAGE_PREFIX'].strip('/')
+          key=os.environ['AZURE_STORAGE_KEY']
+          service=BlobServiceClient(account_url=f'https://{account}.blob.core.windows.net',credential=key)
+          client=service.get_container_client(container)
+
+          pointer_blob=f'{prefix}/pointers/production-current.json'
+          current=json.loads(client.download_blob(pointer_blob).readall())
+          assert current['domain']=='TOWERSIGNAL_BLOB_RELEASE'
+          assert current['source']['run_id']==expected_source_run
+          assert current['source']['source_sha']==expected_source_sha
+          assert current['runtime']['data_prefix']==expected_runtime_prefix
+          assert current['runtime']['manifest']['sha256']==expected_runtime_manifest_sha
+          assert current['runtime']['complete']['sha256']==expected_runtime_complete_sha
+
+          systems_blob=f"{current['runtime']['data_prefix']}/systems.json"
+          systems_bytes=client.download_blob(systems_blob).readall()
+          assert hashlib.sha256(systems_bytes).hexdigest()==expected_systems_sha
+
+          root=Path(os.environ['RUNNER_TEMP'])/'legacy-candidate'
+          root.mkdir()
+          (root/'systems.json').write_bytes(systems_bytes)
+          payload=json.loads(systems_bytes)
           bbls={str(s.get('bbl')) for s in payload['systems'] if s.get('bbl')}
-          assert len(payload['systems'])==4894 and len(bbls)==3802
-          print(json.dumps({'systems':len(payload['systems']),'bbls':len(bbls),'artifact_id':meta['id'],'sha256':digest},indent=2))
+          assert len(payload['systems'])==4894
+          assert len(bbls)==3802
+          proof={
+            'systems':len(payload['systems']),
+            'bbls':len(bbls),
+            'source_run_id':current['source']['run_id'],
+            'source_sha':current['source']['source_sha'],
+            'systems_sha256':expected_systems_sha,
+            'runtime_data_prefix':current['runtime']['data_prefix'],
+            'blob_access':'read-only'
+          }
+          (root/'cohort-proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,indent=2))
           PY
       - name: Run exact candidate builder with production 150-minute bound
         timeout-minutes: 150
@@ -75,6 +101,7 @@ jobs:
           root=Path(os.environ['RUNNER_TEMP'])/'legacy-candidate'
           payload=json.loads((root/'legacy-dob-projects.json').read_text())
           timing=json.loads((root/'timing.json').read_text())
+          cohort=json.loads((root/'cohort-proof.json').read_text())
           summary=payload['summary'];source=payload['source']
           assert source['requested_bbl_count']==3802
           assert timing['wall_seconds'] < 9000
@@ -84,7 +111,9 @@ jobs:
                   'explicit_cooling_tower_record_count':summary['explicit_cooling_tower_record_count'],
                   'recent_relevant_project_record_count':summary['recent_relevant_project_record_count'],
                   'candidate_sha':timing['candidate_sha'],'max_concurrent_requests':3,
-                  'request_start_interval_seconds':5,'source_contract_changed':False,'azure_accessed':False}
+                  'request_start_interval_seconds':5,'source_contract_changed':False,
+                  'azure_accessed':True,'azure_access_mode':'read-only','cohort_source_run_id':cohort['source_run_id'],
+                  'cohort_systems_sha256':cohort['systems_sha256']}
           (root/'acceptance.json').write_text(json.dumps(result,indent=2)+'\n')
           print(json.dumps(result,indent=2))
           PY
@@ -96,6 +125,7 @@ jobs:
           path: |
             ${{ runner.temp }}/legacy-candidate/legacy-dob-projects.json
             ${{ runner.temp }}/legacy-candidate/timing.json
+            ${{ runner.temp }}/legacy-candidate/cohort-proof.json
             ${{ runner.temp }}/legacy-candidate/acceptance.json
           retention-days: 14
           if-no-files-found: warn
