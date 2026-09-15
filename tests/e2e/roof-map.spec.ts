@@ -125,15 +125,16 @@ test('direct hosted roof link signs in and renders on desktop and iPhone', async
 
   if (!isIphone) {
     const layerControl = map.locator('.leaflet-control-layers')
+    const streetMapLabel = map.locator('.leaflet-control-layers-base label', { hasText: 'Street map' })
+    const aerialLabel = map.locator('.leaflet-control-layers-base label', { hasText: '2022 NYS aerial' })
     await layerControl.hover()
-    await map.locator('.leaflet-control-layers-base label', { hasText: 'Street map' }).click()
+    await streetMapLabel.click()
+    await expect(streetMapLabel.locator('input')).toBeChecked()
     await page.waitForFunction(() => [...document.querySelectorAll('.planimetric-map img.leaflet-tile')]
-      .some(image => image instanceof HTMLImageElement
-        && image.src.includes('tile.openstreetmap.org')
-        && image.complete
-        && image.naturalWidth > 0), null, { timeout: 20_000 })
+      .some(image => image instanceof HTMLImageElement && image.src.includes('tile.openstreetmap.org')), null, { timeout: 20_000 })
     await layerControl.hover()
-    await map.locator('.leaflet-control-layers-base label', { hasText: '2022 NYS aerial' }).click()
+    await aerialLabel.click()
+    await expect(aerialLabel.locator('input')).toBeChecked()
 
     const screenshot = await section.screenshot()
     await testInfo.attach(`roof-map-${testInfo.project.name}.png`, { body: screenshot, contentType: 'image/png' })
