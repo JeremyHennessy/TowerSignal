@@ -1,0 +1,88 @@
+name: Verify NYC source-dated intelligence candidate
+on:
+  push:
+    branches: ['agent/nyc-completion-*']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: nyc-evidence-candidate-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34997430388
+          github-token: ${{ github.token }}
+          path: .source-artifact
+      - name: Preserve and verify actual hosted source baseline
+        run: |
+          mkdir -p .source-site proof
+          tar -xf .source-artifact/artifact.tar -C .source-site
+          python scripts/nyc_evidence_release.py baseline --site .source-site
+          gzip -c .source-artifact/artifact.tar > proof/rollback.tgz
+      - run: npm install --no-audit --no-fund
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Source and frontend regression checks
+        run: |
+          python -m unittest discover -s tests/python -p 'test_*.py'
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+      - name: Enrich retained runtime without regenerating unrelated data
+        run: |
+          cp -a .source-site/data dist/data
+          python scripts/attach_reviewed_intelligence.py --output dist/data --evidence-output proof/source-documents
+          python scripts/validate_reviewed_intelligence.py --output dist/data --baseline .source-site/data
+          python scripts/validate_legionella_alert_cache.py --cache dist/data/legionella-alerts.json --max-age-days 1
+          python scripts/nyc_evidence_release.py seal --site dist --proof proof
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Candidate desktop and iPhone acceptance, all page and tab screenshots
+        env:
+          CANDIDATE_ROOT: dist
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Seal the exact tested candidate and retain baseline unchanged
+        run: |
+          python scripts/nyc_evidence_release.py baseline --site .source-site
+          python scripts/nyc_evidence_release.py integrity --site dist --proof proof
+          tar -czf proof/candidate.tgz -C dist .
+      - name: Retain tested candidate and original rollback bytes
+        uses: actions/upload-artifact@v4
+        with:
+          name: nyc-tested-candidate
+          path: |
+            proof/candidate.tgz
+            proof/rollback.tgz
+            proof/candidate-integrity.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Retain browser and source proof even when acceptance fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nyc-candidate-browser-source-proof
+          path: |
+            playwright-report/
+            test-results/
+            proof/source-documents/
+            dist/data/priority-model-review.json
+            dist/data/legionella-tower-links.json
+          retention-days: 30
+          if-no-files-found: warn

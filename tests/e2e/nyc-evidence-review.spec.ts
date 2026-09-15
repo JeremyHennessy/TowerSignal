@@ -1,0 +1,55 @@
+import { expect, test } from './fixtures'
+import { eventDate } from '../../src/domain/changePresentation'
+import type { ChangesPayload } from '../../src/types/history'
+import { expectContained } from './iphone.helpers'
+
+test('Home building links, source-dated Monitor and reviewed scoring are coherent', async ({ page }, testInfo) => {
+  test.setTimeout(120_000)
+  const intel=page.getByLabel('Legionnaires official intelligence',{exact:true})
+  await expect(intel).toBeVisible()
+  await intel.getByRole('searchbox').fill('South Bronx')
+  await expect(intel.getByRole('row').nth(1)).toContainText('Sep 13, 2026')
+  await expect(intel.getByRole('row').nth(1)).toContainText('10 named buildings')
+  await expect(intel.getByRole('row').nth(1)).not.toContainText('nyc-health-department-orders-cooling-towers')
+  await intel.scrollIntoViewIfNeeded()
+  await expectContained(page)
+  await page.screenshot({path:testInfo.outputPath('home-intelligence.png'),scale:'css',fullPage:true})
+  await intel.getByRole('row').nth(1).getByText('Evidence & tower links',{exact:true}).click()
+  await expect(intel.getByRole('link',{name:'820 Concourse Village West →'}).first()).toBeVisible()
+  const target=intel.getByRole('link',{name:'820 Concourse Village West →'}).first()
+  await expect(target).toHaveAttribute('href','#/account/2000003324')
+  await target.click()
+  await expect(page.getByLabel('Official building health evidence')).toBeVisible()
+  await expect(page.getByLabel('Official building health evidence')).toContainText('Order date Sep 12, 2026')
+  await expect(page.getByLabel('Priority score explanation')).toBeVisible()
+  await expect(page.getByLabel('Priority score explanation')).toContainText('Research priority model 1.1')
+  await expect(page.getByLabel('Priority score explanation')).toContainText('building-level match', {ignoreCase:true})
+  await expectContained(page)
+  await page.screenshot({path:testInfo.outputPath('named-bronx-account.png'),scale:'css',fullPage:true})
+  await page.evaluate(()=>{location.hash='#/monitor'})
+  await expect(page.getByRole('heading',{name:'Monitor workspace',exact:true})).toBeVisible()
+  await page.getByRole('tab',{name:/^Violations/}).click()
+  const dates=await page.evaluate(async()=>{
+    const p=await (await fetch('data/changes.json')).json() as ChangesPayload
+    return p
+  })
+  const first=page.locator('.change-reference-table tbody tr').first()
+  await expect(first).toBeVisible()
+  const times=await page.locator('.change-reference-table tbody time').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('datetime')))
+  expect(times.length).toBeGreaterThan(0)
+  expect(times.every((day,index)=>!day || index===0 || !times[index-1] || day<=times[index-1]!)).toBe(true)
+  // Source events may also be preserved in segments: validate the explicit July case via date-range UI.
+  const known=dates.events.find(e=>e.event_type==='VIOLATION_ADDED' && e.system_id==='2000015925')
+  if(known) expect(eventDate(known).value).toBe('2026-07-14')
+  await page.getByLabel('Event date range').selectOption('custom')
+  await page.getByLabel('From',{exact:true}).fill('2026-07-14')
+  await page.getByLabel('To',{exact:true}).fill('2026-07-14')
+  const july=page.locator('.change-reference-table tbody tr').filter({hasText:'1414 MADISON AVE'}).first()
+  await expect(july).toBeVisible()
+  await expect(july.locator('time')).toHaveAttribute('datetime','2026-07-14')
+  await expect(july).not.toContainText('{"')
+  await expect(july.locator('.monitor-row-provenance')).not.toHaveAttribute('open')
+  await expect(page.locator('.change-tabs')).toContainText('Violations')
+  await expectContained(page)
+  await page.screenshot({path:testInfo.outputPath('monitor-source-dates.png'),scale:'css',fullPage:true})
+})

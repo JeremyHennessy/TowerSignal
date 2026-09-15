@@ -1,0 +1,42 @@
+name: Assemble exact locally tested NYC source candidate
+on:
+  push:
+    branches: ['work/nyc-transfer-20260915']
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply checksum-guarded edits and verify all 34 candidate files
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          edits=json.load(open('.nyc-transfer-edits.json'))
+          for entry in edits:
+              p=pathlib.Path(entry['path'])
+              text=p.read_text(encoding='utf-8')
+              assert hashlib.sha256(text.encode()).hexdigest()==entry['before'], 'Source baseline differs: '+str(p)
+              for start,end,value in sorted(entry['edits'],reverse=True):
+                  text=text[:start]+value+text[end:]
+              assert hashlib.sha256(text.encode()).hexdigest()==entry['after'], 'Transferred edit mismatch: '+str(p)
+              p.write_text(text,encoding='utf-8')
+          hashes=json.load(open('.nyc-transfer-hashes.json'))
+          assert len(hashes)==34
+          for name,expected in hashes.items():
+              actual=hashlib.sha256(pathlib.Path(name).read_bytes()).hexdigest()
+              assert actual==expected, 'Transferred file differs: '+name+' '+actual
+              print('SHA-256 matched',name)
+          PY
+      - name: Commit clean source to isolated prepared branch without deploying
+        run: |
+          git rm .nyc-transfer-edits.json .nyc-transfer-hashes.json .github/workflows/nyc-transfer.yml
+          git add .github/workflows/pages.yml scripts/towersignal/legionella_alerts.py src tests
+          git config user.name 'TowerSignal Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git commit -m 'Complete NYC source-dated intelligence, exact building evidence and reviewed priority explanations'
+          git push origin HEAD:refs/heads/work/nyc-prepared-20260915
+          git rev-parse HEAD
+          git rev-parse HEAD^{tree}
