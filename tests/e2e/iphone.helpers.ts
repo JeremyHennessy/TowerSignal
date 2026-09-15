@@ -3,6 +3,7 @@ import { expect, type Locator, type Page } from '@playwright/test'
 type ProjectInfo = { project: { name: string } }
 
 const HEADING_SELECTOR = 'h1,h2,h3,h4,h5,h6'
+const VISIBLE_HEADING_SELECTOR = 'h1:visible,h2:visible,h3:visible,h4:visible,h5:visible,h6:visible'
 const HOSTED_IPHONE_DOM_TIMEOUT = process.env.CI ? 90_000 : 25_000
 
 export function isIphoneProject(testInfo: ProjectInfo): boolean {
@@ -56,7 +57,7 @@ export async function expectHeading(page: Page, testInfo: ProjectInfo, name: str
     return null
   }
 
-  const heading = page.locator(HEADING_SELECTOR).filter({ hasText: name }).first()
+  const heading = page.locator(VISIBLE_HEADING_SELECTOR).filter({ hasText: name }).first()
   await expect(heading).toHaveText(name)
   await heading.scrollIntoViewIfNeeded()
   await expect(heading).toBeVisible()
