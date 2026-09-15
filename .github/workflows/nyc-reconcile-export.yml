@@ -1,0 +1,21 @@
+name: Export current NYC source for conflict review
+on:
+  push:
+    branches: ['work/nyc-reconcile-20260915']
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 2b19b35871af5f4c0141fd1f2f8e1649d48676fc
+          persist-credentials: false
+      - run: git archive --format=zip HEAD -o "$RUNNER_TEMP/current-nyc-source.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: current-nyc-source
+          path: ${{ runner.temp }}/current-nyc-source.zip
+          retention-days: 3
