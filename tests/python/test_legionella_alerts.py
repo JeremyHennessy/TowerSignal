@@ -38,10 +38,18 @@ class LegionellaAlertTests(unittest.TestCase):
         self.assertFalse(_discovery_relevant(generic_form))
         self.assertTrue(_discovery_relevant("Legionella Cluster Health Alert"))
 
-    def test_legacy_nysdoh_alias_canonicalizes_to_current_topic(self):
+    def test_legacy_official_aliases_canonicalize_to_current_pages(self):
         self.assertEqual(
             _canonical_url("https://health.ny.gov/diseases/communicable/legionellosis.htm"),
             "https://www.health.ny.gov/diseases/communicable/legionellosis/",
+        )
+        self.assertEqual(
+            _canonical_url("https://portal.311.nyc.gov/article/KA-02845"),
+            "https://portal.311.nyc.gov/article/?kanumber=KA-02845",
+        )
+        self.assertEqual(
+            _canonical_url("https://portal.311.nyc.gov/article/KA-02664"),
+            "https://portal.311.nyc.gov/article/?kanumber=KA-02664",
         )
 
     def test_notify_nyc_recent_notifications_preserve_local_calendar_date(self):
