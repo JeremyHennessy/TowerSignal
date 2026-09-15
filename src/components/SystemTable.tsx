@@ -49,9 +49,11 @@ export function SystemTable({ rows, onSelect }: { rows: SystemSummary[]; onSelec
   const changeSort = (key: SortKey) => setSort(current => current.key === key ? { key, dir: current.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: key === 'priority_score' ? 'desc' : 'asc' })
   const latestLegionellaItems = useMemo(() => {
     const items = legionella?.items ?? []
-    const dated = items.filter(item => item.published_date)
-    return (dated.length ? dated : items).slice(0, 3)
+    const matched = items.filter(item => (item.matched_system_ids?.length ?? 0) > 0)
+    const dated = (matched.length ? matched : items).filter(item => item.published_date)
+    return (dated.length ? dated : (matched.length ? matched : items)).slice(0, 3)
   }, [legionella])
+  const rowById = useMemo(() => new Map(rows.map(row => [row.system_id, row])), [rows])
 
   return <>
     {legionella && <section className="table-card" aria-label="Legionnaires official intelligence">
@@ -63,10 +65,12 @@ export function SystemTable({ rows, onSelect }: { rows: SystemSummary[]; onSelec
         {latestLegionellaItems.map(item => <article className="signal-card" key={item.item_id}>
           <div className="signal-card-head"><strong>{item.title ?? 'Official Legionella / Legionnaires update'}</strong><span>{item.agency}</span></div>
           <p>{item.published_date ? formatDate(item.published_date) : 'Publication date not published'} · {item.channel_kind.replaceAll('_', ' ').toLowerCase()}</p>
+          {item.tower_match_summary && <div className="activity-stack"><span><strong>{item.tower_match_summary.explicit_pcr_positive_system_count}</strong> TowerSignal system{item.tower_match_summary.explicit_pcr_positive_system_count === 1 ? '' : 's'} at NYC Health PCR-positive addresses</span><span><strong>{item.tower_match_summary.affected_area_system_count}</strong> systems in the affected ZIP-code area</span></div>}
+          {(item.matched_system_ids ?? []).slice(0, 6).map(systemId => { const matched = rowById.get(systemId); return matched ? <button type="button" className="link-button" key={systemId} onClick={() => onSelect(matched)}>{matched.address ?? systemId}{(matched as EnrichedSystemSummary).legionella_pcr_positive_match ? ' · PCR-positive address' : ' · affected area'}</button> : null })}
           <a href={item.url} target="_blank" rel="noreferrer">Open official source</a>
         </article>)}
       </div>
-      <p className="microcopy">Official NYC and New York State public-health intelligence only. These items are not assigned to a property unless a source publishes a deterministic building identity.</p>
+      <p className="microcopy">Tower matching is explicit about evidence strength: exact published building-address matches identify NYC Health PCR-positive locations; ZIP-code matches identify investigation-area towers only. Neither match establishes that a tower caused an illness.</p>
     </section>}
     {legionellaError && <div className="field-pack-alert"><strong>Legionnaires source status:</strong> the optional official-alert cache could not be loaded in this browser session. Account evidence remains available; this is not interpreted as zero alerts.</div>}
     <div className="table-card account-table-card">
@@ -79,14 +83,14 @@ export function SystemTable({ rows, onSelect }: { rows: SystemSummary[]; onSelec
         const hpdOpen = enriched.hpd_open_violation_count ?? 0
         const swoCount = enriched.stop_work_order_event_count ?? 0
         const fispStatus = enriched.facade_latest_status
-        const hasActivity = (row.oath_case_count ?? 0) > 0 || (row.dob_recent_activity_count ?? 0) > 0 || acrisCount > 0 || hpdOpen > 0 || swoCount > 0 || Boolean(fispStatus)
+        const hasActivity = (row.oath_case_count ?? 0) > 0 || (row.dob_recent_activity_count ?? 0) > 0 || acrisCount > 0 || hpdOpen > 0 || swoCount > 0 || Boolean(fispStatus) || Boolean(enriched.legionella_cluster_match)
         return <tr key={row.system_id} onClick={() => onSelect(row)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') onSelect(row) }}>
           <td className="account-cell"><strong>{row.address ?? 'Address unavailable'}</strong><span>{row.borough ?? '—'} · {row.zip ?? '—'}</span><small className="mono">{row.system_id} · {row.active_equipment} active unit{row.active_equipment === 1 ? '' : 's'}</small></td>
           <td><div className={`priority-indicator priority-${priorityBand(row.priority_score)}`}><strong>{row.priority_score}</strong><span><i style={{ width:`${Math.max(4, row.priority_score)}%` }} /></span></div></td>
           <td><span className={`signal signal-${row.primary_signal.toLowerCase()}`}>{signalLabel(row.primary_signal)}</span>{row.confirmed_violation && <small className="urgent-copy">Confirmed record</small>}</td>
           <td>{(row.hpd_contact_count ?? 0) > 0 ? <span className="contact-ready">✓ {row.hpd_contact_count} HPD contact{row.hpd_contact_count === 1 ? '' : 's'}</span> : <span className="muted-copy">No matched contact</span>}</td>
           <td>{formatDate(row.latest_sample_date)}<small>{row.days_since_latest_sample == null ? 'No usable date' : `${row.days_since_latest_sample} days ago`}</small></td>
-          <td><div className="activity-stack">{(row.oath_case_count ?? 0) > 0 && <span>OATH · {row.oath_case_count}</span>}{(row.dob_recent_activity_count ?? 0) > 0 && <span>DOB · {row.dob_recent_activity_count}</span>}{acrisCount > 0 && <span title={enriched.latest_acris_recorded_date ? `Latest recorded ${formatDate(enriched.latest_acris_recorded_date)}` : undefined}>ACRIS · {acrisCount}</span>}{hpdOpen > 0 && <span title={enriched.latest_hpd_violation_inspection_date ? `Latest inspection ${formatDate(enriched.latest_hpd_violation_inspection_date)}` : undefined}>HPD open · {hpdOpen}</span>}{swoCount > 0 && <span title="DOB complaint-disposition Stop Work Order evidence; not a claim that an order remains active">SWO evidence · {swoCount}</span>}{fispStatus && <span>FISP · {fispStatus}</span>}{!hasActivity && <span className="muted-copy">No recent match</span>}</div></td>
+          <td><div className="activity-stack">{(row.oath_case_count ?? 0) > 0 && <span>OATH · {row.oath_case_count}</span>}{(row.dob_recent_activity_count ?? 0) > 0 && <span>DOB · {row.dob_recent_activity_count}</span>}{acrisCount > 0 && <span title={enriched.latest_acris_recorded_date ? `Latest recorded ${formatDate(enriched.latest_acris_recorded_date)}` : undefined}>ACRIS · {acrisCount}</span>}{hpdOpen > 0 && <span title={enriched.latest_hpd_violation_inspection_date ? `Latest inspection ${formatDate(enriched.latest_hpd_violation_inspection_date)}` : undefined}>HPD open · {hpdOpen}</span>}{swoCount > 0 && <span title="DOB complaint-disposition Stop Work Order evidence; not a claim that an order remains active">SWO evidence · {swoCount}</span>}{fispStatus && <span>FISP · {fispStatus}</span>}{enriched.legionella_pcr_positive_match && <span title="NYC Health published this building address among cooling towers with a positive preliminary PCR result; this is not causal attribution">Legionella · PCR-positive address</span>}{!enriched.legionella_pcr_positive_match && enriched.legionella_cluster_match && <span title="Registered tower in an NYC Health affected ZIP code; geographic context only">Legionella · cluster area</span>}{!hasActivity && <span className="muted-copy">No recent match</span>}</div></td>
           <td><StatusBadge value={row.evidence_confidence} /></td><td className="row-arrow">›</td>
         </tr>
       })}</tbody></table></div>}
