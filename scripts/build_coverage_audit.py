@@ -13,6 +13,8 @@ SCHEMA_VERSION = "1.0"
 # These are generated production artifacts, not new source ingestions. The audit
 # reads them only after their existing build/validation gates have succeeded.
 ARTIFACT_CONTRACTS = [
+    ("nyc_property_enforcement", "property-enforcement.json", "Exact canonical BBL for HPD violations; exact BIN for DOB SWO complaint-disposition evidence and Local Law 11 / FISP; not an active-SWO ledger or generic Labor Law feed", ["WHEN_TO_ACT", "WHY_ACCOUNT_MATTERS"]),
+    ("legionella_public_health_alerts", "legionella-alerts.json", "Official NYC/NYS channel snapshots and retained item_id history; ZIP context is not property attribution; no Priority Score change", ["WHY_ACCOUNT_MATTERS"]),
     ("domestic_water_market", "domestic-water-market.json", "BIN/source asset for observed service; source-native provider/lab identities", ["WHO_TO_PURSUE", "WHY_ACCOUNT_MATTERS"]),
     ("provider_resolution_review", "provider-resolution-review.json", "Review-only deterministic provider-name candidates; no automatic fuzzy merge", ["WHO_TO_PURSUE"]),
     ("nyc_building_water_signals", "nyc-water-signals.json", "Exact source BBL/BIN where published; context-only records remain unlinked", ["WHEN_TO_ACT", "WHY_ACCOUNT_MATTERS"]),
