@@ -1,0 +1,27 @@
+name: ArcNY isolated workspace proof
+on:
+  push:
+    branches: [agent/arcny-watchlist-20260915]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Export source and installed test dependencies without credentials
+        run: |
+          mkdir -p /tmp/workspace-export
+          git archive --format=tar HEAD src tests scripts .github config database public package.json tsconfig.app.json tsconfig.json tsconfig.node.json vite.config.ts vitest.config.ts eslint.config.js playwright.config.ts playwright.data-only.config.ts README.md | gzip > /tmp/workspace-export/source.tar.gz
+          tar -czf /tmp/workspace-export/node_modules.tar.gz node_modules
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arcny-source-workspace
+          path: /tmp/workspace-export
+          retention-days: 2
