@@ -4,6 +4,7 @@ on:
     branches: ['work/nyc-reconcile-20260915']
 permissions:
   contents: read
+  actions: read
 jobs:
   export:
     runs-on: ubuntu-24.04
@@ -11,11 +12,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 2b19b35871af5f4c0141fd1f2f8e1649d48676fc
+          ref: c0ca9a8d75c3ce89173bce2d2ad81444fbe59e28
           persist-credentials: false
-      - run: git archive --format=zip HEAD -o "$RUNNER_TEMP/current-nyc-source.zip"
+      - run: |
+          mkdir -p review
+          git archive --format=zip HEAD -o review/current-nyc-source.zip
+      - name: Record actual hosted identity and current release status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs?per_page=40" > review/runs.json
+          python - <<'PY'
+          import hashlib,json,pathlib
+          from urllib.request import urlopen
+          base='https://jeremyhennessy.github.io/TowerSignal/'
+          rows={}
+          for name in ['index.html','data/metadata.json','data/legionella-property-matches.json','data/coverage-audit.json']:
+              with urlopen(base+name,timeout=90) as r: data=r.read()
+              p=pathlib.Path('review/hosted')/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+              rows[name]={'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+          pathlib.Path('review/hosted-identity.json').write_text(json.dumps(rows,indent=2))
+          print(json.dumps(rows,indent=2))
+          PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: current-nyc-source
-          path: ${{ runner.temp }}/current-nyc-source.zip
+          path: review/
           retention-days: 3
