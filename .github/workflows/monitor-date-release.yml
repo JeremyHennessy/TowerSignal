@@ -1,0 +1,114 @@
+name: Release tested NYC Monitor occurrence dates
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  release:
+    if: >-
+      github.ref == 'refs/heads/main' && github.event.pull_request.merged == true &&
+      github.event.pull_request.head.ref == 'agent/nyc-monitor-dates-20260915' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Require exact merged and tested tree
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:context.payload.pull_request.number})).data;
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(!pr.merged || pr.merge_commit_sha!==context.sha || ref.object.sha!==context.sha || pr.head.sha!==context.payload.pull_request.head.sha) throw new Error('Not exact merged head');
+            const a=(await github.rest.git.getCommit({...context.repo,commit_sha:pr.head.sha})).data;
+            const b=(await github.rest.git.getCommit({...context.repo,commit_sha:context.sha})).data;
+            if(a.tree.sha!==b.tree.sha) throw new Error('Merge differs from tested tree');
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:pr.head.sha,event:'push',status:'success',per_page:100})).data.workflow_runs;
+            const proof=runs.find(r=>r.path==='.github/workflows/monitor-date-proof.yml');
+            if(!proof) throw new Error('No successful exact-head proof');
+            core.setOutput('run_id',String(proof.id));
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: monitor-date-candidate
+          run-id: ${{ steps.gate.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: .candidate
+      - name: Verify candidate archives and existing hosted identity
+        run: |
+          (cd .candidate && sha256sum --check monitor-archives.sha256)
+          mkdir -p dist .rollback
+          tar -xf .candidate/monitor-candidate.tar -C dist
+          tar -xf .candidate/monitor-rollback.tar -C .rollback
+          python scripts/verify_home_intelligence_release.py .rollback --candidate
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy exact tested artifact
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify hosted bytes
+        run: python scripts/verify_home_intelligence_release.py dist --candidate
+      - name: Full actual hosted desktop and iPhone acceptance
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Confirm stable hosted identity and release manifest
+        run: |
+          python scripts/verify_home_intelligence_release.py dist --candidate
+          python - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen
+          import time
+          with urlopen('https://jeremyhennessy.github.io/TowerSignal/monitor-release.json?t='+str(time.time_ns()),timeout=60) as r:
+              assert r.read()==Path('dist/monitor-release.json').read_bytes()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: monitor-date-hosted-evidence
+          path: |
+            playwright-report/
+            dist/monitor-release.json
+          retention-days: 30
+      - name: Stage rollback on failed hosted acceptance
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: monitor-date-rollback
+          path: .rollback
+      - name: Restore prior verified artifact
+        if: failure() && steps.deploy.outcome == 'success'
+        id: rollback
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: monitor-date-rollback
+      - name: Verify restored prior identity
+        if: failure() && steps.rollback.outcome == 'success'
+        run: python scripts/verify_home_intelligence_release.py .rollback --candidate
