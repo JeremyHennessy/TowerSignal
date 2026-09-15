@@ -129,9 +129,6 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expectDomText(page, [
       'Selected system',
       'Identity',
-      'Reported samples',
-      'NYC Health inspections',
-      'OATH penalty imposed',
       'DOB NOW project activity',
       'Source & provenance',
       'Copy lead brief',
@@ -139,9 +136,6 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     ])
   } else {
     await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
-    await expect(page.getByText('Reported samples', { exact: true })).toBeVisible()
-    await expect(page.getByText('NYC Health inspections', { exact: true })).toBeVisible()
-    await expect(page.getByText('OATH penalty imposed')).toBeVisible()
     await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
@@ -149,6 +143,13 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   }
 
   await selectAccountMode(page, 'History')
+  // Historical metrics belong to History, not the mutually exclusive Evidence mode.
+  // Require actual visibility on both browser families rather than hidden DOM text.
+  const historicalProfile = page.locator('.detail-panel > section').filter({ has: page.getByRole('heading', { name: 'Historical profile', exact: true }) })
+  await expect(historicalProfile).toBeVisible()
+  for (const label of ['Reported samples', 'NYC Health inspections', 'OATH penalty imposed']) {
+    await expect(historicalProfile.getByText(label, { exact: true })).toBeVisible()
+  }
   if (isIphone) {
     await expectDomText(page, ['Historical profile', 'OATH case lifecycle', 'TowerSignal History', 'ACRIS property activity'], '.detail-panel')
   } else {
