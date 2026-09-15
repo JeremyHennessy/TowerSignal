@@ -16,6 +16,8 @@ def build(output_path: Path) -> dict:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     print(json.dumps(payload["summary"], indent=2))
+    if payload.get("errors"):
+        print(json.dumps({"retrieval_errors": payload["errors"]}, indent=2))
     return payload
 
 
