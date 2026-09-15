@@ -15,6 +15,7 @@ on:
       - 'scripts/validate_legionella_alert_cache.py'
       - 'tests/python/test_property_enforcement.py'
       - 'tests/python/test_legionella_alerts.py'
+      - 'tests/python/test_legionella_alert_history.py'
       - '.github/workflows/property-enforcement-source-proof.yml'
 
 permissions:
@@ -42,10 +43,11 @@ jobs:
           scripts/towersignal/legionella_alerts.py
           scripts/build_legionella_alert_cache.py
           scripts/validate_legionella_alert_cache.py
-      - name: Run isolated normalization tests
+      - name: Run isolated normalization and history tests
         run: |
           python -m unittest discover -s tests/python -p 'test_property_enforcement.py' -v
           python -m unittest discover -s tests/python -p 'test_legionella_alerts.py' -v
+          python -m unittest discover -s tests/python -p 'test_legionella_alert_history.py' -v
       - name: Prove authoritative NYC Open Data contracts with bounded live queries
         env:
           PYTHONPATH: scripts
@@ -114,4 +116,8 @@ jobs:
       - name: Build official Legionella alert cache
         run: python scripts/build_legionella_alert_cache.py --output "$RUNNER_TEMP/legionella-alerts.json"
       - name: Validate official Legionella alert cache
-        run: python scripts/validate_legionella_alert_cache.py --cache "$RUNNER_TEMP/legionella-alerts.json" --max-age-days 1
+        run: >-
+          python scripts/validate_legionella_alert_cache.py
+          --cache "$RUNNER_TEMP/legionella-alerts.json"
+          --max-age-days 1
+          --require-clean-retrieval
