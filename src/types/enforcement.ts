@@ -110,7 +110,30 @@ export interface PropertyEnforcementContext {
   generated_at: string
 }
 
+export interface LegionellaBuildingLink {
+  system_id: string
+  system_address: string
+  address: string
+  bin: string
+  bbl: string | null
+  result: string
+  source_url: string
+  source_title: string
+  source_date: string
+  date_basis: string
+  event_date?: string | null
+  episode_id: string
+  episode_status: string
+  episode_closed_at: string | null
+  closure_source_url: string | null
+  match_basis: string
+  scope: 'BUILDING_LEVEL'
+  link_basis?: 'NAMED_IN_SOURCE' | 'RELATED_EPISODE_UPDATE'
+}
+
 export interface LegionellaAlertItem {
+  building_links?: LegionellaBuildingLink[]
+  linked_building_count?: number
   item_id: string
   url: string
   title: string | null

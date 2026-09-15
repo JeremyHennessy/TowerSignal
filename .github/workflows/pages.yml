@@ -266,6 +266,10 @@ jobs:
       - name: Match official Legionnaires findings to the final NYC registry
         timeout-minutes: 10
         run: python scripts/build_legionella_matches.py --data public/data
+      - name: Apply reviewed NYC research-priority and account building evidence
+        run: python scripts/attach_reviewed_intelligence.py --output public/data
+      - name: Validate every NYC score and account evidence link
+        run: python scripts/validate_reviewed_intelligence.py --output public/data
       - name: Python fixture tests
         run: python -m unittest discover -s tests/python -p 'test_*.py' -v
       - name: Lint frontend

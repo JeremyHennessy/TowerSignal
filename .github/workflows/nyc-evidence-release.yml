@@ -1,0 +1,118 @@
+name: Release exact tested NYC evidence candidate
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.event.pull_request.merged == true && github.event.pull_request.number == 247 && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Require exact merged tree and successful candidate before checkout
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:247})).data;
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(!pr.merged||pr.head.ref!=='agent/nyc-completion-20260915'||pr.head.repo.full_name!==`${context.repo.owner}/${context.repo.repo}`||ref.object.sha!==pr.merge_commit_sha) throw new Error('Not current exact same-repository PR 247 merge');
+            const a=(await github.rest.git.getCommit({...context.repo,commit_sha:pr.head.sha})).data;
+            const b=(await github.rest.git.getCommit({...context.repo,commit_sha:pr.merge_commit_sha})).data;
+            if(a.tree.sha!==b.tree.sha) throw new Error('Merge differs from tested tree');
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:pr.head.sha,event:'push',status:'success',per_page:100})).data.workflow_runs;
+            const proof=runs.find(r=>r.path==='.github/workflows/nyc-evidence-candidate.yml');
+            if(!proof) throw new Error('No successful exact-head candidate');
+            if(!runs.some(r=>r.path==='.github/workflows/ci.yml')) throw new Error('Exact-head CI is not green');
+            core.setOutput('run_id',String(proof.id));core.setOutput('merge_sha',pr.merge_commit_sha);
+            core.info(JSON.stringify({pr:247,source:pr.head.sha,merged:pr.merge_commit_sha,tree:a.tree.sha,proof:proof.id}));
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.gate.outputs.merge_sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: nyc-evidence-tested-candidate
+          run-id: ${{ steps.gate.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: proof
+      - name: Verify exact candidate and still-hosted rollback baseline
+        run: |
+          mkdir -p dist .rollback
+          tar -xzf proof/candidate.tgz -C dist
+          tar -xzf proof/rollback.tgz -C .rollback
+          python scripts/verify_nyc_evidence_release.py integrity --site dist --proof proof
+          python scripts/verify_nyc_evidence_release.py baseline --site .rollback
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Refuse concurrent-main changes before deployment
+        uses: actions/github-script@v7
+        env:
+          EXPECTED_MAIN: ${{ steps.gate.outputs.merge_sha }}
+        with:
+          script: |
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(ref.object.sha!==process.env.EXPECTED_MAIN) throw new Error('Main advanced during release preparation');
+      - name: Deploy the exact pretested NYC runtime
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify actual hosted bytes and every named-building account
+        run: python scripts/verify_nyc_evidence_release.py hosted --site dist
+      - name: Full actual hosted desktop and iPhone acceptance and visual inventory
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Confirm unchanged hosted identity after acceptance
+        run: python scripts/verify_nyc_evidence_release.py hosted --site dist
+      - name: Retain hosted proof and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nyc-evidence-hosted-acceptance
+          path: |
+            playwright-report/
+            test-results/
+            !test-results/.auth/**
+            source-health-proof/
+            dist/nyc-evidence-release.json
+            proof/integrity.json
+          retention-days: 30
+      - name: Stage original runtime if hosted acceptance fails
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: nyc-evidence-rollback
+          path: .rollback
+      - name: Restore the prior verified runtime
+        if: failure() && steps.deploy.outcome == 'success'
+        id: rollback
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: nyc-evidence-rollback
+      - name: Verify restored production bytes
+        if: failure() && steps.rollback.outcome == 'success'
+        run: python scripts/verify_nyc_evidence_release.py baseline --site .rollback

@@ -10,6 +10,7 @@ interface HomeSummary {
   recentChanges: number
   procurementRecords: number
   observedCompanies: number
+  modelVersion: string
   generatedAt: string
 }
 
@@ -35,6 +36,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
           procurementRecords: procurement.cityRecord.notices.length + procurement.checkbook.contracts.length + (procurement.nysAuthorities?.contracts.length ?? 0) + (procurement.openBookWater?.contracts.length ?? 0) + (procurement.nychaWater?.records.length ?? 0),
           observedCompanies: companies.summary.observed_vendor_company_count,
           generatedAt: systems.metadata.generated_at,
+          modelVersion: systems.metadata.priority_model_version,
         })
       })
       .catch(err => setError(err instanceof Error ? err.message : 'Unable to load Home summary.'))
@@ -71,7 +73,7 @@ export function HomePage({ user }: { user: WorkflowUser }) {
       {!summary && !error && <div className="portal-loading">Loading current TowerSignal summary…</div>}
       {summary && <div className="home-metric-grid" aria-label="TowerSignal Home summary">
         <article><small>NYC registered systems</small><strong>{summary.registeredSystems.toLocaleString()}</strong><span>Current source-backed account universe</span></article>
-        <article><small>High-priority accounts</small><strong>{summary.highPriorityAccounts.toLocaleString()}</strong><span>Priority Score 1.0 ≥ 70</span></article>
+        <article><small>High-priority accounts</small><strong>{summary.highPriorityAccounts.toLocaleString()}</strong><span>Priority Score {summary.modelVersion} ≥ 70</span></article>
         <article><small>New deterministic changes</small><strong>{summary.recentChanges.toLocaleString()}</strong><span>Current history-build delta</span></article>
         <article><small>Procurement observations</small><strong>{summary.procurementRecords.toLocaleString()}</strong><span>NYC, statewide authority and water sources</span></article>
         <article><small>Observed vendor companies</small><strong>{summary.observedCompanies.toLocaleString()}</strong><span>Conservative company identities</span></article>
