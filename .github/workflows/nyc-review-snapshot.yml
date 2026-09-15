@@ -1,0 +1,24 @@
+name: Export exact NYC review source
+on:
+  push:
+    branches: ['agent/nyc-live-ui-audit-20260915']
+    paths: ['.github/workflows/nyc-review-snapshot.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Archive exact committed review sources without credentials
+        run: git archive --format=zip HEAD -o "$RUNNER_TEMP/nyc-review-source.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nyc-review-source
+          path: ${{ runner.temp }}/nyc-review-source.zip
+          retention-days: 3
+          if-no-files-found: error
