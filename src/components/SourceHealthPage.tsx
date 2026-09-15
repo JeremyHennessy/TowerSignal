@@ -5,6 +5,7 @@ import type { CoverageAuditPayload } from '../types/coverage'
 import { loadCoverageAudit, loadProcurement } from '../data/api'
 import { formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
+import { SourceHealthExpansion } from './SourceHealthExpansion'
 
 const number = new Intl.NumberFormat('en-US')
 
@@ -96,15 +97,15 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
     </div>
 
     <div className="reference-metric-grid source-health-metrics">
-      <article><span className="reference-metric-icon success">✓</span><div><small>Healthy account sources</small><strong>{healthy}/{health.length || '—'}</strong><span>{failed > 0 ? `${failed} failed` : 'No failed sources'}</span></div></article>
+      <article><span className="reference-metric-icon success">✓</span><div><small>Healthy diagnostic sources</small><strong>{healthy}/{health.length || '—'}</strong><span>{failed > 0 ? `${failed} failed` : 'No failed sources'}</span></div></article>
       <article><span className="reference-metric-icon warning">◷</span><div><small>Warnings</small><strong>{warning}</strong><span>Require review, not silent fallback</span></div></article>
-      <article><span className="reference-metric-icon">◎</span><div><small>Average account coverage</small><strong>{averageCoverage == null ? '—' : `${averageCoverage.toFixed(1)}%`}</strong><span>Across sources publishing coverage</span></div></article>
+      <article><span className="reference-metric-icon">◎</span><div><small>Average account coverage</small><strong>{averageCoverage == null ? '—' : `${averageCoverage.toFixed(1)}%`}</strong><span>Across sources publishing health diagnostics</span></div></article>
       <article><span className="reference-metric-icon success">⌂</span><div><small>NYC accounts</small><strong>{number.format(payload.summary.registered_systems)}</strong><span>Current normalized systems</span></div></article>
       <article><span className="reference-metric-icon">▤</span><div><small>Procurement source rows</small><strong>{procurement ? number.format(procurementRecords) : '—'}</strong><span>City Record, Checkbook and water caches</span></div></article>
     </div>
 
     {health.length === 0 ? <div className="reference-empty-state"><strong>Source-health metrics are not available in this payload.</strong><span>TowerSignal will not infer a healthy state when source diagnostics are missing.</span></div> : <div className="reference-table-card">
-      <div className="reference-table-heading"><div><strong>{health.length} account-intelligence sources</strong><span>Generated {formatTimestamp(payload.metadata.generated_at)}</span></div></div>
+      <div className="reference-table-heading"><div><strong>{health.length} sources publishing account-health diagnostics</strong><span>Generated {formatTimestamp(payload.metadata.generated_at)}</span></div></div>
       <div className="reference-table-scroll"><table className="reference-table source-health-table"><thead><tr><th>Source</th><th>Status</th><th>Coverage</th><th>Retrieved</th><th>Normalized</th><th>Matched</th><th>Attached</th><th>Represented</th><th>Health note</th></tr></thead><tbody>{health.map(source => <tr key={source.source_key}>
         <td><strong>{source.name}</strong><small>{source.dataset_id} · {source.entity_unit}</small></td>
         <td><span className={`health-badge health-${source.status.toLowerCase()}`}>{source.status}</span></td>
@@ -113,6 +114,8 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
         <td><span>{source.coverage_note}</span>{source.status_reasons.length > 0 && <small>{source.status_reasons.join(' · ')}</small>}</td>
       </tr>)}</tbody></table></div>
     </div>}
+
+    <SourceHealthExpansion payload={payload} />
 
     <div className="reference-table-card">
       <div className="reference-table-heading"><div><strong>Completeness &amp; identity audit</strong><span>{coverageAudit ? `Generated ${formatTimestamp(coverageAudit.generated_at)}` : 'Build 015 production completeness audit'}</span></div></div>
