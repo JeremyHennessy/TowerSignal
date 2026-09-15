@@ -86,7 +86,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
     await page.locator('.account-table tbody tr').first().click()
     await expectAccountDetailHydrated(page)
-    await selectAccountMode(page, 'Evidence')
+    await selectAccountMode(page, 'History')
     await expectSectionText(page, testInfo, 'ACRIS property activity', [
       'relevant recorded document',
       'ACRIS is joined by exact borough/block/lot BBL and exact document ID only',
@@ -133,7 +133,6 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
       'NYC Health inspections',
       'OATH penalty imposed',
       'DOB NOW project activity',
-      'ACRIS property activity',
       'Source & provenance',
       'Copy lead brief',
       'Copy account link',
@@ -144,7 +143,6 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.getByText('NYC Health inspections', { exact: true })).toBeVisible()
     await expect(page.getByText('OATH penalty imposed')).toBeVisible()
     await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
-    await expectHeading(page, testInfo, 'ACRIS property activity')
     await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
     await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
@@ -152,11 +150,12 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
 
   await selectAccountMode(page, 'History')
   if (isIphone) {
-    await expectDomText(page, ['Historical profile', 'OATH case lifecycle', 'TowerSignal History'], '.detail-panel')
+    await expectDomText(page, ['Historical profile', 'OATH case lifecycle', 'TowerSignal History', 'ACRIS property activity'], '.detail-panel')
   } else {
     await expect(page.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'OATH case lifecycle', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'TowerSignal History', exact: true })).toBeVisible()
+    await expectHeading(page, testInfo, 'ACRIS property activity')
   }
   await expect(page).toHaveURL(/#\/account\//)
 
