@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          path: driver
           persist-credentials: false
       - uses: actions/checkout@v4
         with:
@@ -23,7 +24,7 @@ jobs:
           python - <<'PY'
           import gzip,hashlib,json,os,subprocess
           from pathlib import Path
-          payload=json.loads(gzip.decompress(Path('scripts/arcny-feature-payload.json.gz').read_bytes()))
+          payload=json.loads(gzip.decompress(Path('driver/scripts/arcny-feature-payload.json.gz').read_bytes()))
           os.chdir('candidate')
           assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='04d2711cde448e8e57909dd0ce9d9152cc8ddf9c'
           for name,digest in payload['preimages'].items():
@@ -51,7 +52,7 @@ jobs:
           npm install --no-audit --no-fund
           npm run lint
           npm run typecheck
-          npm test -- --root "$PWD"
+          npm test
           python -m unittest discover -s tests/python -p 'test_*.py' -v
           npm run build
       - uses: actions/download-artifact@v4
