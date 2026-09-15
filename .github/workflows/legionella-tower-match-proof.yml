@@ -1,0 +1,68 @@
+name: Prove Legionnaires article to NYC tower matching
+on:
+  push:
+    branches: ['agent/nyc-legionella-tower-matching-20260915']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 34997430388
+          github-token: ${{ github.token }}
+          path: .base
+      - name: Recover exact current NYC generated universe without regenerating other sources
+        run: |
+          mkdir -p public
+          tar -xf .base/artifact.tar -C public
+          test -f public/data/systems.json
+      - name: Recollect official Legionnaires sources and match to current NYC systems
+        run: python scripts/build_legionella_alert_cache.py --output public/data/legionella-alerts.json --previous-cache public/data/legionella-alerts.json
+      - name: Validate source retrieval and tower-match contract
+        run: |
+          python scripts/validate_legionella_alert_cache.py --cache public/data/legionella-alerts.json --max-age-days 1 --require-clean-retrieval
+          python - <<'PY'
+          import json
+          a=json.load(open('public/data/legionella-alerts.json'))
+          s=json.load(open('public/data/systems.json'))
+          m=a['tower_matching']
+          assert m['published_positive_address_count'] >= 10, m
+          assert m['explicit_pcr_positive_system_count'] > 0, m
+          assert m['affected_area_system_count'] > m['explicit_pcr_positive_system_count'], m
+          assert a['clusters'][0]['affected_zip_codes'] == ['10451','10456'], a['clusters'][0]
+          explicit={x['system_id'] for x in a['clusters'][0]['tower_matches']['explicit_pcr_positive']}
+          assert explicit
+          assert all(x['legionella_pcr_positive_match'] == (x['system_id'] in explicit) for x in s['systems'])
+          print(json.dumps(m, indent=2))
+          print(json.dumps(a['clusters'][0]['tower_matches']['explicit_pcr_positive'], indent=2))
+          PY
+      - name: Repository tests and production frontend build with matched data
+        run: |
+          npm install --no-audit --no-fund
+          python -m unittest tests.python.test_legionella_tower_matching -v
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: legionella-tower-match-proof
+          path: |
+            public/data/legionella-alerts.json
+            public/data/systems.json
+          retention-days: 14
