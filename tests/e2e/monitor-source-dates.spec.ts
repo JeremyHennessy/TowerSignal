@@ -20,7 +20,7 @@ test('Monitor uses occurrence dates, readable evidence and contained desktop/mob
   await panel.getByLabel('Event date range').selectOption('custom')
   await panel.getByLabel('From', { exact: true }).fill('2026-07-14')
   await panel.getByLabel('To', { exact: true }).fill('2026-07-14')
-  await panel.getByLabel('Borough', { exact: true }).selectOption('Manhattan')
+  await panel.getByLabel(/^Borough/).selectOption('Manhattan')
   const madison = panel.locator('.change-reference-row').filter({ hasText: '1414 MADISON AVE' }).filter({ hasText: 'AH8A' }).first()
   await expect(madison).toBeVisible()
   await expect(madison.locator('time')).toHaveAttribute('datetime', '2026-07-14')
