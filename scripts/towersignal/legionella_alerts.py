@@ -10,7 +10,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlparse, urlunparse
 from urllib.request import Request, urlopen
 
-USER_AGENT = "TowerSignal/1.0 (+https://github.com/JeremyHennessy/TowerSignal)"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
 LEGIONELLA_RE = re.compile(r"\b(legionnaires?|legionella|legionellosis)\b", re.IGNORECASE)
 COOLING_TOWER_RE = re.compile(r"\bcooling\s+towers?\b", re.IGNORECASE)
 DATE_RE = re.compile(
@@ -155,7 +155,14 @@ def _allowed(url: str) -> bool:
 
 
 def _fetch(url: str, *, timeout: int = 60) -> tuple[bytes, str]:
-    request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.1"})
+    request = Request(
+        url,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.1",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+    )
     try:
         with urlopen(request, timeout=timeout) as response:
             return response.read(), str(response.headers.get("Content-Type") or "")
