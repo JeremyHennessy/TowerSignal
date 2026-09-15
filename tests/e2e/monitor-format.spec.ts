@@ -39,11 +39,11 @@ test('every Monitor tab has readable source values, responsive tables and usable
   }
   await page.setViewportSize(original)
   for(const [type,required] of [['OATH_PENALTY_CHANGED','$'],['OATH_BALANCE_CHANGED','$'],['DOB_JOB_FILED','Job'],['LATEST_SAMPLE_CHANGED','Public sample date'],['HPD_CONTACT_ADDED','Business address']]){
-    await monitor.getByLabel('Change type',{exact:true}).selectOption(type)
+    await monitor.getByLabel(/^Change type/).selectOption(type)
     const row=monitor.locator('.change-reference-row').first();await expect(row).toContainText(required)
     await row.scrollIntoViewIfNeeded();await capture(`detail-${type}`)
   }
-  await monitor.getByLabel('Change type',{exact:true}).selectOption('OATH_BALANCE_CHANGED')
+  await monitor.getByLabel(/^Change type/).selectOption('OATH_BALANCE_CHANGED')
   await expect(monitor.locator('.monitor-source-date time').first()).not.toHaveAttribute('datetime',/\d/)
   await monitor.getByLabel('Sort events').selectOption('priority_score:desc')
   const scores=await monitor.locator('.monitor-priority-cell').allTextContents()
