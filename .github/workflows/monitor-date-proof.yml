@@ -1,0 +1,86 @@
+name: Prove NYC Monitor occurrence dates
+on:
+  push:
+    branches: ['agent/nyc-monitor-dates-20260915']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: nyc-monitor-date-proof
+  cancel-in-progress: false
+jobs:
+  proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Require accepted Home release as the exact baseline
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35020424389})).data;
+            if(run.conclusion!=='success' || run.path!=='.github/workflows/home-intelligence-release.yml') throw new Error('Home release not accepted');
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(ref.object.sha!=='4a1499fab419e0b9f2b3607410d54adcb523ca57') throw new Error('Main moved; reconcile before testing');
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35020424389
+          github-token: ${{ github.token }}
+          path: .baseline
+      - name: Restore unchanged accepted source data
+        run: |
+          mkdir -p .baseline/site public/data
+          tar -xf .baseline/artifact.tar -C .baseline/site
+          cp -a .baseline/site/data/. public/data/
+          cp .baseline/site/home-intelligence-release.json public/
+          python scripts/verify_home_intelligence_release.py .baseline/site --candidate
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Checks and unchanged-data production build
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          python -m unittest discover -s tests/python -p 'test_*.py'
+          npm run build
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          old=Path('.baseline/site/data'); new=Path('dist/data')
+          assert {p.relative_to(old) for p in old.rglob('*') if p.is_file()} == {p.relative_to(new) for p in new.rglob('*') if p.is_file()}
+          for p in old.rglob('*'):
+              if p.is_file(): assert hashlib.sha256(p.read_bytes()).digest()==hashlib.sha256((new/p.relative_to(old)).read_bytes()).digest(), str(p)
+          Path('dist/monitor-release.json').write_text(json.dumps({'application_source_sha':os.environ['GITHUB_SHA'],'baseline_sha':'4a1499fab419e0b9f2b3607410d54adcb523ca57','source_run_id':35020424389,'source_data_unchanged':True,'history_data_unchanged':True,'date_basis':'published event or explicitly labelled source reference; no detected_at fallback'},indent=2)+'\n')
+          PY
+      - name: Full candidate desktop and iPhone tests
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: dist
+        run: npm run test:e2e
+      - name: Preserve tested candidate and exact rollback
+        run: |
+          tar -cf monitor-candidate.tar -C dist .
+          cp .baseline/artifact.tar monitor-rollback.tar
+          sha256sum monitor-candidate.tar monitor-rollback.tar > monitor-archives.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: monitor-date-candidate
+          path: |
+            monitor-candidate.tar
+            monitor-rollback.tar
+            monitor-archives.sha256
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: monitor-date-proof-evidence
+          path: |
+            playwright-report/
+            dist/monitor-release.json
+          retention-days: 30
