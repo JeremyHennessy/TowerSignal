@@ -97,7 +97,7 @@ jobs:
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
           CANDIDATE_ROOT: ${{ github.workspace }}/candidate/dist
-        run: npm run test:e2e -- workflow-command-center.spec.ts workflow-site-leads.spec.ts
+        run: GITHUB_RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT}-candidate" npm run test:e2e -- workflow-command-center.spec.ts workflow-site-leads.spec.ts
       - name: Preserve exact candidate and prior artifact
         env:
           CANDIDATE_SHA: ${{ steps.candidate.outputs.sha }}
