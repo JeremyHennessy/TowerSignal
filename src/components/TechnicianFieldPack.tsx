@@ -1,5 +1,6 @@
 import { formatDate } from '../domain/labels'
 import type { SystemSummary } from '../types/data'
+import type { PropertyEnforcementContext } from '../types/enforcement'
 import type { SystemDetailWithDomesticWater } from './DomesticWaterSection'
 import { SalesPreCallPack } from './SalesPreCallPack'
 
@@ -12,19 +13,34 @@ type PackItem = {
   tone: PackTone
 }
 
+type FieldPackDetail = SystemDetailWithDomesticWater & {
+  property_enforcement_context?: PropertyEnforcementContext | null
+}
+
 const display = (value: string | number | null | undefined) => value == null || value === '' ? 'Not published' : String(value)
 
 function plural(value: number, singular: string, pluralLabel = `${singular}s`) {
   return `${value.toLocaleString()} ${value === 1 ? singular : pluralLabel}`
 }
 
-function latestDobLabel(detail: SystemDetailWithDomesticWater) {
+function latestDobLabel(detail: FieldPackDetail) {
   const jobs = detail.dob_activity_history ?? []
   if (jobs.length === 0) return 'No exact-BBL DOB job filing match'
   const latest = jobs.find(job => job.activity_date)?.activity_date
   const explicit = jobs.filter(job => job.explicit_cooling_tower_mention).length
   const mechanical = jobs.filter(job => job.mechanical_systems || job.boiler_equipment).length
   return `${plural(jobs.length, 'filing')}${latest ? `, latest ${formatDate(latest)}` : ''}; ${explicit.toLocaleString()} explicit cooling-tower; ${mechanical.toLocaleString()} mechanical/boiler`
+}
+
+function enforcementLabel(detail: FieldPackDetail) {
+  const enforcement = detail.property_enforcement_context
+  if (!enforcement) return 'No property-enforcement payload'
+  const hpdOpen = enforcement.hpd_violations?.summary.open_count ?? 0
+  const classC = enforcement.hpd_violations?.summary.open_class_c_count ?? 0
+  const swo = enforcement.stop_work_orders?.summary.record_count ?? 0
+  const facade = enforcement.facade_compliance?.summary
+  const fisp = facade?.latest_status ? `FISP ${facade.latest_status}` : 'no published FISP status'
+  return `${plural(hpdOpen, 'open HPD violation')} (${classC.toLocaleString()} Class C); ${plural(swo, 'SWO evidence event')}; ${fisp}`
 }
 
 function sampleLabel(row: SystemSummary) {
@@ -39,13 +55,17 @@ function mainStatus(row: SystemSummary) {
   return { label: 'Routine field context', tone: 'ready' as PackTone }
 }
 
-function sourceItems(row: SystemSummary, detail: SystemDetailWithDomesticWater): PackItem[] {
+function sourceItems(row: SystemSummary, detail: FieldPackDetail): PackItem[] {
   const towers = detail.planimetric_building_tower_features ?? []
   const footprints = detail.building_footprints ?? []
   const domestic = detail.domestic_water
   const buildingWater = detail.nyc_building_water_signals
   const contacts = detail.hpd_registration?.contacts ?? []
   const dobJobs = detail.dob_activity_history ?? []
+  const enforcement = detail.property_enforcement_context
+  const hpdClassC = enforcement?.hpd_violations?.summary.open_class_c_count ?? 0
+  const facadeStatus = (enforcement?.facade_compliance?.summary.latest_status ?? '').toUpperCase()
+  const enforcementAttention = hpdClassC > 0 || facadeStatus === 'UNSAFE' || facadeStatus === 'NO REPORT FILED'
   return [
     {
       label: 'Cooling tower registration',
@@ -84,6 +104,12 @@ function sourceItems(row: SystemSummary, detail: SystemDetailWithDomesticWater):
       tone: contacts.length ? 'ready' : 'verify',
     },
     {
+      label: 'Property enforcement / facade context',
+      value: enforcementLabel(detail),
+      detail: enforcement ? 'HPD open state and FISP status are preserved from published source fields. SWO entries are DOB complaint-disposition evidence and do not assert that an order is currently active.' : 'No attached exact-key HPD violation, SWO disposition or FISP payload is represented for this detail record.',
+      tone: enforcementAttention ? 'attention' : enforcement ? 'verify' : 'missing',
+    },
+    {
       label: 'DOB mechanical project context',
       value: latestDobLabel(detail),
       detail: dobJobs.length ? 'DOB records are exact-BBL project context; only explicit wording is a cooling-tower claim.' : 'No current DOB project context is represented for this building.',
@@ -98,7 +124,7 @@ function sourceItems(row: SystemSummary, detail: SystemDetailWithDomesticWater):
   ]
 }
 
-export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detail: SystemDetailWithDomesticWater }) {
+export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detail: FieldPackDetail }) {
   const towers = detail.planimetric_building_tower_features ?? []
   const footprints = detail.building_footprints ?? []
   const domesticTanks = detail.domestic_water?.summary.planimetric_tank_count ?? 0
@@ -137,6 +163,7 @@ export function TechnicianFieldPack({ row, detail }: { row: SystemSummary; detai
           <li><strong>Confirm identity:</strong> {display(row.address)}; System {row.system_id}; BIN {display(row.bin)}; BBL {display(row.bbl)}.</li>
           <li><strong>Confirm access:</strong> {contacts.length ? `${contacts[0]?.corporation_name ?? contacts[0]?.person_name ?? 'HPD contact'} is published as a contact cue.` : 'No public access contact is matched; verify owner or manager route before sending a technician.'}</li>
           <li><strong>Review compliance context:</strong> sample {sampleLabel(row)}; {row.oath_case_count ? `${plural(row.oath_case_count, 'exact-matched OATH case')}.` : 'no exact-matched OATH case.'}</li>
+          <li><strong>Review property enforcement:</strong> {enforcementLabel(detail)}.</li>
           <li><strong>Review building-water context:</strong> {buildingWaterSignals ? `${plural(buildingWaterSignals, 'exact 311/HPD/DOB/LL84 signal')} attached.` : 'no exact-BBL/BIN building-water signal attached.'}</li>
           <li><strong>Check project timing:</strong> {latestDobLabel(detail)}.</li>
         </ul>

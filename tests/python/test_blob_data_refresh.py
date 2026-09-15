@@ -327,10 +327,15 @@ class DataRefreshTests(unittest.TestCase):
     def test_workflow_preserves_all_original_source_build_commands_and_limits(self):
         root=Path(__file__).resolve().parents[2]
         pages=(root/'.github/workflows/pages.yml').read_text()
-        segment=pages[pages.index('      - name: Fetch, validate and generate current NYC data\n'):
-                      pages.index('      - name: Stage history state for post-deploy persistence\n')]
+        shared_start=pages.index('      - name: Fetch, validate and generate current NYC data\n')
+        pages_only_start=pages.index('      - name: Build NYC property-enforcement cache\n')
+        pages_only_end=pages.index('      - name: Build bounded legacy DOB/BIS project context\n')
+        shared_end=pages.index('      - name: Stage history state for post-deploy persistence\n')
+        shared_segment=pages[shared_start:pages_only_start] + pages[pages_only_end:shared_end]
         workflow=(root/d.WORKFLOW).read_text()
-        self.assertIn(segment,workflow)
+        self.assertIn(shared_segment,workflow)
+        self.assertNotIn('Build NYC property-enforcement cache', workflow)
+        self.assertNotIn('Build official Legionella / Legionnaires intelligence cache', workflow)
         self.assertIn("- cron: '17 10 * * *'",workflow)
         self.assertIn('needs: generate',workflow)
         self.assertIn('contents: read',workflow)

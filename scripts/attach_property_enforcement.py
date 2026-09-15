@@ -1,0 +1,141 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def safe_detail_path(base: Path, system_id: str) -> Path:
+    safe = "".join(ch for ch in system_id if ch.isalnum() or ch in ("-", "_"))
+    return base / "details" / (safe[:2] or "xx").lower() / f"{safe}.json"
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"Expected JSON object: {path}")
+    return payload
+
+
+def _source_row(source: dict[str, Any], matched_count: int) -> dict[str, Any]:
+    return {
+        "dataset_id": source.get("dataset_id"),
+        "name": source.get("name"),
+        "retrieved_at": source.get("retrieved_at"),
+        "source_record_count": int(source.get("source_record_count") or 0),
+        "source_last_updated_at": source.get("source_last_updated_at"),
+        "url": source.get("url"),
+        "matched_record_count": matched_count,
+        "source_query_scope": source.get("source_query_scope"),
+    }
+
+
+def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
+    systems_path = output_dir / "systems.json"
+    metadata_path = output_dir / "metadata.json"
+    payload = load_json(systems_path)
+    cache = load_json(cache_path)
+    if cache.get("domain") != "NYC_PROPERTY_ENFORCEMENT_CONTEXT":
+        raise RuntimeError("Unexpected property enforcement cache domain")
+    by_bbl = cache.get("by_bbl") or {}
+    by_bin = cache.get("by_bin") or {}
+    if not isinstance(by_bbl, dict) or not isinstance(by_bin, dict):
+        raise RuntimeError("Property enforcement cache indexes are malformed")
+
+    attached_hpd_systems = 0
+    attached_swo_systems = 0
+    attached_facade_systems = 0
+    for row in payload.get("systems") or []:
+        bbl = str(row.get("bbl") or "")
+        bin_value = str(row.get("bin") or "")
+        hpd_context = by_bbl.get(bbl)
+        bin_context = by_bin.get(bin_value) or {}
+        swo_context = bin_context.get("stop_work_orders") or {}
+        facade_context = bin_context.get("facade_compliance") or {}
+
+        hpd_summary = (hpd_context or {}).get("summary") or {}
+        swo_summary = swo_context.get("summary") or {}
+        facade_summary = facade_context.get("summary") or {}
+
+        row["hpd_violation_count"] = int(hpd_summary.get("record_count") or 0)
+        row["hpd_open_violation_count"] = int(hpd_summary.get("open_count") or 0)
+        row["hpd_open_class_c_count"] = int(hpd_summary.get("open_class_c_count") or 0)
+        row["latest_hpd_violation_inspection_date"] = hpd_summary.get("latest_inspection_date")
+        row["stop_work_order_event_count"] = int(swo_summary.get("record_count") or 0)
+        row["latest_stop_work_order_event_date"] = swo_summary.get("latest_event_date")
+        row["facade_compliance_filing_count"] = int(facade_summary.get("record_count") or 0)
+        row["facade_latest_status"] = facade_summary.get("latest_status")
+        row["facade_latest_cycle"] = facade_summary.get("latest_cycle")
+        row["facade_latest_submitted_on"] = facade_summary.get("latest_submitted_on")
+
+        if row["hpd_violation_count"]:
+            attached_hpd_systems += 1
+        if row["stop_work_order_event_count"]:
+            attached_swo_systems += 1
+        if row["facade_compliance_filing_count"]:
+            attached_facade_systems += 1
+
+        detail_path = safe_detail_path(output_dir, str(row["system_id"]))
+        detail = load_json(detail_path)
+        detail["property_enforcement_context"] = {
+            "hpd_violations": hpd_context,
+            "stop_work_orders": swo_context if swo_context.get("records") else None,
+            "facade_compliance": facade_context if facade_context.get("records") else None,
+            "evidence_boundaries": cache.get("evidence_semantics") or {},
+            "generated_at": cache.get("generated_at"),
+        }
+        detail_path.write_text(json.dumps(detail, separators=(",", ":")), encoding="utf-8")
+
+    cache_summary = cache.get("summary") or {}
+    summary = payload.get("summary") or {}
+    summary["systems_with_hpd_violation_context"] = attached_hpd_systems
+    summary["systems_with_stop_work_order_context"] = attached_swo_systems
+    summary["systems_with_facade_compliance_context"] = attached_facade_systems
+    payload["summary"] = summary
+
+    metadata = payload.get("metadata") or {}
+    metadata["property_enforcement_cache_available"] = True
+    metadata["property_enforcement_generated_at"] = cache.get("generated_at")
+    metadata["hpd_violation_match_basis"] = "BBL_EXACT"
+    metadata["stop_work_order_match_basis"] = "BIN_EXACT"
+    metadata["facade_compliance_match_basis"] = "BIN_EXACT"
+    metadata["hpd_violation_count"] = int(cache_summary.get("hpd_violation_count") or 0)
+    metadata["hpd_open_violation_count"] = int(cache_summary.get("hpd_open_violation_count") or 0)
+    metadata["stop_work_order_event_count"] = int(cache_summary.get("swo_event_count") or 0)
+    metadata["facade_compliance_filing_count"] = int(cache_summary.get("facade_filing_count") or 0)
+
+    cache_sources = cache.get("sources") or {}
+    dataset_ids = {"wvxf-dwi5", "eabe-havv", "xubg-57si"}
+    sources = [item for item in metadata.get("sources", []) if item.get("dataset_id") not in dataset_ids]
+    sources.extend((
+        _source_row(cache_sources.get("hpd_violations") or {}, int(cache_summary.get("hpd_violation_count") or 0)),
+        _source_row(cache_sources.get("stop_work_orders") or {}, int(cache_summary.get("swo_event_count") or 0)),
+        _source_row(cache_sources.get("facade_compliance") or {}, int(cache_summary.get("facade_filing_count") or 0)),
+    ))
+    metadata["sources"] = sources
+    payload["metadata"] = metadata
+
+    systems_path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    result = {
+        "attached_hpd_systems": attached_hpd_systems,
+        "attached_swo_systems": attached_swo_systems,
+        "attached_facade_systems": attached_facade_systems,
+    }
+    print(json.dumps(result, indent=2))
+    return result
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Attach exact-key NYC property enforcement context")
+    parser.add_argument("--output", type=Path, default=ROOT / "public/data")
+    parser.add_argument("--cache", type=Path, default=ROOT / "public/data/property-enforcement.json")
+    args = parser.parse_args()
+    attach(args.output, args.cache)
+
+
+if __name__ == "__main__":
+    main()

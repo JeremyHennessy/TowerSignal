@@ -1,0 +1,107 @@
+name: Property enforcement production-universe proof
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/towersignal/property_enforcement.py'
+      - 'scripts/build_property_enforcement_cache.py'
+      - 'scripts/validate_property_enforcement_cache.py'
+      - 'scripts/attach_property_enforcement.py'
+      - '.github/workflows/property-enforcement-production-universe-proof.yml'
+
+concurrency:
+  group: property-enforcement-production-universe-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  production-universe-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate current NYC TowerSignal system universe without publishing
+        timeout-minutes: 45
+        run: python scripts/build_data.py --output "$RUNNER_TEMP/towersignal-data"
+      - name: Build property-enforcement cache against current production-scale universe
+        timeout-minutes: 25
+        run: >-
+          python scripts/build_property_enforcement_cache.py
+          --systems "$RUNNER_TEMP/towersignal-data/systems.json"
+          --output "$RUNNER_TEMP/property-enforcement.json"
+      - name: Validate exact-key property-enforcement coverage
+        run: >-
+          python scripts/validate_property_enforcement_cache.py
+          --cache "$RUNNER_TEMP/property-enforcement.json"
+          --max-age-days 1
+          --require-production-universe
+      - name: Attach property-enforcement context to generated runtime
+        run: >-
+          python scripts/attach_property_enforcement.py
+          --output "$RUNNER_TEMP/towersignal-data"
+          --cache "$RUNNER_TEMP/property-enforcement.json"
+      - name: Verify attached runtime contract and print coverage
+        run: |
+          python - <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ['RUNNER_TEMP'])
+          cache = json.loads((root / 'property-enforcement.json').read_text(encoding='utf-8'))
+          payload = json.loads((root / 'towersignal-data' / 'systems.json').read_text(encoding='utf-8'))
+          metadata = payload.get('metadata') or {}
+          summary = payload.get('summary') or {}
+          if metadata.get('property_enforcement_cache_available') is not True:
+              raise SystemExit('Attached runtime does not declare property_enforcement_cache_available')
+          for key in ('systems_with_hpd_violation_context', 'systems_with_stop_work_order_context', 'systems_with_facade_compliance_context'):
+              if int(summary.get(key) or 0) <= 0:
+                  raise SystemExit(f'Attached runtime has no production coverage for {key}')
+
+          sample = next(
+              row for row in payload.get('systems', [])
+              if int(row.get('hpd_open_violation_count') or 0) > 0
+              and int(row.get('stop_work_order_event_count') or 0) > 0
+          )
+          safe = ''.join(ch for ch in sample['system_id'] if ch.isalnum() or ch in ('-', '_'))
+          detail_path = root / 'towersignal-data' / 'details' / (safe[:2] or 'xx').lower() / f'{safe}.json'
+          detail = json.loads(detail_path.read_text(encoding='utf-8'))
+          context = detail.get('property_enforcement_context') or {}
+          if not context.get('hpd_violations') or not context.get('stop_work_orders'):
+              raise SystemExit(f'Property-enforcement detail attachment missing on sample {sample["system_id"]}')
+
+          print(json.dumps({
+              'source_systems_snapshot': cache.get('source_systems_snapshot'),
+              'cache_summary': cache.get('summary'),
+              'attached_summary': {
+                  key: summary.get(key)
+                  for key in (
+                      'systems_with_hpd_violation_context',
+                      'systems_with_stop_work_order_context',
+                      'systems_with_facade_compliance_context',
+                  )
+              },
+              'sample_system_id': sample['system_id'],
+              'sample_hpd_open_violation_count': sample.get('hpd_open_violation_count'),
+              'sample_stop_work_order_event_count': sample.get('stop_work_order_event_count'),
+              'sample_facade_latest_status': sample.get('facade_latest_status'),
+              'source_counts': {
+                  key: {
+                      'dataset_id': value.get('dataset_id'),
+                      'source_record_count': value.get('source_record_count'),
+                      'matched_record_count': value.get('matched_violation_count') or value.get('matched_event_count') or value.get('matched_filing_count'),
+                  }
+                  for key, value in (cache.get('sources') or {}).items()
+              },
+          }, indent=2))
+          PYTHON

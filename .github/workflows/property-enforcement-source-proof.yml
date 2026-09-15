@@ -1,0 +1,123 @@
+name: Property enforcement and Legionella source proof
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/towersignal/property_enforcement.py'
+      - 'scripts/build_property_enforcement_cache.py'
+      - 'scripts/validate_property_enforcement_cache.py'
+      - 'scripts/attach_property_enforcement.py'
+      - 'scripts/towersignal/legionella_alerts.py'
+      - 'scripts/build_legionella_alert_cache.py'
+      - 'scripts/validate_legionella_alert_cache.py'
+      - 'tests/python/test_property_enforcement.py'
+      - 'tests/python/test_legionella_alerts.py'
+      - 'tests/python/test_legionella_alert_history.py'
+      - '.github/workflows/property-enforcement-source-proof.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  source-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile new ingestion code
+        run: >-
+          python -m py_compile
+          scripts/towersignal/property_enforcement.py
+          scripts/build_property_enforcement_cache.py
+          scripts/validate_property_enforcement_cache.py
+          scripts/attach_property_enforcement.py
+          scripts/towersignal/legionella_alerts.py
+          scripts/build_legionella_alert_cache.py
+          scripts/validate_legionella_alert_cache.py
+      - name: Run isolated normalization and history tests
+        run: |
+          python -m unittest discover -s tests/python -p 'test_property_enforcement.py' -v
+          python -m unittest discover -s tests/python -p 'test_legionella_alerts.py' -v
+          python -m unittest discover -s tests/python -p 'test_legionella_alert_history.py' -v
+      - name: Prove authoritative NYC Open Data contracts with bounded live queries
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python - <<'PYTHON'
+          import json
+          from towersignal.fetch import fetch_where
+          from towersignal.pluto import normalize_bbl
+          from towersignal.planimetrics import normalize_bin
+          from towersignal.property_enforcement import (
+              DOB_COMPLAINTS_DATASET_ID,
+              FACADE_FILINGS_DATASET_ID,
+              HPD_VIOLATIONS_DATASET_ID,
+              SWO_CODE_LIST,
+              fetch_facade_filings_by_bin,
+              fetch_hpd_violations_by_bbl,
+              fetch_stop_work_orders_by_bin,
+          )
+
+          hpd_seed_rows = fetch_where(
+              HPD_VIOLATIONS_DATASET_ID,
+              where="bbl is not null AND violationid is not null",
+              select="bbl,violationid",
+              limit=20,
+          )
+          hpd_bbl = next((normalize_bbl(row.get("bbl")) for row in hpd_seed_rows if normalize_bbl(row.get("bbl"))), None)
+          if not hpd_bbl:
+              raise SystemExit("HPD live contract returned no usable BBL seed")
+          hpd_by_bbl, hpd_meta = fetch_hpd_violations_by_bbl({hpd_bbl})
+          if not hpd_by_bbl.get(hpd_bbl):
+              raise SystemExit(f"HPD exact-BBL adapter returned no rows for live seed {hpd_bbl}")
+
+          codes = ",".join(f"'{code}'" for code in SWO_CODE_LIST)
+          swo_seed_rows = fetch_where(
+              DOB_COMPLAINTS_DATASET_ID,
+              where=f"bin is not null AND disposition_code in ({codes})",
+              select="bin,complaint_number,disposition_code",
+              limit=50,
+          )
+          swo_bin = next((normalize_bin(row.get("bin")) for row in swo_seed_rows if normalize_bin(row.get("bin"))), None)
+          if not swo_bin:
+              raise SystemExit("DOB complaint live contract returned no SWO-related BIN seed")
+          swo_by_bin, swo_meta = fetch_stop_work_orders_by_bin({swo_bin})
+          if not swo_by_bin.get(swo_bin):
+              raise SystemExit(f"DOB SWO exact-BIN adapter returned no rows for live seed {swo_bin}")
+
+          facade_seed_rows = fetch_where(
+              FACADE_FILINGS_DATASET_ID,
+              where="bin is not null AND control_no is not null",
+              select="bin,control_no,current_status",
+              limit=20,
+          )
+          facade_bin = next((normalize_bin(row.get("bin")) for row in facade_seed_rows if normalize_bin(row.get("bin"))), None)
+          if not facade_bin:
+              raise SystemExit("DOB NOW Facades live contract returned no usable BIN seed")
+          facade_by_bin, facade_meta = fetch_facade_filings_by_bin({facade_bin})
+          if not facade_by_bin.get(facade_bin):
+              raise SystemExit(f"Facade exact-BIN adapter returned no rows for live seed {facade_bin}")
+
+          print(json.dumps({
+              "hpd": {"seed_bbl": hpd_bbl, "matched": len(hpd_by_bbl[hpd_bbl]), "source_count": hpd_meta["source_record_count"]},
+              "swo": {"seed_bin": swo_bin, "matched": len(swo_by_bin[swo_bin]), "source_count": swo_meta["source_record_count"]},
+              "facades": {"seed_bin": facade_bin, "matched": len(facade_by_bin[facade_bin]), "source_count": facade_meta["source_record_count"]},
+          }, indent=2))
+          PYTHON
+      - name: Build official Legionella alert cache
+        run: python scripts/build_legionella_alert_cache.py --output "$RUNNER_TEMP/legionella-alerts.json"
+      - name: Validate official Legionella alert cache
+        run: >-
+          python scripts/validate_legionella_alert_cache.py
+          --cache "$RUNNER_TEMP/legionella-alerts.json"
+          --max-age-days 1
+          --require-clean-retrieval
