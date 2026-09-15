@@ -1,0 +1,26 @@
+.legionella-linked-intelligence { min-width: 0; margin-bottom: 14px; padding: 14px; }
+.legionella-panel-heading, .legionella-incident-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.legionella-linked-intelligence h3, .legionella-linked-intelligence h4 { margin: 4px 0 8px; }
+.legionella-linked-intelligence p { margin: 8px 0; line-height: 1.5; }
+.legionella-incident { padding: 12px 0; border-top: 1px solid #dbe4ed; }
+.legionella-incident-heading > span, .legionella-panel-heading > small { color: #526579; font-size: 11px; }
+.legionella-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.legionella-actions a { padding: 6px 10px; border: 1px solid #cddadf; border-radius: 6px; background: #f6faf9; text-decoration: none; color: #16695d; font-size: 12px; font-weight: 700; }
+.legionella-linked-intelligence details { margin: 9px 0; }
+.legionella-linked-intelligence summary { cursor: pointer; font-size: 12px; font-weight: 700; }
+.legionella-building-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.legionella-building-table th, .legionella-building-table td { padding: 10px; text-align: left; vertical-align: top; border-bottom: 1px solid #dbe4ed; }
+.legionella-building-table td > a, .legionella-building-table small, .legionella-observations span, .legionella-observations small, .legionella-article-list span { display: block; }
+.legionella-building-table td > a { margin-bottom: 8px; }
+.legionella-observations > div { margin: 6px 0 12px; line-height: 1.5; }
+.legionella-match-note { font-size: 12px; color: #725b20; }
+.legionella-article-list { padding-left: 18px; font-size: 12px; }
+.legionella-article-list li { margin: 8px 0; }
+.legionella-match-label { font-size: 12px; }
+@media (max-width: 700px) {
+  .legionella-panel-heading, .legionella-incident-heading { flex-direction: column; gap: 4px; }
+  .legionella-linked-intelligence { padding: 10px; }
+  .legionella-building-table { min-width: 620px; }
+  .legionella-linked-intelligence .table-scroll { max-width: 100%; overflow-x: auto; }
+  .legionella-actions a { padding: 9px 10px; }
+}
