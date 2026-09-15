@@ -1,0 +1,52 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { chromium } from 'playwright';
+
+const BASE='https://jeremyhennessy.github.io/TowerSignal/';
+const OUT='desktop-demo-capture';
+for(const d of ['screens','states','assets','data','source-reference'])fs.mkdirSync(`${OUT}/${d}`,{recursive:true});
+const manifest={started_at:new Date().toISOString(),base:BASE,repository_reference:'159fac69eb91e2698e9f7dc3a3d22ecb6c2ad8b1',capture_commit:process.env.GITHUB_SHA,viewport:{width:1600,height:1000},device_scale_factor:2,shots:[],errors:[],network_failures:[],data:[],navigation:[]};
+const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
+const write=(p,o)=>fs.writeFileSync(`${OUT}/${p}`,JSON.stringify(o,null,2));
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,75);
+const browser=await chromium.launch();
+const context=await browser.newContext({viewport:manifest.viewport,deviceScaleFactor:2});
+const page=await context.newPage();page.setDefaultTimeout(12000);
+const pending=[];const seenData=new Set();
+page.on('response',r=>{const u=r.url();if(r.status()>=400&&!/favicon/.test(u))manifest.network_failures.push({url:u.split('?')[0],status:r.status()});if(/\/data\/[^?]+\.json/.test(u)&&r.ok()){const name=u.split('/data/')[1].split('?')[0];if(!seenData.has(name)){seenData.add(name);const p=(async()=>{try{const b=await r.body();manifest.data.push({url:u.split('?')[0],path:name,bytes:b.length,sha256:hash(b)});if(b.length<18000000){const f=`${OUT}/data/${name}`;fs.mkdirSync(path.dirname(f),{recursive:true});fs.writeFileSync(f,b);}}catch{}})();pending.push(p);}}});
+page.on('pageerror',e=>manifest.errors.push({type:'pageerror',url:page.url(),message:String(e)}));
+async function settled(){await page.waitForTimeout(1700);await page.locator('.loading-page').waitFor({state:'hidden',timeout:90000}).catch(()=>{});await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(900);}
+async function go(route){for(let n=0;n<2;n++){try{await page.goto(BASE+route,{waitUntil:'domcontentloaded',timeout:100000});await settled();return;}catch(e){if(n===1)throw e;await page.waitForTimeout(3000);}}}
+async function state(name){const s=await page.evaluate(()=>({url:location.href,title:document.title,text:document.body.innerText,headings:[...document.querySelectorAll('h1,h2,h3,h4')].map(e=>({tag:e.tagName,text:e.innerText,id:e.id,cls:e.className})),tabs:[...document.querySelectorAll('[role=tab]')].map(e=>({text:e.innerText,selected:e.getAttribute('aria-selected')})),buttons:[...document.querySelectorAll('button')].filter(e=>e.getBoundingClientRect().width>0).map(e=>({text:e.innerText,label:e.getAttribute('aria-label'),cls:e.className})),selects:[...document.querySelectorAll('select')].map(e=>({label:e.getAttribute('aria-label')||e.closest('label')?.innerText,value:e.value,options:[...e.options].map(o=>({value:o.value,text:o.textContent}))})),links:[...document.querySelectorAll('a[href]')].map(e=>({text:e.innerText,url:e.href})),sections:[...document.querySelectorAll('section,article,details')].map(e=>({tag:e.tagName,id:e.id,cls:e.className,text:e.innerText?.slice(0,130)})),images:[...document.images].map(e=>({src:e.src,alt:e.alt,width:e.naturalWidth,height:e.naturalHeight})),scripts:[...document.querySelectorAll('script[src]')].map(e=>e.src),styles:[...document.querySelectorAll('link[rel=stylesheet]')].map(e=>e.href)}));s.captured_at=new Date().toISOString();write(`states/${name}.json`,s);return s;}
+async function shot(name,selector=null,maxHeight=6200){try{await settled();await page.evaluate(()=>window.scrollTo(0,0));let clip;if(selector){const l=typeof selector==='string'?page.locator(selector).first():selector;await l.waitFor({state:'visible',timeout:10000});await l.scrollIntoViewIfNeeded();await page.waitForTimeout(500);const b=await l.boundingBox();const scroll=await page.evaluate(()=>({x:scrollX,y:scrollY}));clip={x:Math.max(0,b.x+scroll.x),y:Math.max(0,b.y+scroll.y),width:Math.min(b.width,1600),height:Math.min(b.height,maxHeight)};}else{const dims=await page.evaluate(()=>({w:document.documentElement.scrollWidth,h:document.documentElement.scrollHeight}));clip={x:0,y:0,width:1600,height:Math.min(dims.h,maxHeight)};}
+const f=`screens/${name}.png`;await page.screenshot({path:`${OUT}/${f}`,clip,animations:'disabled',timeout:45000});manifest.shots.push({name,file:f,url:page.url(),captured_at:new Date().toISOString(),clip,sha256:hash(fs.readFileSync(`${OUT}/${f}`)),description:'Actual hosted desktop browser pixels. Native UI interaction only; no content, style or data injection.'});await state(name);console.log('CAPTURE',name,page.url());}catch(e){manifest.errors.push({shot:name,error:String(e)});}}
+async function routeCapture(route,name,tabCapture=true){try{await go(route);await shot(name,null,6200);await shot(name+'-viewport',null,1000);const st=await state(name);manifest.navigation.push({route,name,url:page.url(),tabs:st.tabs});if(tabCapture){const originalTabs=await page.getByRole('tab').allTextContents();for(let i=0;i<originalTabs.length&&i<16;i++){if(!originalTabs[i].trim())continue;try{await go(route);const t=page.getByRole('tab').nth(i);const label=await t.innerText();await t.click();await settled();await shot(name+'-tab-'+slug(label),null,5000);}catch(e){manifest.errors.push({tab:originalTabs[i],route,error:String(e)});}}}}catch(e){manifest.errors.push({route,error:String(e)});}}
+try{
+for(const file of ['TopNavigation.tsx','HomePage.tsx','SourceHealthPage.tsx','WorkflowWorkspacePage.tsx','WorkflowScaleWorkspace.tsx','WaterQualityPage.tsx','CompaniesPage.tsx','CompanyProfilePage.tsx','OpportunitiesPage.tsx','PortfoliosPage.tsx','DetailPanel.tsx','AccountSectionNavigator.tsx','NysPage.tsx','NysChangesPage.tsx']){const p='src/components/'+file;if(fs.existsSync(p))fs.copyFileSync(p,`${OUT}/source-reference/${file}`);}for(const file of ['src/App.tsx','src/data/api.ts','src/types/data.ts','src/types/workflow.ts'])if(fs.existsSync(file))fs.copyFileSync(file,`${OUT}/source-reference/${file.replaceAll('/','_')}`);
+for(const f of fs.readdirSync('src/workflow'))if(/demo|rmc|arc/i.test(f)&&fs.statSync('src/workflow/'+f).isFile())fs.copyFileSync('src/workflow/'+f,`${OUT}/source-reference/${f}`);
+await routeCapture('','00-landing',false);
+await go('#/workflow');
+if(await page.getByLabel('Email',{exact:true}).count()){
+await shot('01-sign-in',null,1200);
+const helper=fs.readFileSync('tests/e2e/auth.helpers.ts','utf8');const password=helper.match(/const PASSWORD = '([^']+)'/)[1];
+await page.waitForTimeout(11000);
+await page.getByLabel('Email',{exact:true}).fill('towersignal-e2e-34636977078-1-desktop@example.com');await page.getByLabel('Password',{exact:true}).fill(password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('heading',{name:'Sign in to TowerSignal',exact:true}).waitFor({state:'hidden',timeout:30000});await settled();manifest.authentication='Existing authorized hosted E2E verification account; no user private data modified.';
+}
+for(const [route,name] of [['#/home','02-home'],['#/prospect','03-prospect'],['#/monitor','04-monitor'],['#/map','05-map'],['#/opportunities','06-opportunities'],['#/nys','07-nys-market'],['#/nys-changes','08-nys-changes'],['#/companies','09-known-firms'],['#/water-quality','10-water-quality'],['#/portfolios','11-portfolios'],['#/workflow','12-workflow'],['#/source-health','13-source-health'],['#/my-account','14-my-account']])await routeCapture(route,name);
+await routeCapture('#/prospect?borough=Manhattan&minScore=70','15-prospect-manhattan-priority',false);
+for(const id of ['2000012577','2000000855','2000015564']){
+await routeCapture('#/account/'+id,'16-account-'+id);
+for(const [selector,label,height] of [['.sales-precall-pack','sales',2200],['.technician-field-pack','field',1700],['.planimetric-section','roof',1500],['.account-decision-summary','decision',1000],['.property-enforcement-section','enforcement',1500],['.domestic-water-section','domestic',2000]])if(await page.locator(selector).count())await shot('16-'+id+'-'+label,selector,height);
+const nav=page.locator('.account-section-navigator');if(await nav.count()){const buttons=await nav.locator('button').allTextContents();write('states/16-'+id+'-navigator.json',buttons);}
+}
+await go('#/companies');
+for(const text of ['THE METRO GROUP INC','ROCHESTER MIDLAND']){try{await go('#/companies');const row=page.locator('tr').filter({hasText:new RegExp(text,'i')}).first();if(await row.count()){await row.click();await settled();await shot('17-company-'+slug(text),null,6200);await shot('17-company-'+slug(text)+'-viewport',null,1000);}}catch(e){manifest.errors.push({company:text,error:String(e)});}}
+await go('#/workflow');
+for(const label of ['Table','Map','Map + table']){const b=page.locator('.workflow-account-view-toggle').getByRole('button',{name:label,exact:true});if(await b.count()){await b.click();await shot('18-workflow-view-'+slug(label),null,3500);}}
+for(const label of ['RMC','ArcNY']){const b=page.locator('.workflow-watchlist-shortcuts button').filter({hasText:new RegExp(label,'i')}).first();if(await b.count()){await b.click();await shot('18-workflow-watchlist-'+slug(label),null,3500);}}
+for(const item of manifest.shots.filter(s=>/company/.test(s.name)&&!s.name.includes('viewport')).slice(0,2)){await go(item.url.replace(BASE,''));const first=page.locator('.firm-prospect-sites-table tbody tr').first();if(await first.count()){await first.click();await page.waitForTimeout(2000);await shot(item.name+'-selected-site',null,4200);}}
+const logo=await context.request.get(BASE+'marketing/towersignal-logo.webp');if(logo.ok()){const b=await logo.body();fs.writeFileSync(`${OUT}/assets/towersignal-logo.webp`,b);manifest.logo={url:BASE+'marketing/towersignal-logo.webp',sha256:hash(b)};}
+const scripts=await page.locator('script[src]').evaluateAll(es=>es.map(e=>e.src));for(const u of scripts){const r=await context.request.get(u);if(r.ok()){const b=await r.body();manifest.data.push({url:u,bytes:b.length,sha256:hash(b)});}}
+}catch(e){manifest.errors.push({fatal:String(e)});await shot('99-capture-blocker',null,1600);process.exitCode=1;}
+finally{await Promise.allSettled(pending);manifest.finished_at=new Date().toISOString();write('manifest.json',manifest);await browser.close();console.log(JSON.stringify({shots:manifest.shots.length,errors:manifest.errors.length,network_failures:manifest.network_failures.length}));}
