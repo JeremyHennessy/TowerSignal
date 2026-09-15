@@ -1,0 +1,33 @@
+name: Release obsolete Monitor proof queue
+on:
+  push:
+    branches: [work/monitor-obsolete-run-20260915]
+permissions:
+  contents: read
+  actions: write
+jobs:
+  cancel-obsolete-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Cancel only superseded candidate, never a production release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const old=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35035892286})).data;
+            const next=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35036588647})).data;
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/agent/nyc-monitor-format-20260915'})).data;
+            const path='.github/workflows/monitor-format-candidate.yml';
+            if(old.path!==path||old.head_sha!=='4a4477ecc4ed4852cf6cbcb8778bdd584a56f713'||next.path!==path||next.head_sha!=='d1549c62a850b8837af4bc55106e3eff285a04bd'||ref.object.sha!==next.head_sha) throw new Error('Candidate identity changed; no cancellation');
+            const proof={obsolete_run:old.id,obsolete_head:old.head_sha,obsolete_status:old.status,replacement_run:next.id,replacement_head:next.head_sha,reason:'Superseded after exact wrapped-label selector defect was independently reproduced. Replacement retains every UI/data assertion and reruns full proof.'};
+            if(old.status!=='completed') {
+              await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:old.id});
+              proof.cancellation_requested=true;
+            }
+            require('fs').writeFileSync('queue-repair.json',JSON.stringify(proof,null,2));
+            core.info(JSON.stringify(proof));
+      - uses: actions/upload-artifact@v4
+        with:
+          name: monitor-proof-queue-repair
+          path: queue-repair.json
+          retention-days: 7
