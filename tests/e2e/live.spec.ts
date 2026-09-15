@@ -85,7 +85,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
     await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
     await expect(page.locator('.account-table tbody tr').first().getByText(/ACRIS · \d+/)).toBeVisible()
     await page.locator('.account-table tbody tr').first().click()
-    if (isIphone) await expectAccountDetailHydrated(page)
+    await expectAccountDetailHydrated(page)
     await selectAccountMode(page, 'Evidence')
     await expectSectionText(page, testInfo, 'ACRIS property activity', [
       'relevant recorded document',
@@ -119,7 +119,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   await page.getByRole('button', { name: 'OATH cases', exact: true }).click()
   await expect(page.locator('.account-table tbody tr').first()).toBeVisible()
   await page.locator('.account-table tbody tr').first().click()
-  if (isIphone) await expectAccountDetailHydrated(page)
+  await expectAccountDetailHydrated(page)
   await expect(page.getByLabel('Selected cooling tower detail')).toBeVisible()
   await expect(page.locator('.account-decision-summary')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'What matters before the next action', exact: true })).toBeVisible()
