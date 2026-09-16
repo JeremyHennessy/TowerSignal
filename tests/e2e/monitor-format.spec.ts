@@ -1,15 +1,18 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
+import { devices } from '@playwright/test'
+import { installCandidateRoutes } from './candidate-routes'
 import { expect, test } from './fixtures'
 import { expectContained } from './iphone.helpers'
 
 const categories = ['All changes', 'High priority', 'Violations', 'OATH activity', 'DOB / permits', 'Sampling', 'Property / contact']
 
-test('every Monitor tab has readable source values, responsive tables and usable controls', async ({ page }, testInfo) => {
+test('every Monitor tab has readable source values, responsive tables and usable controls', async ({ page: initialPage, browser }, testInfo) => {
+  let page = initialPage
   test.setTimeout(300_000)
   const folder=testInfo.outputPath('monitor-format');mkdirSync(folder,{recursive:true})
   const states: Record<string,unknown>[]=[]
   await page.evaluate(()=>{location.hash='#/monitor'})
-  const monitor=page.getByRole('region',{name:'TowerSignal changes'})
+  let monitor=page.getByRole('region',{name:'TowerSignal changes'})
   await expect(monitor.locator('.change-reference-row').first()).toBeVisible()
   const original=page.viewportSize()!
   const widths=testInfo.project.name==='iphone'?[390,320]:[1280,1024,768,1440]
@@ -17,6 +20,8 @@ test('every Monitor tab has readable source values, responsive tables and usable
     await expectContained(page)
     const metrics=await monitor.evaluate(root=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,
       clipped:[...root.querySelectorAll('.monitor-open-link,.change-kind,.badge,.monitor-field-list dd')].filter(e=>e.getClientRects().length && e.scrollWidth>e.clientWidth+2).map(e=>e.textContent)}))
+    expect(metrics.width, `Actual layout viewport for ${name}`).toBe(page.viewportSize()!.width)
+    expect(metrics.scrollWidth, `Document viewport containment for ${name}`).toBeLessThanOrEqual(page.viewportSize()!.width + 2)
     expect(metrics.clipped,`Clipped Monitor content: ${name}`).toEqual([])
     const stem=name.replace(/[^a-zA-Z0-9]+/g,'-')
     await page.screenshot({path:`${folder}/${stem}.png`,scale:'css',animations:'disabled'})
@@ -24,7 +29,22 @@ test('every Monitor tab has readable source values, responsive tables and usable
     writeFileSync(`${folder}/manifest.json`,JSON.stringify({mode:process.env.CANDIDATE_ROOT?'CANDIDATE_NOT_HOSTED':'ACTUAL_HOSTED_NYC',code_sha:process.env.GITHUB_SHA,project:testInfo.project.name,states},null,2))
   }
   for(const width of widths){
-    await page.setViewportSize({width,height:original.height})
+    // The retained 320px failure followed resizing an already-rendered mobile
+    // context: innerWidth became 475 and captures went black. Set both screen
+    // and viewport before navigation in a fresh context; keep every assertion.
+    const narrowContext = testInfo.project.name === 'iphone' && width !== original.width
+      ? await browser.newContext({ ...devices['iPhone 13'], baseURL: String(testInfo.project.use.baseURL),
+          viewport: { width, height: original.height }, screen: { width, height: original.height },
+          storageState: await initialPage.context().storageState() }) : null
+    if (narrowContext) {
+      page = await narrowContext.newPage()
+      await installCandidateRoutes(page)
+      await page.goto('./#/monitor', { waitUntil: 'networkidle' })
+      monitor = page.getByRole('region', { name: 'TowerSignal changes' })
+      await expect(monitor.locator('.change-reference-row').first()).toBeVisible()
+    } else if (testInfo.project.name !== 'iphone') {
+      await page.setViewportSize({width,height:original.height})
+    }
     for(const category of categories){
       const tab=monitor.getByRole('tab',{name:new RegExp('^'+category.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*\\d')})
       await tab.click();await expect(tab).toHaveAttribute('aria-selected','true')
@@ -36,8 +56,13 @@ test('every Monitor tab has readable source values, responsive tables and usable
       await monitor.locator('.change-tabs').scrollIntoViewIfNeeded();await capture(`${width}-${category}-tabs`)
       await row.scrollIntoViewIfNeeded();await capture(`${width}-${category}-row`)
     }
+    if (narrowContext) {
+      await narrowContext.close()
+      page = initialPage
+      monitor = page.getByRole('region', { name: 'TowerSignal changes' })
+    }
   }
-  await page.setViewportSize(original)
+  if (testInfo.project.name !== 'iphone') await page.setViewportSize(original)
   for(const [type,required] of [['OATH_PENALTY_CHANGED','$'],['OATH_BALANCE_CHANGED','$'],['DOB_JOB_FILED','Job'],['LATEST_SAMPLE_CHANGED','Public sample date'],['HPD_CONTACT_ADDED','Business address']]){
     await monitor.getByLabel(/^Change type/).selectOption(type)
     const row=monitor.locator('.change-reference-row').first();await expect(row).toContainText(required)

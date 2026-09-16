@@ -19,7 +19,7 @@ SOURCE_FILES={
 'src/domain/monitorFields.ts':'15eba119ef8c3c81fd9166b73e0566f3417d21f4a1a00d9c7ce58ce5ee971f19',
 'src/styles/monitor-event-table.css':'868087a4efa50ca8c290435df772ec41049032178ac75915f25a716965dacafe',
  'tests/frontend/monitorFormatting.test.tsx':'f94d10c13352efb3ddf9a4936b47d1c308dd84e3d98e3880afd844283f9a7259',
- 'tests/e2e/monitor-format.spec.ts':'752148c950ef72cece50f8aa5eaf26e2175fa63abb0f3fae395c333b2d212c4d'}
+ 'tests/e2e/monitor-format.spec.ts':'4c93be8be28bb1b82db544ea7d26bae95f93f98fab30d780406800959035a26e'}
 
 def prepare(root,baseline,proof):
     for name,expected in SOURCE_FILES.items():
