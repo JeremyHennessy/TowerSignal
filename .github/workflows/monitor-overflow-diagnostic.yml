@@ -1,0 +1,32 @@
+name: Diagnose hosted Monitor iPhone overflow
+
+on:
+  push:
+    branches:
+      - agent/monitor-overflow-diagnostic-20260916
+    paths:
+      - tests/e2e/monitor-overflow-diagnostic.spec.ts
+      - .github/workflows/monitor-overflow-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install WebKit
+        run: npx playwright install --with-deps webkit
+      - name: Diagnose deployed Monitor layout
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          GITHUB_RUN_ID: monitor-overflow-diagnostic
+          GITHUB_RUN_ATTEMPT: 1
+        run: npx playwright test tests/e2e/monitor-overflow-diagnostic.spec.ts --project=iphone
