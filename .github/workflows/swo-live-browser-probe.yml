@@ -1,0 +1,88 @@
+name: Probe live SWO CSV through official browser context
+
+on:
+  push:
+    branches:
+      - agent/dobnow-swo-probe-20260916
+    paths:
+      - .github/workflows/swo-live-browser-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Fetch CSV from official map origin
+        run: |
+          mkdir -p probe-output
+          node --input-type=module <<'JS'
+          import { chromium } from '@playwright/test'
+          import fs from 'node:fs'
+          const browser = await chromium.launch({ headless: true })
+          const page = await browser.newPage()
+          const responses = []
+          page.on('response', r => {
+            if (r.url().includes('nyc.gov') || r.url().includes('SWOs_Issued')) responses.push({ url: r.url(), status: r.status(), type: r.headers()['content-type'] ?? null })
+          })
+          let result = { pageStatus: null, pageUrl: null, fetchStatus: null, error: null }
+          try {
+            const response = await page.goto('https://www.nyc.gov/assets/buildings/html/swo-map.html', { waitUntil: 'domcontentloaded', timeout: 90000 })
+            result.pageStatus = response?.status() ?? null
+            result.pageUrl = page.url()
+            await page.waitForTimeout(3000)
+            const payload = await page.evaluate(async () => {
+              const response = await fetch('data/SWOs_Issued_Rescinded_v2.csv', { cache: 'no-store' })
+              return { status: response.status, text: response.ok ? await response.text() : await response.text() }
+            })
+            result.fetchStatus = payload.status
+            if (payload.status === 200) fs.writeFileSync('probe-output/nyc-live.csv', payload.text)
+            else fs.writeFileSync('probe-output/fetch-body.txt', payload.text)
+            fs.writeFileSync('probe-output/page-text.txt', (await page.locator('body').innerText()).slice(0, 50000))
+            await page.screenshot({ path: 'probe-output/map.png', fullPage: true })
+          } catch (error) {
+            result.error = String(error)
+          } finally {
+            fs.writeFileSync('probe-output/browser-result.json', JSON.stringify({ ...result, responses }, null, 2))
+            await browser.close()
+          }
+          console.log(JSON.stringify(result))
+          JS
+      - name: Inspect live CSV if available
+        if: always()
+        run: |
+          python - <<'PY' | tee probe-output/freshness.json
+          import csv, hashlib, json
+          from collections import Counter
+          from datetime import datetime
+          from pathlib import Path
+          p=Path('probe-output/nyc-live.csv')
+          if not p.exists():
+              print(json.dumps({'available': False}, indent=2)); raise SystemExit(0)
+          raw=p.read_bytes(); rows=list(csv.DictReader(raw.decode('utf-8-sig').splitlines()))
+          dates=[]
+          for row in rows:
+              try: dates.append(datetime.strptime((row.get('Last Disposition Date') or '').strip(), '%m/%d/%Y').date())
+              except ValueError: pass
+          print(json.dumps({'available': True,'sha256':hashlib.sha256(raw).hexdigest(),'rows':len(rows),'min_date':min(dates).isoformat() if dates else None,'max_date':max(dates).isoformat() if dates else None,'statuses':dict(Counter((r.get('Disposition Category') or '').strip() for r in rows)),'unique_bins':len({(r.get('BIN') or '').strip() for r in rows if (r.get('BIN') or '').strip()})}, indent=2, sort_keys=True))
+          PY
+      - name: Upload retained browser proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: swo-live-browser-probe
+          path: probe-output/**
+          retention-days: 30
