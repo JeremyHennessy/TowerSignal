@@ -7,6 +7,65 @@ const number = new Intl.NumberFormat('en-US')
 const count = (value: number | null | undefined) => value == null ? 'Not reported' : number.format(value)
 const date = (value: unknown) => timestampOrNull(value) ? formatTimestamp(String(value)) : 'Not reported'
 
+const refreshContracts = [
+  {
+    source: 'Core NYC registry & building context',
+    cadence: 'Daily · 10:17 UTC',
+    path: 'Canonical Pages release',
+    scope: 'Cooling-tower registrations and inspections, MapPLUTO, DOB NOW, HPD registrations/contacts, building footprints and planimetric tower context.',
+    note: 'Live publisher queries are rebuilt daily. Historical publisher snapshots such as 2022 planimetrics keep their source-native observation date.',
+  },
+  {
+    source: 'Property enforcement',
+    cadence: 'Daily · 10:17 UTC',
+    path: 'Canonical Pages release',
+    scope: 'HPD violations, DOB SWO complaint/disposition evidence and FISP / Local Law 11 filings.',
+    note: 'Exact BBL/BIN attachment only. SWO evidence is not an active-order ledger; FISP is not a generic Labor Law feed.',
+  },
+  {
+    source: 'Legionnaires public-health intelligence',
+    cadence: 'Daily · 10:17 UTC',
+    path: 'Canonical Pages release + durable history',
+    scope: 'Official NYC/NYS Legionella and Legionnaires channels, including the NYC Health topic and alert/news channels.',
+    note: 'Current observations replace stable item identities while prior verified official items can be retained. ZIP context is not property attribution.',
+  },
+  {
+    source: 'Water, CMS, procurement & NYS support',
+    cadence: 'Daily · 10:17 UTC',
+    path: 'Canonical Pages release',
+    scope: 'Domestic-water, NYC water signals, CMS facilities, lead service lines, distribution water, City Record, NYS authorities, Open Book, NYCHA and NYS water-system sources.',
+    note: 'Each collector retains its own exact-identity and source-availability guard. A missing source remains unverified rather than becoming zero.',
+  },
+  {
+    source: 'ACRIS property activity',
+    cadence: 'Daily · 08:23 UTC',
+    path: 'Verified durable cache → daily Pages release',
+    scope: 'Bounded recent ACRIS activity for the current TowerSignal property universe.',
+    note: 'Built and independently sampled before persistence. The daily release rejects a cache older than 2 days.',
+  },
+  {
+    source: 'Checkbook NYC procurement',
+    cadence: 'Daily · 08:41 UTC',
+    path: 'Verified durable cache → daily Pages release',
+    scope: 'NYC Checkbook contract/vendor evidence used by procurement and company intelligence.',
+    note: 'Validated before persistence. The daily release rejects a cache older than 2 days.',
+  },
+  {
+    source: 'OATH lifecycle cache',
+    cadence: 'Every 6 hours · :23 UTC',
+    path: 'Verified durable history cache',
+    scope: 'OATH summons lifecycle evidence; current exact summons matches are also queried during the NYC production build.',
+    note: 'Six-hour refresh is intentionally stronger than the daily minimum.',
+  },
+  {
+    source: 'Historical 311 building-water context',
+    cadence: 'Daily · 10:17 UTC',
+    path: 'Canonical Pages release',
+    scope: '2010–2024 DEP water/lead service requests aggregated immediately by exact current TowerSignal BBL.',
+    note: 'Recomputed daily for identity coverage, but the evidence remains historical and never becomes a current-condition or current-sales trigger.',
+  },
+] as const
+
 function SourceLink({ url, label = 'Official source' }: { url: unknown; label?: string }) {
   const href = safeSourceUrl(url)
   return href ? <a href={href} target="_blank" rel="noreferrer">{label}</a> : <span>Source link not reported</span>
@@ -45,6 +104,20 @@ export function SourceHealthExpansion({ payload }: { payload: SystemsPayload }) 
         </tr>)}
       </tbody></table></div>
       <div className="disclaimer"><strong>Evidence gaps remain explicit.</strong> HPD registration/contact coverage is a different source from HPD violations. SWO complaint dispositions do not establish whether an order is currently active. Generic Labor Law court filings are not supplied by FISP. A missing match is not proof of no violation, no filing or no enforcement.</div>
+    </div>
+
+    <div className="reference-table-card" data-testid="source-refresh-coverage">
+      <div className="reference-table-heading"><div><strong>Production refresh coverage</strong><span>One canonical daily NYC release, with durable high-cost caches refreshed ahead of it and OATH refreshed more frequently.</span></div></div>
+      <div className="disclaimer"><strong>Refresh time is not source observation time.</strong> A daily rebuild means TowerSignal checks the publisher or verified cache again; it does not make a historical source snapshot current. The 10:17 UTC production release is the deployment gate: source collection, validation, application build, hosted desktop/iPhone verification and history persistence must all succeed.</div>
+      <div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Source family</th><th>Refresh cadence</th><th>Production path</th><th>Coverage</th><th>Operational boundary</th></tr></thead><tbody>
+        {refreshContracts.map(contract => <tr key={contract.source}>
+          <td><strong>{contract.source}</strong></td>
+          <td><span className="health-badge">{contract.cadence}</span></td>
+          <td>{contract.path}</td>
+          <td>{contract.scope}</td>
+          <td>{contract.note}</td>
+        </tr>)}
+      </tbody></table></div>
     </div>
 
     <div className="reference-table-card" data-testid="legionella-source-health">
