@@ -1,0 +1,72 @@
+name: Diagnose Monitor WebKit viewport without production changes
+on:
+  push:
+    branches: [work/monitor-fixed-viewport-20260916]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  fixed-viewport:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d1549c62a850b8837af4bc55106e3eff285a04bd
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preserve exact source before diagnostic-only edits
+        run: |
+          mkdir -p diagnostics
+          git archive --format=zip HEAD > diagnostics/source.zip
+          git rev-parse HEAD > diagnostics/source-sha.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: nyc-evidence-tested-candidate
+          run-id: 35032234529
+          github-token: ${{ github.token }}
+          path: .baseline/archive
+      - name: Build unchanged candidate UI against unchanged accepted runtime data
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+          mkdir -p .baseline/site
+          tar -xzf .baseline/archive/candidate.tgz -C .baseline/site
+          cp -a .baseline/site/data/. dist/data/
+          tar -czf diagnostics/test-dependencies.tar.gz node_modules
+      - name: Set phone dimensions before context creation, preserving every assertion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/e2e/monitor-format.spec.ts');text=p.read_text()
+          old="const categories ="
+          assert text.count(old)==1
+          text=text.replace(old,"test.use({ viewport: { width: 320, height: 844 }, screen: { width: 320, height: 844 } })\n\n"+old)
+          old="const widths=testInfo.project.name==='iphone'?[390,320]:[1280,1024,768,1440]"
+          assert text.count(old)==1
+          text=text.replace(old,'const widths=[320]')
+          text=text.replace('await page.setViewportSize({width,height:original.height})','expect(page.viewportSize()?.width).toBe(width)')
+          text=text.replace('await page.setViewportSize(original)','expect(page.viewportSize()).toEqual(original)')
+          text=text.replace('await expectContained(page)\n    const metrics=', 'await expectContained(page)\n    expect(await page.evaluate(() => innerWidth)).toBe(320)\n    const metrics=')
+          p.write_text(text)
+          Path('diagnostics/test-under-review.ts').write_text(text)
+          PY
+      - run: npx playwright install --with-deps webkit
+      - name: Test all seven Monitor tabs and controls in a fresh fixed 320-pixel iPhone context
+        env:
+          CANDIDATE_ROOT: dist
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/monitor-format.spec.ts --project=iphone
+      - name: Preserve narrow diagnostic screenshots, results and unchanged source bytes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitor-fixed-viewport-diagnostic
+          path: |
+            diagnostics/
+            playwright-report/
+            test-results/
+            !test-results/.auth/**
+          retention-days: 7
