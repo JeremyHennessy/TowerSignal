@@ -88,6 +88,22 @@ jobs:
       - name: Fetch, validate and generate current NYC data
         timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
+      - name: Build NYC property-enforcement cache
+        timeout-minutes: 25
+        run: python scripts/build_property_enforcement_cache.py --systems public/data/systems.json --output public/data/property-enforcement.json
+      - name: Validate NYC property-enforcement cache
+        run: python scripts/validate_property_enforcement_cache.py --cache public/data/property-enforcement.json --max-age-days 1 --require-production-universe
+      - name: Attach exact-key NYC property-enforcement context
+        run: python scripts/attach_property_enforcement.py --output public/data --cache public/data/property-enforcement.json
+      - name: Build official Legionella / Legionnaires intelligence cache
+        run: |
+          if [ -f .history-store/data/history/legionella-alerts.json ]; then
+            python scripts/build_legionella_alert_cache.py --output public/data/legionella-alerts.json --previous-cache .history-store/data/history/legionella-alerts.json
+          else
+            python scripts/build_legionella_alert_cache.py --output public/data/legionella-alerts.json
+          fi
+      - name: Validate official Legionella / Legionnaires intelligence cache
+        run: python scripts/validate_legionella_alert_cache.py --cache public/data/legionella-alerts.json --max-age-days 1 --require-clean-retrieval
       - name: Build bounded legacy DOB/BIS project context
         timeout-minutes: 15
         run: python scripts/build_legacy_dob_project_cache.py --output public/data
@@ -252,6 +268,13 @@ jobs:
           --summary public/data/nys-service-line-inventory-summary.json
           --max-age-days 1
           --require-production-volume
+      - name: Build bounded NYC historical 311 building-water context
+        timeout-minutes: 20
+        run: python scripts/build_historical_311_context.py --systems public/data/systems.json --output public/data/historical-311-context.json
+      - name: Validate bounded NYC historical 311 context
+        run: python scripts/validate_historical_311_context.py --cache public/data/historical-311-context.json --require-production-volume
+      - name: Attach exact-BBL NYC historical 311 context
+        run: python scripts/attach_historical_311_context.py --output public/data --cache public/data/historical-311-context.json
       - name: Build and validate source-health coverage
         run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Attach domestic-water source health
@@ -266,12 +289,27 @@ jobs:
         run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
       - name: Validate durable NYS history size and growth
         run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
+      - name: Build NYC/NYS source completeness audit
+        run: python scripts/build_coverage_audit.py --output public/data
+      - name: Validate NYC/NYS source completeness audit
+        run: python scripts/validate_coverage_audit.py --report public/data/coverage-audit.json
       - name: Independently verify generated systems and OATH cases against current NYC sources
         run: python scripts/verify_live_data.py --sample-size 5
       - name: Independently verify generated domestic-water context against current sources
         run: python scripts/verify_live_domestic_water.py --output public/data --sample-size 3
       - name: Independently verify generated NYS equipment against current NYS source
         run: python scripts/verify_live_nys.py --sample-size 5
+      - name: Install official-results PDF text reader
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
+      - name: Match official Legionnaires findings to the final NYC registry
+        timeout-minutes: 10
+        run: python scripts/build_legionella_matches.py --data public/data
+      - name: Apply reviewed NYC research-priority and account building evidence
+        run: python scripts/attach_reviewed_intelligence.py --output public/data
+      - name: Validate every NYC score and account evidence link
+        run: python scripts/validate_reviewed_intelligence.py --output public/data
       - name: Python fixture tests
         run: python -m unittest discover -s tests/python -p 'test_*.py' -v
       - name: Lint frontend
