@@ -28,12 +28,20 @@ PAGES_WORKFLOW = 339705737
 DATA_WORKFLOW = '.github/workflows/azure-data-refresh.yml'
 DATA_KIND = 'data-only'
 
+# These are runtime contract files, not merely convenient examples. An otherwise
+# valid Blob release that omits one of these sources is unsafe for a UI-only Pages
+# deployment because materialization replaces the entire dist/data directory.
 REQUIRED = (
     'systems.json',
     'changes.json',
     'nys-systems.json',
     'nys-changes.json',
     'source-health.json',
+    'property-enforcement.json',
+    'legionella-alerts.json',
+    'legionella-property-matches.json',
+    'historical-311-context.json',
+    'coverage-audit.json',
 )
 
 
