@@ -252,10 +252,6 @@ jobs:
         run: python scripts/attach_domestic_water_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Attach ACRIS cache health and freshness
         run: python scripts/attach_acris_health.py --output public/data
-      - name: Build NYC/NYS source completeness audit
-        run: python scripts/build_coverage_audit.py --output public/data
-      - name: Validate NYC/NYS source completeness audit
-        run: python scripts/validate_coverage_audit.py --report public/data/coverage-audit.json
       - name: Build deterministic NYC historical changes
         run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
       - name: Build deterministic NYS historical changes
@@ -264,6 +260,10 @@ jobs:
         run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
       - name: Validate durable NYS history size and growth
         run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
+      - name: Build NYC/NYS source completeness audit
+        run: python scripts/build_coverage_audit.py --output public/data
+      - name: Validate NYC/NYS source completeness audit
+        run: python scripts/validate_coverage_audit.py --report public/data/coverage-audit.json
       - name: Independently verify generated systems and OATH cases against current NYC sources
         run: python scripts/verify_live_data.py --sample-size 5
       - name: Independently verify generated domestic-water context against current sources
