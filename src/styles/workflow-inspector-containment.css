@@ -1,0 +1,101 @@
+/* Final scoped containment for the NYC Workflow command center.
+   This layer fixes presentation only: no workflow state, data, scoring or persistence semantics. */
+
+.workflow-command-grid{
+  grid-template-columns:minmax(0,1fr) minmax(320px,360px);
+  gap:16px;
+  min-width:0;
+}
+.workflow-command-grid>*{min-width:0;max-width:100%}
+.workflow-command-primary{min-width:0;max-width:100%;overflow:hidden}
+.workflow-command-table-card{min-width:0;max-width:100%;overflow:hidden}
+.workflow-command-table-card .table-scroll{
+  width:100%;
+  max-width:100%;
+  overflow:auto;
+  overscroll-behavior-inline:contain;
+  scrollbar-gutter:stable;
+}
+
+/* The account table has ten columns including selection and open-account controls.
+   Older widths were offset by the leading checkbox, which squeezed Watchlists and let
+   the table paint into the inspector column. Keep the complete table inside its scroll port. */
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(1),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(1){width:4%}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(2),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(2){width:22%}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(3),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(3){width:10%}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(4),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(4){width:12%}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(5),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(5){width:10%}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(6),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(6){width:18%}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(7),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(7){width:6%;text-align:center}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(8),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(8){width:7%;text-align:center}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(9),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(9){width:8%}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) th:nth-child(10),
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) td:nth-child(10){width:3%;padding-left:3px;padding-right:3px;text-align:center}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) .workflow-select-cell{width:4%;min-width:34px}
+.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) .row-arrow{min-width:30px}
+
+.workflow-account-inspector{
+  box-sizing:border-box;
+  width:100%;
+  max-width:360px;
+  max-height:calc(100vh - 112px);
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  align-self:start;
+  z-index:1;
+}
+.workflow-account-inspector>*{min-width:0;max-width:100%}
+.workflow-account-inspector :is(input,select,textarea,button){max-width:100%;box-sizing:border-box}
+.workflow-account-inspector textarea{width:100%;min-height:68px;resize:vertical}
+.workflow-account-inspector .workflow-watchlist-picker label{min-width:0;overflow-wrap:anywhere}
+.workflow-account-inspector .workflow-watchlist-picker span{min-width:0;overflow-wrap:anywhere}
+.workflow-inspector-boundary{
+  margin:0;
+  padding-top:10px;
+  border-top:1px solid var(--ts-line);
+  color:var(--ts-muted);
+  font-size:8px;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+.workflow-inspector-note{min-width:0}
+.workflow-inspector-note p{margin:4px 0 0;font-size:9px;line-height:1.5;overflow-wrap:anywhere}
+.workflow-open-full{min-height:34px}
+
+/* Below a comfortable desktop table width, keep inspector in normal flow instead of
+   squeezing the ten-column command table into a narrow adjacent track. */
+@media(max-width:1280px){
+  .workflow-command-grid{grid-template-columns:minmax(0,1fr)}
+  .workflow-account-inspector{
+    position:static;
+    top:auto;
+    width:100%;
+    max-width:none;
+    max-height:none;
+    overflow:visible;
+    scrollbar-gutter:auto;
+  }
+  .workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table){min-width:980px}
+}
+
+@media(max-width:700px){
+  .workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table){min-width:820px}
+  .workflow-account-inspector{padding:12px}
+  .workflow-inspector-boundary{font-size:9px}
+}
+
+@media(max-width:430px){
+  .workflow-account-inspector{padding:11px}
+  .workflow-inspector-head>div>strong{font-size:13px}
+}
