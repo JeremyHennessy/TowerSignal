@@ -1,0 +1,64 @@
+name: Probe live NYC.gov SWO CSV freshness
+
+on:
+  push:
+    branches:
+      - agent/dobnow-swo-probe-20260916
+    paths:
+      - .github/workflows/swo-live-csv-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch deployed and repository SWO sources
+        run: |
+          mkdir -p probe-output
+          curl --fail --location --retry 3 --connect-timeout 20 --max-time 120 -D probe-output/nyc-headers.txt -o probe-output/nyc-live.csv 'https://www.nyc.gov/assets/buildings/html/data/SWOs_Issued_Rescinded_v2.csv'
+          curl --fail --location --retry 3 --connect-timeout 20 --max-time 120 -o probe-output/github.csv 'https://raw.githubusercontent.com/NYCDOB/SWOs_Issued_Rescinded/gh-pages/data/SWOs_Issued_Rescinded_v2.csv'
+          sha256sum probe-output/nyc-live.csv probe-output/github.csv | tee probe-output/sha256.txt
+      - name: Inspect freshness, window and status semantics
+        run: |
+          python - <<'PY' | tee probe-output/summary.json
+          import csv, hashlib, json
+          from collections import Counter
+          from datetime import datetime
+          from pathlib import Path
+
+          def inspect(path):
+              raw = Path(path).read_bytes()
+              rows = list(csv.DictReader(raw.decode('utf-8-sig').splitlines()))
+              dates=[]
+              for row in rows:
+                  value=(row.get('Last Disposition Date') or '').strip()
+                  if value:
+                      try: dates.append(datetime.strptime(value, '%m/%d/%Y').date())
+                      except ValueError: pass
+              return {
+                  'sha256': hashlib.sha256(raw).hexdigest(),
+                  'rows': len(rows),
+                  'min_last_disposition_date': min(dates).isoformat() if dates else None,
+                  'max_last_disposition_date': max(dates).isoformat() if dates else None,
+                  'status_counts': dict(Counter((row.get('Disposition Category') or '').strip() for row in rows)),
+                  'disposition_code_counts': dict(Counter((row.get('Disposition Code Description') or '').strip() for row in rows).most_common(12)),
+                  'unique_bins': len({(row.get('BIN') or '').strip() for row in rows if (row.get('BIN') or '').strip()}),
+              }
+
+          live=inspect('probe-output/nyc-live.csv')
+          repo=inspect('probe-output/github.csv')
+          print(json.dumps({'nyc_live': live, 'github_snapshot': repo, 'byte_identical': live['sha256']==repo['sha256']}, indent=2, sort_keys=True))
+          PY
+      - name: Upload retained source proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: swo-live-source-probe
+          path: probe-output/**
+          retention-days: 30
