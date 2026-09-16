@@ -8,7 +8,7 @@ permissions:
 jobs:
   fixed-viewport:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,45 +23,56 @@ jobs:
           run-id: 35032234529
           github-token: ${{ github.token }}
           path: .baseline/archive
-      - name: Test one isolated CSS hypothesis and retain stricter viewport checks
-        run: |
-          mkdir -p diagnostics
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('src/styles/monitor-event-table.css')
-          p.write_text(p.read_text()+'\n/* Hidden mobile headings must not retain desktop sticky positioning. */\n@media(max-width:900px){.monitor-change-table-card .change-reference-table thead th{position:static}}\n')
-          p=Path('tests/e2e/monitor-format.spec.ts');text=p.read_text()
-          text=text.replace('await expectContained(page)\n    const metrics=', 'await expectContained(page)\n    expect(await page.evaluate(() => innerWidth)).toBe(page.viewportSize()!.width)\n    const metrics=')
-          p.write_text(text)
-          fixed=text.replace('const categories =','test.use({ viewport: { width: 320, height: 844 }, screen: { width: 320, height: 844 } })\n\nconst categories =')
-          fixed=fixed.replace("const widths=testInfo.project.name==='iphone'?[390,320]:[1280,1024,768,1440]",'const widths=[320]')
-          fixed=fixed.replace('await page.setViewportSize({width,height:original.height})','expect(page.viewportSize()?.width).toBe(width)').replace('await page.setViewportSize(original)','expect(page.viewportSize()).toEqual(original)')
-          Path('tests/e2e/monitor-fixed320.spec.ts').write_text(fixed)
-          Path('diagnostics/fixed320-test.ts').write_text(fixed)
-          Path('diagnostics/resize-test.ts').write_text(text)
-          PY
-          git diff > diagnostics/isolated-change.diff
-      - name: Build candidate UI with only the hidden-header correction
+      - name: Build unchanged candidate; do not retain the failed sticky-header experiment
         run: |
           npm install --no-audit --no-fund
           npm run build
-          mkdir -p .baseline/site
+          mkdir -p .baseline/site diagnostics
           tar -xzf .baseline/archive/candidate.tgz -C .baseline/site
           cp -a .baseline/site/data/. dist/data/
+          git diff --exit-code -- src
+      - name: Isolate the hidden header in an ephemeral browser DOM, not in application source
+        run: |
+          cat > tests/e2e/monitor-header-isolation.spec.ts <<'TS'
+          import {writeFileSync} from 'node:fs'
+          import {expect,test} from './fixtures'
+          test.use({viewport:{width:320,height:844},screen:{width:320,height:844}})
+          test('isolate whether the hidden header causes the filter transition failure',async({page})=>{
+            test.setTimeout(90000)
+            const states:unknown[]=[]
+            async function capture(name:string){
+              const data=await page.evaluate(()=>{
+                const box=(e:Element)=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {tag:e.tagName,cls:e.className,text:(e.textContent||'').slice(0,80),x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,scrollWidth:e.scrollWidth,scrollHeight:e.scrollHeight,position:s.position,overflow:s.overflow,transform:s.transform,contain:s.contain}}
+                return {innerWidth,bodyWidth:document.body.scrollWidth,documentWidth:document.documentElement.scrollWidth,viewport:visualViewport?{width:visualViewport.width,scale:visualViewport.scale}:null,containers:[...document.querySelectorAll('body,#root,.reference-main,.product-page,.change-table-workspace,.reference-table-card,.monitor-event-scroll,.change-reference-table,thead,tbody')].map(box),outside:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return e.getClientRects().length&&r.width>0&&(r.right>322||r.x< -2)}).slice(0,80).map(box)}
+              })
+              states.push({name,data});writeFileSync('diagnostics/header-isolation.json',JSON.stringify(states,null,2))
+              await page.screenshot({path:`diagnostics/${name}.png`,scale:'css',animations:'disabled',timeout:10000})
+              expect(data.innerWidth).toBe(320);expect(data.bodyWidth).toBeLessThanOrEqual(322)
+            }
+            await page.evaluate(()=>{location.hash='#/monitor'})
+            const monitor=page.getByRole('region',{name:'TowerSignal changes'})
+            await expect(monitor.locator('.change-reference-row').first()).toBeVisible()
+            await monitor.locator('thead').evaluate(e=>e.remove())
+            await expect(monitor.locator('thead')).toHaveCount(0)
+            await monitor.getByRole('tab',{name:/^Property \/ contact/}).click()
+            await monitor.locator('.change-reference-row').first().scrollIntoViewIfNeeded()
+            await capture('header-absent-before-selection')
+            await monitor.getByLabel(/^Change type/).selectOption('OATH_PENALTY_CHANGED')
+            await expect(monitor.locator('.change-reference-row').first()).toContainText('$')
+            await monitor.locator('.change-reference-row').first().scrollIntoViewIfNeeded()
+            await capture('header-absent-after-selection')
+          })
+          TS
       - run: npx playwright install --with-deps webkit
-      - name: Verify fresh 320px and original 390-to-320px tests without weaker assertions
+      - name: Run single diagnostic with original source and styles
         env:
           CANDIDATE_ROOT: dist
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-        run: npx playwright test tests/e2e/monitor-format.spec.ts tests/e2e/monitor-fixed320.spec.ts --project=iphone
-      - name: Retain complete diagnostic screenshots and assertions
+        run: npx playwright test tests/e2e/monitor-header-isolation.spec.ts --project=iphone
+      - name: Retain geometry and images; this run cannot deploy
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: monitor-hidden-header-proof
-          path: |
-            diagnostics/
-            playwright-report/
-            test-results/
-            !test-results/.auth/**
+          name: monitor-header-isolation
+          path: diagnostics/
           retention-days: 7
