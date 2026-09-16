@@ -36,11 +36,15 @@ class DailySourceRefreshWorkflowTests(unittest.TestCase):
         self.assertLess(self.pages.index(validate), self.pages.index(attach))
         self.assertLess(self.pages.index(attach), self.pages.index(source_health))
 
-    def test_daily_pages_publishes_validated_coverage_audit(self):
+    def test_daily_pages_publishes_validated_coverage_audit_after_current_history(self):
         build = 'python scripts/build_coverage_audit.py --output public/data'
         validate = 'python scripts/validate_coverage_audit.py --report public/data/coverage-audit.json'
-        self.assertIn(build, self.pages)
-        self.assertIn(validate, self.pages)
+        history = 'python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json'
+        history_validate = 'python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json'
+        for command in (build, validate, history, history_validate):
+            self.assertIn(command, self.pages)
+        self.assertLess(self.pages.index(history), self.pages.index(history_validate))
+        self.assertLess(self.pages.index(history_validate), self.pages.index(build))
         self.assertLess(self.pages.index(build), self.pages.index(validate))
         self.assertLess(self.pages.index('python scripts/attach_acris_health.py --output public/data'), self.pages.index(build))
 
