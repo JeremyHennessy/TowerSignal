@@ -25,6 +25,17 @@ class DailySourceRefreshWorkflowTests(unittest.TestCase):
         )
         self.assertNotIn("if: ${{ github.event_name != 'pull_request' }}\n    needs: persist-cache\n    runs-on: ubuntu-latest\n    steps:\n      - name: Deploy product with last verified ACRIS cache", self.acris)
 
+    def test_acris_pr_integration_builds_legacy_dob_before_source_health(self):
+        build = 'python scripts/build_legacy_dob_project_cache.py --output public/data'
+        validate = 'python scripts/validate_legacy_dob_project_cache.py --cache public/data/legacy-dob-projects.json --max-age-days 1 --require-production-volume'
+        attach = 'python scripts/attach_legacy_dob_project_context.py --output public/data --cache public/data/legacy-dob-projects.json'
+        source_health = 'python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json'
+        for command in (build, validate, attach, source_health):
+            self.assertIn(command, self.acris)
+        self.assertLess(self.acris.index(build), self.acris.index(validate))
+        self.assertLess(self.acris.index(validate), self.acris.index(attach))
+        self.assertLess(self.acris.index(attach), self.acris.index(source_health))
+
     def test_daily_pages_builds_and_attaches_historical_311_before_source_health(self):
         build = 'python scripts/build_historical_311_context.py --systems public/data/systems.json --output public/data/historical-311-context.json'
         validate = 'python scripts/validate_historical_311_context.py --cache public/data/historical-311-context.json --require-production-volume'
