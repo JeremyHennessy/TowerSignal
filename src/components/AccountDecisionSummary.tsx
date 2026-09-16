@@ -3,28 +3,42 @@ import type { SystemDetail, SystemSummary } from '../types/data'
 import type { WorkflowAccountState } from '../types/workflow'
 import { formatDate, signalLabel } from '../domain/labels'
 
+const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
+
 function changeLabel(value: string) {
   return value.replaceAll('_', ' ').toLowerCase().replace(/(^|\s)\S/g, match => match.toUpperCase())
 }
 
-function contactLabel(detail: SystemDetail) {
-  const contacts = detail.hpd_registration?.contacts ?? []
-  const preferred = contacts.find(contact => /agent|head officer|corporate owner|individual owner/i.test(contact.type ?? '')) ?? contacts[0]
-  if (!preferred) return 'No public HPD contact match'
-  return preferred.corporation_name ?? preferred.person_name ?? preferred.description ?? preferred.type ?? 'HPD contact published'
-}
-
-function projectLabel(detail: SystemDetail) {
-  const jobs = detail.dob_activity_history ?? []
-  if (!jobs.length) return 'No exact-BBL DOB filing match'
-  const latest = jobs.find(job => job.activity_date)?.activity_date
-  return `${jobs.length.toLocaleString()} filing${jobs.length === 1 ? '' : 's'}${latest ? ` · latest ${formatDate(latest)}` : ''}`
-}
-
 function nextActionLabel(account: WorkflowAccountState | undefined) {
-  if (!account) return 'No private workflow state'
+  if (!account) return 'No private follow-up set'
   if (account.next_action_date) return `${formatDate(account.next_action_date)} · ${account.status}`
-  return `${account.status} · no date`
+  return `${account.status} · no follow-up date`
+}
+
+function latestViolation(detail: SystemDetail) {
+  const inspection = [...detail.inspection_history]
+    .filter(item => item.violation_count > 0)
+    .sort((left, right) => (right.inspection_date ?? '').localeCompare(left.inspection_date ?? ''))[0]
+  return { inspection, violation: inspection?.violations[0] }
+}
+
+function infrastructureSummary(detail: SystemDetail) {
+  const context = detail.nyc_lead_service_lines
+  const first = context?.records[0]
+  if (!context || context.summary.record_count === 0) {
+    return {
+      title: 'No exact-BBL NYC DEP service-line record',
+      detail: 'No service-line material is promoted into this account summary.',
+    }
+  }
+  const materials = Object.entries(context.summary.material_counts)
+    .filter(([, count]) => count > 0)
+    .map(([material, count]) => `${material}${count > 1 ? ` ×${count}` : ''}`)
+    .join(' · ')
+  return {
+    title: `${materials || 'Material published'} · NYC DEP service line`,
+    detail: `${context.summary.record_count.toLocaleString()} exact-BBL record${context.summary.record_count === 1 ? '' : 's'}${first?.record_type ? ` · ${first.record_type}` : ''}${first?.city_owned ? ` · city-owned ${first.city_owned}` : ''}`,
+  }
 }
 
 export function AccountDecisionSummary({
@@ -39,24 +53,41 @@ export function AccountDecisionSummary({
   workflowAccount?: WorkflowAccountState
 }) {
   const latestChange = [...historyEvents].sort((a, b) => b.detected_at.localeCompare(a.detected_at))[0]
-  const whyNow = row.recent_confirmed_violation
-    ? `Confirmed recent violation · ${signalLabel(row.primary_signal)}`
-    : signalLabel(row.primary_signal)
   const scoreDrivers = row.score_components.slice(0, 4)
+  const violationEvidence = latestViolation(detail)
+  const violationDate = violationEvidence.inspection?.inspection_date ?? row.latest_violation_date
+  const violationText = violationEvidence.violation?.violation_text
+    ?? violationEvidence.violation?.citation_text
+    ?? row.violation_types[0]
+    ?? 'Published NYC Health inspection evidence supports the current violation signal.'
+  const mappedTowers = detail.planimetric_building_tower_features?.length ?? row.planimetric_building_tower_count ?? 0
+  const buildingOutlines = detail.building_footprints?.length ?? row.building_footprint_count ?? 0
+  const buildingArea = detail.building_context?.building_area_sqft ?? row.pluto_building_area_sqft ?? null
+  const sampleCount = detail.sample_history.sample_count
+  const inspectionCount = detail.inspection_history.length
+  const owner = detail.building_context?.owner_name ?? row.pluto_owner_name ?? null
+  const infrastructure = infrastructureSummary(detail)
+  const whyNow = row.recent_confirmed_violation ? 'Confirmed recent violation' : signalLabel(row.primary_signal)
 
   return <section className="account-decision-summary" aria-labelledby="account-decision-summary-title">
     <div className="account-decision-head">
-      <div><span className="page-kicker">Account decision summary</span><h3 id="account-decision-summary-title">What matters before the next action</h3><p>One operating layer above the source evidence. Every conclusion below stays tied to the current public snapshot or private workflow state.</p></div>
+      <div><span className="page-kicker">Account decision summary</span><h3 id="account-decision-summary-title">What matters before the next action</h3><p>Current source-backed view of compliance timing, physical scale, sampling, property identity and private follow-up. Missing source matches stay explicit instead of being inferred.</p></div>
       <div className="account-decision-score"><strong>{row.priority_score}</strong><span>Priority</span><small>{row.evidence_confidence.replaceAll('_', ' ')}</small></div>
     </div>
 
-    <div className="account-decision-grid">
-      <article className="urgent"><small>Why now</small><strong>{whyNow}</strong><span>{row.days_since_latest_sample == null ? 'Sampling age unavailable' : `${row.days_since_latest_sample.toLocaleString()} days since latest public sample`}</span></article>
-      <article><small>Account scale</small><strong>{row.active_equipment.toLocaleString()} active unit{row.active_equipment === 1 ? '' : 's'}</strong><span>{row.planimetric_building_tower_count ? `${row.planimetric_building_tower_count} mapped roof footprint${row.planimetric_building_tower_count === 1 ? '' : 's'}` : 'No mapped roof footprint in current summary'}</span></article>
-      <article><small>Recent change</small><strong>{historyEvents.length ? `${historyEvents.length} observed change${historyEvents.length === 1 ? '' : 's'}` : 'No preserved recent change'}</strong><span>{latestChange ? `${changeLabel(latestChange.event_type)} · ${formatDate(latestChange.detected_at)}` : 'No TowerSignal change in the current history set'}</span></article>
-      <article><small>Contact path</small><strong>{contactLabel(detail)}</strong><span>{(detail.hpd_registration?.contacts.length ?? 0).toLocaleString()} published HPD contact row{detail.hpd_registration?.contacts.length === 1 ? '' : 's'}</span></article>
-      <article><small>Project activity</small><strong>{projectLabel(detail)}</strong><span>{row.dob_recent_activity_count ? `${row.dob_recent_activity_count} recent lifecycle update${row.dob_recent_activity_count === 1 ? '' : 's'}` : 'No recent lifecycle update in summary'}</span></article>
-      <article><small>Next action</small><strong>{nextActionLabel(workflowAccount)}</strong><span>{workflowAccount?.note ? workflowAccount.note : 'Use Workflow to set private follow-up context'}</span></article>
+    <div className="account-decision-grid account-decision-evidence-grid">
+      <article className="urgent"><small>Compliance trigger</small><strong>{violationDate ? `${whyNow} · ${formatDate(violationDate)}` : whyNow}</strong><span>{violationText}</span></article>
+      <article><small>Cooling-tower footprint</small><strong>{row.active_equipment.toLocaleString()} registered unit{row.active_equipment === 1 ? '' : 's'} · {mappedTowers.toLocaleString()} mapped footprint{mappedTowers === 1 ? '' : 's'}</strong><span>{buildingOutlines ? `${buildingOutlines.toLocaleString()} exact-BIN building outline${buildingOutlines === 1 ? '' : 's'}` : 'No mapped building outline'}{buildingArea ? ` · ${number.format(buildingArea)} sq ft PLUTO building` : ''}</span></article>
+      <article><small>Sampling &amp; inspections</small><strong>{detail.sample_history.latest_sample_date ? `Latest sample ${formatDate(detail.sample_history.latest_sample_date)}` : 'Latest sample date unavailable'}</strong><span>{sampleCount.toLocaleString()} reported sample date{sampleCount === 1 ? '' : 's'}{detail.sample_history.latest_sample_interval_days != null ? ` · ${detail.sample_history.latest_sample_interval_days.toLocaleString()}-day latest interval` : ''} · {inspectionCount.toLocaleString()} NYC Health inspection{inspectionCount === 1 ? '' : 's'}</span></article>
+      <article><small>Property identity</small><strong>{owner ?? (detail.identity.bbl ? `BBL ${detail.identity.bbl}` : 'No exact property identity')}</strong><span>{detail.identity.bbl ? `BBL ${detail.identity.bbl} · NYC DCP PLUTO context` : 'TowerSignal does not infer a parcel when no exact source identity is available.'}</span></article>
+      <article><small>Infrastructure evidence</small><strong>{infrastructure.title}</strong><span>{infrastructure.detail}</span></article>
+      <article><small>Next action</small><strong>{nextActionLabel(workflowAccount)}</strong><span>{workflowAccount?.note ? workflowAccount.note : 'Use Summary workflow controls to set private disposition, notes and follow-up timing.'}</span></article>
+    </div>
+
+    <div className="account-decision-context" aria-label="Account evidence context">
+      <span><strong>{historyEvents.length.toLocaleString()}</strong> preserved TowerSignal change{historyEvents.length === 1 ? '' : 's'}{latestChange ? ` · latest ${changeLabel(latestChange.event_type)} ${formatDate(latestChange.detected_at)}` : ''}</span>
+      <span><strong>{(detail.hpd_registration?.contacts.length ?? 0).toLocaleString()}</strong> exact-match HPD contact row{detail.hpd_registration?.contacts.length === 1 ? '' : 's'}</span>
+      <span><strong>{(detail.dob_activity_history?.length ?? 0).toLocaleString()}</strong> exact-BBL DOB filing{detail.dob_activity_history?.length === 1 ? '' : 's'}</span>
     </div>
 
     <div className="account-score-drivers">
