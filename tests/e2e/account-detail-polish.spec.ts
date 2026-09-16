@@ -66,7 +66,7 @@ test('desktop account detail uses tab-owned content, modern navigation and a ful
   await expect(morePanel).toBeVisible()
   await expect(morePanel).toContainText('More workspaces')
   await expect(morePanel).toContainText('Providers, labs, vendors and project firms')
-  await detail.locator('.detail-header').click()
+  await page.locator('body').dispatchEvent('pointerdown')
   await expect(morePanel).toBeHidden()
 
   await expect(detail.locator('.account-decision-summary')).toBeVisible()
