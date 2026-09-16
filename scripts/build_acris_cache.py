@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.acris import build_recent_cache, normalize_bbl, validate_cache_file  # noqa: E402
+from towersignal.bbl_identity import apply_bbl_identity_recovery  # noqa: E402
+from towersignal.building_footprints import fetch_building_footprints_by_bin  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
 
@@ -40,7 +42,14 @@ def tower_bbls_from_current_registrations() -> set[str]:
         raise RuntimeError(
             f"Refusing to build production ACRIS cache from only {len(systems):,} normalized current systems"
         )
-    return _tower_bbls(systems, f"current NYC registry {REGISTRATION_DATASET_ID}")
+
+    bin_values = {system["bin"] for system in systems if system.get("bin")}
+    building_footprints_by_bin, _ = fetch_building_footprints_by_bin(bin_values)
+    apply_bbl_identity_recovery(systems, building_footprints_by_bin)
+    return _tower_bbls(
+        systems,
+        f"current NYC registry {REGISTRATION_DATASET_ID} after canonical exact-BIN MapPLUTO BBL recovery",
+    )
 
 
 def build(tower_snapshot: Path | None, output: Path) -> dict:
