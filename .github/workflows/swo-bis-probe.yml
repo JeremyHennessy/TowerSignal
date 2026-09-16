@@ -1,0 +1,30 @@
+name: Probe DOB BIS SWO banners
+
+on:
+  push:
+    branches:
+      - agent/swo-bis-probe-20260916
+    paths:
+      - .github/workflows/swo-bis-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe three exact BIN property profiles
+        run: python scripts/probe_bis_swo_status.py 1035376 1005395 1006227 --timeout 45 --delay 2 | tee bis-swo-probe.log
+      - name: Upload retained probe log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bis-swo-source-probe
+          path: bis-swo-probe.log
+          retention-days: 14
