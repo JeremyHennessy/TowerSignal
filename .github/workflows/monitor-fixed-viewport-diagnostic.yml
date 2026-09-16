@@ -8,7 +8,7 @@ permissions:
 jobs:
   fixed-viewport:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,59 +23,45 @@ jobs:
           run-id: 35032234529
           github-token: ${{ github.token }}
           path: .baseline/archive
-      - name: Build unchanged candidate against accepted source data
+      - name: Test one isolated CSS hypothesis and retain stricter viewport checks
+        run: |
+          mkdir -p diagnostics
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/styles/monitor-event-table.css')
+          p.write_text(p.read_text()+'\n/* Hidden mobile headings must not retain desktop sticky positioning. */\n@media(max-width:900px){.monitor-change-table-card .change-reference-table thead th{position:static}}\n')
+          p=Path('tests/e2e/monitor-format.spec.ts');text=p.read_text()
+          text=text.replace('await expectContained(page)\n    const metrics=', 'await expectContained(page)\n    expect(await page.evaluate(() => innerWidth)).toBe(page.viewportSize()!.width)\n    const metrics=')
+          p.write_text(text)
+          fixed=text.replace('const categories =','test.use({ viewport: { width: 320, height: 844 }, screen: { width: 320, height: 844 } })\n\nconst categories =')
+          fixed=fixed.replace("const widths=testInfo.project.name==='iphone'?[390,320]:[1280,1024,768,1440]",'const widths=[320]')
+          fixed=fixed.replace('await page.setViewportSize({width,height:original.height})','expect(page.viewportSize()?.width).toBe(width)').replace('await page.setViewportSize(original)','expect(page.viewportSize()).toEqual(original)')
+          Path('tests/e2e/monitor-fixed320.spec.ts').write_text(fixed)
+          Path('diagnostics/fixed320-test.ts').write_text(fixed)
+          Path('diagnostics/resize-test.ts').write_text(text)
+          PY
+          git diff > diagnostics/isolated-change.diff
+      - name: Build candidate UI with only the hidden-header correction
         run: |
           npm install --no-audit --no-fund
           npm run build
-          mkdir -p .baseline/site diagnostics
+          mkdir -p .baseline/site
           tar -xzf .baseline/archive/candidate.tgz -C .baseline/site
           cp -a .baseline/site/data/. dist/data/
-      - name: Trace native control and exact overflowing DOM boxes
-        run: |
-          cat > tests/e2e/monitor-layout-trace.spec.ts <<'TS'
-          import {writeFileSync} from 'node:fs'
-          import {expect,test} from './fixtures'
-          test.use({viewport:{width:320,height:844},screen:{width:320,height:844}})
-          test('observe OATH filter transition without changing production styles',async({page},info)=>{
-            test.setTimeout(180000)
-            const states:unknown[]=[]
-            async function state(name:string){
-              const data=await page.evaluate(()=>{
-                const describe=(e:Element)=>{
-                  const r=e.getBoundingClientRect(),s=getComputedStyle(e)
-                  return {tag:e.tagName,cls:e.className,id:e.id,text:(e.textContent||'').trim().slice(0,100),rect:{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right},client:e.clientWidth,scroll:e.scrollWidth,style:{display:s.display,width:s.width,minWidth:s.minWidth,maxWidth:s.maxWidth,padding:s.padding,boxSizing:s.boxSizing,overflow:s.overflow,fontSize:s.fontSize,position:s.position,whiteSpace:s.whiteSpace}}
-                }
-                return {innerWidth,innerHeight,scrollX,scrollY,screen:{width:screen.width,height:screen.height},viewport:visualViewport?{width:visualViewport.width,height:visualViewport.height,scale:visualViewport.scale,offsetLeft:visualViewport.offsetLeft,offsetTop:visualViewport.offsetTop}:null,body:describe(document.body),html:describe(document.documentElement),active:document.activeElement?describe(document.activeElement):null,controls:[...document.querySelectorAll('.changes-table-view select')].map(describe),outside:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return e.getClientRects().length&&r.width>0&&(r.right>322||r.x< -2)}).slice(0,120).map(describe)}
-              })
-              states.push({name,time:new Date().toISOString(),data});writeFileSync('diagnostics/layout.json',JSON.stringify(states,null,2))
-              await page.screenshot({path:`diagnostics/${name}.png`,scale:'css',animations:'disabled',timeout:15000}).catch(e=>writeFileSync(`diagnostics/${name}-screenshot-error.txt`,String(e)))
-            }
-            await page.evaluate(()=>{location.hash='#/monitor'})
-            const monitor=page.getByRole('region',{name:'TowerSignal changes'})
-            await expect(monitor.locator('.change-reference-row').first()).toBeVisible()
-            await monitor.getByRole('tab',{name:/^Property \/ contact/}).click()
-            await monitor.locator('.change-reference-row').first().scrollIntoViewIfNeeded()
-            await state('before-selection')
-            await monitor.getByLabel(/^Change type/).selectOption('OATH_PENALTY_CHANGED')
-            await expect(monitor.locator('.change-reference-row').first()).toContainText('$')
-            await state('after-selection-before-scroll')
-            await monitor.locator('.change-reference-row').first().scrollIntoViewIfNeeded()
-            await state('after-scroll')
-            await page.evaluate(()=>{if(document.activeElement instanceof HTMLElement)document.activeElement.blur()})
-            await state('after-blur')
-            expect(states.length).toBe(4)
-          })
-          TS
       - run: npx playwright install --with-deps webkit
-      - name: Run single unchanged-UI 320-pixel WebKit diagnostic
+      - name: Verify fresh 320px and original 390-to-320px tests without weaker assertions
         env:
           CANDIDATE_ROOT: dist
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-        run: npx playwright test tests/e2e/monitor-layout-trace.spec.ts --project=iphone
-      - name: Preserve exact geometry and screenshots
+        run: npx playwright test tests/e2e/monitor-format.spec.ts tests/e2e/monitor-fixed320.spec.ts --project=iphone
+      - name: Retain complete diagnostic screenshots and assertions
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: monitor-control-geometry
-          path: diagnostics/
+          name: monitor-hidden-header-proof
+          path: |
+            diagnostics/
+            playwright-report/
+            test-results/
+            !test-results/.auth/**
           retention-days: 7
