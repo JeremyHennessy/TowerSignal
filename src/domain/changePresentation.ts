@@ -59,9 +59,9 @@ export function readableValue(value: unknown): string {
   return Object.entries(recordValue(value)).filter(([, v]) => v != null && v !== '').map(([key, v]) => `${labels[key] ?? key.replaceAll('_', ' ')}: ${readableValue(v)}`).join(' · ') || 'No published detail'
 }
 export function sourceLabel(value: string): string {
-  const labels: Record<string, string> = { NYC_COOLING_TOWER_INSPECTIONS: 'NYC Health · tower inspections', NYC_COOLING_TOWER_REGISTRATIONS: 'NYC Health · tower registry', NYC_OATH_HEARINGS_DIVISION_CASE_STATUS: 'OATH · case status', NYC_DOB_NOW_JOB_APPLICATION_FILINGS: 'DOB NOW · filings', NYC_HPD_REGISTRATION_CONTACTS: 'HPD · registered contacts', NYC_HPD_MULTIPLE_DWELLING_REGISTRATION: 'HPD · registrations', NYC_DCP_MAPPLUTO: 'DCP · MapPLUTO' }
+  const labels: Record<string, string> = { NYC_COOLING_TOWER_INSPECTIONS: 'NYC Health · tower inspections', NYC_COOLING_TOWER_REGISTRATIONS: 'NYC Health · tower registry', NYC_OATH_HEARINGS_DIVISION_CASE_STATUS: 'OATH · case status', NYC_DOB_NOW_JOB_APPLICATION_FILINGS: 'DOB NOW · filings', NYC_HPD_REGISTRATION_CONTACTS: 'HPD · registered contacts', NYC_HPD_MULTIPLE_DWELLING_REGISTRATION: 'HPD · registrations', NYC_DCP_MAPPLUTO: 'DCP · MapPLUTO', NYC_DCP_PLUTO: 'DCP · PLUTO', TOWERSIGNAL_DERIVED: 'TowerSignal · derived signal' }
   return labels[value] ?? value.replaceAll('_', ' ')
 }
 export function evidenceLabel(value: string): string {
-  return value.split(';').map(v => ({ SYSTEM_ID_EXACT: 'Exact system ID', BBL_EXACT: 'Exact property BBL', BIN_EXACT: 'Exact building BIN', SUMMONS_TICKET_EXACT: 'Exact summons / ticket', JOB_FILING_NUMBER_EXACT: 'Exact filing', REGISTRATION_ID_EXACT: 'Exact registration' }[v.trim()] ?? v.trim().replaceAll('_', ' ').toLowerCase())).join(' · ')
+  return value.split(';').map(v => ({ SYSTEM_ID_EXACT: 'Exact system ID', BBL_EXACT: 'Exact property BBL', BIN_EXACT: 'Exact building BIN', SUMMONS_TICKET_EXACT: 'Exact summons / ticket', JOB_FILING_NUMBER_EXACT: 'Exact filing', REGISTRATION_ID_EXACT: 'Exact registration', DETERMINISTIC_RULE_CHANGE: 'Rule-based signal change', JOB_DESCRIPTION_EXPLICIT_COOLING_TOWER_TEXT: 'Explicit cooling-tower text' }[v.trim()] ?? v.trim().replaceAll('_', ' ').toLowerCase())).join(' · ')
 }

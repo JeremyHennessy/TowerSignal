@@ -1,0 +1,117 @@
+name: Release verified NYC Monitor formatting
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'agent/nyc-monitor-format-20260915' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Require current exact merged tree and successful candidate
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:context.payload.pull_request.number})).data;
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(!pr.merged||pr.head.ref!=='agent/nyc-monitor-format-20260915'||pr.head.repo.full_name!==`${context.repo.owner}/${context.repo.repo}`||ref.object.sha!==pr.merge_commit_sha) throw new Error('Not current exact same-repository Monitor merge');
+            const head=(await github.rest.git.getCommit({...context.repo,commit_sha:pr.head.sha})).data;
+            const merge=(await github.rest.git.getCommit({...context.repo,commit_sha:pr.merge_commit_sha})).data;
+            if(head.tree.sha!==merge.tree.sha) throw new Error('Merged tree is not the tested head');
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:pr.head.sha,event:'push',status:'success',per_page:100})).data.workflow_runs;
+            const proof=runs.find(r=>r.path==='.github/workflows/monitor-format-candidate.yml');
+            if(!proof||!runs.some(r=>r.path==='.github/workflows/ci.yml')) throw new Error('Missing successful exact-head CI and Monitor candidate');
+            core.setOutput('run_id',String(proof.id));core.setOutput('merge_sha',pr.merge_commit_sha);
+            core.info(JSON.stringify({head:pr.head.sha,merged:pr.merge_commit_sha,tree:head.tree.sha,candidate_run:proof.id}));
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.gate.outputs.merge_sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: monitor-format-tested-candidate
+          run-id: ${{ steps.gate.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: proof
+      - name: Verify sealed candidate and its still-hosted immediate rollback
+        run: |
+          mkdir -p dist .rollback
+          tar -xzf proof/candidate.tgz -C dist
+          tar -xzf proof/rollback.tgz -C .rollback
+          python scripts/verify_monitor_format.py integrity --site dist --proof proof
+          python scripts/verify_monitor_format.py baseline --site .rollback
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Refuse concurrent main movement
+        uses: actions/github-script@v7
+        env:
+          EXPECTED_MAIN: ${{ steps.gate.outputs.merge_sha }}
+        with:
+          script: |
+            const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(ref.object.sha!==process.env.EXPECTED_MAIN) throw new Error('Main advanced during preparation');
+      - name: Deploy only exact tested Monitor runtime
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify actual hosted Monitor and account evidence bytes
+        run: python scripts/verify_monitor_format.py hosted --site dist
+      - name: Full actual hosted desktop and iPhone acceptance with Monitor and all-route screenshots
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npm run test:e2e
+      - name: Require unchanged hosted identity after acceptance
+        run: python scripts/verify_monitor_format.py hosted --site dist
+      - name: Retain actual hosted visual and byte evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitor-format-hosted-acceptance
+          path: |
+            playwright-report/
+            test-results/
+            !test-results/.auth/**
+            dist/monitor-format-release.json
+            proof/integrity.json
+            proof/unchanged-data.json
+          retention-days: 30
+      - name: Stage immediate accepted NYC runtime after failure
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: monitor-format-rollback
+          path: .rollback
+      - name: Restore immediate accepted NYC release
+        if: failure() && steps.deploy.outcome == 'success'
+        id: rollback
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: monitor-format-rollback
+      - name: Verify restored production bytes
+        if: failure() && steps.rollback.outcome == 'success'
+        run: python scripts/verify_monitor_format.py baseline --site .rollback
