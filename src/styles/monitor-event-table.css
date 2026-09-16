@@ -4,7 +4,7 @@
 .changes-table-view .change-workspace-grid{gap:18px}
 .changes-table-view .change-filter-rail{gap:14px;padding:16px}
 .changes-table-view .change-filter-heading button{font-size:11px;padding:4px}
-.changes-table-view .change-filter-rail>label{font-size:10px;gap:6px;min-width:0}
+.changes-table-view .change-filter-rail>label{font-size:10px;gap:6px;min-width:0;overflow-x:hidden}
 .changes-table-view .change-filter-rail :is(select,input[type="date"],input[type="number"]){height:38px;font-size:12px;min-width:0}
 .changes-table-view .change-filter-rail .change-check{font-size:12px}
 .changes-table-view .change-table-topline{gap:18px;align-items:flex-start;margin-bottom:14px}
