@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from attach_cms_institutional_context import attach
+from build_cms_institutional_context import build_with_geosearch_recovery
 from towersignal.cms_institutional import build_cms_institutional_context, is_nyc_zip, reconcile_geosearch
 from validate_cms_institutional_context import validate
 
@@ -32,6 +33,52 @@ class CmsInstitutionalContextTests(unittest.TestCase):
         self.assertEqual(result["bbl"], "1000010001")
         mismatch = reconcile_geosearch({"address": "124 MAIN ST", "zip": "10001"}, payload)
         self.assertEqual(mismatch["status"], "UNRESOLVED_NO_EXACT_PAD_RESULT")
+
+    @patch("build_cms_institutional_context.time.sleep")
+    @patch("build_cms_institutional_context.build_cms_institutional_context")
+    def test_transient_geosearch_failure_retries_complete_reconciliation_serially(self, build_mock, sleep_mock):
+        transient = RuntimeError(
+            "Source request failed after 4 attempts: "
+            "https://geosearch.planninglabs.nyc/v2/search?text=ONE+GUSTAVE+L+LEVY+PLACE: "
+            "HTTP Error 503: Service Unavailable"
+        )
+        recovered = {"summary": {"tower_overlap_facility_count": 1}}
+        build_mock.side_effect = [transient, recovered]
+
+        payload = build_with_geosearch_recovery(["1000010001"], geosearch_workers=4)
+
+        self.assertIs(payload, recovered)
+        self.assertEqual(build_mock.call_count, 2)
+        self.assertEqual(build_mock.call_args_list[0].kwargs["geosearch_workers"], 4)
+        self.assertEqual(build_mock.call_args_list[1].kwargs["geosearch_workers"], 1)
+        sleep_mock.assert_called_once_with(10)
+
+    @patch("build_cms_institutional_context.time.sleep")
+    @patch("build_cms_institutional_context.build_cms_institutional_context")
+    def test_persistent_geosearch_failure_still_fails_closed(self, build_mock, sleep_mock):
+        transient = RuntimeError(
+            "Source request failed after 4 attempts: "
+            "https://geosearch.planninglabs.nyc/v2/search?text=ONE+GUSTAVE+L+LEVY+PLACE: "
+            "HTTP Error 503: Service Unavailable"
+        )
+        build_mock.side_effect = [transient, transient]
+
+        with self.assertRaisesRegex(RuntimeError, "503"):
+            build_with_geosearch_recovery(["1000010001"], geosearch_workers=4)
+
+        self.assertEqual(build_mock.call_count, 2)
+        sleep_mock.assert_called_once_with(10)
+
+    @patch("build_cms_institutional_context.time.sleep")
+    @patch("build_cms_institutional_context.build_cms_institutional_context")
+    def test_non_geosearch_failure_is_not_retried(self, build_mock, sleep_mock):
+        build_mock.side_effect = RuntimeError("CMS dataset returned an unexpected payload")
+
+        with self.assertRaisesRegex(RuntimeError, "CMS dataset"):
+            build_with_geosearch_recovery(["1000010001"], geosearch_workers=4)
+
+        self.assertEqual(build_mock.call_count, 1)
+        sleep_mock.assert_not_called()
 
     @patch("towersignal.cms_institutional.resolve_facility")
     @patch("towersignal.cms_institutional.fetch_cms_dataset")
