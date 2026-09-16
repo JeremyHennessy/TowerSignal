@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import { signInForProject } from './auth.helpers'
 import { expectContained, isIphoneProject } from './iphone.helpers'
 
+// Hosted acceptance must prove the official source sentinel is not presented as a genuine future deadline.
 test.setTimeout(180_000)
 
 test('City Record sentinel deadlines are not presented as genuine open deadlines', async ({ page }, testInfo) => {
