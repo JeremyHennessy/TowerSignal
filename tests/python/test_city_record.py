@@ -16,6 +16,7 @@ from towersignal.city_record import (
     fetch_city_record_metadata,
     fetch_scope,
     normalize_city_record_row,
+    source_document_urls,
 )
 
 
@@ -85,6 +86,8 @@ class CityRecordTests(unittest.TestCase):
         scopes = dict(city_record_scopes(date(2026, 8, 26), award_lookback_days=730))
         self.assertIn("type_of_notice_description = 'Solicitation'", scopes["OPEN_SOLICITATIONS"])
         self.assertIn("due_date >= '2026-08-26T00:00:00.000'", scopes["OPEN_SOLICITATIONS"])
+        self.assertIn("due_date < '2099-01-01T00:00:00.000'", scopes["OPEN_SOLICITATIONS"])
+        self.assertIn("due_date >= '2099-01-01T00:00:00.000'", scopes["UNVERIFIED_DEADLINE_SOLICITATIONS"])
         self.assertIn("type_of_notice_description = 'Award'", scopes["RECENT_AWARDS"])
         self.assertIn("start_date >= '2024-08-26T00:00:00.000'", scopes["RECENT_AWARDS"])
 
@@ -141,6 +144,32 @@ class CityRecordTests(unittest.TestCase):
         self.assertEqual(item["amount_evidence"], "SOURCE_REPORTED_UNVALIDATED")
         self.assertEqual(item["raw"]["request_id"], "77")
 
+    def test_sentinel_deadline_is_preserved_but_not_normalized_as_open(self):
+        source = row(20240411118, "HVAC efficiency cooling tower project", due="9999-09-09T16:00:00.000")
+        item = normalize_city_record_row(source, retrieved_at="2026-09-16T19:00:00Z", scope="UNVERIFIED_DEADLINE_SOLICITATIONS")
+        self.assertIsNone(item["due_date"])
+        self.assertEqual(item["due_date_raw"], "9999-09-09T16:00:00.000")
+        self.assertEqual(item["source_due_date"], "9999-09-09")
+        self.assertEqual(item["due_date_status"], "UNVERIFIED_SENTINEL")
+        self.assertEqual(item["status"], "DEADLINE_UNVERIFIED")
+        self.assertEqual(item["raw"]["due_date"], "9999-09-09T16:00:00.000")
+
+    def test_2099_source_date_is_treated_as_unverified_sentinel(self):
+        source = row(20170329022, "MECHANICAL CONSTRUCTION WORK", due="2099-12-31T14:00:00.000")
+        source["printout_1"] = "MECHANICAL CONSTRUCTION WORK - Due 12-31-99 at 2:00 P.M."
+        item = normalize_city_record_row(source, retrieved_at="2026-09-16T19:00:00Z", scope="UNVERIFIED_DEADLINE_SOLICITATIONS")
+        self.assertIsNone(item["due_date"])
+        self.assertEqual(item["source_due_date"], "2099-12-31")
+        self.assertEqual(item["due_date_status"], "UNVERIFIED_SENTINEL")
+        self.assertEqual(item["status"], "DEADLINE_UNVERIFIED")
+
+    def test_multi_document_field_is_split_unescaped_and_deduplicated(self):
+        raw = {"url": "https://a856-cityrecord.nyc.gov/Search/GetFile?SectionID=6&amp;DocumentID=30888,https://a856-cityrecord.nyc.gov/Search/GetFile?SectionID=6&amp;DocumentID=30889,https://a856-cityrecord.nyc.gov/Search/GetFile?SectionID=6&amp;DocumentID=30888"}
+        urls = source_document_urls(raw)
+        self.assertEqual(len(urls), 2)
+        self.assertEqual(urls[0], "https://a856-cityrecord.nyc.gov/Search/GetFile?SectionID=6&DocumentID=30888")
+        self.assertEqual(urls[1], "https://a856-cityrecord.nyc.gov/Search/GetFile?SectionID=6&DocumentID=30889")
+
     def test_build_payload_classifies_after_complete_scoped_retrieval(self):
         as_of = date(2026, 8, 26)
         scopes = dict(city_record_scopes(as_of, award_lookback_days=730))
@@ -165,6 +194,7 @@ class CityRecordTests(unittest.TestCase):
         self.assertEqual(summary["scoped_record_count"], 5)
         self.assertEqual(summary["relevant_record_count"], 3)
         self.assertEqual(summary["open_relevant_opportunities"], 2)
+        self.assertEqual(summary["unverified_deadline_opportunities"], 0)
         self.assertEqual(summary["recent_relevant_awards"], 1)
         self.assertEqual(summary["unresolved_vendor_count"], 1)
         self.assertEqual(payload["source_health"]["status"], "WARNING")

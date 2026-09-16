@@ -190,7 +190,8 @@ export function OpportunitiesPage({ payload, onOpenAccount }: { payload: Systems
       {procurement.sourceErrors.openBookWater && <div className="reference-empty-state procurement-source-warning"><strong>Open Book NY water procurement is unavailable.</strong><span>{procurement.sourceErrors.openBookWater}</span></div>}
       {procurement.sourceErrors.nychaWater && <div className="reference-empty-state procurement-source-warning"><strong>NYCHA water procurement is unavailable.</strong><span>{procurement.sourceErrors.nychaWater}</span></div>}
       <div className="reference-metric-grid">
-        <article><span className="reference-metric-icon urgent">↗</span><div><small>Open solicitations</small><strong>{number.format(procurement.cityRecord.summary.open_relevant_opportunities)}</strong><span>Relevant City Record notices</span></div></article>
+        <article><span className="reference-metric-icon urgent">↗</span><div><small>Open solicitations</small><strong>{number.format(procurement.cityRecord.summary.open_relevant_opportunities)}</strong><span>Verified future City Record deadlines</span></div></article>
+        <article><span className="reference-metric-icon warning">?</span><div><small>Unverified deadlines</small><strong>{number.format(procurement.cityRecord.summary.unverified_deadline_opportunities)}</strong><span>Sentinel / indefinite source dates</span></div></article>
         <article><span className="reference-metric-icon warning">◷</span><div><small>Recent awards</small><strong>{number.format(procurement.cityRecord.summary.recent_relevant_awards)}</strong><span>City Record lookback window</span></div></article>
         <article><span className="reference-metric-icon success">◎</span><div><small>Verified NYC contracts</small><strong>{number.format(procurement.checkbook.summary.relevant_contract_count)}</strong><span>Relevant Checkbook records</span></div></article>
         <article><span className="reference-metric-icon">NY</span><div><small>Open Book water contracts</small><strong>{procurement.openBookWater ? number.format(procurement.openBookWater.summary.relevant_contract_count) : '—'}</strong><span>{procurement.openBookWater ? 'OSC transaction history' : 'Source unavailable'}</span></div></article>
@@ -229,8 +230,8 @@ export function OpportunitiesPage({ payload, onOpenAccount }: { payload: Systems
           <td>{row.vendor_raw ? <><strong>{row.vendor_raw}</strong><small>{row.company_match_confidence ?? 'UNRESOLVED'}</small></> : <span className="muted-label">Not yet awarded / not published</span>}</td>
           <td><strong>{categoryLabel(row.service_category)}</strong><small>{row.service_confidence}</small></td>
           <td>{procurementAmount(row) == null ? '—' : currency.format(procurementAmount(row) ?? 0)}<small>{row.observed_value_evidence ?? row.amount_evidence ?? 'No amount published'}</small></td>
-          <td>{procurementDate(row) ? formatDate(procurementDate(row) ?? '') : '—'}<small>{row.due_date ? 'due date' : row.start_date ? 'contract start' : row.award_date ? 'award date' : 'source date'}</small></td>
-          <td>{row.source_url ? <a className="table-link" href={row.source_url} target="_blank" rel="noreferrer">Open source ↗</a> : '—'}<small>{row.facility_match_confidence ?? row.tower_link_confidence ?? 'UNLINKED'} facility/account</small></td>
+          <td>{row.due_date_status === 'UNVERIFIED_SENTINEL' ? <><strong>Deadline unverified</strong><small>Source value {row.due_date_raw?.slice(0, 10) ?? 'sentinel / indefinite'}</small></> : <>{procurementDate(row) ? formatDate(procurementDate(row) ?? '') : '—'}<small>{row.due_date ? 'due date' : row.start_date ? 'contract start' : row.award_date ? 'award date' : 'source date'}</small></>}</td>
+          <td>{(row.source_urls?.length ?? 0) > 1 ? <details><summary>{row.source_urls?.length} source documents</summary><div className="workflow-toolbox-list">{row.source_urls?.map((url, index) => <a key={url} className="table-link" href={url} target="_blank" rel="noreferrer">Document {index + 1} ↗</a>)}</div></details> : row.source_url ? <a className="table-link" href={row.source_url} target="_blank" rel="noreferrer">Open source ↗</a> : '—'}<small>{row.facility_match_confidence ?? row.tower_link_confidence ?? 'UNLINKED'} facility/account</small></td>
         </tr>)}</tbody></table></div>
         <PageControls page={safeProcurementPage} total={sortedProcurement.length} onPage={setProcurementPage} />
       </div>
@@ -264,6 +265,6 @@ export function OpportunitiesPage({ payload, onOpenAccount }: { payload: Systems
       <PageControls page={safeAccountPage} total={sortedAccounts.length} onPage={setAccountPage} />
     </div>
 
-    <div className="source-health-footnote">Priority remains WHY NOW for cooling-tower accounts. Procurement classifications and observed contract values are separate source-backed commercial evidence and do not change Priority Score 1.0.</div>
+    <div className="source-health-footnote">Priority remains WHY NOW for cooling-tower accounts. Procurement classifications and observed contract values are separate source-backed commercial evidence and do not change Priority Score 1.1.</div>
   </section>
 }
