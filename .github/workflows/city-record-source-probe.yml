@@ -1,0 +1,30 @@
+name: Probe City Record deadline semantics
+
+on:
+  push:
+    branches:
+      - agent/city-record-source-probe-20260916
+    paths:
+      - .github/workflows/city-record-source-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read three exact source records
+        run: python scripts/probe_city_record_semantics.py | tee city-record-source-probe.log
+      - name: Upload retained source proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: city-record-source-probe
+          path: city-record-source-probe.log
+          retention-days: 14
