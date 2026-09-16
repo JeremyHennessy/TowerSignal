@@ -1,10 +1,10 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 
 const logoAsset = `${import.meta.env.BASE_URL}marketing/towersignal-logo.webp`
 
 type PortalRoute = 'home' | 'my-account'
-type PortalNavItem = { label: string; hash: string }
+type PortalNavItem = { label: string; hash: string; detail?: string }
 
 const primaryItems: PortalNavItem[] = [
   { label: 'Prospect', hash: '#/prospect' },
@@ -15,12 +15,12 @@ const primaryItems: PortalNavItem[] = [
 ]
 
 const secondaryItems: PortalNavItem[] = [
-  { label: 'NYS Changes', hash: '#/nys-changes' },
-  { label: 'Known Firms', hash: '#/companies' },
-  { label: 'Water Quality', hash: '#/water-quality' },
-  { label: 'Portfolios', hash: '#/portfolios' },
-  { label: 'Workflow', hash: '#/workflow' },
-  { label: 'Source Health', hash: '#/source-health' },
+  { label: 'NYS Changes', hash: '#/nys-changes', detail: 'Statewide registry change history' },
+  { label: 'Known Firms', hash: '#/companies', detail: 'Providers, labs, vendors and project firms' },
+  { label: 'Water Quality', hash: '#/water-quality', detail: 'Distribution and building-water context' },
+  { label: 'Portfolios', hash: '#/portfolios', detail: 'Group accounts by owner and account context' },
+  { label: 'Workflow', hash: '#/workflow', detail: 'Private account monitoring and follow-up' },
+  { label: 'Source Health', hash: '#/source-health', detail: 'Coverage, freshness and source status' },
 ]
 
 function initials(user: WorkflowUser): string {
@@ -34,6 +34,7 @@ export function PortalNavigation({ current, user }: { current: PortalRoute; user
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const moreMenuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -45,6 +46,16 @@ export function PortalNavigation({ current, user }: { current: PortalRoute; user
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+
+  useEffect(() => {
+    if (!moreOpen) return
+    const onPointerDown = (event: PointerEvent) => {
+      if (!(event.target instanceof Node)) return
+      if (!moreMenuRef.current?.contains(event.target)) setMoreOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [moreOpen])
 
   const go = (hash: string) => {
     setMoreOpen(false)
@@ -68,10 +79,13 @@ export function PortalNavigation({ current, user }: { current: PortalRoute; user
     <nav className="reference-desktop-nav" aria-label="TowerSignal workspace">
       <button className={current === 'home' ? 'active' : ''} onClick={() => go('#/home')}>Home</button>
       {primaryItems.map(item => <button key={item.hash} onClick={() => go(item.hash)}>{item.label}</button>)}
-      <div className={`reference-more-menu ${moreOpen ? 'open' : ''}`}>
-        <button aria-haspopup="menu" aria-expanded={moreOpen} onClick={() => setMoreOpen(value => !value)}>More <span aria-hidden="true">⌄</span></button>
-        {moreOpen && <div className="reference-more-popover" role="menu">
-          {secondaryItems.map(item => <button key={item.hash} role="menuitem" onClick={() => go(item.hash)}>{item.label}</button>)}
+      <div ref={moreMenuRef} className={`reference-more-menu ${moreOpen ? 'open' : ''}`}>
+        <button aria-haspopup="menu" aria-expanded={moreOpen} aria-controls="portal-workspace-more-menu" onClick={() => setMoreOpen(value => !value)}>More <span aria-hidden="true">⌄</span></button>
+        {moreOpen && <div id="portal-workspace-more-menu" className="reference-more-popover" role="menu" aria-label="More TowerSignal workspaces">
+          <div className="reference-more-popover-head" aria-hidden="true"><strong>More workspaces</strong><span>Additional research and operating views</span></div>
+          <div className="reference-more-popover-items">
+            {secondaryItems.map(item => <button key={item.hash} role="menuitem" onClick={() => go(item.hash)}><span>{item.label}</span><small>{item.detail}</small></button>)}
+          </div>
         </div>}
       </div>
     </nav>
