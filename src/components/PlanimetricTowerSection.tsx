@@ -139,11 +139,54 @@ export function PlanimetricTowerSection({ detail }: { detail: SystemDetailWithDo
       bounds.extend(layer.getBounds())
     })
 
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [34, 34], maxZoom: 20 })
+    let fittedAtVisibleSize = false
+    let frame = 0
+    let settleTimer = 0
+
+    const syncMapLayout = (allowFit: boolean) => {
+      if (mapElement.clientWidth < 32 || mapElement.clientHeight < 32 || mapElement.offsetParent == null) return
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        map.invalidateSize({ animate: false, pan: false })
+        if (allowFit && !fittedAtVisibleSize && bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [34, 34], maxZoom: 20, animate: false })
+          fittedAtVisibleSize = true
+        }
+      })
     }
 
+    const scheduleVisibleSync = () => {
+      syncMapLayout(true)
+      window.clearTimeout(settleTimer)
+      settleTimer = window.setTimeout(() => syncMapLayout(true), 120)
+    }
+
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(() => syncMapLayout(true))
+    resizeObserver?.observe(mapElement)
+
+    const fieldSection = mapElement.closest('section.planimetric-section')
+    const visibilityObserver = fieldSection ? new MutationObserver(() => {
+      if (!fieldSection.hasAttribute('hidden')) scheduleVisibleSync()
+    }) : null
+    if (fieldSection) visibilityObserver?.observe(fieldSection, { attributes: true, attributeFilter: ['hidden'] })
+
+    const onAccountModeChange = (event: Event) => {
+      const nextMode = (event as CustomEvent<{ mode?: string }>).detail?.mode
+      if (nextMode === 'field') scheduleVisibleSync()
+    }
+    const onWindowResize = () => syncMapLayout(false)
+    window.addEventListener('towersignal:account-mode-change', onAccountModeChange)
+    window.addEventListener('resize', onWindowResize)
+
+    scheduleVisibleSync()
+
     return () => {
+      cancelAnimationFrame(frame)
+      window.clearTimeout(settleTimer)
+      resizeObserver?.disconnect()
+      visibilityObserver?.disconnect()
+      window.removeEventListener('towersignal:account-mode-change', onAccountModeChange)
+      window.removeEventListener('resize', onWindowResize)
       map.remove()
     }
   }, [buildingFootprints, features, hasRoofMapContext, roofMapLabel, waterTanks])

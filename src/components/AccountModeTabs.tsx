@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react'
 type AccountMode = 'summary' | 'sales' | 'field' | 'evidence' | 'history'
 
 const modes: Array<{ value: AccountMode; label: string; detail: string }> = [
-  { value: 'summary', label: 'Summary', detail: 'Decision, workflow and score' },
-  { value: 'sales', label: 'Sales', detail: 'Pre-call commercial brief' },
-  { value: 'field', label: 'Field', detail: 'Dispatch, roof and water assets' },
-  { value: 'evidence', label: 'Evidence', detail: 'Property, contacts and source records' },
+  { value: 'summary', label: 'Summary', detail: 'Decision, workflow and priority evidence' },
+  { value: 'sales', label: 'Sales', detail: 'Pre-call brief and qualification prompts' },
+  { value: 'field', label: 'Field', detail: 'Dispatch, roof geometry and water assets' },
+  { value: 'evidence', label: 'Evidence', detail: 'Identity, property and source records' },
   { value: 'history', label: 'History', detail: 'Unified and source-specific chronology' },
 ]
 
@@ -22,7 +22,8 @@ const historyHeadings = new Set([
 ])
 
 function classify(element: HTMLElement): AccountMode | null {
-  if (element.classList.contains('account-decision-summary') || element.classList.contains('account-mode-tabs') || element.classList.contains('workflow-account-section')) return null
+  if (element.classList.contains('account-mode-tabs')) return null
+  if (element.classList.contains('account-decision-summary') || element.classList.contains('workflow-account-section')) return 'summary'
   if (element.classList.contains('sales-precall-pack')) return 'sales'
   if (element.classList.contains('technician-field-pack') || element.classList.contains('planimetric-section') || element.classList.contains('domestic-water-section')) return 'field'
   if (element.classList.contains('account-unified-timeline')) return 'history'
@@ -50,6 +51,7 @@ export function AccountModeTabs() {
         child.dataset.accountModeGroup = group
         child.hidden = group !== mode
       })
+      window.dispatchEvent(new CustomEvent('towersignal:account-mode-change', { detail: { mode } }))
     }
 
     apply()

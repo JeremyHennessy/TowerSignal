@@ -1,10 +1,10 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 import { ShareButton } from './ShareButton'
 
 export type WorkspaceMode = 'prospect' | 'monitor' | 'map' | 'nys' | 'nys-changes' | 'opportunities' | 'companies' | 'water-quality' | 'portfolios' | 'workflow' | 'source-health' | 'account'
 
-type NavigationItem = { mode: WorkspaceMode; label: string }
+type NavigationItem = { mode: WorkspaceMode; label: string; detail?: string }
 
 const logoAsset = `${import.meta.env.BASE_URL}marketing/towersignal-logo.webp`
 
@@ -17,11 +17,11 @@ const primaryNavigation: NavigationItem[] = [
 ]
 
 const secondaryNavigation: NavigationItem[] = [
-  { mode: 'nys-changes', label: 'NYS Changes' },
-  { mode: 'companies', label: 'Known Firms' },
-  { mode: 'water-quality', label: 'Water Quality' },
-  { mode: 'portfolios', label: 'Portfolios' },
-  { mode: 'workflow', label: 'Workflow' },
+  { mode: 'nys-changes', label: 'NYS Changes', detail: 'Statewide registry change history' },
+  { mode: 'companies', label: 'Known Firms', detail: 'Providers, labs, vendors and project firms' },
+  { mode: 'water-quality', label: 'Water Quality', detail: 'Distribution and building-water context' },
+  { mode: 'portfolios', label: 'Portfolios', detail: 'Group accounts by owner and account context' },
+  { mode: 'workflow', label: 'Workflow', detail: 'Private account monitoring and follow-up' },
 ]
 
 const allNavigation = [...primaryNavigation, ...secondaryNavigation]
@@ -71,6 +71,7 @@ export function TopNavigation({
   const [moreOpen, setMoreOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const moreMenuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -82,6 +83,16 @@ export function TopNavigation({
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+
+  useEffect(() => {
+    if (!moreOpen) return
+    const onPointerDown = (event: PointerEvent) => {
+      if (!(event.target instanceof Node)) return
+      if (!moreMenuRef.current?.contains(event.target)) setMoreOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [moreOpen])
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
@@ -114,10 +125,13 @@ export function TopNavigation({
       <button onClick={goHome}>Home</button>
       {primaryNavigation.map(item => <button key={item.mode} className={primaryActive(item) ? 'active' : ''} onClick={() => navigate(item)}>{item.label}</button>)}
       {overflowActive && <button className="active reference-overflow-active" onClick={() => navigate(overflowActive)}>{overflowActive.label}</button>}
-      <div className={`reference-more-menu ${moreOpen ? 'open' : ''}`}>
-        <button className={overflowActive ? 'has-active' : ''} aria-haspopup="menu" aria-expanded={moreOpen} onClick={() => setMoreOpen(value => !value)}>More <span aria-hidden="true">⌄</span></button>
-        {moreOpen && <div className="reference-more-popover" role="menu">
-          {secondaryNavigation.map(item => <button key={item.mode} role="menuitem" className={mode === item.mode ? 'active' : ''} onClick={() => navigate(item)}>{item.label}</button>)}
+      <div ref={moreMenuRef} className={`reference-more-menu ${moreOpen ? 'open' : ''}`}>
+        <button className={overflowActive ? 'has-active' : ''} aria-haspopup="menu" aria-expanded={moreOpen} aria-controls="workspace-more-menu" onClick={() => setMoreOpen(value => !value)}>More <span aria-hidden="true">⌄</span></button>
+        {moreOpen && <div id="workspace-more-menu" className="reference-more-popover" role="menu" aria-label="More TowerSignal workspaces">
+          <div className="reference-more-popover-head" aria-hidden="true"><strong>More workspaces</strong><span>Additional research and operating views</span></div>
+          <div className="reference-more-popover-items">
+            {secondaryNavigation.map(item => <button key={item.mode} role="menuitem" aria-label={item.label} className={mode === item.mode ? 'active' : ''} onClick={() => navigate(item)}><span>{item.label}</span><small>{item.detail}</small></button>)}
+          </div>
         </div>}
       </div>
     </nav>
