@@ -90,8 +90,18 @@
   white-space:normal!important;
 }
 
-/* Account mode switcher is the sole account-level navigation surface. */
+/* The full report is already a CSS grid. Reorder only its top-level blocks so the modern
+   five-mode switcher immediately follows the account header and owns all report navigation. */
+.account-profile-page .detail-header,
+.account-profile-page .detail-actions{
+  order:0;
+}
 .account-profile-page .account-mode-tabs{
+  grid-column:1 / -1!important;
+  grid-row:auto!important;
+  order:1;
+  width:100%;
+  max-width:none;
   top:70px;
   z-index:15;
   gap:4px;
@@ -100,6 +110,17 @@
   border-radius:12px;
   background:rgba(255,255,255,.985);
   box-shadow:0 8px 22px rgba(20,45,38,.08);
+}
+.account-profile-page .account-decision-summary{
+  order:2;
+}
+.account-profile-page .workflow-account-section{
+  order:3;
+}
+.account-profile-page .detail-panel>.technician-field-pack,
+.account-profile-page .detail-panel>section:not(.account-decision-summary):not(.workflow-account-section),
+.account-profile-page .detail-panel>details{
+  order:4;
 }
 .account-profile-page .account-mode-tabs button{
   min-height:48px;
@@ -191,6 +212,13 @@
   }
   .account-profile-page .account-decision-evidence-grid{
     grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:780px){
+  .account-profile-page .detail-panel{
+    display:flex!important;
+    flex-direction:column;
   }
 }
 
