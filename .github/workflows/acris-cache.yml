@@ -112,8 +112,9 @@ jobs:
         run: python scripts/build_nys_history.py --output public/data --previous-snapshot .history-store/data/history/nys/latest.json --previous-events .history-store/data/history/nys/events.json
       - name: Validate NYC history size
         run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
-      - name: Validate NYS history size
-        run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
+      - name: Validate NYS history size for partial ACRIS integration
+        run: >-
+          PYTHONPATH=scripts python -c "from pathlib import Path; from validate_nys_history_store import validate_history_size; validate_history_size(Path('public/data/history/nys/latest.json'), Path('.history-store/data/history/nys/latest.json'))"
       - name: Independently verify NYC sources
         run: python scripts/verify_live_data.py --sample-size 5
       - name: Independently verify NYS source
