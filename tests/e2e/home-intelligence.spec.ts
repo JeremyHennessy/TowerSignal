@@ -15,6 +15,24 @@ async function captureHome(page: Page, panel: Locator, testInfo: TestInfo, name:
 test('Home intelligence is searchable, paginated, responsive and linked to named-building accounts', async ({ page }, testInfo) => {
   testInfo.setTimeout(120_000)
   await page.evaluate(() => { window.location.hash = '#/home' })
+  const contracts = await page.evaluate(async () => {
+    const assets = [
+      ['legionella-alerts.json', 'LEGIONELLA_PUBLIC_HEALTH_ALERTS'],
+      ['legionella-property-matches.json', 'LEGIONELLA_PROPERTY_MATCHES'],
+    ] as const
+    return Promise.all(assets.map(async ([name, expectedDomain]) => {
+      const response = await fetch(`data/${name}?home-contract=${Date.now()}`, { cache: 'no-store' })
+      const payload = response.ok ? await response.json() as { domain?: string; items?: unknown[]; matched_observations?: unknown[] } : null
+      return { name, expectedDomain, status: response.status, domain: payload?.domain ?? null,
+        rowCount: Array.isArray(payload?.items) ? payload.items.length : Array.isArray(payload?.matched_observations) ? payload.matched_observations.length : 0 }
+    }))
+  })
+  for (const contract of contracts) {
+    expect(contract.status, `${contract.name} should be served by the deployed runtime`).toBe(200)
+    expect(contract.domain, `${contract.name} should retain its production contract`).toBe(contract.expectedDomain)
+    expect(contract.rowCount, `${contract.name} should contain retained official evidence`).toBeGreaterThan(0)
+  }
+
   const panel = page.getByRole('region', { name: 'Legionnaires official intelligence' })
   await expect(panel).toBeVisible()
   await expect(panel.locator('.li-headline').first()).toBeVisible()

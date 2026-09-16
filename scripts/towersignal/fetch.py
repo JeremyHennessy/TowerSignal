@@ -4,6 +4,7 @@ import json
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from http.client import RemoteDisconnected
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -34,7 +35,7 @@ def _request_json(url: str, retries: int = 4, timeout: int = 90) -> Any:
             request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
             with urlopen(request, timeout=timeout) as response:
                 return json.load(response)
-        except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
+        except (HTTPError, URLError, TimeoutError, RemoteDisconnected, ConnectionResetError, json.JSONDecodeError) as exc:
             last_error = exc
             if attempt + 1 < retries:
                 time.sleep(2**attempt)
