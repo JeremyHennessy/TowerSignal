@@ -28,6 +28,7 @@ async function workspaceGeometry(page: import('@playwright/test').Page) {
       viewport: document.documentElement.clientWidth,
       pageScrollWidth: document.documentElement.scrollWidth,
       grid: rect('.workflow-command-grid'),
+      primary: rect('.workflow-command-primary'),
       map: rect('.workflow-command-map'),
       inspector: rect('.workflow-account-inspector'),
       tableCard: rect('.workflow-command-table-card'),
@@ -35,7 +36,6 @@ async function workspaceGeometry(page: import('@playwright/test').Page) {
       inspectorScrollWidth: inspector?.scrollWidth ?? 0,
       inspectorClientWidth: inspector?.clientWidth ?? 0,
       inspectorPosition: inspector ? getComputedStyle(inspector).position : '',
-      inspectorOverflowY: inspector ? getComputedStyle(inspector).overflowY : '',
       boundaryFontSize: boundary ? Number.parseFloat(getComputedStyle(boundary).fontSize) : 0,
     }
   })
@@ -49,35 +49,34 @@ async function assertWorkspaceGeometry(page: import('@playwright/test').Page, st
   const layout = await workspaceGeometry(page)
   expect(layout.pageScrollWidth).toBeLessThanOrEqual(layout.viewport + 2)
   expect(layout.grid).not.toBeNull()
+  expect(layout.primary).not.toBeNull()
   expect(layout.inspector).not.toBeNull()
+  expect(layout.primary!.left).toBeGreaterThanOrEqual(layout.grid!.left - 1)
   expect(layout.inspector!.left).toBeGreaterThanOrEqual(layout.grid!.left - 1)
   expect(layout.inspector!.right).toBeLessThanOrEqual(layout.grid!.right + 1)
   expect(layout.inspectorScrollWidth).toBeLessThanOrEqual(layout.inspectorClientWidth + 2)
   expect(layout.boundaryFontSize).toBeLessThanOrEqual(10)
-  expect(layout.inspectorPosition).toBe('static')
   if (layout.tableCard) {
-    expect(layout.tableCard.left).toBeGreaterThanOrEqual(layout.grid!.left - 1)
-    expect(layout.tableCard.right).toBeLessThanOrEqual(layout.grid!.right + 1)
+    expect(layout.tableCard.left).toBeGreaterThanOrEqual(layout.primary!.left - 1)
+    expect(layout.tableCard.right).toBeLessThanOrEqual(layout.primary!.right + 1)
     expect(overlaps(layout.inspector!, layout.tableCard)).toBe(false)
   }
   if (layout.tableScroll) expect(layout.tableScroll.right).toBeLessThanOrEqual(layout.tableCard!.right + 1)
   if (layout.map) {
-    expect(overlaps(layout.map, layout.inspector!)).toBe(false)
-    if (stacked) {
-      expect(layout.inspector!.top).toBeGreaterThanOrEqual(layout.map.bottom - 1)
-      if (layout.tableCard) expect(layout.tableCard.top).toBeGreaterThanOrEqual(layout.inspector!.bottom - 1)
-    } else {
-      expect(layout.map.right).toBeLessThanOrEqual(layout.inspector!.left - 8)
-      expect(Math.abs(layout.map.top - layout.inspector!.top)).toBeLessThanOrEqual(2)
-      expect(layout.inspector!.height).toBeLessThanOrEqual(391)
-      if (layout.tableCard) expect(layout.tableCard.top).toBeGreaterThanOrEqual(Math.max(layout.map.bottom, layout.inspector!.bottom) - 1)
-    }
-  } else if (layout.tableCard) {
-    expect(layout.inspector!.top).toBeGreaterThanOrEqual(layout.tableCard.bottom - 1)
+    expect(layout.map.left).toBeGreaterThanOrEqual(layout.primary!.left - 1)
+    expect(layout.map.right).toBeLessThanOrEqual(layout.primary!.right + 1)
+  }
+  if (stacked) {
+    expect(layout.inspectorPosition).toBe('static')
+    expect(layout.inspector!.top).toBeGreaterThanOrEqual(layout.primary!.bottom - 1)
+  } else {
+    expect(layout.inspectorPosition).toBe('sticky')
+    expect(layout.primary!.right).toBeLessThanOrEqual(layout.inspector!.left - 8)
+    expect(overlaps(layout.primary!, layout.inspector!)).toBe(false)
   }
 }
 
-test('Workflow Account Inspector stays in its context row through selections, views and desktop breakpoints', async ({ page }, testInfo) => {
+test('Workflow Account Inspector stays in a dedicated sidecar through selections, views and desktop breakpoints', async ({ page }, testInfo) => {
   test.skip(isIphoneProject(testInfo), 'Desktop breakpoint coverage runs in Chromium; iPhone has a dedicated test.')
   test.setTimeout(300_000)
   await seedWorkflowAccount(page, testInfo.project.name)
