@@ -16,19 +16,28 @@ test('Source Health baseline screenshot', async ({ page }, testInfo) => {
   await page.screenshot({ path: `source-health-proof/baseline-${testInfo.project.name}.png`, fullPage: true })
 })
 
-test('Source Health reports actual enforcement counts, 12 channels and both cache artifacts', async ({ page }, testInfo) => {
+test('Source Health reports actual enforcement counts, refresh coverage, 12 channels and published cache artifacts', async ({ page }, testInfo) => {
   test.skip(baseline, 'Candidate-only assertions')
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   await page.evaluate(() => { window.location.hash = '#/source-health' })
   await expect(page.getByRole('heading', { name: 'Source Health & Coverage', exact: true })).toBeVisible()
   const property = page.getByTestId('property-enforcement-source-health')
+  const refresh = page.getByTestId('source-refresh-coverage')
   const legionella = page.getByTestId('legionella-source-health')
   await expect(property).toBeVisible()
+  await expect(refresh).toBeVisible()
+  await expect(refresh.locator('tbody tr')).toHaveCount(8)
+  await expect(refresh).toContainText('Daily · 10:17 UTC')
+  await expect(refresh).toContainText('Daily · 08:23 UTC')
+  await expect(refresh).toContainText('Daily · 08:41 UTC')
+  await expect(refresh).toContainText('Every 6 hours · :23 UTC')
+  await expect(refresh).toContainText('Refresh time is not source observation time.')
   await expect(legionella.locator('tbody tr')).toHaveCount(12)
   await expect(property.locator('tbody tr')).toHaveCount(3)
   await expect(property.getByText('AVAILABLE', { exact: true })).toHaveCount(3)
   await expect(legionella.getByText('SNAPSHOT RETRIEVED', { exact: true })).toHaveCount(12)
+  await expect(page.getByText('Coverage audit unavailable.')).toHaveCount(0)
 
   const expected = await page.evaluate(async () => {
     const response = await fetch(new URL('data/systems.json', window.location.href), { cache: 'no-store' })
@@ -56,6 +65,7 @@ test('Source Health reports actual enforcement counts, 12 channels and both cach
   await expect(property).toContainText('Not a complete or current active-SWO ledger')
   await expect(page.getByRole('cell', { name: 'property-enforcement.json', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'legionella-alerts.json', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'historical-311-context.json', exact: true })).toBeVisible()
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)
   expect(overflow).toBe(false)
   expect(errors).toEqual([])
@@ -63,6 +73,7 @@ test('Source Health reports actual enforcement counts, 12 channels and both cach
   const stage = process.env.CANDIDATE_ROOT ? 'candidate' : 'hosted'
   await page.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-page.png`, fullPage: true })
   await property.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-enforcement.png` })
+  await refresh.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-refresh.png` })
   await legionella.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-legionella.png` })
 })
 

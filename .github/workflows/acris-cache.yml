@@ -91,6 +91,13 @@ jobs:
       - name: Generate current NYC data
         timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
+      - name: Build bounded legacy DOB/BIS project context
+        timeout-minutes: 15
+        run: python scripts/build_legacy_dob_project_cache.py --output public/data
+      - name: Validate bounded legacy DOB/BIS project context
+        run: python scripts/validate_legacy_dob_project_cache.py --cache public/data/legacy-dob-projects.json --max-age-days 1 --require-production-volume
+      - name: Attach exact-BBL legacy DOB/BIS project context
+        run: python scripts/attach_legacy_dob_project_context.py --output public/data --cache public/data/legacy-dob-projects.json
       - name: Attach verified ACRIS cache
         run: python scripts/attach_acris.py --output public/data --cache .verified-acris/cache.json
       - name: Generate current NYS data
@@ -105,8 +112,9 @@ jobs:
         run: python scripts/build_nys_history.py --output public/data --previous-snapshot .history-store/data/history/nys/latest.json --previous-events .history-store/data/history/nys/events.json
       - name: Validate NYC history size
         run: python scripts/validate_history_store.py --current public/data/history/latest.json --previous .history-store/data/history/latest.json
-      - name: Validate NYS history size
-        run: python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json
+      - name: Validate NYS history size for partial ACRIS integration
+        run: >-
+          PYTHONPATH=scripts python -c "from pathlib import Path; from validate_nys_history_store import validate_history_size; validate_history_size(Path('public/data/history/nys/latest.json'), Path('.history-store/data/history/nys/latest.json'))"
       - name: Independently verify NYC sources
         run: python scripts/verify_live_data.py --sample-size 5
       - name: Independently verify NYS source
@@ -152,7 +160,7 @@ jobs:
           fi
 
   deploy-refreshed-cache:
-    if: ${{ github.event_name != 'pull_request' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
     needs: persist-cache
     runs-on: ubuntu-latest
     steps:
