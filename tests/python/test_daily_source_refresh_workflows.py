@@ -36,6 +36,13 @@ class DailySourceRefreshWorkflowTests(unittest.TestCase):
         self.assertLess(self.acris.index(validate), self.acris.index(attach))
         self.assertLess(self.acris.index(attach), self.acris.index(source_health))
 
+    def test_acris_pr_integration_validates_nys_history_without_full_product_audit(self):
+        partial = "PYTHONPATH=scripts python -c \"from pathlib import Path; from validate_nys_history_store import validate_history_size; validate_history_size(Path('public/data/history/nys/latest.json'), Path('.history-store/data/history/nys/latest.json'))\""
+        full = 'python scripts/validate_nys_history_store.py --current public/data/history/nys/latest.json --previous .history-store/data/history/nys/latest.json'
+        self.assertIn(partial, self.acris)
+        self.assertNotIn(full, self.acris)
+        self.assertNotIn('python scripts/build_coverage_audit.py --output public/data', self.acris)
+
     def test_daily_pages_builds_and_attaches_historical_311_before_source_health(self):
         build = 'python scripts/build_historical_311_context.py --systems public/data/systems.json --output public/data/historical-311-context.json'
         validate = 'python scripts/validate_historical_311_context.py --cache public/data/historical-311-context.json --require-production-volume'
