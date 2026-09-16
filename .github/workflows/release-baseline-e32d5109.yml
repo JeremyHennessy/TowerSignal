@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - name: Prove application and test tree matches accepted release
+      - name: Prove application and committed test tree matches accepted release
         run: |
           changed="$(git diff --name-only "$RELEASE_SHA" HEAD)"
           printf '%s\n' "$changed"
@@ -32,11 +32,52 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Install baseline browsers
         run: npx playwright install --with-deps chromium webkit
+      - name: Create runtime-only semantic account capture
+        run: |
+          cat > tests/e2e/release-baseline-semantic.spec.ts <<'TS'
+          import { mkdirSync, writeFileSync } from 'node:fs'
+          import { expect, test } from '@playwright/test'
+          import { signInForProject } from './auth.helpers'
+          import { expectAccountDetailHydrated, expectContained } from './iphone.helpers'
+
+          const accounts = [
+            { id: '2000002585', slug: 'cms-nursing-home', address: '1160 TELLER AVE', required: ['Triboro Center for Rehabilitation and Nursing', 'Nursing home'] },
+            { id: '2000011123', slug: 'dwt-heavy', address: '525 East 68th Street', required: ['Domestic water'] },
+          ]
+
+          test('capture verified nursing-home and DWT-heavy account representatives', async ({ page }, testInfo) => {
+            test.setTimeout(420_000)
+            const folder = testInfo.outputPath('semantic-baseline')
+            mkdirSync(folder, { recursive: true })
+            const states: Array<Record<string, unknown>> = []
+            for (const account of accounts) {
+              await signInForProject(page, testInfo.project.name, `#/account/${account.id}`)
+              await expect(page).toHaveURL(new RegExp(`#\\/account\\/${account.id}$`))
+              await expectAccountDetailHydrated(page)
+              const detail = page.locator('.account-profile-page .detail-panel')
+              await expect(detail).toBeVisible()
+              await expect(detail).toContainText(account.address, { ignoreCase: true })
+              for (const text of account.required) await expect(detail).toContainText(text, { ignoreCase: true })
+              const tabs = detail.locator('.account-mode-tabs')
+              for (const mode of ['Summary', 'Field', 'Evidence'] as const) {
+                await tabs.getByRole('button', { name: new RegExp(`^${mode}`) }).click()
+                await expect(tabs.getByRole('button', { name: new RegExp(`^${mode}`) })).toHaveAttribute('aria-pressed', 'true')
+                await expectContained(page)
+                const file = `${account.slug}-${mode.toLowerCase()}-${testInfo.project.name}.png`
+                await page.evaluate(() => scrollTo(0, 0))
+                await page.screenshot({ path: `${folder}/${file}`, fullPage: true, animations: 'disabled', scale: 'css', timeout: 60_000 })
+                states.push({ account_id: account.id, semantic_role: account.slug, mode, image: file, hash: await page.evaluate(() => location.hash) })
+              }
+            }
+            writeFileSync(`${folder}/manifest.json`, JSON.stringify({ release_sha: process.env.RELEASE_SHA, pages_run_id: process.env.RELEASE_PAGES_RUN_ID, project: testInfo.project.name, states }, null, 2))
+          })
+          TS
       - name: Capture exact-release page, account and Workflow baseline
         run: >-
           npx playwright test
           tests/e2e/nyc-all-pages-tabs.spec.ts
           tests/e2e/workflow-inspector-layout.spec.ts
+          tests/e2e/release-baseline-semantic.spec.ts
           --project=desktop-chromium
           --project=iphone
       - name: Write exact-release baseline metadata
@@ -52,8 +93,13 @@ jobs:
               "pages_run_id": os.environ["RELEASE_PAGES_RUN_ID"],
               "hosted_url": os.environ["BASE_URL"],
               "capture_workflow_sha": os.environ["GITHUB_SHA"],
-              "tree_parity": "accepted release plus this retention-only workflow file",
+              "tree_parity": "accepted release plus this retention-only workflow file; semantic capture spec generated only after parity proof",
               "captured_at": datetime.now(timezone.utc).isoformat(),
+              "semantic_fixtures": {
+                  "cms_nursing_home": "2000002585",
+                  "dwt_heavy": "2000011123",
+                  "recovered_bbl_outer_borough_already_in_inventory": "2000012577",
+              },
           }
           Path("release-baseline/release-metadata.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
           PY
@@ -65,6 +111,7 @@ jobs:
           path: |
             release-baseline/release-metadata.json
             test-results/**/page-inventory/**
+            test-results/**/semantic-baseline/**
             test-results/**/workflow-inspector-layout/**
             playwright-report/**
           if-no-files-found: error
