@@ -39,22 +39,37 @@ describe('Home official intelligence', () => {
     expect(screen.getAllByRole('link', { name: /Earlier notice/ })).toHaveLength(5)
     await user.click(screen.getByRole('button', { name: 'Next intelligence page' }))
     expect(screen.queryByRole('link', { name: /Bronx Legionnaires Update/ })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Previous intelligence page' }))
+    expect(screen.getByRole('link', { name: /Bronx Legionnaires Update/ })).toBeInTheDocument()
     await user.type(screen.getByRole('searchbox', { name: 'Search official intelligence' }), '149th')
     await user.click(screen.getByRole('button', { name: /1 building/ }))
     expect(screen.getByRole('link', { name: 'Open tower account 2000000660' })).toHaveAttribute('href', '#/account/2000000660')
     expect(screen.getByText(/does not identify which system tested positive/)).toBeInTheDocument()
     expect(screen.getByText(/Cleaning order reported; completion not established/)).toBeInTheDocument()
   })
+  it('automatically recovers from a transient publication asset failure', async () => {
+    let alertAttempts = 0
+    vi.stubGlobal('fetch', vi.fn(async (input: string) => {
+      if (input.includes('property-matches')) return { ok: true, status: 200, json: async () => matches }
+      alertAttempts += 1
+      if (alertAttempts === 1) return { ok: false, status: 503, json: async () => ({}) }
+      return { ok: true, status: 200, json: async () => alerts }
+    }))
+    render(<LegionellaIntelligencePanel />)
+    await screen.findByRole('link', { name: /Bronx Legionnaires Update/ }, { timeout: 3000 })
+    expect(alertAttempts).toBe(2)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
   it('keeps publications visible when the independent match index is unavailable', async () => {
     mockFetch(false); render(<LegionellaIntelligencePanel />)
-    await screen.findByRole('link', { name: /Bronx Legionnaires Update/ })
-    await screen.findByText(/Building matching is unavailable/)
+    await screen.findByRole('link', { name: /Bronx Legionnaires Update/ }, {}, { timeout: 3000 })
+    await screen.findByText(/Building matching is unavailable/, {}, { timeout: 3000 })
     expect(screen.queryByRole('button', { name: /1 building/ })).not.toBeInTheDocument()
     expect(screen.getAllByText('Not assessed').length).toBeGreaterThan(0)
   })
-  it('reports source failure instead of showing zero alerts', async () => {
+  it('reports persistent source failure instead of showing zero alerts', async () => {
     mockFetch(true, false); render(<LegionellaIntelligencePanel />)
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('not a report of zero alerts'))
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('not a report of zero alerts'), { timeout: 3000 })
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 })
