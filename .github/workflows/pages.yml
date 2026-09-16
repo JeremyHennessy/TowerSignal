@@ -195,7 +195,7 @@ jobs:
         run: python scripts/attach_acris.py --output public/data --cache .acris-store/data/acris/cache.json
       - name: Validate verified ACRIS cache when present
         if: ${{ hashFiles('.acris-store/data/acris/cache.json') != '' }}
-        run: python scripts/validate_acris_cache.py --cache .acris-store/data/acris/cache.json --max-age-days 30 --require-production-volume
+        run: python scripts/validate_acris_cache.py --cache .acris-store/data/acris/cache.json --max-age-days 2 --require-production-volume
       - name: Require attached verified ACRIS cache when requested
         if: ${{ inputs.require_acris }}
         run: |
@@ -239,12 +239,23 @@ jobs:
           --summary public/data/nys-service-line-inventory-summary.json
           --max-age-days 1
           --require-production-volume
+      - name: Build bounded NYC historical 311 building-water context
+        timeout-minutes: 20
+        run: python scripts/build_historical_311_context.py --systems public/data/systems.json --output public/data/historical-311-context.json
+      - name: Validate bounded NYC historical 311 context
+        run: python scripts/validate_historical_311_context.py --cache public/data/historical-311-context.json --require-production-volume
+      - name: Attach exact-BBL NYC historical 311 context
+        run: python scripts/attach_historical_311_context.py --output public/data --cache public/data/historical-311-context.json
       - name: Build and validate source-health coverage
         run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Attach domestic-water source health
         run: python scripts/attach_domestic_water_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Attach ACRIS cache health and freshness
         run: python scripts/attach_acris_health.py --output public/data
+      - name: Build NYC/NYS source completeness audit
+        run: python scripts/build_coverage_audit.py --output public/data
+      - name: Validate NYC/NYS source completeness audit
+        run: python scripts/validate_coverage_audit.py --report public/data/coverage-audit.json
       - name: Build deterministic NYC historical changes
         run: python scripts/build_history.py --output public/data --previous-snapshot .history-store/data/history/latest.json --previous-events .history-store/data/history/events.json
       - name: Build deterministic NYS historical changes
