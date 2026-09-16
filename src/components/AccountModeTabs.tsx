@@ -63,7 +63,7 @@ export function AccountModeTabs() {
     }
   }, [mode])
 
-  return <nav ref={rootRef} className="account-mode-tabs" aria-label="Account profile modes" role="tablist">
-    {modes.map(item => <button type="button" role="tab" key={item.value} className={mode === item.value ? 'active' : ''} aria-selected={mode === item.value} aria-pressed={mode === item.value} onClick={() => setMode(item.value)}><strong>{item.label}</strong><span>{item.detail}</span></button>)}
+  return <nav ref={rootRef} className="account-mode-tabs" aria-label="Account profile modes">
+    {modes.map(item => <button type="button" key={item.value} className={mode === item.value ? 'active' : ''} aria-pressed={mode === item.value} onClick={() => setMode(item.value)}><strong>{item.label}</strong><span>{item.detail}</span></button>)}
   </nav>
 }
