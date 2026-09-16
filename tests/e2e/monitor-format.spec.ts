@@ -65,6 +65,10 @@ test('every Monitor tab has readable source values, responsive tables and usable
   for(const [type,required] of [['OATH_PENALTY_CHANGED','$'],['OATH_BALANCE_CHANGED','$'],['DOB_JOB_FILED','Job'],['LATEST_SAMPLE_CHANGED','Public sample date'],['HPD_CONTACT_ADDED','Business address']]){
     await monitor.getByLabel(/^Change type/).selectOption(type)
     const row=monitor.locator('.change-reference-row').first();await expect(row).toContainText(required)
+    if(type==='LATEST_SAMPLE_CHANGED' && testInfo.project.name==='iphone'){
+      const bodyWidth=await page.evaluate(()=>document.body.scrollWidth)
+      expect(bodyWidth,'LATEST_SAMPLE_CHANGED change-type select must not widen iPhone Monitor').toBeLessThanOrEqual(page.viewportSize()!.width+2)
+    }
     await row.scrollIntoViewIfNeeded();await capture(`detail-${type}`)
   }
   await monitor.getByLabel(/^Change type/).selectOption('OATH_BALANCE_CHANGED')
