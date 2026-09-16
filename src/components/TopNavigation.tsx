@@ -130,7 +130,7 @@ export function TopNavigation({
         {moreOpen && <div id="workspace-more-menu" className="reference-more-popover" role="menu" aria-label="More TowerSignal workspaces">
           <div className="reference-more-popover-head" aria-hidden="true"><strong>More workspaces</strong><span>Additional research and operating views</span></div>
           <div className="reference-more-popover-items">
-            {secondaryNavigation.map(item => <button key={item.mode} role="menuitem" className={mode === item.mode ? 'active' : ''} onClick={() => navigate(item)}><span>{item.label}</span><small>{item.detail}</small></button>)}
+            {secondaryNavigation.map(item => <button key={item.mode} role="menuitem" aria-label={item.label} className={mode === item.mode ? 'active' : ''} onClick={() => navigate(item)}><span>{item.label}</span><small>{item.detail}</small></button>)}
           </div>
         </div>}
       </div>
