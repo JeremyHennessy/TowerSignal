@@ -3,7 +3,7 @@ import { signInForProject } from './auth.helpers'
 
 test.setTimeout(90_000)
 
-test('trace hosted Monitor native select width for LATEST_SAMPLE_CHANGED on iPhone', async ({ page }, testInfo) => {
+test('prove Monitor native-select containment rule on hosted iPhone', async ({ page }, testInfo) => {
   await signInForProject(page, testInfo.project.name, '#/monitor')
   const monitor = page.getByRole('region', { name: 'TowerSignal changes' })
   await expect(monitor.locator('.change-reference-row').first()).toBeVisible()
@@ -12,41 +12,21 @@ test('trace hosted Monitor native select width for LATEST_SAMPLE_CHANGED on iPho
   await typeSelect.selectOption('LATEST_SAMPLE_CHANGED')
   await expect(monitor.locator('.change-reference-row').first()).toContainText('Public sample date')
 
-  const diagnostic = await page.evaluate(() => {
-    const describe = (selector: string) => {
-      const el = document.querySelector(selector) as HTMLElement | null
-      if (!el) return null
-      const rect = el.getBoundingClientRect()
-      const style = getComputedStyle(el)
-      return {
-        selector,
-        text: (el instanceof HTMLSelectElement ? el.options[el.selectedIndex]?.text : el.textContent)?.replace(/\s+/g, ' ').trim(),
-        left: rect.left,
-        right: rect.right,
-        width: rect.width,
-        clientWidth: el.clientWidth,
-        scrollWidth: el.scrollWidth,
-        minWidth: style.minWidth,
-        maxWidth: style.maxWidth,
-        widthCss: style.width,
-        boxSizing: style.boxSizing,
-        overflowX: style.overflowX,
-      }
-    }
-    return {
-      viewport: window.innerWidth,
-      bodyScrollWidth: document.body.scrollWidth,
-      htmlScrollWidth: document.documentElement.scrollWidth,
-      rail: describe('.change-filter-rail'),
-      typeLabel: describe('.change-filter-rail label:nth-of-type(3)'),
-      typeSelect: describe('.change-filter-rail label:nth-of-type(3) select'),
-      allSelects: [...document.querySelectorAll('.change-filter-rail select')].map((el, index) => {
-        const node = el as HTMLSelectElement
-        const rect = node.getBoundingClientRect()
-        const style = getComputedStyle(node)
-        return { index, selected: node.options[node.selectedIndex]?.text, left: rect.left, right: rect.right, width: rect.width, clientWidth: node.clientWidth, scrollWidth: node.scrollWidth, widthCss: style.width, minWidth: style.minWidth, maxWidth: style.maxWidth }
-      }),
-    }
-  })
-  console.log(`LATEST_SAMPLE_SELECT ${JSON.stringify(diagnostic)}`)
+  const before = await page.evaluate(() => ({ body: document.body.scrollWidth, html: document.documentElement.scrollWidth,
+    rail: (document.querySelector('.change-filter-rail') as HTMLElement).scrollWidth,
+    select: (document.querySelector('.change-filter-rail label:nth-of-type(3) select') as HTMLElement).scrollWidth }))
+  console.log(`MONITOR_CONTAIN_BEFORE ${JSON.stringify(before)}`)
+
+  await page.addStyleTag({ content: `.changes-table-view .change-filter-rail :is(select,input[type="date"],input[type="number"]){min-width:0;width:100%;max-width:100%;box-sizing:border-box}` })
+  const widthOnly = await page.evaluate(() => ({ body: document.body.scrollWidth, html: document.documentElement.scrollWidth,
+    rail: (document.querySelector('.change-filter-rail') as HTMLElement).scrollWidth,
+    select: (document.querySelector('.change-filter-rail label:nth-of-type(3) select') as HTMLElement).scrollWidth }))
+  console.log(`MONITOR_CONTAIN_WIDTH_ONLY ${JSON.stringify(widthOnly)}`)
+
+  await page.addStyleTag({ content: `.changes-table-view .change-filter-rail :is(select,input[type="date"],input[type="number"]){overflow:hidden}` })
+  const clippedNative = await page.evaluate(() => ({ body: document.body.scrollWidth, html: document.documentElement.scrollWidth,
+    rail: (document.querySelector('.change-filter-rail') as HTMLElement).scrollWidth,
+    select: (document.querySelector('.change-filter-rail label:nth-of-type(3) select') as HTMLElement).scrollWidth }))
+  console.log(`MONITOR_CONTAIN_OVERFLOW_HIDDEN ${JSON.stringify(clippedNative)}`)
+  expect(clippedNative.body).toBeLessThanOrEqual(392)
 })
