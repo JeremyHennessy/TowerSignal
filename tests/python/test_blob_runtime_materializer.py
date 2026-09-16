@@ -55,7 +55,7 @@ class MaterializerTests(unittest.TestCase):
         }
         self.prefix = 'towersignal-data/releases/pages-123/runtime'
         names = list(m.REQUIRED) + ['details/a.json', 'firm-details/a.json']
-        names += [f'filler/{index:03}.json' for index in range(93)]
+        names += [f'filler/{index:03}.json' for index in range(100 - len(names))]
         self.records = []
         for index, name in enumerate(names):
             body = json.dumps({'name': name, 'index': index}).encode()
@@ -144,11 +144,13 @@ class MaterializerTests(unittest.TestCase):
             m.materialize(self.store, self.output)
 
     def test_missing_required_file_is_rejected_before_download(self):
-        records = [row for row in self.records if row['path'] != 'changes.json']
-        self._seed_release(records)
-        with self.assertRaises(b.PublishError):
-            m.materialize(self.store, self.output)
-        self.assertFalse(self.output.exists())
+        for required in ('changes.json', 'property-enforcement.json', 'legionella-alerts.json',
+                         'legionella-property-matches.json', 'historical-311-context.json', 'coverage-audit.json'):
+            records = [row for row in self.records if row['path'] != required]
+            self._seed_release(records)
+            with self.subTest(required=required), self.assertRaises(b.PublishError):
+                m.materialize(self.store, self.output)
+            self.assertFalse(self.output.exists())
 
 
 if __name__ == '__main__':
