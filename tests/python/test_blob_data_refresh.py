@@ -337,7 +337,7 @@ class DataRefreshTests(unittest.TestCase):
         historical_311_start=pages.index('      - name: Build bounded NYC historical 311 building-water context\n')
         historical_311_end=pages.index('      - name: Build and validate source-health coverage\n', historical_311_start)
         coverage_audit_start=pages.index('      - name: Build NYC/NYS source completeness audit\n')
-        coverage_audit_end=pages.index('      - name: Build deterministic NYC historical changes\n', coverage_audit_start)
+        coverage_audit_end=pages.index('      - name: Independently verify generated systems and OATH cases against current NYC sources\n', coverage_audit_start)
         # Product-only collectors, matching logic and reporting audits are intentionally
         # excluded from Blob parity. The Blob workflow keeps its existing scope and
         # deployment contract unchanged.
