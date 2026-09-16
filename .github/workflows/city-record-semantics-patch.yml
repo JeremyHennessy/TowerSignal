@@ -1,0 +1,43 @@
+name: Apply City Record semantics patch
+
+on:
+  push:
+    branches:
+      - agent/city-record-semantics-20260916
+    paths:
+      - .github/workflows/city-record-semantics-patch.yml
+      - scripts/patch_city_record_semantics.py
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/city-record-semantics-20260916
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact semantics edits
+        run: python scripts/patch_city_record_semantics.py
+      - name: Validate targeted semantics and frontend contract
+        run: |
+          git diff --check
+          python tests/python/test_city_record.py
+          npm install --no-audit --no-fund
+          npm run typecheck
+      - name: Commit intended branch-only changes and remove patch scaffolding
+        run: |
+          git config user.name "TowerSignal Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git rm scripts/patch_city_record_semantics.py .github/workflows/city-record-semantics-patch.yml
+          git add scripts/towersignal/city_record.py tests/python/test_city_record.py src/types/procurement.ts src/components/OpportunitiesPage.tsx tests/e2e/city-record-semantics.spec.ts
+          git commit -m "fix: treat City Record sentinel deadlines as unverified"
+          git push origin HEAD:agent/city-record-semantics-20260916
