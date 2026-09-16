@@ -5,6 +5,7 @@ import { displayHeadline, officialDate, publicationKind, relatedEvidence, result
 import '../styles/legionella-intelligence.css'
 
 const PAGE_SIZE = 6
+const READ_RETRY_DELAYS_MS = [0, 250, 750] as const
 const views = [{ key: 'all', label: 'All updates' }, { key: 'linked', label: 'Linked buildings' }, { key: 'reference', label: 'Reference library' }] as const
 type View = typeof views[number]['key']
 
@@ -23,9 +24,23 @@ export function LegionellaIntelligencePanel() {
     const controller = new AbortController()
     let active = true
     async function read(name: string): Promise<unknown> {
-      const response = await fetch(`${import.meta.env.BASE_URL}data/${name}`, { cache: 'no-store', signal: controller.signal })
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      return response.json()
+      let lastError: unknown = new Error(`Unable to load ${name}`)
+      for (let index = 0; index < READ_RETRY_DELAYS_MS.length; index += 1) {
+        if (index > 0) {
+          await new Promise(resolve => window.setTimeout(resolve, READ_RETRY_DELAYS_MS[index]))
+          if (controller.signal.aborted) throw lastError
+        }
+        try {
+          const suffix = index === 0 ? '' : `?retry=${attempt}-${index}-${Date.now()}`
+          const response = await fetch(`${import.meta.env.BASE_URL}data/${name}${suffix}`, { cache: 'no-store', signal: controller.signal })
+          if (!response.ok) throw new Error(`HTTP ${response.status}`)
+          return await response.json()
+        } catch (error) {
+          lastError = error
+          if (controller.signal.aborted) throw error
+        }
+      }
+      throw lastError
     }
     read('legionella-alerts.json').then(value => {
       const payload = value as LegionellaAlertPayload
