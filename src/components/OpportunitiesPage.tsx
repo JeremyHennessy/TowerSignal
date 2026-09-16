@@ -35,7 +35,7 @@ function procurementAmount(row: ProcurementRecord): number | null {
 }
 
 function sourceLabel(row: ProcurementRecord): string {
-  if (row.source === 'NYC_CITY_RECORD') return row.scope === 'OPEN_SOLICITATIONS' ? 'City Record · Solicitation' : 'City Record · Award'
+  if (row.source === 'NYC_CITY_RECORD') return row.scope === 'RECENT_AWARDS' ? 'City Record · Award' : 'City Record · Solicitation'
   if (row.source === 'NYC_CHECKBOOK_EDC') return 'Checkbook · NYCEDC'
   if (row.source === 'NYS_OPEN_BOOK') return 'Open Book NY'
   if (row.source === 'NYC_CHECKBOOK_NYCHA') return 'Checkbook · NYCHA'
