@@ -1,0 +1,44 @@
+name: Correct City Record scope label
+
+on:
+  push:
+    branches:
+      - agent/city-record-semantics-20260916
+    paths:
+      - .github/workflows/city-record-label-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/city-record-semantics-20260916
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Correct source label semantics
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('src/components/OpportunitiesPage.tsx')
+          text = p.read_text()
+          old = "if (row.source === 'NYC_CITY_RECORD') return row.scope === 'OPEN_SOLICITATIONS' ? 'City Record · Solicitation' : 'City Record · Award'"
+          new = "if (row.source === 'NYC_CITY_RECORD') return row.scope === 'RECENT_AWARDS' ? 'City Record · Award' : 'City Record · Solicitation'"
+          if text.count(old) != 1:
+              raise SystemExit(f'expected one source-label match, found {text.count(old)}')
+          p.write_text(text.replace(old, new, 1))
+          PY
+          git diff --check
+      - name: Commit intended correction and remove workflow
+        run: |
+          git config user.name "TowerSignal Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/city-record-label-fix.yml
+          git add src/components/OpportunitiesPage.tsx
+          git commit -m "fix: label unverified City Record deadlines as solicitations"
+          git push origin HEAD:agent/city-record-semantics-20260916
