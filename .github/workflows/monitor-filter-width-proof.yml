@@ -1,0 +1,64 @@
+name: Verify narrow Monitor filter width
+on:
+  push:
+    branches: [work/monitor-filter-width-20260916]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d1549c62a850b8837af4bc55106e3eff285a04bd
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: nyc-evidence-tested-candidate
+          run-id: 35032234529
+          github-token: ${{ github.token }}
+          path: .baseline
+      - name: Apply only evidence-supported mobile select width hypothesis
+        run: |
+          mkdir -p diagnostics
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/styles/monitor-event-table.css')
+          p.write_text(p.read_text()+'\n/* Long native-select values require a full filter row on narrow screens. */\n@media(max-width:650px){.changes-table-view .change-filter-rail>label:has(select){grid-column:1/-1}}\n')
+          p=Path('tests/e2e/monitor-format.spec.ts');text=p.read_text()
+          text=text.replace('const categories =','test.use({ viewport: { width: 320, height: 844 }, screen: { width: 320, height: 844 } })\n\nconst categories =')
+          text=text.replace("const widths=testInfo.project.name==='iphone'?[390,320]:[1280,1024,768,1440]",'const widths=[320]')
+          text=text.replace('await page.setViewportSize({width,height:original.height})','expect(page.viewportSize()?.width).toBe(width)').replace('await page.setViewportSize(original)','expect(page.viewportSize()).toEqual(original)')
+          text=text.replace('await expectContained(page)\n    const metrics=', 'await expectContained(page)\n    expect(await page.evaluate(() => innerWidth)).toBe(320)\n    const metrics=')
+          p.write_text(text)
+          Path('diagnostics/test-under-review.ts').write_text(text)
+          Path('diagnostics/monitor-event-table.css').write_bytes(Path('src/styles/monitor-event-table.css').read_bytes())
+          PY
+          git diff > diagnostics/isolated-change.diff
+      - run: |
+          npm install --no-audit --no-fund
+          npm run build
+          mkdir -p .baseline/site
+          tar -xzf .baseline/candidate.tgz -C .baseline/site
+          cp -a .baseline/site/data/. dist/data/
+      - run: npx playwright install --with-deps webkit
+      - name: Fixed320 every category, currency, dates, select controls, pagination and provenance
+        env:
+          CANDIDATE_ROOT: dist
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/monitor-format.spec.ts --project=iphone
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: monitor-filter-width-proof
+          path: |
+            diagnostics/
+            playwright-report/
+            test-results/
+            !test-results/.auth/**
+          retention-days: 7
