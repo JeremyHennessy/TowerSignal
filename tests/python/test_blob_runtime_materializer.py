@@ -55,7 +55,7 @@ class MaterializerTests(unittest.TestCase):
         }
         self.prefix = 'towersignal-data/releases/pages-123/runtime'
         names = list(m.REQUIRED) + ['details/a.json', 'firm-details/a.json']
-        names += [f'filler/{index:03}.json' for index in range(93)]
+        names += [f'filler/{index:03}.json' for index in range(100 - len(names))]
         self.records = []
         for index, name in enumerate(names):
             body = json.dumps({'name': name, 'index': index}).encode()
@@ -145,6 +145,16 @@ class MaterializerTests(unittest.TestCase):
 
     def test_missing_required_file_is_rejected_before_download(self):
         records = [row for row in self.records if row['path'] != 'changes.json']
+        self._seed_release(records)
+        with self.assertRaises(b.PublishError):
+            m.materialize(self.store, self.output)
+        self.assertFalse(self.output.exists())
+
+    def test_pre_home_intelligence_runtime_is_rejected_before_download(self):
+        records = [
+            row for row in self.records
+            if row['path'] not in {'legionella-alerts.json', 'legionella-property-matches.json'}
+        ]
         self._seed_release(records)
         with self.assertRaises(b.PublishError):
             m.materialize(self.store, self.output)
