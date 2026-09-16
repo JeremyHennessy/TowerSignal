@@ -62,7 +62,7 @@ describe('Home official intelligence', () => {
   })
   it('keeps publications visible when the independent match index is unavailable', async () => {
     mockFetch(false); render(<LegionellaIntelligencePanel />)
-    await screen.findByRole('link', { name: /Bronx Legionnaires Update/ }, {}, { timeout: 3000 })
+    await screen.findByRole('link', { name: /Bronx Legionnaires Update/ }, { timeout: 3000 })
     await screen.findByText(/Building matching is unavailable/, {}, { timeout: 3000 })
     expect(screen.queryByRole('button', { name: /1 building/ })).not.toBeInTheDocument()
     expect(screen.getAllByText('Not assessed').length).toBeGreaterThan(0)
