@@ -84,7 +84,7 @@ export function PortalNavigation({ current, user }: { current: PortalRoute; user
         {moreOpen && <div id="portal-workspace-more-menu" className="reference-more-popover" role="menu" aria-label="More TowerSignal workspaces">
           <div className="reference-more-popover-head" aria-hidden="true"><strong>More workspaces</strong><span>Additional research and operating views</span></div>
           <div className="reference-more-popover-items">
-            {secondaryItems.map(item => <button key={item.hash} role="menuitem" onClick={() => go(item.hash)}><span>{item.label}</span><small>{item.detail}</small></button>)}
+            {secondaryItems.map(item => <button key={item.hash} role="menuitem" aria-label={item.label} onClick={() => go(item.hash)}><span>{item.label}</span><small>{item.detail}</small></button>)}
           </div>
         </div>}
       </div>
