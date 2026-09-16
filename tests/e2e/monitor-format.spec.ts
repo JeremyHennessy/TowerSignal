@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { devices } from '@playwright/test'
-import { installCandidateRoutes } from './candidate-routes'
+import { signInForProject } from './auth.helpers'
 import { expect, test } from './fixtures'
 import { expectContained } from './iphone.helpers'
 
@@ -29,17 +29,16 @@ test('every Monitor tab has readable source values, responsive tables and usable
     writeFileSync(`${folder}/manifest.json`,JSON.stringify({mode:process.env.CANDIDATE_ROOT?'CANDIDATE_NOT_HOSTED':'ACTUAL_HOSTED_NYC',code_sha:process.env.GITHUB_SHA,project:testInfo.project.name,states},null,2))
   }
   for(const width of widths){
-    // The retained 320px failure followed resizing an already-rendered mobile
-    // context: innerWidth became 475 and captures went black. Set both screen
-    // and viewport before navigation in a fresh context; keep every assertion.
+    // WebKit can authenticate this GitHub Pages tab in memory even when its
+    // cross-site session cookie is blocked. A new context therefore cannot
+    // inherit the authenticated user from storageState alone. For the 320px
+    // proof, establish the same existing E2E account in that fresh context.
     const narrowContext = testInfo.project.name === 'iphone' && width !== original.width
       ? await browser.newContext({ ...devices['iPhone 13'], baseURL: String(testInfo.project.use.baseURL),
-          viewport: { width, height: original.height }, screen: { width, height: original.height },
-          storageState: await initialPage.context().storageState() }) : null
+          viewport: { width, height: original.height }, screen: { width, height: original.height } }) : null
     if (narrowContext) {
       page = await narrowContext.newPage()
-      await installCandidateRoutes(page)
-      await page.goto('./#/monitor', { waitUntil: 'networkidle' })
+      await signInForProject(page, testInfo.project.name, '#/monitor')
       monitor = page.getByRole('region', { name: 'TowerSignal changes' })
       await expect(monitor.locator('.change-reference-row').first()).toBeVisible()
     } else if (testInfo.project.name !== 'iphone') {
