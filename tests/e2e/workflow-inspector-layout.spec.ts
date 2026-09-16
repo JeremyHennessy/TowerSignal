@@ -14,8 +14,8 @@ async function seedWorkflowAccount(page: import('@playwright/test').Page, projec
   await expect(section.getByText('Saved', { exact: true })).toBeVisible()
 }
 
-async function assertWorkspaceGeometry(page: import('@playwright/test').Page, stacked: boolean) {
-  const layout = await page.evaluate(() => {
+async function workspaceGeometry(page: import('@playwright/test').Page) {
+  return page.evaluate(() => {
     const rect = (selector: string) => {
       const element = document.querySelector(selector)
       if (!element) return null
@@ -28,35 +28,56 @@ async function assertWorkspaceGeometry(page: import('@playwright/test').Page, st
       viewport: document.documentElement.clientWidth,
       pageScrollWidth: document.documentElement.scrollWidth,
       grid: rect('.workflow-command-grid'),
-      primary: rect('.workflow-command-primary'),
+      map: rect('.workflow-command-map'),
       inspector: rect('.workflow-account-inspector'),
       tableCard: rect('.workflow-command-table-card'),
       tableScroll: rect('.workflow-command-table-card .table-scroll'),
       inspectorScrollWidth: inspector?.scrollWidth ?? 0,
       inspectorClientWidth: inspector?.clientWidth ?? 0,
-      inspectorOverflowX: inspector ? getComputedStyle(inspector).overflowX : '',
+      inspectorPosition: inspector ? getComputedStyle(inspector).position : '',
+      inspectorOverflowY: inspector ? getComputedStyle(inspector).overflowY : '',
       boundaryFontSize: boundary ? Number.parseFloat(getComputedStyle(boundary).fontSize) : 0,
-      boundaryLineHeight: boundary ? getComputedStyle(boundary).lineHeight : '',
     }
   })
+}
+
+function overlaps(a: { left: number; right: number; top: number; bottom: number }, b: { left: number; right: number; top: number; bottom: number }) {
+  return a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1
+}
+
+async function assertWorkspaceGeometry(page: import('@playwright/test').Page, stacked: boolean) {
+  const layout = await workspaceGeometry(page)
   expect(layout.pageScrollWidth).toBeLessThanOrEqual(layout.viewport + 2)
   expect(layout.grid).not.toBeNull()
-  expect(layout.primary).not.toBeNull()
   expect(layout.inspector).not.toBeNull()
   expect(layout.inspector!.left).toBeGreaterThanOrEqual(layout.grid!.left - 1)
   expect(layout.inspector!.right).toBeLessThanOrEqual(layout.grid!.right + 1)
   expect(layout.inspectorScrollWidth).toBeLessThanOrEqual(layout.inspectorClientWidth + 2)
   expect(layout.boundaryFontSize).toBeLessThanOrEqual(10)
-  if (layout.tableCard) expect(layout.tableCard.right).toBeLessThanOrEqual(layout.primary!.right + 1)
-  if (layout.tableScroll) expect(layout.tableScroll.right).toBeLessThanOrEqual(layout.primary!.right + 1)
-  if (stacked) {
-    expect(layout.inspector!.top).toBeGreaterThanOrEqual(layout.primary!.bottom - 1)
-  } else {
-    expect(layout.primary!.right).toBeLessThanOrEqual(layout.inspector!.left - 8)
+  expect(layout.inspectorPosition).toBe('static')
+  if (layout.tableCard) {
+    expect(layout.tableCard.left).toBeGreaterThanOrEqual(layout.grid!.left - 1)
+    expect(layout.tableCard.right).toBeLessThanOrEqual(layout.grid!.right + 1)
+    expect(overlaps(layout.inspector!, layout.tableCard)).toBe(false)
+  }
+  if (layout.tableScroll) expect(layout.tableScroll.right).toBeLessThanOrEqual(layout.tableCard!.right + 1)
+  if (layout.map) {
+    expect(overlaps(layout.map, layout.inspector!)).toBe(false)
+    if (stacked) {
+      expect(layout.inspector!.top).toBeGreaterThanOrEqual(layout.map.bottom - 1)
+      if (layout.tableCard) expect(layout.tableCard.top).toBeGreaterThanOrEqual(layout.inspector!.bottom - 1)
+    } else {
+      expect(layout.map.right).toBeLessThanOrEqual(layout.inspector!.left - 8)
+      expect(Math.abs(layout.map.top - layout.inspector!.top)).toBeLessThanOrEqual(2)
+      expect(layout.inspector!.height).toBeLessThanOrEqual(391)
+      if (layout.tableCard) expect(layout.tableCard.top).toBeGreaterThanOrEqual(Math.max(layout.map.bottom, layout.inspector!.bottom) - 1)
+    }
+  } else if (layout.tableCard) {
+    expect(layout.inspector!.top).toBeGreaterThanOrEqual(layout.tableCard.bottom - 1)
   }
 }
 
-test('Workflow Account Inspector stays contained through selections, views and desktop breakpoints', async ({ page }, testInfo) => {
+test('Workflow Account Inspector stays in its context row through selections, views and desktop breakpoints', async ({ page }, testInfo) => {
   test.skip(isIphoneProject(testInfo), 'Desktop breakpoint coverage runs in Chromium; iPhone has a dedicated test.')
   test.setTimeout(300_000)
   await seedWorkflowAccount(page, testInfo.project.name)
@@ -66,11 +87,11 @@ test('Workflow Account Inspector stays contained through selections, views and d
 
   for (const width of desktopWidths) {
     await page.setViewportSize({ width, height: 1000 })
-    await expect(workflow.getByRole('heading', { name: 'Workflow workspace', exact: true })).toBeVisible()
     await workflow.getByRole('tab', { name: /^Accounts/ }).click()
-    await workflow.getByRole('button', { name: 'Table', exact: true }).click()
+    await workflow.getByRole('button', { name: 'Map + table', exact: true }).click()
     const row = workflow.locator('.workflow-command-table tbody tr', { hasText: '16 E 39TH ST' }).first()
     await expect(row).toBeVisible()
+    await row.scrollIntoViewIfNeeded()
     await row.click()
 
     const inspector = workflow.locator('.workflow-account-inspector')
@@ -83,24 +104,26 @@ test('Workflow Account Inspector stays contained through selections, views and d
 
     const headers = workflow.locator('.workflow-command-table:not(.workflow-change-table):not(.workflow-actions-table) thead th')
     await expect(headers).toHaveCount(10)
-    const widths = await headers.evaluateAll(nodes => nodes.map(node => Math.round(node.getBoundingClientRect().width)))
-    expect(widths[0]).toBeLessThan(widths[1])
-    expect(widths[8]).toBeGreaterThan(widths[9])
-
-    for (const view of ['Map + table', 'Map'] as const) {
-      await workflow.getByRole('button', { name: view, exact: true }).click()
-      await assertWorkspaceGeometry(page, width <= 1280)
-    }
-    await workflow.getByRole('button', { name: 'Table', exact: true }).click()
+    const columnWidths = await headers.evaluateAll(nodes => nodes.map(node => Math.round(node.getBoundingClientRect().width)))
+    expect(columnWidths[0]).toBeLessThan(columnWidths[1])
+    expect(columnWidths[8]).toBeGreaterThan(columnWidths[9])
 
     await page.evaluate(() => window.scrollTo(0, 0))
-    await testInfo.attach(`workflow-selected-${width}.png`, { body: await page.screenshot({ scale: 'css', fullPage: true, animations: 'disabled' }), contentType: 'image/png' })
+    await testInfo.attach(`workflow-map-table-selected-${width}.png`, { body: await page.screenshot({ scale: 'css', fullPage: true, animations: 'disabled' }), contentType: 'image/png' })
+
+    for (const view of ['Table', 'Map'] as const) {
+      await workflow.getByRole('button', { name: view, exact: true }).click()
+      await assertWorkspaceGeometry(page, width <= 1280)
+      await page.evaluate(() => window.scrollTo(0, 0))
+      await testInfo.attach(`workflow-${view.toLowerCase()}-${width}.png`, { body: await page.screenshot({ scale: 'css', fullPage: true, animations: 'disabled' }), contentType: 'image/png' })
+    }
   }
 
+  await page.setViewportSize({ width: 1440, height: 1000 })
   await workflow.getByRole('tab', { name: /^Changes/ }).click()
   await expect(workflow.locator('.workflow-change-table')).toBeVisible()
   await workflow.locator('.workflow-change-table tbody tr').first().click()
-  await assertWorkspaceGeometry(page, true)
+  await assertWorkspaceGeometry(page, false)
 
   await workflow.getByRole('tab', { name: /^Actions/ }).click()
   const actionRows = workflow.locator('.workflow-actions-table tbody tr')
@@ -108,7 +131,7 @@ test('Workflow Account Inspector stays contained through selections, views and d
     await actionRows.first().click()
     await expect(workflow.locator('.workflow-account-inspector')).toContainText('Open full account')
   }
-  await assertWorkspaceGeometry(page, true)
+  await assertWorkspaceGeometry(page, false)
 
   const toolbox = workflow.locator('details.workflow-command-toolbox')
   await toolbox.locator('summary').click()
@@ -120,7 +143,7 @@ test('Workflow Account Inspector stays contained through selections, views and d
   await testInfo.attach('workflow-expanded-supporting-sections.png', { body: await page.screenshot({ scale: 'css', fullPage: true, animations: 'disabled' }), contentType: 'image/png' })
 })
 
-test('Workflow inspector and table stack without page overflow on iPhone', async ({ page }, testInfo) => {
+test('Workflow inspector and operational table stack without page overflow on iPhone', async ({ page }, testInfo) => {
   test.skip(!isIphoneProject(testInfo), 'iPhone-only containment regression')
   test.setTimeout(300_000)
   await seedWorkflowAccount(page, testInfo.project.name)
@@ -128,7 +151,7 @@ test('Workflow inspector and table stack without page overflow on iPhone', async
   const workflow = page.locator('section.workflow-workspace-page')
   await expect(workflow).toBeVisible()
   await workflow.getByRole('tab', { name: /^Accounts/ }).click()
-  await workflow.getByRole('button', { name: 'Table', exact: true }).click()
+  await workflow.getByRole('button', { name: 'Map + table', exact: true }).click()
   const row = workflow.locator('.workflow-command-table tbody tr', { hasText: '16 E 39TH ST' }).first()
   await row.scrollIntoViewIfNeeded()
   await row.click()
