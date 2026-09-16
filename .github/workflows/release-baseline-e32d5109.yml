@@ -1,0 +1,71 @@
+name: Capture accepted release baseline e32d5109
+
+on:
+  push:
+    branches:
+      - agent/release-baseline-e32d5109-20260916
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+      RELEASE_SHA: e32d5109f9c021ad9e1eb645c1303305b0bd8d14
+      RELEASE_PAGES_RUN_ID: '35149436158'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Prove application and test tree matches accepted release
+        run: |
+          changed="$(git diff --name-only "$RELEASE_SHA" HEAD)"
+          printf '%s\n' "$changed"
+          test "$changed" = ".github/workflows/release-baseline-e32d5109.yml"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install baseline browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Capture exact-release page, account and Workflow baseline
+        run: >-
+          npx playwright test
+          tests/e2e/nyc-all-pages-tabs.spec.ts
+          tests/e2e/workflow-inspector-layout.spec.ts
+          --project=desktop-chromium
+          --project=iphone
+      - name: Write exact-release baseline metadata
+        if: always()
+        run: |
+          mkdir -p release-baseline
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          payload = {
+              "release_sha": os.environ["RELEASE_SHA"],
+              "pages_run_id": os.environ["RELEASE_PAGES_RUN_ID"],
+              "hosted_url": os.environ["BASE_URL"],
+              "capture_workflow_sha": os.environ["GITHUB_SHA"],
+              "tree_parity": "accepted release plus this retention-only workflow file",
+              "captured_at": datetime.now(timezone.utc).isoformat(),
+          }
+          Path("release-baseline/release-metadata.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+          PY
+      - name: Retain named exact-release screenshots and manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-baseline-e32d5109
+          path: |
+            release-baseline/release-metadata.json
+            test-results/**/page-inventory/**
+            test-results/**/workflow-inspector-layout/**
+            playwright-report/**
+          if-no-files-found: error
+          retention-days: 30
