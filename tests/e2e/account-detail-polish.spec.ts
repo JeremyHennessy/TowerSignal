@@ -78,27 +78,27 @@ test('desktop account detail uses tab-owned content, modern navigation and a ful
   await expect(detail.locator('.account-decision-summary')).toContainText('Failure to report Legionella sample test date within 5 days')
   await testInfo.attach('account-2000015594-summary-desktop.png', { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
 
-  await tabs.getByRole('tab', { name: /^Sales/ }).click()
+  await tabs.getByRole('button', { name: /^Sales/ }).click()
   await expect(detail.locator('.sales-precall-pack')).toBeVisible()
   await expect(detail.locator('.account-decision-summary')).toBeHidden()
   await expect(detail.locator('.workflow-account-section')).toBeHidden()
   await testInfo.attach('account-2000015594-sales-desktop.png', { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
 
-  await tabs.getByRole('tab', { name: /^Field/ }).click()
+  await tabs.getByRole('button', { name: /^Field/ }).click()
   await expect(detail.locator('.technician-field-pack')).toBeVisible()
   const map = detail.locator('.planimetric-map')
   await map.scrollIntoViewIfNeeded()
   await assertFullTileCoverage(page)
   await testInfo.attach('account-2000015594-field-desktop.png', { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
 
-  await tabs.getByRole('tab', { name: /^Evidence/ }).click()
+  await tabs.getByRole('button', { name: /^Evidence/ }).click()
   await expect(detail.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
   await expect(detail).toContainText('3,897,404 sq ft')
   await expect(detail).toContainText('Non-Lead')
   await expect(detail.locator('.account-decision-summary')).toBeHidden()
   await testInfo.attach('account-2000015594-evidence-desktop.png', { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
 
-  await tabs.getByRole('tab', { name: /^History/ }).click()
+  await tabs.getByRole('button', { name: /^History/ }).click()
   await expect(detail.locator('.account-unified-timeline')).toBeVisible()
   await expect(detail.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
   await expect(detail).toContainText('Jun 11, 2026')
@@ -117,15 +117,15 @@ test('iPhone account detail keeps the five modes usable without legacy overlays 
 
   await expect(page.locator('.account-jump-control')).toBeHidden()
   await expect(page.locator('.account-section-rail')).toBeHidden()
-  await expect(tabs.getByRole('tab')).toHaveCount(5)
+  await expect(tabs.getByRole('button')).toHaveCount(5)
 
   for (const mode of ['Sales', 'Field', 'Evidence', 'History'] as const) {
-    await tabs.getByRole('tab', { name: new RegExp(`^${mode}`) }).click()
-    await expect(tabs.getByRole('tab', { name: new RegExp(`^${mode}`) })).toHaveAttribute('aria-selected', 'true')
+    await tabs.getByRole('button', { name: new RegExp(`^${mode}`) }).click()
+    await expect(tabs.getByRole('button', { name: new RegExp(`^${mode}`) })).toHaveAttribute('aria-pressed', 'true')
     if (mode !== 'Field') await expect(detail.locator('.workflow-account-section')).toBeHidden()
   }
 
-  await tabs.getByRole('tab', { name: /^Summary/ }).click()
+  await tabs.getByRole('button', { name: /^Summary/ }).click()
   await expect(detail.locator('.account-decision-summary')).toBeVisible()
   await expect(detail.locator('.workflow-account-section')).toBeVisible()
   await expect(detail.locator('.account-decision-summary')).toContainText('Non-Lead · NYC DEP service line')
