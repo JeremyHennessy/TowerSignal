@@ -34,6 +34,8 @@ REQUIRED = (
     'nys-systems.json',
     'nys-changes.json',
     'source-health.json',
+    'legionella-alerts.json',
+    'legionella-property-matches.json',
 )
 
 
