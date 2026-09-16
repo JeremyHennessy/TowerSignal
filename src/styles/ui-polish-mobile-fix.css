@@ -13,6 +13,32 @@
 
 /* Keep account search reachable even on the narrowest supported iPhone widths. */
 @media(max-width:430px){
+  /* The desktop alignment layer deliberately uses !important dimensions. Restore
+     the mobile header geometry after that layer so the workspace label and tool
+     cluster occupy separate grid tracks without widening the document. */
+  .reference-top-nav{
+    padding-left:9px!important;
+    padding-right:9px!important;
+  }
+  .reference-top-nav .reference-brand{
+    flex:0 0 101px!important;
+    width:101px!important;
+  }
+  .reference-top-nav .reference-brand img{
+    width:101px!important;
+  }
+  .reference-top-nav .reference-mobile-current{
+    grid-column:2;
+    grid-row:1;
+    min-width:0;
+  }
+  .reference-top-nav .reference-nav-tools{
+    grid-column:3;
+    grid-row:1;
+    justify-self:end;
+    margin-left:0!important;
+    min-width:0;
+  }
   .reference-mobile-search-trigger{display:grid!important}
 
   /* Long source-backed history tokens must wrap instead of widening the report. */
