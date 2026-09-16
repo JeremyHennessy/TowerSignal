@@ -30,6 +30,20 @@ jobs:
           npm run typecheck
           npm test
           npm run build
+      - name: Attach current hosted core runtime data to candidate
+        env:
+          LIVE_DATA_BASE: https://jeremyhennessy.github.io/TowerSignal/data
+        run: |
+          set -euo pipefail
+          mkdir -p dist/data
+          for name in systems.json changes.json nys-systems.json nys-changes.json; do
+            curl --fail --location --silent --show-error --retry 4 --retry-delay 2 --retry-all-errors \
+              "${LIVE_DATA_BASE}/${name}" \
+              --output "dist/data/${name}"
+            test -s "dist/data/${name}"
+            node -e "JSON.parse(require('fs').readFileSync('dist/data/${name}', 'utf8'))"
+            echo "Attached ${name} ($(wc -c < "dist/data/${name}") bytes)"
+          done
       - name: Install browser engines
         run: npx playwright install --with-deps chromium webkit
       - name: Candidate Workflow desktop and iPhone acceptance
