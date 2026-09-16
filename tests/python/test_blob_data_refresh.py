@@ -327,24 +327,42 @@ class DataRefreshTests(unittest.TestCase):
     def test_workflow_preserves_all_original_source_build_commands_and_limits(self):
         root=Path(__file__).resolve().parents[2]
         pages=(root/'.github/workflows/pages.yml').read_text()
+        workflow=(root/d.WORKFLOW).read_text()
         shared_start=pages.index('      - name: Fetch, validate and generate current NYC data\n')
         pages_only_start=pages.index('      - name: Build NYC property-enforcement cache\n')
         pages_only_end=pages.index('      - name: Build bounded legacy DOB/BIS project context\n')
         shared_end=pages.index('      - name: Stage history state for post-deploy persistence\n')
         matching_start=pages.index('      - name: Install official-results PDF text reader\n')
         matching_end=pages.index('      - name: Python fixture tests\n', matching_start)
-        # These two additions belong only to the NYC Pages product. Preserve the
-        # byte-exact shared source commands/limits without modifying Blob scope.
+        historical_311_start=pages.index('      - name: Build bounded NYC historical 311 building-water context\n')
+        historical_311_end=pages.index('      - name: Build and validate source-health coverage\n', historical_311_start)
+        coverage_audit_start=pages.index('      - name: Build NYC/NYS source completeness audit\n')
+        coverage_audit_end=pages.index('      - name: Build deterministic NYC historical changes\n', coverage_audit_start)
+        # Product-only collectors, matching logic and reporting audits are intentionally
+        # excluded from Blob parity. The Blob workflow keeps its existing scope and
+        # deployment contract unchanged.
         matching_segment=pages[matching_start:matching_end]
         self.assertIn('sudo apt-get install -y --no-install-recommends poppler-utils', matching_segment)
         self.assertIn('        timeout-minutes: 10\n        run: python scripts/build_legionella_matches.py --data public/data\n', matching_segment)
         self.assertLess(pages.index('      - name: Independently verify generated NYS equipment against current NYS source\n'), matching_start)
         shared_segment=(pages[shared_start:pages_only_start] +
-                        pages[pages_only_end:matching_start] + pages[matching_end:shared_end])
-        workflow=(root/d.WORKFLOW).read_text()
+                        pages[pages_only_end:historical_311_start] +
+                        pages[historical_311_end:coverage_audit_start] +
+                        pages[coverage_audit_end:matching_start] +
+                        pages[matching_end:shared_end])
+        # Pages is allowed to enforce a tighter cache freshness boundary without
+        # changing Blob behavior. Normalize that one explicit policy difference
+        # before checking the byte-exact shared source-build segment.
+        pages_acris='python scripts/validate_acris_cache.py --cache .acris-store/data/acris/cache.json --max-age-days 2 --require-production-volume'
+        blob_acris='python scripts/validate_acris_cache.py --cache .acris-store/data/acris/cache.json --max-age-days 30 --require-production-volume'
+        self.assertIn(pages_acris, shared_segment)
+        self.assertIn(blob_acris, workflow)
+        shared_segment=shared_segment.replace(pages_acris, blob_acris)
         self.assertIn(shared_segment,workflow)
         self.assertNotIn('Build NYC property-enforcement cache', workflow)
         self.assertNotIn('Build official Legionella / Legionnaires intelligence cache', workflow)
+        self.assertNotIn('Build bounded NYC historical 311 building-water context', workflow)
+        self.assertNotIn('Build NYC/NYS source completeness audit', workflow)
         self.assertNotIn('scripts/build_legionella_matches.py', workflow)
         self.assertNotIn('poppler-utils', workflow)
         self.assertIn("- cron: '17 10 * * *'",workflow)
