@@ -14,12 +14,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const old=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35035892286})).data;
-            const next=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35036588647})).data;
+            const old=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35042084621})).data;
+            const next=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35042108468})).data;
             const ref=(await github.rest.git.getRef({...context.repo,ref:'heads/agent/nyc-monitor-format-20260915'})).data;
             const path='.github/workflows/monitor-format-candidate.yml';
-            if(old.path!==path||old.head_sha!=='4a4477ecc4ed4852cf6cbcb8778bdd584a56f713'||next.path!==path||next.head_sha!=='d1549c62a850b8837af4bc55106e3eff285a04bd'||ref.object.sha!==next.head_sha) throw new Error('Candidate identity changed; no cancellation');
-            const proof={obsolete_run:old.id,obsolete_head:old.head_sha,obsolete_status:old.status,replacement_run:next.id,replacement_head:next.head_sha,reason:'Superseded after exact wrapped-label selector defect was independently reproduced. Replacement retains every UI/data assertion and reruns full proof.'};
+            if(old.path!==path||old.head_sha!=='415138ac948380b89fc986221723d15f6c32e5a0'||next.path!==path||next.head_sha!=='f4d3872ae5d942ea6798d9e6c860004b6277acad'||ref.object.sha!==next.head_sha) throw new Error('Candidate identity changed; no cancellation');
+            const proof={obsolete_run:old.id,obsolete_head:old.head_sha,obsolete_status:old.status,replacement_run:next.id,replacement_head:next.head_sha,reason:'Fresh 320px context was correctly sized but unauthenticated because WebKit keeps the signed-in user in tab memory when the cross-site cookie is blocked. Replacement authenticates the same existing E2E account inside the fresh 320px context and retains all UI/data assertions.'};
             if(old.status!=='completed') {
               await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:old.id});
               proof.cancellation_requested=true;
