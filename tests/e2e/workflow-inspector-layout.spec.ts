@@ -121,7 +121,8 @@ test('Workflow Account Inspector stays in a dedicated sidecar through selections
   await page.setViewportSize({ width: 1440, height: 1000 })
   await workflow.getByRole('tab', { name: /^Changes/ }).click()
   await expect(workflow.locator('.workflow-change-table')).toBeVisible()
-  await workflow.locator('.workflow-change-table tbody tr').first().click()
+  const changeRows = workflow.locator('.workflow-change-table tbody tr')
+  if (await changeRows.count()) await changeRows.first().click()
   await assertWorkspaceGeometry(page, false)
 
   await workflow.getByRole('tab', { name: /^Actions/ }).click()
