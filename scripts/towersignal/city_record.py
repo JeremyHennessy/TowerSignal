@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
+from html import unescape
 from typing import Any, Callable, Mapping
 from urllib.parse import urlencode
 
 from .fetch import _request_json
-from .procurement import classify_procurement, normalize_notice, normalize_space, procurement_source_health, utc_now
+from .procurement import classify_procurement, normalize_notice, normalize_space, parse_iso_date, procurement_source_health, utc_now
 
 DATASET_ID = "dg92-zbpx"
 DATASET_NAME = "NYC City Record Online"
@@ -80,16 +81,26 @@ def _query_url(url: str, params: Mapping[str, Any]) -> str:
 def city_record_scopes(as_of: date, award_lookback_days: int = DEFAULT_AWARD_LOOKBACK_DAYS) -> tuple[tuple[str, str], ...]:
     if award_lookback_days <= 0:
         raise ValueError("award_lookback_days must be positive")
+    sentinel_start = date(2099, 1, 1)
     open_where = (
         "type_of_notice_description = 'Solicitation' "
-        f"AND due_date >= '{_floating_timestamp(as_of)}'"
+        f"AND due_date >= '{_floating_timestamp(as_of)}' "
+        f"AND due_date < '{_floating_timestamp(sentinel_start)}'"
+    )
+    unverified_deadline_where = (
+        "type_of_notice_description = 'Solicitation' "
+        f"AND due_date >= '{_floating_timestamp(sentinel_start)}'"
     )
     award_start = as_of - timedelta(days=award_lookback_days)
     awards_where = (
         "type_of_notice_description = 'Award' "
         f"AND start_date >= '{_floating_timestamp(award_start)}'"
     )
-    return (("OPEN_SOLICITATIONS", open_where), ("RECENT_AWARDS", awards_where))
+    return (
+        ("OPEN_SOLICITATIONS", open_where),
+        ("UNVERIFIED_DEADLINE_SOLICITATIONS", unverified_deadline_where),
+        ("RECENT_AWARDS", awards_where),
+    )
 
 
 def fetch_city_record_metadata(*, request_json: RequestJson = _request_json) -> dict[str, Any]:
@@ -178,10 +189,31 @@ def source_text(row: Mapping[str, Any]) -> str:
     return normalize_space(" ".join(str(row.get(field) or "") for field in TEXT_FIELDS))
 
 
-def source_document_url(value: Any) -> str | None:
+def source_document_urls(value: Any) -> tuple[str, ...]:
     if isinstance(value, Mapping):
-        return normalize_space(str(value.get("url") or value.get("href") or "")) or None
-    return normalize_space(str(value or "")) or None
+        text = str(value.get("url") or value.get("href") or "")
+    else:
+        text = str(value or "")
+    urls: list[str] = []
+    for candidate in text.split(","):
+        normalized = normalize_space(unescape(candidate))
+        if normalized and normalized not in urls:
+            urls.append(normalized)
+    return tuple(urls)
+
+
+def source_document_url(value: Any) -> str | None:
+    urls = source_document_urls(value)
+    return urls[0] if urls else None
+
+
+def deadline_semantics(value: Any) -> tuple[str | None, str, str | None]:
+    parsed = parse_iso_date(value)
+    if parsed is None:
+        return None, "MISSING", None
+    if int(parsed[:4]) >= 2099:
+        return None, "UNVERIFIED_SENTINEL", parsed
+    return parsed, "VERIFIED_DATE", parsed
 
 
 def normalize_city_record_row(row: Mapping[str, Any], *, retrieved_at: str, scope: str) -> dict[str, Any]:
@@ -190,6 +222,16 @@ def normalize_city_record_row(row: Mapping[str, Any], *, retrieved_at: str, scop
         raise ValueError("City Record row is missing request_id")
     notice_type = normalize_space(str(row.get("type_of_notice_description") or "")) or None
     text = source_text(row)
+    due_date, due_date_status, source_due_date = deadline_semantics(row.get("due_date"))
+    source_urls = source_document_urls(row.get("document_links"))
+    if scope == "RECENT_AWARDS":
+        normalized_status = "AWARDED"
+    elif due_date_status == "UNVERIFIED_SENTINEL":
+        normalized_status = "DEADLINE_UNVERIFIED"
+    elif scope == "OPEN_SOLICITATIONS":
+        normalized_status = "OPEN"
+    else:
+        normalized_status = None
     notice = normalize_notice(
         source="NYC_CITY_RECORD",
         source_record_id=request_id,
@@ -203,18 +245,22 @@ def normalize_city_record_row(row: Mapping[str, Any], *, retrieved_at: str, scop
         procurement_category=normalize_space(str(row.get("category_description") or "")) or None,
         selection_method=normalize_space(str(row.get("selection_method_description") or "")) or None,
         pin=normalize_space(str(row.get("pin") or "")) or None,
-        due_date=row.get("due_date"),
+        due_date=due_date,
         notice_start_date=row.get("start_date"),
         notice_end_date=row.get("end_date"),
         contact_name=normalize_space(str(row.get("contact_name") or "")) or None,
         contact_phone=normalize_space(str(row.get("contact_phone") or "")) or None,
         amount=row.get("contract_amount"),
-        status="OPEN" if scope == "OPEN_SOLICITATIONS" else "AWARDED" if scope == "RECENT_AWARDS" else None,
-        source_url=source_document_url(row.get("document_links")) or DATASET_PAGE,
+        status=normalized_status,
+        source_url=(source_urls[0] if source_urls else DATASET_PAGE),
     )
     notice.update(
         {
             "scope": scope,
+            "due_date_raw": normalize_space(str(row.get("due_date") or "")) or None,
+            "due_date_status": due_date_status,
+            "source_due_date": source_due_date,
+            "source_urls": list(source_urls),
             "vendor_raw": normalize_space(str(row.get("vendor_name") or "")) or None,
             "vendor_address": normalize_space(str(row.get("vendor_address") or "")) or None,
             "contact_email": normalize_space(str(row.get("email") or "")) or None,
@@ -302,7 +348,8 @@ def build_city_record_payload(
         "summary": {
             "scoped_record_count": scoped_record_count,
             "relevant_record_count": len(normalized),
-            "open_relevant_opportunities": sum(1 for item in normalized if item.get("scope") == "OPEN_SOLICITATIONS"),
+            "open_relevant_opportunities": sum(1 for item in normalized if item.get("status") == "OPEN"),
+            "unverified_deadline_opportunities": sum(1 for item in normalized if item.get("status") == "DEADLINE_UNVERIFIED"),
             "recent_relevant_awards": len(relevant_awards),
             "unresolved_vendor_count": unresolved_vendor_count,
             "classification_counts": dict(sorted(classification_counts.items())),
