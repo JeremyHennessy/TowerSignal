@@ -55,6 +55,9 @@ export interface ProcurementRecord {
   end_date?: string | null
   award_date?: string | null
   due_date?: string | null
+  due_date_raw?: string | null
+  due_date_status?: 'VERIFIED_DATE' | 'UNVERIFIED_SENTINEL' | 'MISSING' | null
+  source_due_date?: string | null
   notice_start_date?: string | null
   notice_end_date?: string | null
   status?: string | null
@@ -64,6 +67,7 @@ export interface ProcurementRecord {
   pin?: string | null
   scope?: string | null
   source_url?: string | null
+  source_urls?: string[]
   retrieved_at: string
   source_updated_at?: string | null
   facility_id?: string | null
@@ -80,7 +84,7 @@ export interface CityRecordProcurementPayload {
   schema_version: string
   generated_at: string
   source: { dataset_id: string; name: string; dataset_page?: string; retrieved_at: string; as_of_date: string; award_lookback_days: number }
-  summary: { scoped_record_count: number; relevant_record_count: number; open_relevant_opportunities: number; recent_relevant_awards: number; unresolved_vendor_count: number; classification_counts: Record<string, number> }
+  summary: { scoped_record_count: number; relevant_record_count: number; open_relevant_opportunities: number; unverified_deadline_opportunities: number; recent_relevant_awards: number; unresolved_vendor_count: number; classification_counts: Record<string, number> }
   source_health: ProcurementSourceHealth
   notices: ProcurementRecord[]
 }
