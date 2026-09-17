@@ -1,0 +1,27 @@
+name: Prove isolated Neon auth bridge
+
+on:
+  push:
+    branches:
+      - agent/arcny-hosted-fixture-proof-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prove bridge exchange and RLS Data API round-trip
+        env:
+          BRIDGE_PROOF_AUTH_URL: https://ep-nameless-brook-auxfp8jj.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth
+          BRIDGE_PROOF_URL: https://br-small-resonance-auw6h71b-authbridgeproof.compute.c-10.us-east-1.aws.neon.tech/
+          BRIDGE_PROOF_DATA_API_URL: https://ep-nameless-brook-auxfp8jj.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1
+        run: node scripts/probe_neon_auth_bridge.mjs
