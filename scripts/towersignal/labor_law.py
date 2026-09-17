@@ -8,6 +8,7 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any, Callable, Iterable
 
 from .fetch import SourceFetchError
@@ -57,6 +58,19 @@ def normalize_property_address(value: Any) -> str | None:
     return normalized or None
 
 
+def normalize_publication_date(value: Any) -> str | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = parsedate_to_datetime(text)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc).date().isoformat()
+
+
 def _fetch_bytes(url: str, *, attempts: int = 4, timeout: int = 90) -> tuple[bytes, str | None]:
     error: Exception | None = None
     for attempt in range(1, attempts + 1):
@@ -103,6 +117,7 @@ def normalize_decision(feed: str, feed_url: str, item: dict[str, str], body: byt
         return None
     title = item.get("title", "").strip()
     link = item.get("link", "").strip()
+    publication_date_raw = item.get("pub_date", "").strip()
     addresses = _subject_addresses(text)
     all_addresses = []
     for match in ADDRESS_RE.finditer(text):
@@ -117,7 +132,8 @@ def normalize_decision(feed: str, feed_url: str, item: dict[str, str], body: byt
         "feed_url": feed_url,
         "title": title,
         "decision_url": link,
-        "publication_date": item.get("pub_date") or None,
+        "publication_date": normalize_publication_date(publication_date_raw),
+        "publication_date_raw": publication_date_raw or None,
         "labor_law_mention_count": len(re.findall(r"Labor\s+Law", text, re.I)),
         "labor_law_sections": sorted({match.group(1).strip() for match in SECTIONS_RE.finditer(text) if match.group(1).strip()}),
         "index_numbers": sorted(set(INDEX_RE.findall(text))),
