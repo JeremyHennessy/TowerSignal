@@ -1,10 +1,14 @@
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from build_labor_law_decisions import build as build_labor_law_decisions
 from towersignal.labor_law import (
     match_decisions_to_systems,
     merge_retained_decisions,
@@ -106,6 +110,64 @@ class LaborLawDecisionTests(unittest.TestCase):
         current = [{"decision_id": "new", "publication_date": "2026-09-16", "title": "New"}]
         merged = merge_retained_decisions(current, previous)
         self.assertEqual([row["decision_id"] for row in merged], ["new", "old"])
+
+    def test_build_mirrors_retained_cache_into_verified_history_segments(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            output_dir = root / "public" / "data"
+            output_dir.mkdir(parents=True)
+            systems_path = output_dir / "systems.json"
+            systems_path.write_text(json.dumps({
+                "schema_version": "1.0",
+                "metadata": {"snapshot_date": "2026-09-17"},
+                "systems": [{"system_id": "SYS-1", "address": "350 W 71ST ST"}],
+            }), encoding="utf-8")
+            previous_path = root / "previous.json"
+            previous_path.write_text(json.dumps({
+                "decisions": [{
+                    "decision_id": "old-decision",
+                    "publication_date": "2025-01-01",
+                    "title": "Old retained decision",
+                    "explicit_subject_property_candidates": [],
+                }],
+            }), encoding="utf-8")
+            current = [{
+                "decision_id": "new-decision",
+                "publication_date": "2026-09-17",
+                "publication_date_raw": "Thu, 17 Sep 2026 12:00:00 GMT",
+                "title": "New decision",
+                "decision_url": "https://example.test/new",
+                "explicit_subject_property_candidates": [],
+                "labor_law_sections": [],
+                "index_numbers": [],
+                "case_numbers": [],
+                "nyscef_document_numbers": [],
+                "source": "NYS_OFFICIAL_REPORTS_PUBLISHED_DECISION",
+                "evidence_class": "PUBLISHED_DECISION_PARTIAL_COVERAGE",
+            }]
+            source = {
+                "dataset_id": "NYS_OFFICIAL_REPORTS_LABOR_LAW_PUBLISHED_DECISIONS",
+                "name": "New York Official Reports — Labor Law published decisions",
+                "url": "https://www.nycourts.gov/reporter/RSS.shtml",
+                "retrieved_at": "2026-09-17T12:00:00Z",
+                "source_record_count": 10,
+                "inspected_record_count": 10,
+                "matched_record_count": 1,
+                "feed_health": {},
+                "retrieval_failures": [],
+                "source_query_scope": "fixture",
+                "coverage_boundary": "partial",
+                "current_filing_status_available": False,
+            }
+            with patch("build_labor_law_decisions.fetch_published_labor_law_decisions", return_value=(current, source)):
+                output_path = output_dir / "labor-law-decisions.json"
+                payload = build_labor_law_decisions(systems_path, output_path, previous_path)
+
+            segment_path = output_dir / "history" / "segments" / "labor-law-decisions.json"
+            self.assertTrue(segment_path.exists())
+            segment = json.loads(segment_path.read_text(encoding="utf-8"))
+            self.assertEqual(segment, payload)
+            self.assertEqual([row["decision_id"] for row in payload["decisions"]], ["new-decision", "old-decision"])
 
 
 if __name__ == "__main__":
