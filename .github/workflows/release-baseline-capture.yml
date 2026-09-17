@@ -1,0 +1,63 @@
+name: Capture exact-release visual baseline
+
+on:
+  push:
+    branches:
+      - agent/release-baseline-capture-20260916
+    paths:
+      - .release-baseline-trigger
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Read accepted release identity
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_SHA="$(sed -n 's/^release_sha=//p' .release-baseline-trigger | head -n1)"
+          RELEASE_RUN_ID="$(sed -n 's/^release_run_id=//p' .release-baseline-trigger | head -n1)"
+          if [[ ! "$RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid release_sha in .release-baseline-trigger: $RELEASE_SHA" >&2
+            exit 1
+          fi
+          if [[ ! "$RELEASE_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "Invalid release_run_id in .release-baseline-trigger: $RELEASE_RUN_ID" >&2
+            exit 1
+          fi
+          echo "release_sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "release_run_id=$RELEASE_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${RELEASE_SHA:0:8}" >> "$GITHUB_OUTPUT"
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install hosted-test browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Capture exact live release baseline
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          RELEASE_SHA: ${{ steps.release.outputs.release_sha }}
+          RELEASE_RUN_ID: ${{ steps.release.outputs.release_run_id }}
+        run: |
+          mkdir -p test-results/release-baseline
+          printf 'release_sha=%s\nrelease_run_id=%s\nbase_url=%s\ncaptured_at=%s\n' \
+            "$RELEASE_SHA" "$RELEASE_RUN_ID" "$BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            > test-results/release-baseline/manifest.txt
+          npx playwright test tests/e2e/auth.setup.ts tests/e2e/release-baseline.spec.ts
+      - name: Upload retained release baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-baseline-${{ steps.release.outputs.short_sha }}-${{ steps.release.outputs.release_run_id }}
+          path: |
+            test-results/release-baseline/**
+            playwright-report/**
+          retention-days: 30
