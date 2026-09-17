@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { loadProcurement, loadSystemDetail } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { collectAccountFirmRoleEvidence, explicitAccountProcurementRecords } from '../domain/accountEvidence'
+import { collectProcurementFirmRoleEvidence } from '../domain/procurementFirmRoles'
 import type { SystemDetail } from '../types/data'
 import type { ProcurementBundle, ProcurementRecord } from '../types/procurement'
 import type { PropertyEnforcementContext } from '../types/enforcement'
@@ -76,14 +77,21 @@ function ProjectEvidence({ detail }: { detail: EvidenceDetail }) {
   </>
 }
 
-function FirmRoleEvidence({ detail }: { detail: EvidenceDetail }) {
-  const rows = collectAccountFirmRoleEvidence(detail)
-  if (rows.length === 0) return <div className="empty-inline">No source-named drinking-water inspection/testing firm or relevant DOB applicant business is attached through the current exact BIN/BBL evidence paths.</div>
-  return <div className="observed-firm-role-list">{rows.map(row => <article className="observed-firm-role" key={row.key}>
-    <div className="observed-firm-role-head"><div><strong>{row.name}</strong><span>{row.role}</span></div><span className={`relationship-chip relationship-${row.relationship.toLowerCase()}`}>{row.relationship.replaceAll('_', ' ')}</span></div>
-    <dl className="identity-grid"><div><dt>Source / dataset</dt><dd>{row.sourceName}<small>{row.datasetId}</small></dd></div><div><dt>Observation</dt><dd>{row.observedDate ? formatDate(row.observedDate) : row.observedYear ? `Reporting year ${row.observedYear}` : 'Date not published'}</dd></div><div><dt>Identity basis</dt><dd>{row.matchBasis.replace('_', ' ')}</dd></div><div><dt>Fact / confidence</dt><dd>{row.factClass.replace('_', ' ')} · {row.confidence}</dd></div><div className="wide"><dt>Source reference</dt><dd>{row.sourceReference}</dd></div></dl>
-    <p className="microcopy">{row.serviceAssignmentBoundary}</p>
-  </article>)}</div>
+function FirmRoleEvidence({ detail, procurementRecords, procurementError }: { detail: EvidenceDetail; procurementRecords: ProcurementRecord[] | null; procurementError: string | null }) {
+  const sourceRows = collectAccountFirmRoleEvidence(detail).map(row => ({ ...row, sourceUrls: [] as string[], companyIdentity: null as string | null }))
+  const procurementRows = procurementRecords == null ? [] : collectProcurementFirmRoleEvidence(procurementRecords)
+  const rows = [...sourceRows, ...procurementRows]
+  if (rows.length === 0 && procurementRecords == null && !procurementError) return <div className="loading-state">Loading source-observed and procurement-linked firm roles…</div>
+  return <>
+    {rows.length === 0 ? <div className="empty-inline">No source-named service/recorded role or explicitly account-linked procurement vendor is represented in the current evidence. This is not evidence that no firm relationship exists.</div> : <div className="observed-firm-role-list">{rows.map(row => <article className="observed-firm-role" key={row.key}>
+      <div className="observed-firm-role-head"><div><strong>{row.name}</strong><span>{row.role}</span></div><span className={`relationship-chip relationship-${row.relationship.toLowerCase()}`}>{row.relationship.replaceAll('_', ' ')}</span></div>
+      <dl className="identity-grid"><div><dt>Source / dataset</dt><dd>{row.sourceName}<small>{row.datasetId}</small></dd></div><div><dt>Observation</dt><dd>{row.observedDate ? formatDate(row.observedDate) : row.observedYear ? `Reporting year ${row.observedYear}` : 'Date not published'}</dd></div><div><dt>Identity basis</dt><dd>{row.matchBasis.replaceAll('_', ' ')}</dd></div><div><dt>Fact / confidence</dt><dd>{row.factClass.replaceAll('_', ' ')} · {row.confidence}</dd></div>{row.companyIdentity && <div><dt>Resolved company</dt><dd>{row.companyIdentity}</dd></div>}<div className="wide"><dt>Source reference</dt><dd>{row.sourceReference}</dd></div></dl>
+      {row.sourceUrls.length > 0 && <div className="evidence-source-links">{row.sourceUrls.map((url, index) => <a href={url} target="_blank" rel="noreferrer" key={`${url}-${index}`}>Source {row.sourceUrls.length > 1 ? index + 1 : ''} ↗</a>)}</div>}
+      <p className="microcopy">{row.serviceAssignmentBoundary}</p>
+    </article>)}</div>}
+    {procurementRecords == null && !procurementError && <div className="loading-state">Loading explicitly linked procurement firm roles…</div>}
+    {procurementError && <div className="evidence-boundary"><strong>Procurement-linked firm roles unavailable.</strong><p>{procurementError}</p><p>No zero-vendor or no-relationship conclusion is inferred.</p></div>}
+  </>
 }
 
 function ProcurementEvidence({ records, error }: { records: ProcurementRecord[] | null; error: string | null }) {
@@ -141,7 +149,8 @@ export function AccountEvidenceWorkspace({ systemId = systemIdFromHash() }: { sy
   }, [])
 
   const linkedProcurement = useMemo(() => systemId && procurement ? explicitAccountProcurementRecords(procurement, systemId) : [], [procurement, systemId])
-  const firmCount = detail ? collectAccountFirmRoleEvidence(detail).length : 0
+  const sourceFirmCount = detail ? collectAccountFirmRoleEvidence(detail).length : 0
+  const procurementFirmCount = procurementLoaded && !procurementError ? collectProcurementFirmRoleEvidence(linkedProcurement).length : null
   const institutionalCount = detail?.cms_institutional_context?.facilities.length ?? 0
   const serviceLineCount = detail?.nyc_lead_service_lines?.records.length ?? 0
 
@@ -153,7 +162,7 @@ export function AccountEvidenceWorkspace({ systemId = systemIdFromHash() }: { sy
       <Group title="Project Activity" summary={`${detail.dob_activity_history?.length ?? 0} DOB NOW filings · legacy context kept separate`}><ProjectEvidence detail={detail} /></Group>
       <Group title="Domestic Water" summary={detail.domestic_water ? `${detail.domestic_water.summary.self_report_record_count} self reports · ${detail.domestic_water.summary.compliance_record_count} compliance records` : 'No exact-BIN DWT payload attached'}><DomesticWaterSection detail={detail} /><BuildingWaterSignalsSection detail={detail} /></Group>
       <Group title="Institutional / Infrastructure" summary={`${institutionalCount} CMS facilities · ${serviceLineCount} service-line records`}><InstitutionalFacilitySection detail={detail as SystemDetail} /><LeadServiceLineSection detail={detail as SystemDetail} /></Group>
-      <Group title="Procurement / Commercial" summary={`${firmCount} source-observed/recorded firm roles · ${procurementLoaded && !procurementError ? linkedProcurement.length : '—'} explicit procurement links`}><section className="evidence-subsection"><h4>Observed firms &amp; roles</h4><FirmRoleEvidence detail={detail} /></section><section className="evidence-subsection"><h4>Explicitly linked procurement</h4><ProcurementEvidence records={procurementLoaded && !procurementError ? linkedProcurement : null} error={procurementError} /></section></Group>
+      <Group title="Procurement / Commercial" summary={`${sourceFirmCount + (procurementFirmCount ?? 0)} source-observed/recorded/contract-linked firm roles${procurementFirmCount == null ? ' · procurement pending' : ''} · ${procurementLoaded && !procurementError ? linkedProcurement.length : '—'} explicit procurement links`}><section className="evidence-subsection"><h4>Observed firms &amp; roles</h4><FirmRoleEvidence detail={detail} procurementRecords={procurementLoaded && !procurementError ? linkedProcurement : null} procurementError={procurementError} /></section><section className="evidence-subsection"><h4>Explicitly linked procurement</h4><ProcurementEvidence records={procurementLoaded && !procurementError ? linkedProcurement : null} error={procurementError} /></section></Group>
       <Group title="Historical Evidence" summary={`${detail.metadata.sources.length} source datasets · detailed chronology remains in History`}><HistoricalEvidence detail={detail} /></Group>
     </>}
   </section>
