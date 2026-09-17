@@ -1,0 +1,23 @@
+name: Probe Neon bearer session exchange
+
+on:
+  push:
+    branches:
+      - agent/arcny-hosted-fixture-proof-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Probe cookie-free Neon bearer session exchange
+        run: node scripts/probe_neon_bearer_session.mjs
