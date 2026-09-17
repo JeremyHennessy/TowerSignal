@@ -144,7 +144,7 @@ def build(systems_path: Path, output_path: Path) -> dict[str, Any]:
     output_path.write_text(json.dumps(result, separators=(",", ":")), encoding="utf-8")
 
     labor_path = output_path.with_name("labor-law-decisions.json")
-    previous_labor_path = ROOT / ".history-store" / "data" / "history" / "labor-law-decisions.json"
+    previous_labor_path = ROOT / ".history-store" / "data" / "history" / "segments" / "labor-law-decisions.json"
     labor_payload = build_labor_law_decisions(systems_path, labor_path, previous_labor_path)
     result["labor_law_summary"] = labor_payload.get("summary") or {}
 
