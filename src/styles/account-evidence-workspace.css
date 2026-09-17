@@ -1,0 +1,157 @@
+/* Account Evidence workspace only. Existing Summary, Sales, Field and History layouts remain untouched. */
+.account-evidence-workspace{
+  display:grid;
+  gap:8px;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
+}
+.account-evidence-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding:12px 14px;
+  border:1px solid var(--ref-border,#d9e1e4);
+  border-radius:12px;
+  background:#fff;
+}
+.account-evidence-heading>div{min-width:0}
+.account-evidence-heading h3{margin:2px 0 3px;font-size:17px;line-height:1.2}
+.account-evidence-heading p{margin:0;max-width:760px;font-size:10px;line-height:1.45;color:#667780}
+.evidence-group-count{
+  flex:0 0 auto;
+  padding:5px 8px;
+  border-radius:999px;
+  background:var(--ref-green-soft,#edf7f3);
+  color:var(--ref-green-dark,#245f51);
+  font-size:9px;
+  font-weight:800;
+}
+.account-evidence-group{
+  max-width:100%;
+  min-width:0;
+  border:1px solid var(--ref-border,#d9e1e4);
+  border-radius:10px;
+  background:#fff;
+  overflow:hidden;
+}
+.account-evidence-group>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:52px;
+  padding:10px 13px;
+  cursor:pointer;
+  list-style:none;
+}
+.account-evidence-group>summary::-webkit-details-marker{display:none}
+.account-evidence-group>summary>span:first-child{display:grid;gap:2px;min-width:0}
+.account-evidence-group>summary strong{font-size:11px;color:#1e2f37}
+.account-evidence-group>summary small{font-size:9px;line-height:1.35;color:#738089;white-space:normal}
+.evidence-group-toggle{flex:0 0 auto;font-size:9px;font-weight:800;color:var(--ref-green-dark,#245f51)}
+.account-evidence-group[open] .evidence-group-toggle::before{content:'Hide';font-size:0}
+.account-evidence-group[open] .evidence-group-toggle{color:#52636c}
+.account-evidence-group[open] .evidence-group-toggle{font-size:0}
+.account-evidence-group[open] .evidence-group-toggle::after{content:'Hide';font-size:9px}
+.account-evidence-group-body{
+  display:grid;
+  gap:10px;
+  max-width:100%;
+  min-width:0;
+  padding:0 13px 13px;
+  border-top:1px solid #edf1f2;
+}
+.account-evidence-group-body>section,
+.account-evidence-group-body>div,
+.account-evidence-group-body>details{max-width:100%;min-width:0}
+.account-evidence-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+  padding-top:10px;
+}
+.account-evidence-metrics article{
+  display:grid;
+  gap:2px;
+  min-width:0;
+  padding:9px;
+  border:1px solid #e4e9eb;
+  border-radius:8px;
+  background:#fafcfc;
+}
+.account-evidence-metrics small,
+.account-evidence-metrics span{font-size:8px;line-height:1.35;color:#74828a}
+.account-evidence-metrics strong{font-size:12px;line-height:1.2;color:#1e3038;overflow-wrap:anywhere}
+.evidence-subsection{display:grid;gap:7px;padding-top:10px}
+.evidence-subsection h4{margin:0;font-size:11px;color:#263942}
+.evidence-card-list,
+.observed-firm-role-list{display:grid;gap:7px;min-width:0}
+.evidence-card,
+.observed-firm-role{
+  display:grid;
+  gap:5px;
+  min-width:0;
+  padding:9px 10px;
+  border:1px solid #e2e8ea;
+  border-radius:8px;
+  background:#fbfcfc;
+  overflow-wrap:anywhere;
+}
+.evidence-card>div:first-child,
+.observed-firm-role-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-width:0}
+.evidence-card strong,
+.observed-firm-role strong{font-size:10px;color:#20323a}
+.evidence-card span,
+.observed-firm-role span{font-size:9px;line-height:1.35;color:#566973}
+.evidence-card p{margin:0;font-size:9px;line-height:1.4;color:#40545e}
+.evidence-card small{font-size:8px;line-height:1.4;color:#76838a}
+.observed-firm-role-head>div{display:grid;gap:2px;min-width:0}
+.relationship-chip{
+  flex:0 0 auto;
+  padding:3px 6px;
+  border-radius:999px;
+  font-size:8px!important;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+.relationship-observed_service{background:#e9f6f0;color:#25634f!important}
+.relationship-recorded_role{background:#fff4df;color:#7a5a17!important}
+.observed-firm-role .identity-grid .wide{grid-column:1/-1}
+.observed-firm-role dd small{display:block;margin-top:2px;color:#77858c}
+.evidence-boundary{
+  padding:9px 10px;
+  border:1px solid #e6dfcb;
+  border-radius:8px;
+  background:#fffaf0;
+}
+.evidence-boundary strong{font-size:10px;color:#564817}
+.evidence-boundary p{margin:3px 0 0;font-size:9px;line-height:1.4;color:#6e6446}
+.evidence-source-links{display:flex;flex-wrap:wrap;gap:7px}
+.evidence-source-links a,
+.evidence-card>a{font-size:8px;font-weight:750;color:var(--ref-green-dark,#245f51)}
+.evidence-provenance-details{
+  margin-top:10px;
+  border:1px solid #e2e8ea;
+  border-radius:8px;
+  overflow:hidden;
+}
+.evidence-provenance-details>summary{display:flex;justify-content:space-between;gap:10px;padding:9px 10px;cursor:pointer;font-size:9px}
+.evidence-provenance-details>.evidence-card-list{padding:0 10px 10px}
+.account-evidence-group-body .domestic-water-section,
+.account-evidence-group-body .building-water-signals-section,
+.account-evidence-group-body .institutional-facility-section,
+.account-evidence-group-body .lead-service-line-section,
+.account-evidence-group-body .property-context-section{margin:0;padding-top:10px}
+
+@media(max-width:760px){
+  .account-evidence-heading{align-items:flex-start}
+  .account-evidence-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .account-evidence-group>summary{align-items:flex-start}
+  .evidence-card>div:first-child,
+  .observed-firm-role-head{flex-direction:column}
+  .relationship-chip{align-self:flex-start}
+  .account-evidence-group-body{padding-left:10px;padding-right:10px}
+}

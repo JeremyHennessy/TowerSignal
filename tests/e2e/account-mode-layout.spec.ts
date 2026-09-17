@@ -31,12 +31,16 @@ test('account mode tabs span the report and switch visible evidence on desktop a
   await expect(page.locator('.sales-precall-pack')).toBeHidden()
 
   await tabs.getByRole('button', { name: /^Evidence/ }).click()
-  await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+  const evidence = detail.locator('.account-evidence-workspace')
+  await expect(evidence).toBeVisible()
+  await expect(evidence.getByRole('heading', { name: 'Account evidence', exact: true })).toBeVisible()
+  await expect(evidence.locator(':scope > details.account-evidence-group')).toHaveCount(7)
   await expect(page.locator('.technician-field-pack')).toBeHidden()
 
   await tabs.getByRole('button', { name: /^History/ }).click()
   await expect(page.locator('.account-unified-timeline')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
+  await expect(evidence).toHaveCount(0)
 
   const viewportWidth = page.viewportSize()?.width ?? 0
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
