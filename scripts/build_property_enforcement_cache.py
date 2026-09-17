@@ -10,6 +10,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from build_labor_law_decisions import build as build_labor_law_decisions  # noqa: E402
 from towersignal.planimetrics import normalize_bin  # noqa: E402
 from towersignal.pluto import normalize_bbl  # noqa: E402
 from towersignal.property_enforcement import (  # noqa: E402
@@ -141,7 +142,13 @@ def build(systems_path: Path, output_path: Path) -> dict[str, Any]:
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(result, separators=(",", ":")), encoding="utf-8")
-    print(json.dumps(result["summary"], indent=2))
+
+    labor_path = output_path.with_name("labor-law-decisions.json")
+    previous_labor_path = ROOT / ".history-store" / "data" / "history" / "labor-law-decisions.json"
+    labor_payload = build_labor_law_decisions(systems_path, labor_path, previous_labor_path)
+    result["labor_law_summary"] = labor_payload.get("summary") or {}
+
+    print(json.dumps({**result["summary"], "labor_law": result["labor_law_summary"]}, indent=2))
     return result
 
 
