@@ -5,6 +5,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from validate_labor_law_decisions import validate as validate_labor_law_decisions
+
 DOMAIN = "NYC_PROPERTY_ENFORCEMENT_CONTEXT"
 EXPECTED_DATASETS = {
     "hpd_violations": "wvxf-dwi5",
@@ -105,7 +107,7 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_production_univer
         if int(summary.get(key) or 0) != count:
             raise RuntimeError(f"{key} does not reconcile: summary={summary.get(key)} actual={count}")
 
-    official_source = (sources.get("official_swo_snapshot") or {})
+    official_source = sources.get("official_swo_snapshot") or {}
     if official_source.get("source_health_status") != "WARNING":
         raise RuntimeError("Dated official SWO snapshot must remain WARNING because current status is unavailable")
     if official_source.get("current_status_available") is not False:
@@ -120,7 +122,8 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_production_univer
         if int(universe.get("canonical_bin_count") or 0) < 3000:
             raise RuntimeError("property enforcement build has unexpectedly few canonical BINs")
 
-    result = {"age_days": round(age_days, 3), **reconciliations}
+    labor_result = validate_labor_law_decisions(path.with_name("labor-law-decisions.json"))
+    result = {"age_days": round(age_days, 3), **reconciliations, "labor_law": labor_result}
     print(json.dumps(result, indent=2))
     return result
 
