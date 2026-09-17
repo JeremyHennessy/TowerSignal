@@ -1,0 +1,27 @@
+name: Inspect TowerSignal custom-domain readiness
+
+on:
+  push:
+    branches:
+      - agent/neon-auth-architecture-proof-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Inspect DNS and HTTPS
+        shell: bash
+        run: |
+          set -euo pipefail
+          for host in towersignal.pharm3r.com auth.towersignal.pharm3r.com; do
+            echo "=== $host ==="
+            echo "CNAME: $(dig +short CNAME "$host" | tr '\n' ' ' || true)"
+            echo "A: $(dig +short A "$host" | tr '\n' ' ' || true)"
+            echo "AAAA: $(dig +short AAAA "$host" | tr '\n' ' ' || true)"
+            code=$(curl -L -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 "https://$host/" || true)
+            echo "HTTPS_STATUS: $code"
+          done
