@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from attach_labor_law_decisions import attach as attach_labor_law_decisions
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -149,11 +151,15 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
 
     systems_path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+
+    labor_result = attach_labor_law_decisions(output_dir, cache_path.with_name("labor-law-decisions.json"))
     result = {
         "attached_hpd_systems": attached_hpd_systems,
         "attached_swo_systems": attached_swo_systems,
         "attached_official_swo_snapshot_systems": attached_official_swo_snapshot_systems,
         "attached_facade_systems": attached_facade_systems,
+        "labor_law_attached_systems": labor_result["attached_systems"],
+        "labor_law_attached_records": labor_result["attached_records"],
     }
     print(json.dumps(result, indent=2))
     return result
