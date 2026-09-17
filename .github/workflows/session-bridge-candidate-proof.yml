@@ -1,0 +1,46 @@
+name: Prove sealed Workflow session bridge
+
+on:
+  push:
+    branches:
+      - agent/neon-session-bridge-candidate-20260917
+
+permissions:
+  contents: read
+
+concurrency:
+  group: session-bridge-candidate-proof
+  cancel-in-progress: true
+
+jobs:
+  prove:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build candidate against isolated Neon bridge
+        env:
+          VITE_WORKFLOW_AUTH_BRIDGE_URL: https://br-small-resonance-auw6h71b-authbridgeproof.compute.c-10.us-east-1.aws.neon.tech
+          VITE_NEON_DATA_API_URL: https://ep-nameless-brook-auxfp8jj.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1
+        run: npm run build
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Prove full reload, RLS Workflow, iPhone and sign-out behavior
+        run: npx playwright test --config=playwright.session-bridge.config.ts
+      - name: Retain candidate proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: session-bridge-candidate-proof
+          path: |
+            playwright-report-session-bridge/**
+            test-results/**
+          retention-days: 14
+          if-no-files-found: warn
