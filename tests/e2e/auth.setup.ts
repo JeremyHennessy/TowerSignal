@@ -6,6 +6,13 @@ import { installCandidateRoutes } from './candidate-routes'
 import { seedArcnyWorkflowForProject } from './workflow.seed'
 
 setup('create hosted TowerSignal test account and prove signed-out route gate', async ({ page }, testInfo) => {
+  page.on('response', async response => {
+    if (!response.url().includes('.neonauth.')) return
+    const headers = await response.allHeaders().catch(() => ({} as Record<string, string>))
+    const pathname = new URL(response.url()).pathname
+    console.log(`[NEON_AUTH_DIAG] project=${testInfo.project.name} path=${pathname} status=${response.status()} jwt=${Boolean(headers['set-auth-jwt'])} cookie=${Boolean(headers['set-cookie'])}`)
+  })
+
   await installCandidateRoutes(page)
   await page.goto('./#/companies', { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })).toBeVisible()
@@ -20,9 +27,6 @@ setup('create hosted TowerSignal test account and prove signed-out route gate', 
   await page.getByRole('button', { name: 'Create account', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Known companies & firms', exact: true })).toBeVisible()
 
-  // Hosted ArcNY acceptance must not depend on Jeremy's private watchlist. Seed
-  // the same 11-record research contract into this run's isolated RLS user via
-  // the real managed-auth/Data API persistence path before saving storage state.
   await seedArcnyWorkflowForProject(page, testInfo.project.name)
 
   const statePath = authStatePath(testInfo.project.name)
