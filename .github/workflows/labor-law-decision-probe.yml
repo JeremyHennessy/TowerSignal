@@ -13,89 +13,151 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Probe official selected-trial-court RSS
+      - name: Probe official appellate and selected-trial-court RSS feeds
         run: |
           mkdir -p probe-output
           python - <<'PY' | tee probe-output/summary.json
-          import html, json, re, urllib.request, xml.etree.ElementTree as ET
+          import concurrent.futures
+          import html
+          import json
+          import re
+          import urllib.request
+          import xml.etree.ElementTree as ET
 
-          FEED = 'https://www.nycourts.gov/reporter/RSS/misc.xml'
-          HEADERS = {'User-Agent': 'TowerSignal-law-reporting-probe/1.0'}
+          FEEDS = {
+              'APP_DIV_FIRST': 'https://www.nycourts.gov/reporter/RSS/AD1st.xml',
+              'APP_DIV_SECOND': 'https://www.nycourts.gov/reporter/RSS/AD2d.xml',
+              'SELECTED_TRIAL': 'https://www.nycourts.gov/reporter/RSS/misc.xml',
+          }
+          MAX_ITEMS_PER_FEED = 80
+          HEADERS = {'User-Agent': 'TowerSignal-law-reporting-probe/1.1'}
+          ADDRESS = re.compile(
+              r'\b\d{1,5}\s+(?:East|West|North|South|E\.?|W\.?|N\.?|S\.?)?\s*'
+              r'[A-Z][A-Za-z0-9 .\'\-]{1,70}\s+'
+              r'(?:Street|St\.?|Avenue|Ave\.?|Road|Rd\.?|Boulevard|Blvd\.?|Place|Pl\.?|Lane|Ln\.?|Drive|Dr\.?|Broadway)\b',
+              re.I,
+          )
+          PROPERTY_CONTEXT = re.compile(
+              r'premises|property|building|construction\s+site|work\s*site|workplace|project|accident|incident|perform(?:ing|ed)?\s+work',
+              re.I,
+          )
+          COUNSEL_CONTEXT = re.compile(r'counsel|attorney|law\s+firm|\bLLP\b|\bP\.?C\.?\b|for\s+(?:appellant|respondent|plaintiff|defendant)', re.I)
+          INDEX = re.compile(r'(?:INDEX\s+NO\.?|Index\s+No\.?)\s*[:#]?\s*([0-9A-Za-z/\-]+)', re.I)
+          NYSCEF = re.compile(r'NYSCEF\s+DOC\.\s+NO\.\s*([0-9]+)', re.I)
+          CASE_NO = re.compile(r'(?:Case\s+No\.?)\s*[:#]?\s*([0-9A-Za-z/\-]+)', re.I)
+          SECTIONS = re.compile(r'Labor\s+Law\s*(?:§§?|sections?)?\s*([0-9(),\s]+)', re.I)
 
           def fetch(url):
               req = urllib.request.Request(url, headers=HEADERS)
               with urllib.request.urlopen(req, timeout=90) as response:
                   return response.read(), response.headers.get('Content-Type')
 
-          raw, feed_type = fetch(FEED)
-          root = ET.fromstring(raw)
-          items = []
-          for item in root.findall('.//item'):
-              items.append({
-                  'title': (item.findtext('title') or '').strip(),
-                  'link': (item.findtext('link') or '').strip(),
-                  'pub_date': (item.findtext('pubDate') or '').strip(),
-                  'description': html.unescape(item.findtext('description') or ''),
-              })
+          def parse_feed(label, url):
+              raw, content_type = fetch(url)
+              root = ET.fromstring(raw)
+              rows = []
+              for item in root.findall('.//item')[:MAX_ITEMS_PER_FEED]:
+                  rows.append({
+                      'feed': label,
+                      'feed_url': url,
+                      'feed_content_type': content_type,
+                      'title': (item.findtext('title') or '').strip(),
+                      'link': (item.findtext('link') or '').strip(),
+                      'pub_date': (item.findtext('pubDate') or '').strip(),
+                      'description': html.unescape(item.findtext('description') or ''),
+                  })
+              return len(root.findall('.//item')), rows
+
+          feed_counts = {}
+          candidates = []
+          feed_failures = []
+          for label, url in FEEDS.items():
+              try:
+                  total, rows = parse_feed(label, url)
+                  feed_counts[label] = {'feed_url': url, 'item_count': total, 'inspected_item_count': len(rows)}
+                  candidates.extend(rows)
+              except Exception as exc:
+                  feed_failures.append({'feed': label, 'url': url, 'error': f'{type(exc).__name__}: {exc}'})
+
+          def inspect(entry):
+              if not entry['link']:
+                  return {'kind': 'skip'}
+              try:
+                  body, content_type = fetch(entry['link'])
+                  source = body.decode('utf-8', 'ignore')
+                  clean = html.unescape(re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', source)))
+                  if not re.search(r'Labor\s+Law', clean, re.I):
+                      return {'kind': 'non_labor'}
+                  explicit = []
+                  rejected = []
+                  for match in ADDRESS.finditer(clean):
+                      address = re.sub(r'\s+', ' ', match.group(0)).strip(' ,.;')
+                      left = max(0, match.start() - 220)
+                      right = min(len(clean), match.end() + 220)
+                      context = clean[left:right]
+                      if PROPERTY_CONTEXT.search(context) and not COUNSEL_CONTEXT.search(context):
+                          if address not in [row['address'] for row in explicit]:
+                              explicit.append({'address': address, 'context': context[:500]})
+                      elif address not in [row['address'] for row in rejected]:
+                          rejected.append({'address': address, 'reason': 'not explicit worksite/property context or counsel context'})
+                  sections = sorted({m.group(1).strip() for m in SECTIONS.finditer(clean) if m.group(1).strip()})
+                  return {
+                      'kind': 'labor',
+                      'record': {
+                          **entry,
+                          'decision_content_type': content_type,
+                          'labor_law_mentions': len(re.findall(r'Labor\s+Law', clean, re.I)),
+                          'labor_law_sections': sections,
+                          'index_numbers': sorted(set(INDEX.findall(clean))),
+                          'case_numbers': sorted(set(CASE_NO.findall(clean))),
+                          'nyscef_document_numbers': sorted(set(NYSCEF.findall(clean))),
+                          'explicit_subject_property_candidates': explicit[:8],
+                          'rejected_address_candidates': rejected[:8],
+                          'attachment_eligible': bool(explicit),
+                      },
+                  }
+              except Exception as exc:
+                  return {'kind': 'failure', 'record': {'feed': entry['feed'], 'link': entry['link'], 'error': f'{type(exc).__name__}: {exc}'}}
 
           labor = []
           failures = []
-          address_patterns = [
-              re.compile(r'\b\d{1,5}\s+(?:East|West|North|South|E\.?|W\.?|N\.?|S\.?)?\s*[A-Z][A-Za-z0-9 .\'\-]{1,60}\s+(?:Street|St\.?|Avenue|Ave\.?|Road|Rd\.?|Boulevard|Blvd\.?|Place|Pl\.?|Lane|Ln\.?|Drive|Dr\.?|Broadway)\b', re.I),
-          ]
-          index_pattern = re.compile(r'INDEX NO\.\s*([0-9/\-]+)', re.I)
-          nyscef_pattern = re.compile(r'NYSCEF DOC\. NO\.\s*([0-9]+)', re.I)
-          sections_pattern = re.compile(r'Labor Law\s*(?:§§?|sections?)?\s*([0-9(),\s]+)', re.I)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              for result in pool.map(inspect, candidates):
+                  if result['kind'] == 'labor':
+                      labor.append(result['record'])
+                  elif result['kind'] == 'failure':
+                      failures.append(result['record'])
 
-          for entry in items[:80]:
-              if not entry['link']:
-                  continue
-              try:
-                  body, content_type = fetch(entry['link'])
-                  text = body.decode('utf-8', 'ignore')
-                  clean = html.unescape(re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', text)))
-                  if not re.search(r'Labor Law', clean, re.I):
-                      continue
-                  addresses = []
-                  for pattern in address_patterns:
-                      for match in pattern.finditer(clean):
-                          value = re.sub(r'\s+', ' ', match.group(0)).strip(' ,.;')
-                          if value not in addresses:
-                              addresses.append(value)
-                  sections = sorted({m.group(1).strip() for m in sections_pattern.finditer(clean) if m.group(1).strip()})
-                  labor.append({
-                      **entry,
-                      'content_type': content_type,
-                      'labor_law_mentions': len(re.findall(r'Labor Law', clean, re.I)),
-                      'labor_law_sections': sections,
-                      'explicit_address_candidates': addresses[:12],
-                      'index_numbers': sorted(set(index_pattern.findall(clean))),
-                      'nyscef_document_numbers': sorted(set(nyscef_pattern.findall(clean))),
-                      'mentions_property_terms': bool(re.search(r'premises|property|building|construction site|work site|worksite', clean, re.I)),
-                  })
-              except Exception as exc:
-                  failures.append({'link': entry['link'], 'error': f'{type(exc).__name__}: {exc}'})
+          by_feed = {}
+          for label in FEEDS:
+              records = [row for row in labor if row['feed'] == label]
+              by_feed[label] = {
+                  'labor_law_decision_count': len(records),
+                  'attachment_eligible_count': sum(1 for row in records if row['attachment_eligible']),
+                  'with_index_or_case_number': sum(1 for row in records if row['index_numbers'] or row['case_numbers']),
+              }
 
-          print(json.dumps({
-              'feed': FEED,
-              'feed_content_type': feed_type,
-              'feed_item_count': len(items),
-              'inspected_item_count': min(len(items), 80),
-              'labor_law_decision_count_in_inspected_items': len(labor),
-              'labor_law_decisions_with_address_candidate': sum(1 for item in labor if item['explicit_address_candidates']),
-              'labor_law_decisions_with_nyscef_metadata': sum(1 for item in labor if item['index_numbers'] or item['nyscef_document_numbers']),
+          payload = {
+              'feeds': feed_counts,
+              'feed_retrieval_failures': feed_failures,
+              'inspected_decision_count': len(candidates),
+              'labor_law_decision_count': len(labor),
+              'attachment_eligible_count': sum(1 for row in labor if row['attachment_eligible']),
               'retrieval_failure_count': len(failures),
-              'examples': labor[:12],
-              'failures': failures[:10],
-              'coverage_boundary': 'Official Reports RSS contains selected trial-court decisions, not a comprehensive new-case filing feed. Absence cannot be treated as no Labor Law litigation.',
-              'attachment_boundary': 'Only decision text that explicitly identifies a subject property may be considered for TowerSignal property attachment; party/counsel addresses are not sufficient.',
-          }, indent=2, sort_keys=True))
+              'by_feed': by_feed,
+              'examples': labor[:30],
+              'failures': failures[:20],
+              'coverage_boundary': 'Official Reports covers all appellate decisions but only selected trial-court decisions. This is published-decision evidence, not a comprehensive Supreme Court filing or NYSCEF docket feed; absence cannot be treated as no Labor Law litigation.',
+              'attachment_boundary': 'Property attachment requires an address in explicit worksite/property/project context in the decision text. Party names and counsel/firm addresses are not property identity evidence.',
+              'liability_boundary': 'A published decision is litigation evidence and may describe allegations, motions, or rulings. Presence does not itself establish current liability, safety condition, or cooling-tower relevance.',
+          }
+          print(json.dumps(payload, indent=2, sort_keys=True))
           PY
       - name: Upload retained source-contract proof
         if: always()
