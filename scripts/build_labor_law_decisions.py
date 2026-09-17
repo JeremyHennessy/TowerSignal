@@ -39,14 +39,13 @@ def build(systems_path: Path, output_path: Path, previous_path: Path | None = No
     by_system, unmatched = match_decisions_to_systems(decisions, systems)
     attached_record_count = sum(len(rows) for rows in by_system.values())
     explicit_candidate_count = sum(len(row.get("explicit_subject_property_candidates") or []) for row in decisions)
-    source_health_status = "WARNING"
     source_health_reasons = [
         "Official Reports is complete for appellate decisions but only selected trial-court decisions",
         "Published decisions are not a comprehensive Supreme Court filing or NYSCEF docket feed",
     ]
     if source.get("retrieval_failures"):
         source_health_reasons.append(f"{len(source['retrieval_failures'])} child decision retrieval failures in current collection")
-    source["source_health_status"] = source_health_status
+    source["source_health_status"] = "WARNING"
     source["source_health_reasons"] = source_health_reasons
 
     payload = {
@@ -80,8 +79,19 @@ def build(systems_path: Path, output_path: Path, previous_path: Path | None = No
             "absence": "No matching published decision is not evidence that no Labor Law litigation or filing exists.",
         },
     }
+    raw = json.dumps(payload, separators=(",", ":"))
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    output_path.write_text(raw, encoding="utf-8")
+
+    # The canonical Pages workflow already stages and persists the complete
+    # public/data/history/segments directory only after hosted verification.
+    # Mirror this source-owned durable cache into that directory so prior
+    # published decisions survive RSS-window turnover without a second
+    # persistence owner or any pre-verification history write.
+    durable_segment = output_path.parent / "history" / "segments" / "labor-law-decisions.json"
+    durable_segment.parent.mkdir(parents=True, exist_ok=True)
+    durable_segment.write_text(raw, encoding="utf-8")
+
     print(json.dumps(payload["summary"], indent=2))
     return payload
 
