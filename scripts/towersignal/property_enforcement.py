@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import csv
+import io
+import time
+import urllib.error
+import urllib.request
 from datetime import date, datetime, timezone
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 from .fetch import SourceFetchError, fetch_count, fetch_metadata, fetch_where
 from .planimetrics import normalize_bin
@@ -15,6 +20,18 @@ FACADE_FILINGS_DATASET_ID = "xubg-57si"
 FACADE_FILINGS_URL = "https://data.cityofnewyork.us/Housing-Development/DOB-NOW-Safety-Facades-Compliance-Filings/xubg-57si"
 DOB_DISPOSITION_CODES_URL = "https://www.nyc.gov/assets/buildings/pdf/bis_complaint_disposition_codes.pdf"
 DOB_BUILDING_PROFILES_METHOD_URL = "https://www.nyc.gov/assets/buildings/html/README.html"
+
+DOB_SWO_SNAPSHOT_COMMIT = "29b7ca2d595593795c69055bfa6a39525c4c4cdd"
+DOB_SWO_SNAPSHOT_COMMIT_AT = "2024-02-05T16:14:24Z"
+DOB_SWO_SNAPSHOT_DATASET_ID = "NYCDOB_SWOS_ISSUED_RESCINDED_SNAPSHOT_20240205"
+DOB_SWO_SNAPSHOT_URL = f"https://raw.githubusercontent.com/NYCDOB/SWOs_Issued_Rescinded/{DOB_SWO_SNAPSHOT_COMMIT}/data/SWOs_Issued_Rescinded_v2.csv"
+DOB_SWO_SNAPSHOT_PAGE = f"https://github.com/NYCDOB/SWOs_Issued_Rescinded/blob/{DOB_SWO_SNAPSHOT_COMMIT}/data/SWOs_Issued_Rescinded_v2.csv"
+DOB_SWO_MAP_URL = "https://www.nyc.gov/assets/buildings/html/swo-map.html"
+DOB_SWO_SNAPSHOT_REQUIRED_FIELDS = {
+    "Borough Name", "Complaint Number", "BIN", "Disposition Code Description",
+    "Disposition Category", "Last Disposition Date", "Last Disposition Year",
+    "Latitude", "Longitude", "Address", "Community Board",
+}
 
 FILTERED_PAGE_SIZE = 50000
 HPD_CHUNK_SIZE = 12
@@ -188,6 +205,113 @@ def fetch_hpd_violations_by_bbl(bbl_values: Iterable[Any], *, chunk_size: int = 
         "open_violation_count": sum(1 for record in records if record["is_open"]),
         "class_c_open_count": sum(1 for record in records if record["is_open"] and record.get("class") == "C"),
         "source_query_scope": "Exact canonical BBL subset of TowerSignal NYC cooling-tower properties; complete filtered pagination",
+    }
+
+
+def normalize_official_swo_snapshot(row: dict[str, Any]) -> dict[str, Any]:
+    bin_value = normalize_bin(row.get("BIN"))
+    if not bin_value:
+        raise SourceFetchError("Official DOB SWO snapshot row lacks a valid BIN")
+    complaint_number = _text(row.get("Complaint Number"))
+    if not complaint_number:
+        raise SourceFetchError(f"Official DOB SWO snapshot row on BIN {bin_value} lacks complaint number")
+    category = (_text(row.get("Disposition Category")) or "").upper()
+    if category not in {"ACTIVE", "RESCINDED"}:
+        raise SourceFetchError(f"Unexpected official DOB SWO snapshot category {category!r} for BIN {bin_value}")
+    return {
+        "complaint_number": complaint_number,
+        "bin": bin_value,
+        "borough": _text(row.get("Borough Name")),
+        "address": _text(row.get("Address")),
+        "community_board": _text(row.get("Community Board")),
+        "disposition_description": _text(row.get("Disposition Code Description")),
+        "status_at_snapshot": category,
+        "last_disposition_date": _date(row.get("Last Disposition Date")),
+        "last_disposition_year": _text(row.get("Last Disposition Year")),
+        "latitude": _text(row.get("Latitude")),
+        "longitude": _text(row.get("Longitude")),
+        "source": "NYC_DOB_STOP_WORK_ORDERS_DATED_SNAPSHOT",
+        "source_snapshot_commit": DOB_SWO_SNAPSHOT_COMMIT,
+        "source_snapshot_committed_at": DOB_SWO_SNAPSHOT_COMMIT_AT,
+        "match_basis": "BIN_EXACT",
+        "current_status_claim": False,
+    }
+
+
+def _download_official_swo_snapshot(*, attempts: int = 4, timeout: int = 120) -> bytes:
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            request = urllib.request.Request(
+                DOB_SWO_SNAPSHOT_URL,
+                headers={"User-Agent": "TowerSignal-official-source/1.0"},
+            )
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                return response.read()
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+            last_error = exc
+            if attempt < attempts:
+                time.sleep(min(2 ** attempt, 8))
+    raise SourceFetchError(f"Unable to retrieve pinned official DOB SWO snapshot: {last_error}")
+
+
+def fetch_official_swo_snapshot_by_bin(
+    bin_values: Iterable[Any],
+    *,
+    request_bytes: Callable[[], bytes] | None = None,
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
+    requested = sorted({value for item in bin_values if (value := normalize_bin(item))}, key=int)
+    requested_set = set(requested)
+    raw = request_bytes() if request_bytes else _download_official_swo_snapshot()
+    reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")))
+    fields = set(reader.fieldnames or [])
+    missing = sorted(DOB_SWO_SNAPSHOT_REQUIRED_FIELDS - fields)
+    if missing:
+        raise SourceFetchError(f"Official DOB SWO snapshot schema missing fields: {', '.join(missing)}")
+    source_rows = list(reader)
+    by_bin: dict[str, dict[str, dict[str, Any]]] = {}
+    normalized_source: list[dict[str, Any]] = []
+    for row in source_rows:
+        normalized = normalize_official_swo_snapshot(row)
+        normalized_source.append(normalized)
+        bin_value = normalized["bin"]
+        if bin_value not in requested_set:
+            continue
+        identity = f"{normalized['complaint_number']}:{normalized['status_at_snapshot']}:{normalized.get('last_disposition_date') or ''}"
+        by_bin.setdefault(bin_value, {})[identity] = normalized
+
+    result: dict[str, list[dict[str, Any]]] = {}
+    for bin_value, keyed in by_bin.items():
+        result[bin_value] = sorted(
+            keyed.values(),
+            key=lambda item: (item.get("last_disposition_date") or "", item["complaint_number"]),
+            reverse=True,
+        )
+    source_dates = [row["last_disposition_date"] for row in normalized_source if row.get("last_disposition_date")]
+    matched_records = [record for values in result.values() for record in values]
+    return result, {
+        "dataset_id": DOB_SWO_SNAPSHOT_DATASET_ID,
+        "name": "NYC DOB Stop Work Orders — dated official snapshot",
+        "url": DOB_SWO_SNAPSHOT_PAGE,
+        "official_map_url": DOB_SWO_MAP_URL,
+        "retrieved_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "source_last_updated_at": DOB_SWO_SNAPSHOT_COMMIT_AT,
+        "source_snapshot_commit": DOB_SWO_SNAPSHOT_COMMIT,
+        "source_record_count": len(source_rows),
+        "source_observation_start_at": min(source_dates) if source_dates else None,
+        "source_observation_end_at": max(source_dates) if source_dates else None,
+        "requested_bin_count": len(requested),
+        "matched_bin_count": len(result),
+        "matched_record_count": len(matched_records),
+        "active_at_snapshot_count": sum(1 for record in matched_records if record["status_at_snapshot"] == "ACTIVE"),
+        "rescinded_at_snapshot_count": sum(1 for record in matched_records if record["status_at_snapshot"] == "RESCINDED"),
+        "source_health_status": "WARNING",
+        "source_health_reasons": [
+            "Pinned official DOB source snapshot was committed 2024-02-05 and ends at 2024-02-03; it is not a current 2026 SWO status ledger.",
+            "Live NYC.gov SWO map/CSV and BIS current-status endpoints return HTTP 403 from GitHub Actions, so freshness cannot be independently proven in release automation.",
+        ],
+        "source_query_scope": "Complete pinned NYCDOB SWO snapshot (published two-year window), filtered to TowerSignal BINs only after retrieval; exact BIN match; ACTIVE/RESCINDED means status at the dated snapshot, not current status.",
+        "current_status_available": False,
     }
 
 
