@@ -74,3 +74,29 @@ export async function signInForProject(page: Page, projectName: string, targetHa
     await submitSignIn(page, projectName)
   }
 }
+
+export async function signInFreshForProject(page: Page, projectName: string, targetHash: string): Promise<void> {
+  await installCandidateRoutes(page)
+
+  // GitHub Pages uses cross-origin managed auth. WebKit does not reliably carry
+  // that remote cookie through a brand-new Playwright context, even when local
+  // app storage was restored. For persistence-sensitive hosted tests, prove the
+  // supported boundary explicitly: discard restored auth, perform a real sign-in
+  // in this browser context, then stay in the same hydrated SPA session.
+  await gotoHosted(page, '#/')
+  await page.context().clearCookies()
+  await page.evaluate(() => {
+    window.localStorage.clear()
+    window.sessionStorage.clear()
+  })
+  await gotoHosted(page, targetHash)
+
+  const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
+  await expect(loginHeading).toBeVisible()
+  await submitSignIn(page, projectName)
+
+  // Do not full-reload after sign-in. Hash navigation preserves the authenticated
+  // SPA session and matches the known hosted WebKit support boundary.
+  await page.evaluate(nextHash => { window.location.hash = nextHash }, targetHash)
+  await page.waitForLoadState('networkidle').catch(() => undefined)
+}
