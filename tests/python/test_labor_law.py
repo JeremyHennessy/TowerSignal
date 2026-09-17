@@ -10,6 +10,7 @@ from towersignal.labor_law import (
     merge_retained_decisions,
     normalize_decision,
     normalize_property_address,
+    normalize_publication_date,
 )
 
 
@@ -18,6 +19,11 @@ class LaborLawDecisionTests(unittest.TestCase):
         self.assertEqual(normalize_property_address("350 West 71st Street"), "350 W 71ST ST")
         self.assertEqual(normalize_property_address("3420 Bedford Avenue"), "3420 BEDFORD AVE")
         self.assertIsNone(normalize_property_address(None))
+
+    def test_publication_date_normalizes_rss_rfc_date_to_iso_day(self):
+        self.assertEqual(normalize_publication_date("Wed, 16 Sep 2026 23:30:00 -0400"), "2026-09-17")
+        self.assertIsNone(normalize_publication_date("not a date"))
+        self.assertIsNone(normalize_publication_date(None))
 
     def test_explicit_worksite_address_is_attachment_candidate(self):
         body = b"""
@@ -36,6 +42,8 @@ class LaborLawDecisionTests(unittest.TestCase):
         )
         self.assertIsNotNone(row)
         self.assertEqual(row["explicit_subject_property_candidates"][0]["normalized_address"], "350 W 71ST ST")
+        self.assertEqual(row["publication_date"], "2026-09-16")
+        self.assertEqual(row["publication_date_raw"], "Wed, 16 Sep 2026 12:00:00 GMT")
         self.assertIn("123456/2025", row["index_numbers"])
 
     def test_case_citation_address_is_not_a_property_candidate(self):
@@ -61,7 +69,7 @@ class LaborLawDecisionTests(unittest.TestCase):
             "decision_id": "decision-1",
             "title": "Worker v Owner",
             "decision_url": "https://example.test/decision",
-            "publication_date": "Wed, 16 Sep 2026 12:00:00 GMT",
+            "publication_date": "2026-09-16",
             "labor_law_sections": ["240(1)"],
             "index_numbers": ["123/2026"],
             "case_numbers": [],
