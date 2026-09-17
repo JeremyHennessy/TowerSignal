@@ -3,13 +3,13 @@ import type { AcrisSummaryFields } from '../types/acris'
 import type { PropertyEnforcementSummaryFields } from '../types/enforcement'
 
 export interface FilterState {
-  search: string; borough: string; zip: string; signal: string; confirmed: string; violationType: string; oath: string; hpdContacts: string; acrisActivity: string;
+  preset: string; search: string; borough: string; zip: string; signal: string; confirmed: string; violationType: string; oath: string; hpdContacts: string; acrisActivity: string;
   hpdOpenViolations: string; stopWorkOrders: string; facadeStatus: string;
   minSampleDays: string; minEquipment: string; minScore: string; maxScore: string
 }
 
 export const initialFilters: FilterState = {
-  search:'', borough:'', zip:'', signal:'', confirmed:'', violationType:'', oath:'', hpdContacts:'', acrisActivity:'',
+  preset:'timing', search:'', borough:'', zip:'', signal:'', confirmed:'', violationType:'', oath:'', hpdContacts:'', acrisActivity:'',
   hpdOpenViolations:'', stopWorkOrders:'', facadeStatus:'', minSampleDays:'', minEquipment:'', minScore:'', maxScore:''
 }
 
@@ -54,10 +54,10 @@ export function Filters({ rows, value, onChange, onQuick, acrisAvailable = false
   const violationTypes = [...new Set(rows.flatMap(r => r.violation_types))].sort()
   const facadeStatuses = [...new Set(rows.map(row => (row as SystemSummary & PropertyEnforcementSummaryFields).facade_latest_status).filter(Boolean) as string[])].sort()
   const set = (key: keyof FilterState, next: string) => onChange({ ...value, [key]: next })
-  const active = (Object.entries(value) as [keyof FilterState, string][]).filter(([, entry]) => entry !== '')
+  const active = (Object.entries(value) as [keyof FilterState, string][]).filter(([key, entry]) => key !== 'preset' && entry !== '')
   const quickFilters = ['Highest priority','Sampling-gap signals','OATH cases',...(acrisAvailable ? ['Recent ACRIS activity'] : []),'Confirmed violations','No sample date','3+ active units','Manhattan']
   return <section className="filters filter-panel" aria-label="Lead filters">
-    <div className="filter-panel-head"><div><span className="eyebrow">Account criteria</span><h3>Filter prospects</h3></div>{active.length > 0 && <button className="link-button" onClick={() => onChange(initialFilters)}>Clear all</button>}</div>
+    <div className="filter-panel-head"><div><span className="eyebrow">Account criteria</span><h3>Filter prospects</h3></div>{active.length > 0 && <button className="link-button" onClick={() => onChange({ ...initialFilters, preset: value.preset })}>Clear all</button>}</div>
     <label className="search-field"><span>Search accounts</span><input value={value.search} onChange={e => set('search', e.target.value)} placeholder="Address, system ID, BIN…" /></label>
     {active.length > 0 && <div className="active-filter-chips" aria-label="Active filters">{active.filter(([key]) => key !== 'search').map(([key, entry]) => <button key={key} onClick={() => set(key, '')}><span>{labels[key]}:</span> {entry === 'true' ? 'Yes' : entry === 'false' ? 'No' : entry} ×</button>)}</div>}
     <div className="quick-filters" aria-label="Quick filters">
