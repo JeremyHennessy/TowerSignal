@@ -1,15 +1,16 @@
 import { expect, test } from '@playwright/test'
-import { signInForProject } from './auth.helpers'
+import { signInFreshForProject } from './auth.helpers'
 import { expectContained, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(180_000)
 
-// Each Playwright project starts from its own authenticated browser context, so
-// desktop + iPhone execution proves the same remote private watchlist is visible
-// across fresh sessions without rewriting the underlying ArcNY or RMC records.
+// Workflow state is private per user. Setup seeds this run's isolated RLS user,
+// then the test performs a fresh real sign-in in the same browser context so
+// desktop + iPhone prove remote persistence without relying on cross-context
+// third-party auth-cookie restoration on GitHub Pages.
 test('ArcNY watchlist preserves external research leads without fabricating market evidence', async ({ page }, testInfo) => {
   if (isIphoneProject(testInfo)) testInfo.setTimeout(300_000)
-  await signInForProject(page, testInfo.project.name, '#/workflow')
+  await signInFreshForProject(page, testInfo.project.name, '#/workflow')
 
   const workflow = page.locator('section.workflow-workspace-page')
   await expect(workflow).toBeVisible()
@@ -19,7 +20,11 @@ test('ArcNY watchlist preserves external research leads without fabricating mark
 
   const rows = workflow.locator('.workflow-command-table tbody tr')
   await expect(rows).toHaveCount(11)
-  await expect(workflow.locator('.workflow-command-table-card')).toContainText('Arc Companies / Arc Ventures office')
+  // 2000002133 is a real current NYC system. Mapped accounts retain their public
+  // TowerSignal identity in the table instead of replacing it with private-note
+  // display text used only for external/unverified synthetic leads.
+  const mapped = rows.filter({ hasText: '2000002133' }).first()
+  await expect(mapped).toContainText('655 Third Ave')
   await expect(workflow.locator('.workflow-command-table-card')).toContainText('International Corporate Center at Rye')
   await expect(workflow.locator('.workflow-command-table-card')).toContainText('Solaria Riverdale')
   await expect(workflow.locator('.workflow-command-table-card')).toContainText('West Clinic of Memphis')
