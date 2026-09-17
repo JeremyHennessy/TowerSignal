@@ -19,7 +19,36 @@ type DomesticWaterSummaryFields = {
   dwt_violation_record_count?: number
 }
 
-type WorkflowSystem = SystemSummary & AcrisSummaryFields & DomesticWaterSummaryFields
+type WorkflowSystem = SystemSummary & AcrisSummaryFields & DomesticWaterSummaryFields & { workflow_external_lead?: boolean }
+
+function externalWorkflowSystem(account: WorkflowAccountState | undefined, systemId: string): WorkflowSystem {
+  const firstLine = account?.note.split(/\r?\n/, 1)[0]?.trim()
+  return {
+    system_id: systemId,
+    bin: null,
+    bbl: null,
+    address: firstLine || `External research lead · ${systemId}`,
+    borough: null,
+    zip: null,
+    active_equipment: 0,
+    latitude: null,
+    longitude: null,
+    coordinate_status: 'MISSING',
+    latest_sample_date: null,
+    days_since_latest_sample: null,
+    latest_inspection_date: null,
+    latest_inspection_type: null,
+    confirmed_violation: false,
+    recent_confirmed_violation: false,
+    violation_types: [],
+    signal_types: ['EXTERNAL_RESEARCH_LEAD'],
+    primary_signal: 'EXTERNAL_RESEARCH_LEAD',
+    evidence_confidence: 'VERIFY',
+    priority_score: 0,
+    score_components: [],
+    workflow_external_lead: true,
+  }
+}
 
 type CoverageGroup = {
   title: string
@@ -77,12 +106,14 @@ export function WorkflowWorkspacePage({
   }, [])
 
   const byId = new Map(systems.map(row => [row.system_id, row]))
+  const workflowAccountById = new Map(accounts.map(account => [account.system_id, account]))
   const today = new Date().toISOString().slice(0, 10)
   const recentCutoff = Date.now() - RECENT_CHANGE_WINDOW_MS
   const recentEvents = (changes?.events ?? []).filter(event => new Date(event.detected_at).getTime() >= recentCutoff)
   const scopeIds = new Set([...accounts.map(account => account.system_id), ...memberships.map(item => item.system_id)])
-  const scopedRows = systems.filter(row => scopeIds.has(row.system_id))
-  const missingScopeCount = [...scopeIds].filter(systemId => !byId.has(systemId)).length
+  const externalRows = [...scopeIds].filter(systemId => !byId.has(systemId)).map(systemId => externalWorkflowSystem(workflowAccountById.get(systemId), systemId))
+  const scopedRows = [...systems.filter(row => scopeIds.has(row.system_id)), ...externalRows]
+  const externalLeadCount = externalRows.length
 
   const eventsBySystem = new Map<string, ChangeEvent[]>()
   recentEvents.forEach(event => {
@@ -128,7 +159,7 @@ export function WorkflowWorkspacePage({
 
   return <section className="product-page workflow-workspace-page">
     <div className="product-page-heading workflow-page-heading">
-      <div><span className="page-kicker">New York City · private operating workspace</span><h1 aria-label="Workflow workspace">Workflow <span className="private-chip">Private</span></h1><p>Monitor a large account portfolio, triage source changes and due actions, and update private workflow state without treating cards or Kanban columns as the source of truth.</p><div className="workflow-summary-meta"><span>Workflow scope <strong>{number.format(scopedRows.length)}</strong></span><span>NYC market <strong>{number.format(systems.length)}</strong></span>{changes?.observed_at && <span>Data observed <strong>{formatTimestamp(changes.observed_at)}</strong></span>}{changes?.history_started_at && <span>History since <strong>{formatDate(changes.history_started_at)}</strong></span>}{changeLoadFailed && <span className="workflow-meta-warning">Monitor history unavailable in this view</span>}{missingScopeCount > 0 && <span className="workflow-meta-warning"><strong>{missingScopeCount}</strong> saved account{missingScopeCount === 1 ? '' : 's'} not in current snapshot</span>}</div></div>
+      <div><span className="page-kicker">New York City · private operating workspace</span><h1 aria-label="Workflow workspace">Workflow <span className="private-chip">Private</span></h1><p>Monitor a large account portfolio, triage source changes and due actions, and update private workflow state without treating cards or Kanban columns as the source of truth.</p><div className="workflow-summary-meta"><span>Workflow scope <strong>{number.format(scopedRows.length)}</strong></span><span>NYC market <strong>{number.format(systems.length)}</strong></span>{changes?.observed_at && <span>Data observed <strong>{formatTimestamp(changes.observed_at)}</strong></span>}{changes?.history_started_at && <span>History since <strong>{formatDate(changes.history_started_at)}</strong></span>}{changeLoadFailed && <span className="workflow-meta-warning">Monitor history unavailable in this view</span>}{externalLeadCount > 0 && <span><strong>{externalLeadCount}</strong> external / unverified research lead{externalLeadCount === 1 ? '' : 's'}</span>}</div></div>
       <div className="page-actions"><ShareButton label="Share public page link" /></div>
     </div>
 
