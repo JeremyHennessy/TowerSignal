@@ -29,6 +29,31 @@ test('Prospect presets are URL-restorable and switching columns preserves filter
   await expectContained(page)
 })
 
+test('Prospect saved views restore the active preset through the existing workflow state owner', async ({ page }, testInfo) => {
+  if (isIphoneProject(testInfo)) testInfo.setTimeout(300_000)
+  await signInForProject(page, testInfo.project.name, '#/prospect?borough=Queens&preset=field')
+  await expect(page.getByRole('heading', { name: 'Prospect workspace' })).toBeVisible()
+
+  const name = `Preset persistence ${testInfo.project.name} ${Date.now()}`
+  await page.getByLabel('Saved view name').fill(name)
+  await page.getByRole('button', { name: 'Save', exact: true }).click()
+  const saved = page.getByRole('button', { name, exact: true })
+  await expect(saved).toBeVisible()
+
+  const presets = page.getByRole('group', { name: 'Prospect table columns' })
+  await presets.getByRole('button', { name: 'Timing', exact: true }).click()
+  await page.getByLabel('Borough').selectOption('Manhattan')
+  await expect(presets.getByRole('button', { name: 'Timing', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByLabel('Borough')).toHaveValue('Manhattan')
+
+  await saved.click()
+  await expect(presets.getByRole('button', { name: 'Field', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByLabel('Borough')).toHaveValue('Queens')
+  await expect(page).toHaveURL(/preset=field/)
+  await expect(page).toHaveURL(/borough=Queens/)
+  await expectContained(page)
+})
+
 test('Prospect shared links reject unknown preset values without changing filters', async ({ page }, testInfo) => {
   if (isIphoneProject(testInfo)) testInfo.setTimeout(300_000)
   await signInForProject(page, testInfo.project.name, '#/prospect?minScore=70&preset=not-a-preset')
