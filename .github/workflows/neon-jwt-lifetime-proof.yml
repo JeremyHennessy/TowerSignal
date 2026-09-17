@@ -1,0 +1,22 @@
+name: Measure Neon Auth JWT lifetime
+
+on:
+  push:
+    branches:
+      - agent/neon-auth-architecture-proof-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/probe_neon_jwt_lifetime.mjs
