@@ -27,6 +27,7 @@ on:
       - tests/e2e/roof-map.spec.ts
       - tests/e2e/sales-precall.spec.ts
       - tests/e2e/live.spec.ts
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,6 +41,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     environment: azure-production
