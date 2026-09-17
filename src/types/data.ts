@@ -13,6 +13,12 @@ export interface SourceMetadata {
   url: string
   matched_record_count?: number
   source_query_scope?: string
+  source_health_status?: SourceHealthStatus
+  source_health_reasons?: string[]
+  source_observation_start_at?: string | null
+  source_observation_end_at?: string | null
+  source_snapshot_commit?: string | null
+  current_status_available?: boolean
 }
 
 export interface SourceHealthEntry {
@@ -146,6 +152,11 @@ export interface SystemSummary {
   nyc_lead_service_line_materials?: string[]
   cms_institutional_facility_count?: number
   cms_institutional_facility_types?: string[]
+  official_swo_snapshot_record_count?: number
+  official_swo_active_at_snapshot_count?: number
+  official_swo_rescinded_at_snapshot_count?: number
+  official_swo_snapshot_latest_disposition_date?: string | null
+  official_swo_snapshot_observation_status?: 'MATCHED_DATED_OBSERVATION' | 'NO_MATCH_IN_DATED_SNAPSHOT' | 'NO_USABLE_BIN'
 }
 
 export interface SystemsPayload {

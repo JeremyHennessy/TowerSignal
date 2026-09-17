@@ -5,10 +5,13 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from validate_labor_law_decisions import validate as validate_labor_law_decisions
+
 DOMAIN = "NYC_PROPERTY_ENFORCEMENT_CONTEXT"
 EXPECTED_DATASETS = {
     "hpd_violations": "wvxf-dwi5",
     "stop_work_orders": "eabe-havv",
+    "official_swo_snapshot": "NYCDOB_SWOS_ISSUED_RESCINDED_SNAPSHOT_20240205",
     "facade_compliance": "xubg-57si",
 }
 VALID_FACADE_STATUSES = {"SAFE", "SWARMP", "UNSAFE", "No Report Filed", None}
@@ -51,16 +54,21 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_production_univer
             hpd_records.append(row)
 
     swo_records = []
+    official_swo_records = []
     facade_records = []
     for bin_value, context in by_bin.items():
         if not str(bin_value).isdigit():
             raise RuntimeError(f"invalid BIN in property enforcement cache: {bin_value}")
         swo_context = (context or {}).get("stop_work_orders") or {}
+        official_swo_context = (context or {}).get("official_swo_snapshot") or {}
         facade_context = (context or {}).get("facade_compliance") or {}
         swos = swo_context.get("records") or []
+        official_swos = official_swo_context.get("records") or []
         facades = facade_context.get("records") or []
         if int((swo_context.get("summary") or {}).get("record_count") or 0) != len(swos):
             raise RuntimeError(f"SWO record count mismatch on BIN {bin_value}")
+        if int((official_swo_context.get("summary") or {}).get("record_count") or 0) != len(official_swos):
+            raise RuntimeError(f"official SWO snapshot record count mismatch on BIN {bin_value}")
         if int((facade_context.get("summary") or {}).get("record_count") or 0) != len(facades):
             raise RuntimeError(f"facade record count mismatch on BIN {bin_value}")
         for row in swos:
@@ -69,6 +77,14 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_production_univer
             if not row.get("disposition_code") or not row.get("event_type"):
                 raise RuntimeError("SWO record lacks disposition semantics")
             swo_records.append(row)
+        for row in official_swos:
+            if row.get("bin") != bin_value or row.get("match_basis") != "BIN_EXACT":
+                raise RuntimeError(f"official SWO snapshot contains non-exact BIN match on {bin_value}")
+            if row.get("status_at_snapshot") not in {"ACTIVE", "RESCINDED"}:
+                raise RuntimeError(f"Unexpected official SWO snapshot status {row.get('status_at_snapshot')!r}")
+            if row.get("current_status_claim") is not False:
+                raise RuntimeError("Official SWO snapshot records must explicitly refuse current-status claims")
+            official_swo_records.append(row)
         for row in facades:
             if row.get("bin") != bin_value or row.get("match_basis") != "BIN_EXACT":
                 raise RuntimeError(f"facade cache contains non-exact BIN match on {bin_value}")
@@ -82,11 +98,22 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_production_univer
         "hpd_open_violation_count": sum(1 for row in hpd_records if row.get("is_open")),
         "hpd_open_class_c_count": sum(1 for row in hpd_records if row.get("is_open") and row.get("class") == "C"),
         "swo_event_count": len(swo_records),
+        "official_swo_snapshot_record_count": len(official_swo_records),
+        "official_swo_snapshot_active_count": sum(1 for row in official_swo_records if row.get("status_at_snapshot") == "ACTIVE"),
+        "official_swo_snapshot_rescinded_count": sum(1 for row in official_swo_records if row.get("status_at_snapshot") == "RESCINDED"),
         "facade_filing_count": len(facade_records),
     }
     for key, count in reconciliations.items():
         if int(summary.get(key) or 0) != count:
             raise RuntimeError(f"{key} does not reconcile: summary={summary.get(key)} actual={count}")
+
+    official_source = sources.get("official_swo_snapshot") or {}
+    if official_source.get("source_health_status") != "WARNING":
+        raise RuntimeError("Dated official SWO snapshot must remain WARNING because current status is unavailable")
+    if official_source.get("current_status_available") is not False:
+        raise RuntimeError("Dated official SWO snapshot must not claim current-status availability")
+    if official_source.get("source_observation_end_at") != "2024-02-03":
+        raise RuntimeError("Official SWO snapshot observation window unexpectedly changed")
 
     universe = payload.get("source_systems_snapshot") or {}
     if require_production_universe:
@@ -95,7 +122,8 @@ def validate(path: Path, *, max_age_days: float = 1.0, require_production_univer
         if int(universe.get("canonical_bin_count") or 0) < 3000:
             raise RuntimeError("property enforcement build has unexpectedly few canonical BINs")
 
-    result = {"age_days": round(age_days, 3), **reconciliations}
+    labor_result = validate_labor_law_decisions(path.with_name("labor-law-decisions.json"))
+    result = {"age_days": round(age_days, 3), **reconciliations, "labor_law": labor_result}
     print(json.dumps(result, indent=2))
     return result
 

@@ -2,6 +2,7 @@ import { mkdir } from 'node:fs/promises'
 import { expect, test } from './fixtures'
 
 const baseline = process.env.SOURCE_HEALTH_BASELINE === '1'
+const LABOR_LAW_DATASET_ID = 'NYS_OFFICIAL_REPORTS_LABOR_LAW_PUBLISHED_DECISIONS'
 
 async function screenshotDirectory() {
   await mkdir('source-health-proof', { recursive: true })
@@ -63,6 +64,34 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   }
   await expect(property).toContainText('not a generic Labor Law filing feed')
   await expect(property).toContainText('Not a complete or current active-SWO ledger')
+
+  const laborHealth = page.locator('.source-health-table tbody tr').filter({ hasText: LABOR_LAW_DATASET_ID })
+  await expect(laborHealth).toBeVisible()
+  await expect(laborHealth.getByText('WARNING', { exact: true })).toBeVisible()
+  await expect(laborHealth).toContainText('published Labor Law decisions')
+  await expect(laborHealth).toContainText('not a comprehensive Supreme Court filing or NYSCEF docket feed')
+  await expect(laborHealth).toContainText('zero coverage is not evidence that no Labor Law filing or litigation exists')
+
+  const laborPayload = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/labor-law-decisions.json', window.location.href), { cache: 'no-store' })
+    if (!response.ok) throw new Error(`Labor Law cache HTTP ${response.status}`)
+    const data = await response.json()
+    return {
+      domain: data.domain,
+      currentFilingStatusAvailable: data.source?.current_filing_status_available,
+      sourceHealthStatus: data.source?.source_health_status,
+      retainedDecisionCount: data.summary?.retained_labor_law_decision_count,
+      matchedSystemCount: data.summary?.matched_system_count,
+      coverageBoundary: data.evidence_boundaries?.coverage,
+    }
+  })
+  expect(laborPayload.domain).toBe('NYS_LABOR_LAW_PUBLISHED_DECISIONS')
+  expect(laborPayload.currentFilingStatusAvailable).toBe(false)
+  expect(laborPayload.sourceHealthStatus).toBe('WARNING')
+  expect(Number(laborPayload.retainedDecisionCount)).toBeGreaterThanOrEqual(0)
+  expect(Number(laborPayload.matchedSystemCount)).toBeGreaterThanOrEqual(0)
+  expect(laborPayload.coverageBoundary).toContain('not a comprehensive filing/docket feed')
+
   await expect(page.getByRole('cell', { name: 'property-enforcement.json', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'legionella-alerts.json', exact: true })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'historical-311-context.json', exact: true })).toBeVisible()

@@ -11,6 +11,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.source_health import health_entry, validate_source_health  # noqa: E402
 
+LABOR_LAW_DATASET_ID = "NYS_OFFICIAL_REPORTS_LABOR_LAW_PUBLISHED_DECISIONS"
+
 
 def load_json(path: Path | None, default: Any) -> Any:
     if path is None or not path.exists():
@@ -57,6 +59,9 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
     planimetric_systems = sum(1 for row in systems if bool(row.get("planimetric_bin_match")))
     building_footprint_systems = sum(1 for row in systems if bool(row.get("building_footprint_bin_match")))
     legacy_dob_systems = sum(1 for row in systems if int(row.get("legacy_dob_project_record_count") or 0) > 0)
+    labor_law_systems = sum(1 for row in systems if int(row.get("labor_law_published_decision_count") or 0) > 0)
+    labor_law_cache = load_json(output_dir / "labor-law-decisions.json", {})
+    labor_law_summary = labor_law_cache.get("summary") or {} if isinstance(labor_law_cache, dict) else {}
 
     reg = sources.get("y4fw-iqfr", {})
     insp = sources.get("f9wb-g8mb", {})
@@ -65,7 +70,8 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
     legacy_dob = sources.get("ic3t-wcy2", {})
     planimetric = sources.get("x748-37q7", {})
     building_footprints = sources.get("5zhs-2jue", {})
-    pluto = next((value for key, value in sources.items() if key not in {"y4fw-iqfr", "f9wb-g8mb", "jz4z-kudi", "w9ak-ipjd", "tesw-yqqr", "feu5-w2e2", "x748-37q7", "5zhs-2jue"} and "PLUTO" in str(value.get("name", "")).upper()), {})
+    labor_law = sources.get(LABOR_LAW_DATASET_ID, {})
+    pluto = next((value for key, value in sources.items() if key not in {"y4fw-iqfr", "f9wb-g8mb", "jz4z-kudi", "w9ak-ipjd", "tesw-yqqr", "feu5-w2e2", "x748-37q7", "5zhs-2jue", LABOR_LAW_DATASET_ID} and "PLUTO" in str(value.get("name", "")).upper()), {})
     hpd_reg = sources.get("tesw-yqqr", {})
     hpd_contacts = sources.get("feu5-w2e2", {})
 
@@ -146,6 +152,30 @@ def build(output_dir: Path, previous_snapshot_path: Path | None = None) -> list[
             ),
         ),
     ]
+
+    labor_entry = health_entry(
+        source_key="labor_law_published_decisions",
+        dataset_id=str(labor_law.get("dataset_id") or LABOR_LAW_DATASET_ID),
+        name=str(labor_law.get("name") or "New York Official Reports — Labor Law published decisions"),
+        entity_unit="current TowerSignal systems with exact subject-worksite matches in retained published Labor Law decisions",
+        retrieved_record_count=int(labor_law.get("source_record_count") or 0),
+        requested_entity_count=normalized_system_count,
+        normalized_entity_count=int(labor_law_summary.get("retained_labor_law_decision_count") or 0),
+        matched_entity_count=labor_law_systems,
+        attached_entity_count=labor_law_systems,
+        displayed_entity_count=labor_law_systems,
+        previous_coverage_percentage=None,
+        coverage_note=(
+            "Coverage is prevalence of explicit subject-worksite addresses in official published Labor Law decisions that exactly match a current TowerSignal property address. "
+            "Official Reports is complete for appellate decisions but only selected trial-court decisions; zero coverage is not evidence that no Labor Law filing or litigation exists."
+        ),
+    )
+    labor_entry["status"] = "WARNING"
+    labor_entry["status_reasons"] = list(labor_law.get("source_health_reasons") or [
+        "Official Reports is complete for appellate decisions but only selected trial-court decisions",
+        "Published decisions are not a comprehensive Supreme Court filing or NYSCEF docket feed",
+    ])
+    entries.append(labor_entry)
 
     validate_source_health(entries)
     metadata["source_health"] = entries

@@ -29,7 +29,7 @@ test('NYC Prospect keeps enforcement filters and Home owns official Legionnaires
   await expect(hpdRow).toContainText(/HPD open · [1-9]/)
 
   await hpd.selectOption('')
-  const swo = page.getByLabel('Stop Work Order evidence')
+  const swo = page.getByLabel('SWO complaint/disposition evidence')
   await swo.selectOption('true')
   await expect(page.getByLabel('Active filters')).toContainText('SWO evidence: Yes')
   const swoRow = page.locator('.account-table tbody tr').first()

@@ -10,16 +10,18 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from build_labor_law_decisions import build as build_labor_law_decisions  # noqa: E402
 from towersignal.planimetrics import normalize_bin  # noqa: E402
 from towersignal.pluto import normalize_bbl  # noqa: E402
 from towersignal.property_enforcement import (  # noqa: E402
     fetch_facade_filings_by_bin,
     fetch_hpd_violations_by_bbl,
+    fetch_official_swo_snapshot_by_bin,
     fetch_stop_work_orders_by_bin,
 )
 
 DOMAIN = "NYC_PROPERTY_ENFORCEMENT_CONTEXT"
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 
 
 def _hpd_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
@@ -46,6 +48,15 @@ def _swo_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _official_swo_snapshot_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "record_count": len(records),
+        "active_at_snapshot_count": sum(1 for row in records if row.get("status_at_snapshot") == "ACTIVE"),
+        "rescinded_at_snapshot_count": sum(1 for row in records if row.get("status_at_snapshot") == "RESCINDED"),
+        "latest_disposition_date": max((row.get("last_disposition_date") or "" for row in records), default="") or None,
+    }
+
+
 def _facade_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     latest = records[0] if records else None
     return {
@@ -67,19 +78,22 @@ def build(systems_path: Path, output_path: Path) -> dict[str, Any]:
 
     hpd_by_bbl, hpd_source = fetch_hpd_violations_by_bbl(requested_bbls)
     swo_by_bin, swo_source = fetch_stop_work_orders_by_bin(requested_bins)
+    official_swo_by_bin, official_swo_source = fetch_official_swo_snapshot_by_bin(requested_bins)
     facade_by_bin, facade_source = fetch_facade_filings_by_bin(requested_bins)
 
     by_bbl = {
         bbl: {"summary": _hpd_summary(records), "hpd_violations": records}
         for bbl, records in hpd_by_bbl.items()
     }
-    all_bins = sorted(set(swo_by_bin) | set(facade_by_bin), key=int)
+    all_bins = sorted(set(swo_by_bin) | set(official_swo_by_bin) | set(facade_by_bin), key=int)
     by_bin: dict[str, Any] = {}
     for bin_value in all_bins:
         swo_records = swo_by_bin.get(bin_value, [])
+        official_swo_records = official_swo_by_bin.get(bin_value, [])
         facade_records = facade_by_bin.get(bin_value, [])
         by_bin[bin_value] = {
             "stop_work_orders": {"summary": _swo_summary(swo_records), "records": swo_records},
+            "official_swo_snapshot": {"summary": _official_swo_snapshot_summary(official_swo_records), "records": official_swo_records},
             "facade_compliance": {"summary": _facade_summary(facade_records), "records": facade_records},
         }
 
@@ -97,6 +111,7 @@ def build(systems_path: Path, output_path: Path) -> dict[str, Any]:
         "sources": {
             "hpd_violations": hpd_source,
             "stop_work_orders": swo_source,
+            "official_swo_snapshot": official_swo_source,
             "facade_compliance": facade_source,
         },
         "summary": {
@@ -108,12 +123,17 @@ def build(systems_path: Path, output_path: Path) -> dict[str, Any]:
             "hpd_open_class_c_count": sum(item["summary"]["open_class_c_count"] for item in by_bbl.values()),
             "swo_matched_bin_count": len(swo_by_bin),
             "swo_event_count": sum(len(rows) for rows in swo_by_bin.values()),
+            "official_swo_snapshot_matched_bin_count": len(official_swo_by_bin),
+            "official_swo_snapshot_record_count": sum(len(rows) for rows in official_swo_by_bin.values()),
+            "official_swo_snapshot_active_count": sum(1 for rows in official_swo_by_bin.values() for row in rows if row.get("status_at_snapshot") == "ACTIVE"),
+            "official_swo_snapshot_rescinded_count": sum(1 for rows in official_swo_by_bin.values() for row in rows if row.get("status_at_snapshot") == "RESCINDED"),
             "facade_matched_bin_count": len(facade_by_bin),
             "facade_filing_count": sum(len(rows) for rows in facade_by_bin.values()),
         },
         "evidence_semantics": {
             "hpd": "Official HPD Housing Maintenance Code / Multiple Dwelling Law violations joined only by exact canonical BBL. violation_status is used directly for open/close state; TowerSignal does not infer closure from free text.",
             "stop_work_orders": "Official DOB Complaints current disposition records joined only by exact BIN and restricted to SWO-related disposition codes documented by DOB. These are complaint disposition events, not a reconstructed complete SWO disposition-history ledger.",
+            "official_swo_snapshot": "Separate official DOB Stop Work Orders snapshot joined only by exact BIN. ACTIVE/RESCINDED is preserved exactly as published at the dated 2024 snapshot; it must never be presented as current status. Absence from the snapshot means no matching dated observation, not no order.",
             "facade_compliance": "Official DOB NOW Safety Facades (Local Law 11 / FISP) compliance filings joined only by exact BIN. SAFE/SWARMP/UNSAFE/No Report Filed are preserved as published.",
             "scoring": "Property enforcement evidence is context only in this build and does not modify TowerSignal Priority Score.",
         },
@@ -122,7 +142,13 @@ def build(systems_path: Path, output_path: Path) -> dict[str, Any]:
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(result, separators=(",", ":")), encoding="utf-8")
-    print(json.dumps(result["summary"], indent=2))
+
+    labor_path = output_path.with_name("labor-law-decisions.json")
+    previous_labor_path = ROOT / ".history-store" / "data" / "history" / "segments" / "labor-law-decisions.json"
+    labor_payload = build_labor_law_decisions(systems_path, labor_path, previous_labor_path)
+    result["labor_law_summary"] = labor_payload.get("summary") or {}
+
+    print(json.dumps({**result["summary"], "labor_law": result["labor_law_summary"]}, indent=2))
     return result
 
 

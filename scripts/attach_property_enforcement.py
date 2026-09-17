@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from attach_labor_law_decisions import attach as attach_labor_law_decisions
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -30,6 +32,12 @@ def _source_row(source: dict[str, Any], matched_count: int) -> dict[str, Any]:
         "url": source.get("url"),
         "matched_record_count": matched_count,
         "source_query_scope": source.get("source_query_scope"),
+        "source_health_status": source.get("source_health_status"),
+        "source_health_reasons": source.get("source_health_reasons"),
+        "source_observation_start_at": source.get("source_observation_start_at"),
+        "source_observation_end_at": source.get("source_observation_end_at"),
+        "source_snapshot_commit": source.get("source_snapshot_commit"),
+        "current_status_available": source.get("current_status_available"),
     }
 
 
@@ -47,6 +55,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
 
     attached_hpd_systems = 0
     attached_swo_systems = 0
+    attached_official_swo_snapshot_systems = 0
     attached_facade_systems = 0
     for row in payload.get("systems") or []:
         bbl = str(row.get("bbl") or "")
@@ -54,10 +63,12 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
         hpd_context = by_bbl.get(bbl)
         bin_context = by_bin.get(bin_value) or {}
         swo_context = bin_context.get("stop_work_orders") or {}
+        official_swo_context = bin_context.get("official_swo_snapshot") or {}
         facade_context = bin_context.get("facade_compliance") or {}
 
         hpd_summary = (hpd_context or {}).get("summary") or {}
         swo_summary = swo_context.get("summary") or {}
+        official_swo_summary = official_swo_context.get("summary") or {}
         facade_summary = facade_context.get("summary") or {}
 
         row["hpd_violation_count"] = int(hpd_summary.get("record_count") or 0)
@@ -66,6 +77,11 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
         row["latest_hpd_violation_inspection_date"] = hpd_summary.get("latest_inspection_date")
         row["stop_work_order_event_count"] = int(swo_summary.get("record_count") or 0)
         row["latest_stop_work_order_event_date"] = swo_summary.get("latest_event_date")
+        row["official_swo_snapshot_record_count"] = int(official_swo_summary.get("record_count") or 0)
+        row["official_swo_active_at_snapshot_count"] = int(official_swo_summary.get("active_at_snapshot_count") or 0)
+        row["official_swo_rescinded_at_snapshot_count"] = int(official_swo_summary.get("rescinded_at_snapshot_count") or 0)
+        row["official_swo_snapshot_latest_disposition_date"] = official_swo_summary.get("latest_disposition_date")
+        row["official_swo_snapshot_observation_status"] = "NO_USABLE_BIN" if not bin_value else ("MATCHED_DATED_OBSERVATION" if row["official_swo_snapshot_record_count"] else "NO_MATCH_IN_DATED_SNAPSHOT")
         row["facade_compliance_filing_count"] = int(facade_summary.get("record_count") or 0)
         row["facade_latest_status"] = facade_summary.get("latest_status")
         row["facade_latest_cycle"] = facade_summary.get("latest_cycle")
@@ -75,6 +91,8 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
             attached_hpd_systems += 1
         if row["stop_work_order_event_count"]:
             attached_swo_systems += 1
+        if row["official_swo_snapshot_record_count"]:
+            attached_official_swo_snapshot_systems += 1
         if row["facade_compliance_filing_count"]:
             attached_facade_systems += 1
 
@@ -83,6 +101,12 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
         detail["property_enforcement_context"] = {
             "hpd_violations": hpd_context,
             "stop_work_orders": swo_context if swo_context.get("records") else None,
+            "official_swo_snapshot": {
+                "summary": official_swo_summary,
+                "records": official_swo_context.get("records") or [],
+                "observation_status": row["official_swo_snapshot_observation_status"],
+                "source": (cache.get("sources") or {}).get("official_swo_snapshot") or {},
+            },
             "facade_compliance": facade_context if facade_context.get("records") else None,
             "evidence_boundaries": cache.get("evidence_semantics") or {},
             "generated_at": cache.get("generated_at"),
@@ -93,6 +117,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     summary = payload.get("summary") or {}
     summary["systems_with_hpd_violation_context"] = attached_hpd_systems
     summary["systems_with_stop_work_order_context"] = attached_swo_systems
+    summary["systems_with_official_swo_snapshot_observation"] = attached_official_swo_snapshot_systems
     summary["systems_with_facade_compliance_context"] = attached_facade_systems
     payload["summary"] = summary
 
@@ -101,18 +126,24 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     metadata["property_enforcement_generated_at"] = cache.get("generated_at")
     metadata["hpd_violation_match_basis"] = "BBL_EXACT"
     metadata["stop_work_order_match_basis"] = "BIN_EXACT"
+    metadata["official_swo_snapshot_match_basis"] = "BIN_EXACT"
+    metadata["official_swo_snapshot_current_status_available"] = False
+    metadata["official_swo_snapshot_source_last_updated_at"] = ((cache.get("sources") or {}).get("official_swo_snapshot") or {}).get("source_last_updated_at")
+    metadata["official_swo_snapshot_observation_end_at"] = ((cache.get("sources") or {}).get("official_swo_snapshot") or {}).get("source_observation_end_at")
     metadata["facade_compliance_match_basis"] = "BIN_EXACT"
     metadata["hpd_violation_count"] = int(cache_summary.get("hpd_violation_count") or 0)
     metadata["hpd_open_violation_count"] = int(cache_summary.get("hpd_open_violation_count") or 0)
     metadata["stop_work_order_event_count"] = int(cache_summary.get("swo_event_count") or 0)
+    metadata["official_swo_snapshot_record_count"] = int(cache_summary.get("official_swo_snapshot_record_count") or 0)
     metadata["facade_compliance_filing_count"] = int(cache_summary.get("facade_filing_count") or 0)
 
     cache_sources = cache.get("sources") or {}
-    dataset_ids = {"wvxf-dwi5", "eabe-havv", "xubg-57si"}
+    dataset_ids = {"wvxf-dwi5", "eabe-havv", "NYCDOB_SWOS_ISSUED_RESCINDED_SNAPSHOT_20240205", "xubg-57si"}
     sources = [item for item in metadata.get("sources", []) if item.get("dataset_id") not in dataset_ids]
     sources.extend((
         _source_row(cache_sources.get("hpd_violations") or {}, int(cache_summary.get("hpd_violation_count") or 0)),
         _source_row(cache_sources.get("stop_work_orders") or {}, int(cache_summary.get("swo_event_count") or 0)),
+        _source_row(cache_sources.get("official_swo_snapshot") or {}, int(cache_summary.get("official_swo_snapshot_record_count") or 0)),
         _source_row(cache_sources.get("facade_compliance") or {}, int(cache_summary.get("facade_filing_count") or 0)),
     ))
     metadata["sources"] = sources
@@ -120,10 +151,15 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
 
     systems_path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+
+    labor_result = attach_labor_law_decisions(output_dir, cache_path.with_name("labor-law-decisions.json"))
     result = {
         "attached_hpd_systems": attached_hpd_systems,
         "attached_swo_systems": attached_swo_systems,
+        "attached_official_swo_snapshot_systems": attached_official_swo_snapshot_systems,
         "attached_facade_systems": attached_facade_systems,
+        "labor_law_attached_systems": labor_result["attached_systems"],
+        "labor_law_attached_records": labor_result["attached_records"],
     }
     print(json.dumps(result, indent=2))
     return result
