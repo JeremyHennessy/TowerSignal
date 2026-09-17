@@ -34,6 +34,7 @@ BASELINE_MANIFEST = '14fc341268dfdfc0cd0e6df9628f678293c5b44de2a1da9b148745434ac
 BASELINE_COMPLETE = 'dffeca3b807a708ffad11665fbf1f445cbcf0eac2705a0defce40679749fe688'
 REQUIRED = ('systems.json', 'changes.json', 'nys-systems.json', 'nys-changes.json', 'source-health.json')
 HISTORY_WRITTEN = ('latest.json', 'events.json', 'nys/latest.json', 'nys/events.json', 'source-health.json')
+HISTORY_ARTIFACT_ROOT = ('source-health.json', 'legionella-alerts.json')
 
 
 def get_reader():
@@ -111,7 +112,7 @@ def written_history(records):
     result = {}
     for row in records:
         name = row['path']
-        if name == 'source-health.json':
+        if name in HISTORY_ARTIFACT_ROOT:
             target = name
         elif name.startswith('history/'):
             target = name.removeprefix('history/')
@@ -130,7 +131,7 @@ def check_history_parity(runtime, history, staged_history=None):
     generated = written_history(runtime)
     durable = {r['path']: (r['bytes'], r['sha256']) for r in history}
     require(all(durable.get(n) == v for n, v in generated.items()), 'Runtime/GitHub history parity failed')
-    written_names = {n for n in durable if n in HISTORY_WRITTEN or n.startswith('segments/')}
+    written_names = {n for n in durable if n in HISTORY_WRITTEN or n in HISTORY_ARTIFACT_ROOT or n.startswith('segments/')}
     require(written_names == set(generated), 'Unexpected persisted history segment')
     if staged_history is not None:
         staged = written_history(staged_history)
@@ -170,7 +171,7 @@ def unpack_history(archive, destination):
             require(not stat.S_ISLNK(entry.external_attr >> 16), 'History archive symlink')
             if entry.is_dir():
                 continue
-            require(name not in seen and (name.startswith('history/') or name == 'source-health.json'),
+            require(name not in seen and (name.startswith('history/') or name in HISTORY_ARTIFACT_ROOT),
                     'Duplicate/unexpected history archive member')
             seen.add(name)
             total += entry.file_size
