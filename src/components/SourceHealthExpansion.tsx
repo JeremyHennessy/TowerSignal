@@ -19,8 +19,8 @@ const refreshContracts = [
     source: 'Property enforcement',
     cadence: 'Daily · 10:17 UTC',
     path: 'Canonical Pages release',
-    scope: 'HPD violations, DOB SWO complaint/disposition evidence and FISP / Local Law 11 filings.',
-    note: 'Exact BBL/BIN attachment only. SWO evidence is not an active-order ledger; FISP is not a generic Labor Law feed.',
+    scope: 'HPD violations, DOB SWO complaint/disposition evidence, the official DOB issued/rescinded SWO dated snapshot, FISP / Local Law 11 filings and official published Labor Law decisions.',
+    note: 'Exact BBL/BIN or explicit-worksite attachment only. Complaint dispositions and the dated DOB snapshot do not establish current SWO status. Official Reports covers all appellate decisions but only selected trial-court decisions, so published Labor Law decisions are not a comprehensive filing feed.',
   },
   {
     source: 'Legionnaires public-health intelligence',
@@ -90,20 +90,23 @@ export function SourceHealthExpansion({ payload }: { payload: SystemsPayload }) 
 
   return <>
     <div className="reference-table-card" data-testid="property-enforcement-source-health">
-      <div className="reference-table-heading"><div><strong>Property enforcement coverage</strong><span>HPD violations, DOB SWO disposition evidence and Local Law 11 / FISP. Counts follow the currently loaded NYC accounts.</span></div></div>
-      <div className="disclaimer">Dataset rows are the publisher's full dataset count. Retained records are the normalized, exact-key cohort records, not a claimed raw retrieval count. Matched properties are distinct BBLs or BINs; represented systems can share a property. Coverage is observed prevalence across {number.format(payload.systems.length)} systems, not completeness of citywide enforcement. Available means published provenance and account measurements are present; it is not a substitute for pagination or schema diagnostics.</div>
+      <div className="reference-table-heading"><div><strong>Property enforcement coverage</strong><span>HPD violations, DOB SWO complaint/disposition evidence, the official DOB dated SWO snapshot and Local Law 11 / FISP. Counts follow the currently loaded NYC accounts.</span></div></div>
+      <div className="disclaimer">Dataset rows are the publisher's full dataset count. Retained records are the normalized, exact-key cohort records, not a claimed raw retrieval count. Matched properties are distinct BBLs or BINs; represented systems can share a property. Coverage is observed prevalence across {number.format(payload.systems.length)} systems, not completeness of citywide enforcement. Available means published provenance and account measurements are present; WARNING preserves an explicit source limitation such as a historical observation window. Neither state substitutes for pagination or schema diagnostics.</div>
       <div className="reference-table-scroll"><table className="reference-table source-health-table"><thead><tr><th>Source</th><th>Availability</th><th>Dataset rows</th><th>Retained records</th><th>Requested properties</th><th>Matched properties</th><th>Represented systems</th><th>System coverage</th><th>Freshness &amp; evidence scope</th></tr></thead><tbody>
-        {properties.map(source => <tr key={source.id}>
-          <td><strong>{source.name}</strong><small>{source.id} · exact {source.unit}</small><SourceLink url={source.source?.url} /></td>
-          <td><span className={`health-badge${source.available ? '' : ' health-warning'}`}>{source.available ? 'AVAILABLE' : 'UNVERIFIED'}</span></td>
-          <td>{count(source.sourceRecords)}</td><td>{count(source.records)}</td>
-          <td>{count(source.requested)} {source.unit}<small>Current account identity universe</small></td>
-          <td>{count(source.matched)} {source.unit}</td><td>{count(source.attached)} / {number.format(source.totalSystems)}</td>
-          <td>{source.coverage === null ? 'Not reported' : `${source.coverage.toFixed(1)}%`}</td>
-          <td><span>Last retrieved: {date(source.retrievedAt)}</span><small>Publisher updated: {date(source.source?.source_last_updated_at)}</small><small>{source.source?.source_query_scope}</small><small>{source.note}</small><small>Raw retrieved count, pagination and schema diagnostics: not reported in account metadata.</small></td>
-        </tr>)}
+        {properties.map(source => {
+          const status = !source.available ? 'UNVERIFIED' : source.source?.source_health_status === 'FAILED' ? 'FAILED' : source.source?.source_health_status === 'WARNING' ? 'WARNING' : 'AVAILABLE'
+          return <tr key={source.id}>
+            <td><strong>{source.name}</strong><small>{source.id} · exact {source.unit}</small><SourceLink url={source.source?.url} /></td>
+            <td><span className={`health-badge${status === 'AVAILABLE' ? '' : ' health-warning'}`}>{status}</span></td>
+            <td>{count(source.sourceRecords)}</td><td>{count(source.records)}</td>
+            <td>{count(source.requested)} {source.unit}<small>Current account identity universe</small></td>
+            <td>{count(source.matched)} {source.unit}</td><td>{count(source.attached)} / {number.format(source.totalSystems)}</td>
+            <td>{source.coverage === null ? 'Not reported' : `${source.coverage.toFixed(1)}%`}</td>
+            <td><span>Last retrieved: {date(source.retrievedAt)}</span><small>Publisher updated: {date(source.source?.source_last_updated_at)}</small>{(source.source?.source_observation_start_at || source.source?.source_observation_end_at) && <small>Observation window: {date(source.source?.source_observation_start_at)} – {date(source.source?.source_observation_end_at)}</small>}{source.source?.current_status_available === false && <small>Current status: not available from this source.</small>}<small>{source.source?.source_query_scope}</small><small>{source.note}</small>{(source.source?.source_health_reasons ?? []).map(reason => <small key={reason}>{reason}</small>)}<small>Raw retrieved count, pagination and schema diagnostics: not reported in account metadata.</small></td>
+          </tr>
+        })}
       </tbody></table></div>
-      <div className="disclaimer"><strong>Evidence gaps remain explicit.</strong> HPD registration/contact coverage is a different source from HPD violations. SWO complaint dispositions do not establish whether an order is currently active. Generic Labor Law court filings are not supplied by FISP. A missing match is not proof of no violation, no filing or no enforcement.</div>
+      <div className="disclaimer"><strong>Evidence gaps remain explicit.</strong> HPD registration/contact coverage is a different source from HPD violations. DOB complaint dispositions are event evidence, not an active-order ledger. The official DOB issued/rescinded snapshot is a dated 2022–2024 observation and does not establish current 2026 SWO status. FISP is Local Law 11, not generic Labor Law. Official Reports published decisions are complete for appellate decisions but only selected trial-court decisions, so they are not a comprehensive Supreme Court/NYSCEF filing feed. A missing match is not proof of no violation, no filing or no enforcement.</div>
     </div>
 
     <div className="reference-table-card" data-testid="source-refresh-coverage">

@@ -4,6 +4,7 @@ import type { PropertyEnforcementSummaryFields } from '../types/enforcement'
 export const enforcementSources = [
   { id: 'wvxf-dwi5', name: 'HPD Housing Maintenance Code violations', field: 'hpd_violation_count', identity: 'bbl', unit: 'BBLs', note: 'Exact canonical BBL. Open status is the published violationstatus, not a free-text inference.' },
   { id: 'eabe-havv', name: 'DOB stop-work-order disposition evidence', field: 'stop_work_order_event_count', identity: 'bin', unit: 'BINs', note: 'Exact BIN, restricted to documented SWO-related complaint disposition codes. Not a complete or current active-SWO ledger.' },
+  { id: 'NYCDOB_SWOS_ISSUED_RESCINDED_SNAPSHOT_20240205', name: 'DOB issued/rescinded SWO dated snapshot', field: 'official_swo_snapshot_record_count', identity: 'bin', unit: 'BINs', note: 'Exact BIN. The published DOB snapshot contains 2022–2024 issued/rescinded observations; ACTIVE and RESCINDED are status at that dated snapshot, not current 2026 SWO status.' },
   { id: 'xubg-57si', name: 'DOB NOW facades / FISP / Local Law 11', field: 'facade_compliance_filing_count', identity: 'bin', unit: 'BINs', note: 'Exact BIN. Published facade filing statuses are retained. This is Local Law 11 / FISP, not a generic Labor Law filing feed.' },
 ] as const
 

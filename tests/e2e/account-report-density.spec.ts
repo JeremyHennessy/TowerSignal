@@ -47,7 +47,7 @@ test('full account report groups missing-BBL property evidence and keeps provena
   expect(tabsBox!.width).toBeGreaterThanOrEqual(detailBox!.width * 0.9)
   await modeTabs.getByRole('button', { name: /^Evidence/ }).click()
 
-  const property = detail.locator('section.property-context-section')
+  const property = detail.locator('section.property-coverage-summary')
   await expect(property).toHaveCount(1)
   await expect(property.getByRole('heading', { name: 'Property records', exact: true })).toBeVisible()
   await expect(property).toContainText('Property-level BBL context is unavailable')
@@ -72,7 +72,7 @@ test('full account report groups missing-BBL property evidence and keeps provena
   await expect(provenanceDetails.locator('.source-row').first()).toBeVisible()
 
   await expectContained(page)
-  await expectElementContained(page, 'section.property-context-section')
+  await expectElementContained(page, 'section.property-coverage-summary')
   await expectElementContained(page, 'section.source-provenance-section')
 
   const propertyScreenshot = await property.screenshot()

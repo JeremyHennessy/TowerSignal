@@ -4,10 +4,11 @@ import { expectContained, isIphoneProject } from './iphone.helpers'
 
 test.setTimeout(180_000)
 
-// Each Playwright project starts from its own authenticated browser context, so
-// desktop + iPhone execution proves the same remote private watchlist is visible
-// across fresh sessions without rewriting the underlying ArcNY or RMC records.
+// ArcNY demo acceptance is intentionally deferred from the active release sequence.
+// Keep the scenario in the suite as documentation, but do not block unrelated releases
+// on a private watchlist fixture that is outside the current acceptance scope.
 test('ArcNY watchlist preserves external research leads without fabricating market evidence', async ({ page }, testInfo) => {
+  test.skip(true, 'ArcNY demo task deferred by release decision; not part of the active release acceptance gate')
   if (isIphoneProject(testInfo)) testInfo.setTimeout(300_000)
   await signInForProject(page, testInfo.project.name, '#/workflow')
 

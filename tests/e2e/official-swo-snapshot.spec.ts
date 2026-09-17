@@ -7,6 +7,12 @@ test.setTimeout(180_000)
 test('official DOB SWO evidence remains a dated snapshot and never a current-status claim', async ({ page }, testInfo) => {
   if (isIphoneProject(testInfo)) testInfo.setTimeout(300_000)
   await signInForProject(page, testInfo.project.name, '#/account/2000015564')
+
+  const detail = page.locator('.account-profile-page .detail-panel')
+  const modeTabs = detail.locator('.account-mode-tabs')
+  await expect(modeTabs).toBeVisible()
+  await modeTabs.getByRole('button', { name: /^Evidence/ }).click()
+
   const section = page.getByRole('region', { name: 'Official DOB stop work order snapshot' })
   await expect(section).toBeVisible()
   await expect(section).toContainText('Historical DOB snapshot · not current status')

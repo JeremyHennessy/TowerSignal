@@ -3,6 +3,7 @@ import { expect, test } from './fixtures'
 
 const baseline = process.env.SOURCE_HEALTH_BASELINE === '1'
 const LABOR_LAW_DATASET_ID = 'NYS_OFFICIAL_REPORTS_LABOR_LAW_PUBLISHED_DECISIONS'
+const OFFICIAL_SWO_DATASET_ID = 'NYCDOB_SWOS_ISSUED_RESCINDED_SNAPSHOT_20240205'
 
 async function screenshotDirectory() {
   await mkdir('source-health-proof', { recursive: true })
@@ -34,9 +35,12 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   await expect(refresh).toContainText('Daily · 08:41 UTC')
   await expect(refresh).toContainText('Every 6 hours · :23 UTC')
   await expect(refresh).toContainText('Refresh time is not source observation time.')
+  await expect(refresh).toContainText('dated DOB snapshot do not establish current SWO status')
+  await expect(refresh).toContainText('not a comprehensive filing feed')
   await expect(legionella.locator('tbody tr')).toHaveCount(12)
-  await expect(property.locator('tbody tr')).toHaveCount(3)
+  await expect(property.locator('tbody tr')).toHaveCount(4)
   await expect(property.getByText('AVAILABLE', { exact: true })).toHaveCount(3)
+  await expect(property.getByText('WARNING', { exact: true })).toHaveCount(1)
   await expect(legionella.getByText('SNAPSHOT RETRIEVED', { exact: true })).toHaveCount(12)
   await expect(page.getByText('Coverage audit unavailable.')).toHaveCount(0)
 
@@ -47,6 +51,7 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
     return [
       ['wvxf-dwi5', 'hpd_violation_count', 'bbl'],
       ['eabe-havv', 'stop_work_order_event_count', 'bin'],
+      ['NYCDOB_SWOS_ISSUED_RESCINDED_SNAPSHOT_20240205', 'official_swo_snapshot_record_count', 'bin'],
       ['xubg-57si', 'facade_compliance_filing_count', 'bin'],
     ].map(([id, field, identity]) => {
       const source = data.metadata.sources.find((item: { dataset_id: string }) => item.dataset_id === id)
@@ -64,6 +69,31 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   }
   await expect(property).toContainText('not a generic Labor Law filing feed')
   await expect(property).toContainText('Not a complete or current active-SWO ledger')
+  await expect(property).toContainText('dated 2022–2024 observation')
+  await expect(property).toContainText('does not establish current 2026 SWO status')
+
+  const swoHealth = property.locator('tbody tr').filter({ hasText: OFFICIAL_SWO_DATASET_ID })
+  await expect(swoHealth).toBeVisible()
+  await expect(swoHealth.getByText('WARNING', { exact: true })).toBeVisible()
+  await expect(swoHealth).toContainText('Current status: not available from this source.')
+  await expect(swoHealth).toContainText('status at that dated snapshot, not current 2026 SWO status')
+
+  const swoSource = await page.evaluate(async datasetId => {
+    const response = await fetch(new URL('data/systems.json', window.location.href), { cache: 'no-store' })
+    if (!response.ok) throw new Error(`Systems HTTP ${response.status}`)
+    const data = await response.json()
+    const source = data.metadata.sources.find((item: { dataset_id: string }) => item.dataset_id === datasetId)
+    return {
+      currentStatusAvailable: source?.current_status_available,
+      sourceHealthStatus: source?.source_health_status,
+      observationStart: source?.source_observation_start_at,
+      observationEnd: source?.source_observation_end_at,
+    }
+  }, OFFICIAL_SWO_DATASET_ID)
+  expect(swoSource.currentStatusAvailable).toBe(false)
+  expect(swoSource.sourceHealthStatus).toBe('WARNING')
+  expect(swoSource.observationStart).toBeTruthy()
+  expect(swoSource.observationEnd).toBeTruthy()
 
   const laborHealth = page.locator('.source-health-table tbody tr').filter({ hasText: LABOR_LAW_DATASET_ID })
   await expect(laborHealth).toBeVisible()
