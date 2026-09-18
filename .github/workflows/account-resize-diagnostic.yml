@@ -1,0 +1,53 @@
+name: Account resize diagnostic
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: ['.github/workflows/account-resize-diagnostic.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 27151c871ade30dcb90a84e9296b05ed70f8d152
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare unchanged product and explicit diagnostic
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+          mkdir -p .accepted .candidate-pages proof
+          git rev-parse HEAD > proof/product-head.txt
+          gh run download 35334719612 -n github-pages -D .accepted
+          tar -xf "$(find .accepted -type f | head -1)" -C .candidate-pages
+          python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection.json
+          cp dist/index.html .candidate-pages/index.html
+          rm -rf .candidate-pages/assets
+          cp -R dist/assets .candidate-pages/assets
+          for f in auth.helpers.ts candidate-routes.ts; do
+            gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+          done
+          gh api 'repos/JeremyHennessy/TowerSignal/contents/tests/e2e/account-resize-diagnostic.spec.ts?ref=dd318b51dc52f16cf2924602a5b6375bdcecad5c' --jq '.content' | base64 --decode > tests/e2e/account-resize-diagnostic.spec.ts
+      - name: Install WebKit
+        run: npx playwright install --with-deps webkit
+      - name: Record original resize sequence and failures
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: npx playwright test tests/e2e/account-resize-diagnostic.spec.ts --project=iphone --output=test-results/resize-diagnostic
+      - name: Retain geometry including failure state
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-resize-diagnostic
+          path: |
+            proof
+            playwright-report
+          retention-days: 14
