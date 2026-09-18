@@ -43,7 +43,7 @@ function cleanText(value: unknown): string | null {
   return text || null
 }
 
-function firmKey(value: string): string {
+export function knownFirmKey(value: string): string {
   return value
     .toUpperCase()
     .replace(/&/g, ' AND ')
@@ -96,7 +96,7 @@ function observationSortKey(observation: FirmObservation): string {
 function addObservation(map: Map<string, FirmAccumulator>, observation: FirmObservation) {
   const name = cleanText(observation.name)
   if (!looksLikeFirm(name)) return
-  const key = firmKey(name)
+  const key = knownFirmKey(name)
   const nextSortKey = observationSortKey(observation)
   const existing = map.get(key)
   if (!existing) {

@@ -7,6 +7,7 @@ import type { NysChangesPayload, NysSystem, NysSystemsPayload } from './types/ny
 import type { CompanyIntelligenceRecord } from './types/company'
 import { formatTimestamp } from './domain/labels'
 import { normalizeProspectPreset, type ProspectPreset } from './domain/prospectPreset'
+import { accountHashWithView, accountViewFromHash, normalizeAccountView, type AccountView } from './domain/accountMode'
 import { ChangesView } from './components/ChangesView'
 import { DetailPanel } from './components/DetailPanel'
 import { Filters, filterSystems, initialFilters, type FilterState } from './components/Filters'
@@ -100,7 +101,17 @@ export default function App() {
   const [viewName, setViewName] = useState('')
   const [watchedOnly, setWatchedOnly] = useState(false)
   const [globalSearch, setGlobalSearch] = useState(initialRoute.filters.search ?? '')
+  const [accountView, setAccountView] = useState<AccountView>(() => accountViewFromHash(window.location.hash))
   const workflow = useWorkflow()
+
+  useEffect(() => {
+    const onAccountModeChange = (event: Event) => {
+      const detail = event instanceof CustomEvent ? event.detail : null
+      setAccountView(normalizeAccountView(detail?.mode))
+    }
+    window.addEventListener('towersignal:account-mode-change', onAccountModeChange)
+    return () => window.removeEventListener('towersignal:account-mode-change', onAccountModeChange)
+  }, [])
 
   useEffect(() => {
     Promise.all([loadSystems(), loadChanges(), loadNysSystems(), loadNysChanges()])
@@ -119,6 +130,7 @@ export default function App() {
       setMode(route.mode)
       if (Object.keys(route.filters).length > 0) setFilters(current => ({ ...current, ...route.filters }))
       if (route.mode === 'account' && route.id && payload) {
+        setAccountView(accountViewFromHash(window.location.hash))
         setSelected(payload.systems.find(row => row.system_id === route.id) ?? null)
       } else if (route.mode !== 'account') {
         setSelected(null)
@@ -253,7 +265,10 @@ export default function App() {
   const sampleChanges = monitorChanges.events.filter(event => event.event_type.includes('SAMPLE') || event.event_type.includes('SAMPLING')).length
   const dobChanges = monitorChanges.events.filter(event => event.event_type.startsWith('DOB_')).length
   const propertyChanges = monitorChanges.events.filter(event => event.event_type.startsWith('HPD_') || event.event_type === 'PLUTO_OWNER_CHANGED').length
-  const currentShareUrl = shareUrl(mode, filters, mode === 'account' ? selected?.system_id : mode === 'nys-account' ? selectedNys?.system_id : mode === 'company' ? selectedCompanyId : null)
+  const accountShareHash = selected ? accountHashWithView(routeHash('account', selected.system_id), accountView) : routeHash('account')
+  const currentShareUrl = mode === 'account'
+    ? `${window.location.origin}${window.location.pathname}${window.location.search}${accountShareHash}`
+    : shareUrl(mode, filters, mode === 'nys-account' ? selectedNys?.system_id : mode === 'company' ? selectedCompanyId : null)
 
   const exportWorkflow = () => exportWorkflowCsv(watchedRows, payload.metadata, workflow.accounts, workflow.memberships, workflow.watchlists)
 
