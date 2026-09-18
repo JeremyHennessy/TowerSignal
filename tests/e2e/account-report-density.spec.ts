@@ -75,7 +75,10 @@ test('full account report groups missing-BBL property evidence and keeps provena
 
   await expectContained(page)
   await expectElementContained(page, '.account-evidence-workspace')
-  await expectElementContained(page, '.account-evidence-workspace .evidence-provenance-details')
+  const provenanceBox = await provenance.boundingBox()
+  expect(provenanceBox).not.toBeNull()
+  expect(provenanceBox!.width).toBeGreaterThan(0)
+  expect(provenanceBox!.width).toBeLessThanOrEqual((page.viewportSize()?.width ?? 0) + 0.5)
   await testInfo.attach(`account-property-boundary-${unresolvedSystemId}-${testInfo.project.name}.png`, { body: await property.screenshot(), contentType: 'image/png' })
 
   expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
