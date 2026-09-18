@@ -4,7 +4,7 @@ on:
     branches: [agent/account-unblock-harness-20260918]
     paths: ['.github/workflows/account-unblock.yml']
 permissions:
-  contents: write
+  contents: read
   actions: read
 concurrency:
   group: account-unblock-proof
@@ -15,65 +15,34 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 27151c871ade30dcb90a84e9296b05ed70f8d152
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validate patch transport and apply only to pinned product
+      - name: Record and validate exact product
         run: |
-          mkdir -p "$RUNNER_TEMP/account-unblock" proof
-          cp review/account-unblock.patch.gz.b64 "$RUNNER_TEMP/account-unblock/input.b64"
-          python - <<'PY'
-          import base64,gzip,hashlib,pathlib,os
-          text=pathlib.Path('review/account-unblock.patch.gz.b64').read_text()
-          repairs=[('Cm3pGMBJW8LQdMRymlWHL0NxKxLHUBtM','Cm3pGMBJW8LQdMRyVRqmlWHL0NxKxLHUBtM'),('NVOyzxS8KQtccEBuTj0q9Dr7fVAJQOZo','NVOyzxS8KQtccEBu+Txh0q9Dr7fVAJQOZo'),('lGi7A53hOiws4vyF3rQGu0K8mj4NmYXQg','lGi7A53hOiws4vyF7rQGu0K8mj4NmYXQg'),('ZIlzryz5wlEWep3Efw+nPcJlodED2nIqt','ZIlzryz5wlEWep3Ew+nPcJlodED2nIqt')]
-          for before,after in repairs:
-              assert text.count(before)==1
-              text=text.replace(before,after)
-          raw=gzip.decompress(base64.b64decode(text))
-          assert hashlib.sha256(raw).hexdigest()=='6639a452e475972296ec9b99de09f02fd7cbf7cef98b7708cf4595193a4184ae'
-          pathlib.Path(os.environ['RUNNER_TEMP']+'/account-unblock/product.patch').write_bytes(raw)
-          PY
-          git fetch --depth=1 origin 6c73fa356402b99c9160b26d302a5d725c8d0333
-          git checkout --detach 6c73fa356402b99c9160b26d302a5d725c8d0333
-          git apply --check "$RUNNER_TEMP/account-unblock/product.patch"
-          git apply "$RUNNER_TEMP/account-unblock/product.patch"
-          python - <<'PY'
-          from pathlib import Path
-          block='      - name: Build bounded exact-account procurement projection\n        run: python scripts/build_account_procurement.py --output public/data\n'
-          for name in ['pages.yml','azure-data-refresh.yml']:
-              p=Path('.github/workflows')/name
-              text=p.read_text(); assert text.count(block)==1
-              text=text.replace(block,'')
-              target='      - name: Production build\n'; assert text.count(target)==1
-              p.write_text(text.replace(target,block+target))
-          PY
-      - name: Validate all product code and build
-        run: |
+          mkdir -p proof
+          git rev-parse HEAD | tee proof/product-head.txt
+          test "$(git rev-parse HEAD)" = 27151c871ade30dcb90a84e9296b05ed70f8d152
           npm install --no-audit --no-fund
           npm run lint
           npm run typecheck
           npm test -- --reporter=junit --outputFile=proof/vitest.xml
           python -m unittest discover -s tests/python -p 'test_*.py' -v > proof/python-tests.log 2>&1
           npm run build
-      - name: Create isolated product commit without changing main or existing PR
-        id: product
-        run: |
-          git config user.name 'Jeremy Hennessy'
-          git config user.email 'jeremy.hennessy@gmail.com'
-          git add scripts/build_account_procurement.py src/data/accountProcurement.ts src/components/AccountEvidenceWorkspace.tsx tests/python/test_account_procurement.py tests/frontend/AccountReview.test.tsx tests/frontend/AccountProcurementTransport.test.ts .github/workflows/pages.yml .github/workflows/azure-data-refresh.yml
-          git diff --cached --name-only > proof/changed-files.txt
-          test "$(wc -l < proof/changed-files.txt)" = 8
-          git commit -m 'Bound Account procurement by exact source-linked account pages'
-          git rev-parse HEAD | tee proof/product-head.txt
           git archive --format=tar.gz HEAD src scripts tests .github package.json > proof/product-source.tar.gz
-          git push origin HEAD:refs/heads/agent/account-loading-unblock-20260918
-      - name: Stage retained source data and generate deterministic account slices
+      - name: Stage accepted source bytes and prove deterministic account slices
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          gh api repos/JeremyHennessy/TowerSignal/actions/runs/35334719612 --jq '{id,head_sha,conclusion,path}' > proof/accepted-run.json
+          test "$(gh api repos/JeremyHennessy/TowerSignal/actions/runs/35334719612 --jq .conclusion)" = success
           mkdir -p .accepted .candidate-pages
           gh run download 35334719612 -n github-pages -D .accepted
-          tar -xf "$(find .accepted -type f | head -1)" -C .candidate-pages
+          ARCHIVE="$(find .accepted -type f | head -1)"
+          sha256sum "$ARCHIVE" > proof/accepted-archive.sha256
+          tar -xf "$ARCHIVE" -C .candidate-pages
           python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection.json
           find .candidate-pages/data/account-procurement -type f -print0 | sort -z | xargs -0 sha256sum > proof/projection-before.sha256
           python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection-repeat.json
@@ -81,25 +50,46 @@ jobs:
           cp dist/index.html .candidate-pages/index.html
           rm -rf .candidate-pages/assets
           cp -R dist/assets .candidate-pages/assets
+          cp .candidate-pages/data/account-procurement/20/2000015564/index.json proof/account-procurement-example.json
+          cp dist/index.html proof/index.html
+          cp -R dist/assets proof/assets
           for f in auth.helpers.ts candidate-routes.ts; do
             gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
           done
-          gh api 'repos/JeremyHennessy/TowerSignal/contents/tests/e2e/account-correction-acceptance.spec.ts?ref=0b63235f4eea96bdcf274a67a87a25886a0acac5' --jq '.content' | base64 --decode > tests/e2e/account-correction-acceptance.spec.ts
+          gh api 'repos/JeremyHennessy/TowerSignal/contents/tests/e2e/account-full-review.spec.ts?ref=0b63235f4eea96bdcf274a67a87a25886a0acac5' --jq '.content' | base64 --decode > tests/e2e/account-full-review.spec.ts
+      - name: Retain input and deterministic data proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-unblock-input
+          path: proof
+          retention-days: 14
       - name: Install browser engines
         run: npx playwright install --with-deps chromium webkit
-      - name: Prove original resize test and complete Account source parity
+      - name: Prove unchanged resize test, complete source parity and bounded network loading
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
           CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
         run: |
-          npx playwright test tests/e2e/account-correction-acceptance.spec.ts tests/e2e/account-sticky-header.spec.ts tests/e2e/account-mode-layout.spec.ts --project=desktop-chromium --project=iphone
-      - name: Retain exact results and input for independent inspection
+          npx playwright test tests/e2e/account-correction-acceptance.spec.ts tests/e2e/account-sticky-header.spec.ts tests/e2e/account-mode-layout.spec.ts tests/e2e/account-procurement-loading.spec.ts tests/e2e/account-evidence-architecture.spec.ts --project=desktop-chromium --project=iphone --output=test-results/account-core
+      - name: Retain complete Account browser proof
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: account-unblock-proof
-          path: |
-            proof
-            playwright-report
-            ${{ runner.temp }}/account-unblock
+          name: account-unblock-browser
+          path: playwright-report
+          retention-days: 14
+      - name: Verify nine distinct source-rich accounts on both browsers
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: |
+          rm -rf playwright-report
+          npx playwright test tests/e2e/account-full-review.spec.ts --grep 'distinct source-rich' --project=desktop-chromium --project=iphone --no-deps --output=test-results/account-matrix
+      - name: Retain source-rich account matrix
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-unblock-matrix
+          path: playwright-report
           retention-days: 14
