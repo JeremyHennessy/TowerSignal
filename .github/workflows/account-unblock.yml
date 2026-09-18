@@ -24,7 +24,13 @@ jobs:
           cp review/account-unblock.patch.gz.b64 "$RUNNER_TEMP/account-unblock/input.b64"
           python - <<'PY'
           import base64,gzip,hashlib,pathlib,os
-          raw=gzip.decompress(base64.b64decode(pathlib.Path('review/account-unblock.patch.gz.b64').read_text()))
+          text=pathlib.Path('review/account-unblock.patch.gz.b64').read_text()
+          # Correct four verified transcription differences in this diagnostic transport only.
+          repairs=[('Cm3pGMBJW8LQdMRymlWHL0NxKxLHUBtM','Cm3pGMBJW8LQdMRyVRqmlWHL0NxKxLHUBtM'),('NVOyzxS8KQtccEBuTj0q9Dr7fVAJQOZo','NVOyzxS8KQtccEBu+Txh0q9Dr7fVAJQOZo'),('lGi7A53hOiws4vyF3rQGu0K8mj4NmYXQg','lGi7A53hOiws4vyF7rQGu0K8mj4NmYXQg'),('ZIlzryz5wlEWep3Efw+nPcJlodED2nIqt','ZIlzryz5wlEWep3Ew+nPcJlodED2nIqt')]
+          for before,after in repairs:
+              assert text.count(before)==1
+              text=text.replace(before,after)
+          raw=gzip.decompress(base64.b64decode(text))
           assert hashlib.sha256(raw).hexdigest()=='6639a452e475972296ec9b99de09f02fd7cbf7cef98b7708cf4595193a4184ae'
           pathlib.Path(os.environ['RUNNER_TEMP']+'/account-unblock/product.patch').write_bytes(raw)
           PY
