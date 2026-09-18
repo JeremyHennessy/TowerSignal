@@ -1,0 +1,162 @@
+name: Stage diagnosed Account release tests
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: [.github/workflows/stage-account-delivery-tests.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 945b16618bcb0c14f5f791e4e57bfe3ab6c6318a
+      - name: Apply only diagnosed test and release-harness changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/account-stage
+          gh api 'repos/JeremyHennessy/TowerSignal/contents/review/evidence-selectors.patch?ref=82987790c2c590b597c6c5e04de73df74db12646' --jq '.content' | base64 --decode > /tmp/account-stage/evidence-selectors.patch
+          git apply --check /tmp/account-stage/evidence-selectors.patch
+          git apply /tmp/account-stage/evidence-selectors.patch
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/e2e/account-broadway-release.spec.ts')
+          text=p.read_text()
+          old="    await info.attach(`225-Broadway-${mode}-full`, { body: await page.screenshot({ fullPage: true, animations: 'disabled' }), contentType: 'image/png' })"
+          assert text.count(old)==1
+          new="""    // WebKit caps screenshot dimensions at 32767 pixels. Capture CSS pixels,
+              // and tile genuinely longer pages without hiding or truncating any content.
+              const fullHeight = await page.evaluate(() => document.documentElement.scrollHeight)
+              if (fullHeight < 24000) {
+                await info.attach(`225-Broadway-${mode}-full`, { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
+              } else {
+                for (let y = 0; y < fullHeight; y += Math.max(1, viewport.height - 100)) {
+                  await page.evaluate(position => window.scrollTo(0, position), y)
+                  await info.attach(`225-Broadway-${mode}-segment-${y}`, { body: await page.screenshot({ animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
+                }
+              }"""
+          text=text.replace(old,new).replace("page.screenshot({ animations: 'disabled' })", "page.screenshot({ animations: 'disabled', scale: 'css' })")
+          p.write_text(text)
+          p=Path('.github/workflows/account-reviewed-delivery.yml');text=p.read_text()
+          start=text.index('      - name: Require unchanged reviewed application and complete full-suite proof\n')
+          end=text.index('      - name: Reproduce the fully tested compiled application\n')
+          text=text[:start]+"""      - name: Pin reviewed product and previously exercised dependency resolution
+                  env:
+                    GH_TOKEN: ${{ github.token }}
+                  run: |
+                    set -euo pipefail
+                    git fetch --depth=1 origin 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6
+                    git diff --exit-code 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6 HEAD -- src scripts package.json index.html vite.config.ts tsconfig.json tsconfig.app.json
+                    mkdir -p .full-proof proof .deployed .candidate-pages
+                    gh run download 35371986075 -n account-full-release-proof -D .full-proof
+                    test "$(cat .full-proof/proof/product-head.txt)" = 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6
+                    cp .full-proof/proof/resolved-dependencies.json package-lock.json
+                    cp package-lock.json proof/resolved-dependencies.json
+                    git rev-parse HEAD > proof/product-head.txt
+                    echo 'Earlier suite had six obsolete flat-Evidence selectors. New full_regression jobs below must pass every corrected test; no old-suite success is assumed.'
+          """.replace('                  ', '        ').replace('                    ', '          ')+text[end:]
+          # Correct indentation above using explicit lines rather than YAML rewriting.
+          start=text.index('      - name: Pin reviewed product')
+          end=text.index('      - name: Reproduce the fully tested compiled application\n')
+          lines=[
+            '      - name: Pin reviewed product and previously exercised dependency resolution',
+            '        env:', '          GH_TOKEN: ${{ github.token }}', '        run: |',
+            '          set -euo pipefail',
+            '          git fetch --depth=1 origin 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6',
+            '          git diff --exit-code 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6 HEAD -- src scripts package.json index.html vite.config.ts tsconfig.json tsconfig.app.json',
+            '          mkdir -p .full-proof proof .deployed .candidate-pages',
+            '          gh run download 35371986075 -n account-full-release-proof -D .full-proof',
+            '          test "$(cat .full-proof/proof/product-head.txt)" = 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6',
+            '          cp .full-proof/proof/resolved-dependencies.json package-lock.json',
+            '          cp package-lock.json proof/resolved-dependencies.json',
+            '          git rev-parse HEAD > proof/product-head.txt',
+            "          echo 'Full regression jobs below must pass all corrected tests; the previous failed suite is not accepted.'",
+          ]
+          text=text[:start]+'\n'.join(lines)+'\n'+text[end:]
+          marker='\n  release:\n'
+          assert text.count(marker)==1
+          full="""
+            full_regression:
+              if: github.event_name == 'push'
+              needs: candidate
+              strategy:
+                fail-fast: false
+                matrix:
+                  browser: [desktop-chromium, iphone]
+              runs-on: ubuntu-latest
+              timeout-minutes: 40
+              steps:
+                - uses: actions/checkout@v4
+                - uses: actions/download-artifact@v4
+                  with:
+                    name: account-reviewed-release-candidate
+                    path: .sealed
+                - uses: actions/setup-node@v4
+                  with:
+                    node-version: 22
+                - name: Open the sealed candidate and install its exact browser dependencies
+                  run: |
+                    test "$(cat .sealed/proof/product-head.txt)" = "$GITHUB_SHA"
+                    (cd .sealed/proof && sha256sum --check candidate.tgz.sha256)
+                    mkdir -p .candidate-pages
+                    tar -xzf .sealed/proof/candidate.tgz -C .candidate-pages
+                    cp .sealed/proof/resolved-dependencies.json package-lock.json
+                    npm ci --no-audit --no-fund
+                    npx playwright install --with-deps chromium webkit
+                - name: Use existing candidate transport without changing product bytes
+                  env:
+                    GH_TOKEN: ${{ github.token }}
+                  run: |
+                    for f in auth.helpers.ts candidate-routes.ts; do
+                      gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+                    done
+                    git diff --exit-code -- src scripts package.json
+                - name: Complete every release test in this browser family
+                  env:
+                    BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+                    CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+                    REQUIRE_ACRIS: false
+                  run: GITHUB_RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT}-full" npx playwright test --project=${{ matrix.browser }} --output=test-results/full-${{ matrix.browser }}
+                - name: Preserve complete report and page inventory
+                  if: always()
+                  uses: actions/upload-artifact@v4
+                  with:
+                    name: account-complete-candidate-${{ matrix.browser }}
+                    path: |
+                      playwright-report
+                      test-results/full-${{ matrix.browser }}
+                    retention-days: 30
+          """
+          import textwrap
+          full=textwrap.dedent(full)
+          full='\n'.join(('  '+line if line else '') for line in full.splitlines())+'\n'
+          text=text.replace(marker,full+marker)
+          old='          npx playwright test tests/e2e/account-broadway-release.spec.ts tests/e2e/account-procurement-loading.spec.ts --project=desktop-chromium --project=iphone\n          cp -R playwright-report broadway-hosted-report'
+          new=old.replace('--project=iphone\n', '--project=iphone --output=test-results/broadway-hosted\n')
+          assert text.count(old)==1;text=text.replace(old,new)
+          old='        run: npm run test:e2e\n'
+          assert text.count(old)==1
+          text=text.replace(old,'        run: npx playwright test --no-deps --output=test-results/full-hosted\n')
+          p.write_text(text)
+          PY
+          git diff --exit-code -- src scripts package.json
+          git diff --stat
+          git diff > /tmp/account-stage/changes.diff
+          git config user.name 'TowerSignal release maintenance'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add tests/e2e/account-detail-polish.spec.ts tests/e2e/account-report-density.spec.ts tests/e2e/live.spec.ts tests/e2e/official-swo-snapshot.spec.ts tests/e2e/account-broadway-release.spec.ts .github/workflows/account-reviewed-delivery.yml
+          test "$(git diff --cached --name-only | wc -l)" = 6
+          git commit -m 'Align release tests with grouped Evidence and require complete sealed-candidate browser acceptance'
+          git rev-parse HEAD | tee /tmp/account-stage/head.txt
+          git push origin HEAD:refs/heads/agent/account-delivery-test-migration-20260918
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: account-release-test-migration
+          path: /tmp/account-stage
+          retention-days: 14
