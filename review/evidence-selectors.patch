@@ -1,0 +1,120 @@
+--- a/tests/e2e/official-swo-snapshot.spec.ts
++++ b/tests/e2e/official-swo-snapshot.spec.ts
+@@ -13,7 +13,9 @@
+   await expect(modeTabs).toBeVisible()
+   await modeTabs.getByRole('button', { name: /^Evidence/ }).click()
+ 
+-  const section = page.getByRole('region', { name: 'Official DOB stop work order snapshot' })
++  const compliance = detail.locator('.account-evidence-workspace > details').filter({ has: page.locator('summary strong', { hasText: 'Compliance' }) })
++  await compliance.locator(':scope > summary').click()
++  const section = compliance.getByRole('region', { name: 'Official DOB stop work order snapshot' })
+   await expect(section).toBeVisible()
+   await expect(section).toContainText('Historical DOB snapshot · not current status')
+   await expect(section).toContainText('Current status available')
+--- a/tests/e2e/account-detail-polish.spec.ts
++++ b/tests/e2e/account-detail-polish.spec.ts
+@@ -92,7 +92,12 @@
+   await testInfo.attach('account-2000015594-field-desktop.png', { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
+ 
+   await tabs.getByRole('button', { name: /^Evidence/ }).click()
+-  await expect(detail.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
++  const evidence = detail.locator('.account-evidence-workspace')
++  await expect(evidence.locator(':scope > details')).toHaveCount(7)
++  for (const title of ['Property / Ownership', 'Institutional / Infrastructure']) {
++    await evidence.locator(':scope > details').filter({ has: page.locator('summary strong', { hasText: title }) }).locator(':scope > summary').click()
++  }
++  await expect(evidence.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+   await expect(detail).toContainText('3,897,404 sq ft')
+   await expect(detail).toContainText('Non-Lead')
+   await expect(detail.locator('.account-decision-summary')).toBeHidden()
+--- a/tests/e2e/live.spec.ts
++++ b/tests/e2e/live.spec.ts
+@@ -36,6 +36,14 @@
+   const tabs = page.locator('.account-mode-tabs')
+   await expect(tabs).toBeVisible()
+   await tabs.getByRole('button', { name: new RegExp(`^${name}`) }).click()
++  if (name === 'Evidence') {
++    const workspace = page.locator('.account-evidence-workspace')
++    await expect(workspace.locator(':scope > details')).toHaveCount(7)
++    for (const title of ['Property / Ownership', 'Project Activity', 'Historical Evidence']) {
++      const group = workspace.locator(':scope > details').filter({ has: page.locator('summary strong', { hasText: title }) })
++      if (await group.getAttribute('open') === null) await group.locator(':scope > summary').click()
++    }
++  }
+ }
+ 
+ test('hosted TowerSignal redesigned workspace is functional, linkable and source-backed', async ({ page }, testInfo) => {
+@@ -137,7 +145,7 @@
+   } else {
+     await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+     await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
+-    await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
++    await expect(page.locator('.account-evidence-workspace .evidence-provenance-details > summary').getByText('Source & provenance', { exact: true })).toBeVisible()
+     await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
+     await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
+   }
+--- a/tests/e2e/account-report-density.spec.ts
++++ b/tests/e2e/account-report-density.spec.ts
+@@ -47,36 +47,36 @@
+   expect(tabsBox!.width).toBeGreaterThanOrEqual(detailBox!.width * 0.9)
+   await modeTabs.getByRole('button', { name: /^Evidence/ }).click()
+ 
+-  const property = detail.locator('section.property-coverage-summary')
+-  await expect(property).toHaveCount(1)
+-  await expect(property.getByRole('heading', { name: 'Property records', exact: true })).toBeVisible()
+-  await expect(property).toContainText('Property-level BBL context is unavailable')
+-  await expect(property).toContainText('PLUTO building context')
+-  await expect(property).toContainText('HPD registered contacts')
+-  await expect(property).toContainText('DOB NOW project activity')
+-  await expect(property).toContainText('ACRIS property activity')
++  const evidence = detail.locator('.account-evidence-workspace')
++  await expect(evidence.locator(':scope > details')).toHaveCount(7)
++  const property = evidence.locator(':scope > details').filter({ has: page.locator('summary strong', { hasText: 'Property / Ownership' }) })
++  await expect(property).not.toHaveAttribute('open', '')
++  await property.locator(':scope > summary').click()
++  const boundary = property.locator('.evidence-boundary')
++  await expect(boundary).toBeVisible()
++  await expect(boundary).toContainText('Property-level BBL evidence unavailable')
++  for (const source of ['PLUTO ownership', 'HPD contacts', 'DOB project roles', 'ACRIS parties']) await expect(boundary).toContainText(source)
++  await expect(boundary).toContainText('does not infer a parcel identity')
+ 
+-  const legacyBblHeadings = await detail.locator('h3').evaluateAll(headings => headings
+-    .map(heading => heading.textContent?.trim())
+-    .filter(text => ['Building context', 'HPD registered contacts', 'DOB NOW project activity', 'ACRIS property activity'].includes(text ?? '')))
+-  expect(legacyBblHeadings).toEqual([])
++  // The old flat Evidence sections must remain hidden, not leak a second layout.
++  for (const legacy of await detail.locator(':scope > [data-account-mode-group="legacy-evidence"]').all()) await expect(legacy).toBeHidden()
+ 
+-  const provenance = detail.locator('section.source-provenance-section')
+-  await expect(provenance.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
+-  await expect(provenance).toContainText(/source datasets?/)
+-  const provenanceDetails = provenance.locator('details.account-provenance-details')
+-  await expect(provenanceDetails).toBeVisible()
+-  await expect(provenanceDetails).not.toHaveAttribute('open', '')
+-  await provenanceDetails.locator(':scope > summary').click()
+-  expect(await provenanceDetails.locator('.source-row').count()).toBeGreaterThan(0)
+-  await expect(provenanceDetails.locator('.source-row').first()).toBeVisible()
++  const historical = evidence.locator(':scope > details').filter({ has: page.locator('summary strong', { hasText: 'Historical Evidence' }) })
++  await historical.locator(':scope > summary').click()
++  const provenance = historical.locator('.evidence-provenance-details')
++  await expect(provenance.locator(':scope > summary').getByText('Source & provenance', { exact: true })).toBeVisible()
++  await expect(provenance).not.toHaveAttribute('open', '')
++  await provenance.locator(':scope > summary').click()
++  expect(await provenance.locator('.evidence-card').count()).toBeGreaterThan(0)
++  await expect(provenance.locator('.evidence-card').first()).toBeVisible()
++  await expect(provenance).toContainText('Generated')
++  await expect(provenance).toContainText('Rules')
++  await expect(provenance).toContainText('Priority model')
+ 
+   await expectContained(page)
+-  await expectElementContained(page, 'section.property-coverage-summary')
+-  await expectElementContained(page, 'section.source-provenance-section')
+-
+-  const propertyScreenshot = await property.screenshot()
+-  await testInfo.attach(`account-property-boundary-${unresolvedSystemId}-${testInfo.project.name}.png`, { body: propertyScreenshot, contentType: 'image/png' })
++  await expectElementContained(page, '.account-evidence-workspace')
++  await expectElementContained(page, '.evidence-provenance-details')
++  await testInfo.attach(`account-property-boundary-${unresolvedSystemId}-${testInfo.project.name}.png`, { body: await property.screenshot(), contentType: 'image/png' })
+ 
+   expect(sameOriginFailures, `Same-origin request failures:\n${sameOriginFailures.join('\n')}`).toEqual([])
+   expect(consoleErrors, `Console errors:\n${consoleErrors.join('\n')}`).toEqual([])
