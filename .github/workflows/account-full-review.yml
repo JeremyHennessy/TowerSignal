@@ -41,7 +41,7 @@ jobs:
             gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
           done
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
       - name: Retrieve accepted production artifact and public live identity
         env:
           GH_TOKEN: ${{ github.token }}
