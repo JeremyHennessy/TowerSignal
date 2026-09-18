@@ -48,8 +48,17 @@ test('225 Broadway keeps complete Account navigation above every mode and preser
     }
     measurements.push({ mode, viewport, navBox, contentBox, buttonBoxes, url: page.url() })
     await page.evaluate(() => window.scrollTo(0, 0))
-    await info.attach(`225-Broadway-${mode}-top`, { body: await page.screenshot({ animations: 'disabled' }), contentType: 'image/png' })
-    await info.attach(`225-Broadway-${mode}-full`, { body: await page.screenshot({ fullPage: true, animations: 'disabled' }), contentType: 'image/png' })
+    await info.attach(`225-Broadway-${mode}-top`, { body: await page.screenshot({ animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
+    // Capture CSS pixels; tile pages beyond the browser screenshot dimension limit.
+    const fullHeight = await page.evaluate(() => document.documentElement.scrollHeight)
+    if (fullHeight < 24000) {
+      await info.attach(`225-Broadway-${mode}-full`, { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
+    } else {
+      for (let y = 0; y < fullHeight; y += Math.max(1, viewport.height - 100)) {
+        await page.evaluate(position => window.scrollTo(0, position), y)
+        await info.attach(`225-Broadway-${mode}-segment-${y}`, { body: await page.screenshot({ animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
+      }
+    }
     await page.evaluate(() => window.scrollTo(0, Math.min(650, document.documentElement.scrollHeight - innerHeight)))
     const sticky = await page.evaluate(() => {
       const header = document.querySelector('.reference-top-nav')!.getBoundingClientRect()

@@ -13,7 +13,9 @@ test('official DOB SWO evidence remains a dated snapshot and never a current-sta
   await expect(modeTabs).toBeVisible()
   await modeTabs.getByRole('button', { name: /^Evidence/ }).click()
 
-  const section = page.getByRole('region', { name: 'Official DOB stop work order snapshot' })
+  const compliance = detail.locator('.account-evidence-workspace > details').filter({ has: page.locator('summary strong', { hasText: 'Compliance' }) })
+  await compliance.locator(':scope > summary').click()
+  const section = compliance.getByRole('region', { name: 'Official DOB stop work order snapshot' })
   await expect(section).toBeVisible()
   await expect(section).toContainText('Historical DOB snapshot · not current status')
   await expect(section).toContainText('Current status available')
