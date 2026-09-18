@@ -14,5 +14,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api --method POST repos/JeremyHennessy/TowerSignal/actions/runs/35376701240/cancel || true
-          echo "Superseded e3f4781 proof cancelled; current exact head is 6cd2f538b6f6bea714246bf54956fb1fca28229a."
+          gh api --method POST repos/JeremyHennessy/TowerSignal/actions/runs/35379736291/cancel || true
+          echo "Superseded b96eaf6 proof cancelled; current exact head is 18c21ea5f7e536fb94479ef8c8ac4065045597f4."
