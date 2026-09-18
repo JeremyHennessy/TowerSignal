@@ -56,6 +56,12 @@ test('Prospect presets stay contained across supported desktop widths', async ({
   }
 })
 
+// The existing mobile design hides the Saved views rail below 780px.
+// Preserve that UI; verify persistence in the supported desktop layout in
+// both Chromium and WebKit. Other preset tests retain native phone coverage.
+test.describe('Saved views in the supported desktop layout', () => {
+  test.use({ viewport: { width: 1280, height: 900 }, screen: { width: 1280, height: 900 } })
+
 test('Prospect saved views restore the active preset through the existing workflow state owner', async ({ page }, testInfo) => {
   if (isIphoneProject(testInfo)) testInfo.setTimeout(300_000)
   await signInForProject(page, testInfo.project.name, '#/prospect?borough=Queens&preset=field')
@@ -79,6 +85,8 @@ test('Prospect saved views restore the active preset through the existing workfl
   await expect(page).toHaveURL(/preset=field/)
   await expect(page).toHaveURL(/borough=Queens/)
   await expectContained(page)
+})
+
 })
 
 test('Prospect shared links reject unknown preset values without changing filters', async ({ page }, testInfo) => {
