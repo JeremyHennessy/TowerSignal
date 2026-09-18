@@ -1,0 +1,18 @@
+name: Cancel obsolete Account proof
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: [.github/workflows/cancel-obsolete-account-proof.yml]
+permissions:
+  actions: write
+  contents: read
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel only the superseded Account delivery proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST repos/JeremyHennessy/TowerSignal/actions/runs/35376701240/cancel || true
+          echo "Superseded e3f4781 proof cancelled; current exact head is 6cd2f538b6f6bea714246bf54956fb1fca28229a."
