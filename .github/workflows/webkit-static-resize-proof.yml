@@ -1,0 +1,60 @@
+name: Static WebKit resize isolation
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: ['.github/workflows/webkit-static-resize-proof.yml']
+permissions:
+  contents: read
+jobs:
+  isolate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps webkit
+      - name: Compare dynamic resizing and correctly initialized fresh mobile contexts
+        run: |
+          mkdir -p proof
+          node --input-type=module <<'JS'
+          import { webkit, devices } from '@playwright/test';
+          import fs from 'node:fs/promises';
+          const html = '<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0}header{position:sticky;top:0;height:68px;background:white}nav{position:sticky;top:70px;height:52px;background:lightgray}main{height:6000px}button{min-height:40px}</style><header>Static header</header><nav><button>Summary</button></nav><main>Pure static content. No app, network, auth, frameworks or external style sheets.</main>';
+          await fs.writeFile('proof/static.html', html);
+          const browser = await webkit.launch();
+          const states = [];
+          async function capture(page, phase, requested) {
+            const state = await page.evaluate(({phase,requested}) => ({ phase, requested, innerWidth, innerHeight, scrollY, screen:{width:screen.width,height:screen.height}, viewport:visualViewport && {width:visualViewport.width,height:visualViewport.height,scale:visualViewport.scale}, elements:['header','nav','button'].map(s => { const b=document.querySelector(s).getBoundingClientRect();return {selector:s,top:b.top,left:b.left,width:b.width,bottom:b.bottom}; }) }),{phase,requested});
+            states.push(state);console.log(JSON.stringify(state));
+          }
+          const context = await browser.newContext({...devices['iPhone 13']});
+          const page = await context.newPage();
+          await page.setContent(html);
+          await page.setViewportSize({width:390,height:844});
+          await page.evaluate(() => scrollTo(0,770));
+          await capture(page,'static-before-dynamic-resize',390);
+          await page.setViewportSize({width:768,height:844});
+          await capture(page,'static-after-dynamic-resize',768);
+          try { await page.getByRole('button',{name:'Summary'}).click({timeout:3000});states.push({phase:'dynamic-click',success:true}); }
+          catch(error) { states.push({phase:'dynamic-click',success:false,message:String(error)}); }
+          await page.screenshot({path:'proof/dynamic-resize.png'});
+          await context.close();
+          for(const width of [390,768,1280]) {
+            const fresh = await browser.newContext({...devices['iPhone 13'],viewport:{width,height:844},screen:{width,height:844}});
+            const p = await fresh.newPage();await p.setContent(html);await p.evaluate(()=>scrollTo(0,770));
+            await capture(p,`static-fresh-context-${width}`,width);
+            await p.getByRole('button',{name:'Summary'}).click({timeout:3000});
+            await p.screenshot({path:`proof/fresh-${width}.png`});await fresh.close();
+          }
+          await fs.writeFile('proof/static-resize-results.json',JSON.stringify(states,null,2));
+          await browser.close();
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: static-webkit-resize-isolation
+          path: proof
+          retention-days: 14
