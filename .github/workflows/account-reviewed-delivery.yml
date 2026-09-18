@@ -1,0 +1,346 @@
+name: Deliver reviewed Account application
+
+# Application-only release: preserve the deployed source snapshot and its dates.
+# Scheduled data generation and durable history remain owned by pages.yml.
+on:
+  push:
+    branches: [agent/account-evidence-architecture-promotion-20260917, main]
+    paths:
+      - .github/workflows/account-reviewed-delivery.yml
+      - tests/e2e/**
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+jobs:
+  candidate:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/account-evidence-architecture-promotion-20260917'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pin the reviewed application and exercised dependencies
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6
+          git diff --exit-code 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6 HEAD -- src scripts package.json index.html vite.config.ts tsconfig.json tsconfig.app.json
+          mkdir -p .prior-proof proof .deployed .candidate-pages
+          gh run download 35371986075 -n account-full-release-proof -D .prior-proof
+          test "$(cat .prior-proof/proof/product-head.txt)" = 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6
+          cp .prior-proof/proof/resolved-dependencies.json package-lock.json
+          cp package-lock.json proof/resolved-dependencies.json
+          git rev-parse HEAD > proof/product-head.txt
+          echo 'The earlier suite had obsolete flat-Evidence assertions. Both full_regression jobs below must pass the corrected complete suite; no earlier success is assumed.'
+      - name: Reproduce the reviewed compiled application
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          cmp dist/index.html .prior-proof/proof/candidate-index.html
+      - name: Preserve every existing data file and generate only the Account projection
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 35356884004 -n github-pages -D .deployed
+          ARCHIVE="$(find .deployed -type f | head -1)"
+          test "$(sha256sum "$ARCHIVE" | cut -d' ' -f1)" = "$(cut -d' ' -f1 .prior-proof/proof/deployed-data-archive.sha256)"
+          tar -xf "$ARCHIVE" -C .candidate-pages
+          python - <<'PY'
+          import json,hashlib,pathlib
+          root=pathlib.Path('.candidate-pages/data')
+          hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          pathlib.Path('proof/preserved-data-sha256.json').write_text(json.dumps(hashes,sort_keys=True))
+          PY
+          python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection.json
+          find .candidate-pages/data/account-procurement -type f -print0 | sort -z | xargs -0 sha256sum > proof/projection-first.sha256
+          python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection-repeat.json
+          sha256sum --check proof/projection-first.sha256 > proof/projection-repeat-verification.txt
+          cp dist/index.html .candidate-pages/index.html
+          rm -rf .candidate-pages/assets
+          cp -R dist/assets .candidate-pages/assets
+          python - <<'PY'
+          import json,hashlib,pathlib,os
+          root=pathlib.Path('.candidate-pages/data')
+          hashes=json.loads(pathlib.Path('proof/preserved-data-sha256.json').read_text())
+          for name,digest in hashes.items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest,'Existing source changed: '+name
+          metadata=json.loads((root/'metadata.json').read_text())
+          release={'kind':'REVIEWED_ACCOUNT_APPLICATION_ONLY','candidate_sha':os.environ['GITHUB_SHA'],'reviewed_product_sha':'62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6','source_pages_run':35356884004,'source_generated_at':metadata['generated_at'],'source_freshness_advanced':False,'durable_history_advanced':False,'preserved_data_files':len(hashes)}
+          text=json.dumps(release,indent=2)+'\n'
+          (root/'account-release.json').write_text(text)
+          pathlib.Path('proof/account-release.json').write_text(text)
+          PY
+      - name: Seal the artifact that both browser suites must verify
+        run: |
+          tar -czf proof/candidate.tgz -C .candidate-pages .
+          (cd proof && sha256sum candidate.tgz > candidate.tgz.sha256)
+      - name: Retain immutable candidate and source-preservation proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-reviewed-release-candidate
+          path: proof
+          compression-level: 0
+          retention-days: 30
+
+  full_regression:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/account-evidence-architecture-promotion-20260917'
+    needs: candidate
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [desktop-chromium, iphone]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: account-reviewed-release-candidate
+          path: .sealed
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Open the sealed candidate and use its exact dependency resolution
+        run: |
+          test "$(cat .sealed/product-head.txt)" = "$GITHUB_SHA"
+          (cd .sealed && sha256sum --check candidate.tgz.sha256)
+          mkdir -p .candidate-pages
+          tar -xzf .sealed/candidate.tgz -C .candidate-pages
+          cp .sealed/resolved-dependencies.json package-lock.json
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Use existing candidate transport without changing application bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in auth.helpers.ts candidate-routes.ts; do
+            gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+          done
+          git diff --exit-code -- src scripts package.json
+      - name: Verify every release test including the exact 225 Broadway page
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+          REQUIRE_ACRIS: false
+        run: npx playwright test --project=${{ matrix.browser }} --output=test-results/full-${{ matrix.browser }}
+      - name: Preserve complete report and page inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-complete-candidate-${{ matrix.browser }}
+          path: |
+            playwright-report
+            test-results/full-${{ matrix.browser }}
+          retention-days: 30
+
+
+  release_control:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+      pull-requests: read
+    steps:
+      - name: Verify exact PR 278 merge and stop the competing canonical Pages push
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:278})).data;
+            const main=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(!pr.merged || pr.merge_commit_sha!==context.sha || main.object.sha!==context.sha) throw new Error('Not the exact current PR278 merge on main');
+            const runs=(await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:339705737,head_sha:context.sha,event:'push',per_page:20})).data.workflow_runs;
+            for(const run of runs) {
+              if(run.status==='queued' || run.status==='in_progress' || run.status==='waiting' || run.status==='pending') {
+                core.info(`Cancelling competing canonical Pages push run ${run.id} before the sealed application release`);
+                await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:run.id});
+              }
+            }
+            core.info('Competing same-commit Pages publisher is stopped; source collection/history remain unchanged by this release.');
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: release_control
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Require exact merged tree and a fully successful sealed-candidate workflow
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:278})).data;
+            const expected=pr.head.sha;
+            const main=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(!pr.merged || pr.head.repo.full_name!==`${context.repo.owner}/${context.repo.repo}` || pr.head.ref!=='agent/account-evidence-architecture-promotion-20260917' || pr.head.sha!==expected || pr.merge_commit_sha!==context.sha || main.object.sha!==context.sha) throw new Error('Not the exact current same-repository PR278 merge');
+            const a=(await github.rest.git.getCommit({...context.repo,commit_sha:expected})).data;
+            const b=(await github.rest.git.getCommit({...context.repo,commit_sha:context.sha})).data;
+            if(a.tree.sha!==b.tree.sha) throw new Error('Merge tree differs from the tested candidate');
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:expected,event:'push',status:'success',per_page:100})).data.workflow_runs;
+            const proof=runs.find(r=>r.path==='.github/workflows/account-reviewed-delivery.yml' && r.head_branch===pr.head.ref);
+            if(!proof || !runs.some(r=>r.path==='.github/workflows/ci.yml')) throw new Error('Exact-head successful full-browser workflow and CI are required');
+            const jobs=(await github.rest.actions.listJobsForWorkflowRun({...context.repo,run_id:proof.id,per_page:100})).data.jobs;
+            for(const name of ['candidate','full_regression (desktop-chromium)','full_regression (iphone)']) {
+              if(!jobs.some(job=>job.name===name && job.conclusion==='success')) throw new Error('Missing successful candidate gate: '+name);
+            }
+            core.setOutput('run_id',String(proof.id)); core.setOutput('candidate_sha',expected);
+            core.info(JSON.stringify({candidate_sha:expected,merge_sha:context.sha,tree:a.tree.sha,proof_run:proof.id,source_pages_run:35356884004}));
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: account-reviewed-release-candidate
+          run-id: ${{ steps.gate.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: .sealed
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35356884004
+          github-token: ${{ github.token }}
+          path: .rollback-archive
+      - name: Verify the sealed candidate and every preserved data file
+        env:
+          EXPECTED_CANDIDATE: ${{ steps.gate.outputs.candidate_sha }}
+        run: |
+          (cd .sealed && sha256sum --check candidate.tgz.sha256)
+          mkdir -p dist .rollback
+          tar -xzf .sealed/candidate.tgz -C dist
+          tar -xf .rollback-archive/artifact.tar -C .rollback
+          python - <<'PY'
+          import hashlib,json,pathlib,os
+          old=pathlib.Path('.rollback/data');new=pathlib.Path('dist/data')
+          for p in old.rglob('*'):
+              if p.is_file():
+                  q=new/p.relative_to(old)
+                  assert q.is_file() and hashlib.sha256(q.read_bytes()).digest()==hashlib.sha256(p.read_bytes()).digest(),'Changed source: '+str(p)
+          release=json.loads((new/'account-release.json').read_text())
+          assert release['candidate_sha']==os.environ['EXPECTED_CANDIDATE']
+          assert release['source_pages_run']==35356884004 and not release['source_freshness_advanced'] and not release['durable_history_advanced']
+          print('All pre-existing source files preserved. No source freshness or durable-history timestamp advanced.')
+          PY
+      - name: Refuse to overwrite a newer hosted snapshot
+        run: |
+          python - <<'PY'
+          import hashlib,pathlib,time,urllib.request
+          for name in ['index.html','data/metadata.json','data/systems.json','data/details/20/2000010998.json']:
+              expected=(pathlib.Path('.rollback')/name).read_bytes()
+              with urllib.request.urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?before='+str(time.time_ns()),timeout=90) as response: actual=response.read()
+              assert hashlib.sha256(actual).digest()==hashlib.sha256(expected).digest(),'Hosted baseline changed: '+name
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the exact tested dependencies and hosted browsers
+        run: |
+          cp .sealed/resolved-dependencies.json package-lock.json
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy the sealed tested Account artifact
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify actual hosted HTML assets and account source bytes
+        run: |
+          python - <<'PY'
+          import hashlib,pathlib,time,urllib.request,json
+          root=pathlib.Path('dist')
+          names=['index.html','data/metadata.json','data/systems.json','data/account-release.json','data/details/20/2000010998.json','data/account-procurement/20/2000010998/index.json']
+          names += [str(p.relative_to(root)) for p in sorted((root/'assets').rglob('*')) if p.is_file()]
+          results=[]
+          for name in names:
+              expected=hashlib.sha256((root/name).read_bytes()).hexdigest()
+              for attempt in range(12):
+                  try:
+                      with urllib.request.urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?release='+str(time.time_ns()),timeout=90) as response: actual=hashlib.sha256(response.read()).hexdigest()
+                      if actual==expected: break
+                  except Exception:
+                      if attempt==11: raise
+                  if attempt==11: raise SystemExit('Hosted byte mismatch: '+name)
+                  time.sleep(5)
+              results.append({'file':name,'sha256':expected,'match':True})
+          pathlib.Path('hosted-byte-proof.json').write_text(json.dumps(results,indent=2))
+          PY
+      - name: Verify 225 Broadway on the actual hosted site in both browser engines
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: |
+          test -z "${CANDIDATE_ROOT:-}"
+          npx playwright test tests/e2e/account-broadway-release.spec.ts tests/e2e/account-procurement-loading.spec.ts --project=desktop-chromium --project=iphone --output=test-results/broadway-hosted
+          cp -R playwright-report broadway-hosted-report
+      - name: Retain the exact reported page's hosted screenshots immediately
+        if: always() && steps.deploy.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-broadway-hosted-proof
+          path: |
+            broadway-hosted-report
+            playwright-report
+            hosted-byte-proof.json
+            dist/data/account-release.json
+          retention-days: 30
+      - name: Complete the full hosted regression suite without recreating test users
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          REQUIRE_ACRIS: false
+        run: npx playwright test --no-deps --output=test-results/full-hosted
+      - name: Retain actual-hosted full release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-reviewed-hosted-release-evidence
+          path: |
+            broadway-hosted-report
+            playwright-report
+            test-results/full-hosted
+            hosted-byte-proof.json
+            dist/data/account-release.json
+          retention-days: 30
+      - name: Stage prior exact artifact on failed hosted acceptance
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: account-rollback
+          path: .rollback
+      - name: Restore the prior artifact if hosted acceptance fails
+        if: failure() && steps.deploy.outcome == 'success'
+        id: rollback
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: account-rollback
+      - name: Verify restored hosted identity
+        if: failure() && steps.rollback.outcome == 'success'
+        run: |
+          python - <<'PY'
+          import hashlib,pathlib,time,urllib.request
+          for name in ['index.html','data/metadata.json','data/systems.json']:
+              expected=hashlib.sha256((pathlib.Path('.rollback')/name).read_bytes()).digest()
+              for attempt in range(12):
+                  with urllib.request.urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?rollback='+str(time.time_ns()),timeout=90) as response: actual=hashlib.sha256(response.read()).digest()
+                  if actual==expected: break
+                  if attempt==11: raise SystemExit('Rollback mismatch: '+name)
+                  time.sleep(5)
+          print('Prior hosted artifact restored and byte-verified.')
+          PY

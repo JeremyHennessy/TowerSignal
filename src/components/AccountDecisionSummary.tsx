@@ -55,11 +55,16 @@ export function AccountDecisionSummary({
   const latestChange = [...historyEvents].sort((a, b) => b.detected_at.localeCompare(a.detected_at))[0]
   const scoreDrivers = row.score_components.slice(0, 4)
   const violationEvidence = latestViolation(detail)
-  const violationDate = violationEvidence.inspection?.inspection_date ?? row.latest_violation_date
-  const violationText = violationEvidence.violation?.violation_text
-    ?? violationEvidence.violation?.citation_text
-    ?? row.violation_types[0]
-    ?? 'Published NYC Health inspection evidence supports the current violation signal.'
+  // The trigger label, date and explanation must describe the same evidence.
+  // Historic Health violations remain in History; they are not dates for a
+  // current building-follow-up or equipment-scale signal.
+  const currentSignal = detail.signals.find(signal => signal.type === (row.recent_confirmed_violation ? 'CONFIRMED_RECENT_VIOLATION' : row.primary_signal))
+  const violationDate = row.recent_confirmed_violation
+    ? currentSignal?.date ?? violationEvidence.inspection?.inspection_date ?? row.latest_violation_date
+    : currentSignal?.date ?? null
+  const violationText = row.recent_confirmed_violation
+    ? violationEvidence.violation?.violation_text ?? violationEvidence.violation?.citation_text ?? row.violation_types[0] ?? currentSignal?.reason ?? 'Review the attached NYC Health evidence.'
+    : currentSignal?.reason ?? 'No primary-signal detail is attached. Review the source records before acting.'
   const mappedTowers = detail.planimetric_building_tower_features?.length ?? row.planimetric_building_tower_count ?? 0
   const buildingOutlines = detail.building_footprints?.length ?? row.building_footprint_count ?? 0
   const buildingArea = detail.building_context?.building_area_sqft ?? row.pluto_building_area_sqft ?? null

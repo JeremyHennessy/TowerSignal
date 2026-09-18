@@ -92,7 +92,12 @@ test('desktop account detail uses tab-owned content, modern navigation and a ful
   await testInfo.attach('account-2000015594-field-desktop.png', { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
 
   await tabs.getByRole('button', { name: /^Evidence/ }).click()
-  await expect(detail.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
+  const evidence = detail.locator('.account-evidence-workspace')
+  await expect(evidence.locator(':scope > details')).toHaveCount(7)
+  for (const title of ['Property / Ownership', 'Institutional / Infrastructure']) {
+    await evidence.locator(':scope > details').filter({ has: page.locator('summary strong', { hasText: title }) }).locator(':scope > summary').click()
+  }
+  await expect(evidence.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
   await expect(detail).toContainText('3,897,404 sq ft')
   await expect(detail).toContainText('Non-Lead')
   await expect(detail.locator('.account-decision-summary')).toBeHidden()

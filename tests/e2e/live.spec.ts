@@ -36,6 +36,14 @@ async function selectAccountMode(page: Page, name: 'Summary' | 'Sales' | 'Field'
   const tabs = page.locator('.account-mode-tabs')
   await expect(tabs).toBeVisible()
   await tabs.getByRole('button', { name: new RegExp(`^${name}`) }).click()
+  if (name === 'Evidence') {
+    const workspace = page.locator('.account-evidence-workspace')
+    await expect(workspace.locator(':scope > details')).toHaveCount(7)
+    for (const title of ['Property / Ownership', 'Project Activity', 'Historical Evidence']) {
+      const group = workspace.locator(':scope > details').filter({ has: page.locator('summary strong', { hasText: title }) })
+      if (await group.getAttribute('open') === null) await group.locator(':scope > summary').click()
+    }
+  }
 }
 
 test('hosted TowerSignal redesigned workspace is functional, linkable and source-backed', async ({ page }, testInfo) => {
@@ -137,7 +145,7 @@ test('hosted TowerSignal redesigned workspace is functional, linkable and source
   } else {
     await expect(page.getByRole('heading', { name: 'Identity', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'DOB NOW project activity', exact: true })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Source & provenance', exact: true })).toBeVisible()
+    await expect(page.locator('.account-evidence-workspace .evidence-provenance-details > summary').getByText('Source & provenance', { exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Copy lead brief', exact: true })).toBeEnabled()
     await expect(page.getByRole('button', { name: 'Copy account link', exact: true })).toBeVisible()
   }
