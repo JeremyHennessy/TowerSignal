@@ -138,13 +138,39 @@ jobs:
             test-results/full-${{ matrix.browser }}
           retention-days: 30
 
+
+  release_control:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+      pull-requests: read
+    steps:
+      - name: Verify exact PR 278 merge and stop the competing canonical Pages push
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr=(await github.rest.pulls.get({...context.repo,pull_number:278})).data;
+            const main=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(!pr.merged || pr.merge_commit_sha!==context.sha || main.object.sha!==context.sha) throw new Error('Not the exact current PR278 merge on main');
+            const runs=(await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:339705737,head_sha:context.sha,event:'push',per_page:20})).data.workflow_runs;
+            for(const run of runs) {
+              if(run.status==='queued' || run.status==='in_progress' || run.status==='waiting' || run.status==='pending') {
+                core.info(`Cancelling competing canonical Pages push run ${run.id} before the sealed application release`);
+                await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:run.id});
+              }
+            }
+            core.info('Competing same-commit Pages publisher is stopped; source collection/history remain unchanged by this release.');
+
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: release_control
     runs-on: ubuntu-latest
     timeout-minutes: 60
     concurrency:
       group: pages
-      cancel-in-progress: false
+      cancel-in-progress: true
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
