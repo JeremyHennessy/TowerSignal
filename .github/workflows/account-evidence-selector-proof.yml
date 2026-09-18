@@ -1,0 +1,72 @@
+name: Account Evidence selector diagnosis
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: [.github/workflows/account-evidence-selector-proof.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 945b16618bcb0c14f5f791e4e57bfe3ab6c6318a
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build unchanged product on current hosted sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p proof .source-pages .candidate-pages
+          git rev-parse HEAD > proof/product-head.txt
+          npm install --no-audit --no-fund
+          cp package-lock.json proof/resolved-dependencies.json
+          npm run build
+          gh run download 35356884004 -n github-pages -D .source-pages
+          tar -xf .source-pages/artifact.tar -C .candidate-pages
+          python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection.json
+          cp dist/index.html .candidate-pages/index.html
+          rm -rf .candidate-pages/assets
+          cp -R dist/assets .candidate-pages/assets
+          cp dist/index.html proof/candidate-index.html
+          for f in auth.helpers.ts candidate-routes.ts; do
+            gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+          done
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Diagnose unchanged legacy Evidence assertions
+        id: legacy
+        continue-on-error: true
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: npx playwright test tests/e2e/account-report-density.spec.ts tests/e2e/official-swo-snapshot.spec.ts tests/e2e/account-detail-polish.spec.ts --project=desktop-chromium
+      - name: Retain old-selector diagnostics separately
+        if: always()
+        run: cp -R playwright-report legacy-selector-report
+      - name: Test the user's exact Broadway page across both browser engines
+        id: broadway
+        continue-on-error: true
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: npx playwright test tests/e2e/account-broadway-release.spec.ts --project=desktop-chromium --project=iphone
+      - name: Preserve complete diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-selector-and-broadway-proof
+          path: |
+            proof
+            playwright-report
+            legacy-selector-report
+          retention-days: 14
+      - name: Report true outcomes
+        if: always()
+        run: |
+          echo 'Legacy assertions: ${{ steps.legacy.outcome }}; Broadway: ${{ steps.broadway.outcome }}'
+          test '${{ steps.legacy.outcome }}' = success
+          test '${{ steps.broadway.outcome }}' = success
