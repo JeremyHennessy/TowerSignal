@@ -61,6 +61,22 @@ export function explicitAccountProcurementRecords(bundle: ProcurementBundle, sys
   })
 }
 
+// Sort source-native ISO and US dates by calendar value, while retaining the
+// original date string on every evidence row. Unknown dates stay undated.
+function observedSortKey(date: string | null, year: string | null): string {
+  const iso = date && /^(\d{4})-(\d{2})-(\d{2})/.exec(date)
+  const us = date && /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(date)
+  const parts = iso ? [iso[1], iso[2], iso[3]] : us ? [us[3], us[1], us[2]] : null
+  if (parts) {
+    const [y, m, d] = parts.map(Number)
+    const parsed = new Date(Date.UTC(y, m - 1, d))
+    if (parsed.getUTCFullYear() === y && parsed.getUTCMonth() === m - 1 && parsed.getUTCDate() === d) {
+      return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`
+    }
+  }
+  return year && /^\d{4}$/.test(year) ? `${year}-00-00` : ''
+}
+
 export function collectAccountFirmRoleEvidence(detail: SystemDetailWithDomesticWater): AccountFirmRoleEvidence[] {
   const canonical = new Map(collectKnownAccountFirms(detail).map(firm => [firm.key, firm.name]))
   const rows: AccountFirmRoleEvidence[] = []
@@ -149,8 +165,8 @@ export function collectAccountFirmRoleEvidence(detail: SystemDetailWithDomesticW
   }
 
   return rows.sort((left, right) => {
-    const leftDate = left.observedDate ?? (left.observedYear ? `${left.observedYear}-00-00` : '')
-    const rightDate = right.observedDate ?? (right.observedYear ? `${right.observedYear}-00-00` : '')
+    const leftDate = observedSortKey(left.observedDate, left.observedYear)
+    const rightDate = observedSortKey(right.observedDate, right.observedYear)
     return rightDate.localeCompare(leftDate) || left.name.localeCompare(right.name) || left.role.localeCompare(right.role)
   })
 }
