@@ -1,0 +1,59 @@
+name: Account full release proof
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: ['.github/workflows/account-full-release-proof.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build exact tested head and stage current deployed source data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p proof .deployed .candidate-pages
+          git rev-parse HEAD > proof/product-head.txt
+          test "$(git rev-parse HEAD)" = 62a2ca4af7e0d1e7c1d2aefdae8929c277181ba6
+          npm install --no-audit --no-fund
+          npm run build
+          gh run download 35356884004 -n github-pages -D .deployed
+          ARCHIVE="$(find .deployed -type f | head -1)"
+          sha256sum "$ARCHIVE" > proof/deployed-data-archive.sha256
+          tar -xf "$ARCHIVE" -C .candidate-pages
+          python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection.json
+          cp dist/index.html .candidate-pages/index.html
+          rm -rf .candidate-pages/assets
+          cp -R dist/assets .candidate-pages/assets
+          cp dist/index.html proof/candidate-index.html
+          cp package-lock.json proof/resolved-dependencies.json
+          for f in auth.helpers.ts candidate-routes.ts; do
+            gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+          done
+          git diff --exit-code -- src scripts .github package.json
+      - name: Install release browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Run complete existing release browser suite
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+          REQUIRE_ACRIS: false
+        run: npm run test:e2e
+      - name: Retain full release proof without deployment or history advancement
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-full-release-proof
+          path: |
+            proof
+            playwright-report
+          retention-days: 14
