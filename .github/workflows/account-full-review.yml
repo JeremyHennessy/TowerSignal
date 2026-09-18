@@ -1,0 +1,116 @@
+name: Full Account review (non-production)
+
+on:
+  push:
+    branches:
+      - agent/account-full-review-20260918
+    paths:
+      - '.github/workflows/account-full-review.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: account-full-review-20260918
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pin provenance and retain review source
+        run: |
+          mkdir -p review
+          git rev-parse HEAD > review/review-head.txt
+          printf '%s\n' 'Product candidate: 04e5505475077544d350d85f3a4586ad12155bdf' 'Accepted data run: 35334719612 (Pages 215)' 'Proof transport: 17a136f0f3d486ab50ea6970e761c77bb8f89205' > review/provenance.txt
+          mapfile -t roots < <(git ls-tree --name-only HEAD | grep -E '^(src|tests|scripts|docs|\.github|AGENTS\.md|README\.md|package.*json|.*config.*|index\.html)$')
+          git archive --format=tar.gz -o review/review-source.tar.gz HEAD "${roots[@]}"
+      - name: Fetch pinned existing browser transport helpers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in auth.helpers.ts candidate-routes.ts; do
+            gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+          done
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Retrieve accepted production artifact and public live identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .accepted-pages .candidate-pages
+          gh run download 35334719612 -n github-pages -D .accepted-pages
+          ARCHIVE="$(find .accepted-pages -type f | head -n 1)"
+          test -n "$ARCHIVE"
+          tar -xf "$ARCHIVE" -C .candidate-pages
+          test -f .candidate-pages/data/systems.json
+          sha256sum "$ARCHIVE" .candidate-pages/index.html .candidate-pages/data/systems.json > review/accepted-artifact-sha256.txt
+          cp .candidate-pages/index.html review/accepted-index.html
+          curl --fail --location --max-time 90 'https://jeremyhennessy.github.io/TowerSignal/' -o review/live-index.html
+          sha256sum review/live-index.html > review/live-index-sha256.txt
+          find .candidate-pages -maxdepth 2 -type f | sort > review/accepted-file-index.txt
+          python - <<'PY'
+          import json,pathlib,shutil
+          root=pathlib.Path('.candidate-pages/data')
+          out=pathlib.Path('review/public-data');out.mkdir(parents=True,exist_ok=True)
+          for name in ['systems.json','metadata.json','deployment.json','release-manifest.json']:
+              p=root/name
+              if p.is_file():shutil.copy2(p,out/name)
+          ids=['2000015564','2000002585','2000011123']
+          for p in root.rglob('*.json'):
+              if any(i in p.name for i in ids):
+                  q=out/p.relative_to(root);q.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,q)
+          PY
+      - name: Build exact candidate application
+        run: |
+          npm run build
+          cp dist/index.html .candidate-pages/index.html
+          rm -rf .candidate-pages/assets
+          cp -R dist/assets .candidate-pages/assets
+          cp -R dist/assets review/candidate-assets
+          sha256sum .candidate-pages/index.html > review/candidate-index-sha256.txt
+      - name: Retain review input before browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-full-review-input
+          path: review
+          retention-days: 14
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Review candidate all modes and source-rich accounts
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: >-
+          npx playwright test tests/e2e/account-full-review.spec.ts
+          --project=desktop-chromium --project=iphone
+      - name: Retain candidate browser review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-full-review-candidate
+          path: playwright-report
+          retention-days: 14
+      - name: Review actual hosted Account against its current bytes
+        if: success()
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: >-
+          npx playwright test tests/e2e/account-full-review.spec.ts
+          --project=desktop-chromium --project=iphone --no-deps
+      - name: Retain hosted browser review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-full-review-hosted
+          path: playwright-report
+          retention-days: 14
