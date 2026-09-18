@@ -6,6 +6,7 @@ import type { ChangesPayload } from './types/history'
 import type { NysChangesPayload, NysSystem, NysSystemsPayload } from './types/nys'
 import type { CompanyIntelligenceRecord } from './types/company'
 import { formatTimestamp } from './domain/labels'
+import { normalizeProspectPreset, type ProspectPreset } from './domain/prospectPreset'
 import { ChangesView } from './components/ChangesView'
 import { DetailPanel } from './components/DetailPanel'
 import { Filters, filterSystems, initialFilters, type FilterState } from './components/Filters'
@@ -61,7 +62,7 @@ function parseRoute(): { mode: ProductMode; id: string | null; filters: Partial<
   const filters: Partial<FilterState> = {}
   filterKeys.forEach(key => {
     const value = params.get(key)
-    if (value != null) filters[key] = value
+    if (value != null) filters[key] = key === 'preset' ? normalizeProspectPreset(value) : value
   })
   return { mode, id: parts[1] ? decodeURIComponent(parts[1]) : null, filters }
 }
@@ -90,7 +91,7 @@ export default function App() {
   const [nysPayload, setNysPayload] = useState<NysSystemsPayload | null>(null)
   const [nysChanges, setNysChanges] = useState<NysChangesPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [filters, setFilters] = useState<FilterState>({ ...initialFilters, ...initialRoute.filters })
+  const [filters, setFilters] = useState<FilterState>({ ...initialFilters, ...initialRoute.filters, preset: normalizeProspectPreset(initialRoute.filters.preset) })
   const [selected, setSelected] = useState<SystemSummary | null>(null)
   const [selectedNys, setSelectedNys] = useState<NysSystem | null>(null)
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(initialRoute.mode === 'company' ? initialRoute.id : null)
@@ -155,11 +156,12 @@ export default function App() {
     setSelected(null)
     setSelectedNys(null)
     setSelectedCompanyId(null)
-    window.location.hash = routeHash(next)
+    const normalizedFilters = { ...filters, preset: normalizeProspectPreset(filters.preset) }
+    window.location.hash = next === 'prospect' || next === 'map' ? routeHash(next, null, normalizedFilters) : routeHash(next)
     if (next === 'workflow' && returnState?.mode === 'workflow') {
       window.setTimeout(() => window.scrollTo({ top: returnState.scrollY, behavior: 'auto' }), 80)
     }
-  }, [])
+  }, [filters])
 
   const openAccount = useCallback((row: SystemSummary) => {
     const origin = mode === 'account' || mode === 'nys-account' || mode === 'company' ? 'prospect' : mode
@@ -190,15 +192,26 @@ export default function App() {
     if (row) openAccount(row)
   }, [payload, openAccount])
 
+  const updateProspectFilters = useCallback((next: FilterState) => {
+    const normalized = { ...next, preset: normalizeProspectPreset(next.preset) }
+    setFilters(normalized)
+    if (mode === 'prospect') window.history.replaceState(null, '', routeHash('prospect', null, normalized))
+  }, [mode])
+
+  const changeProspectPreset = useCallback((preset: ProspectPreset) => {
+    updateProspectFilters({ ...filters, preset })
+  }, [filters, updateProspectFilters])
+
   const quick = (kind: string) => {
-    if (kind === 'Confirmed violations') setFilters({ ...initialFilters, confirmed:'true' })
-    if (kind === 'OATH cases') setFilters({ ...initialFilters, oath:'true' })
-    if (kind === 'Recent ACRIS activity') setFilters({ ...initialFilters, acrisActivity:'true' })
-    if (kind === 'Sampling-gap signals') setFilters({ ...initialFilters, signal:'POTENTIAL_SAMPLING_GAP' })
-    if (kind === 'No sample date') setFilters({ ...initialFilters, signal:'NO_PUBLIC_SAMPLE_DATE' })
-    if (kind === '3+ active units') setFilters({ ...initialFilters, minEquipment:'3' })
-    if (kind === 'Manhattan') setFilters({ ...initialFilters, borough:'Manhattan' })
-    if (kind === 'Highest priority') setFilters({ ...initialFilters, minScore:'70' })
+    const reset = { ...initialFilters, preset: normalizeProspectPreset(filters.preset) }
+    if (kind === 'Confirmed violations') updateProspectFilters({ ...reset, confirmed:'true' })
+    if (kind === 'OATH cases') updateProspectFilters({ ...reset, oath:'true' })
+    if (kind === 'Recent ACRIS activity') updateProspectFilters({ ...reset, acrisActivity:'true' })
+    if (kind === 'Sampling-gap signals') updateProspectFilters({ ...reset, signal:'POTENTIAL_SAMPLING_GAP' })
+    if (kind === 'No sample date') updateProspectFilters({ ...reset, signal:'NO_PUBLIC_SAMPLE_DATE' })
+    if (kind === '3+ active units') updateProspectFilters({ ...reset, minEquipment:'3' })
+    if (kind === 'Manhattan') updateProspectFilters({ ...reset, borough:'Manhattan' })
+    if (kind === 'Highest priority') updateProspectFilters({ ...reset, minScore:'70' })
   }
 
   const saveView = async () => {
@@ -210,10 +223,11 @@ export default function App() {
 
   const submitGlobalSearch = () => {
     const search = globalSearch.trim()
-    setFilters({ ...initialFilters, search })
+    const next = { ...initialFilters, preset: normalizeProspectPreset(filters.preset), search }
+    setFilters(next)
     setMode('prospect')
     setSelectedCompanyId(null)
-    window.location.hash = routeHash('prospect', null, { ...initialFilters, search })
+    window.location.hash = routeHash('prospect', null, next)
   }
 
   if (error) return <main className="app-shell"><div className="fatal-state"><div className="brand-lockup"><span className="brand-mark">TS</span><strong>TowerSignal</strong></div><h2>Intelligence workspace unavailable</h2><p>{error}</p><p>The application will not substitute fixture or mock records for a failed production dataset.</p></div></main>
@@ -278,11 +292,11 @@ export default function App() {
         </div>
         <div className="prospect-layout reference-prospect-layout">
           <aside className="filter-rail">
-            <Filters rows={payload.systems} value={filters} onChange={setFilters} onQuick={quick} acrisAvailable={acrisAvailable} />
-            <section className="saved-views"><div className="section-title"><div><span className="eyebrow">Monitor</span><h3>Saved views</h3></div><span>{workflow.savedViews.length}</span></div><div className="save-view-row"><input aria-label="Saved view name" value={viewName} onChange={event => setViewName(event.target.value)} placeholder="e.g. Manhattan follow-up" /><button onClick={() => void saveView()} disabled={!viewName.trim() || workflow.busy}>Save</button></div>{workflow.savedViews.length === 0 ? <p>No saved views yet. Save this filter set for repeat prospecting.</p> : <div className="saved-view-list">{workflow.savedViews.map(view => <div key={view.id}><button onClick={() => setFilters({ ...initialFilters, ...view.filters })}>{view.name}</button><button className="icon-button-small" aria-label={`Delete ${view.name}`} onClick={() => void workflow.deleteView(view.id)}>×</button></div>)}</div>}<p className="microcopy">{workflow.user ? 'Saved views sync with your private workflow account.' : 'Saved views remain in this browser until you sign in to sync them.'}</p></section>
+            <Filters rows={payload.systems} value={filters} onChange={updateProspectFilters} onQuick={quick} acrisAvailable={acrisAvailable} />
+            <section className="saved-views"><div className="section-title"><div><span className="eyebrow">Monitor</span><h3>Saved views</h3></div><span>{workflow.savedViews.length}</span></div><div className="save-view-row"><input aria-label="Saved view name" value={viewName} onChange={event => setViewName(event.target.value)} placeholder="e.g. Manhattan follow-up" /><button onClick={() => void saveView()} disabled={!viewName.trim() || workflow.busy}>Save</button></div>{workflow.savedViews.length === 0 ? <p>No saved views yet. Save this filter set for repeat prospecting.</p> : <div className="saved-view-list">{workflow.savedViews.map(view => <div key={view.id}><button onClick={() => updateProspectFilters({ ...initialFilters, ...view.filters, preset: normalizeProspectPreset(view.filters.preset) })}>{view.name}</button><button className="icon-button-small" aria-label={`Delete ${view.name}`} onClick={() => void workflow.deleteView(view.id)}>×</button></div>)}</div>}<p className="microcopy">{workflow.user ? 'Saved views sync with your private workflow account.' : 'Saved views remain in this browser until you sign in to sync them.'}</p></section>
             <WorkflowPanel user={workflow.user} watchlists={workflow.watchlists} watchedSystemIds={workflow.watchedSystemIds} memberships={workflow.memberships} watchedOnly={watchedOnly} busy={workflow.busy} onToggleWatchedOnly={() => setWatchedOnly(value => !value)} onCreateWatchlist={workflow.createWatchlist} onDeleteWatchlist={workflow.deleteWatchlist} onExport={exportWorkflow} />
           </aside>
-          <section className="account-workspace"><div className="workspace-heading"><div><span className="eyebrow">Account intelligence</span><h2>Sales-ready accounts</h2><p>{watchedOnly && workflow.user ? 'Watched accounts matching the current public-evidence filters.' : 'Priority is WHY NOW. Commercial enrichment remains separate from the deterministic timing score.'}</p></div><div className="workspace-heading-actions"><ShareButton url={shareUrl('prospect', filters)} label="Share filters" /><button onClick={() => navigate('map')}>View on map</button></div></div><SystemTable rows={filtered} onSelect={openAccount} /></section>
+          <section className="account-workspace"><div className="workspace-heading"><div><span className="eyebrow">Account intelligence</span><h2>Sales-ready accounts</h2><p>{watchedOnly && workflow.user ? 'Watched accounts matching the current public-evidence filters.' : 'Priority is WHY NOW. Commercial enrichment remains separate from the deterministic timing score.'}</p></div><div className="workspace-heading-actions"><ShareButton url={shareUrl('prospect', filters)} label="Share filters" /><button onClick={() => navigate('map')}>View on map</button></div></div><SystemTable rows={filtered} onSelect={openAccount} preset={normalizeProspectPreset(filters.preset)} onPresetChange={changeProspectPreset} /></section>
         </div>
       </section>}
 
