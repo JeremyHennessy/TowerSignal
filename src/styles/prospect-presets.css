@@ -1,0 +1,53 @@
+/* Prospect commercial column presets. Filtering and Priority Score remain unchanged. */
+.prospect-preset-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:50px;
+  margin:0 0 8px;
+  padding:8px 10px;
+  border:1px solid var(--ref-border);
+  border-radius:10px;
+  background:#fff;
+}
+.prospect-preset-bar>div:first-child{display:grid;gap:2px;min-width:0}
+.prospect-preset-bar>div:first-child strong{font-size:9px;line-height:1.35;color:#52636d;font-weight:650}
+.prospect-preset-buttons{display:flex;gap:4px;flex:0 0 auto}
+.prospect-preset-buttons button{
+  min-width:64px;
+  min-height:31px;
+  padding:6px 10px;
+  border:1px solid #d4dfe2;
+  border-radius:7px;
+  background:#fff;
+  color:#40525c;
+  font-size:9px;
+  font-weight:800;
+}
+.prospect-preset-buttons button.active{
+  border-color:#9fcbbf;
+  background:var(--ref-green-soft);
+  color:var(--ref-green-dark);
+}
+.prospect-preset-buttons button:focus-visible{outline:2px solid #5f9e8e;outline-offset:2px}
+.account-table-card .table-scroll{max-width:100%;overflow:auto}
+.prospect-table-preset-timing .account-table{min-width:1040px}
+.prospect-table-preset-sales .account-table{min-width:1280px}
+.prospect-table-preset-field .account-table{min-width:1440px}
+.commercial-stack{display:grid;gap:3px;min-width:115px}
+.commercial-stack>span{display:block;font-size:9px;line-height:1.35;color:#35464f}
+.commercial-stack>span>strong{font-size:9px;color:#1b2a33}
+.commercial-stack small{display:block;font-size:8px;line-height:1.35;color:#78858d;margin-top:1px}
+.commercial-stack .muted-copy{color:#7b878f}
+.prospect-table-preset-sales td,.prospect-table-preset-field td{vertical-align:middle}
+.prospect-table-preset-sales .account-cell,.prospect-table-preset-field .account-cell{min-width:210px}
+
+@media(max-width:760px){
+  .prospect-preset-bar{align-items:flex-start;flex-direction:column}
+  .prospect-preset-buttons{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .prospect-preset-buttons button{min-width:0;width:100%}
+  .prospect-table-preset-timing .account-table{min-width:1020px}
+  .prospect-table-preset-sales .account-table{min-width:1220px}
+  .prospect-table-preset-field .account-table{min-width:1320px}
+}
