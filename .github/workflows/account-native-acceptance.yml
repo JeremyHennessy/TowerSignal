@@ -1,0 +1,83 @@
+name: Account native viewport acceptance
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: ['.github/workflows/account-native-acceptance.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d909ff328f2ce598a6f08ce9ae9261fb1780d194
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build exact candidate over current deployed data without claiming predecessor acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p proof .deployed .candidate-pages
+          git rev-parse HEAD > proof/product-head.txt
+          printf '%s\n' 'Source: Pages #219 run 35356884004. Build/deploy succeeded; four Prospect acceptance failures are being investigated, not waived.' 'Prior WebKit resize failure independently reproduced on pure static HTML in run 35369659415.' > proof/scope.txt
+          npm install --no-audit --no-fund
+          npm run lint
+          npm run typecheck
+          npm test -- --reporter=junit --outputFile=proof/vitest.xml
+          npm run build
+          gh run download 35356884004 -n github-pages -D .deployed
+          tar -xf "$(find .deployed -type f | head -1)" -C .candidate-pages
+          sha256sum .candidate-pages/data/systems.json .candidate-pages/data/metadata.json > proof/deployed-input.sha256
+          python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection.json
+          cp dist/index.html .candidate-pages/index.html
+          rm -rf .candidate-pages/assets
+          cp -R dist/assets .candidate-pages/assets
+          cp .candidate-pages/data/account-procurement/20/2000015564/index.json proof/account-example.json
+          for f in auth.helpers.ts candidate-routes.ts; do
+            gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+          done
+          gh api 'repos/JeremyHennessy/TowerSignal/contents/tests/e2e/account-full-review.spec.ts?ref=0b63235f4eea96bdcf274a67a87a25886a0acac5' --jq '.content' | base64 --decode > tests/e2e/account-full-review.spec.ts
+          gh api 'repos/JeremyHennessy/TowerSignal/contents/tests/e2e/prospect-release-diagnostic.spec.ts?ref=0ba70e5cafc183495fc4883b2eea5264ded0a04a' --jq '.content' | base64 --decode > tests/e2e/prospect-release-diagnostic.spec.ts
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Diagnose actual hosted Prospect without candidate routing
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: npx playwright test tests/e2e/prospect-release-diagnostic.spec.ts --project=desktop-chromium --project=iphone --output=test-results/prospect-diagnostic
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: actual-hosted-prospect-diagnostic
+          path: playwright-report
+          retention-days: 14
+      - name: Validate Account exact source parity and real initialized viewports
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: |
+          rm -rf playwright-report
+          npx playwright test tests/e2e/account-correction-acceptance.spec.ts tests/e2e/account-sticky-header.spec.ts tests/e2e/account-mode-layout.spec.ts tests/e2e/account-procurement-loading.spec.ts tests/e2e/account-evidence-architecture.spec.ts --project=desktop-chromium --project=iphone --no-deps --output=test-results/account-native
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: account-native-acceptance
+          path: |
+            playwright-report
+            proof
+          retention-days: 14
+      - name: Prove nine distinct source-rich account categories in both browsers
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: |
+          rm -rf playwright-report
+          npx playwright test tests/e2e/account-full-review.spec.ts --grep 'distinct source-rich' --project=desktop-chromium --project=iphone --no-deps --output=test-results/account-native-matrix
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: account-native-matrix
+          path: playwright-report
+          retention-days: 14
