@@ -14,7 +14,15 @@ test('account mode tabs span the report and switch visible evidence on desktop a
 
   const detail = page.locator('.account-profile-page .detail-panel')
   const tabs = detail.locator('.account-mode-tabs')
+  const captureMode = async (mode: string) => {
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await testInfo.attach(`account-${mode.toLowerCase()}-${testInfo.project.name}.png`, {
+      body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }),
+      contentType: 'image/png',
+    })
+  }
   await expect(tabs).toBeVisible()
+  await captureMode('Summary')
   const detailBox = await detail.boundingBox()
   const tabsBox = await tabs.boundingBox()
   expect(detailBox).not.toBeNull()
@@ -24,11 +32,13 @@ test('account mode tabs span the report and switch visible evidence on desktop a
   await tabs.getByRole('button', { name: /^Sales/ }).click()
   await expect(page.locator('.sales-precall-pack')).toBeVisible()
   await expect(page.locator('.technician-field-pack')).toBeHidden()
+  await captureMode('Sales')
 
   await tabs.getByRole('button', { name: /^Field/ }).click()
   await expect(page.locator('.technician-field-pack')).toBeVisible()
   await expect(page.locator('section.planimetric-section')).toBeVisible()
   await expect(page.locator('.sales-precall-pack')).toBeHidden()
+  await captureMode('Field')
 
   await tabs.getByRole('button', { name: /^Evidence/ }).click()
   const evidence = detail.locator('.account-evidence-workspace')
@@ -36,11 +46,13 @@ test('account mode tabs span the report and switch visible evidence on desktop a
   await expect(evidence.getByRole('heading', { name: 'Account evidence', exact: true })).toBeVisible()
   await expect(evidence.locator(':scope > details.account-evidence-group')).toHaveCount(7)
   await expect(page.locator('.technician-field-pack')).toBeHidden()
+  await captureMode('Evidence')
 
   await tabs.getByRole('button', { name: /^History/ }).click()
   await expect(page.locator('.account-unified-timeline')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Historical profile', exact: true })).toBeVisible()
   await expect(evidence).toHaveCount(0)
+  await captureMode('History')
 
   const viewportWidth = page.viewportSize()?.width ?? 0
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth)
