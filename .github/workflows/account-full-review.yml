@@ -1,4 +1,4 @@
-name: Full Account actual-hosted review (non-production)
+name: Reviewed Account correction proof (non-production)
 
 on:
   push:
@@ -24,44 +24,110 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Record actual-hosted review identity
+      - name: Preserve audit harness and check out exact reviewed product
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p review
-          git rev-parse HEAD > review/review-head.txt
-          printf '%s\n' 'ACTUAL HOSTED: no candidate asset routing, no data overlays, no build or deploy' 'Previously reviewed candidate: 04e5505475077544d350d85f3a4586ad12155bdf' 'Earlier candidate diagnostic run: 35358122545' > review/provenance.txt
-          gh api repos/JeremyHennessy/TowerSignal/branches/main --jq '.commit.sha' > review/main-at-start.txt
-          gh api repos/JeremyHennessy/TowerSignal/pulls/278 --jq '{number,state,draft,head:.head.sha,base:.base.sha}' > review/pr278-at-start.json
+          mkdir -p "$RUNNER_TEMP/account-audit" review
+          git rev-parse HEAD > "$RUNNER_TEMP/account-audit/audit-head.txt"
+          cp tests/e2e/account-full-review.spec.ts tests/e2e/account-correction-acceptance.spec.ts tests/e2e/account-session-review.spec.ts "$RUNNER_TEMP/account-audit/"
+          git fetch --depth=1 origin 8c514bab62a2a011700cc043f1d1fd1a74872dde
+          git checkout --detach 8c514bab62a2a011700cc043f1d1fd1a74872dde
+          cp "$RUNNER_TEMP/account-audit/"*.spec.ts tests/e2e/
+          cp "$RUNNER_TEMP/account-audit/audit-head.txt" review/
+          git rev-parse HEAD > review/product-head.txt
+          printf '%s\n' 'Candidate product: 8c514bab62a2a011700cc043f1d1fd1a74872dde' 'Retained public data: Pages 215 / 35334719612' 'No deployment, no private Workflow mutations, no auth code changes' > review/provenance.txt
+          for f in auth.helpers.ts candidate-routes.ts; do
+            gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+          done
+      - name: Install and build exact reviewed frontend
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+          git diff --exit-code -- src package.json
+      - name: Stage candidate bytes over pinned accepted public data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .accepted-pages .candidate-pages
+          gh run download 35334719612 -n github-pages -D .accepted-pages
+          ARCHIVE="$(find .accepted-pages -type f | head -n 1)"
+          test -n "$ARCHIVE"
+          tar -xf "$ARCHIVE" -C .candidate-pages
+          test -f .candidate-pages/data/systems.json
+          sha256sum "$ARCHIVE" .candidate-pages/data/systems.json > review/data-sha256.txt
+          cp dist/index.html .candidate-pages/index.html
+          rm -rf .candidate-pages/assets
+          cp -R dist/assets .candidate-pages/assets
+          cp dist/index.html review/candidate-index.html
+          cp -R dist/assets review/candidate-assets
+          cp .candidate-pages/data/metadata.json review/public-metadata.json
+          cp package-lock.json review/resolved-dependencies.json
           curl --fail --location --max-time 90 https://jeremyhennessy.github.io/TowerSignal/ -o review/live-index-before.html
-          curl --fail --location --max-time 90 https://jeremyhennessy.github.io/TowerSignal/data/metadata.json -o review/live-metadata-before.json
-          sha256sum review/live-index-before.html review/live-metadata-before.json > review/live-sha256-before.txt
-      - name: Install established frontend dependencies
-        run: npm install --no-audit --no-fund
-      - name: Install desktop and iPhone browser engines
+      - name: Install browser engines
         run: npx playwright install --with-deps chromium webkit
-      - name: Review actual hosted Account modes and distinct source-rich accounts
+      - name: Candidate Account acceptance
+        id: acceptance
+        continue-on-error: true
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
         run: |
-          test -z "${CANDIDATE_ROOT:-}"
-          npx playwright test tests/e2e/account-full-review.spec.ts --project=desktop-chromium --project=iphone
-      - name: Record final hosted identity
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh api repos/JeremyHennessy/TowerSignal/branches/main --jq '.commit.sha' > review/main-at-end.txt
-          curl --fail --location --max-time 90 https://jeremyhennessy.github.io/TowerSignal/ -o review/live-index-after.html
-          sha256sum review/live-index-after.html > review/live-sha256-after.txt
-          cp package-lock.json review/resolved-dependencies.json
-      - name: Retain actual-hosted browser review only
+          npx playwright test tests/e2e/account-correction-acceptance.spec.ts --project=desktop-chromium --project=iphone --output=test-results/account-acceptance
+      - name: Retain candidate acceptance separately
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: account-full-review-actual-hosted
-          path: |
-            playwright-report
-            review
+          name: account-reviewed-correction-acceptance
+          path: playwright-report
           retention-days: 14
-          if-no-files-found: error
+      - name: Distinct representative source matrix
+        id: matrix
+        if: steps.acceptance.outcome == 'success'
+        continue-on-error: true
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: |
+          rm -rf playwright-report
+          npx playwright test tests/e2e/account-full-review.spec.ts --grep 'distinct source-rich' --project=desktop-chromium --project=iphone --no-deps --output=test-results/account-matrix
+      - name: Retain source matrix separately
+        if: steps.matrix.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-reviewed-correction-matrix
+          path: playwright-report
+          retention-days: 14
+      - name: Unchanged actual-hosted session diagnostic
+        id: session
+        if: steps.acceptance.outcome == 'success'
+        continue-on-error: true
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: |
+          rm -rf playwright-report
+          npx playwright test tests/e2e/account-session-review.spec.ts --project=desktop-chromium --project=iphone --no-deps --output=test-results/account-session
+      - name: Retain actual-hosted session diagnostic separately
+        if: steps.session.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-actual-hosted-session-diagnostic
+          path: playwright-report
+          retention-days: 14
+      - name: Retain exact source and evidence provenance
+        if: always()
+        run: |
+          printf '%s\n' 'acceptance=${{ steps.acceptance.outcome }}' 'matrix=${{ steps.matrix.outcome }}' 'actual_hosted_session=${{ steps.session.outcome }}' > review/outcomes.txt
+          git archive --format=tar.gz HEAD src tests/frontend package.json vitest.config.ts > review/product-source.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: account-reviewed-correction-provenance
+          path: review
+          retention-days: 14
+      - name: Do not turn a failed diagnostic into green production acceptance
+        if: always()
+        run: |
+          test '${{ steps.acceptance.outcome }}' = success
+          test '${{ steps.matrix.outcome }}' = success
+          test '${{ steps.session.outcome }}' = success
