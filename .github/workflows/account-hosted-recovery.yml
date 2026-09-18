@@ -1,0 +1,257 @@
+name: Recover verified Account hosted release
+
+# The application is not rebuilt. Replay the identical sealed 18c21ea artifact.
+# The only behavioral correction is explicit browser selection for phase two,
+# so its existing test accounts are not created twice in the same workflow run.
+on:
+  push:
+    branches: [agent/account-hosted-recovery-20260918, main]
+    paths: [.github/workflows/account-hosted-recovery.yml]
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+jobs:
+  preflight:
+    if: github.ref == 'refs/heads/agent/account-hosted-recovery-20260918'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prove recovery changes only this workflow and retain exact tested dependencies
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin 0f2d9b4c210fbe297119d7f8380879b56dfef323
+          test "$(git diff --name-only 0f2d9b4c210fbe297119d7f8380879b56dfef323 HEAD)" = .github/workflows/account-hosted-recovery.yml
+          mkdir -p .sealed preflight
+          gh run download 35380175972 -n account-reviewed-release-candidate -D .sealed
+          test "$(cat .sealed/product-head.txt)" = 18c21ea5f7e536fb94479ef8c8ac4065045597f4
+          (cd .sealed && sha256sum --check candidate.tgz.sha256)
+          cp .sealed/resolved-dependencies.json package-lock.json
+          npm ci --no-audit --no-fund
+          git rev-parse HEAD > preflight/recovery-head.txt
+          cp .sealed/candidate.tgz.sha256 preflight/
+      - name: Prove phase two selects all application checks and no direct setup projects
+        run: |
+          npx playwright test --project=desktop-chromium --project=iphone --no-deps --list > preflight/selected-tests.txt
+          python - <<'PY'
+          import pathlib,re,json
+          text=pathlib.Path('preflight/selected-tests.txt').read_text()
+          counts={}
+          for line in text.splitlines():
+              match=re.search(r'\[([^\]]+)\]',line)
+              if match:counts[match[1]]=counts.get(match[1],0)+1
+          assert counts=={'desktop-chromium':40,'iphone':40},counts
+          pathlib.Path('preflight/selection.json').write_text(json.dumps({'selected_application_checks':counts,'recreates_test_accounts':False},indent=2))
+          print(json.dumps(counts))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: account-recovery-preflight
+          path: preflight
+          retention-days: 30
+
+  release_control:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    permissions:
+      contents: read
+      actions: write
+      pull-requests: read
+    steps:
+      - name: Require the exact tested recovery merge and stop only its competing Pages publisher
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch='agent/account-hosted-recovery-20260918';
+            const file='.github/workflows/account-hosted-recovery.yml';
+            const prs=(await github.rest.repos.listPullRequestsAssociatedWithCommit({...context.repo,commit_sha:context.sha})).data;
+            const pr=prs.find(p=>p.merged_at && p.merge_commit_sha===context.sha && p.head.ref===branch && p.head.repo.full_name===`${context.repo.owner}/${context.repo.repo}`);
+            if(!pr) throw new Error('Not the authorized same-repository recovery merge');
+            const main=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if(main.object.sha!==context.sha) throw new Error('Main moved');
+            const diff=(await github.rest.repos.compareCommits({...context.repo,base:'0f2d9b4c210fbe297119d7f8380879b56dfef323',head:context.sha})).data;
+            if(diff.files.length!==1 || diff.files[0].filename!==file) throw new Error('Recovery changes more than its runner workflow');
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:pr.head.sha,event:'push',status:'success',per_page:100})).data.workflow_runs;
+            if(!runs.some(r=>r.path===file && r.head_branch===branch) || !runs.some(r=>r.path==='.github/workflows/ci.yml')) throw new Error('Exact recovery head lacks successful preflight or CI');
+            const original=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35380175972})).data;
+            if(original.head_sha!=='18c21ea5f7e536fb94479ef8c8ac4065045597f4' || original.conclusion!=='success') throw new Error('Original sealed candidate lacks full acceptance');
+            for(let attempt=0;attempt<30;attempt++) {
+              const current=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:context.sha,per_page:100})).data.workflow_runs;
+              const publishers=current.filter(r=>r.path==='.github/workflows/pages.yml' && r.status!=='completed');
+              for(const run of publishers) await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:run.id}).catch(e=>{if(e.status!==409)throw e});
+              if(attempt>=2 && publishers.length===0) break;
+              if(attempt===29) throw new Error('Competing same-commit Pages publisher has not stopped');
+              await new Promise(resolve=>setTimeout(resolve,4000));
+            }
+            core.info(JSON.stringify({recovery_merge:context.sha,recovery_head:pr.head.sha,application_candidate:'18c21ea5f7e536fb94479ef8c8ac4065045597f4',source_run:35356884004}));
+
+  release:
+    if: github.ref == 'refs/heads/main'
+    needs: release_control
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: account-reviewed-release-candidate
+          run-id: 35380175972
+          github-token: ${{ github.token }}
+          path: .sealed
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35356884004
+          github-token: ${{ github.token }}
+          path: .rollback-archive
+      - name: Prove identical sealed application and preserve every pre-existing source file
+        run: |
+          test "$(cat .sealed/product-head.txt)" = 18c21ea5f7e536fb94479ef8c8ac4065045597f4
+          (cd .sealed && sha256sum --check candidate.tgz.sha256)
+          mkdir -p dist .rollback
+          tar -xzf .sealed/candidate.tgz -C dist
+          tar -xf .rollback-archive/artifact.tar -C .rollback
+          python - <<'PY'
+          import hashlib,json,pathlib,os
+          old=pathlib.Path('.rollback/data');new=pathlib.Path('dist/data');count=0
+          for p in old.rglob('*'):
+              if p.is_file():
+                  q=new/p.relative_to(old)
+                  assert q.is_file() and hashlib.sha256(q.read_bytes()).digest()==hashlib.sha256(p.read_bytes()).digest(),'Changed source: '+str(p)
+                  count+=1
+          release=json.loads((new/'account-release.json').read_text())
+          assert release['candidate_sha']=='18c21ea5f7e536fb94479ef8c8ac4065045597f4'
+          assert release['source_pages_run']==35356884004 and not release['source_freshness_advanced'] and not release['durable_history_advanced']
+          assert count==release['preserved_data_files']==22841
+          pathlib.Path('recovery-provenance.json').write_text(json.dumps({'recovery_merge':os.environ['GITHUB_SHA'],'application_release':release,'original_sealed_acceptance_run':35380175972,'changed_layer':'second-phase browser project selection only','preexisting_source_files_byte_preserved':count},indent=2))
+          PY
+      - name: Refuse to overwrite a newer production baseline
+        run: |
+          python - <<'PY'
+          import hashlib,pathlib,time,urllib.request
+          for name in ['index.html','data/metadata.json','data/systems.json','data/details/20/2000010998.json']:
+              expected=(pathlib.Path('.rollback')/name).read_bytes()
+              with urllib.request.urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?before='+str(time.time_ns()),timeout=90) as response: actual=response.read()
+              assert hashlib.sha256(actual).digest()==hashlib.sha256(expected).digest(),'Hosted baseline changed: '+name
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the original tested dependencies and browser engines
+        run: |
+          cp .sealed/resolved-dependencies.json package-lock.json
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Redeploy the identical sealed Account artifact
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Verify actual hosted application and Account payload hashes
+        run: |
+          python - <<'PY'
+          import hashlib,pathlib,time,urllib.request,json
+          root=pathlib.Path('dist')
+          names=['index.html','data/metadata.json','data/systems.json','data/account-release.json','data/details/20/2000010998.json','data/account-procurement/20/2000010998/index.json']
+          names += [str(p.relative_to(root)) for p in sorted((root/'assets').rglob('*')) if p.is_file()]
+          results=[]
+          for name in names:
+              expected=hashlib.sha256((root/name).read_bytes()).hexdigest()
+              for attempt in range(12):
+                  try:
+                      with urllib.request.urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?release='+str(time.time_ns()),timeout=90) as response: actual=hashlib.sha256(response.read()).hexdigest()
+                      if actual==expected: break
+                  except Exception:
+                      if attempt==11: raise
+                  if attempt==11: raise SystemExit('Hosted byte mismatch: '+name)
+                  time.sleep(5)
+              results.append({'file':name,'sha256':expected,'match':True})
+          pathlib.Path('hosted-byte-proof.json').write_text(json.dumps(results,indent=2))
+          PY
+      - name: Create isolated users once and verify live Broadway and procurement behavior
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: |
+          test -z "${CANDIDATE_ROOT:-}"
+          npx playwright test tests/e2e/account-broadway-release.spec.ts tests/e2e/account-procurement-loading.spec.ts --project=desktop-chromium --project=iphone --output=test-results/broadway-hosted
+          cp -R playwright-report broadway-hosted-report
+      - name: Retain immediate actual-hosted Broadway acceptance
+        if: always() && steps.deploy.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-recovered-broadway-hosted-proof
+          path: |
+            broadway-hosted-report
+            playwright-report
+            hosted-byte-proof.json
+            recovery-provenance.json
+            dist/data/account-release.json
+          retention-days: 30
+      - name: Run all 80 application checks without repeating account creation
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          REQUIRE_ACRIS: false
+        run: npx playwright test --project=desktop-chromium --project=iphone --no-deps --output=test-results/full-hosted
+      - name: Retain complete actual-hosted page and tab screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-recovered-full-hosted-evidence
+          path: |
+            broadway-hosted-report
+            playwright-report
+            test-results/full-hosted
+            hosted-byte-proof.json
+            recovery-provenance.json
+            dist/data/account-release.json
+          retention-days: 30
+      - name: Stage the exact prior artifact if genuine acceptance fails
+        if: failure() && steps.deploy.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: account-recovery-rollback
+          path: .rollback
+      - name: Restore the prior site after a failed acceptance
+        if: failure() && steps.deploy.outcome == 'success'
+        id: rollback
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: account-recovery-rollback
+      - name: Verify rollback identity
+        if: failure() && steps.rollback.outcome == 'success'
+        run: |
+          python - <<'PY'
+          import hashlib,pathlib,time,urllib.request
+          for name in ['index.html','data/metadata.json','data/systems.json']:
+              expected=hashlib.sha256((pathlib.Path('.rollback')/name).read_bytes()).digest()
+              for attempt in range(12):
+                  with urllib.request.urlopen('https://jeremyhennessy.github.io/TowerSignal/'+name+'?rollback='+str(time.time_ns()),timeout=90) as response: actual=hashlib.sha256(response.read()).digest()
+                  if actual==expected: break
+                  if attempt==11: raise SystemExit('Rollback mismatch: '+name)
+                  time.sleep(5)
+          print('Prior site restored and byte-verified.')
+          PY
