@@ -65,6 +65,6 @@ export function WorkflowAccountSection({
     <div className="workflow-watchlist-picker"><strong>Watchlists</strong>{watchlists.map(watchlist => <label key={watchlist.id}><input type="checkbox" checked={membershipIds.has(watchlist.id)} disabled={busy} onChange={event => { markEdited(); void onToggleMembership(watchlist.id, event.target.checked) }} />{watchlist.name}</label>)}</div>
     <button className="primary workflow-save" disabled={busy} onClick={() => void save()}>{busy ? 'Saving…' : 'Save workflow state'}</button>
     {saveState === 'session-only' && <p className="workflow-session-note"><strong>Saved in this tab.</strong> Cross-device sync could not be confirmed in this browser session. Keep this tab open if you need the private note or next action before sync is restored.</p>}
-    <p className="microcopy">Disposition, notes, next-action dates and watchlist membership are user-entered commercial workflow state. They do not alter Priority Score ${priorityModelVersion} or any source-backed evidence.</p>
+    <p className="microcopy">Disposition, notes, next-action dates and watchlist membership are user-entered commercial workflow state. They do not alter Priority Score {priorityModelVersion} or any source-backed evidence.</p>
   </section>
 }
