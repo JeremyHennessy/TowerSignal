@@ -85,3 +85,59 @@ test('account modes restore from the share URL and all five modes remain visible
   }
   await expectContained(page)
 })
+
+
+test('Sales keeps Account mode navigation above the brief and can switch to every other mode', async ({ page }, testInfo) => {
+  const isIphone = isIphoneProject(testInfo)
+  if (isIphone) testInfo.setTimeout(300_000)
+  await signInForProject(page, testInfo.project.name, '#/account/2000015564?view=sales')
+  await expectAccountDetailHydrated(page)
+
+  const detail = page.locator('.account-profile-page .detail-panel')
+  const tabs = detail.locator('.account-mode-tabs')
+  const sales = detail.locator('.sales-precall-pack')
+
+  await expect(tabs.getByRole('button', { name: /^Sales/ })).toHaveAttribute('aria-pressed', 'true')
+  await expect(sales).toBeVisible()
+  await expect(page).toHaveURL(/#\/account\/2000015564\?view=sales$/)
+
+  const geometry = await page.evaluate(() => {
+    const tabs = document.querySelector<HTMLElement>('.account-profile-page .account-mode-tabs')
+    const sales = document.querySelector<HTMLElement>('.account-profile-page .sales-precall-pack')
+    if (!tabs || !sales) return null
+    const tabBox = tabs.getBoundingClientRect()
+    const salesBox = sales.getBoundingClientRect()
+    return { tabTop: tabBox.top, tabBottom: tabBox.bottom, salesTop: salesBox.top }
+  })
+  expect(geometry).not.toBeNull()
+  expect(geometry!.tabTop).toBeLessThan(geometry!.salesTop)
+  expect(geometry!.tabBottom).toBeLessThanOrEqual(geometry!.salesTop + 1)
+
+  const transitions = [
+    { name: 'Field', selector: '.technician-field-pack', view: 'field' },
+    { name: 'Evidence', selector: '.account-evidence-workspace', view: 'evidence' },
+    { name: 'History', selector: '.account-unified-timeline', view: 'history' },
+    { name: 'Summary', selector: '.account-decision-summary', view: null },
+    { name: 'Sales', selector: '.sales-precall-pack', view: 'sales' },
+  ] as const
+
+  for (const transition of transitions) {
+    await tabs.getByRole('button', { name: new RegExp(`^${transition.name}`) }).click()
+    await expect(detail.locator(transition.selector)).toBeVisible()
+    await expect(tabs.getByRole('button', { name: new RegExp(`^${transition.name}`) })).toHaveAttribute('aria-pressed', 'true')
+    if (transition.view) await expect(page).toHaveURL(new RegExp(`#\\/account\\/2000015564\\?view=${transition.view}$`))
+    else await expect(page).toHaveURL(/#\/account\/2000015564$/)
+    await expectContained(page)
+  }
+
+  const finalGeometry = await page.evaluate(() => {
+    const tabs = document.querySelector<HTMLElement>('.account-profile-page .account-mode-tabs')
+    const sales = document.querySelector<HTMLElement>('.account-profile-page .sales-precall-pack')
+    if (!tabs || !sales) return null
+    const tabBox = tabs.getBoundingClientRect()
+    const salesBox = sales.getBoundingClientRect()
+    return { tabBottom: tabBox.bottom, salesTop: salesBox.top }
+  })
+  expect(finalGeometry).not.toBeNull()
+  expect(finalGeometry!.tabBottom).toBeLessThanOrEqual(finalGeometry!.salesTop + 1)
+})
