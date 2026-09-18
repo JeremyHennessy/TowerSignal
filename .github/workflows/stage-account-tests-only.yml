@@ -1,0 +1,62 @@
+name: Stage Account tests only
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: [.github/workflows/stage-account-tests-only.yml]
+permissions:
+  contents: write
+  actions: write
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 945b16618bcb0c14f5f791e4e57bfe3ab6c6318a
+      - name: Delete the failed temporary staging artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method DELETE repos/JeremyHennessy/TowerSignal/actions/artifacts/10560535816
+      - name: Stage diagnosed tests only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/account-tests
+          gh api 'repos/JeremyHennessy/TowerSignal/contents/review/evidence-selectors.patch?ref=82987790c2c590b597c6c5e04de73df74db12646' --jq '.content' | base64 --decode > /tmp/account-tests/selectors.patch
+          git apply --check /tmp/account-tests/selectors.patch
+          git apply /tmp/account-tests/selectors.patch
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/e2e/account-broadway-release.spec.ts');s=p.read_text()
+          old="    await info.attach(`225-Broadway-${mode}-full`, { body: await page.screenshot({ fullPage: true, animations: 'disabled' }), contentType: 'image/png' })"
+          assert s.count(old)==1
+          new="""    // Capture CSS pixels; tile pages beyond the browser screenshot dimension limit.
+              const fullHeight = await page.evaluate(() => document.documentElement.scrollHeight)
+              if (fullHeight < 24000) {
+                await info.attach(`225-Broadway-${mode}-full`, { body: await page.screenshot({ fullPage: true, animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
+              } else {
+                for (let y = 0; y < fullHeight; y += Math.max(1, viewport.height - 100)) {
+                  await page.evaluate(position => window.scrollTo(0, position), y)
+                  await info.attach(`225-Broadway-${mode}-segment-${y}`, { body: await page.screenshot({ animations: 'disabled', scale: 'css' }), contentType: 'image/png' })
+                }
+              }"""
+          s=s.replace(old,new).replace("page.screenshot({ animations: 'disabled' })", "page.screenshot({ animations: 'disabled', scale: 'css' })")
+          p.write_text(s)
+          PY
+          git diff --exit-code -- src scripts .github package.json
+          test "$(git diff --name-only | wc -l)" = 5
+          git diff > /tmp/account-tests/changes.diff
+          git config user.name 'TowerSignal release maintenance'
+          git config user.email 'noreply@users.noreply.github.com'
+          git add tests/e2e/account-detail-polish.spec.ts tests/e2e/account-report-density.spec.ts tests/e2e/live.spec.ts tests/e2e/official-swo-snapshot.spec.ts tests/e2e/account-broadway-release.spec.ts
+          git commit -m 'Migrate release assertions to collapsed Evidence groups and retain complete mobile screenshots'
+          git rev-parse HEAD | tee /tmp/account-tests/head.txt
+          git push origin HEAD:refs/heads/agent/account-tests-only-20260918
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: account-tests-only-change
+          path: /tmp/account-tests
+          retention-days: 14
