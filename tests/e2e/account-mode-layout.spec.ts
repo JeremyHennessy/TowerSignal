@@ -22,6 +22,12 @@ test('account mode tabs span the report and switch visible evidence on desktop a
     })
   }
   await expect(tabs).toBeVisible()
+  const systemsResponse = await page.request.get(new URL('data/systems.json', testInfo.project.use.baseURL as string).toString())
+  expect(systemsResponse.ok()).toBe(true)
+  const systemsPayload = await systemsResponse.json() as { metadata?: { priority_model_version?: string } }
+  const priorityModelVersion = systemsPayload.metadata?.priority_model_version
+  expect(priorityModelVersion).toBeTruthy()
+  await expect(detail.locator('.workflow-account-section')).toContainText(`Priority Score ${priorityModelVersion}`)
   await captureMode('Summary')
   const detailBox = await detail.boundingBox()
   const tabsBox = await tabs.boundingBox()
