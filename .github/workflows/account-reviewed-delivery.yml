@@ -4,13 +4,10 @@ name: Deliver reviewed Account application
 # Scheduled data generation and durable history remain owned by pages.yml.
 on:
   push:
-    branches: [agent/account-evidence-architecture-promotion-20260917]
+    branches: [agent/account-evidence-architecture-promotion-20260917, main]
     paths:
       - .github/workflows/account-reviewed-delivery.yml
       - tests/e2e/**
-  pull_request_target:
-    types: [closed]
-    branches: [main]
 permissions:
   contents: read
   actions: read
@@ -18,7 +15,7 @@ permissions:
 
 jobs:
   candidate:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/account-evidence-architecture-promotion-20260917'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -91,7 +88,7 @@ jobs:
           retention-days: 30
 
   full_regression:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/agent/account-evidence-architecture-promotion-20260917'
     needs: candidate
     strategy:
       fail-fast: false
@@ -142,10 +139,7 @@ jobs:
           retention-days: 30
 
   release:
-    if: >-
-      github.event_name == 'pull_request_target' && github.ref == 'refs/heads/main' &&
-      github.event.pull_request.merged == true && github.event.pull_request.number == 278 &&
-      github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     concurrency:
@@ -167,7 +161,7 @@ jobs:
         with:
           script: |
             const pr=(await github.rest.pulls.get({...context.repo,pull_number:278})).data;
-            const expected=context.payload.pull_request.head.sha;
+            const expected=pr.head.sha;
             const main=(await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
             if(!pr.merged || pr.head.repo.full_name!==`${context.repo.owner}/${context.repo.repo}` || pr.head.ref!=='agent/account-evidence-architecture-promotion-20260917' || pr.head.sha!==expected || pr.merge_commit_sha!==context.sha || main.object.sha!==context.sha) throw new Error('Not the exact current same-repository PR278 merge');
             const a=(await github.rest.git.getCommit({...context.repo,commit_sha:expected})).data;
