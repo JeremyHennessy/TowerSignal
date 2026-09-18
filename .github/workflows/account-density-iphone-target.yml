@@ -1,0 +1,47 @@
+name: Account density iPhone target
+on:
+  push:
+    branches: [agent/account-unblock-harness-20260918]
+    paths: [.github/workflows/account-density-iphone-target.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: b96eaf6f725e7bfc3c0dbab794a710a497ddd6f1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build exact current Account head over current deployed data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+          mkdir -p .source .candidate-pages proof
+          gh run download 35356884004 -n github-pages -D .source
+          tar -xf .source/artifact.tar -C .candidate-pages
+          python scripts/build_account_procurement.py --output .candidate-pages/data > proof/projection.json
+          cp dist/index.html .candidate-pages/index.html
+          rm -rf .candidate-pages/assets
+          cp -R dist/assets .candidate-pages/assets
+          for f in auth.helpers.ts candidate-routes.ts; do
+            gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
+          done
+      - run: npx playwright install --with-deps webkit
+      - name: Run only the previously failing iPhone test
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: npx playwright test tests/e2e/account-report-density.spec.ts --project=iphone
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: account-density-iphone-target
+          path: playwright-report
+          retention-days: 7
