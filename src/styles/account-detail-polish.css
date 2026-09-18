@@ -230,14 +230,23 @@
   .account-profile-page .account-mode-tabs{
     position:sticky;
     top:55px;
-    display:flex;
-    overflow-x:auto;
-    overscroll-behavior-inline:contain;
-    scrollbar-width:none;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:2px;
+    overflow:visible;
+    overscroll-behavior:auto;
+    scrollbar-width:auto;
   }
-  .account-profile-page .account-mode-tabs::-webkit-scrollbar{display:none}
   .account-profile-page .account-mode-tabs button{
-    flex:0 0 145px;
+    min-width:0;
+    min-height:40px;
+    padding:7px 3px;
+  }
+  .account-profile-page .account-mode-tabs button strong{
+    font-size:9px;
+  }
+  .account-profile-page .account-mode-tabs button span{
+    display:none;
   }
   .account-profile-page .account-decision-evidence-grid{
     grid-template-columns:1fr;
