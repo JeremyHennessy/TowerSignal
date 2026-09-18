@@ -1,0 +1,59 @@
+name: Actual hosted supplemental route screenshots
+on:
+  push:
+    branches: [agent/hosted-supplement-20260918]
+    paths: [.github/workflows/hosted-supplement.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [desktop-chromium, iphone]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Use accepted dependency resolution and require the actual corrected live release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .sealed proof
+          git fetch --depth=1 origin c83a07d719e963efc9990b59e1a17ddb1705429c
+          git diff --exit-code c83a07d719e963efc9990b59e1a17ddb1705429c HEAD -- src scripts package.json
+          gh run download 35380175972 -n account-reviewed-release-candidate -D .sealed
+          cp .sealed/resolved-dependencies.json package-lock.json
+          npm ci --no-audit --no-fund
+          curl --fail --location --max-time 90 'https://jeremyhennessy.github.io/TowerSignal/data/account-release.json' -o proof/account-release.json
+          python - <<'PY'
+          import json,pathlib
+          release=json.loads(pathlib.Path('proof/account-release.json').read_text())
+          assert release['candidate_sha']=='18c21ea5f7e536fb94479ef8c8ac4065045597f4'
+          assert release['source_pages_run']==35356884004
+          PY
+          git rev-parse HEAD > proof/verification-head.txt
+      - name: Install actual browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Read-only page navigation and screenshot acceptance
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          BROWSER_PROJECT: ${{ matrix.browser }}
+        run: |
+          test -z "${CANDIDATE_ROOT:-}"
+          npx playwright test tests/e2e/hosted-supplement.spec.ts --project=${{ matrix.browser }} --output=test-results/supplement
+      - name: Retain actual-hosted supplemental evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: actual-hosted-supplement-${{ matrix.browser }}
+          path: |
+            proof
+            playwright-report
+            test-results/supplement
+          retention-days: 30
