@@ -232,7 +232,7 @@ test('includes an annotated non-watchlisted account in CRM workflow export', () 
 })
 
 test('labels account workflow as user-entered private context', () => {
-  render(<WorkflowAccountSection signedIn={false} account={undefined} watchlists={[]} membershipIds={new Set()} busy={false} onSave={vi.fn().mockResolvedValue('synced')} onToggleMembership={vi.fn()} />)
+  render(<WorkflowAccountSection signedIn={false} account={undefined} watchlists={[]} membershipIds={new Set()} busy={false} priorityModelVersion="1.1" onSave={vi.fn().mockResolvedValue('synced')} onToggleMembership={vi.fn()} />)
   expect(screen.getByText('User workflow')).toBeInTheDocument()
   expect(screen.getByText(/never treated as public-source evidence or scoring input/i)).toBeInTheDocument()
 })

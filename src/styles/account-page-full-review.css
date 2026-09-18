@@ -1,0 +1,176 @@
+/* Cohesive full-page Account workspace hierarchy.
+   Drawer DetailPanel behavior stays unchanged; only #/account/ receives this shell. */
+.account-profile-page .account-profile-hero{
+  grid-column:1 / -1!important;
+  grid-row:auto!important;
+  order:0;
+  display:grid;
+  gap:0;
+  width:100%;
+  margin:0;
+  border:1px solid var(--ref-border);
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 8px 24px rgba(24,50,43,.05);
+  overflow:hidden;
+}
+.account-profile-page .account-profile-hero-controls{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:46px;
+  padding:8px 14px;
+  border-bottom:1px solid #e5ece9;
+  background:#fbfcfc;
+}
+.account-profile-page .account-page-context,
+.account-profile-page .account-page-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+.account-profile-page .account-page-context span{
+  color:var(--ref-muted);
+  font-size:9px;
+  white-space:nowrap;
+}
+.account-profile-page .account-page-actions{
+  justify-content:flex-end;
+}
+.account-profile-page .account-profile-hero-main{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:24px;
+  padding:17px 18px 18px;
+}
+.account-profile-page .account-profile-identity{
+  min-width:0;
+}
+.account-profile-page .account-profile-identity h1{
+  margin:5px 0 3px;
+  color:#13232e;
+  font-size:28px;
+  line-height:1.05;
+  letter-spacing:-.035em;
+}
+.account-profile-page .account-profile-identity p{
+  margin:0;
+  color:var(--ref-muted);
+  font-size:11px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.account-profile-page .account-profile-priority{
+  display:flex;
+  align-items:stretch;
+  gap:10px;
+}
+.account-profile-page .account-lead-brief-button{
+  min-width:160px;
+  min-height:48px;
+  padding:10px 14px;
+  background:#fff;
+  font-size:15px;
+  white-space:nowrap;
+}
+.account-profile-page .account-profile-score{
+  display:grid;
+  grid-template-columns:auto auto;
+  grid-template-rows:auto auto;
+  align-items:center;
+  column-gap:7px;
+  min-width:116px;
+  padding:8px 11px;
+  border:1px solid #dbe5e1;
+  border-radius:10px;
+  background:#f7fbf9;
+}
+.account-profile-page .account-profile-score strong{
+  grid-row:1 / span 2;
+  color:#08725c;
+  font-size:34px;
+  line-height:1;
+  letter-spacing:-.04em;
+}
+.account-profile-page .account-profile-score span{
+  align-self:end;
+  color:#28463f;
+  font-size:9px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.account-profile-page .account-profile-score small{
+  align-self:start;
+  color:var(--ref-muted);
+  font-size:7.5px;
+  text-transform:uppercase;
+}
+.account-profile-page .account-mode-tabs{
+  margin:0!important;
+}
+.account-profile-page .account-unified-timeline{
+  order:4;
+}
+.account-profile-page .detail-panel{
+  overflow:visible!important;
+  max-height:none!important;
+}
+@media(max-width:780px){
+  .account-profile-page .account-profile-hero{
+    margin:0 0 9px;
+  }
+  .account-profile-page .account-profile-hero-controls{
+    align-items:stretch;
+    flex-direction:column;
+    gap:7px;
+    padding:9px 10px;
+  }
+  .account-profile-page .account-page-context{
+    justify-content:space-between;
+  }
+  .account-profile-page .account-page-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+  }
+  .account-profile-page .account-page-actions>button{
+    width:100%;
+    min-width:0;
+  }
+  .account-profile-page .account-profile-hero-main{
+    grid-template-columns:1fr;
+    gap:12px;
+    padding:14px 12px;
+  }
+  .account-profile-page .account-profile-identity h1{
+    font-size:25px;
+  }
+  .account-profile-page .account-profile-priority{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+  }
+  .account-profile-page .account-lead-brief-button{
+    min-width:0;
+    width:100%;
+  }
+  .account-profile-page .account-profile-score{
+    min-width:104px;
+  }
+  .account-profile-page .account-mode-tabs{
+    margin-bottom:9px!important;
+  }
+}
+@media(max-width:430px){
+  .account-profile-page .account-page-context span{
+    white-space:normal;
+    text-align:right;
+  }
+  .account-profile-page .account-profile-score strong{
+    font-size:30px;
+  }
+}
