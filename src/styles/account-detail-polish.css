@@ -117,6 +117,7 @@
 .account-profile-page .workflow-account-section{
   order:3;
 }
+.account-profile-page .detail-panel>.sales-precall-pack,
 .account-profile-page .detail-panel>.technician-field-pack,
 .account-profile-page .detail-panel>section:not(.account-decision-summary):not(.workflow-account-section),
 .account-profile-page .detail-panel>details{
