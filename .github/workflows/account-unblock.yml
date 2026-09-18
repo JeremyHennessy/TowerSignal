@@ -25,7 +25,6 @@ jobs:
           python - <<'PY'
           import base64,gzip,hashlib,pathlib,os
           text=pathlib.Path('review/account-unblock.patch.gz.b64').read_text()
-          # Correct four verified transcription differences in this diagnostic transport only.
           repairs=[('Cm3pGMBJW8LQdMRymlWHL0NxKxLHUBtM','Cm3pGMBJW8LQdMRyVRqmlWHL0NxKxLHUBtM'),('NVOyzxS8KQtccEBuTj0q9Dr7fVAJQOZo','NVOyzxS8KQtccEBu+Txh0q9Dr7fVAJQOZo'),('lGi7A53hOiws4vyF3rQGu0K8mj4NmYXQg','lGi7A53hOiws4vyF7rQGu0K8mj4NmYXQg'),('ZIlzryz5wlEWep3Efw+nPcJlodED2nIqt','ZIlzryz5wlEWep3Ew+nPcJlodED2nIqt')]
           for before,after in repairs:
               assert text.count(before)==1
@@ -38,6 +37,16 @@ jobs:
           git checkout --detach 6c73fa356402b99c9160b26d302a5d725c8d0333
           git apply --check "$RUNNER_TEMP/account-unblock/product.patch"
           git apply "$RUNNER_TEMP/account-unblock/product.patch"
+          python - <<'PY'
+          from pathlib import Path
+          block='      - name: Build bounded exact-account procurement projection\n        run: python scripts/build_account_procurement.py --output public/data\n'
+          for name in ['pages.yml','azure-data-refresh.yml']:
+              p=Path('.github/workflows')/name
+              text=p.read_text(); assert text.count(block)==1
+              text=text.replace(block,'')
+              target='      - name: Production build\n'; assert text.count(target)==1
+              p.write_text(text.replace(target,block+target))
+          PY
       - name: Validate all product code and build
         run: |
           npm install --no-audit --no-fund
@@ -56,6 +65,7 @@ jobs:
           test "$(wc -l < proof/changed-files.txt)" = 8
           git commit -m 'Bound Account procurement by exact source-linked account pages'
           git rev-parse HEAD | tee proof/product-head.txt
+          git archive --format=tar.gz HEAD src scripts tests .github package.json > proof/product-source.tar.gz
           git push origin HEAD:refs/heads/agent/account-loading-unblock-20260918
       - name: Stage retained source data and generate deterministic account slices
         env:
