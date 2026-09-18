@@ -1,0 +1,53 @@
+name: Hosted test project selection diagnostic
+on:
+  push:
+    branches: [agent/hosted-test-selection-diagnostic-20260918]
+    paths: [.github/workflows/hosted-test-selection-diagnostic.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  enumerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 0f2d9b4c210fbe297119d7f8380879b56dfef323
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Use the exact release dependency resolution
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .proof diagnostic
+          gh run download 35371986075 -n account-full-release-proof -D .proof
+          cp .proof/proof/resolved-dependencies.json package-lock.json
+          npm ci --no-audit --no-fund
+          git rev-parse HEAD > diagnostic/product-head.txt
+          npx playwright --version > diagnostic/playwright-version.txt
+      - name: Enumerate only - no browsers, test users, or application writes
+        run: |
+          npx playwright test --no-deps --list > diagnostic/current-command.txt
+          npx playwright test --project=desktop-chromium --project=iphone --no-deps --list > diagnostic/explicit-browser-command.txt
+          python - <<'PY'
+          import json,pathlib,re
+          root=pathlib.Path('diagnostic')
+          result={}
+          for name in ['current-command','explicit-browser-command']:
+              text=(root/(name+'.txt')).read_text()
+              projects={}
+              for line in text.splitlines():
+                  m=re.search(r'\[([^\]]+)\]',line)
+                  if m:projects[m.group(1)]=projects.get(m.group(1),0)+1
+              result[name]={'projects':projects,'totals':[line for line in text.splitlines() if line.startswith('Total:')]}
+          (root/'selection.json').write_text(json.dumps(result,indent=2)+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hosted-test-selection-diagnostic
+          path: diagnostic
+          retention-days: 7
