@@ -7,8 +7,9 @@ import type { SystemDetail, SystemSummary } from '../../src/types/data'
 import type { SystemDetailWithDomesticWater } from '../../src/components/DomesticWaterSection'
 import type { ProcurementBundle } from '../../src/types/procurement'
 
-const api = vi.hoisted(() => ({ loadSystemDetail: vi.fn(), loadProcurement: vi.fn() }))
+const api = vi.hoisted(() => ({ loadSystemDetail: vi.fn(), loadProcurement: vi.fn(), loadAccountProcurementManifest: vi.fn(), loadAccountProcurementPage: vi.fn() }))
 vi.mock('../../src/data/api', () => api)
+vi.mock('../../src/data/accountProcurement', () => api)
 vi.mock('../../src/components/BuildingWaterSignalsSection', () => ({ BuildingWaterSignalsSection: () => null }))
 vi.mock('../../src/components/DomesticWaterSection', () => ({ DomesticWaterSection: () => null }))
 vi.mock('../../src/components/InstitutionalFacilitySection', () => ({ InstitutionalFacilitySection: () => null }))
@@ -54,7 +55,12 @@ const bundle = {
 
 beforeEach(() => {
   api.loadSystemDetail.mockResolvedValue(detail)
-  api.loadProcurement.mockResolvedValue(bundle)
+  api.loadAccountProcurementManifest.mockResolvedValue({
+    system_id: 'REVIEW-1', generated_at: detail.metadata.generated_at,
+    record_count: 21, pages: [{ record_count: 20 }, { record_count: 1 }],
+    sources: [{ file: 'procurement-openbook-water.json', name: 'Open Book NY', status: 'UNAVAILABLE', reason: 'HTTP 503 fixture source failure', record_count: null }],
+  })
+  api.loadAccountProcurementPage.mockImplementation((_manifest: unknown, index: number) => Promise.resolve(bundle.cityRecord.notices.slice(index * 20, (index + 1) * 20)))
 })
 afterEach(cleanup)
 
@@ -97,7 +103,7 @@ test('partial procurement failure remains explicit without dropping available li
   expect(container.textContent).toContain('HTTP 503 fixture source failure')
   expect(screen.getByText('Procurement parity 1')).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: /show.*more.*procurement/i }))
-  expect(screen.getByText('Procurement parity 21')).toBeInTheDocument()
+  expect(await screen.findByText('Procurement parity 21')).toBeInTheDocument()
 })
 
 test('observed firm chronology normalizes source date keys without changing raw evidence dates', () => {

@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { loadProcurement, loadSystemDetail } from '../data/api'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { loadSystemDetail } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
-import { collectAccountFirmRoleEvidence, explicitAccountProcurementRecords } from '../domain/accountEvidence'
+import { collectAccountFirmRoleEvidence } from '../domain/accountEvidence'
 import { collectProcurementFirmRoleEvidence } from '../domain/procurementFirmRoles'
 import type { SystemDetail } from '../types/data'
-import type { ProcurementBundle, ProcurementRecord } from '../types/procurement'
+import type { ProcurementRecord } from '../types/procurement'
 import type { PropertyEnforcementContext } from '../types/enforcement'
 import { BuildingWaterSignalsSection } from './BuildingWaterSignalsSection'
 import { DomesticWaterSection, type SystemDetailWithDomesticWater } from './DomesticWaterSection'
@@ -12,21 +12,10 @@ import { InstitutionalFacilitySection } from './InstitutionalFacilitySection'
 import { LeadServiceLineSection } from './LeadServiceLineSection'
 import { LegacyDobProjectSection } from './LegacyDobProjectSection'
 import { OfficialSwoSnapshotSection } from './OfficialSwoSnapshotSection'
+import { loadAccountProcurementManifest, loadAccountProcurementPage, type AccountProcurementManifest } from '../data/accountProcurement'
 
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 })
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
-let procurementPromise: Promise<ProcurementBundle> | null = null
-
-function loadProcurementCached(): Promise<ProcurementBundle> {
-  if (!procurementPromise) {
-    procurementPromise = loadProcurement().catch(error => {
-      procurementPromise = null
-      throw error
-    })
-  }
-  return procurementPromise
-}
-
 function systemIdFromHash(): string | null {
   const raw = window.location.hash.replace(/^#\/?/, '')
   const parts = raw.split('?')[0].split('/').filter(Boolean)
@@ -53,13 +42,8 @@ function EvidenceRecordList({ records, label }: { records: ReactNode[]; label: s
   </>
 }
 
-function procurementWarnings(bundle: ProcurementBundle | null): string[] {
-  if (!bundle) return []
-  const sources = [['nysAuthorities', 'NYS authority procurement'], ['openBookWater', 'Open Book NY'], ['nychaWater', 'NYCHA']] as const
-  return sources.flatMap(([key, label]) => {
-    const error = bundle.sourceErrors?.[key]
-    return error ? [`${label}: ${error}`] : bundle[key] == null ? [`${label}: source payload unavailable`] : []
-  })
+function procurementWarnings(manifest: AccountProcurementManifest | null): string[] {
+  return manifest?.sources.filter(source => source.status !== 'LOADED').map(source => `${source.name}: ${source.reason ?? source.status}`) ?? []
 }
 
 function EvidenceProvenanceJoins({ detail }: { detail: EvidenceDetail }) {
@@ -150,7 +134,7 @@ function ProcurementEvidence({ records, error, incomplete }: { records: Procurem
   if (records == null) return <div className="loading-state">Loading explicitly linked procurement evidence…</div>
   if (records.length === 0 && incomplete) return <div className="empty-inline">No explicit account-linked record was returned by the loaded procurement sources. Coverage is incomplete; unavailable sources remain unverified.</div>
   if (records.length === 0) return <div className="empty-inline">No generated procurement record explicitly links this system through `tower_account_system_ids`. This is not evidence that no public or private contract exists.</div>
-  return <EvidenceRecordList label="procurement records" records={records.map(record => {
+  return <div className="evidence-card-list">{records.map(record => {
     const links = record.source_urls?.length ? record.source_urls : record.source_url ? [record.source_url] : []
     const date = record.due_date ?? record.award_date ?? record.start_date ?? record.notice_start_date
     const amount = record.current_amount ?? record.original_amount ?? record.amount
@@ -160,7 +144,7 @@ function ProcurementEvidence({ records, error, incomplete }: { records: Procurem
       <small>{record.source} · {record.source_dataset_id ?? 'dataset id not published'} · tower link {record.tower_link_confidence ?? 'UNVERIFIED'} · {record.service_category}{amount != null ? ` · ${money.format(amount)}` : ''}</small>
       {links.length > 0 && <div className="evidence-source-links">{links.map((url, index) => <a href={url} target="_blank" rel="noreferrer" key={`${url}-${index}`}>Source {links.length > 1 ? index + 1 : ''} ↗</a>)}</div>}
     </article>
-  })} />
+  })}</div>
 }
 
 function HistoricalEvidence({ detail }: { detail: EvidenceDetail }) {
@@ -177,7 +161,12 @@ type EvidenceDetail = SystemDetailWithDomesticWater & { property_enforcement_con
 export function AccountEvidenceWorkspace({ systemId = systemIdFromHash() }: { systemId?: string | null }) {
   const [detail, setDetail] = useState<EvidenceDetail | null>(null)
   const [detailError, setDetailError] = useState<string | null>(null)
-  const [procurement, setProcurement] = useState<ProcurementBundle | null>(null)
+  const [procurement, setProcurement] = useState<AccountProcurementManifest | null>(null)
+  const [linkedProcurement, setLinkedProcurement] = useState<ProcurementRecord[]>([])
+  const [nextPage, setNextPage] = useState(0)
+  const [pageLoading, setPageLoading] = useState(false)
+  const [pageError, setPageError] = useState<string | null>(null)
+  const procurementRequest = useRef<AbortController | null>(null)
   const [procurementLoaded, setProcurementLoaded] = useState(false)
   const [procurementError, setProcurementError] = useState<string | null>(null)
 
@@ -191,16 +180,46 @@ export function AccountEvidenceWorkspace({ systemId = systemIdFromHash() }: { sy
     return () => { active = false }
   }, [systemId])
 
+  const detailGeneration = detail?.metadata.generated_at
   useEffect(() => {
-    let active = true
-    setProcurementLoaded(false); setProcurementError(null)
-    loadProcurementCached()
-      .then(value => { if (active) { setProcurement(value); setProcurementLoaded(true) } })
-      .catch(error => { if (active) { setProcurementError(error instanceof Error ? error.message : 'Unable to load procurement evidence'); setProcurementLoaded(true) } })
-    return () => { active = false }
-  }, [])
+    const controller = new AbortController()
+    procurementRequest.current = controller
+    setProcurement(null); setLinkedProcurement([]); setNextPage(0)
+    setProcurementLoaded(false); setProcurementError(null); setPageError(null); setPageLoading(false)
+    if (!systemId || !detailGeneration) return () => controller.abort()
+    const load = async () => {
+      try {
+        const manifest = await loadAccountProcurementManifest(systemId, detailGeneration, controller.signal)
+        const rows = manifest.pages.length ? await loadAccountProcurementPage(manifest, 0, controller.signal) : []
+        if (!controller.signal.aborted) {
+          setProcurement(manifest); setLinkedProcurement(rows)
+          setNextPage(manifest.pages.length ? 1 : 0); setProcurementLoaded(true)
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setProcurementError(error instanceof Error ? error.message : 'Account procurement projection unavailable')
+          setProcurementLoaded(true)
+        }
+      }
+    }
+    void load()
+    return () => controller.abort()
+  }, [systemId, detailGeneration])
 
-  const linkedProcurement = useMemo(() => systemId && procurement ? explicitAccountProcurementRecords(procurement, systemId) : [], [procurement, systemId])
+  const loadMoreProcurement = async () => {
+    const signal = procurementRequest.current?.signal
+    if (!procurement || pageLoading || signal?.aborted) return
+    setPageLoading(true); setPageError(null)
+    try {
+      const rows = await loadAccountProcurementPage(procurement, nextPage, signal)
+      if (!signal?.aborted) {
+        setLinkedProcurement(previous => [...previous, ...rows]); setNextPage(previous => previous + 1)
+      }
+    } catch (error) {
+      if (!signal?.aborted) setPageError(error instanceof Error ? error.message : 'Remaining procurement records unavailable')
+    } finally { if (!signal?.aborted) setPageLoading(false) }
+  }
+
   const sourceFirmCount = detail ? collectAccountFirmRoleEvidence(detail).length : 0
   const procurementFirmCount = procurementLoaded && !procurementError ? collectProcurementFirmRoleEvidence(linkedProcurement).length : null
   const coverageWarnings = procurementWarnings(procurement)
@@ -215,7 +234,7 @@ export function AccountEvidenceWorkspace({ systemId = systemIdFromHash() }: { sy
       <Group title="Project Activity" summary={`${detail.dob_activity_history ? `${detail.dob_activity_history.length} DOB NOW filings` : 'DOB NOW filing attachment unavailable'} · legacy context kept separate`}><ProjectEvidence detail={detail} /></Group>
       <Group title="Domestic Water" summary={detail.domestic_water ? `${detail.domestic_water.summary.self_report_record_count} self reports · ${detail.domestic_water.summary.compliance_record_count} compliance records` : 'No exact-BIN DWT payload attached'}><DomesticWaterSection detail={detail} /><BuildingWaterSignalsSection detail={detail} /></Group>
       <Group title="Institutional / Infrastructure" summary={`${institutionalSummary} · ${serviceLineSummary}`}><InstitutionalFacilitySection detail={detail as SystemDetail} /><LeadServiceLineSection detail={detail as SystemDetail} /></Group>
-      <Group title="Procurement / Commercial" summary={`${coverageWarnings.length ? 'At least ' : ''}${sourceFirmCount + (procurementFirmCount ?? 0)} source-observed/recorded/contract-linked firm roles${procurementError ? ' · procurement unavailable' : procurementFirmCount == null ? ' · procurement pending' : coverageWarnings.length ? ' · incomplete procurement coverage' : ''} · ${procurementLoaded && !procurementError ? linkedProcurement.length : '—'} explicit procurement links`}><>{coverageWarnings.length > 0 && <div className="evidence-boundary" role="status"><strong>Procurement coverage incomplete.</strong>{coverageWarnings.map(warning => <p key={warning}>{warning}</p>)}<p>Counts and records describe loaded sources only. Unavailable sources remain unverified; no zero-contract or no-vendor conclusion is inferred.</p></div>}<section className="evidence-subsection"><h4>Observed firms &amp; roles</h4><FirmRoleEvidence detail={detail} procurementRecords={procurementLoaded && !procurementError ? linkedProcurement : null} procurementError={procurementError} /></section><section className="evidence-subsection"><h4>Explicitly linked procurement</h4><ProcurementEvidence records={procurementLoaded && !procurementError ? linkedProcurement : null} error={procurementError} incomplete={coverageWarnings.length > 0} /></section></></Group>
+      <Group title="Procurement / Commercial" summary={`${coverageWarnings.length ? 'At least ' : ''}${sourceFirmCount + (procurementFirmCount ?? 0)} source-observed/recorded/contract-linked firm roles${procurementError ? ' · procurement unavailable' : procurementFirmCount == null ? ' · procurement pending' : coverageWarnings.length ? ' · incomplete procurement coverage' : ''} · ${procurement?.record_count ?? '—'} explicit procurement links${procurement && linkedProcurement.length < procurement.record_count ? ` · ${linkedProcurement.length} loaded` : ''}`}><>{coverageWarnings.length > 0 && <div className="evidence-boundary" role="status"><strong>Procurement coverage incomplete.</strong>{coverageWarnings.map(warning => <p key={warning}>{warning}</p>)}<p>Counts and records describe loaded sources only. Unavailable sources remain unverified; no zero-contract or no-vendor conclusion is inferred.</p></div>}<section className="evidence-subsection"><h4>Observed firms &amp; roles</h4><FirmRoleEvidence detail={detail} procurementRecords={procurementLoaded && !procurementError ? linkedProcurement : null} procurementError={procurementError} /></section><section className="evidence-subsection"><h4>Explicitly linked procurement</h4><ProcurementEvidence records={procurementLoaded && !procurementError ? linkedProcurement : null} error={procurementError} incomplete={coverageWarnings.length > 0} />{procurement && <p className="microcopy">Showing {linkedProcurement.length} of {procurement.record_count} explicitly linked procurement records from this account snapshot.</p>}{pageError && <div className="evidence-boundary" role="alert">{pageError} Previously loaded records are retained; remaining records are unverified.</div>}{procurement && nextPage < procurement.pages.length && <button type="button" disabled={pageLoading} onClick={() => void loadMoreProcurement()}>{pageLoading ? 'Loading account procurement page…' : `Show ${procurement.pages[nextPage].record_count} more procurement records`}</button>}{procurement && <details className="evidence-provenance-details"><summary>Procurement source coverage</summary>{procurement.sources.map(source => <p key={source.file}>{source.name} · {source.status} · source snapshot {source.generated_at ? formatTimestamp(source.generated_at) : 'unavailable'} · {source.record_count ?? 'unknown'} source records</p>)}</details>}</section></></Group>
       <Group title="Historical Evidence" summary={`${detail.metadata.sources.length} source datasets · detailed chronology remains in History`}><HistoricalEvidence detail={detail} /></Group>
     </>}
   </section>

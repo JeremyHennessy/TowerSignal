@@ -280,6 +280,8 @@ jobs:
         run: npm run typecheck
       - name: Frontend tests
         run: npm test
+      - name: Build bounded exact-account procurement projection
+        run: python scripts/build_account_procurement.py --output public/data
       - name: Production build
         run: npm run build
       - name: Install local data-test browsers
