@@ -287,7 +287,8 @@ class PublisherTests(unittest.TestCase):
 
     def test_runtime_history_parity_and_retained_oath_cache(self):
         runtime = [b.record_bytes('history/'+n, n.encode()) for n in p.HISTORY_WRITTEN[:-1]]
-        runtime += [b.record_bytes('history/segments/core.json', b'core'), b.record_bytes('source-health.json', b'health')]
+        runtime += [b.record_bytes('history/segments/core.json', b'core'), b.record_bytes('source-health.json', b'health'),
+                    b.record_bytes('legionella-alerts.json', b'legionella')]
         history = [{**r, 'path': r['path'].removeprefix('history/')} for r in runtime]
         history += [b.record_bytes('oath-cache.json.gz', b'persisted')]
         proof = p.check_history_parity(runtime, history)
@@ -354,8 +355,10 @@ class PublisherTests(unittest.TestCase):
         archive = self.root/'valid.zip'
         with zipfile.ZipFile(archive, 'w') as z:
             z.writestr('history/latest.json', b'{}'); z.writestr('source-health.json', b'{}')
+            z.writestr('legionella-alerts.json', b'{}')
         p.unpack_history(archive, self.root/'valid')
         self.assertEqual((self.root/'valid/history/latest.json').read_bytes(), b'{}')
+        self.assertEqual((self.root/'valid/legionella-alerts.json').read_bytes(), b'{}')
 
     def test_missing_destination_key_and_wrong_account_rejected(self):
         with patch.dict('os.environ', {}, clear=True), self.assertRaises(b.PublishError):
@@ -387,10 +390,12 @@ class PublisherTests(unittest.TestCase):
         values.update({'details/20/a.json': b'{}', 'firm-details/kn/a.json': b'{}'})
         values.update({'history/'+n: n.encode() for n in p.HISTORY_WRITTEN[:-1]})
         values['history/segments/core.json'] = b'core'
+        values['legionella-alerts.json'] = b'legionella'
         for name, data in values.items():
             out = runtime / name; out.parent.mkdir(parents=True, exist_ok=True); out.write_bytes(data)
         hist = {n.removeprefix('history/'): d for n,d in values.items() if n.startswith('history/')}
         hist['source-health.json'] = values['source-health.json']
+        hist['legionella-alerts.json'] = values['legionella-alerts.json']
         hist['oath-cache.json.gz'] = b'retained Git input'
         for name,data in hist.items():
             out=history/name; out.parent.mkdir(parents=True,exist_ok=True); out.write_bytes(data)
