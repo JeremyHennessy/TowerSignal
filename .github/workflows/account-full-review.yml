@@ -1,4 +1,4 @@
-name: Reviewed Account correction proof (non-production)
+name: Full reviewed Account acceptance (non-production)
 
 on:
   push:
@@ -24,28 +24,28 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Preserve audit harness and check out exact reviewed product
+      - name: Retain audit and select exact reviewed product
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p "$RUNNER_TEMP/account-audit" review
           git rev-parse HEAD > "$RUNNER_TEMP/account-audit/audit-head.txt"
-          cp tests/e2e/account-full-review.spec.ts tests/e2e/account-correction-acceptance.spec.ts tests/e2e/account-session-review.spec.ts "$RUNNER_TEMP/account-audit/"
-          git fetch --depth=1 origin 8c514bab62a2a011700cc043f1d1fd1a74872dde
-          git checkout --detach 8c514bab62a2a011700cc043f1d1fd1a74872dde
+          cp tests/e2e/account-full-review.spec.ts tests/e2e/account-correction-acceptance.spec.ts "$RUNNER_TEMP/account-audit/"
+          git fetch --depth=1 origin 6c73fa356402b99c9160b26d302a5d725c8d0333
+          git checkout --detach 6c73fa356402b99c9160b26d302a5d725c8d0333
           cp "$RUNNER_TEMP/account-audit/"*.spec.ts tests/e2e/
           cp "$RUNNER_TEMP/account-audit/audit-head.txt" review/
           git rev-parse HEAD > review/product-head.txt
-          printf '%s\n' 'Candidate product: 8c514bab62a2a011700cc043f1d1fd1a74872dde' 'Retained public data: Pages 215 / 35334719612' 'No deployment, no private Workflow mutations, no auth code changes' > review/provenance.txt
+          printf '%s\n' 'Exact product: 6c73fa356402b99c9160b26d302a5d725c8d0333' 'Retained source data: Pages 215 / 35334719612' 'Existing actual-hosted iPhone reload failure is separately retained in run 35361717071; not fixed or waived by this Account-only test.' 'No deployment, no private Workflow edits, no authentication changes.' > review/provenance.txt
           for f in auth.helpers.ts candidate-routes.ts; do
             gh api "repos/JeremyHennessy/TowerSignal/contents/tests/e2e/$f?ref=17a136f0f3d486ab50ea6970e761c77bb8f89205" --jq '.content' | base64 --decode > "tests/e2e/$f"
           done
-      - name: Install and build exact reviewed frontend
+      - name: Install and build reviewed frontend
         run: |
           npm install --no-audit --no-fund
           npm run build
           git diff --exit-code -- src package.json
-      - name: Stage candidate bytes over pinned accepted public data
+      - name: Preserve accepted source bytes and measure procurement payload scope
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -63,25 +63,38 @@ jobs:
           cp -R dist/assets review/candidate-assets
           cp .candidate-pages/data/metadata.json review/public-metadata.json
           cp package-lock.json review/resolved-dependencies.json
-          curl --fail --location --max-time 90 https://jeremyhennessy.github.io/TowerSignal/ -o review/live-index-before.html
-      - name: Install browser engines
+          python - <<'PY'
+          import pathlib,json,hashlib
+          root=pathlib.Path('.candidate-pages/data')
+          report=[]
+          for name in ['procurement-city-record.json','procurement-checkbook.json','procurement-nys-authorities.json','procurement-openbook-water.json','procurement-nycha-water.json']:
+              path=root/name
+              if not path.exists():
+                  report.append({'file':name,'missing':True});continue
+              raw=path.read_bytes();payload=json.loads(raw)
+              rows=payload.get('notices',payload.get('contracts',payload.get('records',[])))
+              linked=[r for r in rows if r.get('tower_account_system_ids') and r.get('tower_link_confidence') in ['CONFIRMED','STRONG']]
+              report.append({'file':name,'decoded_json_bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'records':len(rows),'explicit_account_linked_records':len(linked),'linked_records_json_bytes':len(json.dumps(linked).encode()),'sample_accounts':{sid:sum(sid in r.get('tower_account_system_ids',[]) for r in linked) for sid in ['2000015564','2000002585','2000011123']}})
+          pathlib.Path('review/procurement-load-audit.json').write_text(json.dumps({'scope':'decoded JSON payload cost, not measured compressed network transfer or browser latency','sources':report,'total_decoded_bytes':sum(r.get('decoded_json_bytes',0) for r in report)},indent=2))
+          PY
+      - name: Install desktop and iPhone browsers
         run: npx playwright install --with-deps chromium webkit
-      - name: Candidate Account acceptance
+      - name: Full candidate Account and header-boundary acceptance
         id: acceptance
         continue-on-error: true
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
           CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
         run: |
-          npx playwright test tests/e2e/account-correction-acceptance.spec.ts --project=desktop-chromium --project=iphone --output=test-results/account-acceptance
-      - name: Retain candidate acceptance separately
+          npx playwright test tests/e2e/account-correction-acceptance.spec.ts tests/e2e/account-sticky-header.spec.ts --project=desktop-chromium --project=iphone --output=test-results/account-acceptance
+      - name: Retain full Account acceptance
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: account-reviewed-correction-acceptance
+          name: account-final-candidate-acceptance
           path: playwright-report
           retention-days: 14
-      - name: Distinct representative source matrix
+      - name: Representative source-rich account matrix
         id: matrix
         if: steps.acceptance.outcome == 'success'
         continue-on-error: true
@@ -91,43 +104,26 @@ jobs:
         run: |
           rm -rf playwright-report
           npx playwright test tests/e2e/account-full-review.spec.ts --grep 'distinct source-rich' --project=desktop-chromium --project=iphone --no-deps --output=test-results/account-matrix
-      - name: Retain source matrix separately
+      - name: Retain representative source matrix
         if: steps.matrix.outcome != 'skipped'
         uses: actions/upload-artifact@v4
         with:
-          name: account-reviewed-correction-matrix
+          name: account-final-candidate-matrix
           path: playwright-report
           retention-days: 14
-      - name: Unchanged actual-hosted session diagnostic
-        id: session
-        if: steps.acceptance.outcome == 'success'
-        continue-on-error: true
-        env:
-          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-        run: |
-          rm -rf playwright-report
-          npx playwright test tests/e2e/account-session-review.spec.ts --project=desktop-chromium --project=iphone --no-deps --output=test-results/account-session
-      - name: Retain actual-hosted session diagnostic separately
-        if: steps.session.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
-        with:
-          name: account-actual-hosted-session-diagnostic
-          path: playwright-report
-          retention-days: 14
-      - name: Retain exact source and evidence provenance
+      - name: Retain exact source and review provenance
         if: always()
         run: |
-          printf '%s\n' 'acceptance=${{ steps.acceptance.outcome }}' 'matrix=${{ steps.matrix.outcome }}' 'actual_hosted_session=${{ steps.session.outcome }}' > review/outcomes.txt
-          git archive --format=tar.gz HEAD src tests/frontend package.json vitest.config.ts > review/product-source.tar.gz
+          printf '%s\n' 'account_acceptance=${{ steps.acceptance.outcome }}' 'matrix=${{ steps.matrix.outcome }}' 'hosted_session=existing failure documented independently in run 35361717071' 'production=not deployed by this workflow' > review/outcomes.txt
+          git archive --format=tar.gz HEAD src tests/frontend tests/e2e/account-sticky-header.spec.ts package.json vitest.config.ts > review/product-source.tar.gz
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: account-reviewed-correction-provenance
+          name: account-final-candidate-provenance
           path: review
           retention-days: 14
-      - name: Do not turn a failed diagnostic into green production acceptance
+      - name: Enforce scoped Account acceptance without claiming production deployment
         if: always()
         run: |
           test '${{ steps.acceptance.outcome }}' = success
           test '${{ steps.matrix.outcome }}' = success
-          test '${{ steps.session.outcome }}' = success
