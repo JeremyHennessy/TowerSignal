@@ -329,8 +329,6 @@ class DataRefreshTests(unittest.TestCase):
         pages=(root/'.github/workflows/pages.yml').read_text()
         workflow=(root/d.WORKFLOW).read_text()
         shared_start=pages.index('      - name: Fetch, validate and generate current NYC data\n')
-        pages_only_start=pages.index('      - name: Build NYC property-enforcement cache\n')
-        pages_only_end=pages.index('      - name: Build bounded legacy DOB/BIS project context\n')
         shared_end=pages.index('      - name: Stage history state for post-deploy persistence\n')
         matching_start=pages.index('      - name: Install official-results PDF text reader\n')
         matching_end=pages.index('      - name: Python fixture tests\n', matching_start)
@@ -338,15 +336,14 @@ class DataRefreshTests(unittest.TestCase):
         historical_311_end=pages.index('      - name: Build and validate source-health coverage\n', historical_311_start)
         coverage_audit_start=pages.index('      - name: Build NYC/NYS source completeness audit\n')
         coverage_audit_end=pages.index('      - name: Independently verify generated systems and OATH cases against current NYC sources\n', coverage_audit_start)
-        # Product-only collectors, matching logic and reporting audits are intentionally
-        # excluded from Blob parity. The Blob workflow keeps its existing scope and
-        # deployment contract unchanged.
+        # Property-enforcement and Legionella artifacts are required by the shared
+        # release coverage audit, so Blob parity must build them too. Historical 311,
+        # document matching and reporting-only audits remain outside this data producer.
         matching_segment=pages[matching_start:matching_end]
         self.assertIn('sudo apt-get install -y --no-install-recommends poppler-utils', matching_segment)
         self.assertIn('        timeout-minutes: 10\n        run: python scripts/build_legionella_matches.py --data public/data\n', matching_segment)
         self.assertLess(pages.index('      - name: Independently verify generated NYS equipment against current NYS source\n'), matching_start)
-        shared_segment=(pages[shared_start:pages_only_start] +
-                        pages[pages_only_end:historical_311_start] +
+        shared_segment=(pages[shared_start:historical_311_start] +
                         pages[historical_311_end:coverage_audit_start] +
                         pages[coverage_audit_end:matching_start] +
                         pages[matching_end:shared_end])
@@ -359,8 +356,8 @@ class DataRefreshTests(unittest.TestCase):
         self.assertIn(blob_acris, workflow)
         shared_segment=shared_segment.replace(pages_acris, blob_acris)
         self.assertIn(shared_segment,workflow)
-        self.assertNotIn('Build NYC property-enforcement cache', workflow)
-        self.assertNotIn('Build official Legionella / Legionnaires intelligence cache', workflow)
+        self.assertIn('Build NYC property-enforcement cache', workflow)
+        self.assertIn('Build official Legionella / Legionnaires intelligence cache', workflow)
         self.assertNotIn('Build bounded NYC historical 311 building-water context', workflow)
         self.assertNotIn('Build NYC/NYS source completeness audit', workflow)
         self.assertNotIn('scripts/build_legionella_matches.py', workflow)
