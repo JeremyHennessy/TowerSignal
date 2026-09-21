@@ -42,10 +42,20 @@ jobs:
           cp .sealed/resolved-dependencies.json package-lock.json
           npm ci --no-audit --no-fund
           npx playwright install --with-deps chromium webkit
+      - name: Serve the frozen candidate without consulting current hosted data
+        run: |
+          mkdir -p .candidate-host
+          ln -s ../.candidate-pages .candidate-host/TowerSignal
+          nohup python3 -m http.server 4173 --bind 127.0.0.1 --directory .candidate-host > frozen-server.log 2>&1 &
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/TowerSignal/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat frozen-server.log
+          exit 1
       - name: Run only reconciled final acceptance against frozen candidate
         env:
-          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
-          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+          BASE_URL: http://127.0.0.1:4173/TowerSignal/
           REQUIRE_ACRIS: false
         run: >-
           npx playwright test tests/e2e/final-release-acceptance.spec.ts
