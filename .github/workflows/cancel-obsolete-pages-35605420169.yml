@@ -1,0 +1,30 @@
+name: Cancel obsolete pre-final Pages run
+
+on:
+  push:
+    branches: [control/cancel-obsolete-pages-35605420169]
+    paths: [.github/workflows/cancel-obsolete-pages-35605420169.yml]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel only obsolete Pages run 35605420169
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const obsolete=35605420169;
+            const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:obsolete})).data;
+            if(run.path!=='.github/workflows/pages.yml' || run.head_sha!=='9a69605979fa407e97d4e3f49c86fc786e9d43a7') {
+              throw new Error('Target is not the expected obsolete Pages run');
+            }
+            if(run.status!=='completed') {
+              await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:obsolete});
+              core.info('Cancellation requested for obsolete Pages run '+obsolete);
+            } else {
+              core.info('Obsolete run already completed as '+run.conclusion);
+            }
