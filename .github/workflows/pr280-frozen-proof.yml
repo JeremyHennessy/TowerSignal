@@ -1,0 +1,62 @@
+name: Verify PR280 against frozen Account release
+
+on:
+  push:
+    branches: [agent/pr280-frozen-proof-20260921]
+    paths: [.github/workflows/pr280-frozen-proof.yml]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  frozen_regression:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [desktop-chromium, iphone]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prove verification branch changes only this workflow
+        run: |
+          git fetch --depth=1 origin e6ae4f2affbdead39b1629463738a8e933535dff
+          test "$(git diff --name-only e6ae4f2affbdead39b1629463738a8e933535dff HEAD)" = .github/workflows/pr280-frozen-proof.yml
+          git diff --exit-code e6ae4f2affbdead39b1629463738a8e933535dff HEAD -- tests/e2e/final-release-acceptance.spec.ts
+      - uses: actions/download-artifact@v4
+        with:
+          name: account-reviewed-release-candidate
+          run-id: 35380175972
+          github-token: ${{ github.token }}
+          path: .sealed
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Open exact accepted frozen Account candidate
+        run: |
+          test "$(cat .sealed/product-head.txt)" = 18c21ea5f7e536fb94479ef8c8ac4065045597f4
+          (cd .sealed && sha256sum --check candidate.tgz.sha256)
+          mkdir -p .candidate-pages
+          tar -xzf .sealed/candidate.tgz -C .candidate-pages
+          cp .sealed/resolved-dependencies.json package-lock.json
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Run only reconciled final acceptance against frozen candidate
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+          REQUIRE_ACRIS: false
+        run: >-
+          npx playwright test tests/e2e/final-release-acceptance.spec.ts
+          --project=${{ matrix.browser }}
+          --output=test-results/pr280-${{ matrix.browser }}
+      - name: Retain frozen-data browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr280-frozen-${{ matrix.browser }}
+          path: |
+            playwright-report
+            test-results/pr280-${{ matrix.browser }}
+          retention-days: 30
