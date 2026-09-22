@@ -127,6 +127,7 @@ def _identifier_gap(systems: list[dict[str, Any]]) -> dict[str, Any]:
     canonical_bbls = [str(row.get("bbl")) for row in systems if row.get("bbl")]
     usable_bin = [str(row.get("bin")) for row in systems if row.get("bin")]
     recovered = [row for row in systems if row.get("bbl_identity_status") == "RECOVERED_EXACT_BIN_MAPPLUTO_BBL"]
+    reconciled = [row for row in systems if row.get("bbl_identity_status") == "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL"]
 
     by_borough: dict[str, dict[str, int]] = {}
     for row in systems:
@@ -139,6 +140,7 @@ def _identifier_gap(systems: list[dict[str, Any]]) -> dict[str, Any]:
                 "with_registry_source_bbl": 0,
                 "with_canonical_bbl": 0,
                 "recovered_bbl": 0,
+                "reconciled_registry_bbl": 0,
                 "with_bin": 0,
             },
         )
@@ -148,6 +150,7 @@ def _identifier_gap(systems: list[dict[str, Any]]) -> dict[str, Any]:
         bucket["with_registry_source_bbl"] += int(bool(source_bbl))
         bucket["with_canonical_bbl"] += int(bool(row.get("bbl")))
         bucket["recovered_bbl"] += int(row.get("bbl_identity_status") == "RECOVERED_EXACT_BIN_MAPPLUTO_BBL")
+        bucket["reconciled_registry_bbl"] += int(row.get("bbl_identity_status") == "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL")
         bucket["with_bin"] += int(bool(row.get("bin")))
 
     return {
@@ -161,13 +164,15 @@ def _identifier_gap(systems: list[dict[str, Any]]) -> dict[str, Any]:
         "missing_canonical_bbl": total - len(canonical_bbls),
         "unique_canonical_bbl": len(set(canonical_bbls)),
         "recovered_bbl_count": len(recovered),
+        "reconciled_registry_bbl_count": len(reconciled),
         "with_bin": len(usable_bin),
         "missing_bin": total - len(usable_bin),
         "unique_bin": len(set(usable_bin)),
         "bbl_semantics": {
             "with_bbl": "Registry-source BBL coverage; recovered identifiers do not inflate source completeness.",
-            "with_canonical_bbl": "Canonical BBL available for exact downstream joins after conservative identity recovery.",
+            "with_canonical_bbl": "Current property BBL available for exact downstream joins after deterministic identity reconciliation.",
             "recovery": "Exact BIN to one unique published MapPLUTO BBL with borough-prefix reconciliation; no address or fuzzy matching.",
+            "registry_reconciliation": "When registry BBL equals exact-BIN footprint base_bbl and exactly one different MapPLUTO BBL is published, registry_bbl is preserved as provenance and the MapPLUTO BBL becomes the current property identity.",
         },
         "by_borough": dict(sorted(by_borough.items())),
     }
