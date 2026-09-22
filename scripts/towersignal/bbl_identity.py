@@ -110,10 +110,13 @@ def resolve_system_bbl_identity(
                 source_dataset = "NYC_OTI_BUILDING_FOOTPRINTS"
                 source_field = "mappluto_bbl"
 
+    aliases = sorted({value for value in (canonical, registry_bbl) if value})
+
     return {
         "canonical_bbl": canonical,
         "property_bbl": canonical,
         "registry_bbl": registry_bbl,
+        "bbl_aliases": aliases,
         "identity_basis": identity_basis,
         "status": status,
         "source_dataset": source_dataset,
@@ -152,6 +155,7 @@ def apply_bbl_identity_recovery(
         evidence = resolve_system_bbl_identity(system, footprints_by_bin.get(bin_value or "", []))
         system["registry_bbl"] = evidence["registry_bbl"]
         system["property_bbl"] = evidence["property_bbl"]
+        system["bbl_aliases"] = evidence["bbl_aliases"]
         system["bbl"] = evidence["canonical_bbl"]
         system["bbl_identity_basis"] = evidence["identity_basis"]
         system["bbl_identity_status"] = evidence["status"]
@@ -217,6 +221,7 @@ def apply_bbl_identity_recovery(
             "address_matching_used": False,
             "fuzzy_matching_used": False,
             "registry_bbl_preserved_as_provenance": True,
+            "historical_bbl_aliases": "Canonical property BBL plus distinct registry/base BBL; aliases are exact identifiers, never fuzzy matches.",
             "registry_bbl_reconciliation_rule": (
                 "When the exact-BIN footprint has one MapPLUTO BBL, the registry BBL "
                 "equals footprint base_bbl, and the MapPLUTO BBL differs, use the "
