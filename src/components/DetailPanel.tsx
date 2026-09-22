@@ -3,6 +3,7 @@ import { OfficialSwoSnapshotSection } from './OfficialSwoSnapshotSection'
 import { ScoreExplanation } from './ScoreExplanation'
 import type { LegionellaBuildingLink } from '../types/enforcement'
 import { useEffect, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { loadSystemDetail } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { leadSummary } from '../utils/export'
@@ -71,7 +72,7 @@ export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, wo
     {error && <div className="error-state">{error}</div>}
     {!detail && !error && <div className="loading-state">Loading source-backed details…</div>}
     {detail && <>
-      {isFullAccountReport && <ClientSiteReport row={row} detail={detail} metadata={metadata} historyEvents={historyEvents} />}
+      {isFullAccountReport && createPortal(<ClientSiteReport row={row} detail={detail} metadata={metadata} historyEvents={historyEvents} />, document.body)}
       {isFullAccountReport && <><AccountDecisionSummary row={row} detail={detail} historyEvents={historyEvents} workflowAccount={workflowAccount} /><AccountModeTabs /></>}
       <TechnicianFieldPack row={row} detail={detail} />
       <section><h3>Identity</h3><dl className="identity-grid"><div><dt>BIN</dt><dd>{detail.identity.bin ?? '—'}</dd></div><div><dt>BBL</dt><dd>{detail.identity.bbl ?? '—'}</dd></div><div><dt>Active equipment</dt><dd>{detail.identity.active_equipment}</dd></div><div><dt>Coordinates</dt><dd>{detail.identity.coordinate_status === 'VALID' && detail.identity.latitude != null && detail.identity.longitude != null ? `${detail.identity.latitude.toFixed(4)}, ${detail.identity.longitude.toFixed(4)}` : detail.identity.coordinate_status === 'INVALID_SOURCE' ? `Unusable source coordinates (${detail.identity.source_latitude_raw ?? 'blank'}, ${detail.identity.source_longitude_raw ?? 'blank'})` : 'Not published'}</dd></div></dl></section>
