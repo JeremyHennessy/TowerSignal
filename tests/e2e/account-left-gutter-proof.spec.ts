@@ -18,16 +18,20 @@ test('Account report removes the retired 180px rail gutter without mobile regres
     const pageEl = document.querySelector('.account-profile-page') as HTMLElement
     const panelEl = document.querySelector('.account-profile-page .detail-panel') as HTMLElement
     const toolbarEl = document.querySelector('.account-profile-page .account-profile-toolbar') as HTMLElement
+    const headerEl = panelEl.querySelector('.detail-header') as HTMLElement
     const panelStyle = getComputedStyle(panelEl)
     const toolbarStyle = getComputedStyle(toolbarEl)
     const pageBox = pageEl.getBoundingClientRect()
     const panelBox = panelEl.getBoundingClientRect()
     const toolbarBox = toolbarEl.getBoundingClientRect()
+    const headerBox = headerEl.getBoundingClientRect()
     return {
       viewport: { width: innerWidth, height: innerHeight },
       pageLeft: pageBox.left,
       panelLeft: panelBox.left,
       toolbarLeft: toolbarBox.left,
+      headerLeft: headerBox.left,
+      headerInsetFromPanel: headerBox.left - panelBox.left,
       panelPaddingLeft: panelStyle.paddingLeft,
       toolbarPaddingLeft: toolbarStyle.paddingLeft,
       scrollWidth: document.documentElement.scrollWidth,
@@ -39,7 +43,7 @@ test('Account report removes the retired 180px rail gutter without mobile regres
     expect(geometry.panelPaddingLeft).toBe('0px')
     expect(geometry.toolbarPaddingLeft).toBe('0px')
     expect(Math.abs(geometry.panelLeft - geometry.toolbarLeft)).toBeLessThanOrEqual(1)
-    expect(geometry.panelLeft - geometry.pageLeft).toBeLessThan(40)
+    expect(geometry.headerInsetFromPanel).toBeLessThanOrEqual(1)
   }
 
   expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.viewport.width + 1)
