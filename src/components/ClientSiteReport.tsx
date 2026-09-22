@@ -47,7 +47,7 @@ export function ClientSiteReport({
   const buildingArea = detail.building_context?.building_area_sqft ?? row.pluto_building_area_sqft ?? null
   const mappedTowers = detail.planimetric_building_tower_features?.length ?? row.planimetric_building_tower_count ?? 0
 
-  return <article className="client-pdf-report" aria-label="Client-ready site intelligence report">
+  return <article className="client-pdf-report" aria-label="Client-ready site intelligence report" aria-hidden="true">
     <header className="client-pdf-cover">
       <div className="client-pdf-brand"><span>TS</span><strong>TowerSignal</strong></div>
       <div className="client-pdf-cover-copy">
