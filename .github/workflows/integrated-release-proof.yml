@@ -1,0 +1,88 @@
+name: Prove integrated release candidate
+
+on:
+  push:
+    branches:
+      - agent/integrated-release-proof-20260922
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Reuse exact Pages 230 deployed data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .pages230 .site230 public/data
+          gh run download 35744133412 -n github-pages -D .pages230
+          archive="$(find .pages230 -type f | head -1)"
+          tar -xf "$archive" -C .site230
+          rm -rf public/data
+          cp -R .site230/data public/data
+          test -f public/data/systems.json
+          test -f public/data/details/20/2000014227.json
+          test -f public/data/details/20/2000015594.json
+
+      - name: Lint typecheck frontend tests and build
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Install browser and PDF tools
+        run: |
+          npx playwright install --with-deps chromium webkit
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: Verify hosted-failure corrections and Account geometry
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/dist
+        run: |
+          npx playwright test             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             tests/e2e/account-left-gutter-proof.spec.ts             --project=desktop-chromium             --project=iphone
+
+      - name: Generate and inspect real client PDFs without recreating test accounts
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/dist
+        run: |
+          npx playwright test tests/e2e/client-pdf-proof.spec.ts --project=desktop-chromium --no-deps
+          mkdir -p integrated-proof/renders integrated-proof/text integrated-proof/pdfs
+          while IFS= read -r -d '' pdf; do
+            name="$(basename "$pdf" .pdf)"
+            cp "$pdf" "integrated-proof/pdfs/$name.pdf"
+            pdftotext "$pdf" "integrated-proof/text/$name.txt"
+            mkdir -p "integrated-proof/renders/$name"
+            pdftoppm -png -r 140 "$pdf" "integrated-proof/renders/$name/page"
+          done < <(find test-results -type f -name 'TowerSignal-*-client-report.pdf' -print0)
+          test "$(find integrated-proof/pdfs -type f -name '*.pdf' | wc -l)" -eq 2
+          grep -R "No public Legionella sample date" integrated-proof/text
+          grep -R "Interpretation boundary" integrated-proof/text
+
+      - name: Retain integrated release proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integrated-release-candidate-proof
+          path: |
+            integrated-proof
+            playwright-report
+            test-results
+          retention-days: 30
