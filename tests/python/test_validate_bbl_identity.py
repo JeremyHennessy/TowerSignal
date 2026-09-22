@@ -24,6 +24,7 @@ class ValidateBblIdentityTests(unittest.TestCase):
                 "bbl": row.get("bbl"),
                 "property_bbl": row.get("property_bbl"),
                 "registry_bbl": row.get("registry_bbl"),
+                "bbl_aliases": row.get("bbl_aliases") or [],
                 "bbl_identity_evidence": {
                     "registry_base_bridge_confirmed": row.get("bbl_identity_status") == "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL"
                 },
@@ -42,6 +43,7 @@ class ValidateBblIdentityTests(unittest.TestCase):
                     "bbl": "1011717513",
                     "property_bbl": "1011717513",
                     "registry_bbl": "1011710154",
+                    "bbl_aliases": ["1011710154", "1011717513"],
                     "bbl_identity_status": "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL",
                 },
                 {"base_bbl": "1011710154", "mappluto_bbl": "1011717513"},
@@ -61,6 +63,7 @@ class ValidateBblIdentityTests(unittest.TestCase):
                     "bbl": "1011710154",
                     "property_bbl": "1011710154",
                     "registry_bbl": "1011710154",
+                    "bbl_aliases": ["1011710154"],
                     "bbl_identity_status": "REGISTRY_SOURCE_BBL",
                 },
                 {"base_bbl": "1011710154", "mappluto_bbl": "1011717513"},
