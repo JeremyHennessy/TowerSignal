@@ -125,3 +125,38 @@ test('Summary does not attach a historical violation to a different current prim
   expect(trigger.textContent).toContain('CURRENT FOLLOWUP REASON FIXTURE')
   expect(trigger.textContent).not.toContain('Jun 15, 2017')
 })
+
+
+test('Summary promotes a missing public Legionella sample date as a VERIFY warning', () => {
+  const row = {
+    system_id: 'REVIEW-1',
+    priority_score: 18,
+    evidence_confidence: 'VERIFY',
+    active_equipment: 1,
+    primary_signal: 'NO_PUBLIC_SAMPLE_DATE',
+    signal_types: ['NO_PUBLIC_SAMPLE_DATE'],
+    recent_confirmed_violation: false,
+    score_components: [{ points: 18, reason: 'no usable public sample date' }],
+    violation_types: [],
+  } as unknown as SystemSummary
+  const missingSampleDetail = {
+    ...detail,
+    sample_history: { sample_count: 0, latest_sample_date: null },
+    signals: [{
+      type: 'NO_PUBLIC_SAMPLE_DATE',
+      title: 'No public sample date',
+      evidence_confidence: 'VERIFY',
+      fact_class: 'COMMERCIAL_SIGNAL',
+      reason: 'The current public registration record does not include a usable reported sample date. Verify current operating and sampling status independently.',
+    }],
+  } as unknown as SystemDetail
+
+  render(<AccountDecisionSummary row={row} detail={missingSampleDetail} historyEvents={[]} />)
+
+  const warning = screen.getByText('No public Legionella sample dates reported').closest('article')
+  expect(warning).not.toBeNull()
+  expect(warning).toHaveClass('urgent')
+  expect(warning?.textContent).toContain('Sampling & inspections · VERIFY')
+  expect(warning?.textContent).toContain('Verify current operating and sampling status independently.')
+  expect(warning?.textContent).toContain('1 NYC Health inspection')
+})
