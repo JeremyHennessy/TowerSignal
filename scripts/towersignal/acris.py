@@ -178,6 +178,7 @@ STREET_SUFFIX_TOKENS = {
 CONDO_BILLING_LOT_MIN = 7500
 CONDO_BILLING_LOT_MAX = 7999
 CONDO_ROLLUP_MATCH_BASIS = "CONDO_BILLING_BBL_BLOCK_ADDRESS_EXACT"
+ALIAS_BBL_MATCH_BASIS = "BBL_ALIAS_EXACT_DOCUMENT_ID_EXACT"
 EXACT_BBL_MATCH_BASIS = "BBL_EXACT_DOCUMENT_ID_EXACT"
 
 
@@ -220,6 +221,20 @@ def normalize_street_name(value: Any) -> str | None:
         token = STREET_SUFFIX_TOKENS.get(token, token)
         normalized.append(token)
     return " ".join(normalized) or None
+
+
+def _alias_target_index(property_targets: dict[str, dict[str, Any]] | None) -> dict[str, set[str]]:
+    index: dict[str, set[str]] = defaultdict(set)
+    for raw_bbl, target in (property_targets or {}).items():
+        canonical = normalize_bbl(raw_bbl)
+        if not canonical:
+            continue
+        aliases = target.get("bbl_aliases") if isinstance(target.get("bbl_aliases"), list) else []
+        for raw_alias in aliases:
+            alias = normalize_bbl(raw_alias)
+            if alias and alias != canonical:
+                index[alias].add(canonical)
+    return index
 
 
 def _condo_target_index(property_targets: dict[str, dict[str, Any]] | None) -> dict[tuple[int, int, str, str], set[str]]:
@@ -457,6 +472,7 @@ def build_recent_cache(
     if not tower_bbls:
         raise AcrisError("No usable cooling-tower BBLs were supplied for ACRIS cache generation")
     tower_bbl_set = set(tower_bbls)
+    alias_target_index = _alias_target_index(property_targets)
     condo_target_index = _condo_target_index(property_targets)
     cutoff = ((as_of or datetime.now(timezone.utc).date()) - timedelta(days=lookback_days)).isoformat()
     type_clause = ",".join(_quote(value) for value in RELEVANT_DOC_TYPES)
@@ -519,7 +535,9 @@ def build_recent_cache(
     match_basis_by_bbl_doc: dict[tuple[str, str], str] = {}
     matched_legal_row_count = 0
     exact_document_links = 0
+    alias_document_links = 0
     condo_document_links = 0
+    alias_rollup_bbls: set[str] = set()
     condo_rollup_bbls: set[str] = set()
 
     for row in legal_rows:
@@ -535,6 +553,17 @@ def build_recent_cache(
             matched_docs_by_bbl[source_bbl].add(document_id)
             legal_by_bbl_doc[key].append(row)
             match_basis_by_bbl_doc[key] = EXACT_BBL_MATCH_BASIS
+            matched_legal_row_count += 1
+
+        for target_bbl in alias_target_index.get(source_bbl or "", set()):
+            key = (target_bbl, document_id)
+            if document_id not in matched_docs_by_bbl[target_bbl]:
+                alias_document_links += 1
+            matched_docs_by_bbl[target_bbl].add(document_id)
+            legal_by_bbl_doc[key].append(row)
+            if match_basis_by_bbl_doc.get(key) != EXACT_BBL_MATCH_BASIS:
+                match_basis_by_bbl_doc[key] = ALIAS_BBL_MATCH_BASIS
+            alias_rollup_bbls.add(target_bbl)
             matched_legal_row_count += 1
 
         address_key = _legal_address_key(row)
@@ -643,7 +672,9 @@ def build_recent_cache(
         "retained_document_link_count": sum(len(context.get("documents") or []) for context in properties.values()),
         "matched_legal_row_count": matched_legal_row_count,
         "exact_bbl_document_link_count": exact_document_links,
+        "alias_bbl_document_link_count": alias_document_links,
         "condo_address_document_link_count": condo_document_links,
+        "alias_rollup_property_count": len(alias_rollup_bbls),
         "condo_rollup_property_count": len(condo_rollup_bbls),
         "median_matched_documents_per_matched_bbl": sorted(matched_counts)[len(matched_counts) // 2] if matched_counts else 0,
         "max_matched_documents_per_bbl": max(matched_counts, default=0),
@@ -665,6 +696,8 @@ def build_recent_cache(
         "metrics": metrics,
         "identity_contract": {
             "property_bbl_match": EXACT_BBL_MATCH_BASIS,
+            "base_alias_match": ALIAS_BBL_MATCH_BASIS,
+            "base_alias_scope": "Only exact registry/base BBL aliases published by the property-identity resolver; source BBL retained in legal provenance.",
             "condo_rollup_match": CONDO_ROLLUP_MATCH_BASIS,
             "condo_rollup_scope": "Only canonical property BBL lots 7500-7999; same borough + block + exact normalized street number + street name in ACRIS Legals.",
             "address_matching": "DETERMINISTIC_EXACT_NORMALIZATION_ONLY",
@@ -719,12 +752,12 @@ def validate_cache(cache: dict[str, Any], *, require_production_volume: bool = F
         for document in documents:
             if not isinstance(document, dict):
                 raise AcrisError(f"ACRIS document for {bbl} is malformed")
-            if document.get("bbl") != bbl or document.get("match_basis") not in {EXACT_BBL_MATCH_BASIS, CONDO_ROLLUP_MATCH_BASIS}:
+            if document.get("bbl") != bbl or document.get("match_basis") not in {EXACT_BBL_MATCH_BASIS, ALIAS_BBL_MATCH_BASIS, CONDO_ROLLUP_MATCH_BASIS}:
                 raise AcrisError(f"ACRIS document join provenance mismatch for {bbl}")
-            if document.get("match_basis") == CONDO_ROLLUP_MATCH_BASIS:
+            if document.get("match_basis") in {ALIAS_BBL_MATCH_BASIS, CONDO_ROLLUP_MATCH_BASIS}:
                 legal_context = document.get("legal_context") or []
                 if not any(item.get("source_bbl") and item.get("source_bbl") != bbl for item in legal_context if isinstance(item, dict)):
-                    raise AcrisError(f"ACRIS condo roll-up for {bbl} lacks source unit-BBL provenance")
+                    raise AcrisError(f"ACRIS roll-up for {bbl} lacks source-BBL provenance")
             document_id = _text(document.get("document_id"))
             if not document_id:
                 raise AcrisError(f"ACRIS document for {bbl} is missing document_id")
