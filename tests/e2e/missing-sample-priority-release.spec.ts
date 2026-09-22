@@ -12,7 +12,7 @@ test('400 West 61st scores missing public sampling at 30 while remaining VERIFY'
 
   const profile = page.locator('.account-profile-page')
   const summary = profile.locator('.account-decision-summary')
-  await expect(summary).toContainText('400 West 61st Street', { ignoreCase: true })
+  await expect(profile.locator('.detail-header')).toContainText('400 West 61st Street', { ignoreCase: true })
   await expect(summary.locator('.account-decision-score strong')).toHaveText('30')
   await expect(summary.locator('.account-decision-score')).toContainText('VERIFY')
   await expect(summary).toContainText('No public Legionella sample dates reported')
