@@ -23,13 +23,13 @@ jobs:
       - name: Install frontend dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Reuse last fully accepted hosted data snapshot
+      - name: Reuse exact deployed Pages 230 data candidate
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p .accepted-pages .accepted-site public/data
-          gh run download 35606171481 -n github-pages -D .accepted-pages
+          gh run download 35744133412 -n github-pages -D .accepted-pages
           archive="$(find .accepted-pages -type f | head -1)"
           tar -xf "$archive" -C .accepted-site
           rm -rf public/data
