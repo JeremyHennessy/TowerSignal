@@ -55,9 +55,10 @@ jobs:
       - name: Render and inspect downloaded PDF
         run: |
           set -euo pipefail
-          PDF="$(find test-results/client-pdf -type f -name '*.pdf' -print -quit)"
+          PDF="$(find test-results/client-pdf -type f -path '*/attachments/*' -print -quit)"
           test -n "$PDF"
           cp "$PDF" proof/account-2000015594-client-report.pdf
+          file proof/account-2000015594-client-report.pdf | grep -F 'PDF document'
           if ! command -v pdftoppm >/dev/null 2>&1; then
             sudo apt-get update
             sudo apt-get install -y poppler-utils
