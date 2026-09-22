@@ -28,13 +28,23 @@ test('400 West 61st scores missing public sampling at 30 while remaining VERIFY'
   })
 
   if (!isIphoneProject(testInfo)) {
-    await page.emulateMedia({ media: 'print' })
     const report = page.locator('.client-pdf-report')
+    await expect(report).toHaveAttribute('data-report-design', 'approved-20260922')
+    await expect(report).toHaveAttribute('data-report-system', '2000014227')
+    // Exercise the approved export's asset readiness without an operating-system print dialog.
+    await page.evaluate(() => { window.print = () => { document.body.dataset.nativePrintCalled = 'true'; window.dispatchEvent(new Event('afterprint')) } })
+    await page.getByRole('button', { name: 'Export client PDF', exact: true }).click()
+    await expect(report).toHaveAttribute('data-assets-ready', 'true')
+    await expect(page.locator('body')).toHaveAttribute('data-native-print-called', 'true')
+    await page.emulateMedia({ media: 'print' })
     await expect(report).toBeVisible()
+    await expect(report.locator('.tsr-page')).toHaveCount(4)
     await expect(report).toContainText('400 West 61st Street', { ignoreCase: true })
-    await expect(report).toContainText('30/100')
-    await expect(report).toContainText('VERIFY · No public Legionella sample date')
-    const pdf = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true })
+    await expect(report.locator('.tsr-priority > strong')).toHaveText(/^30\s*\/\s*100$/)
+    const samplingFinding = report.locator('.tsr-finding').filter({ hasText: 'No public Legionella sample date is shown.' })
+    await expect(samplingFinding.locator('.tsr-badge')).toHaveText('VERIFY')
+    await expect(samplingFinding).toContainText('Missing public dates do not prove that testing did not occur.')
+    const pdf = await page.pdf({ printBackground: true, preferCSSPageSize: true, displayHeaderFooter: false })
     expect(pdf.byteLength).toBeGreaterThan(10_000)
     await testInfo.attach('400-west-61st-priority-30.pdf', { body: pdf, contentType: 'application/pdf' })
   }
