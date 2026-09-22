@@ -1,0 +1,249 @@
+name: Release Priority 1.2 missing-sample rescore
+
+on:
+  push:
+    branches:
+      - agent/missing-sample-priority-30-20260922
+      - main
+    paths:
+      - scripts/towersignal/reviewed_priority.py
+      - tests/python/test_reviewed_priority.py
+      - tests/e2e/missing-sample-priority-release.spec.ts
+      - .github/workflows/priority-rescore-release-20260922.yml
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: priority-rescore-release-20260922
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact scoring-only product delta
+        env:
+          ACCEPTED_BASELINE: 190e99920e196e68a3900e04a9751b2d0d6336c5
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin "$ACCEPTED_BASELINE"
+          git diff --name-only "$ACCEPTED_BASELINE" HEAD > /tmp/rescore-diff.txt
+          cat /tmp/rescore-diff.txt
+          python - <<'PY'
+          from pathlib import Path
+          allowed={
+              'scripts/towersignal/reviewed_priority.py',
+              'tests/python/test_reviewed_priority.py',
+              'tests/e2e/missing-sample-priority-release.spec.ts',
+              '.github/workflows/priority-rescore-release-20260922.yml',
+          }
+          actual={line.strip() for line in Path('/tmp/rescore-diff.txt').read_text().splitlines() if line.strip()}
+          assert actual == allowed, (actual, allowed)
+          PY
+          git diff --exit-code "$ACCEPTED_BASELINE" HEAD -- src package.json vite.config.ts tsconfig.json tsconfig.app.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Download accepted live Account/PDF site
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35768655554
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .accepted-live
+
+      - name: Freeze accepted live data
+        run: |
+          set -euo pipefail
+          mkdir -p .baseline-site .baseline-data public/data
+          archive="$(find .accepted-live -type f | head -1)"
+          tar -xf "$archive" -C .baseline-site
+          cp -R .baseline-site/data/. .baseline-data/
+          rm -rf public/data
+          cp -R .baseline-data public/data
+          test -f public/data/systems.json
+          test -f public/data/details/20/2000014227.json
+          test -f public/data/legionella-property-matches.json
+
+      - name: Prove Priority 1.2 rule
+        run: |
+          python -m unittest tests.python.test_reviewed_priority -v
+          python scripts/attach_reviewed_intelligence.py --output public/data
+          python scripts/validate_reviewed_intelligence.py --output public/data
+
+      - name: Prove rescore changes only derived priority fields
+        run: |
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+
+          before=Path('.baseline-data')
+          after=Path('public/data')
+
+          def hash_file(path):
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          allowed_top={'systems.json','metadata.json','priority-model-review.json'}
+          changed_non_detail=[]
+          before_files={str(p.relative_to(before)):p for p in before.rglob('*') if p.is_file()}
+          after_files={str(p.relative_to(after)):p for p in after.rglob('*') if p.is_file()}
+          assert before_files.keys() == after_files.keys(), 'Rescore changed the data file inventory'
+          for rel in sorted(before_files):
+              if hash_file(before_files[rel]) == hash_file(after_files[rel]):
+                  continue
+              if rel in allowed_top or rel.startswith('details/'):
+                  continue
+              changed_non_detail.append(rel)
+          assert not changed_non_detail, f'Unexpected source/context data changes: {changed_non_detail[:20]}'
+
+          old=json.loads((before/'systems.json').read_text())
+          new=json.loads((after/'systems.json').read_text())
+          old_rows={row['system_id']:row for row in old['systems']}
+          new_rows={row['system_id']:row for row in new['systems']}
+          assert old_rows.keys() == new_rows.keys()
+
+          changed_scores=[]
+          for sid in sorted(old_rows):
+              a=dict(old_rows[sid]); b=dict(new_rows[sid])
+              old_score=a.pop('priority_score'); new_score=b.pop('priority_score')
+              a.pop('score_components',None); b.pop('score_components',None)
+              assert a == b, f'Non-priority SystemSummary field changed for {sid}'
+              if old_score != new_score:
+                  changed_scores.append((sid,old_score,new_score))
+
+          for rel in sorted(r for r in before_files if r.startswith('details/') and r.endswith('.json')):
+              a=json.loads(before_files[rel].read_text())
+              b=json.loads(after_files[rel].read_text())
+              a.pop('scoring',None); b.pop('scoring',None)
+              if isinstance(a.get('metadata'),dict): a['metadata'].pop('priority_model_version',None)
+              if isinstance(b.get('metadata'),dict): b['metadata'].pop('priority_model_version',None)
+              assert a == b, f'Non-scoring detail field changed: {rel}'
+
+          target=new_rows['2000014227']
+          assert target['priority_score'] == 30, target
+          assert target['primary_signal'] == 'NO_PUBLIC_SAMPLE_DATE', target
+          assert target['evidence_confidence'] == 'VERIFY', target
+          component=next(c for c in target['score_components'] if c['source']=='NYC tower registration')
+          assert component['points'] == 30, component
+          assert 'Absence of a public date is not a violation.' in component['reason']
+
+          unchanged=new_rows['2000011002']
+          assert unchanged['priority_score'] == 86, unchanged
+
+          assert new['metadata']['priority_model_version'] == '1.2'
+          print(json.dumps({
+              'changed_score_count':len(changed_scores),
+              'target':target,
+              'sample_changed_scores':changed_scores[:20],
+          },indent=2))
+          PY
+
+      - name: Build exact rescore candidate
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Install candidate browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify 400 West 61st candidate on desktop and iPhone
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/dist
+        run: |
+          npx playwright test tests/e2e/missing-sample-priority-release.spec.ts             --project=desktop-chromium             --project=iphone
+
+      - name: Retain candidate score screenshots and PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: priority-1-2-candidate-proof
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
+
+      - name: Upload exact rescored site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Stage accepted site for rollback
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: priority-1-2-rollback
+          path: .baseline-site
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy verified Priority 1.2 rescore
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify:
+    if: github.ref == 'refs/heads/main'
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install hosted verification dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Verify live Priority 1.2 Account on desktop and iPhone
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test             tests/e2e/missing-sample-priority-release.spec.ts             --project=desktop-chromium             --project=iphone
+      - name: Retain hosted score screenshots and PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: priority-1-2-hosted-proof
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
+
+  rollback:
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
+    needs: [build, deploy, verify]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Restore accepted Account/PDF site
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: priority-1-2-rollback
