@@ -4,14 +4,43 @@ import type { ProcurementBundle, ProcurementSourceHealth } from '../types/procur
 import type { CoverageAuditPayload } from '../types/coverage'
 import { loadCoverageAudit, loadProcurement } from '../data/api'
 import { formatTimestamp } from '../domain/labels'
+import { safeSourceUrl } from '../domain/sourceHealthExpansion'
 import { ShareButton } from './ShareButton'
 import { SourceHealthExpansion } from './SourceHealthExpansion'
 
 const number = new Intl.NumberFormat('en-US')
 
-function procurementHealthRows(procurement: ProcurementBundle | null): ProcurementSourceHealth[] {
+type ProcurementHealthRow = ProcurementSourceHealth & { source_url: string | null }
+
+const fallbackDiagnosticSourceUrls: Record<string, string> = {
+  nys_registry: 'https://health.data.ny.gov/Health/New-York-State-Cooling-Tower-Registry-Weekly-Extr/24a4-muw7',
+  labor_law_published_decisions: 'https://www.nycourts.gov/reporter/RSS.shtml',
+}
+
+function SourceNameLink({ name, url }: { name: string; url: string | null }) {
+  return <strong>{url ? <a href={url} target="_blank" rel="noreferrer">{name}</a> : name}</strong>
+}
+
+function diagnosticSourceUrl(payload: SystemsPayload, source: { source_key: string; dataset_id: string }): string | null {
+  const metadataUrl = (payload.metadata.sources ?? []).find(item => item.dataset_id === source.dataset_id)?.url
+  return safeSourceUrl(metadataUrl) ?? safeSourceUrl(fallbackDiagnosticSourceUrls[source.source_key])
+}
+
+function recordSourceUrl(source: Record<string, unknown>, keys: string[]): string | null {
+  for (const key of keys) {
+    const url = safeSourceUrl(source[key])
+    if (url) return url
+  }
+  return null
+}
+
+function procurementHealthRows(procurement: ProcurementBundle | null): ProcurementHealthRow[] {
   if (!procurement) return []
-  const rows: ProcurementSourceHealth[] = [procurement.cityRecord.source_health, ...Object.values(procurement.checkbook.source_health)]
+  const checkbookSourceUrl = safeSourceUrl(procurement.checkbook.source.documentation_url) ?? safeSourceUrl(procurement.checkbook.source.api_url)
+  const rows: ProcurementHealthRow[] = [
+    { ...procurement.cityRecord.source_health, source_url: safeSourceUrl(procurement.cityRecord.source.dataset_page) },
+    ...Object.values(procurement.checkbook.source_health).map(source => ({ ...source, source_url: checkbookSourceUrl })),
+  ]
   if (procurement.openBookWater) {
     const source = procurement.openBookWater.source
     const transportComplete = source.transport_complete === true
@@ -26,9 +55,11 @@ function procurementHealthRows(procurement: ProcurementBundle | null): Procureme
       facility_link_count: 0, exact_tower_link_count: 0, pagination_complete: transportComplete, schema_valid: schemaValid,
       freshness: `generated ${procurement.openBookWater.generated_at.slice(0, 10)}`,
       status_reasons: ['CSV transport hash verified', 'facility links intentionally unlinked'],
+      source_url: recordSourceUrl(source, ['search_page', 'source_url', 'export_url']),
     })
   }
   if (procurement.nychaWater) {
+    const sourceMetadata = procurement.nychaWater.source
     const sourceRows = procurement.nychaWater.source_health
     const partitionsHealthy = sourceRows.every(row => row.status === 'HEALTHY')
     const paginationComplete = sourceRows.every(row => row.pagination_complete === true)
@@ -43,6 +74,7 @@ function procurementHealthRows(procurement: ProcurementBundle | null): Procureme
       facility_link_count: 0, exact_tower_link_count: 0, pagination_complete: paginationComplete, schema_valid: schemaValid,
       freshness: `${procurement.nychaWater.summary.fiscal_year_count} fiscal-year partitions`,
       status_reasons: ['NYCHA location text retained as source context', 'line/release amounts are not summed as company revenue'],
+      source_url: recordSourceUrl(sourceMetadata, ['contract_api_url', 'api_url', 'source_url']),
     })
   }
   return rows
@@ -107,7 +139,7 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
     {health.length === 0 ? <div className="reference-empty-state"><strong>Source-health metrics are not available in this payload.</strong><span>TowerSignal will not infer a healthy state when source diagnostics are missing.</span></div> : <div className="reference-table-card">
       <div className="reference-table-heading"><div><strong>{health.length} sources publishing account-health diagnostics</strong><span>Generated {formatTimestamp(payload.metadata.generated_at)}</span></div></div>
       <div className="reference-table-scroll"><table className="reference-table source-health-table"><thead><tr><th>Source</th><th>Status</th><th>Coverage</th><th>Retrieved</th><th>Normalized</th><th>Matched</th><th>Attached</th><th>Represented</th><th>Health note</th></tr></thead><tbody>{health.map(source => <tr key={source.source_key}>
-        <td><strong>{source.name}</strong><small>{source.dataset_id} · {source.entity_unit}</small></td>
+        <td><SourceNameLink name={source.name} url={diagnosticSourceUrl(payload, source)} /><small>{source.dataset_id} · {source.entity_unit}</small></td>
         <td><span className={`health-badge health-${source.status.toLowerCase()}`}>{source.status}</span></td>
         <td><strong>{source.coverage_percentage == null ? 'n/a' : `${source.coverage_percentage.toFixed(1)}%`}</strong>{source.coverage_change_percentage_points != null && <small>{source.coverage_change_percentage_points >= 0 ? '+' : ''}{source.coverage_change_percentage_points.toFixed(1)} pp vs prior</small>}</td>
         <td>{number.format(source.retrieved_record_count)}</td><td>{number.format(source.normalized_entity_count)}</td><td>{number.format(source.matched_entity_count)}</td><td>{number.format(source.attached_entity_count)}</td><td>{number.format(source.displayed_entity_count)}</td>
@@ -140,7 +172,7 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
 
     {coverageAudit && <div className="reference-table-card">
       <div className="reference-table-heading"><div><strong>Generated dataset inventory</strong><span>Validated caches already available to product surfaces</span></div></div>
-      <div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Dataset</th><th>Status</th><th>Artifact</th><th>Identity / evidence contract</th><th>Supports</th><th>Size</th></tr></thead><tbody>{coverageAudit.source_artifacts.map(artifact => <tr key={artifact.source_key}><td><strong>{artifact.source_key.replaceAll('_', ' ')}</strong></td><td><span className={`health-badge ${artifact.exists ? 'health-healthy' : 'health-warning'}`}>{artifact.integration_status}</span></td><td>{artifact.artifact}</td><td>{artifact.authoritative_contract}</td><td>{artifact.decisions_supported.join(' · ') || 'Context'}</td><td>{bytes(artifact.artifact_bytes)}</td></tr>)}</tbody></table></div>
+      <div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Dataset</th><th>Status</th><th>Artifact</th><th>Identity / evidence contract</th><th>Supports</th><th>Size</th></tr></thead><tbody>{coverageAudit.source_artifacts.map(artifact => <tr key={artifact.source_key}><td><strong>{artifact.source_key.replaceAll('_', ' ')}</strong></td><td><span className={`health-badge ${artifact.exists ? 'health-healthy' : 'health-warning'}`}>{artifact.integration_status}</span></td><td><a href={`${import.meta.env.BASE_URL}data/${artifact.artifact}`} target="_blank" rel="noreferrer">{artifact.artifact}</a></td><td>{artifact.authoritative_contract}</td><td>{artifact.decisions_supported.join(' · ') || 'Context'}</td><td>{bytes(artifact.artifact_bytes)}</td></tr>)}</tbody></table></div>
     </div>}
 
     <div className="reference-table-card">
@@ -150,7 +182,7 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
         {procurement.sourceErrors.openBookWater && <div className="reference-empty-state compact"><strong>Open Book water procurement unavailable.</strong><span>{procurement.sourceErrors.openBookWater}</span></div>}
         {procurement.sourceErrors.nychaWater && <div className="reference-empty-state compact"><strong>NYCHA water procurement unavailable.</strong><span>{procurement.sourceErrors.nychaWater}</span></div>}
       </div><div className="reference-table-scroll"><table className="reference-table procurement-health-table"><thead><tr><th>Source</th><th>Status</th><th>Source rows</th><th>Relevant</th><th>Contracts</th><th>Notices</th><th>Companies resolved</th><th>Vendors unresolved</th><th>Facility links</th><th>Exact tower links</th><th>Guards</th></tr></thead><tbody>{procurementHealth.map(source => <tr key={source.source}>
-        <td><strong>{source.source}</strong><small>{source.freshness ?? 'freshness not published'}</small></td><td><span className={`health-badge health-${source.status.toLowerCase()}`}>{source.status}</span></td><td>{number.format(source.record_count)}</td><td>{number.format(source.relevant_record_count)}</td><td>{number.format(source.normalized_contract_count)}</td><td>{number.format(source.normalized_notice_count)}</td><td>{number.format(source.resolved_company_count)}</td><td>{number.format(source.unresolved_vendor_count)}</td><td>{number.format(source.facility_link_count)}</td><td>{number.format(source.exact_tower_link_count)}</td><td><span>{source.pagination_complete ? 'Pagination complete' : 'Pagination incomplete'}</span><small>{source.schema_valid ? 'Schema valid' : 'Schema invalid'}</small></td>
+        <td><SourceNameLink name={source.source} url={source.source_url} /><small>{source.freshness ?? 'freshness not published'}</small></td><td><span className={`health-badge health-${source.status.toLowerCase()}`}>{source.status}</span></td><td>{number.format(source.record_count)}</td><td>{number.format(source.relevant_record_count)}</td><td>{number.format(source.normalized_contract_count)}</td><td>{number.format(source.normalized_notice_count)}</td><td>{number.format(source.resolved_company_count)}</td><td>{number.format(source.unresolved_vendor_count)}</td><td>{number.format(source.facility_link_count)}</td><td>{number.format(source.exact_tower_link_count)}</td><td><span>{source.pagination_complete ? 'Pagination complete' : 'Pagination incomplete'}</span><small>{source.schema_valid ? 'Schema valid' : 'Schema invalid'}</small></td>
       </tr>)}</tbody></table></div></>}
     </div>
 
