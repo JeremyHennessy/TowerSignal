@@ -87,7 +87,10 @@ class ReviewedPriorityTests(unittest.TestCase):
             self.row['latest_sample_date'] = (TODAY - timedelta(days=days)).isoformat()
             self.assertEqual(self.result()['score'], expected)
         self.row['latest_sample_date'] = None
-        self.assertEqual(self.result()['score'], 18)
+        missing = self.result()
+        self.assertEqual(missing['score'], 30)
+        self.assertEqual(missing['priority_model_version'], '1.2')
+        self.assertIn('Absence of a public date is not a violation.', missing['components'][0]['reason'])
         self.row['latest_sample_date'] = '2026-09-16'
         self.assertEqual(self.result()['score'], 0)
 
