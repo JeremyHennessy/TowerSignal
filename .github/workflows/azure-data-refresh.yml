@@ -88,6 +88,8 @@ jobs:
       - name: Fetch, validate and generate current NYC data
         timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
+      - name: Validate exact-BIN property BBL reconciliation
+        run: python scripts/validate_bbl_identity.py --output public/data --require-production-volume
       - name: Build NYC property-enforcement cache
         timeout-minutes: 25
         run: python scripts/build_property_enforcement_cache.py --systems public/data/systems.json --output public/data/property-enforcement.json
