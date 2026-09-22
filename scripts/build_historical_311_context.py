@@ -22,7 +22,13 @@ def load_current_bbls(systems_path: Path) -> list[str]:
     systems = payload.get("systems")
     if not isinstance(systems, list):
         raise RuntimeError("TowerSignal systems payload is malformed")
-    return sorted({bbl for row in systems if isinstance(row, dict) and (bbl := _normalize_bbl(row.get("bbl")))})
+    return sorted({
+        bbl
+        for row in systems
+        if isinstance(row, dict)
+        for value in (row.get("bbl_aliases") if isinstance(row.get("bbl_aliases"), list) else [row.get("bbl")])
+        if (bbl := _normalize_bbl(value))
+    })
 
 
 def main() -> None:
@@ -36,7 +42,7 @@ def main() -> None:
     bbls = load_current_bbls(args.systems)
     if len(bbls) < 3000:
         raise RuntimeError(f"Refusing historical 311 build for implausibly small TowerSignal BBL universe: {len(bbls):,}")
-    print(f"[historical-311] Building compact context for {len(bbls):,} exact TowerSignal BBLs", flush=True)
+    print(f"[historical-311] Building compact context for {len(bbls):,} exact TowerSignal current/base BBL aliases", flush=True)
     payload = build_historical_context(bbls, batch_size=args.bbl_batch_size, page_size=args.page_size)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
