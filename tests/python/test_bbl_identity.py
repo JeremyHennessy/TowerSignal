@@ -27,6 +27,7 @@ class BblIdentityRecoveryTests(unittest.TestCase):
         self.assertEqual(evidence["canonical_bbl"], "3000017501")
         self.assertEqual(evidence["property_bbl"], "3000017501")
         self.assertEqual(evidence["registry_bbl"], "3000010001")
+        self.assertEqual(evidence["bbl_aliases"], ["3000010001", "3000017501"])
         self.assertEqual(evidence["status"], "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL")
         self.assertEqual(evidence["identity_basis"], "REGISTRY_BASE_BBL_TO_MAPPLUTO_BBL_EXACT_BIN")
         self.assertTrue(evidence["registry_base_bridge_confirmed"])
@@ -110,6 +111,7 @@ class BblIdentityRecoveryTests(unittest.TestCase):
         self.assertEqual(systems[1]["registry_bbl"], "3000020001")
         self.assertEqual(systems[1]["property_bbl"], "3000027501")
         self.assertEqual(systems[1]["bbl"], "3000027501")
+        self.assertEqual(systems[1]["bbl_aliases"], ["3000020001", "3000027501"])
         self.assertEqual(systems[2]["bbl"], "3000037501")
         self.assertIsNone(systems[3]["bbl"])
 
@@ -130,6 +132,7 @@ class BblIdentityRecoveryTests(unittest.TestCase):
         self.assertEqual(evidence["registry_bbl"], "1011710154")
         self.assertEqual(evidence["property_bbl"], "1011717513")
         self.assertEqual(evidence["canonical_bbl"], "1011717513")
+        self.assertEqual(evidence["bbl_aliases"], ["1011710154", "1011717513"])
         self.assertEqual(evidence["status"], "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL")
 
     def test_priority_score_is_invariant_to_bbl_recovery(self):
