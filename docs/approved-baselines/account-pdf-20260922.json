@@ -1,0 +1,19 @@
+{
+  "status": "USER_APPROVED_DESIGN",
+  "approved_at": "2026-09-22T19:38:33Z",
+  "approval": "Ok this perfect, Make the exportable pdf exactly like this",
+  "artifact": "TowerSignal_805_Columbus_Account_Report_Mockup.pdf",
+  "artifact_sha256": "eb566d5b3c8e66919639bb9d212875b31db2ac41e02357254a5c7107c1bb702f",
+  "artifact_conversation_file_id": "file_00000000525c81f5a1c08f8c38cc1f83",
+  "preview_conversation_file_id": "file_000000004088822f9c1ec8dc874137a9",
+  "application_baseline_sha": "190e99920e196e68a3900e04a9751b2d0d6336c5",
+  "published_baseline_run": 35768655554,
+  "published_data_snapshot": "2026-09-22",
+  "example_system_id": "2000000407",
+  "page_size_pt": [612, 792],
+  "pages": ["Summary", "Evidence", "Next steps", "Sources"],
+  "locked": ["four-page sequence", "Inter typography", "original website logo", "navy and orange palette", "margins and hierarchy", "source references", "testing-date timeline", "separate inspection and case outcomes", "published building geometry", "three numbered next steps", "QR and account links"],
+  "live_fields": ["account identity", "source-backed values and dates", "exact-ticket case outcomes", "geometry", "source timestamps", "release provenance"],
+  "boundaries": ["Do not change Account screen layout", "Do not change scoring or collection", "Do not hard-code the example as other accounts", "Missing evidence remains unknown", "No production acceptance until original-artifact comparison and hosted PDF verification"],
+  "original_artifact_location": "Immutable original PDF in the approving ChatGPT conversation; SHA-256 above is the byte identity. Do not replace it with a reconstruction."
+}
