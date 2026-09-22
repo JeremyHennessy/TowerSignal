@@ -16,7 +16,18 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from towersignal.acris import LEGALS_DATASET_ID, MASTER_DATASET_ID, PARTIES_DATASET_ID, bbl_from_legal, load_cache  # noqa: E402
+from towersignal.acris import (  # noqa: E402
+    ALIAS_BBL_MATCH_BASIS,
+    CONDO_ROLLUP_MATCH_BASIS,
+    EXACT_BBL_MATCH_BASIS,
+    LEGALS_DATASET_ID,
+    MASTER_DATASET_ID,
+    PARTIES_DATASET_ID,
+    bbl_from_legal,
+    load_cache,
+    normalize_address_number,
+    normalize_street_name,
+)
 
 API_ROOT = "https://data.cityofnewyork.us"
 USER_AGENT = "TowerSignal-ACRIS-Verifier/1.0"
@@ -77,7 +88,7 @@ def verify(cache_path: Path, sample_size: int) -> None:
     legal_rows = request_rows(
         LEGALS_DATASET_ID,
         where,
-        "document_id,borough,block,lot",
+        "document_id,borough,block,lot,street_number,street_name",
     )
     party_rows = request_rows(
         PARTIES_DATASET_ID,
@@ -90,8 +101,10 @@ def verify(cache_path: Path, sample_size: int) -> None:
         master_by_document[str(row.get("document_id") or "")].append(row)
 
     legal_bbls_by_document: dict[str, set[str]] = defaultdict(set)
+    legal_rows_by_document: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in legal_rows:
         document_id = str(row.get("document_id") or "")
+        legal_rows_by_document[document_id].append(row)
         if bbl := bbl_from_legal(row):
             legal_bbls_by_document[document_id].add(bbl)
 
@@ -117,8 +130,49 @@ def verify(cache_path: Path, sample_size: int) -> None:
         ):
             raise RuntimeError(f"ACRIS Master values no longer reproduce cached document {document_id}")
 
-        if bbl not in legal_bbls_by_document.get(document_id, set()):
-            raise RuntimeError(f"ACRIS Legals no longer reproduces exact BBL {bbl} for document {document_id}")
+        match_basis = str(cached.get("match_basis") or EXACT_BBL_MATCH_BASIS)
+        live_legals = legal_rows_by_document.get(document_id, [])
+        live_bbls = legal_bbls_by_document.get(document_id, set())
+        cached_legals = [row for row in (cached.get("legal_context") or []) if isinstance(row, dict)]
+
+        if match_basis == EXACT_BBL_MATCH_BASIS:
+            if bbl not in live_bbls:
+                raise RuntimeError(f"ACRIS Legals no longer reproduces exact BBL {bbl} for document {document_id}")
+        elif match_basis == ALIAS_BBL_MATCH_BASIS:
+            source_bbls = {
+                str(row.get("source_bbl") or "")
+                for row in cached_legals
+                if row.get("source_bbl") and str(row.get("source_bbl")) != bbl
+            }
+            if not source_bbls or not (source_bbls & live_bbls):
+                raise RuntimeError(
+                    f"ACRIS Legals no longer reproduces exact preserved BBL alias for {bbl} document {document_id}"
+                )
+        elif match_basis == CONDO_ROLLUP_MATCH_BASIS:
+            reproduced = False
+            for cached_legal in cached_legals:
+                source_bbl = str(cached_legal.get("source_bbl") or "")
+                cached_number = normalize_address_number(cached_legal.get("street_number"))
+                cached_street = normalize_street_name(cached_legal.get("street_name"))
+                if not source_bbl or source_bbl == bbl or not cached_number or not cached_street:
+                    continue
+                for live_legal in live_legals:
+                    if bbl_from_legal(live_legal) != source_bbl:
+                        continue
+                    if normalize_address_number(live_legal.get("street_number")) != cached_number:
+                        continue
+                    if normalize_street_name(live_legal.get("street_name")) != cached_street:
+                        continue
+                    reproduced = True
+                    break
+                if reproduced:
+                    break
+            if not reproduced:
+                raise RuntimeError(
+                    f"ACRIS Legals no longer reproduces condo source-BBL + exact-address evidence for {bbl} document {document_id}"
+                )
+        else:
+            raise RuntimeError(f"ACRIS verifier encountered unsupported match basis {match_basis!r}")
 
         cached_parties = cached.get("parties") or []
         cached_party_pairs = {
@@ -130,7 +184,7 @@ def verify(cache_path: Path, sample_size: int) -> None:
             raise RuntimeError(f"ACRIS Parties no longer returns cached party evidence for document {document_id}")
         if cached_party_pairs and not (cached_party_pairs & live_party_pairs):
             raise RuntimeError(f"ACRIS Parties no longer reproduces cached party evidence for document {document_id}")
-        verified.append({"bbl": bbl, "document_id": document_id, "doc_type": cached_type, "recorded_date": cached_recorded})
+        verified.append({"bbl": bbl, "document_id": document_id, "doc_type": cached_type, "recorded_date": cached_recorded, "match_basis": match_basis})
 
     print(json.dumps({"status": "PASS", "sample_size": len(verified), "verified": verified}, indent=2))
 
