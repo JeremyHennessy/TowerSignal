@@ -41,6 +41,49 @@ def _source_row(source: dict[str, Any], matched_count: int) -> dict[str, Any]:
     }
 
 
+def _bbl_aliases(row: dict[str, Any]) -> list[str]:
+    values = row.get("bbl_aliases") if isinstance(row.get("bbl_aliases"), list) else [row.get("bbl")]
+    return sorted({str(value) for value in values if value})
+
+
+def _merge_hpd_alias_contexts(by_bbl: dict[str, Any], aliases: list[str]) -> tuple[dict[str, Any] | None, list[str]]:
+    records_by_id: dict[str, dict[str, Any]] = {}
+    matched_aliases: list[str] = []
+    for bbl in aliases:
+        context = by_bbl.get(bbl)
+        if not isinstance(context, dict):
+            continue
+        matched_aliases.append(bbl)
+        for record in context.get("hpd_violations") or []:
+            if not isinstance(record, dict):
+                continue
+            identity = str(record.get("violation_id") or "")
+            if identity:
+                records_by_id[identity] = record
+    if not records_by_id:
+        return None, matched_aliases
+    records = sorted(
+        records_by_id.values(),
+        key=lambda item: (item.get("inspection_date") or "", item.get("violation_id") or ""),
+        reverse=True,
+    )
+    open_records = [row for row in records if row.get("is_open")]
+    summary = {
+        "record_count": len(records),
+        "open_count": len(open_records),
+        "open_class_a_count": sum(1 for row in open_records if row.get("class") == "A"),
+        "open_class_b_count": sum(1 for row in open_records if row.get("class") == "B"),
+        "open_class_c_count": sum(1 for row in open_records if row.get("class") == "C"),
+        "latest_inspection_date": max((row.get("inspection_date") or "" for row in records), default="") or None,
+    }
+    return {
+        "summary": summary,
+        "hpd_violations": records,
+        "matched_bbl_aliases": matched_aliases,
+        "match_basis": "BBL_ALIAS_EXACT",
+    }, matched_aliases
+
+
 def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     systems_path = output_dir / "systems.json"
     metadata_path = output_dir / "metadata.json"
@@ -58,9 +101,9 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     attached_official_swo_snapshot_systems = 0
     attached_facade_systems = 0
     for row in payload.get("systems") or []:
-        bbl = str(row.get("bbl") or "")
+        aliases = _bbl_aliases(row)
         bin_value = str(row.get("bin") or "")
-        hpd_context = by_bbl.get(bbl)
+        hpd_context, hpd_matched_aliases = _merge_hpd_alias_contexts(by_bbl, aliases)
         bin_context = by_bin.get(bin_value) or {}
         swo_context = bin_context.get("stop_work_orders") or {}
         official_swo_context = bin_context.get("official_swo_snapshot") or {}
@@ -100,6 +143,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
         detail = load_json(detail_path)
         detail["property_enforcement_context"] = {
             "hpd_violations": hpd_context,
+            "hpd_matched_bbl_aliases": hpd_matched_aliases,
             "stop_work_orders": swo_context if swo_context.get("records") else None,
             "official_swo_snapshot": {
                 "summary": official_swo_summary,
@@ -124,7 +168,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     metadata = payload.get("metadata") or {}
     metadata["property_enforcement_cache_available"] = True
     metadata["property_enforcement_generated_at"] = cache.get("generated_at")
-    metadata["hpd_violation_match_basis"] = "BBL_EXACT"
+    metadata["hpd_violation_match_basis"] = "BBL_ALIAS_EXACT"
     metadata["stop_work_order_match_basis"] = "BIN_EXACT"
     metadata["official_swo_snapshot_match_basis"] = "BIN_EXACT"
     metadata["official_swo_snapshot_current_status_available"] = False
