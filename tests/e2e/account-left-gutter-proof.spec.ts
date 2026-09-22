@@ -12,7 +12,6 @@ test('Account report removes the retired 180px rail gutter without mobile regres
 
   const report = page.locator('.account-profile-page')
   const panel = report.locator('.detail-panel')
-  const toolbar = report.locator('.account-profile-toolbar')
   await expect(panel).toBeVisible()
 
   const geometry = await page.evaluate(() => {
