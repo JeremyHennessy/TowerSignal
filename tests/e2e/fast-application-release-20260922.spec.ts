@@ -12,7 +12,6 @@ test('225 Broadway exposes client PDF and centers the Account canvas', async ({ 
 
   const profile = page.locator('.account-profile-page')
   const panel = profile.locator('.detail-panel')
-  const toolbar = profile.locator('.account-profile-toolbar')
   await expect(panel).toContainText('225 BROADWAY')
   await expect(panel).toContainText('2000011002')
   await expect(panel.getByRole('button', { name: 'Export client PDF', exact: true })).toBeVisible()
