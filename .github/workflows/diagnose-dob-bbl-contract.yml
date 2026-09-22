@@ -76,7 +76,28 @@ jobs:
                                   'current_component_count':int(component[0]['count']),
                                   'component_example':example[:1]})
 
-          report={'aggregate':aggregate,'samples':comparisons}
+          batch=sorted(prior)[:25]
+          in_where="bbl in (" + ",".join("'" + b + "'" for b in batch) + ")"
+          or_where=" or ".join("bbl='" + b + "'" for b in batch)
+          in_rows=get({'$limit':50000,'$select':'job_filing_number,bbl',
+                       '$where':in_where,'$order':'bbl,job_filing_number'})
+          in_unordered=get({'$limit':50000,'$select':'job_filing_number,bbl',
+                            '$where':in_where})
+          or_rows=get({'$limit':50000,'$select':'job_filing_number,bbl',
+                       '$where':or_where,'$order':'bbl,job_filing_number'})
+          expected={b:len(prior[b]) for b in batch}
+          def summarize(rows):
+              counts={}
+              for row in rows:
+                  b=str(row.get('bbl') or '')
+                  counts[b]=counts.get(b,0)+1
+              return {'row_count':len(rows),'distinct_bbl_count':len(counts),
+                      'counts':counts,'missing_bbls':[b for b in batch if b not in counts]}
+          report={'aggregate':aggregate,'samples':comparisons,
+                  'batch_probe':{'bbls':batch,'expected_counts':expected,
+                                 'in_ordered':summarize(in_rows),
+                                 'in_unordered':summarize(in_unordered),
+                                 'or_ordered':summarize(or_rows)}}
           Path('dob-bbl-contract.json').write_text(json.dumps(report,indent=2))
           print(json.dumps(report,indent=2))
           PY
