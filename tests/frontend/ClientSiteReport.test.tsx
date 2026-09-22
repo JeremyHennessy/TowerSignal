@@ -78,9 +78,9 @@ const metadata = {
 } as unknown as Metadata
 
 test('client site report carries the current missing-sample warning and site identity', () => {
-  render(<ClientSiteReport row={row} detail={detail} metadata={metadata} historyEvents={[]} />)
+  const { container } = render(<ClientSiteReport row={row} detail={detail} metadata={metadata} historyEvents={[]} />)
 
-  expect(screen.getByRole('heading', { name: '400 West 61st Street' })).toBeInTheDocument()
+  expect(container.querySelector('.client-pdf-cover h1')).toHaveTextContent('400 West 61st Street')
   expect(screen.getAllByText(/2000014227/).length).toBeGreaterThan(0)
   expect(screen.getByText('VERIFY · No public Legionella sample date')).toBeInTheDocument()
   expect(screen.getAllByText(/Verify current operating and sampling status independently/).length).toBeGreaterThan(0)
