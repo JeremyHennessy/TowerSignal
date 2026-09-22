@@ -136,7 +136,8 @@ function ensureSpace(ctx: PdfContext, required: number, sectionTitle = ctx.secti
 
 function sectionHeading(ctx: PdfContext, title: string, subtitle?: string) {
   const { doc } = ctx
-  ensureSpace(ctx, subtitle ? 62 : 44)
+  ensureSpace(ctx, subtitle ? 70 : 52)
+  ctx.y += 8
   setText(doc, 17, BRAND, 'bold')
   doc.text(ascii(title), MARGIN, ctx.y)
   ctx.y += 9
@@ -169,7 +170,7 @@ function callout(ctx: PdfContext, title: string, body: string, tone: 'default' |
   doc.text(titleLines, MARGIN + 14, ctx.y + 18)
   setText(doc, 9.2, INK)
   doc.text(bodyLines, MARGIN + 14, ctx.y + 18 + titleLines.length * 12 + 5)
-  ctx.y += height + 10
+  ctx.y += height + 18
 }
 
 function infoCards(ctx: PdfContext, cards: InfoCard[], columns = 2) {
@@ -516,7 +517,8 @@ function drawSiteContext(ctx: PdfContext) {
 }
 
 function drawCompliance(ctx: PdfContext) {
-  addPage(ctx, 'Sampling, inspections and enforcement')
+  ctx.sectionTitle = 'Sampling, inspections and enforcement'
+  ensureSpace(ctx, 210, ctx.sectionTitle)
   sectionHeading(ctx, 'Sampling history', 'Reported public sample dates are shown as observations. Intervals do not establish continuous operation or retroactive noncompliance.')
 
   const samples = [...ctx.detail.sample_history.dates].sort((a, b) => b.localeCompare(a))
@@ -579,7 +581,8 @@ function drawCompliance(ctx: PdfContext) {
 }
 
 function drawProjects(ctx: PdfContext) {
-  addPage(ctx, 'Projects and observed changes')
+  ctx.sectionTitle = 'Projects and observed changes'
+  ensureSpace(ctx, 190, ctx.sectionTitle)
   sectionHeading(ctx, 'DOB NOW project activity', 'Exact-BBL project filings provide property timing context. Only explicit published wording is treated as cooling-tower project evidence.')
 
   const jobs = [...(ctx.detail.dob_activity_history ?? [])].sort((a, b) => (b.activity_date ?? '').localeCompare(a.activity_date ?? ''))
