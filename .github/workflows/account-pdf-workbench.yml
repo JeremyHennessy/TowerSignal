@@ -2,7 +2,7 @@ name: Account PDF isolated workbench
 on:
   push:
     branches: [agent/approved-account-pdf-20260922]
-    paths: [.github/workflows/account-pdf-workbench.yml]
+    paths: [.github/workflows/account-pdf-workbench.yml, scripts/prepare-account-report-fonts.mjs]
 permissions:
   contents: read
 jobs:
@@ -16,11 +16,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install --no-audit --no-fund
-      - name: Package isolated source and installed toolchain (no credentials)
-        run: tar -czf /tmp/account-pdf-workbench.tar.gz src tests scripts config public package.json package-lock.json node_modules index.html vite.config.ts tsconfig*.json eslint.config.js playwright*.ts .github/workflows
+      - run: node scripts/prepare-account-report-fonts.mjs
       - uses: actions/upload-artifact@v4
         with:
-          name: account-pdf-workbench
-          path: /tmp/account-pdf-workbench.tar.gz
+          name: account-pdf-report-assets
+          path: public/report-assets
           retention-days: 1
