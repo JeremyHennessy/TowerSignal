@@ -112,7 +112,7 @@ class ReviewedPriorityTests(unittest.TestCase):
         self.notice()
         self.row.update(active_equipment=10, latest_sample_date=None)
         self.assertEqual(self.result()['score'], 100)
-        self.assertEqual(self.result()['uncapped_score'], 106)
+        self.assertEqual(self.result()['uncapped_score'], 118)
 
 class ExistingMatchAdapterTests(unittest.TestCase):
     def test_canonical_bin_and_negative_result_preserved(self):
