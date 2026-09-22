@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -157,6 +158,100 @@ def bbl_from_legal(row: dict[str, Any]) -> str | None:
     return f"{borough}{block:05d}{lot:04d}"
 
 
+DIRECTION_TOKENS = {
+    "NORTH": "N", "SOUTH": "S", "EAST": "E", "WEST": "W",
+    "NORTHEAST": "NE", "NORTHWEST": "NW", "SOUTHEAST": "SE", "SOUTHWEST": "SW",
+}
+STREET_SUFFIX_TOKENS = {
+    "STREET": "ST", "ST": "ST",
+    "AVENUE": "AVE", "AVE": "AVE",
+    "BOULEVARD": "BLVD", "BLVD": "BLVD",
+    "ROAD": "RD", "RD": "RD",
+    "PLACE": "PL", "PL": "PL",
+    "DRIVE": "DR", "DR": "DR",
+    "LANE": "LN", "LN": "LN",
+    "COURT": "CT", "CT": "CT",
+    "HIGHWAY": "HWY", "HWY": "HWY",
+    "PARKWAY": "PKWY", "PKWY": "PKWY",
+    "TERRACE": "TER", "TER": "TER",
+}
+CONDO_BILLING_LOT_MIN = 7500
+CONDO_BILLING_LOT_MAX = 7999
+CONDO_ROLLUP_MATCH_BASIS = "CONDO_BILLING_BBL_BLOCK_ADDRESS_EXACT"
+EXACT_BBL_MATCH_BASIS = "BBL_EXACT_DOCUMENT_ID_EXACT"
+
+
+def bbl_parts(value: Any) -> tuple[int, int, int] | None:
+    normalized = normalize_bbl(value)
+    if not normalized:
+        return None
+    padded = normalized.zfill(10)
+    if len(padded) != 10:
+        return None
+    borough = int(padded[0])
+    block = int(padded[1:6])
+    lot = int(padded[6:10])
+    if borough not in range(1, 6) or block <= 0 or lot <= 0:
+        return None
+    return borough, block, lot
+
+
+def normalize_address_number(value: Any) -> str | None:
+    text = _text(value)
+    if not text:
+        return None
+    normalized = re.sub(r"\s+", "", text.upper())
+    normalized = normalized.lstrip("0") or "0"
+    return normalized
+
+
+def normalize_street_name(value: Any) -> str | None:
+    text = _text(value)
+    if not text:
+        return None
+    cleaned = re.sub(r"[^A-Z0-9 ]+", " ", text.upper())
+    tokens = [token for token in cleaned.split() if token]
+    normalized: list[str] = []
+    for token in tokens:
+        ordinal = re.fullmatch(r"(\d+)(?:ST|ND|RD|TH)", token)
+        if ordinal:
+            token = ordinal.group(1)
+        token = DIRECTION_TOKENS.get(token, token)
+        token = STREET_SUFFIX_TOKENS.get(token, token)
+        normalized.append(token)
+    return " ".join(normalized) or None
+
+
+def _condo_target_index(property_targets: dict[str, dict[str, Any]] | None) -> dict[tuple[int, int, str, str], set[str]]:
+    index: dict[tuple[int, int, str, str], set[str]] = defaultdict(set)
+    for raw_bbl, target in (property_targets or {}).items():
+        bbl = normalize_bbl(raw_bbl)
+        parts = bbl_parts(bbl)
+        if not bbl or not parts:
+            continue
+        borough, block, lot = parts
+        if not (CONDO_BILLING_LOT_MIN <= lot <= CONDO_BILLING_LOT_MAX):
+            continue
+        number = normalize_address_number(target.get("number"))
+        street = normalize_street_name(target.get("street"))
+        if number and street:
+            index[(borough, block, number, street)].add(bbl)
+    return index
+
+
+def _legal_address_key(row: dict[str, Any]) -> tuple[int, int, str, str] | None:
+    try:
+        borough = int(float(str(row.get("borough"))))
+        block = int(float(str(row.get("block"))))
+    except (TypeError, ValueError):
+        return None
+    number = normalize_address_number(row.get("street_number"))
+    street = normalize_street_name(row.get("street_name"))
+    if borough not in range(1, 6) or block <= 0 or not number or not street:
+        return None
+    return borough, block, number, street
+
+
 def tower_bbl_hash(values: Iterable[str]) -> str:
     normalized = sorted({bbl for value in values if (bbl := normalize_bbl(value)) is not None})
     return hashlib.sha256("\n".join(normalized).encode("utf-8")).hexdigest()
@@ -259,6 +354,7 @@ def normalize_party(row: dict[str, Any]) -> dict[str, Any]:
 
 def normalize_legal_context(row: dict[str, Any]) -> dict[str, Any]:
     return {
+        "source_bbl": bbl_from_legal(row),
         "property_type": _text(row.get("property_type")),
         "street_number": _text(row.get("street_number")),
         "street_name": _text(row.get("street_name")),
@@ -271,6 +367,7 @@ def normalize_document(
     master: dict[str, Any],
     legal_rows: list[dict[str, Any]],
     party_rows: list[dict[str, Any]],
+    match_basis: str = EXACT_BBL_MATCH_BASIS,
 ) -> dict[str, Any]:
     document_id = _text(master.get("document_id"))
     if not document_id:
@@ -313,7 +410,7 @@ def normalize_document(
         "legal_context": legal_context,
         "parties": parties,
         "source": "NYC_ACRIS_REAL_PROPERTY",
-        "match_basis": "BBL_EXACT_DOCUMENT_ID_EXACT",
+        "match_basis": match_basis,
     }
 
 
@@ -348,6 +445,7 @@ def browser_property_context(property_context: dict[str, Any], document_limit: i
 def build_recent_cache(
     tower_bbl_values: Iterable[str],
     *,
+    property_targets: dict[str, dict[str, Any]] | None = None,
     as_of: date | None = None,
     lookback_days: int = ACRIS_LOOKBACK_DAYS,
     page_size: int = 50000,
@@ -359,6 +457,7 @@ def build_recent_cache(
     if not tower_bbls:
         raise AcrisError("No usable cooling-tower BBLs were supplied for ACRIS cache generation")
     tower_bbl_set = set(tower_bbls)
+    condo_target_index = _condo_target_index(property_targets)
     cutoff = ((as_of or datetime.now(timezone.utc).date()) - timedelta(days=lookback_days)).isoformat()
     type_clause = ",".join(_quote(value) for value in RELEVANT_DOC_TYPES)
     master_where = f"recorded_datetime >= '{cutoff}T00:00:00.000' AND doc_type in ({type_clause})"
@@ -417,14 +516,41 @@ def build_recent_cache(
 
     matched_docs_by_bbl: dict[str, set[str]] = defaultdict(set)
     legal_by_bbl_doc: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    match_basis_by_bbl_doc: dict[tuple[str, str], str] = {}
     matched_legal_row_count = 0
+    exact_document_links = 0
+    condo_document_links = 0
+    condo_rollup_bbls: set[str] = set()
+
     for row in legal_rows:
-        bbl = bbl_from_legal(row)
+        source_bbl = bbl_from_legal(row)
         document_id = _text(row.get("document_id"))
-        if bbl in tower_bbl_set and document_id in canonical_master_by_doc:
-            matched_docs_by_bbl[bbl].add(document_id)
-            legal_by_bbl_doc[(bbl, document_id)].append(row)
+        if not document_id or document_id not in canonical_master_by_doc:
+            continue
+
+        if source_bbl in tower_bbl_set:
+            key = (source_bbl, document_id)
+            if document_id not in matched_docs_by_bbl[source_bbl]:
+                exact_document_links += 1
+            matched_docs_by_bbl[source_bbl].add(document_id)
+            legal_by_bbl_doc[key].append(row)
+            match_basis_by_bbl_doc[key] = EXACT_BBL_MATCH_BASIS
             matched_legal_row_count += 1
+
+        address_key = _legal_address_key(row)
+        for target_bbl in condo_target_index.get(address_key, set()) if address_key else set():
+            if target_bbl == source_bbl:
+                continue
+            key = (target_bbl, document_id)
+            if document_id not in matched_docs_by_bbl[target_bbl]:
+                condo_document_links += 1
+            matched_docs_by_bbl[target_bbl].add(document_id)
+            legal_by_bbl_doc[key].append(row)
+            if match_basis_by_bbl_doc.get(key) != EXACT_BBL_MATCH_BASIS:
+                match_basis_by_bbl_doc[key] = CONDO_ROLLUP_MATCH_BASIS
+            condo_rollup_bbls.add(target_bbl)
+            matched_legal_row_count += 1
+
     matched_document_ids = sorted({document_id for values in matched_docs_by_bbl.values() for document_id in values})
     legal_elapsed = time.monotonic() - started
 
@@ -461,6 +587,7 @@ def build_recent_cache(
                 canonical_master_by_doc[document_id],
                 legal_by_bbl_doc[(bbl, document_id)],
                 parties_by_doc.get(document_id, []),
+                match_basis_by_bbl_doc.get((bbl, document_id), EXACT_BBL_MATCH_BASIS),
             )
             for document_id in sorted(matched_docs_by_bbl[bbl])
         ]
@@ -511,6 +638,9 @@ def build_recent_cache(
         "tower_bbls_with_recent_relevant_acris": len(properties),
         "matched_recent_document_count": len(matched_document_ids),
         "matched_legal_row_count": matched_legal_row_count,
+        "exact_bbl_document_link_count": exact_document_links,
+        "condo_address_document_link_count": condo_document_links,
+        "condo_rollup_property_count": len(condo_rollup_bbls),
         "median_matched_documents_per_matched_bbl": sorted(matched_counts)[len(matched_counts) // 2] if matched_counts else 0,
         "max_matched_documents_per_bbl": max(matched_counts, default=0),
         "party_batch_count": len(party_batches),
@@ -529,6 +659,13 @@ def build_recent_cache(
         "tower_bbl_universe": {"count": len(tower_bbls), "sha256": tower_bbl_hash(tower_bbls)},
         "sources": sources,
         "metrics": metrics,
+        "identity_contract": {
+            "property_bbl_match": EXACT_BBL_MATCH_BASIS,
+            "condo_rollup_match": CONDO_ROLLUP_MATCH_BASIS,
+            "condo_rollup_scope": "Only canonical property BBL lots 7500-7999; same borough + block + exact normalized street number + street name in ACRIS Legals.",
+            "address_matching": "DETERMINISTIC_EXACT_NORMALIZATION_ONLY",
+            "fuzzy_matching_used": False,
+        },
         "properties": properties,
     }
     validate_cache(cache, require_production_volume=True)
@@ -567,8 +704,12 @@ def validate_cache(cache: dict[str, Any], *, require_production_volume: bool = F
         for document in documents:
             if not isinstance(document, dict):
                 raise AcrisError(f"ACRIS document for {bbl} is malformed")
-            if document.get("bbl") != bbl or document.get("match_basis") != "BBL_EXACT_DOCUMENT_ID_EXACT":
+            if document.get("bbl") != bbl or document.get("match_basis") not in {EXACT_BBL_MATCH_BASIS, CONDO_ROLLUP_MATCH_BASIS}:
                 raise AcrisError(f"ACRIS document join provenance mismatch for {bbl}")
+            if document.get("match_basis") == CONDO_ROLLUP_MATCH_BASIS:
+                legal_context = document.get("legal_context") or []
+                if not any(item.get("source_bbl") and item.get("source_bbl") != bbl for item in legal_context if isinstance(item, dict)):
+                    raise AcrisError(f"ACRIS condo roll-up for {bbl} lacks source unit-BBL provenance")
             document_id = _text(document.get("document_id"))
             if not document_id:
                 raise AcrisError(f"ACRIS document for {bbl} is missing document_id")
