@@ -73,7 +73,12 @@ def _facade_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
 def build(systems_path: Path, output_path: Path) -> dict[str, Any]:
     systems_payload = json.loads(systems_path.read_text(encoding="utf-8"))
     systems = systems_payload.get("systems") or []
-    requested_bbls = sorted({bbl for row in systems if (bbl := normalize_bbl(row.get("bbl")))}, key=int)
+    requested_bbls = sorted({
+        bbl
+        for row in systems
+        for value in (row.get("bbl_aliases") if isinstance(row.get("bbl_aliases"), list) else [row.get("bbl")])
+        if (bbl := normalize_bbl(value))
+    }, key=int)
     requested_bins = sorted({value for row in systems if (value := normalize_bin(row.get("bin")))}, key=int)
 
     hpd_by_bbl, hpd_source = fetch_hpd_violations_by_bbl(requested_bbls)
@@ -131,7 +136,7 @@ def build(systems_path: Path, output_path: Path) -> dict[str, Any]:
             "facade_filing_count": sum(len(rows) for rows in facade_by_bin.values()),
         },
         "evidence_semantics": {
-            "hpd": "Official HPD Housing Maintenance Code / Multiple Dwelling Law violations joined only by exact canonical BBL. violation_status is used directly for open/close state; TowerSignal does not infer closure from free text.",
+            "hpd": "Official HPD Housing Maintenance Code / Multiple Dwelling Law violations joined only by exact current/base BBL aliases. violation_status is used directly for open/close state; TowerSignal does not infer closure from free text.",
             "stop_work_orders": "Official DOB Complaints current disposition records joined only by exact BIN and restricted to SWO-related disposition codes documented by DOB. These are complaint disposition events, not a reconstructed complete SWO disposition-history ledger.",
             "official_swo_snapshot": "Separate official DOB Stop Work Orders snapshot joined only by exact BIN. ACTIVE/RESCINDED is preserved exactly as published at the dated 2024 snapshot; it must never be presented as current status. Absence from the snapshot means no matching dated observation, not no order.",
             "facade_compliance": "Official DOB NOW Safety Facades (Local Law 11 / FISP) compliance filings joined only by exact BIN. SAFE/SWARMP/UNSAFE/No Report Filed are preserved as published.",
