@@ -52,7 +52,7 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   expect(diagnosticRowCount).toBeGreaterThan(0)
   await expect(diagnostics.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(diagnosticRowCount)
   await expect(property.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(4)
-  await expect(legionella.locator('tbody tr td:last-child a[target="_blank"]')).toHaveCount(12)
+  await expect(legionella.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(12)
   const procurementRowCount = await procurementSources.locator('tbody tr').count()
   expect(procurementRowCount).toBeGreaterThan(0)
   await expect(procurementSources.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(procurementRowCount)
@@ -60,7 +60,7 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   const allExternalSourceHrefs = await page.locator([
     '.reference-table.source-health-table:first-of-type tbody tr td:first-child a',
     '[data-testid="property-enforcement-source-health"] tbody tr td:first-child a',
-    '[data-testid="legionella-source-health"] tbody tr td:last-child a',
+    '[data-testid="legionella-source-health"] tbody tr td:first-child a',
     '.procurement-health-table tbody tr td:first-child a',
   ].join(',')).evaluateAll(elements => elements.map(element => element.getAttribute('href') ?? ''))
   expect(allExternalSourceHrefs.length).toBeGreaterThanOrEqual(diagnosticRowCount + 4 + 12 + procurementRowCount)

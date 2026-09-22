@@ -1,0 +1,196 @@
+name: Source Health layout application-only release
+on:
+  push:
+    branches: [agent/source-health-layout-20260922, main]
+    paths:
+      - .github/workflows/source-health-layout-release.yml
+      - src/components/SourceHealthPage.tsx
+      - src/components/SourceHealthExpansion.tsx
+      - src/components/SourceHealthLinks.tsx
+      - src/styles/source-health.css
+      - tests/frontend/SourceHealthLinks.test.tsx
+      - tests/e2e/source-health-layout.spec.ts
+      - tests/e2e/source-health-coverage.spec.ts
+permissions:
+  contents: read
+  actions: write
+  pages: write
+  id-token: write
+concurrency:
+  group: source-health-layout-release
+  cancel-in-progress: false
+env:
+  VITE_REPORT_APPLICATION_SHA: ${{ github.sha }}
+  EXPECTED_REPORT_SHA: ${{ github.sha }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require the accepted Account-header baseline and serialize this main release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const accepted=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:35793283170})).data;
+            if(accepted.head_sha !== '6fc3aeca3f5c0e82b2f2b3a019db0bf972d666be' || accepted.conclusion !== 'success') throw new Error('The exact Account-header/PDF baseline is not fully accepted');
+            if(context.ref === 'refs/heads/main') {
+              const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:context.sha,per_page:100})).data.workflow_runs;
+              for(const run of runs) {
+                if(run.path === '.github/workflows/pages.yml' && ['queued','in_progress','waiting','pending'].includes(run.status)) {
+                  await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:run.id}).catch(error => { if(error.status !== 409) throw error; });
+                }
+              }
+            }
+      - name: Prove Source Health-only scope against accepted main
+        run: |
+          python - <<'PY'
+          import subprocess
+          allowed={
+            '.github/workflows/source-health-layout-release.yml',
+            'src/components/SourceHealthPage.tsx',
+            'src/components/SourceHealthExpansion.tsx',
+            'src/components/SourceHealthLinks.tsx',
+            'src/styles/source-health.css',
+            'tests/frontend/SourceHealthLinks.test.tsx',
+            'tests/e2e/source-health-layout.spec.ts',
+            'tests/e2e/source-health-coverage.spec.ts',
+          }
+          actual=set(subprocess.check_output(['git','diff','--name-only','6fc3aeca3f5c0e82b2f2b3a019db0bf972d666be','HEAD'],text=True).splitlines())
+          assert actual == allowed, (actual, allowed)
+          print('Only the eight reviewed Source Health implementation, test and release files changed.')
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Download exact accepted Account-header site
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35793283170
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .accepted-site
+      - name: Freeze published data and retain the exact prior application
+        run: |
+          set -euo pipefail
+          mkdir -p .rollback
+          tar -xf "$(find .accepted-site -type f | head -1)" -C .rollback
+          rm -rf public/data
+          cp -R .rollback/data public/data
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('public/data')
+          hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          pathlib.Path('source-health-frozen-data.json').write_text(json.dumps(hashes,sort_keys=True))
+          print(f'Frozen {len(hashes):,} accepted data files; no collector is run.')
+          PY
+      - name: Verify exact application and unchanged data
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+          python - <<'PY'
+          import hashlib,json,pathlib
+          expected=json.loads(pathlib.Path('source-health-frozen-data.json').read_text())
+          root=pathlib.Path('dist/data')
+          actual={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert actual == expected, 'Source Health release changed accepted data'
+          print(f'{len(actual):,} published data files remain byte-for-byte identical.')
+          PY
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Test Source Health and preserve Account header, PDF and existing evidence guards
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/dist
+        run: npx playwright test tests/e2e/source-health-layout.spec.ts tests/e2e/source-health-coverage.spec.ts tests/e2e/account-header.spec.ts tests/e2e/approved-account-pdf.spec.ts tests/e2e/fast-application-release-20260922.spec.ts tests/e2e/city-record-semantics.spec.ts --project=desktop-chromium --project=iphone
+      - name: Verify preserved four-page PDF bytes
+        run: |
+          python -m pip install --quiet PyMuPDF==1.24.14
+          python scripts/verify-account-pdf.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-health-layout-candidate-proof
+          path: |
+            source-health-proof
+            playwright-report
+            test-results
+            source-health-frozen-data.json
+          retention-days: 30
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          name: source-health-layout-rollback
+          path: .rollback
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Refuse to deploy over a newer main
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const head=(await github.rest.repos.getBranch({...context.repo,branch:'main'})).data.commit.sha;
+            if(head !== context.sha) throw new Error('Main advanced; rebase and reverify before deploying');
+      - id: deployment
+        uses: actions/deploy-pages@v4
+  verify:
+    if: github.ref == 'refs/heads/main'
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Independently verify actual hosted Source Health and preserved Account
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test tests/e2e/source-health-layout.spec.ts tests/e2e/source-health-coverage.spec.ts tests/e2e/account-header.spec.ts tests/e2e/approved-account-pdf.spec.ts tests/e2e/fast-application-release-20260922.spec.ts tests/e2e/city-record-semantics.spec.ts --project=desktop-chromium --project=iphone
+      - name: Verify actual hosted four-page PDF bytes
+        run: |
+          python -m pip install --quiet PyMuPDF==1.24.14
+          python scripts/verify-account-pdf.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-health-layout-hosted-proof
+          path: |
+            source-health-proof
+            playwright-report
+            test-results
+          retention-days: 30
+  rollback:
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
+    needs: [build, deploy, verify]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Do not overwrite a newer main with rollback
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const head=(await github.rest.repos.getBranch({...context.repo,branch:'main'})).data.commit.sha;
+            if(head !== context.sha) throw new Error('Newer main exists; automatic rollback refused');
+      - name: Restore the exact accepted Account-header site
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: source-health-layout-rollback

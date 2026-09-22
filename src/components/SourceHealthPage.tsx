@@ -7,6 +7,8 @@ import { formatTimestamp } from '../domain/labels'
 import { safeSourceUrl } from '../domain/sourceHealthExpansion'
 import { ShareButton } from './ShareButton'
 import { SourceHealthExpansion } from './SourceHealthExpansion'
+import { SourceHealthDirectory, SourceHealthLinks, SourceHealthSource } from './SourceHealthLinks'
+import '../styles/source-health.css'
 
 const number = new Intl.NumberFormat('en-US')
 
@@ -16,10 +18,6 @@ const fallbackDiagnosticSourceUrls: Record<string, string> = {
   nys_registry: 'https://health.data.ny.gov/Health/New-York-State-Cooling-Tower-Registry-Weekly-Extr/24a4-muw7',
   labor_law_published_decisions: 'https://www.nycourts.gov/reporter/RSS.shtml',
   acris_recent: 'https://data.cityofnewyork.us/City-Government/ACRIS-Real-Property-Master/bnx9-e6tj',
-}
-
-function SourceNameLink({ name, url }: { name: string; url: string | null }) {
-  return <strong>{url ? <a href={url} target="_blank" rel="noreferrer">{name}</a> : name}</strong>
 }
 
 function diagnosticSourceUrl(payload: SystemsPayload, source: { source_key: string; dataset_id: string }): string | null {
@@ -125,7 +123,7 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
 
   return <section className="product-page source-health-page">
     <div className="product-page-heading">
-      <div><span className="page-kicker">New York · data trust</span><h1>Source Health &amp; Coverage</h1><p>Freshness, exact-identity coverage, generated-dataset integration and known evidence gaps across TowerSignal.</p></div>
+      <div><span className="page-kicker">New York · data trust</span><h1>Source Health &amp; Coverage</h1><p>See where the data comes from, when it was checked and which evidence gaps still need review.</p></div>
       <div className="page-actions"><ShareButton label="Share this view" /></div>
     </div>
 
@@ -137,10 +135,24 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
       <article><span className="reference-metric-icon">▤</span><div><small>Procurement source rows</small><strong>{procurement ? number.format(procurementRecords) : '—'}</strong><span>City Record, Checkbook and water caches</span></div></article>
     </div>
 
-    {health.length === 0 ? <div className="reference-empty-state"><strong>Source-health metrics are not available in this payload.</strong><span>TowerSignal will not infer a healthy state when source diagnostics are missing.</span></div> : <div className="reference-table-card">
+    <div className="source-health-guide"><strong>One place for every source link.</strong><span>Publisher links sit below each source name. JSON links open TowerSignal’s published datasets, not the publisher’s website. Scroll wide tables sideways to see all measurements.</span></div>
+    <nav className="source-health-jump-nav" aria-label="Source Health sections">{[
+      ['source-health-directory', 'Publisher directory'], ['source-health-diagnostics', 'Account sources'],
+      ['source-health-enforcement', 'Enforcement'], ['source-health-refresh', 'Refresh schedule'],
+      ['source-health-monitoring', 'Monitoring'], ['source-health-identity', 'Identity audit'],
+      ['source-health-gaps', 'Evidence gaps'], ['source-health-datasets', 'Datasets'], ['source-health-procurement', 'Procurement'],
+    ].map(([id, label]) => <button key={id} type="button" onClick={() => {
+      const section = document.getElementById(id)
+      if (section instanceof HTMLDetailsElement) section.open = true
+      section?.scrollIntoView({ block: 'start' })
+      section?.focus({ preventScroll: true })
+    }}>{label}</button>)}</nav>
+    <SourceHealthDirectory payload={payload} procurement={procurement} />
+
+    {health.length === 0 ? <div className="reference-empty-state"><strong>Source-health metrics are not available in this payload.</strong><span>TowerSignal will not infer a healthy state when source diagnostics are missing.</span></div> : <div className="reference-table-card" id="source-health-diagnostics" tabIndex={-1}>
       <div className="reference-table-heading"><div><strong>{health.length} sources publishing account-health diagnostics</strong><span>Generated {formatTimestamp(payload.metadata.generated_at)}</span></div></div>
-      <div className="reference-table-scroll"><table className="reference-table source-health-table"><thead><tr><th>Source</th><th>Status</th><th>Coverage</th><th>Retrieved</th><th>Normalized</th><th>Matched</th><th>Attached</th><th>Represented</th><th>Health note</th></tr></thead><tbody>{health.map(source => <tr key={source.source_key}>
-        <td><SourceNameLink name={source.name} url={diagnosticSourceUrl(payload, source)} /><small>{source.dataset_id} · {source.entity_unit}</small></td>
+      <div className="reference-table-scroll" tabIndex={0} role="region" aria-label="Account source diagnostics"><table className="reference-table source-health-table source-linked-table"><thead><tr><th>Source &amp; links</th><th>Status</th><th>Coverage</th><th>Retrieved</th><th>Normalized</th><th>Matched</th><th>Attached</th><th>Represented</th><th>Health note</th></tr></thead><tbody>{health.map(source => <tr key={source.source_key}>
+        <td><SourceHealthSource name={source.name} detail={`${source.dataset_id} · ${source.entity_unit}`} links={[{ url: diagnosticSourceUrl(payload, source) }]} /></td>
         <td><span className={`health-badge health-${source.status.toLowerCase()}`}>{source.status}</span></td>
         <td><strong>{source.coverage_percentage == null ? 'n/a' : `${source.coverage_percentage.toFixed(1)}%`}</strong>{source.coverage_change_percentage_points != null && <small>{source.coverage_change_percentage_points >= 0 ? '+' : ''}{source.coverage_change_percentage_points.toFixed(1)} pp vs prior</small>}</td>
         <td>{number.format(source.retrieved_record_count)}</td><td>{number.format(source.normalized_entity_count)}</td><td>{number.format(source.matched_entity_count)}</td><td>{number.format(source.attached_entity_count)}</td><td>{number.format(source.displayed_entity_count)}</td>
@@ -150,8 +162,8 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
 
     <SourceHealthExpansion payload={payload} />
 
-    <div className="reference-table-card">
-      <div className="reference-table-heading"><div><strong>Completeness &amp; identity audit</strong><span>{coverageAudit ? `Generated ${formatTimestamp(coverageAudit.generated_at)}` : 'Build 015 production completeness audit'}</span></div></div>
+    <div className="reference-table-card" id="source-health-identity" tabIndex={-1}>
+      <div className="reference-table-heading"><div><strong>Completeness &amp; identity audit</strong><span>{coverageAudit ? `Generated ${formatTimestamp(coverageAudit.generated_at)}` : 'Build 015 production completeness audit'}</span></div>{coverageAudit && <SourceHealthLinks links={[{ artifact: 'coverage-audit.json', label: 'Audit data' }]} />}</div>
       {coverageAuditError ? <div className="reference-empty-state"><strong>Coverage audit unavailable.</strong><span>{coverageAuditError}</span><span>No completeness claim is inferred from a missing audit artifact.</span></div> : !coverageAudit ? <div className="reference-empty-state"><strong>Loading completeness audit…</strong></div> : <>
         <div className="reference-metric-grid">
           <article><span className="reference-metric-icon success">BIN</span><div><small>NYC systems with BIN</small><strong>{percent(coverageAudit.nyc.identifier_coverage.with_bin, coverageAudit.nyc.identifier_coverage.systems)}</strong><span>{number.format(coverageAudit.nyc.identifier_coverage.with_bin)} / {number.format(coverageAudit.nyc.identifier_coverage.systems)}</span></div></article>
@@ -162,28 +174,28 @@ export function SourceHealthPage({ payload }: { payload: SystemsPayload }) {
           <article><span className="reference-metric-icon">DATA</span><div><small>Published data footprint</small><strong>{bytes(coverageAudit.storage_footprint.public_data_total_bytes)}</strong><span>{number.format(coverageAudit.storage_footprint.file_count ?? 0)} generated files</span></div></article>
         </div>
         <div className="disclaimer"><strong>Identity coverage is not sales coverage.</strong> A missing source BBL, HPD registration or recent ACRIS event does not mean the building, owner or service relationship is absent. It means that specific source cannot support that claim under the current exact-identity contract.</div>
-        <div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Borough</th><th>Systems</th><th>With BIN</th><th>BIN coverage</th><th>With source BBL</th><th>BBL coverage</th></tr></thead><tbody>{Object.entries(coverageAudit.nyc.identifier_coverage.by_borough).map(([borough, values]) => <tr key={borough}><td><strong>{borough}</strong></td><td>{number.format(values.systems)}</td><td>{number.format(values.with_bin)}</td><td>{percent(values.with_bin, values.systems)}</td><td>{number.format(values.with_bbl)}</td><td>{percent(values.with_bbl, values.systems)}</td></tr>)}</tbody></table></div>
+        <div className="reference-table-scroll" tabIndex={0} role="region" aria-label="Borough identity coverage"><table className="reference-table"><thead><tr><th>Borough</th><th>Systems</th><th>With BIN</th><th>BIN coverage</th><th>With source BBL</th><th>BBL coverage</th></tr></thead><tbody>{Object.entries(coverageAudit.nyc.identifier_coverage.by_borough).map(([borough, values]) => <tr key={borough}><td><strong>{borough}</strong></td><td>{number.format(values.systems)}</td><td>{number.format(values.with_bin)}</td><td>{percent(values.with_bin, values.systems)}</td><td>{number.format(values.with_bbl)}</td><td>{percent(values.with_bbl, values.systems)}</td></tr>)}</tbody></table></div>
       </>}
     </div>
 
-    {coverageAudit && <div className="reference-table-card">
+    {coverageAudit && <div className="reference-table-card" id="source-health-gaps" tabIndex={-1}>
       <div className="reference-table-heading"><div><strong>Known evidence gaps &amp; next actions</strong><span>Classified so expected source scope is not mistaken for data loss</span></div></div>
-      <div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Gap</th><th>Classification</th><th>Observed</th><th>Interpretation</th><th>Next action</th></tr></thead><tbody>{coverageAudit.gap_analysis.map(gap => <tr key={gap.gap_key}><td><strong>{gap.gap_key}</strong></td><td><span className="health-badge health-warning">{gap.classification}</span></td><td>{observedText(gap.observed) || '—'}</td><td>{gap.interpretation}</td><td>{gap.next_action}</td></tr>)}</tbody></table></div>
+      <div className="reference-table-scroll" tabIndex={0} role="region" aria-label="Known evidence gaps"><table className="reference-table"><thead><tr><th>Gap</th><th>Classification</th><th>Observed</th><th>Interpretation</th><th>Next action</th></tr></thead><tbody>{coverageAudit.gap_analysis.map(gap => <tr key={gap.gap_key}><td><strong>{gap.gap_key}</strong></td><td><span className="health-badge health-warning">{gap.classification}</span></td><td>{observedText(gap.observed) || '—'}</td><td>{gap.interpretation}</td><td>{gap.next_action}</td></tr>)}</tbody></table></div>
     </div>}
 
-    {coverageAudit && <div className="reference-table-card">
+    {coverageAudit && <div className="reference-table-card" id="source-health-datasets" tabIndex={-1}>
       <div className="reference-table-heading"><div><strong>Generated dataset inventory</strong><span>Validated caches already available to product surfaces</span></div></div>
-      <div className="reference-table-scroll"><table className="reference-table"><thead><tr><th>Dataset</th><th>Status</th><th>Artifact</th><th>Identity / evidence contract</th><th>Supports</th><th>Size</th></tr></thead><tbody>{coverageAudit.source_artifacts.map(artifact => <tr key={artifact.source_key}><td><strong>{artifact.source_key.replaceAll('_', ' ')}</strong></td><td><span className={`health-badge ${artifact.exists ? 'health-healthy' : 'health-warning'}`}>{artifact.integration_status}</span></td><td><a href={`${import.meta.env.BASE_URL}data/${artifact.artifact}`} target="_blank" rel="noreferrer">{artifact.artifact}</a></td><td>{artifact.authoritative_contract}</td><td>{artifact.decisions_supported.join(' · ') || 'Context'}</td><td>{bytes(artifact.artifact_bytes)}</td></tr>)}</tbody></table></div>
+      <div className="reference-table-scroll" tabIndex={0} role="region" aria-label="Generated dataset inventory"><table className="reference-table source-linked-table"><thead><tr><th>Dataset &amp; links</th><th>Status</th><th>Identity / evidence contract</th><th>Supports</th><th>Size</th></tr></thead><tbody>{coverageAudit.source_artifacts.map(artifact => <tr key={artifact.source_key}><td><SourceHealthSource name={artifact.source_key.replaceAll('_', ' ')} links={artifact.exists ? [{ artifact: artifact.artifact, label: artifact.artifact }] : []} /></td><td><span className={`health-badge ${artifact.exists ? 'health-healthy' : 'health-warning'}`}>{artifact.integration_status}</span></td><td>{artifact.authoritative_contract}</td><td>{artifact.decisions_supported.join(' · ') || 'Context'}</td><td>{bytes(artifact.artifact_bytes)}</td></tr>)}</tbody></table></div>
     </div>}
 
-    <div className="reference-table-card">
+    <div className="reference-table-card" id="source-health-procurement" tabIndex={-1}>
       <div className="reference-table-heading"><div><strong>Procurement sources</strong><span>Retrieval, normalization and linkage remain separate from account-source coverage.</span></div></div>
       {procurementError ? <div className="reference-empty-state"><strong>Procurement source health unavailable.</strong><span>{procurementError}</span><span>No healthy status is inferred when the production procurement payload cannot be loaded.</span></div> : !procurement ? <div className="reference-empty-state"><strong>Loading procurement source health…</strong></div> : <><div className="source-health-warning-stack">
         {procurement.sourceErrors.nysAuthorities && <div className="reference-empty-state compact"><strong>NYS authority procurement unavailable.</strong><span>{procurement.sourceErrors.nysAuthorities}</span></div>}
         {procurement.sourceErrors.openBookWater && <div className="reference-empty-state compact"><strong>Open Book water procurement unavailable.</strong><span>{procurement.sourceErrors.openBookWater}</span></div>}
         {procurement.sourceErrors.nychaWater && <div className="reference-empty-state compact"><strong>NYCHA water procurement unavailable.</strong><span>{procurement.sourceErrors.nychaWater}</span></div>}
-      </div><div className="reference-table-scroll"><table className="reference-table procurement-health-table"><thead><tr><th>Source</th><th>Status</th><th>Source rows</th><th>Relevant</th><th>Contracts</th><th>Notices</th><th>Companies resolved</th><th>Vendors unresolved</th><th>Facility links</th><th>Exact tower links</th><th>Guards</th></tr></thead><tbody>{procurementHealth.map(source => <tr key={source.source}>
-        <td><SourceNameLink name={source.source} url={source.source_url} /><small>{source.freshness ?? 'freshness not published'}</small></td><td><span className={`health-badge health-${source.status.toLowerCase()}`}>{source.status}</span></td><td>{number.format(source.record_count)}</td><td>{number.format(source.relevant_record_count)}</td><td>{number.format(source.normalized_contract_count)}</td><td>{number.format(source.normalized_notice_count)}</td><td>{number.format(source.resolved_company_count)}</td><td>{number.format(source.unresolved_vendor_count)}</td><td>{number.format(source.facility_link_count)}</td><td>{number.format(source.exact_tower_link_count)}</td><td><span>{source.pagination_complete ? 'Pagination complete' : 'Pagination incomplete'}</span><small>{source.schema_valid ? 'Schema valid' : 'Schema invalid'}</small></td>
+      </div><div className="reference-table-scroll" tabIndex={0} role="region" aria-label="Procurement source health"><table className="reference-table procurement-health-table source-linked-table"><thead><tr><th>Source &amp; links</th><th>Status</th><th>Source rows</th><th>Relevant</th><th>Contracts</th><th>Notices</th><th>Companies resolved</th><th>Vendors unresolved</th><th>Facility links</th><th>Exact tower links</th><th>Guards</th></tr></thead><tbody>{procurementHealth.map(source => <tr key={source.source}>
+        <td><SourceHealthSource name={source.source} detail={source.freshness ?? 'freshness not published'} links={[{ url: source.source_url }]} /></td><td><span className={`health-badge health-${source.status.toLowerCase()}`}>{source.status}</span></td><td>{number.format(source.record_count)}</td><td>{number.format(source.relevant_record_count)}</td><td>{number.format(source.normalized_contract_count)}</td><td>{number.format(source.normalized_notice_count)}</td><td>{number.format(source.resolved_company_count)}</td><td>{number.format(source.unresolved_vendor_count)}</td><td>{number.format(source.facility_link_count)}</td><td>{number.format(source.exact_tower_link_count)}</td><td><span>{source.pagination_complete ? 'Pagination complete' : 'Pagination incomplete'}</span><small>{source.schema_valid ? 'Schema valid' : 'Schema invalid'}</small></td>
       </tr>)}</tbody></table></div></>}
     </div>
 

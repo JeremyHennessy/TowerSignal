@@ -1,0 +1,65 @@
+/* Source Health only: one source-cell/link pattern; no Account, PDF or global table changes. */
+.source-health-page{min-width:0;color:var(--ref-text,#1b2a33)}
+.source-health-page>.reference-table-card{margin-block:20px;scroll-margin-top:100px}
+.source-health-page .reference-table-heading{padding:18px 20px;gap:16px;align-items:flex-start}
+.source-health-page .reference-table-heading strong{font-size:16px;line-height:1.4}
+.source-health-page .reference-table-heading span{font-size:12px;line-height:1.55}
+.source-health-page .reference-table-scroll{overscroll-behavior-inline:contain}
+.source-health-page .reference-table-scroll:focus-visible{outline:2px solid var(--ref-green,#087f68);outline-offset:-3px}
+.source-health-page .reference-table{font-size:12px;line-height:1.6;min-width:900px}
+.source-health-page .reference-table th{font-size:10px;letter-spacing:.035em;background:#f3f7f6;padding:13px 16px;white-space:normal}
+.source-health-page .reference-table td{font-size:12px;padding:16px;line-height:1.6;overflow-wrap:anywhere}
+.source-health-page .reference-table td strong{font-size:12px;line-height:1.55}
+.source-health-page .reference-table td small{font-size:10.5px;line-height:1.55;color:#596a73;margin-top:5px}
+.source-health-page .reference-table tbody tr:last-child td{border-bottom:0}
+.source-health-page .source-linked-table{border-collapse:separate;border-spacing:0}
+.source-health-page .source-linked-table th:first-child,.source-health-page .source-linked-table td:first-child{position:sticky;left:0;z-index:1;min-width:245px;width:265px;max-width:290px;background:#fff;box-shadow:1px 0 0 #e5ece9}
+.source-health-page .source-linked-table th:first-child{background:#f3f7f6;z-index:2}
+.source-health-page .source-linked-table tr:hover td:first-child{background:#f8fbfa}
+.source-health-page .source-health-source{display:grid;gap:4px;min-width:0;max-width:100%}
+.source-health-page .source-health-source>strong{font-size:13px;line-height:1.45;font-weight:750}
+.source-health-page .source-health-source>small{overflow-wrap:anywhere;margin:0;color:#5b6c76}
+.source-health-page .source-health-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;min-width:0}
+.source-health-page .source-health-link{display:inline-flex;align-items:center;gap:7px;min-height:32px;max-width:100%;box-sizing:border-box;padding:5px 9px;border:1px solid #c5dfd5;border-radius:6px;background:#f2f9f5;color:#08644e;font-size:11px;font-weight:650;line-height:1.4;text-decoration:none;overflow-wrap:anywhere}
+.source-health-page .source-health-link>span:first-of-type{min-width:0}
+.source-health-page .source-health-link:hover{background:#e2f2e9;border-color:#71b19a;text-decoration:underline;text-underline-offset:3px}
+.source-health-page .source-health-link:focus-visible,.source-health-page summary:focus-visible,.source-health-page .source-health-jump-nav button:focus-visible{outline:2px solid #08644e;outline-offset:3px}
+.source-health-page .source-health-link-kind{font-size:9px;letter-spacing:.04em;color:#566c63;border-right:1px solid #bdd8cb;padding-right:7px;flex:none}
+.source-health-page .source-health-link-missing{font-size:11px;color:#6c7780;font-style:italic}
+.source-health-page .health-badge{font-size:10px;line-height:1.5;white-space:normal;overflow-wrap:anywhere;padding:5px 8px}
+.source-health-page .disclaimer{font-size:12px;line-height:1.65;margin:12px 16px;padding:12px 14px;overflow-wrap:anywhere}
+.source-health-page .source-health-footnote{font-size:12px;line-height:1.7;margin-top:20px}
+.source-health-guide{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;padding:14px 16px;margin:18px 0 12px;background:#eaf3ef;border:1px solid #d1e2da;border-radius:9px;font-size:12px;line-height:1.65}
+.source-health-guide strong{color:#185e4c}
+.source-health-jump-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.source-health-jump-nav button{font:inherit;font-size:12px;line-height:1.4;padding:8px 12px;min-height:36px;border:1px solid #d1ded9;background:#fff;color:#255847;border-radius:7px;cursor:pointer}
+.source-health-jump-nav button:hover{background:#f0f7f3;border-color:#7eac99}
+.source-health-directory>summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 20px;cursor:pointer;color:#234b3e;list-style:none}
+.source-health-directory>summary::-webkit-details-marker{display:none}
+.source-health-directory>summary strong{display:block;font-size:15px;line-height:1.5}
+.source-health-directory>summary small{display:block;color:#65736c;font-size:11px;line-height:1.55;margin-top:4px}
+.source-health-directory>summary>span:last-child{flex-shrink:0;font-size:12px;font-weight:650}
+.source-health-directory[open]>summary{border-bottom:1px solid #e1e9e5}
+.source-health-directory-search{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 20px;background:#fafcfb;font-size:12px}
+.source-health-directory-search label{font-weight:650}
+.source-health-directory-search input{flex:1;min-width:200px;max-width:520px;border:1px solid #b8ccc2;border-radius:6px;padding:10px 12px;font:inherit;background:#fff}
+.source-health-directory-search [role=status]{color:#64746b}
+.source-health-no-results{padding:12px 20px;font-size:12px}
+.source-health-explainer{margin:12px 16px;border:1px solid #dfe8e3;border-radius:7px;background:#fafcfb}
+.source-health-explainer>summary{padding:11px 13px;font-size:12px;font-weight:650;color:#53685c;cursor:pointer}
+.source-health-page .source-health-explainer .disclaimer{margin:0;border:0;border-radius:0;background:transparent}
+@media(max-width:760px){
+  .source-health-page .reference-table-heading{padding:15px;flex-direction:column;gap:8px}
+  .source-health-page .reference-table-heading strong{font-size:15px}
+  .source-health-page .reference-table td{padding:13px 12px}
+  .source-health-page .source-linked-table th:first-child,.source-health-page .source-linked-table td:first-child{min-width:195px;width:210px;max-width:230px}
+  .source-health-page .source-health-link{min-height:44px;padding:8px 10px;font-size:12px}
+  .source-health-jump-nav button{min-height:44px}
+  .source-health-directory>summary{padding:15px;align-items:flex-start;gap:10px}
+  .source-health-directory>summary>span:last-child{font-size:11px}
+  .source-health-directory-search{padding:14px;align-items:stretch}
+  .source-health-directory-search label{width:100%}
+  .source-health-directory-search input{width:100%;min-width:0;flex-basis:100%;font-size:16px}
+  .source-health-guide{display:grid;gap:3px}
+  .source-health-page .reference-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
