@@ -28,7 +28,6 @@ interface InfoCard {
 }
 
 const PAGE_WIDTH = 612
-const PAGE_HEIGHT = 792
 const MARGIN = 48
 const CONTENT_WIDTH = PAGE_WIDTH - (MARGIN * 2)
 const BODY_TOP = 76
@@ -46,8 +45,6 @@ const ATTENTION = [161, 96, 24] as const
 const ATTENTION_BG = [255, 247, 232] as const
 const POSITIVE = [38, 99, 80] as const
 const POSITIVE_BG = [237, 248, 243] as const
-const RED = [151, 53, 49] as const
-const RED_BG = [255, 241, 239] as const
 
 const integer = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -60,7 +57,7 @@ function ascii(value: unknown): string {
     .replace(/\u2192/g, ' to ')
     .replace(/\u2022/g, '-')
     .replace(/\u00a0/g, ' ')
-    .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '')
+    .replace(/[^\u0020-\u007E]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 }
@@ -145,16 +142,6 @@ function sectionHeading(ctx: PdfContext, title: string, subtitle?: string) {
     doc.text(lines, MARGIN, ctx.y)
     ctx.y += lines.length * 12 + 8
   }
-}
-
-function paragraph(ctx: PdfContext, text: string, width = CONTENT_WIDTH, size = 9.4, color: readonly [number, number, number] = INK) {
-  const { doc } = ctx
-  setText(doc, size, color)
-  const lines = wrap(doc, text, width)
-  const height = lines.length * (size + 3)
-  ensureSpace(ctx, height + 8)
-  doc.text(lines, MARGIN, ctx.y)
-  ctx.y += height + 8
 }
 
 function callout(ctx: PdfContext, title: string, body: string, tone: 'default' | 'attention' | 'positive' = 'default') {
