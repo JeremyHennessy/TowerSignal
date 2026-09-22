@@ -137,19 +137,8 @@ jobs:
                       "system_id": sid, "borough": borough_name, "property_bbl": canonical, "status": status
                   })
 
-              evidence = row.get("bbl_identity_evidence") or {}
-              if evidence.get("address_matching_used") is not False or evidence.get("fuzzy_matching_used") is not False:
-                  evidence_errors.append({"system_id": sid, "reason": "prohibited fuzzy/address matching marker"})
               if status == "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL":
                   reconciled_ids.append(sid)
-                  candidates = [bbl(x) for x in (evidence.get("mappluto_bbl_candidates") or []) if bbl(x)]
-                  bases = [bbl(x) for x in (evidence.get("base_bbl_context") or []) if bbl(x)]
-                  if not (
-                      registry_bbl and property_bbl and registry_bbl != property_bbl
-                      and evidence.get("registry_base_bridge_confirmed") is True
-                      and candidates == [property_bbl] and registry_bbl in bases
-                  ):
-                      evidence_errors.append({"system_id": sid, "reason": "reconciled bridge contract mismatch"})
               elif status == "RECOVERED_EXACT_BIN_MAPPLUTO_BBL":
                   recovered_ids.append(sid)
                   if registry_bbl is not None or property_bbl is None:
@@ -164,6 +153,19 @@ jobs:
                   raise SystemExit(f"FAIL: missing detail payload for {sid}")
               detail_count += 1
               detail = json.loads(detail_path.read_text(encoding="utf-8"))
+              identity = detail.get("identity") or {}
+              evidence = identity.get("bbl_identity_evidence") or {}
+              if evidence.get("address_matching_used") is not False or evidence.get("fuzzy_matching_used") is not False:
+                  evidence_errors.append({"system_id": sid, "reason": "prohibited fuzzy/address matching marker"})
+              if status == "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL":
+                  candidates = [bbl(x) for x in (evidence.get("mappluto_bbl_candidates") or []) if bbl(x)]
+                  bases = [bbl(x) for x in (evidence.get("base_bbl_context") or []) if bbl(x)]
+                  if not (
+                      registry_bbl and property_bbl and registry_bbl != property_bbl
+                      and evidence.get("registry_base_bridge_confirmed") is True
+                      and candidates == [property_bbl] and registry_bbl in bases
+                  ):
+                      evidence_errors.append({"system_id": sid, "reason": "reconciled bridge contract mismatch"})
 
               for fp in (detail.get("building_footprints") or []):
                   if not isinstance(fp, dict):
