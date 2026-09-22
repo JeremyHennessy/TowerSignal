@@ -117,13 +117,15 @@ class CmsInstitutionalContextTests(unittest.TestCase):
             detail_path = output / "details" / "20" / "2000015740.json"
             detail_path.parent.mkdir(parents=True)
             detail_path.write_text(json.dumps({"identity": {"system_id": "2000015740"}}), encoding="utf-8")
-            (output / "systems.json").write_text(json.dumps({"metadata": {}, "summary": {}, "systems": [{"system_id": "2000015740", "bbl": "1011210036", "priority_score": 50}]}), encoding="utf-8")
+            (output / "systems.json").write_text(json.dumps({"metadata": {}, "summary": {}, "systems": [{"system_id": "2000015740", "bbl": "1011217501", "property_bbl": "1011217501", "registry_bbl": "1011210036", "bbl_aliases": ["1011210036", "1011217501"], "priority_score": 50}]}), encoding="utf-8")
             result = attach(output, cache)
             self.assertEqual(result["facilities_attached"], 1)
             systems = json.loads((output / "systems.json").read_text())
             self.assertEqual(systems["systems"][0]["priority_score"], 50)
             detail = json.loads(detail_path.read_text())
             self.assertEqual(detail["cms_institutional_context"]["facilities"][0]["source_facility_id"], "H1")
+            self.assertEqual(detail["cms_institutional_context"]["matched_bbl_aliases"], ["1011210036"])
+            self.assertEqual(detail["cms_institutional_context"]["match_basis"], "PAD_EXACT_ADDRESS_BBL_ALIAS")
 
 
 if __name__ == "__main__":
