@@ -10,9 +10,17 @@
 
 /* The legacy desktop section rail used to reserve 180px inside the Account report.
    The rail is now intentionally removed, so its layout reservation must be removed too. */
-@media(min-width:1500px){
+@media(min-width:1181px){
+  .account-profile-page{
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
   .account-profile-page .detail-panel,
   .account-profile-page .account-profile-toolbar{
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
     padding-left:0!important;
   }
 }
