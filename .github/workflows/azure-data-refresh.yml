@@ -224,6 +224,8 @@ jobs:
         run: python scripts/validate_deal_validation.py --report public/data/deal-validation.json
       - name: Attach last verified ACRIS timing cache
         run: python scripts/attach_acris.py --output public/data --cache .acris-store/data/acris/cache.json
+      - name: Validate 400 West 61st property identity and account enrichment
+        run: python scripts/validate_property_identity_acceptance.py --output public/data --require-acris
       - name: Validate verified ACRIS cache when present
         if: ${{ hashFiles('.acris-store/data/acris/cache.json') != '' }}
         run: python scripts/validate_acris_cache.py --cache .acris-store/data/acris/cache.json --max-age-days 30 --require-production-volume
