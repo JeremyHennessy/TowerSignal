@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { loadSystemDetail } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { leadSummary } from '../utils/export'
+import { exportAccountClientPdf } from '../utils/accountClientPdf'
 import type { Metadata, SystemDetail, SystemSummary } from '../types/data'
 import type { ChangeEvent } from '../types/history'
 import type { WorkflowAccountState } from '../types/workflow'
@@ -44,9 +45,11 @@ export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, wo
   const [detail, setDetail] = useState<SystemDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [pdfBusy, setPdfBusy] = useState(false)
+  const [pdfError, setPdfError] = useState<string | null>(null)
   const isFullAccountReport = window.location.hash.startsWith('#/account/')
   useEffect(() => {
-    setDetail(null); setError(null); setCopied(false)
+    setDetail(null); setError(null); setCopied(false); setPdfBusy(false); setPdfError(null)
     if (!row) return
     loadSystemDetail(row.system_id).then(setDetail).catch(err => setError(err instanceof Error ? err.message : 'Unable to load system details'))
   }, [row])
@@ -56,9 +59,22 @@ export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, wo
     await navigator.clipboard.writeText(leadSummary(row, metadata, detail))
     setCopied(true)
   }
+  const exportClientPdf = async () => {
+    if (!detail || pdfBusy) return
+    setPdfBusy(true)
+    setPdfError(null)
+    try {
+      await exportAccountClientPdf({ row, detail, historyEvents })
+    } catch (err) {
+      setPdfError(err instanceof Error ? err.message : 'Unable to create client PDF')
+    } finally {
+      setPdfBusy(false)
+    }
+  }
   return <aside className="detail-panel" aria-label="Selected cooling tower detail">
     <div className="detail-header"><div><span className="eyebrow">Selected system</span><h2>{row.address ?? row.system_id}</h2><p>{row.borough} {row.zip} · System <span className="mono">{row.system_id}</span></p></div><button className="icon-button" onClick={onClose} aria-label="Close details">×</button></div>
-    <div className="detail-actions"><button onClick={copy} disabled={!detail}>{copied ? 'Copied' : 'Copy lead brief'}</button><span className="score large">{row.priority_score}</span><span>Priority score</span></div>
+    <div className="detail-actions"><button onClick={copy} disabled={!detail}>{copied ? 'Copied' : 'Copy lead brief'}</button>{isFullAccountReport && <button onClick={exportClientPdf} disabled={!detail || pdfBusy}>{pdfBusy ? 'Preparing PDF...' : 'Export client PDF'}</button>}<span className="score large">{row.priority_score}</span><span>Priority score</span></div>
+    {pdfError && <div className="error-state">Client PDF export failed: {pdfError}</div>}
     {workflowSection}
     {error && <div className="error-state">{error}</div>}
     {!detail && !error && <div className="loading-state">Loading source-backed details…</div>}
