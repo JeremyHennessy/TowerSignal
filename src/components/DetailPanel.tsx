@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { loadSystemDetail } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { leadSummary } from '../utils/export'
+import { prepareAccountReport } from '../utils/prepareAccountReport'
 import type { Metadata, SystemDetail, SystemSummary } from '../types/data'
 import type { ChangeEvent } from '../types/history'
 import type { WorkflowAccountState } from '../types/workflow'
@@ -46,9 +47,11 @@ export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, wo
   const [detail, setDetail] = useState<SystemDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
   const isFullAccountReport = window.location.hash.startsWith('#/account/')
   useEffect(() => {
-    setDetail(null); setError(null); setCopied(false)
+    setDetail(null); setError(null); setCopied(false); setExportError(null)
     if (!row) return
     loadSystemDetail(row.system_id).then(setDetail).catch(err => setError(err instanceof Error ? err.message : 'Unable to load system details'))
   }, [row])
@@ -58,16 +61,29 @@ export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, wo
     await navigator.clipboard.writeText(leadSummary(row, metadata, detail))
     setCopied(true)
   }
-  const exportClientPdf = () => {
-    if (!detail || !isFullAccountReport) return
+  const exportClientPdf = async () => {
+    if (!detail || !isFullAccountReport || exporting) return
+    setExporting(true); setExportError(null)
     const originalTitle = document.title
-    document.title = `TowerSignal - ${row.address ?? row.system_id} - Site Intelligence Report`
-    window.print()
-    document.title = originalTitle
+    const restore = () => { document.title = originalTitle }
+    try {
+      await prepareAccountReport()
+      if (document.querySelector<HTMLElement>('.client-pdf-report')?.dataset.reportSystem !== row.system_id) throw new Error('The selected account changed. Export it again from the current account.')
+      document.title = `TowerSignal - ${row.address ?? row.system_id} - Account Report`
+      window.addEventListener('afterprint', restore, { once: true })
+      window.print()
+    } catch (error) {
+      window.removeEventListener('afterprint', restore)
+      restore()
+      setExportError(error instanceof Error ? error.message : 'The PDF could not be prepared. Please retry.')
+    } finally {
+      setExporting(false)
+    }
   }
   return <aside className="detail-panel" aria-label="Selected cooling tower detail">
     <div className="detail-header"><div><span className="eyebrow">Selected system</span><h2>{row.address ?? row.system_id}</h2><p>{row.borough} {row.zip} · System <span className="mono">{row.system_id}</span></p></div><button className="icon-button" onClick={onClose} aria-label="Close details">×</button></div>
-    <div className="detail-actions"><button onClick={copy} disabled={!detail}>{copied ? 'Copied' : 'Copy lead brief'}</button>{isFullAccountReport && <button onClick={exportClientPdf} disabled={!detail}>Export client PDF</button>}<span className="score large">{row.priority_score}</span><span>Priority score</span></div>
+    <div className="detail-actions"><button onClick={copy} disabled={!detail}>{copied ? 'Copied' : 'Copy lead brief'}</button>{isFullAccountReport && <button onClick={exportClientPdf} disabled={!detail || exporting}>Export client PDF</button>}<span className="score large">{row.priority_score}</span><span>Priority score</span></div>
+    {exportError && <div role="alert" className="error-state">{exportError}</div>}
     {workflowSection}
     {error && <div className="error-state">{error}</div>}
     {!detail && !error && <div className="loading-state">Loading source-backed details…</div>}

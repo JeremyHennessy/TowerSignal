@@ -1,0 +1,482 @@
+{
+  "provenance": {
+    "source": "Published Pages run 35768655554",
+    "application_sha": "190e99920e196e68a3900e04a9751b2d0d6336c5",
+    "snapshot": "2026-09-22",
+    "selection": "Only fields consumed by the approved PDF. No invented fixture values."
+  },
+  "row": {
+    "system_id": "2000000407",
+    "address": "805 Columbus Ave",
+    "borough": "Manhattan",
+    "zip": "10025",
+    "active_equipment": 1,
+    "priority_score": 80
+  },
+  "detail": {
+    "metadata": {
+      "snapshot_date": "2026-09-22",
+      "generated_at": "2026-09-22T15:07:51.244919Z",
+      "sources": [
+        {
+          "dataset_id": "y4fw-iqfr",
+          "name": "NYC Cooling Tower Registrations",
+          "retrieved_at": "2026-09-22T15:01:51.681936Z",
+          "source_record_count": 5944,
+          "source_last_updated_at": "2026-09-22T14:00:21Z",
+          "url": "https://data.cityofnewyork.us/Health/NYC-Cooling-Tower-Registrations/y4fw-iqfr"
+        },
+        {
+          "dataset_id": "f9wb-g8mb",
+          "name": "NYC Cooling Tower System Inspection Results",
+          "retrieved_at": "2026-09-22T15:02:26.835692Z",
+          "source_record_count": 125065,
+          "source_last_updated_at": "2026-09-14T15:07:33Z",
+          "url": "https://data.cityofnewyork.us/Health/NYC-Cooling-Tower-System-Inspection-Results/f9wb-g8mb"
+        },
+        {
+          "dataset_id": "jz4z-kudi",
+          "name": "OATH Hearings Division Case Status",
+          "retrieved_at": "2026-09-22T11:48:13.098648Z",
+          "source_record_count": 59421,
+          "source_query_scope": "OATH issuing_agency='COOLING TOWERS - DOHMH' rows intersected by exact NYC Health summons_number values; verified durable cache intersected to current registered-system summons",
+          "source_last_updated_at": "2026-09-22T04:07:25Z",
+          "url": "https://data.cityofnewyork.us/City-Government/OATH-Hearings-Division-Case-Status/jz4z-kudi",
+          "matched_record_count": 40916
+        },
+        {
+          "dataset_id": "64uk-42ks",
+          "name": "Primary Land Use Tax Lot Output (PLUTO)",
+          "retrieved_at": "2026-09-22T15:03:50.001406Z",
+          "source_record_count": 858284,
+          "source_query_scope": "BBL exact-match subset for 3,801 registered cooling-tower systems with usable BBLs",
+          "source_last_updated_at": "2026-08-24T20:48:51Z",
+          "url": "https://data.cityofnewyork.us/City-Government/Primary-Land-Use-Tax-Lot-Output-PLUTO-/64uk-42ks",
+          "matched_record_count": 3676
+        },
+        {
+          "dataset_id": "tesw-yqqr",
+          "name": "Multiple Dwelling Registrations",
+          "retrieved_at": "2026-09-22T15:07:50.470871Z",
+          "source_record_count": 203887,
+          "source_query_scope": "Exact BBL subset of cooling-tower properties, then exact HPD registration_id contact lookup",
+          "source_last_updated_at": "2026-08-12T15:00:41Z",
+          "url": "https://data.cityofnewyork.us/Housing-Development/Multiple-Dwelling-Registrations/tesw-yqqr",
+          "matched_record_count": 1795
+        },
+        {
+          "dataset_id": "feu5-w2e2",
+          "name": "Registration Contacts",
+          "retrieved_at": "2026-09-22T15:07:50.470871Z",
+          "source_record_count": 810494,
+          "source_query_scope": "Exact registration_id contacts for HPD registrations matched to cooling-tower BBLs",
+          "source_last_updated_at": "2026-08-12T15:02:05Z",
+          "url": "https://data.cityofnewyork.us/Housing-Development/Registration-Contacts/feu5-w2e2",
+          "matched_record_count": 8622
+        },
+        {
+          "dataset_id": "x748-37q7",
+          "name": "NYC Planimetric Database: Cooling Towers",
+          "retrieved_at": "2026-09-22T15:02:30.935319Z",
+          "source_record_count": 82322,
+          "source_query_scope": "Exact BIN matches for the current TowerSignal NYC cooling-tower registry universe",
+          "source_last_updated_at": "2025-12-04T15:57:08Z",
+          "url": "https://data.cityofnewyork.us/City-Government/NYC-Planimetric-Database-Cooling-Towers/x748-37q7",
+          "matched_record_count": 8485
+        },
+        {
+          "dataset_id": "5zhs-2jue",
+          "name": "BUILDING",
+          "retrieved_at": "2026-09-22T15:03:18.985612Z",
+          "source_record_count": 1083047,
+          "source_query_scope": "Exact BIN building footprints for the current TowerSignal NYC cooling-tower registry universe",
+          "source_last_updated_at": "2026-09-21T06:40:23Z",
+          "url": "https://data.cityofnewyork.us/City-Government/BUILDING/5zhs-2jue",
+          "matched_record_count": 3881
+        }
+      ]
+    },
+    "identity": {
+      "system_id": "2000000407",
+      "bin": "1088152",
+      "bbl": "1018337507",
+      "registry_bbl": "1018337507",
+      "bbl_identity_basis": "REGISTRY_SOURCE_BBL",
+      "bbl_identity_status": "REGISTRY_SOURCE_BBL",
+      "bbl_identity_evidence": {
+        "canonical_bbl": "1018337507",
+        "registry_bbl": "1018337507",
+        "identity_basis": "REGISTRY_SOURCE_BBL",
+        "status": "REGISTRY_SOURCE_BBL",
+        "source_dataset": "NYC_COOLING_TOWER_REGISTRATIONS",
+        "source_field": "bbl",
+        "join_key": null,
+        "mappluto_bbl_candidates": [],
+        "base_bbl_context": [],
+        "address_matching_used": false,
+        "fuzzy_matching_used": false
+      },
+      "address": "805 Columbus Ave",
+      "borough": "Manhattan",
+      "zip": "10025",
+      "active_equipment": 1,
+      "latitude": 40.794993,
+      "longitude": -73.965639,
+      "coordinate_status": "VALID",
+      "source_latitude_raw": "40.794993",
+      "source_longitude_raw": "-73.965639"
+    },
+    "sample_history": {
+      "source_raw": "07/09/2026, 04/06/2026",
+      "dates": [
+        "2026-04-06",
+        "2026-07-09"
+      ],
+      "malformed_values": [],
+      "latest_sample_date": "2026-07-09",
+      "previous_sample_date": "2026-04-06",
+      "latest_sample_interval_days": 94,
+      "intervals_days": [
+        94
+      ],
+      "sample_count": 2
+    },
+    "scoring": {
+      "score": 80,
+      "components": [
+        {
+          "points": 50,
+          "reason": "NYC Health findings on 2026-07-23 (61 days ago; 1 non-dismissed citation records; critical / public health hazard; recency factor 1). A recorded finding is not proof it remains uncorrected.",
+          "source": "NYC cooling-tower inspection / exact summons OATH status",
+          "source_date": "2026-07-23"
+        },
+        {
+          "points": 30,
+          "reason": "Public sampling follow-up: 75 days since 2026-07-09; beyond 31 days plus the 5-day reporting allowance. Operating status remains unverified.",
+          "source": "NYC tower registration",
+          "source_date": "2026-07-09"
+        }
+      ],
+      "priority_model_version": "1.1",
+      "notes": [
+        "2 recent citation record(s) excluded after an exact-ticket published dismissal. Other citations remain independently eligible.",
+        "No separate inspection-activity bonus: the inspection is already represented in the findings component."
+      ]
+    },
+    "inspection_history": [
+      {
+        "system_id": "2000000407",
+        "inspection_date": "2026-07-23",
+        "inspection_type": "Cycle",
+        "status": "Active",
+        "active_equipment_at_publication": 1,
+        "violations": [
+          {
+            "violation_code": "AH8S",
+            "law_section": "24 RCNY \u00a78-05(f)(3)",
+            "violation_text": "Legionella samples not collected or analyzed, or results not recorded or reported to the Department as required",
+            "violation_type": "PHH",
+            "citation_text": "At the time of inspection, Legionella sample records contained a gap greater than 90 days, from 10/07/2025 to 04/06/2026; Legionella sample was due by 01/06/2026.",
+            "summons_number": "0881344164"
+          },
+          {
+            "violation_code": "AHK0",
+            "law_section": "Admin Code 17-194.1(f)",
+            "violation_text": "Failure to report Legionella sample test date within 5 days",
+            "violation_type": "General",
+            "citation_text": "At the time of the inspection, the Qualified Person failed to report the Legionella sample in the NYC Cooling Tower Registration portal within 5 days in accordance with Administrative Code \u00a717-194.1 for the sample taken on 04/06/2026.",
+            "summons_number": "0881344173"
+          },
+          {
+            "violation_code": "AHK2",
+            "law_section": "Admin Code 17-194.1(f)",
+            "violation_text": "Failure to report Legionella sample test date",
+            "violation_type": "Critical",
+            "citation_text": "Respondent is in violation of Admin Code 17-194.1 in that  the Legionella sample test date(s) due by 04/10/2025, 07/09/2025, 10/07/2025 were not reported by the Qualified Person in the Cooling Tower Registration Portal.",
+            "summons_number": "0881344182"
+          }
+        ],
+        "violation_count": 3
+      }
+    ],
+    "oath_case_history": [
+      {
+        "ticket_number": "0881344182",
+        "ticket_number_source_raw": "0881344182",
+        "match_basis": "SUMMONS_NUMBER_EXACT",
+        "issuing_agency": "COOLING TOWERS - DOHMH",
+        "violation_date": "2026-07-23",
+        "violation_location": {
+          "borough": "MANHATTAN",
+          "block": "01833",
+          "lot": "7507",
+          "house": "805",
+          "street_name": "COLUMBUS AVENUE",
+          "zip": "10025"
+        },
+        "hearing_status": "HEARING COMPLETED",
+        "hearing_result": "DISMISSED",
+        "hearing_date": "2026-08-18",
+        "decision_date": "2026-08-21",
+        "compliance_status": "All Terms Met",
+        "violation_description": "20260818N",
+        "penalty_imposed": 0.0,
+        "paid_amount": 0.0,
+        "additional_penalties_or_late_fees": 0.0,
+        "balance_due": 0.0,
+        "total_violation_amount": 1000.0,
+        "date_judgment_docketed": null,
+        "charges": [
+          {
+            "code": "AHK2",
+            "code_section": "ADMIN",
+            "description": "FAILURE TO REPORT LEGIONELLA SAMPLE TEST DATE",
+            "infraction_amount": 1000.0
+          }
+        ]
+      },
+      {
+        "ticket_number": "0881344173",
+        "ticket_number_source_raw": "0881344173",
+        "match_basis": "SUMMONS_NUMBER_EXACT",
+        "issuing_agency": "COOLING TOWERS - DOHMH",
+        "violation_date": "2026-07-23",
+        "violation_location": {
+          "borough": "MANHATTAN",
+          "block": "01833",
+          "lot": "7507",
+          "house": "805",
+          "street_name": "COLUMBUS AVENUE",
+          "zip": "10025"
+        },
+        "hearing_status": "HEARING COMPLETED",
+        "hearing_result": "DISMISSED",
+        "hearing_date": "2026-08-18",
+        "decision_date": "2026-08-21",
+        "compliance_status": "All Terms Met",
+        "violation_description": "20260818N",
+        "penalty_imposed": 0.0,
+        "paid_amount": 0.0,
+        "additional_penalties_or_late_fees": 0.0,
+        "balance_due": 0.0,
+        "total_violation_amount": 500.0,
+        "date_judgment_docketed": null,
+        "charges": [
+          {
+            "code": "AHK0",
+            "code_section": "ADMIN",
+            "description": "FAILURE TO REPORT LEGIONELLA SAMPLE TEST DATE WITHIN 5 DAYS",
+            "infraction_amount": 500.0
+          }
+        ]
+      },
+      {
+        "ticket_number": "0881344164",
+        "ticket_number_source_raw": "0881344164",
+        "match_basis": "SUMMONS_NUMBER_EXACT",
+        "issuing_agency": "COOLING TOWERS - DOHMH",
+        "violation_date": "2026-07-23",
+        "violation_location": {
+          "borough": "MANHATTAN",
+          "block": "01833",
+          "lot": "7507",
+          "house": "805",
+          "street_name": "COLUMBUS AVENUE",
+          "zip": "10025"
+        },
+        "hearing_status": "HEARING COMPLETED",
+        "hearing_result": "IN VIOLATION",
+        "hearing_date": "2026-08-18",
+        "decision_date": "2026-08-20",
+        "compliance_status": "Penalty Due",
+        "violation_description": "20260818N",
+        "penalty_imposed": 2000.0,
+        "paid_amount": 0.0,
+        "additional_penalties_or_late_fees": 0.0,
+        "balance_due": 2000.0,
+        "total_violation_amount": 2000.0,
+        "date_judgment_docketed": null,
+        "charges": [
+          {
+            "code": "AH8S",
+            "code_section": "NYCHC",
+            "description": "LEGIONELLA SAMP NOT COLLECT ANALYZE RESULTS NOT RECD REPORT TO DEPT 1",
+            "infraction_amount": 2000.0
+          }
+        ]
+      }
+    ],
+    "building_context": {
+      "bbl": "1018337507",
+      "owner_name": "UNAVAILABLE OWNER",
+      "land_use": "4",
+      "building_class": "RM",
+      "lot_area_sqft": 16782.0,
+      "building_area_sqft": 106501.0,
+      "floors": 14.0,
+      "residential_units": 63,
+      "total_units": 68,
+      "year_built": 2007,
+      "year_altered_1": 0,
+      "year_altered_2": 0,
+      "source": "NYC_DCP_PLUTO"
+    },
+    "hpd_registration": {
+      "registration_id": "143362",
+      "building_id": "932598",
+      "last_registration_date": "2025-08-20",
+      "contacts": [
+        {
+          "registration_contact_id": "14336204",
+          "type": "Agent",
+          "description": "GEN.PART",
+          "corporation_name": "WESTERN RESIDENTIAL, INC.",
+          "person_name": "RYAN MICHALAK",
+          "title": null,
+          "business_address": "808 COLUMBUS AVENUE, 20D, New York, NY 10025",
+          "source": "NYC_HPD_REGISTRATION_CONTACTS"
+        },
+        {
+          "registration_contact_id": "14336203",
+          "type": "CorporateOwner",
+          "description": "GEN.PART",
+          "corporation_name": "COLUMBUS SQUARE 805 LLC",
+          "person_name": null,
+          "title": null,
+          "business_address": "1745 SHEA CENTER DRIVE, 200, HIGHLANDS RANCH, CO 80129",
+          "source": "NYC_HPD_REGISTRATION_CONTACTS"
+        }
+      ],
+      "source": "NYC_HPD_MULTIPLE_DWELLING_REGISTRATION"
+    },
+    "building_footprints": [
+      {
+        "bin": "1088152",
+        "name": null,
+        "doitt_id": "1108313",
+        "object_id": "343177",
+        "shape_area": 2591.09375,
+        "base_bbl": "1018330020",
+        "mappluto_bbl": "1018337507",
+        "construction_year": 2007,
+        "feature_code": "2100",
+        "geometry_source": "Other (Manual)",
+        "ground_elevation_ft": 84.0,
+        "height_roof_ft": 162.0,
+        "last_edited_date": "2017-08-22T19:13:11.000Z",
+        "last_status_type": "Constructed",
+        "geometry": {
+          "type": "MultiPolygon",
+          "coordinates": [
+            [
+              [
+                [
+                  -73.965336899965,
+                  40.795155499117
+                ],
+                [
+                  -73.965690551697,
+                  40.794674118304
+                ],
+                [
+                  -73.965932966295,
+                  40.794776976892
+                ],
+                [
+                  -73.965555171625,
+                  40.795291221283
+                ],
+                [
+                  -73.965336899965,
+                  40.795155499117
+                ]
+              ]
+            ]
+          ]
+        },
+        "source": "NYC_OTI_BUILDING_FOOTPRINTS",
+        "match_basis": "BIN_EXACT",
+        "feature_identity_basis": "DOITT_ID"
+      }
+    ],
+    "planimetric_building_tower_features": [
+      {
+        "source_id": "1212000716.0",
+        "global_id": "26f9c1dc-6a8f-49d5-ab7a-fadff6cf37d2",
+        "bin": "1088152",
+        "feature_code": "2120",
+        "sub_feature_code": "212000",
+        "location_level": "ROOF_LEVEL",
+        "status": "Unchanged",
+        "geometry": {
+          "type": "MultiPolygon",
+          "coordinates": [
+            [
+              [
+                [
+                  -73.96553009777381,
+                  40.79504773057004
+                ],
+                [
+                  -73.96554428210673,
+                  40.79502518359108
+                ],
+                [
+                  -73.96557040555581,
+                  40.79503467546258
+                ],
+                [
+                  -73.9655562200448,
+                  40.7950572224444
+                ],
+                [
+                  -73.96553009777381,
+                  40.79504773057004
+                ]
+              ]
+            ]
+          ]
+        },
+        "source": "NYC_OTI_PLANIMETRICS_COOLING_TOWERS",
+        "match_basis": "BIN_EXACT",
+        "feature_identity_basis": "GLOBALID",
+        "imagery_year": 2022
+      }
+    ],
+    "signals": [
+      {
+        "type": "CONFIRMED_RECENT_VIOLATION",
+        "title": "Confirmed violation",
+        "evidence_confidence": "CONFIRMED",
+        "fact_class": "CONFIRMED_FACT",
+        "date": "2026-07-23",
+        "reason": "NYC Health inspection record contains 3 violation(s) within the configured recent period.",
+        "violation_types": [
+          "Critical",
+          "General",
+          "PHH"
+        ],
+        "inspection_type": "Cycle"
+      },
+      {
+        "type": "POTENTIAL_SAMPLING_GAP",
+        "title": "Potential sampling gap",
+        "evidence_confidence": "VERIFY",
+        "fact_class": "COMMERCIAL_SIGNAL",
+        "date": "2026-07-09",
+        "reason": "The latest Legionella sample date appearing in NYC's public registration record is 75 days old. NYC's 31-day sampling requirement applies while a system is operating. TowerSignal does not have enough public information to confirm continuous operating status, so this is a verification signal rather than a compliance determination."
+      },
+      {
+        "type": "RECENT_NYC_HEALTH_INSPECTION",
+        "title": "Recent NYC Health inspection",
+        "evidence_confidence": "STRONG_SIGNAL",
+        "fact_class": "CONFIRMED_FACT",
+        "date": "2026-07-23",
+        "reason": "NYC Health recorded a Cycle inspection 61 days ago."
+      }
+    ]
+  },
+  "metadata": {
+    "snapshot_date": "2026-09-22"
+  }
+}
