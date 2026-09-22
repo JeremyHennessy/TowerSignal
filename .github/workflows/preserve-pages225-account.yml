@@ -1,0 +1,93 @@
+name: Preserve Account and accepted Pages 225 evidence
+on:
+  push:
+    branches: [custody/preserve-pages225-account-20260922]
+    paths: [.github/workflows/preserve-pages225-account.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve digest-pinned artifacts and compare current hosted bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          import hashlib, json, os, pathlib, shutil, tarfile, urllib.request, zipfile
+          from datetime import datetime, timezone
+          from publish_pages_to_blob import get_reader, successful_source
+          reader = get_reader()
+          out = pathlib.Path('custody'); out.mkdir()
+          source, jobs = successful_source(reader, 35606171481)
+          assert source['source_sha'] == 'bf183c6414ab1908de8d7881362de9aa9d57310c'
+          records = [
+              ('pages225.zip', 10673536208, 35606171481, source['source_sha'], '13d387d9c1f4db05da0b48415c26a6580d74af81f6e09c9948d49e75d04edf85'),
+              ('pages225-history.zip', 10673740919, 35606171481, source['source_sha'], '29b0fadee103a9f60b7eb77577cc9e71f6e1f430bbdf46d130cb4b80d105d493'),
+              ('pages225-hosted-browser-evidence.zip', 10673244329, 35606171481, source['source_sha'], '0ab2511f136cc7bde9404f778b6f3a099662285e6e604fe5105aecee6dcf443d'),
+              ('accepted-account-candidate.zip', 10561468943, 35380175972, '18c21ea5f7e536fb94479ef8c8ac4065045597f4', '41d99bbd9469bf9804894a92d0d8c702aee58793be125209e2069b75dcf836b7'),
+          ]
+          receipt = {'recorded_at': datetime.now(timezone.utc).isoformat(), 'source': source,
+                     'custody_run': os.environ['GITHUB_RUN_ID'], 'application_changed': False,
+                     'data_regenerated': False, 'production_written': False, 'archives': []}
+          for filename, aid, rid, sha, digest in records:
+              meta = reader.get(f'/actions/artifacts/{aid}')
+              assert not meta['expired'] and meta['workflow_run']['id'] == rid
+              assert meta['workflow_run']['head_sha'] == sha and meta['digest'] == 'sha256:' + digest
+              path = out / filename
+              reader.download(f'/actions/artifacts/{aid}/zip', path)
+              assert path.stat().st_size == meta['size_in_bytes']
+              with path.open('rb') as f: actual = hashlib.file_digest(f, 'sha256').hexdigest()
+              assert actual == digest, filename
+              receipt['archives'].append({'name': filename, 'artifact_id': aid, 'source_run_id': rid,
+                                           'source_sha': sha, 'sha256': digest, 'bytes': path.stat().st_size})
+          with zipfile.ZipFile(out / 'pages225.zip') as z:
+              assert z.namelist() == ['artifact.tar']
+              with z.open('artifact.tar') as src, pathlib.Path('pages225.tar').open('wb') as dst:
+                  shutil.copyfileobj(src, dst)
+          checks = []
+          required = {'index.html', 'data/metadata.json', 'data/systems.json', 'data/nys-systems.json',
+                      'data/source-health.json', 'data/coverage-audit.json'}
+          metadata = None
+          with tarfile.open('pages225.tar') as tar:
+              for member in tar:
+                  name = member.name.removeprefix('./')
+                  if not member.isfile(): continue
+                  if name not in required and not (name.startswith('assets/') and name.endswith(('.js', '.css'))): continue
+                  expected = hashlib.sha256()
+                  with tar.extractfile(member) as f:
+                      if name == 'data/metadata.json':
+                          payload = f.read(); metadata = json.loads(payload); expected.update(payload)
+                      else:
+                          while chunk := f.read(4 * 1024**2): expected.update(chunk)
+                  url = 'https://jeremyhennessy.github.io/TowerSignal/' + name + '?custody=' + os.environ['GITHUB_RUN_ID']
+                  actual = hashlib.sha256(); size = 0
+                  with urllib.request.urlopen(url, timeout=120) as response:
+                      assert response.status == 200
+                      while chunk := response.read(4 * 1024**2): actual.update(chunk); size += len(chunk)
+                  assert actual.digest() == expected.digest() and size == member.size, 'Hosted bytes differ: ' + name
+                  checks.append({'path': name, 'bytes': size, 'sha256': actual.hexdigest()})
+          assert required <= {c['path'] for c in checks}
+          receipt['hosted_hash_checks'] = checks
+          receipt['generated_at'] = metadata.get('generated_at')
+          receipt['generated_metadata'] = metadata
+          receipt['status'] = 'PRESERVED_AND_HOSTED_HASH_MATCHED'
+          (out / 'custody.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          print(json.dumps({'status': receipt['status'], 'source': source, 'generated_at': receipt['generated_at'],
+                            'archive_count': len(records), 'hosted_files_hash_matched': len(checks)}, indent=2))
+          PY
+      - name: Retain source snapshots, dependencies, screenshots and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: towersignal-preserved-account-pages225-${{ github.run_id }}
+          path: custody/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
