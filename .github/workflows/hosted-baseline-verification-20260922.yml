@@ -1,0 +1,71 @@
+name: Hosted baseline verification 2026-09-22
+
+on:
+  push:
+    branches:
+      - agent/hosted-baseline-verification-20260922
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for canonical Pages 230
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_RUN: "35744133412"
+          TARGET_SHA: "68ed7af617ec96fabc49eb72811374c92aff5a34"
+        run: |
+          set -euo pipefail
+          deadline=$(( $(date +%s) + 7200 ))
+          while true; do
+            payload="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$TARGET_RUN")"
+            status="$(python -c 'import json,sys; print(json.load(sys.stdin)["status"])' <<<"$payload")"
+            conclusion="$(python -c 'import json,sys; print(json.load(sys.stdin).get("conclusion") or "")' <<<"$payload")"
+            sha="$(python -c 'import json,sys; print(json.load(sys.stdin)["head_sha"])' <<<"$payload")"
+            test "$sha" = "$TARGET_SHA"
+            echo "Pages #230: status=$status conclusion=$conclusion sha=$sha"
+            if [ "$status" = "completed" ]; then
+              test "$conclusion" = "success"
+              break
+            fi
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo "Timed out waiting for canonical Pages #230" >&2
+              exit 1
+            fi
+            sleep 60
+          done
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install hosted-test browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify System 2000014227 and complete Source Health links
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+        run: |
+          npx playwright test             tests/e2e/hosted-baseline-verification.spec.ts             tests/e2e/source-health-coverage.spec.ts             --project=desktop-chromium             --project=iphone
+
+      - name: Retain hosted verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosted-baseline-verification
+          path: |
+            playwright-report
+            test-results
+            source-health-proof
+          if-no-files-found: warn
+          retention-days: 14
