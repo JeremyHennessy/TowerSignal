@@ -15,17 +15,15 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - name: Check out durable verified history
+        uses: actions/checkout@v4
         with:
-          name: github-pages
-          run-id: 35515939783
-          github-token: ${{ github.token }}
-          path: .baseline
-      - name: Restore successful September 20 runtime
-        run: |
-          mkdir -p .baseline/site
-          ARCHIVE="$(find .baseline -type f | head -1)"
-          tar -xf "$ARCHIVE" -C .baseline/site
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history/segments/dob.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Probe current DOB NOW BBL and component-field contract
         run: |
           python - <<'PY'
@@ -42,14 +40,18 @@ jobs:
               with urllib.request.urlopen(req,timeout=90) as r:
                   return json.load(r)
 
-          systems=json.loads(Path('.baseline/site/data/systems.json').read_text())['systems']
+          durable=json.loads(Path('.history-store/data/history/segments/dob.json').read_text())
+          prior=durable.get('dob_by_bbl') or {}
+          by_borough={i:[] for i in range(1,6)}
+          for bbl, records in sorted(prior.items()):
+              text=str(bbl)
+              if len(text)==10 and text.isdigit() and int(text[0]) in by_borough and records:
+                  by_borough[int(text[0])].append({'bbl':text,'prior_dob_activity_count':len(records)})
           samples=[]
-          seen=set()
-          for row in systems:
-              bbl=str(row.get('bbl') or '')
-              if len(bbl)==10 and int(row.get('dob_activity_count') or 0)>0 and bbl not in seen:
-                  seen.add(bbl); samples.append({'system_id':row['system_id'],'bbl':bbl,'prior_dob_activity_count':row['dob_activity_count']})
-              if len(samples)>=10: break
+          for code in range(1,6):
+              samples.extend(by_borough[code][:2])
+          if len(samples)<10:
+              raise SystemExit(f'Not enough durable DOB samples: {len(samples)}')
 
           aggregate={}
           for key,where in [
