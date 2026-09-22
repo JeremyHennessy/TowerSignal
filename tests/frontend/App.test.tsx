@@ -153,7 +153,8 @@ test('filters records and opens a shareable full account profile with DOB projec
   expect(window.location.hash).toBe('#/account/SYS-1')
   expect(screen.getByRole('button', { name:'Copy account link' })).toBeInTheDocument()
   const detailPanel = screen.getByRole('complementary', { name: 'Selected cooling tower detail' })
-  expect(within(detailPanel).getByText('Potential sampling gap')).toBeInTheDocument()
+  const decisionSummary = detailPanel.querySelector('.account-decision-summary') as HTMLElement
+  expect(within(decisionSummary).getByText('Potential sampling gap')).toBeInTheDocument()
 
   await user.click(within(detailPanel).getByRole('button', { name: /^Evidence/ }))
   await waitFor(() => expect(within(detailPanel).getByRole('heading', { name:'Identity' })).toBeInTheDocument())
