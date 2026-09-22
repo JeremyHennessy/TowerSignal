@@ -1,0 +1,63 @@
+name: Reproduce full DOB NOW production fetch
+
+on:
+  push:
+    branches: [diagnostic/dob-bbl-contract-20260921]
+    paths: [.github/workflows/reproduce-full-dob-fetch.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: |
+            data/history/segments/core.json
+            data/history/segments/dob.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Run production DOB adapter across verified BBL universe
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          import json
+          from pathlib import Path
+          from towersignal.dob_activity import fetch_dob_activity_by_bbl
+
+          core=json.loads(Path('.history-store/data/history/segments/core.json').read_text())
+          prior=json.loads(Path('.history-store/data/history/segments/dob.json').read_text())['dob_by_bbl']
+          bbls={str(row.get('bbl')) for row in core['systems'] if row.get('bbl')}
+          if len(bbls)!=3801:
+              raise SystemExit(f'Expected verified 3,801-BBL universe, got {len(bbls)}')
+
+          current,meta=fetch_dob_activity_by_bbl(bbls,chunk_size=25)
+          prior_counts={b:len(v) for b,v in prior.items()}
+          current_counts={b:len(v) for b,v in current.items()}
+          missing=[b for b in sorted(prior_counts) if prior_counts[b]>0 and current_counts.get(b,0)==0]
+          changed=[b for b in sorted(prior_counts) if current_counts.get(b,0)!=prior_counts[b]]
+          report={
+            'requested_bbl_count':len(bbls),
+            'current_matched_bbl_count':len(current),
+            'current_filing_count':sum(current_counts.values()),
+            'prior_matched_bbl_count':len(prior_counts),
+            'prior_filing_count':sum(prior_counts.values()),
+            'missing_prior_bbl_count':len(missing),
+            'changed_bbl_count':len(changed),
+            'first_missing_prior_bbls':missing[:20],
+            'metadata':meta,
+          }
+          Path('full-dob-fetch.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-dob-fetch
+          path: full-dob-fetch.json
+          retention-days: 14
