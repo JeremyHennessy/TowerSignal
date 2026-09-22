@@ -107,6 +107,11 @@ export interface SystemSummary {
   system_id: string
   bin: string | null
   bbl: string | null
+  property_bbl?: string | null
+  registry_bbl?: string | null
+  bbl_aliases?: string[]
+  bbl_identity_basis?: string | null
+  bbl_identity_status?: string | null
   address: string | null
   borough: string | null
   zip: string | null
@@ -493,7 +498,8 @@ export interface HistoricalProfile {
 export interface SystemDetail {
   schema_version: string
   metadata: Metadata
-  identity: Pick<SystemSummary, 'system_id' | 'bin' | 'bbl' | 'address' | 'borough' | 'zip' | 'active_equipment' | 'latitude' | 'longitude' | 'coordinate_status'> & {
+  identity: Pick<SystemSummary, 'system_id' | 'bin' | 'bbl' | 'property_bbl' | 'registry_bbl' | 'bbl_aliases' | 'bbl_identity_basis' | 'bbl_identity_status' | 'address' | 'borough' | 'zip' | 'active_equipment' | 'latitude' | 'longitude' | 'coordinate_status'> & {
+    bbl_identity_evidence?: Record<string, unknown> | null
     source_latitude_raw: string | null
     source_longitude_raw: string | null
   }
