@@ -86,6 +86,12 @@ def build(output_dir: Path) -> dict:
     progress("Reconciling registry/base BBL identity with exact-BIN published MapPLUTO property BBLs")
     bbl_identity_meta = apply_bbl_identity_recovery(systems, building_footprints_by_bin)
     bbl_values = {system["bbl"] for system in systems if system.get("bbl")}
+    bbl_alias_values = {
+        alias
+        for system in systems
+        for alias in (system.get("bbl_aliases") or ([system.get("bbl")] if system.get("bbl") else []))
+        if normalize_bbl(alias)
+    }
     progress(
         f"Canonical property BBL identity: {bbl_identity_meta['canonical_bbl_count']:,}/{len(systems):,}; "
         f"{bbl_identity_meta['reconciled_registry_bbl_count']:,} registry/base lots reconciled; "
@@ -98,8 +104,8 @@ def build(output_dir: Path) -> dict:
     pluto_by_bbl, pluto_meta = fetch_pluto_by_bbl(bbl_values)
     progress(f"Matched PLUTO context for {len(pluto_by_bbl):,} BBLs")
 
-    progress(f"Fetching DOB NOW activity for {len(bbl_values):,} canonical BBLs")
-    dob_by_bbl, dob_meta = fetch_dob_activity_by_bbl(bbl_values)
+    progress(f"Fetching DOB NOW activity for {len(bbl_alias_values):,} exact current/base BBL aliases")
+    dob_by_bbl, dob_meta = fetch_dob_activity_by_bbl(bbl_alias_values)
     progress(f"Matched DOB NOW activity for {len(dob_by_bbl):,} BBLs")
 
     progress(f"Fetching HPD contacts for {len(bbl_values):,} canonical BBLs")
@@ -210,6 +216,7 @@ def build(output_dir: Path) -> dict:
         "pluto_requested_bbl_count": pluto_meta["requested_bbl_count"],
         "pluto_matched_bbl_count": pluto_meta["matched_bbl_count"],
         "dob_requested_bbl_count": dob_meta["requested_bbl_count"],
+        "dob_match_basis": "BBL_ALIAS_EXACT",
         "dob_matched_bbl_count": dob_meta["matched_bbl_count"],
         "dob_matched_filing_count": dob_meta["matched_filing_count"],
         "dob_explicit_cooling_tower_filing_count": dob_meta["explicit_cooling_tower_filing_count"],
@@ -266,8 +273,23 @@ def build(output_dir: Path) -> dict:
             systems_with_oath_cases += 1
         bbl_key = normalize_bbl(system.get("bbl"))
         bin_key = normalize_planimetric_bin(system.get("bin"))
+        bbl_aliases = sorted({
+            alias
+            for value in (system.get("bbl_aliases") or ([system.get("bbl")] if system.get("bbl") else []))
+            if (alias := normalize_bbl(value))
+        }, key=int)
         building_context = pluto_by_bbl.get(bbl_key) if bbl_key else None
-        dob_activity = dob_by_bbl.get(bbl_key, []) if bbl_key else []
+
+        dob_activity_by_id: dict[str, dict[str, Any]] = {}
+        for alias in bbl_aliases:
+            for index, record in enumerate(dob_by_bbl.get(alias, [])):
+                identity = str(record.get("job_filing_number") or f"{alias}:{index}")
+                dob_activity_by_id[identity] = record
+        dob_activity = sorted(
+            dob_activity_by_id.values(),
+            key=lambda item: (item.get("activity_date") or "", item.get("job_filing_number") or ""),
+            reverse=True,
+        )
         dob_summary = summarize_dob_activity(dob_activity, snapshot_date)
         hpd_registration = hpd_by_bbl.get(bbl_key) if bbl_key else None
         planimetric_building_tower_features = planimetric_by_bin.get(bin_key, []) if bin_key else []
