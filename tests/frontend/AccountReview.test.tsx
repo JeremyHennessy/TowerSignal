@@ -160,3 +160,78 @@ test('Summary promotes a missing public Legionella sample date as a VERIFY warni
   expect(warning?.textContent).toContain('Verify current operating and sampling status independently.')
   expect(warning?.textContent).toContain('1 NYC Health inspection')
 })
+
+test('Summary distinguishes reconciled property BBL from registry/base BBL', () => {
+  const row = {
+    system_id: 'REVIEW-1',
+    priority_score: 30,
+    evidence_confidence: 'VERIFY',
+    active_equipment: 1,
+    bbl: '1011717513',
+    property_bbl: '1011717513',
+    registry_bbl: '1011710154',
+    bbl_aliases: ['1011710154', '1011717513'],
+    bbl_identity_status: 'RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL',
+    primary_signal: 'NO_CURRENT_SIGNAL',
+    recent_confirmed_violation: false,
+    score_components: [],
+    violation_types: [],
+  } as unknown as SystemSummary
+  const reconciledDetail = {
+    ...detail,
+    identity: {
+      ...detail.identity,
+      bbl: '1011717513',
+      property_bbl: '1011717513',
+      registry_bbl: '1011710154',
+      bbl_aliases: ['1011710154', '1011717513'],
+      bbl_identity_status: 'RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL',
+    },
+  } as unknown as SystemDetail
+
+  const { container } = render(<AccountDecisionSummary row={row} detail={reconciledDetail} historyEvents={[]} />)
+  const property = Array.from(container.querySelectorAll('.account-decision-evidence-grid article'))
+    .find(article => article.textContent?.includes('Property identity')) as HTMLElement
+  expect(property.textContent).toContain('FIXTURE OWNER')
+  expect(property.textContent).toContain('Property BBL 1011717513')
+  expect(property.textContent).toContain('registry/base BBL 1011710154')
+  expect(property.textContent).toContain('exact-BIN MapPLUTO reconciliation')
+})
+
+test('Summary flags unresolved property identity conflicts instead of implying missing source data', () => {
+  const row = {
+    system_id: 'REVIEW-1',
+    priority_score: 0,
+    evidence_confidence: 'VERIFY',
+    active_equipment: 1,
+    bbl: '1011710154',
+    property_bbl: '1011710154',
+    registry_bbl: '1011710154',
+    bbl_aliases: ['1011710154'],
+    bbl_identity_status: 'REGISTRY_SOURCE_BBL_MAPPLUTO_CONFLICT',
+    primary_signal: 'NO_CURRENT_SIGNAL',
+    recent_confirmed_violation: false,
+    score_components: [],
+    violation_types: [],
+  } as unknown as SystemSummary
+  const conflictDetail = {
+    ...detail,
+    building_context: null,
+    identity: {
+      ...detail.identity,
+      bbl: '1011710154',
+      property_bbl: '1011710154',
+      registry_bbl: '1011710154',
+      bbl_aliases: ['1011710154'],
+      bbl_identity_status: 'REGISTRY_SOURCE_BBL_MAPPLUTO_CONFLICT',
+    },
+  } as unknown as SystemDetail
+
+  const { container } = render(<AccountDecisionSummary row={row} detail={conflictDetail} historyEvents={[]} />)
+  const property = Array.from(container.querySelectorAll('.account-decision-evidence-grid article'))
+    .find(article => article.textContent?.includes('Property identity')) as HTMLElement
+  expect(property).toHaveClass('urgent')
+  expect(property.textContent).toContain('Property identity · VERIFY')
+  expect(property.textContent).toContain('Property identity needs review')
+  expect(property.textContent).toContain('Property-level joins are not treated as complete.')
+})
