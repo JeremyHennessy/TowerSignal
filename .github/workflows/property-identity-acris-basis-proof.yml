@@ -1,0 +1,108 @@
+name: Prove all ACRIS property identity match bases
+
+on:
+  push:
+    branches: [agent/property-identity-acris-basis-proof-20260922]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  live-basis-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: a305b8aeaf02b1195f6bbe0e7b8a7aa964b8e872
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download the exact current candidate cache, without rebuilding it
+        uses: actions/download-artifact@v4
+        with:
+          name: towersignal-acris-cache
+          run-id: 35795415814
+          github-token: ${{ github.token }}
+          path: acris-cache
+      - name: Replay every retained alias and regression-account document plus exact-BBL samples
+        run: |
+          python - <<'PY'
+          import contextlib
+          import hashlib
+          import io
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path('scripts').resolve()))
+          from verify_live_acris import verify
+
+          expected_head = 'a305b8aeaf02b1195f6bbe0e7b8a7aa964b8e872'
+          actual_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          assert actual_head == expected_head, (actual_head, expected_head)
+          raw = Path('acris-cache/cache.json').read_bytes()
+          cache_sha = hashlib.sha256(raw).hexdigest()
+          assert cache_sha == '3f1384159ef5166925402bbba362666e0cebdc934dd411fc89b9b0ecaadc7fde', cache_sha
+          cache = json.loads(raw)
+          inputs = Path('.basis-proof-input')
+          inputs.mkdir()
+          output = Path('proof')
+          output.mkdir()
+          scopes = [
+              ('exact-bbl', 'BBL_EXACT_DOCUMENT_ID_EXACT', None, 5),
+              ('all-retained-base-aliases', 'BBL_ALIAS_EXACT_DOCUMENT_ID_EXACT', None, None),
+              ('400-west-61st-all-documents', 'CONDO_BILLING_BBL_BLOCK_ADDRESS_EXACT', '1011717513', None),
+          ]
+          receipts = []
+          for name, basis, required_bbl, requested_size in scopes:
+              properties = {}
+              for bbl, context in cache['properties'].items():
+                  if required_bbl is not None and bbl != required_bbl:
+                      continue
+                  documents = [doc for doc in context.get('documents', []) if doc.get('match_basis') == basis]
+                  if documents:
+                      properties[bbl] = {**context, 'documents': documents}
+              count = sum(len(context['documents']) for context in properties.values())
+              assert count > 0, f'No real cached documents for required scope {name}'
+              sample_size = requested_size if requested_size is not None else count
+              assert count >= sample_size, (name, count, sample_size)
+              # This is a test-only projection of immutable source records, never a published cache.
+              subset = {**cache, 'properties': properties, 'proof_subset': name}
+              path = inputs / f'{name}.json'
+              path.write_text(json.dumps(subset), encoding='utf-8')
+              capture = io.StringIO()
+              with contextlib.redirect_stdout(capture):
+                  verify(path, sample_size)
+              result = json.loads(capture.getvalue())
+              assert result['status'] == 'PASS', result
+              assert result['sample_size'] == sample_size, result
+              assert all(row['match_basis'] == basis for row in result['verified']), result
+              if required_bbl is not None:
+                  assert all(row['bbl'] == required_bbl for row in result['verified']), result
+              receipt = {
+                  'scope': name,
+                  'input_is_test_subset': True,
+                  'application_sha': actual_head,
+                  'source_run_id': 35795415814,
+                  'source_artifact_id': 10722964561,
+                  'source_cache_sha256': cache_sha,
+                  'source_cache_generated_at': cache['generated_at'],
+                  'retained_documents_in_scope': count,
+                  'result': result,
+              }
+              (output / f'{name}.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')
+              receipts.append(receipt)
+              print(json.dumps(receipt, indent=2), flush=True)
+          assert len(receipts) == 3
+          print('PASS: live Master, Legals and Parties reproduce all three required identity match bases.')
+          PY
+      - name: Retain independently replayed source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: property-identity-acris-basis-proof
+          path: proof/*.json
+          if-no-files-found: error
+          retention-days: 30
