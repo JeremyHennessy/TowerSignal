@@ -1,0 +1,63 @@
+name: Source Health layout baseline audit
+on:
+  push:
+    branches: [agent/source-health-layout-audit-20260922]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package exact review sources
+        run: |
+          git archive --format=zip --output=review-source.zip HEAD src tests scripts .github config package.json index.html eslint.config.js tsconfig.json tsconfig.app.json tsconfig.node.json vite.config.ts vitest.config.ts playwright.config.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-health-review-source
+          path: review-source.zip
+          retention-days: 3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Package local verification dependencies
+        run: tar -czf review-node-modules.tar.gz node_modules
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-health-review-dependencies
+          path: review-node-modules.tar.gz
+          retention-days: 3
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Capture actual hosted desktop and iPhone page
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          SOURCE_HEALTH_BASELINE: '1'
+        run: npx playwright test tests/e2e/source-health-coverage.spec.ts --project=desktop-chromium --project=iphone
+      - name: Collect public source metadata
+        run: |
+          mkdir -p source-health-metadata
+          python - <<'PY'
+          import json, urllib.request, pathlib
+          root=pathlib.Path('source-health-metadata')
+          base='https://jeremyhennessy.github.io/TowerSignal/data/'
+          for name in ['systems.json','coverage-audit.json','legionella-alerts.json']:
+              try:
+                  with urllib.request.urlopen(base+name,timeout=90) as r: value=json.load(r)
+                  if name=='systems.json': value={'metadata':value['metadata'],'summary':value['summary']}
+                  (root/name).write_text(json.dumps(value,indent=2))
+              except Exception as e:
+                  print(name, str(e))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-health-layout-before
+          path: |
+            source-health-proof
+            source-health-metadata
+            playwright-report
+            test-results
+          retention-days: 30
