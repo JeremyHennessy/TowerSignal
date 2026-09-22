@@ -4,7 +4,7 @@ name: Deliver reviewed Account application
 # Scheduled data generation and durable history remain owned by pages.yml.
 on:
   push:
-    branches: [agent/account-evidence-architecture-promotion-20260917, main]
+    branches: [agent/account-evidence-architecture-promotion-20260917]
     paths:
       - .github/workflows/account-reviewed-delivery.yml
       - tests/e2e/**
