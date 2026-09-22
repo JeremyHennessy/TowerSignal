@@ -322,6 +322,12 @@ function inspectionViolations(detail: SystemDetail) {
     .flatMap(inspection => inspection.violations.map(violation => ({ inspection, violation })))
 }
 
+function isClientFacingSignal(signal: SystemDetail['signals'][number]): boolean {
+  const factClass = String(signal.fact_class ?? '').toUpperCase()
+  const copy = `${signal.title ?? ''} ${signal.reason ?? ''}`.toLowerCase()
+  return !factClass.includes('COMMERCIAL') && !copy.includes('commercial-value') && !copy.includes('higher-value service account')
+}
+
 function primaryObservation(row: SystemSummary, detail: SystemDetail) {
   const recent = detail.signals.find(signal => signal.type === 'CONFIRMED_RECENT_VIOLATION')
   if (row.recent_confirmed_violation && recent) {
@@ -331,7 +337,7 @@ function primaryObservation(row: SystemSummary, detail: SystemDetail) {
       tone: 'attention' as const,
     }
   }
-  const clientSignals = detail.signals.filter(item => item.fact_class !== 'COMMERCIAL_SIGNAL')
+  const clientSignals = detail.signals.filter(isClientFacingSignal)
   const signal = clientSignals.find(item => item.type === row.primary_signal) ?? clientSignals[0]
   if (signal) {
     return {
@@ -406,11 +412,6 @@ function drawCover(ctx: PdfContext) {
     { label: 'BBL', value: display(detail.identity.bbl) },
   ])
 
-  callout(
-    ctx,
-    'Use and interpretation',
-    'This report summarizes source-backed public records and exact-key property joins. It does not establish current operating status, maintenance history, service responsibility, safety, legal compliance or causation. Verify current site conditions and authoritative agency status before relying on any observation.',
-  )
 }
 
 function drawOverview(ctx: PdfContext) {
@@ -429,7 +430,7 @@ function drawOverview(ctx: PdfContext) {
   ])
 
   sectionHeading(ctx, 'Current public-record observations')
-  const clientSignals = ctx.detail.signals.filter(signal => signal.fact_class !== 'COMMERCIAL_SIGNAL')
+  const clientSignals = ctx.detail.signals.filter(isClientFacingSignal)
   if (clientSignals.length) {
     bullets(ctx, clientSignals.slice(0, 8).map(signal => {
       const prefix = signal.date ? `${date(signal.date)} - ` : ''
@@ -448,11 +449,6 @@ function drawOverview(ctx: PdfContext) {
     { label: 'Year built', value: building?.year_built ? String(building.year_built) : 'Not published', detail: `${(ctx.detail.building_footprints?.length ?? 0).toLocaleString()} exact-BIN building footprint${(ctx.detail.building_footprints?.length ?? 0) === 1 ? '' : 's'}` },
   ])
 
-  callout(
-    ctx,
-    'Evidence boundary',
-    'A source non-match is reported as a non-match, not as proof that the underlying owner, project, condition, service relationship or compliance state does not exist. Property records are joined only through the exact source identifiers represented in TowerSignal.',
-  )
 }
 
 function drawSiteContext(ctx: PdfContext) {
@@ -644,7 +640,8 @@ function drawProjects(ctx: PdfContext) {
 }
 
 function drawSources(ctx: PdfContext) {
-  addPage(ctx, 'Sources and methodology')
+  ctx.sectionTitle = 'Sources and methodology'
+  ensureSpace(ctx, 220, ctx.sectionTitle)
   sectionHeading(ctx, 'Sources and provenance', `${ctx.detail.metadata.sources.length.toLocaleString()} source dataset${ctx.detail.metadata.sources.length === 1 ? '' : 's'} are represented in this generated detail record. Each entry retains its dataset identity and retrieval timing.`)
 
   ctx.detail.metadata.sources.forEach(source => sourceEntry(ctx, source))
