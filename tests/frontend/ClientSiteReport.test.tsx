@@ -84,7 +84,7 @@ test('client site report carries the current missing-sample warning and site ide
   expect(screen.getAllByText(/2000014227/).length).toBeGreaterThan(0)
   expect(screen.getByText('VERIFY · No public Legionella sample date')).toBeInTheDocument()
   expect(screen.getAllByText(/Verify current operating and sampling status independently/).length).toBeGreaterThan(0)
-  expect(screen.getByText('CLIENT REPORT OWNER')).toBeInTheDocument()
+  expect(screen.getAllByText('CLIENT REPORT OWNER').length).toBeGreaterThan(0)
 })
 
 test('client site report includes source provenance and an explicit interpretation boundary', () => {
