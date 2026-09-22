@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.acris import build_recent_cache, normalize_bbl, validate_cache_file  # noqa: E402
+from towersignal.bbl_identity import apply_bbl_identity_recovery  # noqa: E402
+from towersignal.building_footprints import fetch_building_footprints_by_bin  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
 
@@ -40,7 +42,18 @@ def tower_bbls_from_current_registrations() -> set[str]:
         raise RuntimeError(
             f"Refusing to build production ACRIS cache from only {len(systems):,} normalized current systems"
         )
-    return _tower_bbls(systems, f"current NYC registry {REGISTRATION_DATASET_ID}")
+
+    bins = {str(system.get("bin")) for system in systems if system.get("bin")}
+    footprints_by_bin, _ = fetch_building_footprints_by_bin(bins)
+    identity_meta = apply_bbl_identity_recovery(systems, footprints_by_bin)
+    if identity_meta["canonical_bbl_count"] < 1000:
+        raise RuntimeError(
+            "Refusing to build ACRIS cache from an implausibly small reconciled property-BBL universe"
+        )
+    return _tower_bbls(
+        systems,
+        f"current NYC registry {REGISTRATION_DATASET_ID} after exact-BIN property-BBL reconciliation",
+    )
 
 
 def build(tower_snapshot: Path | None, output: Path) -> dict:
