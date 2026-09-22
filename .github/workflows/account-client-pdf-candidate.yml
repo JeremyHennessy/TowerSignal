@@ -45,6 +45,7 @@ jobs:
           done
           curl --fail --location --retry 3 --retry-delay 2 "$base/details/20/2000015594.json?candidate=$GITHUB_SHA" -o .candidate-pages/data/details/20/2000015594.json
           sha256sum .candidate-pages/data/systems.json .candidate-pages/data/changes.json .candidate-pages/data/nys-systems.json .candidate-pages/data/nys-changes.json .candidate-pages/data/details/20/2000015594.json > proof/retained-live-data.sha256
+          cp .candidate-pages/data/details/20/2000015594.json proof/account-detail.json
       - name: Install browser
         run: npx playwright install --with-deps chromium
       - name: Run site-specific PDF download acceptance
@@ -77,7 +78,7 @@ jobs:
             echo 'Internal priority-score label leaked into client PDF' >&2
             exit 1
           fi
-          if grep -F 'higher-value service account' proof/report.txt; then
+          if grep -Ei 'commercial-value|higher-value service account' proof/report.txt; then
             echo 'Internal commercial-value language leaked into client PDF' >&2
             exit 1
           fi
