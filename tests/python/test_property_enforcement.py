@@ -5,6 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from attach_property_enforcement import _merge_hpd_alias_contexts
 from towersignal.property_enforcement import (
     fetch_official_swo_snapshot_by_bin,
     normalize_facade_filing,
@@ -102,6 +103,32 @@ class PropertyEnforcementTests(unittest.TestCase):
         self.assertEqual(filing["cycle"], "10")
         self.assertEqual(filing["qewi_name"], "Example Engineer")
         self.assertEqual(filing["match_basis"], "BIN_EXACT")
+
+
+    def test_hpd_context_merges_current_and_registry_bbl_aliases_without_duplicates(self):
+        by_bbl = {
+            "1011710154": {
+                "summary": {},
+                "hpd_violations": [
+                    {"violation_id": "V1", "inspection_date": "2025-01-01", "is_open": False, "class": "B"},
+                    {"violation_id": "V2", "inspection_date": "2026-01-01", "is_open": True, "class": "C"},
+                ],
+            },
+            "1011717513": {
+                "summary": {},
+                "hpd_violations": [
+                    {"violation_id": "V2", "inspection_date": "2026-01-01", "is_open": True, "class": "C"},
+                    {"violation_id": "V3", "inspection_date": "2026-02-01", "is_open": True, "class": "A"},
+                ],
+            },
+        }
+        context, matched = _merge_hpd_alias_contexts(by_bbl, ["1011710154", "1011717513"])
+        self.assertEqual(matched, ["1011710154", "1011717513"])
+        self.assertEqual(context["summary"]["record_count"], 3)
+        self.assertEqual(context["summary"]["open_count"], 2)
+        self.assertEqual(context["summary"]["open_class_c_count"], 1)
+        self.assertEqual(context["match_basis"], "BBL_ALIAS_EXACT")
+
 
 
 if __name__ == "__main__":
