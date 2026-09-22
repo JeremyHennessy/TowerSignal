@@ -31,5 +31,6 @@ import './styles/workflow-inspector-containment.css'
 import './styles/account-detail-polish.css'
 import './styles/prospect-presets.css'
 import './styles/account-evidence-workspace.css'
+import './styles/client-site-report.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AuthGate /></React.StrictMode>)
