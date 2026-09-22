@@ -13,7 +13,7 @@ import build_acris_cache  # noqa: E402
 class BuildAcrisCacheTests(unittest.TestCase):
     def test_current_registry_defines_cache_bbl_universe(self):
         systems = [
-            {"system_id": f"CT-{index}", "bbl": str(1_000_000_000 + (index % 1500))}
+            {"system_id": f"CT-{index}", "bbl": str(1_000_000_000 + index)}
             for index in range(4000)
         ]
         footprints = {
@@ -34,7 +34,7 @@ class BuildAcrisCacheTests(unittest.TestCase):
         fetch.assert_called_once_with(build_acris_cache.REGISTRATION_DATASET_ID, "system_id")
         normalize.assert_called_once_with([{"system_id": "source-row"}])
         footprints_fetch.assert_called_once()
-        self.assertEqual(len(bbls), 1500)
+        self.assertEqual(len(bbls), 4000)
         self.assertIn("1000009999", bbls)
         self.assertNotIn("1000000000", bbls)
 
