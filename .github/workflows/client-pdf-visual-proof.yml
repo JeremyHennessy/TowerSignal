@@ -1,0 +1,80 @@
+name: Prove client PDF candidate
+
+on:
+  push:
+    branches:
+      - agent/client-pdf-visual-proof-20260922
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Reuse last fully accepted hosted data snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .accepted-pages .accepted-site public/data
+          gh run download 35606171481 -n github-pages -D .accepted-pages
+          archive="$(find .accepted-pages -type f | head -1)"
+          tar -xf "$archive" -C .accepted-site
+          rm -rf public/data
+          cp -R .accepted-site/data public/data
+          test -f public/data/details/20/2000014227.json
+          test -f public/data/details/20/2000015594.json
+
+      - name: Build exact PDF candidate against accepted data
+        run: npm run build
+
+      - name: Install Chromium and PDF inspection tools
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+
+      - name: Generate actual client PDFs
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/dist
+        run: npx playwright test tests/e2e/client-pdf-proof.spec.ts --project=desktop-chromium
+
+      - name: Extract and render generated PDFs
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p pdf-proof/renders pdf-proof/text pdf-proof/pdfs
+          while IFS= read -r -d '' pdf; do
+            name="$(basename "$pdf" .pdf)"
+            cp "$pdf" "pdf-proof/pdfs/$name.pdf"
+            pdftotext "$pdf" "pdf-proof/text/$name.txt"
+            mkdir -p "pdf-proof/renders/$name"
+            pdftoppm -png -r 140 "$pdf" "pdf-proof/renders/$name/page"
+          done < <(find test-results -type f -name 'TowerSignal-*-client-report.pdf' -print0)
+          test "$(find pdf-proof/pdfs -type f -name '*.pdf' | wc -l)" -eq 2
+          grep -R "No public Legionella sample date" pdf-proof/text
+          grep -R "Interpretation boundary" pdf-proof/text
+
+      - name: Retain PDF visual proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-pdf-candidate-visual-proof
+          path: |
+            pdf-proof
+            playwright-report
+            test-results
+          retention-days: 30
