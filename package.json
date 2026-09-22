@@ -10,14 +10,16 @@
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "prebuild": "node scripts/prepare-account-report-fonts.mjs"
   },
   "dependencies": {
     "@neondatabase/neon-js": "0.7.0-beta",
     "leaflet": "1.9.4",
     "leaflet.markercluster": "1.5.3",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "qrcode-generator": "2.0.4"
   },
   "devDependencies": {
     "@eslint/js": "9.17.0",

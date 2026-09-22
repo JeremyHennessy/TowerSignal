@@ -1,16 +1,22 @@
-name: Deploy verified application-only release
+name: Deploy approved Account PDF application-only release
 
 on:
   push:
     branches:
-      - agent/fast-application-release-20260922
-      - agent/account-full-width-live-hotfix-v2-20260922
+      - agent/approved-account-pdf-20260922
       - main
     paths:
       - .github/workflows/fast-application-release-20260922.yml
-      - .github/workflows/account-reviewed-delivery.yml
+      - src/components/ClientSiteReport.tsx
+      - src/components/DetailPanel.tsx
+      - src/styles/client-site-report.css
+      - src/utils/accountReportModel.ts
+      - src/utils/prepareAccountReport.ts
+      - tests/e2e/approved-account-pdf.spec.ts
       - tests/e2e/fast-application-release-20260922.spec.ts
-      - src/styles/account-detail-polish.css
+      - scripts/prepare-account-report-fonts.mjs
+      - scripts/verify-account-pdf.py
+      - package.json
 
 permissions:
   contents: read
@@ -21,6 +27,10 @@ permissions:
 concurrency:
   group: fast-application-release-20260922
   cancel-in-progress: true
+
+env:
+  VITE_REPORT_APPLICATION_SHA: ${{ github.sha }}
+  EXPECTED_REPORT_SHA: ${{ github.sha }}
 
 jobs:
   build:
@@ -46,9 +56,9 @@ jobs:
               }
             }
 
-      - name: Prove exact accepted application plus release-control-only delta
+      - name: Prove report-only delta against accepted full-width Account baseline
         env:
-          EXPECTED_PRODUCT: fae60fbdb1cf2fda13c71cd476c3e62bf4546d44
+          EXPECTED_PRODUCT: 190e99920e196e68a3900e04a9751b2d0d6336c5
         run: |
           set -euo pipefail
           git fetch --depth=1 origin "$EXPECTED_PRODUCT"
@@ -57,14 +67,26 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           allowed={
+            '.gitignore',
             '.github/workflows/fast-application-release-20260922.yml',
-            'src/styles/account-detail-polish.css',
+            'docs/approved-baselines/account-pdf-20260922.json',
+            'package.json',
+            'scripts/prepare-account-report-fonts.mjs',
+            'scripts/verify-account-pdf.py',
+            'src/components/ClientSiteReport.tsx',
+            'src/components/DetailPanel.tsx',
+            'src/styles/client-site-report.css',
+            'src/utils/accountReportModel.ts',
+            'src/utils/prepareAccountReport.ts',
+            'tests/e2e/approved-account-pdf.spec.ts',
             'tests/e2e/fast-application-release-20260922.spec.ts',
+            'tests/frontend/ClientSiteReport.test.tsx',
+            'tests/fixtures/approved-account-report-2000000407.json',
           }
           actual={line.strip() for line in Path('/tmp/release-diff.txt').read_text().splitlines() if line.strip()}
           assert actual == allowed, (actual, allowed)
           PY
-          git diff --exit-code "$EXPECTED_PRODUCT" HEAD -- src ':!src/styles/account-detail-polish.css' package.json vite.config.ts tsconfig.json tsconfig.app.json
+          git diff --exit-code "$EXPECTED_PRODUCT" HEAD -- src/data src/domain src/styles/account-detail-polish.css vite.config.ts tsconfig.json tsconfig.app.json
 
       - uses: actions/setup-node@v4
         with:
@@ -73,20 +95,20 @@ jobs:
       - name: Install exact frontend dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Download deployed Pages 230 snapshot
+      - name: Download exact accepted 190e999 site and data
         uses: actions/download-artifact@v4
         with:
           repository: JeremyHennessy/TowerSignal
-          run-id: 35744133412
+          run-id: 35768655554
           name: github-pages
           github-token: ${{ github.token }}
-          path: .pages230
+          path: .accepted-site
 
-      - name: Freeze Pages 230 data byte-for-byte
+      - name: Freeze accepted data byte-for-byte
         run: |
           set -euo pipefail
           mkdir -p .rollback .source-data public/data
-          archive="$(find .pages230 -type f | head -1)"
+          archive="$(find .accepted-site -type f | head -1)"
           tar -xf "$archive" -C .rollback
           rm -rf public/data
           cp -R .rollback/data public/data
@@ -95,8 +117,8 @@ jobs:
           import hashlib,json,pathlib
           root=pathlib.Path('.source-data/data')
           hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
-          pathlib.Path('pages230-data-sha256.json').write_text(json.dumps(hashes,sort_keys=True))
-          print(f'Frozen {len(hashes):,} data files from Pages 230')
+          pathlib.Path('accepted-data-sha256.json').write_text(json.dumps(hashes,sort_keys=True))
+          print(f'Frozen {len(hashes):,} data files from accepted main 190e999')
           PY
 
       - name: Verify and build exact main application
@@ -107,11 +129,11 @@ jobs:
           npm run build
           python - <<'PY'
           import hashlib,json,pathlib
-          expected=json.loads(pathlib.Path('pages230-data-sha256.json').read_text())
+          expected=json.loads(pathlib.Path('accepted-data-sha256.json').read_text())
           root=pathlib.Path('dist/data')
           actual={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
           assert actual == expected, 'Application-only build changed the frozen data snapshot'
-          print(f'All {len(actual):,} deployed data files remain byte-for-byte identical to Pages 230')
+          print(f'All {len(actual):,} deployed data files remain byte-for-byte identical to accepted main 190e999')
           PY
 
       - name: Install candidate browsers
@@ -122,7 +144,12 @@ jobs:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
           CANDIDATE_ROOT: ${{ github.workspace }}/dist
         run: |
-          npx playwright test             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+          npx playwright test             tests/e2e/approved-account-pdf.spec.ts             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+
+      - name: Inspect actual four-page PDF bytes
+        run: |
+          python -m pip install --quiet PyMuPDF==1.24.14
+          python scripts/verify-account-pdf.py
 
       - name: Retain pre-deploy Account screenshots and PDF
         if: always()
@@ -149,7 +176,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fast-release-data-proof
-          path: pages230-data-sha256.json
+          path: accepted-data-sha256.json
           retention-days: 30
 
   deploy:
@@ -184,7 +211,11 @@ jobs:
         env:
           BASE_URL: ${{ needs.deploy.outputs.page_url }}
         run: |
-          GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+          GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test             tests/e2e/approved-account-pdf.spec.ts             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+      - name: Inspect actual hosted four-page PDF bytes
+        run: |
+          python -m pip install --quiet PyMuPDF==1.24.14
+          python scripts/verify-account-pdf.py
       - name: Retain hosted screenshots and PDF
         if: always()
         uses: actions/upload-artifact@v4
@@ -202,7 +233,7 @@ jobs:
     environment:
       name: github-pages
     steps:
-      - name: Restore exact prior Pages 230 site
+      - name: Restore exact prior 190e999 site
         uses: actions/deploy-pages@v4
         with:
           artifact_name: fast-release-rollback
