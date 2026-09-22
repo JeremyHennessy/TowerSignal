@@ -63,7 +63,7 @@ jobs:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
           CANDIDATE_ROOT: ${{ github.workspace }}/dist
         run: |
-          npx playwright test tests/e2e/client-pdf-proof.spec.ts --project=desktop-chromium --no-deps
+          npx playwright test tests/e2e/client-pdf-proof.spec.ts --project=desktop-chromium --no-deps --output=test-results/pdf-proof
           mkdir -p integrated-proof/renders integrated-proof/text integrated-proof/pdfs
           while IFS= read -r -d '' pdf; do
             name="$(basename "$pdf" .pdf)"
