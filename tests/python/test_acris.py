@@ -205,7 +205,7 @@ class AcrisTests(unittest.TestCase):
         }
         validate_cache(cache)
         cache["properties"]["1011717513"]["documents"][0]["legal_context"] = []
-        with self.assertRaisesRegex(Exception, "lacks source unit-BBL provenance"):
+        with self.assertRaisesRegex(Exception, "lacks source-BBL provenance"):
             validate_cache(cache)
 
     def test_cache_file_size_and_age_validation(self):
