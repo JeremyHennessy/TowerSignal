@@ -77,6 +77,10 @@ jobs:
             echo 'Internal priority-score label leaked into client PDF' >&2
             exit 1
           fi
+          if grep -F 'higher-value service account' proof/report.txt; then
+            echo 'Internal commercial-value language leaked into client PDF' >&2
+            exit 1
+          fi
           mkdir -p proof/rendered
           pdftoppm -png -r 120 proof/account-2000015594-client-report.pdf proof/rendered/page
           test "$(find proof/rendered -type f -name 'page-*.png' | wc -l)" -ge 4
