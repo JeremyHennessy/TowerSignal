@@ -37,6 +37,7 @@ jobs:
           import sys
           from pathlib import Path
           sys.path.insert(0, str(Path('scripts').resolve()))
+          from towersignal.acris import validate_cache, tower_bbl_hash
           from verify_live_acris import verify
 
           expected_head = 'a305b8aeaf02b1195f6bbe0e7b8a7aa964b8e872'
@@ -46,6 +47,7 @@ jobs:
           cache_sha = hashlib.sha256(raw).hexdigest()
           assert cache_sha == '3f1384159ef5166925402bbba362666e0cebdc934dd411fc89b9b0ecaadc7fde', cache_sha
           cache = json.loads(raw)
+          validate_cache(cache, require_production_volume=True)
           inputs = Path('.basis-proof-input')
           inputs.mkdir()
           output = Path('proof')
@@ -63,13 +65,31 @@ jobs:
                       continue
                   documents = [doc for doc in context.get('documents', []) if doc.get('match_basis') == basis]
                   if documents:
-                      properties[bbl] = {**context, 'documents': documents}
+                      properties[bbl] = {
+                          'documents': documents,
+                          'recent_document_count': len(documents),
+                          'displayed_document_count': len(documents),
+                      }
               count = sum(len(context['documents']) for context in properties.values())
+              unique_ids = {doc['document_id'] for context in properties.values() for doc in context['documents']}
               assert count > 0, f'No real cached documents for required scope {name}'
               sample_size = requested_size if requested_size is not None else count
               assert count >= sample_size, (name, count, sample_size)
-              # This is a test-only projection of immutable source records, never a published cache.
-              subset = {**cache, 'properties': properties, 'proof_subset': name}
+              # Test-only projection: retain each source document byte-equivalent as parsed,
+              # but describe the subset honestly rather than carrying full-cache counts.
+              subset = {
+                  **cache,
+                  'properties': properties,
+                  'proof_subset': name,
+                  'tower_bbl_universe': {'count': len(properties), 'sha256': tower_bbl_hash(properties)},
+                  'metrics': {
+                      'requested_tower_bbl_count': len(properties),
+                      'tower_bbls_with_recent_relevant_acris': len(properties),
+                      'retained_document_link_count': count,
+                      'matched_recent_document_count': len(unique_ids),
+                  },
+              }
+              validate_cache(subset)
               path = inputs / f'{name}.json'
               path.write_text(json.dumps(subset), encoding='utf-8')
               capture = io.StringIO()
@@ -89,6 +109,7 @@ jobs:
                   'source_artifact_id': 10722964561,
                   'source_cache_sha256': cache_sha,
                   'source_cache_generated_at': cache['generated_at'],
+                  'source_cache_production_validation': 'PASS',
                   'retained_documents_in_scope': count,
                   'result': result,
               }
