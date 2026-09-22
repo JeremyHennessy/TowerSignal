@@ -18,6 +18,13 @@ class DailySourceRefreshWorkflowTests(unittest.TestCase):
         self.assertIn("cron: '41 8 * * *'", self.checkbook)
         self.assertIn("cron: '23 */6 * * *'", self.oath)
 
+    def test_scheduled_pages_refresh_never_cancels_an_active_pages_release(self):
+        self.assertIn(
+            "cancel-in-progress: ${{ github.event_name != 'schedule' }}",
+            self.pages,
+        )
+        self.assertNotIn("cancel-in-progress: true", self.pages)
+
     def test_scheduled_acris_refresh_does_not_launch_competing_pages_release(self):
         self.assertIn(
             "if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}",
