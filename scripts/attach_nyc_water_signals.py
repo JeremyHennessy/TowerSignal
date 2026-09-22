@@ -199,10 +199,12 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, Any]:
     bbl_to_systems: dict[str, list[Mapping[str, Any]]] = {}
     bin_to_systems: dict[str, list[Mapping[str, Any]]] = {}
     for system in systems:
-        bbl = _normalize_bbl(system.get("bbl"))
+        alias_values = system.get("bbl_aliases") if isinstance(system.get("bbl_aliases"), list) else [system.get("bbl")]
+        for value in alias_values:
+            bbl = _normalize_bbl(value)
+            if bbl:
+                bbl_to_systems.setdefault(bbl, []).append(system)
         bin_value = _normalize_bin(system.get("bin"))
-        if bbl:
-            bbl_to_systems.setdefault(bbl, []).append(system)
         if bin_value:
             bin_to_systems.setdefault(bin_value, []).append(system)
 
@@ -237,7 +239,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, Any]:
     metadata = systems_payload["metadata"]
     metadata.update({
         "nyc_water_signal_cache_available": True,
-        "nyc_water_signal_match_basis": "EXACT_SOURCE_BBL_OR_BIN",
+        "nyc_water_signal_match_basis": "EXACT_SOURCE_BBL_ALIAS_OR_BIN",
         "nyc_water_signal_source_record_count": sum(
             int(source.get("source_record_count") or 0)
             for source in signal_payload.get("source_health", [])
@@ -251,7 +253,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, Any]:
     (output_dir / "metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
     report = {
-        "match_basis": "EXACT_SOURCE_BBL_OR_BIN",
+        "match_basis": "EXACT_SOURCE_BBL_ALIAS_OR_BIN",
         "requested_bbl_count": len(bbl_to_systems),
         "requested_bin_count": len(bin_to_systems),
         "systems_attached": systems_attached,
