@@ -70,7 +70,7 @@ def _context(rows: list[dict[str, Any]], summary: Mapping[str, Any]) -> dict[str
             ),
         ),
         "evidence_boundaries": {
-            "property_link": "Exact source-reported NYC DEP BBL only; address text is not used for matching.",
+            "property_link": "Exact source-reported NYC DEP BBL matched to current property or preserved registry/base BBL alias; address text is not used for matching.",
             "material": "Last-known service-line material category as published by NYC DEP; not a TowerSignal inference.",
         },
         "source": {
@@ -105,27 +105,45 @@ def attach(output_dir: Path, data_path: Path, summary_path: Path) -> dict[str, A
         if bbl in matched_by_bbl:
             matched_by_bbl[bbl].append(row)
 
-    systems_with_records = 0
-    matched_record_total = 0
-    matched_bbl_count = 0
+    matched_record_total = sum(len(records) for records in matched_by_bbl.values())
+    matched_bbl_count = sum(1 for records in matched_by_bbl.values() if records)
+
+    records_by_system: dict[str, dict[str, dict[str, Any]]] = {}
+    aliases_by_system: dict[str, set[str]] = {}
+    systems_by_id = {str(system.get("system_id") or ""): system for system in systems}
+
     for bbl, records in matched_by_bbl.items():
-        if records:
-            matched_bbl_count += 1
-            matched_record_total += len(records)
-        context = _context(records, summary) if records else None
+        if not records:
+            continue
         for system in bbl_to_systems[bbl]:
-            system["nyc_lead_service_line_record_count"] = len(records)
-            system["nyc_lead_service_line_materials"] = sorted(
-                {str(row.get("material")) for row in records if row.get("material")}
-            )
-            if records:
-                systems_with_records += 1
-            detail_path = _safe_detail_path(output_dir, str(system.get("system_id") or ""))
-            if not detail_path.exists():
-                raise RuntimeError(f"Missing account detail while attaching service-line records: {system.get('system_id')}")
-            detail = json.loads(detail_path.read_text(encoding="utf-8"))
-            detail["nyc_lead_service_lines"] = context
-            detail_path.write_text(json.dumps(detail, separators=(",", ":")), encoding="utf-8")
+            system_id = str(system.get("system_id") or "")
+            if not system_id:
+                continue
+            aliases_by_system.setdefault(system_id, set()).add(bbl)
+            bucket = records_by_system.setdefault(system_id, {})
+            for index, record in enumerate(records):
+                identity = str(record.get("record_id") or f"{bbl}:{index}")
+                bucket[identity] = record
+
+    systems_with_records = 0
+    for system_id, system in systems_by_id.items():
+        records = list(records_by_system.get(system_id, {}).values())
+        context = _context(records, summary) if records else None
+        if context is not None:
+            context["matched_bbl_aliases"] = sorted(aliases_by_system.get(system_id, set()))
+            context["match_basis"] = "BBL_ALIAS_EXACT"
+        system["nyc_lead_service_line_record_count"] = len(records)
+        system["nyc_lead_service_line_materials"] = sorted(
+            {str(row.get("material")) for row in records if row.get("material")}
+        )
+        if records:
+            systems_with_records += 1
+        detail_path = _safe_detail_path(output_dir, system_id)
+        if not detail_path.exists():
+            raise RuntimeError(f"Missing account detail while attaching service-line records: {system_id}")
+        detail = json.loads(detail_path.read_text(encoding="utf-8"))
+        detail["nyc_lead_service_lines"] = context
+        detail_path.write_text(json.dumps(detail, separators=(",", ":")), encoding="utf-8")
 
     metadata = payload["metadata"]
     metadata.update({
