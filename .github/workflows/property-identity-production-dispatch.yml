@@ -1,0 +1,64 @@
+name: Dispatch verified property identity data release
+
+on:
+  push:
+    branches: [agent/property-identity-production-dispatch-20260922]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-verified-producer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      EXPECTED_MAIN: fc5c255c5b41e561566eb0938239499ba03fa95b
+    steps:
+      - name: Require the accepted merge and start only the existing verified ACRIS workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          repo = os.environ['GH_REPO']
+          expected = os.environ['EXPECTED_MAIN']
+          def gh_json(*args):
+              return json.loads(subprocess.check_output(['gh', *args], text=True))
+          main = gh_json('api', f'repos/{repo}/branches/main')['commit']['sha']
+          if main != expected:
+              raise SystemExit(f'Main moved: {main}; expected {expected}. No workflow dispatched.')
+          runs = gh_json('run', 'list', '--repo', repo, '--workflow', 'acris-cache.yml',
+                         '--branch', 'main', '--limit', '30',
+                         '--json', 'databaseId,headSha,status,conclusion,event,url')
+          acceptable = [r for r in runs if r['headSha'] == expected and (
+              r['status'] in ('queued', 'in_progress', 'requested', 'waiting', 'pending')
+              or (r['status'] == 'completed' and r['conclusion'] == 'success')
+          )]
+          receipt = {'checked_at': datetime.now(timezone.utc).isoformat(),
+                     'main_sha': main, 'workflow': 'acris-cache.yml',
+                     'matching_existing_runs': acceptable,
+                     'main_code_modified': False, 'cache_validation_bypassed': False}
+          if acceptable:
+              receipt['action'] = 'existing_producer_retained'
+          else:
+              subprocess.run(['gh', 'workflow', 'run', 'acris-cache.yml', '--repo', repo,
+                              '--ref', 'main'], check=True)
+              receipt['action'] = 'verified_producer_dispatched'
+          Path('proof').mkdir()
+          Path('proof/dispatch.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')
+          print(json.dumps(receipt, indent=2), flush=True)
+          PY
+      - name: Retain production dispatch receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: property-identity-production-dispatch
+          path: proof/dispatch.json
+          retention-days: 14
