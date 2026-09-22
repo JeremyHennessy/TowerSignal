@@ -18,6 +18,10 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  VITE_REPORT_APPLICATION_SHA: ${{ github.sha }}
+  EXPECTED_REPORT_SHA: ${{ github.sha }}
+
 concurrency:
   group: pages
   # A new code push may supersede stale work. A scheduled refresh must wait rather
