@@ -96,6 +96,8 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
     await expect(row.locator('td').nth(5)).toContainText(number.format(value.properties))
     await expect(row.locator('td').nth(6)).toHaveText(`${number.format(value.attached)} / ${number.format(value.total)}`)
   }
+  // Verify the evidence caveats through the same disclosure a reader opens.
+  await property.getByText('Evidence limits and what a missing match means', { exact: true }).click()
   await expect(property).toContainText('not a generic Labor Law filing feed')
   await expect(property).toContainText('Not a complete or current active-SWO ledger')
   await expect(property).toContainText('dated 2022–2024 observation')
