@@ -66,6 +66,7 @@ def property_targets_from_systems(systems: list[dict[str, Any]]) -> dict[str, di
             "number": system.get("number"),
             "street": system.get("street"),
             "address": system.get("address"),
+            "bbl_aliases": list(system.get("bbl_aliases") or []),
         }
     return targets
 
@@ -100,6 +101,7 @@ def build(tower_snapshot: Path | None, output: Path) -> dict:
         "tower_bbls_with_recent_relevant_acris": metrics["tower_bbls_with_recent_relevant_acris"],
         "matched_recent_document_count": metrics["matched_recent_document_count"],
         "party_row_count": metrics["party_row_count"],
+        "alias_bbl_document_link_count": metrics.get("alias_bbl_document_link_count", 0),
         "condo_address_document_link_count": metrics.get("condo_address_document_link_count", 0),
         "condo_rollup_property_count": metrics.get("condo_rollup_property_count", 0),
         "total_seconds": metrics["total_seconds"],
