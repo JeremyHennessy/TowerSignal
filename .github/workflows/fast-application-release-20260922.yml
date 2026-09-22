@@ -172,7 +172,7 @@ jobs:
         env:
           BASE_URL: ${{ needs.deploy.outputs.page_url }}
         run: |
-          npx playwright test             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+          GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
       - name: Retain hosted screenshots and PDF
         if: always()
         uses: actions/upload-artifact@v4
