@@ -26,6 +26,9 @@ function Qr({ url }: { url: string }) {
 }
 
 export function ClientSiteReport({ row, detail, metadata }: { row: SystemSummary; detail: SystemDetail; metadata: Metadata; historyEvents: ChangeEvent[] }) {
+  // The Account loader clears its previous detail in an effect after a route change.
+  // Never render stale account evidence or throw during that loading frame.
+  if (row.system_id !== detail.identity.system_id) return null
   const m = reportModel(row, detail, metadata)
   const shape = reportGeometry(detail)
   const applicationSha = /^[a-f0-9]{40}$/.test(import.meta.env.VITE_REPORT_APPLICATION_SHA || '') ? import.meta.env.VITE_REPORT_APPLICATION_SHA : null

@@ -97,3 +97,11 @@ test('sources link to their actual datasets and the selected account, not a plac
   expect(reportGeometry(detail)?.towerCount).toBe(1)
   expect(reportGeometry(detail)?.buildingPath).toMatch(/^M/)
 })
+
+test('account navigation does not render the previous account while the next record loads', () => {
+  const { container, rerender } = render(<ClientSiteReport row={row} detail={detail} metadata={metadata} historyEvents={[]} />)
+  expect(container.querySelector('[data-report-system="2000000407"]')).not.toBeNull()
+  const other = { ...row, system_id: '2000014227', address: '400 West 61st Street' }
+  expect(() => rerender(<ClientSiteReport row={other} detail={detail} metadata={metadata} historyEvents={[]} />)).not.toThrow()
+  expect(container.querySelector('.client-pdf-report')).toBeNull()
+})
