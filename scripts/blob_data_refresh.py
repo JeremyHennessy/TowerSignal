@@ -23,7 +23,7 @@ import zipfile
 
 import blob_release_store as b
 from publish_pages_to_blob import (REPO, REPO_ID, PAGES_WORKFLOW, check_runtime,
-                                  check_history_parity, written_history, get_reader)
+                                  check_history_parity, written_history, get_reader, HISTORY_ARTIFACT_ROOT)
 
 WORKFLOW = '.github/workflows/azure-data-refresh.yml'
 KIND = 'data-only'
@@ -197,7 +197,7 @@ def seal(root):
     if (history_root / 'segments').exists():
         shutil.rmtree(history_root / 'segments')
     for relative in written_history(runtime):
-        src = root / 'public/data' / ('source-health.json' if relative == 'source-health.json' else 'history/' + relative)
+        src = root / 'public/data' / (relative if relative in HISTORY_ARTIFACT_ROOT else 'history/' + relative)
         target = history_root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(src, target)
