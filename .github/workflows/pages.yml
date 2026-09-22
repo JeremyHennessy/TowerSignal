@@ -20,7 +20,9 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  # A new code push may supersede stale work. A scheduled refresh must wait rather
+  # than discard an active push release that may already be deep into source collection.
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
 
 jobs:
   build:
