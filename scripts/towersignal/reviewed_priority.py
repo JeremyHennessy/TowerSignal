@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any
 
-MODEL = '1.1'
+MODEL = '1.2'
 CONTEXT_NOTE = ('HPD housing violations, SWO dispositions, facade filings, domestic-water records, 311 complaints, '
                 'CMS facilities, lead lines, distribution-water samples, property transactions, contacts and procurement '
                 'remain contextual evidence. They do not establish a cooling-tower fault. General news and neighborhood '
@@ -67,7 +67,7 @@ def score(detail: dict[str, Any], row: dict[str, Any], links: list[dict[str, Any
         notes.append(f'{excluded} recent citation record(s) excluded after an exact-ticket published dismissal. Other citations remain independently eligible.')
     samples = age(as_of, row.get('latest_sample_date'))
     if not row.get('latest_sample_date'):
-        components.append(component(18, 'No usable public sample date; verify operating and sampling status. Absence of a public date is not a violation.', 'NYC tower registration'))
+        components.append(component(30, 'No usable public sample date; verify operating and sampling status. Absence of a public date is not a violation.', 'NYC tower registration'))
     elif samples is None:
         notes.append('Future or invalid public sample date: no gap points; source date requires review.')
     elif samples > 36:
