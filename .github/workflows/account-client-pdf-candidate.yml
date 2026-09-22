@@ -1,0 +1,91 @@
+name: Verify account client PDF candidate
+
+on:
+  push:
+    branches: [agent/account-client-pdf-20260922]
+    paths:
+      - .github/workflows/account-client-pdf-candidate.yml
+      - package.json
+      - src/components/DetailPanel.tsx
+      - src/utils/accountClientPdf.ts
+      - tests/e2e/account-client-pdf.spec.ts
+
+permissions:
+  contents: read
+
+concurrency:
+  group: account-client-pdf-candidate
+  cancel-in-progress: true
+
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build exact branch application
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run build
+          mkdir -p .candidate-pages/data/details/20 proof
+          cp -a dist/. .candidate-pages/
+          git rev-parse HEAD > proof/candidate-head.txt
+      - name: Retain exact current hosted data needed by the account test
+        run: |
+          set -euo pipefail
+          base='https://jeremyhennessy.github.io/TowerSignal/data'
+          for name in systems.json changes.json nys-systems.json nys-changes.json; do
+            curl --fail --location --retry 3 --retry-delay 2 "$base/$name?candidate=$GITHUB_SHA" -o ".candidate-pages/data/$name"
+          done
+          curl --fail --location --retry 3 --retry-delay 2 "$base/details/20/2000015594.json?candidate=$GITHUB_SHA" -o .candidate-pages/data/details/20/2000015594.json
+          sha256sum .candidate-pages/data/systems.json .candidate-pages/data/changes.json .candidate-pages/data/nys-systems.json .candidate-pages/data/nys-changes.json .candidate-pages/data/details/20/2000015594.json > proof/retained-live-data.sha256
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Run site-specific PDF download acceptance
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/.candidate-pages
+        run: npx playwright test tests/e2e/account-client-pdf.spec.ts --project=desktop-chromium --output=test-results/client-pdf
+      - name: Render and inspect downloaded PDF
+        run: |
+          set -euo pipefail
+          PDF="$(find test-results/client-pdf -type f -name '*.pdf' -print -quit)"
+          test -n "$PDF"
+          cp "$PDF" proof/account-2000015594-client-report.pdf
+          if ! command -v pdftoppm >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y poppler-utils
+          fi
+          pdfinfo proof/account-2000015594-client-report.pdf | tee proof/pdfinfo.txt
+          pdftotext -layout proof/account-2000015594-client-report.pdf proof/report.txt
+          grep -F 'Site Intelligence Report' proof/report.txt
+          grep -F 'Cooling Tower System 2000015594' proof/report.txt
+          grep -F 'Sources and provenance' proof/report.txt
+          grep -F 'Client-use notice' proof/report.txt
+          if grep -F 'Copy lead brief' proof/report.txt; then
+            echo 'Internal lead control leaked into client PDF' >&2
+            exit 1
+          fi
+          if grep -F 'Priority score' proof/report.txt; then
+            echo 'Internal priority-score label leaked into client PDF' >&2
+            exit 1
+          fi
+          mkdir -p proof/rendered
+          pdftoppm -png -r 120 proof/account-2000015594-client-report.pdf proof/rendered/page
+          test "$(find proof/rendered -type f -name 'page-*.png' | wc -l)" -ge 4
+      - name: Retain PDF and rendered pages
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-client-pdf-candidate-proof
+          path: |
+            proof/
+            playwright-report/
+            test-results/client-pdf/
+          retention-days: 14
