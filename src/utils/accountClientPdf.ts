@@ -101,6 +101,14 @@ function setText(doc: PdfDoc, size: number, color: readonly [number, number, num
   doc.setTextColor(...color)
 }
 
+function setFill(doc: PdfDoc, color: readonly [number, number, number]) {
+  doc.setFillColor(color[0], color[1], color[2])
+}
+
+function setDraw(doc: PdfDoc, color: readonly [number, number, number]) {
+  doc.setDrawColor(color[0], color[1], color[2])
+}
+
 function drawBodyHeader(ctx: PdfContext) {
   const { doc } = ctx
   doc.setFillColor(...BRAND)
@@ -154,8 +162,8 @@ function callout(ctx: PdfContext, title: string, body: string, tone: 'default' |
   const bodyLines = wrap(doc, body, CONTENT_WIDTH - 28)
   const height = 20 + titleLines.length * 12 + bodyLines.length * 11.5
   ensureSpace(ctx, height + 10)
-  doc.setFillColor(...bg)
-  doc.setDrawColor(...fg)
+  setFill(doc, bg)
+  setDraw(doc, fg)
   doc.roundedRect(MARGIN, ctx.y, CONTENT_WIDTH, height, 6, 6, 'FD')
   setText(doc, 10.5, fg, 'bold')
   doc.text(titleLines, MARGIN + 14, ctx.y + 18)
@@ -185,7 +193,7 @@ function infoCards(ctx: PdfContext, cards: InfoCard[], columns = 2) {
       const x = MARGIN + index * (width + GAP)
       const toneColor = item.card.tone === 'attention' ? ATTENTION : item.card.tone === 'positive' ? POSITIVE : BRAND
       const toneBg = item.card.tone === 'attention' ? ATTENTION_BG : item.card.tone === 'positive' ? POSITIVE_BG : PALE
-      doc.setFillColor(...toneBg)
+      setFill(doc, toneBg)
       doc.setDrawColor(...LINE)
       doc.roundedRect(x, ctx.y, width, height, 5, 5, 'FD')
       setText(doc, 7.8, toneColor, 'bold')
@@ -257,7 +265,7 @@ function table(
       addPage(ctx, ctx.sectionTitle)
       drawHeader()
     }
-    doc.setFillColor(...(rowIndex % 2 === 0 ? [255, 255, 255] as const : PALE))
+    setFill(doc, rowIndex % 2 === 0 ? [255, 255, 255] : PALE)
     doc.setDrawColor(...LINE)
     doc.rect(MARGIN, ctx.y, CONTENT_WIDTH, rowHeight, 'FD')
     let x = MARGIN
