@@ -377,12 +377,12 @@ def normalize_document(
     legal_context: list[dict[str, Any]] = []
     for row in legal_rows:
         normalized = normalize_legal_context(row)
-        identity = tuple(normalized.get(key) for key in ("property_type", "street_number", "street_name", "unit"))
+        identity = tuple(normalized.get(key) for key in ("source_bbl", "property_type", "street_number", "street_name", "unit"))
         if identity in legal_seen:
             continue
         legal_seen.add(identity)
         legal_context.append(normalized)
-    legal_context.sort(key=lambda item: tuple(str(item.get(key) or "") for key in ("street_number", "street_name", "unit", "property_type")))
+    legal_context.sort(key=lambda item: tuple(str(item.get(key) or "") for key in ("source_bbl", "street_number", "street_name", "unit", "property_type")))
 
     party_seen: set[tuple[Any, ...]] = set()
     parties: list[dict[str, Any]] = []
