@@ -705,13 +705,17 @@ def validate_cache(cache: dict[str, Any], *, require_production_volume: bool = F
             raise AcrisError(f"ACRIS property context for {bbl} is missing documents")
         retained_count = len(documents)
         recent_count = int(context.get("recent_document_count") or 0)
-        displayed_count = int(context.get("displayed_document_count") or 0)
+        displayed_raw = context.get("displayed_document_count")
         if recent_count < retained_count:
             raise AcrisError(f"ACRIS property context retained more documents than its full count for {bbl}")
-        if retained_count > ACRIS_BROWSER_DOCUMENT_LIMIT:
-            raise AcrisError(f"ACRIS property context exceeds the retained browser-document limit for {bbl}")
-        if displayed_count != retained_count:
-            raise AcrisError(f"ACRIS property context displayed/retained document mismatch for {bbl}")
+        if displayed_raw is not None:
+            displayed_count = int(displayed_raw or 0)
+            if retained_count > ACRIS_BROWSER_DOCUMENT_LIMIT:
+                raise AcrisError(f"ACRIS property context exceeds the retained browser-document limit for {bbl}")
+            if displayed_count != retained_count:
+                raise AcrisError(f"ACRIS property context displayed/retained document mismatch for {bbl}")
+        elif recent_count != retained_count:
+            raise AcrisError(f"Legacy ACRIS property context full/retained document mismatch for {bbl}")
         for document in documents:
             if not isinstance(document, dict):
                 raise AcrisError(f"ACRIS document for {bbl} is malformed")
@@ -726,10 +730,14 @@ def validate_cache(cache: dict[str, Any], *, require_production_volume: bool = F
                 raise AcrisError(f"ACRIS document for {bbl} is missing document_id")
             unique_documents.add(document_id)
     retained_links = sum(len(context.get("documents") or []) for context in properties.values() if isinstance(context, dict))
-    if int(metrics.get("retained_document_link_count") or 0) != retained_links:
-        raise AcrisError("ACRIS retained document-link count does not match metrics")
-    if int(metrics.get("matched_recent_document_count") or 0) < len(unique_documents):
-        raise AcrisError("ACRIS retained documents exceed the full matched unique-document count")
+    retained_metric = metrics.get("retained_document_link_count")
+    if retained_metric is not None:
+        if int(retained_metric or 0) != retained_links:
+            raise AcrisError("ACRIS retained document-link count does not match metrics")
+        if int(metrics.get("matched_recent_document_count") or 0) < len(unique_documents):
+            raise AcrisError("ACRIS retained documents exceed the full matched unique-document count")
+    elif int(metrics.get("matched_recent_document_count") or 0) != len(unique_documents):
+        raise AcrisError("Legacy ACRIS unique document count does not match metrics")
     if require_production_volume:
         if int(metrics.get("requested_tower_bbl_count") or 0) < 1000:
             raise AcrisError("ACRIS cache was not built against a production-scale cooling-tower BBL universe")
