@@ -1,0 +1,174 @@
+name: Deploy verified application-only release
+
+on:
+  push:
+    branches:
+      - agent/fast-application-release-20260922
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prove exact current-main application plus test-only release harness
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_MAIN: 1a6d85675cb95feb314502aeb154aa2a6b45b598
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          git diff --name-only "$EXPECTED_MAIN" HEAD > /tmp/release-diff.txt
+          cat /tmp/release-diff.txt
+          python - <<'PY'
+          from pathlib import Path
+          allowed={
+            '.github/workflows/fast-application-release-20260922.yml',
+            'tests/e2e/fast-application-release-20260922.spec.ts',
+          }
+          actual={line.strip() for line in Path('/tmp/release-diff.txt').read_text().splitlines() if line.strip()}
+          assert actual == allowed, (actual, allowed)
+          PY
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install exact frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Download deployed Pages 230 snapshot
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35744133412
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .pages230
+
+      - name: Freeze Pages 230 data byte-for-byte
+        run: |
+          set -euo pipefail
+          mkdir -p .rollback .source-data public/data
+          archive="$(find .pages230 -type f | head -1)"
+          tar -xf "$archive" -C .rollback
+          rm -rf public/data
+          cp -R .rollback/data public/data
+          cp -R public/data .source-data/data
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('.source-data/data')
+          hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          pathlib.Path('pages230-data-sha256.json').write_text(json.dumps(hashes,sort_keys=True))
+          print(f'Frozen {len(hashes):,} data files from Pages 230')
+          PY
+
+      - name: Verify and build exact main application
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+          python - <<'PY'
+          import hashlib,json,pathlib
+          expected=json.loads(pathlib.Path('pages230-data-sha256.json').read_text())
+          root=pathlib.Path('dist/data')
+          actual={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert actual == expected, 'Application-only build changed the frozen data snapshot'
+          print(f'All {len(actual):,} deployed data files remain byte-for-byte identical to Pages 230')
+          PY
+
+      - name: Install candidate browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify exact reported Account, PDF and hosted-failure corrections before deploy
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/dist
+        run: |
+          npx playwright test             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+
+      - name: Upload exact application candidate
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Stage exact prior site for rollback
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: fast-release-rollback
+          path: .rollback
+
+      - name: Retain frozen-data manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast-release-data-proof
+          path: pages230-data-sha256.json
+          retention-days: 30
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy exact verified application
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install hosted acceptance dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Verify actual hosted 225 Broadway layout and PDF
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          npx playwright test             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+      - name: Retain hosted screenshots and PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast-application-hosted-proof
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
+
+  rollback:
+    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
+    needs: [build, deploy, verify]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Restore exact prior Pages 230 site
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: fast-release-rollback
