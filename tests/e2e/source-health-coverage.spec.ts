@@ -24,9 +24,11 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   page.on('pageerror', error => errors.push(error.message))
   await page.evaluate(() => { window.location.hash = '#/source-health' })
   await expect(page.getByRole('heading', { name: 'Source Health & Coverage', exact: true })).toBeVisible()
+  const diagnostics = page.locator('.reference-table.source-health-table').first()
   const property = page.getByTestId('property-enforcement-source-health')
   const refresh = page.getByTestId('source-refresh-coverage')
   const legionella = page.getByTestId('legionella-source-health')
+  const procurementSources = page.locator('.procurement-health-table')
   await expect(property).toBeVisible()
   await expect(refresh).toBeVisible()
   await expect(refresh.locator('tbody tr')).toHaveCount(8)
@@ -43,6 +45,31 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   await expect(property.getByText('WARNING', { exact: true })).toHaveCount(1)
   await expect(legionella.getByText('SNAPSHOT RETRIEVED', { exact: true })).toHaveCount(12)
   await expect(page.getByText('Coverage audit unavailable.')).toHaveCount(0)
+  await expect(procurementSources).toBeVisible()
+
+  const diagnosticRows = diagnostics.locator('tbody tr')
+  const diagnosticRowCount = await diagnosticRows.count()
+  expect(diagnosticRowCount).toBeGreaterThan(0)
+  await expect(diagnostics.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(diagnosticRowCount)
+  await expect(property.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(4)
+  await expect(legionella.locator('tbody tr td:last-child a[target="_blank"]')).toHaveCount(12)
+  const procurementRowCount = await procurementSources.locator('tbody tr').count()
+  expect(procurementRowCount).toBeGreaterThan(0)
+  await expect(procurementSources.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(procurementRowCount)
+
+  const allExternalSourceHrefs = await page.locator([
+    '.reference-table.source-health-table:first-of-type tbody tr td:first-child a',
+    '[data-testid="property-enforcement-source-health"] tbody tr td:first-child a',
+    '[data-testid="legionella-source-health"] tbody tr td:last-child a',
+    '.procurement-health-table tbody tr td:first-child a',
+  ].join(',')).evaluateAll(elements => elements.map(element => element.getAttribute('href') ?? ''))
+  expect(allExternalSourceHrefs.length).toBeGreaterThanOrEqual(diagnosticRowCount + 4 + 12 + procurementRowCount)
+  expect(allExternalSourceHrefs.every(href => href.startsWith('https://'))).toBe(true)
+
+  const nysRegistryLink = diagnosticRows.filter({ hasText: '24a4-muw7' }).locator('a').first()
+  await expect(nysRegistryLink).toHaveAttribute('href', 'https://health.data.ny.gov/Health/New-York-State-Cooling-Tower-Registry-Weekly-Extr/24a4-muw7')
+  const laborLawLink = diagnosticRows.filter({ hasText: LABOR_LAW_DATASET_ID }).locator('a').first()
+  await expect(laborLawLink).toHaveAttribute('href', 'https://www.nycourts.gov/reporter/RSS.shtml')
 
   const expected = await page.evaluate(async () => {
     const response = await fetch(new URL('data/systems.json', window.location.href), { cache: 'no-store' })
@@ -122,9 +149,15 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   expect(Number(laborPayload.matchedSystemCount)).toBeGreaterThanOrEqual(0)
   expect(laborPayload.coverageBoundary).toContain('not a comprehensive filing/docket feed')
 
-  await expect(page.getByRole('cell', { name: 'property-enforcement.json', exact: true })).toBeVisible()
-  await expect(page.getByRole('cell', { name: 'legionella-alerts.json', exact: true })).toBeVisible()
-  await expect(page.getByRole('cell', { name: 'historical-311-context.json', exact: true })).toBeVisible()
+  const enforcementArtifact = page.getByRole('link', { name: 'property-enforcement.json', exact: true })
+  const legionellaArtifact = page.getByRole('link', { name: 'legionella-alerts.json', exact: true })
+  const historical311Artifact = page.getByRole('link', { name: 'historical-311-context.json', exact: true })
+  await expect(enforcementArtifact).toBeVisible()
+  await expect(legionellaArtifact).toBeVisible()
+  await expect(historical311Artifact).toBeVisible()
+  await expect(enforcementArtifact).toHaveAttribute('href', /data\/property-enforcement\.json$/)
+  await expect(legionellaArtifact).toHaveAttribute('href', /data\/legionella-alerts\.json$/)
+  await expect(historical311Artifact).toHaveAttribute('href', /data\/historical-311-context\.json$/)
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)
   expect(overflow).toBe(false)
   expect(errors).toEqual([])
