@@ -41,6 +41,16 @@ def validate(output_dir: Path, *, require_production_volume: bool = False) -> di
         property_bbl = _normalized_bbl(row.get("property_bbl"))
         registry = _normalized_bbl(row.get("registry_bbl"))
         status = str(row.get("bbl_identity_status") or "")
+        aliases = sorted({
+            value
+            for raw in (row.get("bbl_aliases") or [])
+            if (value := _normalized_bbl(raw))
+        })
+        expected_aliases = sorted({value for value in (canonical, registry) if value})
+        if aliases != expected_aliases:
+            raise RuntimeError(
+                f"System {system_id} exact BBL alias mismatch: aliases={aliases} expected={expected_aliases}"
+            )
 
         if canonical != property_bbl:
             raise RuntimeError(
@@ -58,6 +68,13 @@ def validate(output_dir: Path, *, require_production_volume: bool = False) -> di
             raise RuntimeError(f"System {system_id} summary/detail registry BBL mismatch")
         if _normalized_bbl(identity.get("property_bbl")) != property_bbl:
             raise RuntimeError(f"System {system_id} summary/detail property BBL mismatch")
+        detail_aliases = sorted({
+            value
+            for raw in (identity.get("bbl_aliases") or [])
+            if (value := _normalized_bbl(raw))
+        })
+        if detail_aliases != aliases:
+            raise RuntimeError(f"System {system_id} summary/detail BBL alias mismatch")
 
         footprints = detail.get("building_footprints") or []
         candidates = {
