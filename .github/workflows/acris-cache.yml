@@ -9,6 +9,8 @@ on:
     paths:
       - '.github/workflows/acris-cache.yml'
       - 'scripts/towersignal/acris.py'
+      - 'scripts/towersignal/bbl_identity.py'
+      - 'scripts/towersignal/building_footprints.py'
       - 'scripts/build_acris_cache.py'
       - 'scripts/validate_acris_cache.py'
       - 'scripts/verify_live_acris.py'
@@ -20,6 +22,8 @@ on:
       - '.github/workflows/acris-cache.yml'
       - '.github/workflows/pages.yml'
       - 'scripts/towersignal/acris.py'
+      - 'scripts/towersignal/bbl_identity.py'
+      - 'scripts/towersignal/building_footprints.py'
       - 'scripts/build_acris_cache.py'
       - 'scripts/validate_acris_cache.py'
       - 'scripts/verify_live_acris.py'
@@ -91,6 +95,8 @@ jobs:
       - name: Generate current NYC data
         timeout-minutes: 45
         run: python scripts/build_data.py --output public/data
+      - name: Validate exact-BIN property BBL reconciliation
+        run: python scripts/validate_bbl_identity.py --output public/data --require-production-volume
       - name: Build bounded legacy DOB/BIS project context
         timeout-minutes: 30
         run: python scripts/build_legacy_dob_project_cache.py --output public/data
@@ -100,6 +106,8 @@ jobs:
         run: python scripts/attach_legacy_dob_project_context.py --output public/data --cache public/data/legacy-dob-projects.json
       - name: Attach verified ACRIS cache
         run: python scripts/attach_acris.py --output public/data --cache .verified-acris/cache.json
+      - name: Validate 400 West 61st property identity, contacts and ACRIS recovery
+        run: python scripts/validate_property_identity_acceptance.py --output public/data --require-acris
       - name: Generate current NYS data
         run: python scripts/build_nys_data.py --output public/data
       - name: Build source health
