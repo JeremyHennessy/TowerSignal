@@ -1,0 +1,85 @@
+name: Diagnose DOB NOW BBL contract
+
+on:
+  push:
+    branches: [diagnostic/dob-bbl-contract-20260921]
+    paths: [.github/workflows/diagnose-dob-bbl-contract.yml]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35515939783
+          github-token: ${{ github.token }}
+          path: .baseline
+      - name: Restore successful September 20 runtime
+        run: |
+          mkdir -p .baseline/site
+          ARCHIVE="$(find .baseline -type f | head -1)"
+          tar -xf "$ARCHIVE" -C .baseline/site
+      - name: Probe current DOB NOW BBL and component-field contract
+        run: |
+          python - <<'PY'
+          import json, urllib.parse, urllib.request
+          from pathlib import Path
+
+          API='https://data.cityofnewyork.us/resource/w9ak-ipjd.json'
+          UA='TowerSignal-Diagnostic/1.0'
+          borough={1:'Manhattan',2:'Bronx',3:'Brooklyn',4:'Queens',5:'Staten Island'}
+
+          def get(params):
+              url=API+'?'+urllib.parse.urlencode(params)
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json'})
+              with urllib.request.urlopen(req,timeout=90) as r:
+                  return json.load(r)
+
+          systems=json.loads(Path('.baseline/site/data/systems.json').read_text())['systems']
+          samples=[]
+          seen=set()
+          for row in systems:
+              bbl=str(row.get('bbl') or '')
+              if len(bbl)==10 and int(row.get('dob_activity_count') or 0)>0 and bbl not in seen:
+                  seen.add(bbl); samples.append({'system_id':row['system_id'],'bbl':bbl,'prior_dob_activity_count':row['dob_activity_count']})
+              if len(samples)>=10: break
+
+          aggregate={}
+          for key,where in [
+              ('total',None),
+              ('bbl_non_null',"bbl is not null"),
+              ('bbl_non_empty',"bbl is not null and bbl != ''"),
+              ('components_non_null',"borough is not null and block is not null and lot is not null"),
+          ]:
+              params={'$select':'count(*) as count'}
+              if where: params['$where']=where
+              aggregate[key]=int(get(params)[0]['count'])
+
+          comparisons=[]
+          for sample in samples:
+              bbl=sample['bbl']; b=int(bbl[0]); block=int(bbl[1:6]); lot=int(bbl[6:10])
+              direct=get({'$select':'count(*) as count', '$where':f"bbl='{bbl}'"})
+              component_where=f"borough='{borough[b]}' and block='{block}' and lot='{lot}'"
+              component=get({'$select':'count(*) as count', '$where':component_where})
+              example=get({'$limit':1,'$select':'job_filing_number,borough,block,lot,bbl,bin',
+                           '$where':component_where,'$order':'job_filing_number'})
+              comparisons.append({**sample,'current_bbl_count':int(direct[0]['count']),
+                                  'current_component_count':int(component[0]['count']),
+                                  'component_example':example[:1]})
+
+          report={'aggregate':aggregate,'samples':comparisons}
+          Path('dob-bbl-contract.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dob-bbl-contract
+          path: dob-bbl-contract.json
+          retention-days: 14
