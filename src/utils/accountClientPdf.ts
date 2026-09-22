@@ -331,7 +331,8 @@ function primaryObservation(row: SystemSummary, detail: SystemDetail) {
       tone: 'attention' as const,
     }
   }
-  const signal = detail.signals.find(item => item.type === row.primary_signal) ?? detail.signals[0]
+  const clientSignals = detail.signals.filter(item => item.fact_class !== 'COMMERCIAL_SIGNAL')
+  const signal = clientSignals.find(item => item.type === row.primary_signal) ?? clientSignals[0]
   if (signal) {
     return {
       title: display(signal.title, signalLabel(row.primary_signal)),
@@ -340,8 +341,8 @@ function primaryObservation(row: SystemSummary, detail: SystemDetail) {
     }
   }
   return {
-    title: 'No current priority signal is attached',
-    body: 'The report still includes site identity, source coverage and available historical public records. Absence of a TowerSignal signal does not establish absence of a site condition.',
+    title: 'No current compliance or event observation is attached',
+    body: 'The report still includes site identity, source coverage and available historical public records. Absence of an attached current observation does not establish absence of a site condition.',
     tone: 'default' as const,
   }
 }
@@ -428,8 +429,9 @@ function drawOverview(ctx: PdfContext) {
   ])
 
   sectionHeading(ctx, 'Current public-record observations')
-  if (ctx.detail.signals.length) {
-    bullets(ctx, ctx.detail.signals.slice(0, 8).map(signal => {
+  const clientSignals = ctx.detail.signals.filter(signal => signal.fact_class !== 'COMMERCIAL_SIGNAL')
+  if (clientSignals.length) {
+    bullets(ctx, clientSignals.slice(0, 8).map(signal => {
       const prefix = signal.date ? `${date(signal.date)} - ` : ''
       return `${display(signal.title)} [${signal.evidence_confidence.replaceAll('_', ' ')}]: ${prefix}${display(signal.reason)}`
     }))
