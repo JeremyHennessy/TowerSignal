@@ -1,0 +1,237 @@
+name: Full NYC property mapping audit
+
+on:
+  push:
+    branches: [agent/full-mapping-audit-20260922]
+
+permissions:
+  contents: read
+
+jobs:
+  full-mapping-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Check out exact accepted production code
+        uses: actions/checkout@v4
+        with:
+          ref: fc5c255c5b41e561566eb0938239499ba03fa95b
+
+      - name: Check out durable TowerSignal history
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history
+
+      - name: Check out newly verified ACRIS cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-acris
+          path: .acris-store
+          fetch-depth: 1
+          sparse-checkout: data/acris
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate a fresh full NYC mapping snapshot
+        timeout-minutes: 45
+        run: python scripts/build_data.py --output audit-data
+
+      - name: Run the production whole-universe identity validator
+        run: |
+          mkdir -p audit-proof
+          python scripts/validate_bbl_identity.py --output audit-data --require-production-volume | tee audit-proof/production-identity-validator.json
+
+      - name: Attach the newly persisted verified ACRIS cache
+        run: python scripts/attach_acris.py --output audit-data --cache .acris-store/data/acris/cache.json
+
+      - name: Re-run the 400 West 61st strict regression acceptance
+        run: python scripts/validate_property_identity_acceptance.py --output audit-data --require-acris | tee audit-proof/400-west-61st-acceptance.json
+
+      - name: Independently replay a larger ACRIS sample against live source
+        run: python scripts/verify_live_acris.py --cache .acris-store/data/acris/cache.json --sample-size 25 | tee audit-proof/acris-live-sample.json
+
+      - name: Audit every generated NYC system for silent mapping inconsistencies
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          from towersignal.bbl_identity import BOROUGH_CODE_BY_NAME
+          from towersignal.planimetrics import normalize_bin
+          from towersignal.pluto import normalize_bbl
+
+          root = Path("audit-data")
+          payload = json.loads((root / "systems.json").read_text(encoding="utf-8"))
+          systems = payload.get("systems") or []
+          if len(systems) < 3500:
+              raise SystemExit(f"FAIL: only {len(systems)} systems in full mapping audit")
+
+          seen_ids = set()
+          status_counts = Counter()
+          borough_counts = Counter()
+          silent_borough_mismatches = []
+          malformed_bins = []
+          alias_errors = []
+          evidence_errors = []
+          footprint_bin_errors = []
+          building_bbl_errors = []
+          hpd_bbl_errors = []
+          acris_basis_errors = []
+          detail_count = 0
+          reconciled_ids = []
+          recovered_ids = []
+          explicit_conflict_ids = []
+          unresolved_ids = []
+
+          def bbl(value):
+              n = normalize_bbl(value)
+              return n.zfill(10) if n else None
+
+          aliases_allowed = {
+              "BBL_EXACT_DOCUMENT_ID_EXACT",
+              "BBL_ALIAS_EXACT_DOCUMENT_ID_EXACT",
+              "CONDO_BILLING_BBL_BLOCK_ADDRESS_EXACT",
+          }
+
+          borough_aliases = {
+              "MN": "MANHATTAN", "BX": "BRONX", "BK": "BROOKLYN",
+              "QN": "QUEENS", "SI": "STATEN ISLAND",
+              "STATEN ISLAND / RICHMOND": "STATEN ISLAND",
+          }
+
+          for row in systems:
+              sid = str(row.get("system_id") or "")
+              if not sid or sid in seen_ids:
+                  raise SystemExit(f"FAIL: missing/duplicate system_id {sid!r}")
+              seen_ids.add(sid)
+
+              raw_bin = row.get("bin")
+              normalized_bin = normalize_bin(raw_bin)
+              if raw_bin is not None and str(raw_bin) != str(normalized_bin):
+                  malformed_bins.append({"system_id": sid, "bin": raw_bin, "normalized": normalized_bin})
+
+              canonical = bbl(row.get("bbl"))
+              property_bbl = bbl(row.get("property_bbl"))
+              registry_bbl = bbl(row.get("registry_bbl"))
+              if canonical != property_bbl:
+                  raise SystemExit(f"FAIL: {sid} canonical/property mismatch {canonical} != {property_bbl}")
+
+              observed_aliases = sorted({bbl(x) for x in (row.get("bbl_aliases") or []) if bbl(x)})
+              expected_aliases = sorted({x for x in (canonical, registry_bbl) if x})
+              if observed_aliases != expected_aliases:
+                  alias_errors.append({"system_id": sid, "observed": observed_aliases, "expected": expected_aliases})
+
+              status = str(row.get("bbl_identity_status") or "")
+              status_counts[status] += 1
+              borough_name = str(row.get("borough") or "").strip().upper()
+              borough_name = borough_aliases.get(borough_name, borough_name)
+              borough_counts[borough_name or "UNKNOWN"] += 1
+              prefix = BOROUGH_CODE_BY_NAME.get(borough_name)
+              if canonical and prefix and canonical[0] != prefix and "CONFLICT" not in status:
+                  silent_borough_mismatches.append({
+                      "system_id": sid, "borough": borough_name, "property_bbl": canonical, "status": status
+                  })
+
+              evidence = row.get("bbl_identity_evidence") or {}
+              if evidence.get("address_matching_used") is not False or evidence.get("fuzzy_matching_used") is not False:
+                  evidence_errors.append({"system_id": sid, "reason": "prohibited fuzzy/address matching marker"})
+              if status == "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL":
+                  reconciled_ids.append(sid)
+                  candidates = [bbl(x) for x in (evidence.get("mappluto_bbl_candidates") or []) if bbl(x)]
+                  bases = [bbl(x) for x in (evidence.get("base_bbl_context") or []) if bbl(x)]
+                  if not (
+                      registry_bbl and property_bbl and registry_bbl != property_bbl
+                      and evidence.get("registry_base_bridge_confirmed") is True
+                      and candidates == [property_bbl] and registry_bbl in bases
+                  ):
+                      evidence_errors.append({"system_id": sid, "reason": "reconciled bridge contract mismatch"})
+              elif status == "RECOVERED_EXACT_BIN_MAPPLUTO_BBL":
+                  recovered_ids.append(sid)
+                  if registry_bbl is not None or property_bbl is None:
+                      evidence_errors.append({"system_id": sid, "reason": "recovered identity source/canonical mismatch"})
+              if "CONFLICT" in status or "MULTIPLE_MAPPLUTO" in status:
+                  explicit_conflict_ids.append(sid)
+              if property_bbl is None:
+                  unresolved_ids.append(sid)
+
+              detail_path = root / "details" / sid[:2] / f"{sid}.json"
+              if not detail_path.exists():
+                  raise SystemExit(f"FAIL: missing detail payload for {sid}")
+              detail_count += 1
+              detail = json.loads(detail_path.read_text(encoding="utf-8"))
+
+              for fp in (detail.get("building_footprints") or []):
+                  if not isinstance(fp, dict):
+                      continue
+                  fp_bin = normalize_bin(fp.get("bin"))
+                  if fp_bin and normalized_bin and fp_bin != normalized_bin:
+                      footprint_bin_errors.append({"system_id": sid, "system_bin": normalized_bin, "footprint_bin": fp_bin})
+
+              building = detail.get("building_context")
+              if isinstance(building, dict) and building.get("bbl") is not None:
+                  building_bbl = bbl(building.get("bbl"))
+                  if property_bbl and building_bbl != property_bbl:
+                      building_bbl_errors.append({"system_id": sid, "property_bbl": property_bbl, "building_bbl": building_bbl})
+
+              hpd = detail.get("hpd_registration")
+              if isinstance(hpd, dict) and hpd.get("bbl") is not None:
+                  hpd_bbl = bbl(hpd.get("bbl"))
+                  if property_bbl and hpd_bbl != property_bbl:
+                      hpd_bbl_errors.append({"system_id": sid, "property_bbl": property_bbl, "hpd_bbl": hpd_bbl})
+
+              acris = detail.get("acris_activity")
+              if isinstance(acris, dict):
+                  for doc in (acris.get("documents") or []):
+                      if isinstance(doc, dict) and str(doc.get("match_basis") or "") not in aliases_allowed:
+                          acris_basis_errors.append({
+                              "system_id": sid,
+                              "document_id": doc.get("document_id"),
+                              "match_basis": doc.get("match_basis"),
+                          })
+
+          failures = {
+              "malformed_normalized_bins": malformed_bins,
+              "alias_errors": alias_errors,
+              "silent_borough_mismatches": silent_borough_mismatches,
+              "identity_evidence_errors": evidence_errors,
+              "cross_bin_footprint_errors": footprint_bin_errors,
+              "building_context_bbl_errors": building_bbl_errors,
+              "hpd_registration_bbl_errors": hpd_bbl_errors,
+              "acris_match_basis_errors": acris_basis_errors,
+          }
+          report = {
+              "status": "PASS" if not any(failures.values()) else "FAIL",
+              "application_sha": "fc5c255c5b41e561566eb0938239499ba03fa95b",
+              "system_count": len(systems),
+              "detail_count": detail_count,
+              "unique_system_id_count": len(seen_ids),
+              "reconciled_system_count": len(reconciled_ids),
+              "recovered_system_count": len(recovered_ids),
+              "explicit_conflict_system_count": len(set(explicit_conflict_ids)),
+              "unresolved_system_count": len(unresolved_ids),
+              "status_counts": dict(sorted(status_counts.items())),
+              "borough_counts": dict(sorted(borough_counts.items())),
+              "reconciled_system_ids": reconciled_ids,
+              "failure_counts": {k: len(v) for k, v in failures.items()},
+              "failures": failures,
+          }
+          out = Path("audit-proof/full-mapping-audit.json")
+          out.write_text(json.dumps(report, indent=2), encoding="utf-8")
+          print(json.dumps({k: v for k, v in report.items() if k not in {"reconciled_system_ids", "failures"}}, indent=2))
+          if report["status"] != "PASS":
+              raise SystemExit("FAIL: silent mapping inconsistencies found; inspect full-mapping-audit.json")
+          PY
+
+      - name: Retain full mapping proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-nyc-property-mapping-audit
+          path: audit-proof/*
+          if-no-files-found: error
+          retention-days: 30
