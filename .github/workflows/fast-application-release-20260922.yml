@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - agent/fast-application-release-20260922
+      - main
+    paths:
+      - .github/workflows/fast-application-release-20260922.yml
+      - .github/workflows/account-reviewed-delivery.yml
+      - tests/e2e/fast-application-release-20260922.spec.ts
 
 permissions:
   contents: read
@@ -24,41 +29,40 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Stop the redundant full-data release and queued predecessor
+      - name: Stop the competing full-data release after the main promotion
+        if: github.ref == 'refs/heads/main'
         uses: actions/github-script@v7
         with:
           script: |
-            for (const run_id of [35761692269, 35763033083]) {
-              const run = (await github.rest.actions.getWorkflowRun({...context.repo, run_id})).data;
-              if (['queued','in_progress','waiting','pending'].includes(run.status)) {
-                core.info(`Cancelling run ${run_id} (${run.name}) at status ${run.status}`);
-                await github.rest.actions.cancelWorkflowRun({...context.repo, run_id}).catch(error => {
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:context.sha,per_page:100})).data.workflow_runs;
+            for (const run of runs) {
+              if (run.path === '.github/workflows/pages.yml' && ['queued','in_progress','waiting','pending'].includes(run.status)) {
+                core.info(`Cancelling competing canonical Pages run ${run.id}`);
+                await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:run.id}).catch(error => {
                   if (error.status !== 409) throw error;
                 });
-              } else {
-                core.info(`Run ${run_id} already completed as ${run.conclusion}`);
               }
             }
 
-      - name: Prove exact current-main application plus test-only release harness
+      - name: Prove exact accepted application plus release-control-only delta
         env:
-          GH_TOKEN: ${{ github.token }}
-          EXPECTED_MAIN: 1a6d85675cb95feb314502aeb154aa2a6b45b598
+          EXPECTED_PRODUCT: 1a6d85675cb95feb314502aeb154aa2a6b45b598
         run: |
           set -euo pipefail
-          git fetch origin main
-          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
-          git diff --name-only "$EXPECTED_MAIN" HEAD > /tmp/release-diff.txt
+          git fetch --depth=1 origin "$EXPECTED_PRODUCT"
+          git diff --name-only "$EXPECTED_PRODUCT" HEAD > /tmp/release-diff.txt
           cat /tmp/release-diff.txt
           python - <<'PY'
           from pathlib import Path
           allowed={
             '.github/workflows/fast-application-release-20260922.yml',
+            '.github/workflows/account-reviewed-delivery.yml',
             'tests/e2e/fast-application-release-20260922.spec.ts',
           }
           actual={line.strip() for line in Path('/tmp/release-diff.txt').read_text().splitlines() if line.strip()}
           assert actual == allowed, (actual, allowed)
           PY
+          git diff --exit-code "$EXPECTED_PRODUCT" HEAD -- src package.json vite.config.ts tsconfig.json tsconfig.app.json
 
       - uses: actions/setup-node@v4
         with:
@@ -137,6 +141,7 @@ jobs:
           retention-days: 30
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -150,6 +155,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
   verify:
+    if: github.ref == 'refs/heads/main'
     needs: deploy
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -178,7 +184,7 @@ jobs:
           retention-days: 30
 
   rollback:
-    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
     needs: [build, deploy, verify]
     runs-on: ubuntu-latest
     environment:
