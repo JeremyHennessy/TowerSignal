@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures'
+import { expect, test } from '@playwright/test'
 import { signInForProject } from './auth.helpers'
 import { expectAccountDetailHydrated } from './iphone.helpers'
 
