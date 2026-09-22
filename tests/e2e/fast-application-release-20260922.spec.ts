@@ -45,6 +45,8 @@ test('225 Broadway exposes client PDF and centers the Account canvas', async ({ 
     expect(geometry.headerInset).toBeLessThanOrEqual(1)
     expect(Math.abs(geometry.panelLeft - geometry.toolbarLeft)).toBeLessThanOrEqual(1)
     expect(Math.abs(geometry.panelRight - geometry.toolbarRight)).toBeLessThanOrEqual(1)
+    expect(geometry.leftMargin).toBeLessThanOrEqual(24)
+    expect(geometry.rightMargin).toBeLessThanOrEqual(24)
     expect(Math.abs(geometry.leftMargin - geometry.rightMargin)).toBeLessThanOrEqual(2)
   }
   expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.viewportWidth + 1)
