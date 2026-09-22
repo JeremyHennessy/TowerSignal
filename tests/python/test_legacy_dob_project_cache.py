@@ -89,13 +89,16 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
                 "summary": {"registered_systems": 1},
                 "systems": [{
                     "system_id": "200001",
-                    "bbl": "3000010001",
+                    "bbl": "3000017501",
+                    "property_bbl": "3000017501",
+                    "registry_bbl": "3000010001",
+                    "bbl_aliases": ["3000010001", "3000017501"],
                     "priority_score": 77,
                 }],
             }
             (output / "systems.json").write_text(json.dumps(systems), encoding="utf-8")
             (output / "metadata.json").write_text(json.dumps(systems["metadata"]), encoding="utf-8")
-            (detail_dir / "200001.json").write_text(json.dumps({"identity": {"system_id": "200001", "bbl": "3000010001"}}), encoding="utf-8")
+            (detail_dir / "200001.json").write_text(json.dumps({"identity": {"system_id": "200001", "bbl": "3000017501"}}), encoding="utf-8")
             record = normalize_job(self.base_row(), as_of=date(2026, 9, 7))
             cache = {
                 "domain": "NYC_LEGACY_DOB_PROJECT_CONTEXT",
@@ -136,6 +139,8 @@ class LegacyDobProjectCacheTests(unittest.TestCase):
             self.assertEqual(updated["systems"][0]["priority_score"], 77)
             self.assertEqual(updated["systems"][0]["legacy_dob_project_record_count"], 1)
             self.assertEqual(result["attached_systems"], 1)
+            self.assertEqual(detail["legacy_dob_project_context"]["matched_bbl_aliases"], ["3000010001"])
+            self.assertEqual(detail["legacy_dob_project_context"]["match_basis"], "BBL_ALIAS_EXACT")
             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["applicant_name"], "Jane Engineer")
             self.assertEqual(detail["legacy_dob_project_context"]["records"][0]["relationship_boundary"], "RECORDED_DOB_APPLICANT_NOT_PROOF_OF_SERVICE_CONTRACT")
 
