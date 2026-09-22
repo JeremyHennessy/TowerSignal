@@ -20,6 +20,44 @@ def load_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def _aliases(row: dict[str, Any]) -> list[str]:
+    values = row.get("bbl_aliases") if isinstance(row.get("bbl_aliases"), list) else [row.get("bbl")]
+    return sorted({str(value) for value in values if value})
+
+
+def _merge_alias_contexts(by_bbl: dict[str, Any], aliases: list[str]) -> tuple[dict[str, Any] | None, list[str]]:
+    records_by_id: dict[str, dict[str, Any]] = {}
+    matched_aliases: list[str] = []
+    for bbl in aliases:
+        context = by_bbl.get(bbl)
+        if not isinstance(context, dict):
+            continue
+        matched_aliases.append(bbl)
+        for record in context.get("records") or []:
+            if not isinstance(record, dict):
+                continue
+            identity = str(record.get("source_row_id") or f"{record.get('job_number')}:{record.get('document_number')}")
+            records_by_id[identity] = record
+    if not records_by_id:
+        return None, matched_aliases
+    records = sorted(
+        records_by_id.values(),
+        key=lambda row: (
+            bool(row.get("explicit_cooling_tower_mention")),
+            row.get("activity_date") or "",
+            row.get("source_row_id") or "",
+        ),
+        reverse=True,
+    )
+    summary = {
+        "record_count": len(records),
+        "explicit_cooling_tower_count": sum(1 for row in records if row.get("explicit_cooling_tower_mention")),
+        "recent_relevant_project_count": sum(1 for row in records if row.get("recent_relevant_project")),
+        "latest_activity_date": max((row.get("activity_date") or "" for row in records), default="") or None,
+    }
+    return {"summary": summary, "records": records}, matched_aliases
+
+
 def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     systems_path = output_dir / "systems.json"
     metadata_path = output_dir / "metadata.json"
@@ -37,8 +75,8 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     explicit_systems = 0
     recent_relevant_systems = 0
     for row in systems:
-        bbl = str(row.get("bbl") or "")
-        context = by_bbl.get(bbl)
+        aliases = _aliases(row)
+        context, matched_aliases = _merge_alias_contexts(by_bbl, aliases)
         summary = (context or {}).get("summary") or {}
         count = int(summary.get("record_count") or 0)
         explicit = int(summary.get("explicit_cooling_tower_count") or 0)
@@ -61,6 +99,8 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
             detail["legacy_dob_project_context"] = {
                 "summary": summary,
                 "records": context.get("records") or [],
+                "matched_bbl_aliases": matched_aliases,
+                "match_basis": "BBL_ALIAS_EXACT",
                 "evidence_boundaries": cache.get("evidence_semantics") or {},
                 "source": cache.get("source") or {},
                 "generated_at": cache.get("generated_at"),
@@ -79,7 +119,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     metadata = payload.get("metadata") or {}
     source = cache.get("source") or {}
     metadata["legacy_dob_project_cache_available"] = True
-    metadata["legacy_dob_project_match_basis"] = "BBL_EXACT"
+    metadata["legacy_dob_project_match_basis"] = "BBL_ALIAS_EXACT"
     metadata["legacy_dob_project_requested_bbl_count"] = int(source.get("requested_bbl_count") or 0)
     metadata["legacy_dob_project_source_matched_bbl_count"] = int(source.get("source_matched_bbl_count") or 0)
     metadata["legacy_dob_project_exact_bbl_job_count"] = int(source.get("exact_bbl_job_count") or 0)
@@ -94,7 +134,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
         "source_last_updated_at": source.get("source_last_updated_at"),
         "url": source.get("url"),
         "matched_record_count": int((cache.get("summary") or {}).get("retained_record_count") or 0),
-        "source_query_scope": "Exact canonical BBLs; retained explicit cooling-tower text plus recent mechanical/boiler/plumbing/equipment project records only",
+        "source_query_scope": "Exact current property BBL plus preserved registry/base BBL aliases; retained explicit cooling-tower text plus recent mechanical/boiler/plumbing/equipment project records only",
     })
     metadata["sources"] = sources
     payload["metadata"] = metadata
