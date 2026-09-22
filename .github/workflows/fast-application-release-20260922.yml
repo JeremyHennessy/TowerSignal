@@ -1,22 +1,15 @@
-name: Deploy approved Account PDF application-only release
+name: Deploy Account header application-only release
 
 on:
   push:
     branches:
-      - agent/approved-account-pdf-20260922
+      - agent/account-header-format-20260922
       - main
     paths:
       - .github/workflows/fast-application-release-20260922.yml
-      - src/components/ClientSiteReport.tsx
-      - src/components/DetailPanel.tsx
-      - src/styles/client-site-report.css
-      - src/utils/accountReportModel.ts
-      - src/utils/prepareAccountReport.ts
-      - tests/e2e/approved-account-pdf.spec.ts
-      - tests/e2e/fast-application-release-20260922.spec.ts
-      - scripts/prepare-account-report-fonts.mjs
-      - scripts/verify-account-pdf.py
-      - package.json
+      - src/main.tsx
+      - src/styles/account-header.css
+      - tests/e2e/account-header.spec.ts
 
 permissions:
   contents: read
@@ -56,9 +49,9 @@ jobs:
               }
             }
 
-      - name: Prove report-only delta against accepted full-width Account baseline
+      - name: Prove header-only delta against the accepted approved-PDF baseline
         env:
-          EXPECTED_PRODUCT: 190e99920e196e68a3900e04a9751b2d0d6336c5
+          EXPECTED_PRODUCT: 6afb6ad88407b2778bb230ebce0afae2cc34eba5
         run: |
           set -euo pipefail
           git fetch --depth=1 origin "$EXPECTED_PRODUCT"
@@ -67,26 +60,15 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           allowed={
-            '.gitignore',
             '.github/workflows/fast-application-release-20260922.yml',
-            'docs/approved-baselines/account-pdf-20260922.json',
-            'package.json',
-            'scripts/prepare-account-report-fonts.mjs',
-            'scripts/verify-account-pdf.py',
-            'src/components/ClientSiteReport.tsx',
-            'src/components/DetailPanel.tsx',
-            'src/styles/client-site-report.css',
-            'src/utils/accountReportModel.ts',
-            'src/utils/prepareAccountReport.ts',
-            'tests/e2e/approved-account-pdf.spec.ts',
-            'tests/e2e/fast-application-release-20260922.spec.ts',
-            'tests/frontend/ClientSiteReport.test.tsx',
-            'tests/fixtures/approved-account-report-2000000407.json',
+            'src/main.tsx',
+            'src/styles/account-header.css',
+            'tests/e2e/account-header.spec.ts',
           }
           actual={line.strip() for line in Path('/tmp/release-diff.txt').read_text().splitlines() if line.strip()}
           assert actual == allowed, (actual, allowed)
           PY
-          git diff --exit-code "$EXPECTED_PRODUCT" HEAD -- src/data src/domain src/styles/account-detail-polish.css vite.config.ts tsconfig.json tsconfig.app.json
+          git diff --exit-code "$EXPECTED_PRODUCT" HEAD -- src/components src/data src/domain src/utils src/styles/client-site-report.css docs/approved-baselines tests/fixtures tests/e2e/approved-account-pdf.spec.ts scripts/verify-account-pdf.py vite.config.ts tsconfig.json tsconfig.app.json
 
       - uses: actions/setup-node@v4
         with:
@@ -95,11 +77,11 @@ jobs:
       - name: Install exact frontend dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Download exact accepted 190e999 site and data
+      - name: Download exact accepted approved-PDF site and data
         uses: actions/download-artifact@v4
         with:
           repository: JeremyHennessy/TowerSignal
-          run-id: 35768655554
+          run-id: 35789610808
           name: github-pages
           github-token: ${{ github.token }}
           path: .accepted-site
@@ -118,10 +100,10 @@ jobs:
           root=pathlib.Path('.source-data/data')
           hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
           pathlib.Path('accepted-data-sha256.json').write_text(json.dumps(hashes,sort_keys=True))
-          print(f'Frozen {len(hashes):,} data files from accepted main 190e999')
+          print(f'Frozen {len(hashes):,} data files from accepted main 6afb6ad')
           PY
 
-      - name: Verify and build exact main application
+      - name: Verify and build exact application
         run: |
           npm run lint
           npm run typecheck
@@ -133,18 +115,18 @@ jobs:
           root=pathlib.Path('dist/data')
           actual={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
           assert actual == expected, 'Application-only build changed the frozen data snapshot'
-          print(f'All {len(actual):,} deployed data files remain byte-for-byte identical to accepted main 190e999')
+          print(f'All {len(actual):,} deployed data files remain byte-for-byte identical to accepted main 6afb6ad')
           PY
 
       - name: Install candidate browsers
         run: npx playwright install --with-deps chromium webkit
 
-      - name: Verify exact reported Account, PDF and hosted-failure corrections before deploy
+      - name: Verify Account header, approved PDF and existing release regressions before deploy
         env:
           BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
           CANDIDATE_ROOT: ${{ github.workspace }}/dist
         run: |
-          npx playwright test             tests/e2e/approved-account-pdf.spec.ts             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+          npx playwright test tests/e2e/account-header.spec.ts tests/e2e/approved-account-pdf.spec.ts tests/e2e/fast-application-release-20260922.spec.ts tests/e2e/source-health-coverage.spec.ts tests/e2e/city-record-semantics.spec.ts --project=desktop-chromium --project=iphone
 
       - name: Inspect actual four-page PDF bytes
         run: |
@@ -207,11 +189,11 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium webkit
-      - name: Verify actual hosted 225 Broadway layout and PDF
+      - name: Verify actual hosted Account header, layout and PDF
         env:
           BASE_URL: ${{ needs.deploy.outputs.page_url }}
         run: |
-          GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test             tests/e2e/approved-account-pdf.spec.ts             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+          GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test tests/e2e/account-header.spec.ts tests/e2e/approved-account-pdf.spec.ts tests/e2e/fast-application-release-20260922.spec.ts tests/e2e/source-health-coverage.spec.ts tests/e2e/city-record-semantics.spec.ts --project=desktop-chromium --project=iphone
       - name: Inspect actual hosted four-page PDF bytes
         run: |
           python -m pip install --quiet PyMuPDF==1.24.14
@@ -233,7 +215,7 @@ jobs:
     environment:
       name: github-pages
     steps:
-      - name: Restore exact prior 190e999 site
+      - name: Restore exact prior approved-PDF site
         uses: actions/deploy-pages@v4
         with:
           artifact_name: fast-release-rollback
