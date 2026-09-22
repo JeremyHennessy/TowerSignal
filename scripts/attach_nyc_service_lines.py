@@ -93,9 +93,11 @@ def attach(output_dir: Path, data_path: Path, summary_path: Path) -> dict[str, A
     systems = payload["systems"]
     bbl_to_systems: dict[str, list[dict[str, Any]]] = {}
     for row in systems:
-        bbl = _normalize_bbl(row.get("bbl"))
-        if bbl:
-            bbl_to_systems.setdefault(bbl, []).append(row)
+        alias_values = row.get("bbl_aliases") if isinstance(row.get("bbl_aliases"), list) else [row.get("bbl")]
+        for value in alias_values:
+            bbl = _normalize_bbl(value)
+            if bbl:
+                bbl_to_systems.setdefault(bbl, []).append(row)
 
     matched_by_bbl: dict[str, list[dict[str, Any]]] = {bbl: [] for bbl in bbl_to_systems}
     for row in _iter_rows(data_path):
@@ -133,7 +135,7 @@ def attach(output_dir: Path, data_path: Path, summary_path: Path) -> dict[str, A
         "nyc_lead_service_line_requested_bbl_count": len(bbl_to_systems),
         "nyc_lead_service_line_matched_bbl_count": matched_bbl_count,
         "nyc_lead_service_line_matched_record_count": matched_record_total,
-        "nyc_lead_service_line_match_basis": "BBL_EXACT",
+        "nyc_lead_service_line_match_basis": "BBL_ALIAS_EXACT",
     })
     payload["summary"]["systems_with_nyc_lead_service_line_records"] = systems_with_records
     (output_dir / "systems.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
@@ -141,7 +143,7 @@ def attach(output_dir: Path, data_path: Path, summary_path: Path) -> dict[str, A
 
     report = {
         "dataset_id": DATASET_ID,
-        "match_basis": "BBL_EXACT",
+        "match_basis": "BBL_ALIAS_EXACT",
         "requested_bbl_count": len(bbl_to_systems),
         "matched_bbl_count": matched_bbl_count,
         "matched_record_count": matched_record_total,
