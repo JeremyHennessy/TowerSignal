@@ -42,6 +42,8 @@ export function ClientSiteReport({
   const missingSample = detail.signals.find(signal => signal.type === 'NO_PUBLIC_SAMPLE_DATE')
   const currentSignals = detail.signals.slice(0, 6)
   const owner = detail.building_context?.owner_name ?? row.pluto_owner_name ?? null
+  const propertyBbl = detail.identity.property_bbl ?? row.property_bbl ?? detail.identity.bbl ?? row.bbl ?? null
+  const registryBbl = detail.identity.registry_bbl ?? row.registry_bbl ?? null
   const latestHistory = [...historyEvents].sort((a, b) => b.detected_at.localeCompare(a.detected_at))[0]
   const sourceCount = detail.metadata.sources.length
   const buildingArea = detail.building_context?.building_area_sqft ?? row.pluto_building_area_sqft ?? null
@@ -72,7 +74,7 @@ export function ClientSiteReport({
         <div><small>Mapped tower features</small><strong>{mappedTowers.toLocaleString()}</strong><span>exact-BIN physical context</span></div>
         <div><small>Latest public sample</small><strong>{detail.sample_history.latest_sample_date ? formatDate(detail.sample_history.latest_sample_date) : 'Not published'}</strong><span>{detail.sample_history.sample_count.toLocaleString()} reported date{detail.sample_history.sample_count === 1 ? '' : 's'}</span></div>
         <div><small>NYC Health inspections</small><strong>{detail.inspection_history.length.toLocaleString()}</strong><span>{violationInspection ? `latest cited ${formatDate(violationInspection.inspection_date)}` : 'no joined cited inspection'}</span></div>
-        <div><small>Property owner</small><strong>{display(owner)}</strong><span>{detail.identity.bbl ? `BBL ${detail.identity.bbl}` : 'exact BBL not available'}</span></div>
+        <div><small>Property owner</small><strong>{display(owner)}</strong><span>{propertyBbl ? `Property BBL ${propertyBbl}` : 'exact property BBL not available'}</span></div>
         <div><small>Building area</small><strong>{buildingArea == null ? 'Not published' : `${number.format(buildingArea)} sq ft`}</strong><span>{detail.building_context ? 'NYC DCP PLUTO' : 'property context unavailable'}</span></div>
       </div>
     </section>
@@ -152,7 +154,8 @@ export function ClientSiteReport({
           <dl>
             <div><dt>System ID</dt><dd>{row.system_id}</dd></div>
             <div><dt>BIN</dt><dd>{display(detail.identity.bin)}</dd></div>
-            <div><dt>BBL</dt><dd>{display(detail.identity.bbl)}</dd></div>
+            <div><dt>Property BBL</dt><dd>{display(propertyBbl)}</dd></div>
+            <div><dt>Registry/base BBL</dt><dd>{registryBbl && registryBbl !== propertyBbl ? registryBbl : 'Same as property BBL'}</dd></div>
             <div><dt>Owner</dt><dd>{display(owner)}</dd></div>
           </dl>
         </div>
