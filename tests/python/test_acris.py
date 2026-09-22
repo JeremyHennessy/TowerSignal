@@ -14,9 +14,14 @@ from towersignal.acris import (
     MASTER_DATASET_ID,
     AcrisError,
     _metadata,
+    CONDO_ROLLUP_MATCH_BASIS,
+    _condo_target_index,
+    _legal_address_key,
     browser_property_context,
     canonical_master,
+    normalize_address_number,
     normalize_document,
+    normalize_street_name,
     summarize_property,
     tower_bbl_hash,
     validate_cache,
@@ -62,6 +67,48 @@ class AcrisTests(unittest.TestCase):
         self.assertEqual(document["document_amount"], 2500000.0)
         self.assertEqual(document["percent_transferred"], 50.0)
         self.assertEqual([party["party_type"] for party in document["parties"]], ["1", "2"])
+
+    def test_condo_address_normalization_is_exact_and_deterministic(self):
+        self.assertEqual(normalize_address_number("0400"), "400")
+        self.assertEqual(normalize_street_name("West 61st Street"), "W 61 ST")
+        self.assertEqual(normalize_street_name("WEST 61 STREET"), "W 61 ST")
+        index = _condo_target_index({
+            "1011717513": {"number": "400", "street": "West 61st Street"},
+            "1011710154": {"number": "400", "street": "West 61st Street"},
+        })
+        key = _legal_address_key({
+            "borough": "1",
+            "block": "1171",
+            "lot": "4942",
+            "street_number": "400",
+            "street_name": "WEST 61 STREET",
+        })
+        self.assertEqual(index[key], {"1011717513"})
+        self.assertNotIn("1011710154", index[key])
+
+    def test_condo_rollup_document_preserves_source_unit_bbl(self):
+        document = normalize_document(
+            "1011717513",
+            {
+                "document_id": "D-CONDO",
+                "doc_type": "DEED",
+                "recorded_datetime": "2026-05-01T12:00:00",
+            },
+            [{
+                "borough": "1",
+                "block": "1171",
+                "lot": "4942",
+                "property_type": "AP",
+                "street_number": "400",
+                "street_name": "WEST 61 STREET",
+                "unit": "34C",
+            }],
+            [],
+            CONDO_ROLLUP_MATCH_BASIS,
+        )
+        self.assertEqual(document["bbl"], "1011717513")
+        self.assertEqual(document["match_basis"], CONDO_ROLLUP_MATCH_BASIS)
+        self.assertEqual(document["legal_context"][0]["source_bbl"], "1011714942")
 
     def test_summary_and_browser_limit_preserve_full_counts(self):
         documents = []
@@ -110,6 +157,31 @@ class AcrisTests(unittest.TestCase):
         validate_cache(cache)
         cache["properties"]["1002360038"]["documents"][0]["match_basis"] = "FUZZY"
         with self.assertRaises(Exception):
+            validate_cache(cache)
+
+    def test_cache_validation_accepts_provenanced_condo_rollup_and_rejects_missing_source_bbl(self):
+        document = {
+            "document_id": "D-CONDO",
+            "bbl": "1011717513",
+            "doc_type": "DEED",
+            "recorded_date": "2026-05-01",
+            "parties": [],
+            "match_basis": CONDO_ROLLUP_MATCH_BASIS,
+            "legal_context": [{"source_bbl": "1011714942", "street_number": "400", "street_name": "WEST 61 STREET"}],
+        }
+        cache = {
+            "schema_version": ACRIS_CACHE_SCHEMA_VERSION,
+            "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "lookback_days": 365,
+            "cutoff": "2025-09-22",
+            "tower_bbl_universe": {"count": 1, "sha256": tower_bbl_hash(["1011717513"])},
+            "sources": [{"dataset_id": "bnx9-e6tj"}, {"dataset_id": "8h5j-fqxa"}, {"dataset_id": "636b-3b5g"}],
+            "metrics": {"tower_bbls_with_recent_relevant_acris": 1, "matched_recent_document_count": 1},
+            "properties": {"1011717513": summarize_property([document])},
+        }
+        validate_cache(cache)
+        cache["properties"]["1011717513"]["documents"][0]["legal_context"] = []
+        with self.assertRaisesRegex(Exception, "lacks source unit-BBL provenance"):
             validate_cache(cache)
 
     def test_cache_file_size_and_age_validation(self):
