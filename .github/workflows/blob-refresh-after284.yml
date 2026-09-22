@@ -1,0 +1,88 @@
+name: Run verified Blob refresh after PR284
+on:
+  push:
+    branches: [control/blob-refresh-after284-20260922]
+    paths: [.github/workflows/blob-refresh-after284.yml]
+permissions:
+  contents: read
+  pull-requests: read
+  actions: write
+concurrency:
+  group: control-blob-refresh-after284
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify accepted baseline and exact repair before starting data generation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const expected = '5e52bb9e1c2f26cc592e72f7a51f196386e7a836';
+            const tested = 'e8f470e655527c0a51664ccfc7eff57e70a3833a';
+            const baseline = 'bf183c6414ab1908de8d7881362de9aa9d57310c';
+            const pr = (await github.rest.pulls.get({...context.repo, pull_number:284})).data;
+            const main = (await github.rest.git.getRef({...context.repo, ref:'heads/main'})).data;
+            if (!pr.merged || pr.merge_commit_sha !== expected || pr.head.sha !== tested || main.object.sha !== expected) throw new Error('Not the exact tested PR284 merge');
+            const diff = (await github.rest.repos.compareCommits({...context.repo, base:baseline, head:expected})).data;
+            const allowed = ['scripts/blob_data_refresh.py','tests/python/test_blob_alert_history_projection.py'];
+            if (diff.files.length !== allowed.length || diff.files.some(f => !allowed.includes(f.filename))) throw new Error('Repair scope differs from approved two-file delta');
+            for (const [run_id,event] of [[35718731699,'push'],[35718846953,'pull_request']]) {
+              const run = (await github.rest.actions.getWorkflowRun({...context.repo,run_id})).data;
+              if (run.head_sha !== tested || run.event !== event || run.path !== '.github/workflows/ci.yml' || run.conclusion !== 'success') throw new Error('Exact-head CI proof missing');
+            }
+            const release = (await github.rest.actions.getWorkflowRun({...context.repo,run_id:35606171481})).data;
+            if (release.head_sha !== baseline || release.conclusion !== 'success') throw new Error('Accepted Pages225 release is not successful');
+            const custody = (await github.rest.actions.getWorkflowRun({...context.repo,run_id:35718894824})).data;
+            const artifact = (await github.rest.actions.getArtifact({...context.repo,artifact_id:10690665431})).data;
+            if (custody.conclusion !== 'success' || artifact.expired || artifact.digest !== 'sha256:1bb301f7f78c2753b755bcf3890c25f205dccc88ce5e39e8dde00927a1496c8d') throw new Error('Preserved accepted artifacts are unavailable');
+            // The repair does not alter browser/application code. Do not run a second
+            // full Pages source collection against the same APIs while Blob refresh runs.
+            const cancelled = [];
+            for (let attempt=0; attempt<30; attempt++) {
+              const runs = (await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:expected,event:'push',per_page:100})).data.workflow_runs;
+              const pages = runs.filter(r => r.path === '.github/workflows/pages.yml' && r.status !== 'completed');
+              for (const run of pages) {
+                if (!cancelled.includes(run.id)) {
+                  await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:run.id});
+                  cancelled.push(run.id);
+                }
+              }
+              if (pages.length === 0 && attempt >= 2) break;
+              if (attempt === 29) throw new Error('Competing exact-merge Pages run did not stop');
+              await new Promise(resolve => setTimeout(resolve,4000));
+            }
+            const current = (await github.rest.git.getRef({...context.repo,ref:'heads/main'})).data;
+            if (current.object.sha !== expected) throw new Error('Main moved before dispatch');
+            const prior = (await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:355813764,branch:'main',per_page:100})).data.workflow_runs;
+            const active = prior.filter(r => r.status !== 'completed');
+            if (active.length > 1 || active.some(r => r.head_sha !== expected)) throw new Error('Another data producer is active; do not race it');
+            let selected = active[0];
+            if (!selected) {
+              const previousIds = new Set(prior.map(r => r.id));
+              await github.rest.actions.createWorkflowDispatch({...context.repo,workflow_id:355813764,ref:'main',inputs:{require_acris:'false'}});
+              for (let attempt=0; attempt<30; attempt++) {
+                const runs = (await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:355813764,branch:'main',event:'workflow_dispatch',per_page:20})).data.workflow_runs;
+                selected = runs.find(r => !previousIds.has(r.id) && r.head_sha === expected && r.path === '.github/workflows/azure-data-refresh.yml');
+                if (selected) break;
+                await new Promise(resolve => setTimeout(resolve,2000));
+              }
+            }
+            if (!selected) throw new Error('No exact-head data workflow acknowledged the dispatch');
+            const receipt = {main_sha:expected, tested_head:tested, accepted_site_run:35606171481,
+              preserved_artifact:10690665431, cancelled_exact_merge_pages_runs:cancelled,
+              data_run_id:selected.id, data_run_url:selected.html_url, data_status:selected.status,
+              site_deployed_by_control:false, publication_claimed:false};
+            fs.writeFileSync('dispatch-receipt.json',JSON.stringify(receipt,null,2)+'\n');
+            core.info(JSON.stringify(receipt));
+            await core.summary.addHeading('Verified Blob refresh dispatched').addCodeBlock(JSON.stringify(receipt,null,2),'json').write();
+      - name: Preserve exact dispatch receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-refresh-after284-control-${{ github.run_id }}
+          path: dispatch-receipt.json
+          retention-days: 30
+          if-no-files-found: warn
