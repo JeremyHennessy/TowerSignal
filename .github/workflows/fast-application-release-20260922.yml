@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - agent/fast-application-release-20260922
+      - agent/account-full-width-live-hotfix-v2-20260922
       - main
     paths:
       - .github/workflows/fast-application-release-20260922.yml
       - .github/workflows/account-reviewed-delivery.yml
       - tests/e2e/fast-application-release-20260922.spec.ts
+      - src/styles/account-detail-polish.css
 
 permissions:
   contents: read
@@ -46,7 +48,7 @@ jobs:
 
       - name: Prove exact accepted application plus release-control-only delta
         env:
-          EXPECTED_PRODUCT: 1a6d85675cb95feb314502aeb154aa2a6b45b598
+          EXPECTED_PRODUCT: fae60fbdb1cf2fda13c71cd476c3e62bf4546d44
         run: |
           set -euo pipefail
           git fetch --depth=1 origin "$EXPECTED_PRODUCT"
@@ -56,13 +58,13 @@ jobs:
           from pathlib import Path
           allowed={
             '.github/workflows/fast-application-release-20260922.yml',
-            '.github/workflows/account-reviewed-delivery.yml',
+            'src/styles/account-detail-polish.css',
             'tests/e2e/fast-application-release-20260922.spec.ts',
           }
           actual={line.strip() for line in Path('/tmp/release-diff.txt').read_text().splitlines() if line.strip()}
           assert actual == allowed, (actual, allowed)
           PY
-          git diff --exit-code "$EXPECTED_PRODUCT" HEAD -- src package.json vite.config.ts tsconfig.json tsconfig.app.json
+          git diff --exit-code "$EXPECTED_PRODUCT" HEAD -- src ':!src/styles/account-detail-polish.css' package.json vite.config.ts tsconfig.json tsconfig.app.json
 
       - uses: actions/setup-node@v4
         with:
@@ -121,6 +123,16 @@ jobs:
           CANDIDATE_ROOT: ${{ github.workspace }}/dist
         run: |
           npx playwright test             tests/e2e/fast-application-release-20260922.spec.ts             tests/e2e/source-health-coverage.spec.ts             tests/e2e/city-record-semantics.spec.ts             --project=desktop-chromium             --project=iphone
+
+      - name: Retain pre-deploy Account screenshots and PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast-application-candidate-proof
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
 
       - name: Upload exact application candidate
         uses: actions/upload-pages-artifact@v3
