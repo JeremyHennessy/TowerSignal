@@ -15,6 +15,7 @@ type ProcurementHealthRow = ProcurementSourceHealth & { source_url: string | nul
 const fallbackDiagnosticSourceUrls: Record<string, string> = {
   nys_registry: 'https://health.data.ny.gov/Health/New-York-State-Cooling-Tower-Registry-Weekly-Extr/24a4-muw7',
   labor_law_published_decisions: 'https://www.nycourts.gov/reporter/RSS.shtml',
+  acris_recent: 'https://data.cityofnewyork.us/City-Government/ACRIS-Real-Property-Master/bnx9-e6tj',
 }
 
 function SourceNameLink({ name, url }: { name: string; url: string | null }) {

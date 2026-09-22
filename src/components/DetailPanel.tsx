@@ -3,6 +3,7 @@ import { OfficialSwoSnapshotSection } from './OfficialSwoSnapshotSection'
 import { ScoreExplanation } from './ScoreExplanation'
 import type { LegionellaBuildingLink } from '../types/enforcement'
 import { useEffect, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { loadSystemDetail } from '../data/api'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { leadSummary } from '../utils/export'
@@ -21,6 +22,7 @@ import { LegacyDobProjectSection } from './LegacyDobProjectSection'
 import { AccountDecisionSummary } from './AccountDecisionSummary'
 import { AccountModeTabs } from './AccountModeTabs'
 import { AccountUnifiedTimeline } from './AccountUnifiedTimeline'
+import { ClientSiteReport } from './ClientSiteReport'
 
 const money = (value: number | null) => value == null ? '—' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
 const number = (value: number | null) => value == null ? '—' : new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(value)
@@ -56,13 +58,21 @@ export function DetailPanel({ row, metadata, historyEvents, historyStartedAt, wo
     await navigator.clipboard.writeText(leadSummary(row, metadata, detail))
     setCopied(true)
   }
+  const exportClientPdf = () => {
+    if (!detail || !isFullAccountReport) return
+    const originalTitle = document.title
+    document.title = `TowerSignal - ${row.address ?? row.system_id} - Site Intelligence Report`
+    window.print()
+    document.title = originalTitle
+  }
   return <aside className="detail-panel" aria-label="Selected cooling tower detail">
     <div className="detail-header"><div><span className="eyebrow">Selected system</span><h2>{row.address ?? row.system_id}</h2><p>{row.borough} {row.zip} · System <span className="mono">{row.system_id}</span></p></div><button className="icon-button" onClick={onClose} aria-label="Close details">×</button></div>
-    <div className="detail-actions"><button onClick={copy} disabled={!detail}>{copied ? 'Copied' : 'Copy lead brief'}</button><span className="score large">{row.priority_score}</span><span>Priority score</span></div>
+    <div className="detail-actions"><button onClick={copy} disabled={!detail}>{copied ? 'Copied' : 'Copy lead brief'}</button>{isFullAccountReport && <button onClick={exportClientPdf} disabled={!detail}>Export client PDF</button>}<span className="score large">{row.priority_score}</span><span>Priority score</span></div>
     {workflowSection}
     {error && <div className="error-state">{error}</div>}
     {!detail && !error && <div className="loading-state">Loading source-backed details…</div>}
     {detail && <>
+      {isFullAccountReport && createPortal(<ClientSiteReport row={row} detail={detail} metadata={metadata} historyEvents={historyEvents} />, document.body)}
       {isFullAccountReport && <><AccountDecisionSummary row={row} detail={detail} historyEvents={historyEvents} workflowAccount={workflowAccount} /><AccountModeTabs /></>}
       <TechnicianFieldPack row={row} detail={detail} />
       <section><h3>Identity</h3><dl className="identity-grid"><div><dt>BIN</dt><dd>{detail.identity.bin ?? '—'}</dd></div><div><dt>BBL</dt><dd>{detail.identity.bbl ?? '—'}</dd></div><div><dt>Active equipment</dt><dd>{detail.identity.active_equipment}</dd></div><div><dt>Coordinates</dt><dd>{detail.identity.coordinate_status === 'VALID' && detail.identity.latitude != null && detail.identity.longitude != null ? `${detail.identity.latitude.toFixed(4)}, ${detail.identity.longitude.toFixed(4)}` : detail.identity.coordinate_status === 'INVALID_SOURCE' ? `Unusable source coordinates (${detail.identity.source_latitude_raw ?? 'blank'}, ${detail.identity.source_longitude_raw ?? 'blank'})` : 'Not published'}</dd></div></dl></section>

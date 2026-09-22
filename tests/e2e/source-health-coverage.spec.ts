@@ -70,6 +70,8 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   await expect(nysRegistryLink).toHaveAttribute('href', 'https://health.data.ny.gov/Health/New-York-State-Cooling-Tower-Registry-Weekly-Extr/24a4-muw7')
   const laborLawLink = diagnosticRows.filter({ hasText: LABOR_LAW_DATASET_ID }).locator('a').first()
   await expect(laborLawLink).toHaveAttribute('href', 'https://www.nycourts.gov/reporter/RSS.shtml')
+  const acrisLink = diagnosticRows.filter({ hasText: 'bnx9-e6tj+8h5j-fqxa+636b-3b5g' }).locator('a').first()
+  await expect(acrisLink).toHaveAttribute('href', 'https://data.cityofnewyork.us/City-Government/ACRIS-Real-Property-Master/bnx9-e6tj')
 
   const expected = await page.evaluate(async () => {
     const response = await fetch(new URL('data/systems.json', window.location.href), { cache: 'no-store' })
