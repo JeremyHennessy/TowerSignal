@@ -14,6 +14,7 @@ from towersignal.acris import (
     MASTER_DATASET_ID,
     AcrisError,
     _metadata,
+    ALIAS_BBL_MATCH_BASIS,
     CONDO_ROLLUP_MATCH_BASIS,
     _condo_target_index,
     _legal_address_key,
@@ -67,6 +68,29 @@ class AcrisTests(unittest.TestCase):
         self.assertEqual(document["document_amount"], 2500000.0)
         self.assertEqual(document["percent_transferred"], 50.0)
         self.assertEqual([party["party_type"] for party in document["parties"]], ["1", "2"])
+
+    def test_exact_base_bbl_alias_provenance_is_accepted(self):
+        document = normalize_document(
+            "1011717513",
+            {
+                "document_id": "D-BASE",
+                "doc_type": "MTGE",
+                "recorded_datetime": "2026-06-01T12:00:00",
+            },
+            [{
+                "borough": "1",
+                "block": "1171",
+                "lot": "0154",
+                "property_type": "AP",
+                "street_number": "400",
+                "street_name": "WEST 61 STREET",
+            }],
+            [],
+            ALIAS_BBL_MATCH_BASIS,
+        )
+        self.assertEqual(document["bbl"], "1011717513")
+        self.assertEqual(document["match_basis"], ALIAS_BBL_MATCH_BASIS)
+        self.assertEqual(document["legal_context"][0]["source_bbl"], "1011710154")
 
     def test_condo_address_normalization_is_exact_and_deterministic(self):
         self.assertEqual(normalize_address_number("0400"), "400")
