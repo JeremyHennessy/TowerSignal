@@ -35,7 +35,7 @@ def tower_bbls_from_snapshot(path: Path) -> set[str]:
     return _tower_bbls([row for row in systems if isinstance(row, dict)], str(path))
 
 
-def tower_bbls_from_current_registrations() -> set[str]:
+def reconciled_current_systems() -> list[dict[str, Any]]:
     snapshot = fetch_dataset(REGISTRATION_DATASET_ID, "system_id")
     systems, _ = normalize_registrations(snapshot.rows)
     if len(systems) < 3500:
@@ -50,6 +50,28 @@ def tower_bbls_from_current_registrations() -> set[str]:
         raise RuntimeError(
             "Refusing to build ACRIS cache from an implausibly small reconciled property-BBL universe"
         )
+    return systems
+
+
+def property_targets_from_systems(systems: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    targets: dict[str, dict[str, Any]] = {}
+    for system in systems:
+        bbl = normalize_bbl(system.get("bbl"))
+        if not bbl:
+            continue
+        targets[bbl] = {
+            "system_id": system.get("system_id"),
+            "bin": system.get("bin"),
+            "borough": system.get("borough"),
+            "number": system.get("number"),
+            "street": system.get("street"),
+            "address": system.get("address"),
+        }
+    return targets
+
+
+def tower_bbls_from_current_registrations() -> set[str]:
+    systems = reconciled_current_systems()
     return _tower_bbls(
         systems,
         f"current NYC registry {REGISTRATION_DATASET_ID} after exact-BIN property-BBL reconciliation",
@@ -57,8 +79,17 @@ def tower_bbls_from_current_registrations() -> set[str]:
 
 
 def build(tower_snapshot: Path | None, output: Path) -> dict:
-    bbls = tower_bbls_from_snapshot(tower_snapshot) if tower_snapshot else tower_bbls_from_current_registrations()
-    cache = build_recent_cache(bbls)
+    if tower_snapshot:
+        bbls = tower_bbls_from_snapshot(tower_snapshot)
+        property_targets: dict[str, dict[str, Any]] = {}
+    else:
+        systems = reconciled_current_systems()
+        bbls = _tower_bbls(
+            systems,
+            f"current NYC registry {REGISTRATION_DATASET_ID} after exact-BIN property-BBL reconciliation",
+        )
+        property_targets = property_targets_from_systems(systems)
+    cache = build_recent_cache(bbls, property_targets=property_targets)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(cache, separators=(",", ":")), encoding="utf-8")
     result = validate_cache_file(output, require_production_volume=True)
@@ -69,6 +100,8 @@ def build(tower_snapshot: Path | None, output: Path) -> dict:
         "tower_bbls_with_recent_relevant_acris": metrics["tower_bbls_with_recent_relevant_acris"],
         "matched_recent_document_count": metrics["matched_recent_document_count"],
         "party_row_count": metrics["party_row_count"],
+        "condo_address_document_link_count": metrics.get("condo_address_document_link_count", 0),
+        "condo_rollup_property_count": metrics.get("condo_rollup_property_count", 0),
         "total_seconds": metrics["total_seconds"],
     }, indent=2))
     return cache
