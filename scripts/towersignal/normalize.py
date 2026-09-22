@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any
 
+from .planimetrics import normalize_bin
+
 DATE_FORMATS = ("%m/%d/%Y", "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d")
 NYC_LATITUDE_RANGE = (40.3, 41.1)
 NYC_LONGITUDE_RANGE = (-74.4, -73.5)
@@ -150,7 +152,7 @@ def normalize_registrations(rows: list[dict[str, Any]]) -> tuple[list[dict[str, 
         normalized.append(
             {
                 "system_id": system_id,
-                "bin": _clean(row.get("bin")),
+                "bin": normalize_bin(row.get("bin")),
                 "bbl": _clean(row.get("bbl")),
                 "date_registered": _clean(row.get("date_registered")),
                 "address": address,

@@ -23,7 +23,7 @@ class AttachNycWaterSignalsTests(unittest.TestCase):
                 "metadata": {"generated_at": "2026-09-05T00:00:00Z"},
                 "summary": {},
                 "systems": [
-                    {"system_id": "SYS-1", "bbl": "1000010001", "bin": "1000001", "address": "10 Alpha St"},
+                    {"system_id": "SYS-1", "bbl": "1000017501", "property_bbl": "1000017501", "registry_bbl": "1000010001", "bbl_aliases": ["1000010001", "1000017501"], "bin": "1000001", "address": "10 Alpha St"},
                     {"system_id": "SYS-2", "bbl": "2000020002", "bin": "2000002", "address": "10 Alpha St"},
                 ],
             }

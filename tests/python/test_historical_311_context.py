@@ -95,13 +95,21 @@ class Historical311ContextTests(unittest.TestCase):
             detail_path.write_text(json.dumps({"identity": {"system_id": "2000015740", "bbl": "1011210036"}, "nyc_building_water_signals": {"summary": {"record_count": 1}}}), encoding="utf-8")
             systems = {
                 "metadata": {}, "summary": {},
-                "systems": [{"system_id": "2000015740", "bbl": "1011210036"}],
+                "systems": [{
+                    "system_id": "2000015740",
+                    "bbl": "1011217501",
+                    "property_bbl": "1011217501",
+                    "registry_bbl": "1011210036",
+                    "bbl_aliases": ["1011210036", "1011217501"],
+                }],
             }
             (output / "systems.json").write_text(json.dumps(systems), encoding="utf-8")
             result = attach(output, cache)
             self.assertEqual(result["systems_attached"], 1)
             detail = json.loads(detail_path.read_text(encoding="utf-8"))
             self.assertEqual(detail["nyc_historical_water_context"]["summary"]["request_count"], 3)
+            self.assertEqual(detail["nyc_historical_water_context"]["matched_bbl_aliases"], ["1011210036"])
+            self.assertEqual(detail["nyc_historical_water_context"]["match_basis"], "BBL_ALIAS_EXACT")
             self.assertEqual(detail["nyc_building_water_signals"]["summary"]["record_count"], 1)
 
 

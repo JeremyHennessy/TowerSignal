@@ -27,7 +27,13 @@ def load_tower_bbls(path: Path) -> list[str]:
     systems = payload.get("systems")
     if not isinstance(systems, list):
         raise RuntimeError("TowerSignal systems payload is malformed")
-    return sorted({bbl for row in systems if isinstance(row, dict) and (bbl := normalize_bbl(row.get("bbl")))})
+    return sorted({
+        bbl
+        for row in systems
+        if isinstance(row, dict)
+        for value in (row.get("bbl_aliases") if isinstance(row.get("bbl_aliases"), list) else [row.get("bbl")])
+        if (bbl := normalize_bbl(value))
+    })
 
 
 def _is_transient_geosearch_failure(exc: RuntimeError) -> bool:

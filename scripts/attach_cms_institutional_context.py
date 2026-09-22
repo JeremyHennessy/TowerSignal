@@ -36,10 +36,22 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
         if not isinstance(system, dict):
             continue
         system_id = str(system.get("system_id") or "")
-        bbl = _normalize_bbl(system.get("bbl"))
-        facilities = by_bbl.get(bbl, []) if bbl else []
-        if not isinstance(facilities, list):
-            raise RuntimeError(f"CMS institutional context malformed for BBL {bbl}")
+        alias_values = system.get("bbl_aliases") if isinstance(system.get("bbl_aliases"), list) else [system.get("bbl")]
+        aliases = sorted({bbl for value in alias_values if (bbl := _normalize_bbl(value))})
+        facilities_by_id: dict[str, dict[str, Any]] = {}
+        matched_aliases: list[str] = []
+        for bbl in aliases:
+            rows = by_bbl.get(bbl, [])
+            if not isinstance(rows, list):
+                raise RuntimeError(f"CMS institutional context malformed for BBL {bbl}")
+            if rows:
+                matched_aliases.append(bbl)
+            for index, row in enumerate(rows):
+                if not isinstance(row, dict):
+                    continue
+                identity = str(row.get("facility_id") or row.get("ccn") or row.get("provider_id") or f"{bbl}:{index}")
+                facilities_by_id[identity] = row
+        facilities = list(facilities_by_id.values())
         system["cms_institutional_facility_count"] = len(facilities)
         system["cms_institutional_facility_types"] = sorted({str(row.get("source_kind") or "") for row in facilities if isinstance(row, dict) and row.get("source_kind")})
         if facilities:
@@ -51,6 +63,8 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
         detail = json.loads(detail_path.read_text(encoding="utf-8"))
         detail["cms_institutional_context"] = {
             "facilities": facilities,
+            "matched_bbl_aliases": matched_aliases,
+            "match_basis": "PAD_EXACT_ADDRESS_BBL_ALIAS",
             "evidence_boundaries": cache.get("evidence_boundaries") or {},
             "source": cache.get("source") or {},
             "generated_at": cache.get("generated_at"),
@@ -63,7 +77,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     summary = cache.get("summary") or {}
     metadata.update({
         "cms_institutional_context_available": True,
-        "cms_institutional_match_basis": "PAD_EXACT_ADDRESS_BBL",
+        "cms_institutional_match_basis": "PAD_EXACT_ADDRESS_BBL_ALIAS",
         "cms_institutional_exact_resolved_facility_count": int(summary.get("exact_resolved_facility_count") or 0),
         "cms_institutional_tower_overlap_facility_count": attached_facilities,
         "cms_institutional_systems_attached": attached_systems,

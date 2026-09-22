@@ -72,6 +72,21 @@ export function AccountDecisionSummary({
   const inspectionCount = detail.inspection_history.length
   const missingPublicSampleSignal = detail.signals.find(signal => signal.type === 'NO_PUBLIC_SAMPLE_DATE')
   const owner = detail.building_context?.owner_name ?? row.pluto_owner_name ?? null
+  const propertyBbl = detail.identity.property_bbl ?? row.property_bbl ?? detail.identity.bbl ?? row.bbl ?? null
+  const registryBbl = detail.identity.registry_bbl ?? row.registry_bbl ?? null
+  const identityStatus = detail.identity.bbl_identity_status ?? row.bbl_identity_status ?? ''
+  const identityConflict = identityStatus.includes('CONFLICT') || identityStatus.includes('MULTIPLE_MAPPLUTO')
+  const reconciledIdentity = identityStatus === 'RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL'
+  const propertyTitle = identityConflict
+    ? 'Property identity needs review'
+    : owner ?? (propertyBbl ? `Property BBL ${propertyBbl}` : 'No exact property identity')
+  const propertyDetail = identityConflict
+    ? `Registry BBL ${registryBbl ?? 'unavailable'} conflicts with exact-BIN MapPLUTO context. Property-level joins are not treated as complete.`
+    : reconciledIdentity
+      ? `Property BBL ${propertyBbl} · registry/base BBL ${registryBbl} · exact-BIN MapPLUTO reconciliation`
+      : propertyBbl
+        ? `Property BBL ${propertyBbl} · NYC DCP PLUTO context`
+        : 'TowerSignal does not infer a parcel when no exact source identity is available.'
   const infrastructure = infrastructureSummary(detail)
   const whyNow = row.recent_confirmed_violation ? 'Confirmed recent violation' : signalLabel(row.primary_signal)
 
@@ -85,7 +100,7 @@ export function AccountDecisionSummary({
       <article className="urgent"><small>Compliance trigger</small><strong>{violationDate ? `${whyNow} · ${formatDate(violationDate)}` : whyNow}</strong><span>{violationText}</span></article>
       <article><small>Cooling-tower footprint</small><strong>{row.active_equipment.toLocaleString()} registered unit{row.active_equipment === 1 ? '' : 's'} · {mappedTowers.toLocaleString()} mapped footprint{mappedTowers === 1 ? '' : 's'}</strong><span>{buildingOutlines ? `${buildingOutlines.toLocaleString()} exact-BIN building outline${buildingOutlines === 1 ? '' : 's'}` : 'No mapped building outline'}{buildingArea ? ` · ${number.format(buildingArea)} sq ft PLUTO building` : ''}</span></article>
       <article className={missingPublicSampleSignal ? 'urgent' : undefined}><small>Sampling &amp; inspections{missingPublicSampleSignal ? ' · VERIFY' : ''}</small><strong>{detail.sample_history.latest_sample_date ? `Latest sample ${formatDate(detail.sample_history.latest_sample_date)}` : missingPublicSampleSignal ? 'No public Legionella sample dates reported' : 'Latest sample date unavailable'}</strong><span>{missingPublicSampleSignal ? `${missingPublicSampleSignal.reason} · ${inspectionCount.toLocaleString()} NYC Health inspection${inspectionCount === 1 ? '' : 's'}` : `${sampleCount.toLocaleString()} reported sample date${sampleCount === 1 ? '' : 's'}${detail.sample_history.latest_sample_interval_days != null ? ` · ${detail.sample_history.latest_sample_interval_days.toLocaleString()}-day latest interval` : ''} · ${inspectionCount.toLocaleString()} NYC Health inspection${inspectionCount === 1 ? '' : 's'}`}</span></article>
-      <article><small>Property identity</small><strong>{owner ?? (detail.identity.bbl ? `BBL ${detail.identity.bbl}` : 'No exact property identity')}</strong><span>{detail.identity.bbl ? `BBL ${detail.identity.bbl} · NYC DCP PLUTO context` : 'TowerSignal does not infer a parcel when no exact source identity is available.'}</span></article>
+      <article className={identityConflict ? 'urgent' : undefined}><small>Property identity{identityConflict ? ' · VERIFY' : ''}</small><strong>{propertyTitle}</strong><span>{propertyDetail}</span></article>
       <article><small>Infrastructure evidence</small><strong>{infrastructure.title}</strong><span>{infrastructure.detail}</span></article>
       <article><small>Next action</small><strong>{nextActionLabel(workflowAccount)}</strong><span>{workflowAccount?.note ? workflowAccount.note : 'Use Summary workflow controls to set private disposition, notes and follow-up timing.'}</span></article>
     </div>

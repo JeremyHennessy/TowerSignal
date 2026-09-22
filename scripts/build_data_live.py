@@ -5,6 +5,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -83,12 +84,20 @@ def build(output_dir: Path) -> dict:
     building_footprints_by_bin, building_footprint_meta = fetch_building_footprints_by_bin(bin_values)
     progress(f"Matched building footprints for {len(building_footprints_by_bin):,} BINs")
 
-    progress("Recovering missing registry BBL identity from exact-BIN published MapPLUTO BBLs")
+    progress("Reconciling registry/base BBL identity with exact-BIN published MapPLUTO property BBLs")
     bbl_identity_meta = apply_bbl_identity_recovery(systems, building_footprints_by_bin)
     bbl_values = {system["bbl"] for system in systems if system.get("bbl")}
+    bbl_alias_values = {
+        alias
+        for system in systems
+        for alias in (system.get("bbl_aliases") or ([system.get("bbl")] if system.get("bbl") else []))
+        if normalize_bbl(alias)
+    }
     progress(
-        f"Canonical BBL identity: {bbl_identity_meta['canonical_bbl_count']:,}/{len(systems):,}; "
-        f"{bbl_identity_meta['recovered_bbl_count']:,} recovered; "
+        f"Canonical property BBL identity: {bbl_identity_meta['canonical_bbl_count']:,}/{len(systems):,}; "
+        f"{bbl_identity_meta['reconciled_registry_bbl_count']:,} registry/base lots reconciled; "
+        f"{bbl_identity_meta['recovered_bbl_count']:,} missing BBLs recovered; "
+        f"{bbl_identity_meta['explicit_conflict_count']:,} explicit conflicts; "
         f"{bbl_identity_meta['unresolved_bbl_count']:,} unresolved"
     )
 
@@ -96,8 +105,8 @@ def build(output_dir: Path) -> dict:
     pluto_by_bbl, pluto_meta = fetch_pluto_by_bbl(bbl_values)
     progress(f"Matched PLUTO context for {len(pluto_by_bbl):,} BBLs")
 
-    progress(f"Fetching DOB NOW activity for {len(bbl_values):,} canonical BBLs")
-    dob_by_bbl, dob_meta = fetch_dob_activity_by_bbl(bbl_values)
+    progress(f"Fetching DOB NOW activity for {len(bbl_alias_values):,} exact current/base BBL aliases")
+    dob_by_bbl, dob_meta = fetch_dob_activity_by_bbl(bbl_alias_values)
     progress(f"Matched DOB NOW activity for {len(dob_by_bbl):,} BBLs")
 
     progress(f"Fetching HPD contacts for {len(bbl_values):,} canonical BBLs")
@@ -208,6 +217,7 @@ def build(output_dir: Path) -> dict:
         "pluto_requested_bbl_count": pluto_meta["requested_bbl_count"],
         "pluto_matched_bbl_count": pluto_meta["matched_bbl_count"],
         "dob_requested_bbl_count": dob_meta["requested_bbl_count"],
+        "dob_match_basis": "BBL_ALIAS_EXACT",
         "dob_matched_bbl_count": dob_meta["matched_bbl_count"],
         "dob_matched_filing_count": dob_meta["matched_filing_count"],
         "dob_explicit_cooling_tower_filing_count": dob_meta["explicit_cooling_tower_filing_count"],
@@ -226,7 +236,9 @@ def build(output_dir: Path) -> dict:
         "building_footprint_matched_feature_count": building_footprint_meta["matched_feature_count"],
         "building_footprint_match_basis": building_footprint_meta["match_basis"],
         "bbl_registry_source_count": bbl_identity_meta["registry_source_bbl_count"],
+        "bbl_reconciled_registry_base_to_mappluto_count": bbl_identity_meta["reconciled_registry_bbl_count"],
         "bbl_recovered_exact_bin_mappluto_count": bbl_identity_meta["recovered_bbl_count"],
+        "bbl_explicit_conflict_count": bbl_identity_meta["explicit_conflict_count"],
         "bbl_canonical_count": bbl_identity_meta["canonical_bbl_count"],
         "bbl_unresolved_count": bbl_identity_meta["unresolved_bbl_count"],
         "bbl_identity_recovery_contract": bbl_identity_meta["recovery_contract"],
@@ -262,8 +274,23 @@ def build(output_dir: Path) -> dict:
             systems_with_oath_cases += 1
         bbl_key = normalize_bbl(system.get("bbl"))
         bin_key = normalize_planimetric_bin(system.get("bin"))
+        bbl_aliases = sorted({
+            alias
+            for value in (system.get("bbl_aliases") or ([system.get("bbl")] if system.get("bbl") else []))
+            if (alias := normalize_bbl(value))
+        }, key=int)
         building_context = pluto_by_bbl.get(bbl_key) if bbl_key else None
-        dob_activity = dob_by_bbl.get(bbl_key, []) if bbl_key else []
+
+        dob_activity_by_id: dict[str, dict[str, Any]] = {}
+        for alias in bbl_aliases:
+            for index, record in enumerate(dob_by_bbl.get(alias, [])):
+                identity = str(record.get("job_filing_number") or f"{alias}:{index}")
+                dob_activity_by_id[identity] = record
+        dob_activity = sorted(
+            dob_activity_by_id.values(),
+            key=lambda item: (item.get("activity_date") or "", item.get("job_filing_number") or ""),
+            reverse=True,
+        )
         dob_summary = summarize_dob_activity(dob_activity, snapshot_date)
         hpd_registration = hpd_by_bbl.get(bbl_key) if bbl_key else None
         planimetric_building_tower_features = planimetric_by_bin.get(bin_key, []) if bin_key else []
@@ -317,7 +344,9 @@ def build(output_dir: Path) -> dict:
             "system_id": system["system_id"],
             "bin": system["bin"],
             "bbl": system["bbl"],
+            "property_bbl": system.get("property_bbl"),
             "registry_bbl": system.get("registry_bbl"),
+            "bbl_aliases": system.get("bbl_aliases") or [],
             "bbl_identity_basis": system.get("bbl_identity_basis"),
             "bbl_identity_status": system.get("bbl_identity_status"),
             "address": system["address"],
@@ -369,7 +398,9 @@ def build(output_dir: Path) -> dict:
                 "system_id": system["system_id"],
                 "bin": system["bin"],
                 "bbl": system["bbl"],
+                "property_bbl": system.get("property_bbl"),
                 "registry_bbl": system.get("registry_bbl"),
+                "bbl_aliases": system.get("bbl_aliases") or [],
                 "bbl_identity_basis": system.get("bbl_identity_basis"),
                 "bbl_identity_status": system.get("bbl_identity_status"),
                 "bbl_identity_evidence": system.get("bbl_identity_evidence"),
@@ -425,7 +456,9 @@ def build(output_dir: Path) -> dict:
             "systems_with_planimetric_bin_match": systems_with_planimetric_bin_match,
             "systems_with_building_footprint_match": systems_with_building_footprint_match,
             "systems_with_registry_source_bbl": bbl_identity_meta["registry_source_bbl_count"],
+            "systems_with_reconciled_registry_bbl": bbl_identity_meta["reconciled_registry_bbl_count"],
             "systems_with_recovered_bbl": bbl_identity_meta["recovered_bbl_count"],
+            "systems_with_explicit_bbl_conflict": bbl_identity_meta["explicit_conflict_count"],
             "systems_with_canonical_bbl": bbl_identity_meta["canonical_bbl_count"],
             "systems_with_unresolved_bbl": bbl_identity_meta["unresolved_bbl_count"],
         },
@@ -442,7 +475,13 @@ def build(output_dir: Path) -> dict:
     print(f"HPD exact BBL registrations: {hpd_meta['matched_registration_bbl_count']:,}/{hpd_meta['requested_bbl_count']:,}; contacts on {hpd_meta['matched_contact_bbl_count']:,} BBLs")
     print(f"Planimetric exact BIN matches: {planimetric_meta['matched_bin_count']:,}/{planimetric_meta['requested_bin_count']:,}; {planimetric_meta['matched_feature_count']:,} physical tower features")
     print(f"Building-footprint exact BIN matches: {building_footprint_meta['matched_bin_count']:,}/{building_footprint_meta['requested_bin_count']:,}; {building_footprint_meta['matched_feature_count']:,} footprint features")
-    print(f"BBL identity: {bbl_identity_meta['registry_source_bbl_count']:,} registry-source + {bbl_identity_meta['recovered_bbl_count']:,} exact-BIN MapPLUTO recovered; {bbl_identity_meta['unresolved_bbl_count']:,} unresolved")
+    print(
+        f"BBL identity: {bbl_identity_meta['registry_source_bbl_count']:,} registry-source; "
+        f"{bbl_identity_meta['reconciled_registry_bbl_count']:,} exact-BIN registry/base→MapPLUTO reconciled; "
+        f"{bbl_identity_meta['recovered_bbl_count']:,} missing BBLs recovered; "
+        f"{bbl_identity_meta['explicit_conflict_count']:,} explicit conflicts; "
+        f"{bbl_identity_meta['unresolved_bbl_count']:,} unresolved"
+    )
     print(f"Generated {len(summary_rows):,} systems at {generated_at}")
     return payload
 

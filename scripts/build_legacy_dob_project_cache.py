@@ -106,6 +106,16 @@ def _exact_where(chunk: list[str]) -> str:
     return " OR ".join(clauses)
 
 
+def _system_bbl_aliases(row: dict[str, Any]) -> list[str]:
+    values = row.get("bbl_aliases") if isinstance(row.get("bbl_aliases"), list) else [row.get("bbl")]
+    aliases = {
+        bbl
+        for value in values
+        if (bbl := normalize_bbl(value)) and _bbl_components(bbl)
+    }
+    return sorted(aliases, key=int)
+
+
 def _applicant(row: dict[str, Any]) -> str | None:
     parts = [_text(row.get("applicant_s_first_name")), _text(row.get("applicant_s_last_name"))]
     name = " ".join(part for part in parts if part)
@@ -190,7 +200,7 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
     payload = json.loads(systems_path.read_text(encoding="utf-8"))
     systems = payload.get("systems") or []
     snapshot_date = date.fromisoformat(str((payload.get("metadata") or {}).get("snapshot_date") or date.today().isoformat()))
-    requested = sorted({bbl for row in systems if (bbl := normalize_bbl(row.get("bbl"))) and _bbl_components(bbl)}, key=int)
+    requested = sorted({bbl for row in systems for bbl in _system_bbl_aliases(row)}, key=int)
     requested_set = set(requested)
 
     retained_by_bbl: dict[str, dict[str, dict[str, Any]]] = {}
@@ -275,7 +285,7 @@ def build(output_dir: Path, output_file: Path | None = None) -> dict[str, Any]:
             "recent_relevant_project_record_count": recent_relevant_count,
         },
         "evidence_semantics": {
-            "property_link": "Exact borough + block + lot reconstruction to canonical 10-digit BBL only; no address or fuzzy property matching.",
+            "property_link": "Exact borough + block + lot reconstruction to current property BBL and preserved registry/base BBL aliases only; no address or fuzzy property matching.",
             "retention": "Retain all explicit published cooling-tower mentions plus mechanical/boiler/plumbing/equipment jobs with lifecycle activity within 1,095 days of the build snapshot.",
             "roles": "Applicant and owner names are recorded DOB project roles only; they do not establish a service contract, incumbent provider, current ownership or maintenance responsibility.",
             "history": "This cache is historical/project context and is not written into TowerSignal Monitor history as newly occurring events.",

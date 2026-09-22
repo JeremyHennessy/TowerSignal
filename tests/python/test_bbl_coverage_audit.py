@@ -17,10 +17,20 @@ class BblCoverageAuditTests(unittest.TestCase):
                 "bbl_identity_status": "REGISTRY_SOURCE_BBL",
             },
             {
+                "system_id": "reconciled",
+                "borough": "Manhattan",
+                "bin": "1000002",
+                "bbl": "1000017501",
+                "property_bbl": "1000017501",
+                "registry_bbl": "1000010001",
+                "bbl_identity_status": "RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL",
+            },
+            {
                 "system_id": "recovered",
                 "borough": "Brooklyn",
                 "bin": "3000001",
                 "bbl": "3000017501",
+                "property_bbl": "3000017501",
                 "registry_bbl": None,
                 "bbl_identity_status": "RECOVERED_EXACT_BIN_MAPPLUTO_BBL",
             },
@@ -36,17 +46,21 @@ class BblCoverageAuditTests(unittest.TestCase):
 
         gap = _identifier_gap(systems)
 
-        self.assertEqual(gap["with_bbl"], 1)
+        self.assertEqual(gap["with_bbl"], 2)
         self.assertEqual(gap["missing_bbl"], 2)
-        self.assertEqual(gap["with_registry_source_bbl"], 1)
-        self.assertEqual(gap["with_canonical_bbl"], 2)
+        self.assertEqual(gap["with_registry_source_bbl"], 2)
+        self.assertEqual(gap["with_canonical_bbl"], 3)
         self.assertEqual(gap["missing_canonical_bbl"], 1)
         self.assertEqual(gap["recovered_bbl_count"], 1)
+        self.assertEqual(gap["reconciled_registry_bbl_count"], 1)
+        self.assertEqual(gap["by_borough"]["Manhattan"]["with_registry_source_bbl"], 2)
+        self.assertEqual(gap["by_borough"]["Manhattan"]["reconciled_registry_bbl"], 1)
         self.assertEqual(gap["by_borough"]["Brooklyn"]["with_registry_source_bbl"], 0)
         self.assertEqual(gap["by_borough"]["Brooklyn"]["with_canonical_bbl"], 1)
         self.assertEqual(gap["by_borough"]["Brooklyn"]["recovered_bbl"], 1)
         self.assertIn("do not inflate source completeness", gap["bbl_semantics"]["with_bbl"])
         self.assertIn("no address or fuzzy matching", gap["bbl_semantics"]["recovery"])
+        self.assertIn("preserved as provenance", gap["bbl_semantics"]["registry_reconciliation"])
 
 
 if __name__ == "__main__":
