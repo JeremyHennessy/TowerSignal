@@ -8,6 +8,15 @@
   display:none!important;
 }
 
+/* The legacy desktop section rail used to reserve 180px inside the Account report.
+   The rail is now intentionally removed, so its layout reservation must be removed too. */
+@media(min-width:1500px){
+  .account-profile-page .detail-panel,
+  .account-profile-page .account-profile-toolbar{
+    padding-left:0!important;
+  }
+}
+
 /* Modern, bounded More menu used by the app and authenticated portal navigation. */
 .reference-more-menu{
   position:relative;
