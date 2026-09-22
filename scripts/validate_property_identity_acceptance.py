@@ -90,7 +90,11 @@ def validate(output: Path, *, require_acris: bool = False) -> dict[str, Any]:
         documents = acris.get("documents") or []
         if not documents:
             raise RuntimeError(f"{SYSTEM_ID} ACRIS activity has no retained source documents")
-        allowed = {"BBL_EXACT_DOCUMENT_ID_EXACT", "CONDO_BILLING_BBL_BLOCK_ADDRESS_EXACT"}
+        allowed = {
+            "BBL_EXACT_DOCUMENT_ID_EXACT",
+            "BBL_ALIAS_EXACT_DOCUMENT_ID_EXACT",
+            "CONDO_BILLING_BBL_BLOCK_ADDRESS_EXACT",
+        }
         if any(str(doc.get("match_basis") or "") not in allowed for doc in documents if isinstance(doc, dict)):
             raise RuntimeError(f"{SYSTEM_ID} ACRIS activity contains an unapproved match basis")
 
