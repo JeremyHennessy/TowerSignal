@@ -128,6 +128,7 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   expect(swoSource.currentStatusAvailable).toBe(false)
   expect(swoSource.sourceHealthStatus).toBe('WARNING')
   expect(swoSource.observationStart).toBeTruthy()
+  expect(swoSource.sourceHealthStatus).toBe('WARNING')
   expect(swoSource.observationEnd).toBeTruthy()
 
   const laborHealth = page.locator('.source-health-table tbody tr').filter({ hasText: LABOR_LAW_DATASET_ID })
@@ -171,10 +172,12 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   expect(errors).toEqual([])
   await screenshotDirectory()
   const stage = process.env.CANDIDATE_ROOT ? 'candidate' : 'hosted'
-  await page.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-page.png`, fullPage: true })
-  await property.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-enforcement.png` })
-  await refresh.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-refresh.png` })
-  await legionella.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-legionella.png` })
+  await page.evaluate(() => window.scrollTo(0, 0))
+  // WebKit caps raster dimensions; mobile proof is also captured section by section.
+  await page.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-page.png`, fullPage: testInfo.project.name !== 'iphone', scale: 'css' })
+  await property.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-enforcement.png`, scale: 'css' })
+  await refresh.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-refresh.png`, scale: 'css' })
+  await legionella.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-legionella.png`, scale: 'css' })
 })
 
 test('Source Health keeps a failed Legionnaires request visible without zero or healthy fallback', async ({ page }) => {
