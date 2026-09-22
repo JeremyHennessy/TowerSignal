@@ -15,11 +15,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install existing GitHub reader dependency in isolated runner environment
+        run: |
+          python -m venv "$RUNNER_TEMP/custody-tools"
+          "$RUNNER_TEMP/custody-tools/bin/pip" install --disable-pip-version-check requests
       - name: Preserve digest-pinned artifacts and compare current hosted bytes
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          PYTHONPATH=scripts python - <<'PY'
+          PYTHONPATH=scripts "$RUNNER_TEMP/custody-tools/bin/python" - <<'PY'
           import hashlib, json, os, pathlib, shutil, tarfile, urllib.request, zipfile
           from datetime import datetime, timezone
           from publish_pages_to_blob import get_reader, successful_source
