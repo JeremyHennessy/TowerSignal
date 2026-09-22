@@ -1,0 +1,62 @@
+name: Diagnose DOB NOW batch query
+
+on:
+  push:
+    branches: [diagnostic/dob-bbl-contract-20260921]
+    paths: [.github/workflows/diagnose-dob-batch.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-history
+          path: .history-store
+          fetch-depth: 1
+          sparse-checkout: data/history/segments/dob.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Compare production 25-BBL query with single-BBL queries
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          import json
+          from pathlib import Path
+          from towersignal.dob_activity import fetch_dob_activity_by_bbl
+
+          prior=json.loads(Path('.history-store/data/history/segments/dob.json').read_text())['dob_by_bbl']
+          chosen=[b for b in sorted(prior) if len(str(b))==10 and prior[b]][:25]
+          if len(chosen)!=25: raise SystemExit('Need 25 durable BBLs')
+
+          batch,_=fetch_dob_activity_by_bbl(set(chosen),chunk_size=25)
+          singles={}
+          for bbl in chosen:
+              one,_=fetch_dob_activity_by_bbl({bbl},chunk_size=1)
+              singles[bbl]=len(one.get(bbl,[]))
+
+          expected={b:len(prior[b]) for b in chosen}
+          result={
+            'chosen':chosen,
+            'expected':expected,
+            'batch_counts':{b:len(batch.get(b,[])) for b in chosen},
+            'batch_matched_bbls':len(batch),
+            'batch_filings':sum(len(v) for v in batch.values()),
+            'single_counts':singles,
+            'single_matched_bbls':sum(1 for v in singles.values() if v>0),
+            'expected_filings':sum(expected.values()),
+          }
+          result['batch_matches_expected']=result['batch_counts']==expected
+          result['singles_match_expected']=singles==expected
+          Path('dob-batch-probe.json').write_text(json.dumps(result,indent=2))
+          print(json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dob-batch-probe
+          path: dob-batch-probe.json
+          retention-days: 14
