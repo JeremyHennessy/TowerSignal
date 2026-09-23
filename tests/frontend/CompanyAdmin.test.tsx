@@ -20,15 +20,26 @@ const profile = {
   legal_name:'Alpha Water Services LLC',
   rollup_name:'ALPHA WATER',
   rollup_company_id:null,
+  rollup_source_name:'Fixture rollup evidence',
+  rollup_source_url:'https://example.test/rollup',
   website:'https://alpha.example',
+  website_source_name:'Official site',
+  website_source_url:'https://alpha.example',
+  identity_source_name:'Official site',
+  identity_source_url:'https://alpha.example/about',
   headquarters_address:'1 Water Way',
   headquarters_city:'New York',
   headquarters_region:'NY',
   headquarters_postal_code:'10001',
   headquarters_country:'US',
+  headquarters_source_name:'Official contact page',
+  headquarters_source_url:'https://alpha.example/contact',
   parent_company_id:null,
   parent_company_name:null,
+  parent_source_name:null,
+  parent_source_url:null,
   company_type:'Water treatment',
+  enrichment_checked_at:'2026-09-23T18:00:00Z',
   revenue_amount:12000000,
   revenue_low:null,
   revenue_high:null,
@@ -73,12 +84,13 @@ test('admin company panel exposes private enrichment without changing public evi
   render(<CompanyAdminPanel companyId="observed-company-alpha" canonicalName="ALPHA WATER SERVICES LLC" />)
 
   expect(await screen.findByRole('region', { name:'Admin company database' })).toBeInTheDocument()
-  expect(screen.getByDisplayValue('https://alpha.example')).toBeInTheDocument()
+  expect(screen.getAllByDisplayValue('https://alpha.example').length).toBeGreaterThan(0)
+  expect(screen.getByDisplayValue('Official contact page')).toBeInTheDocument()
   expect(screen.getByDisplayValue('ALPHA WATER')).toBeInTheDocument()
   expect(screen.getByText('$12,000,000')).toBeInTheDocument()
   expect(screen.getByDisplayValue('Existing private note')).toBeInTheDocument()
 
-  const website = screen.getByDisplayValue('https://alpha.example')
+  const website = screen.getAllByDisplayValue('https://alpha.example')[0]
   await user.clear(website)
   await user.type(website, 'https://alpha-water.example')
   await user.click(screen.getByRole('button', { name:'Save company' }))
