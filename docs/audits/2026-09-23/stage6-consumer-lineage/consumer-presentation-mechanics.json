@@ -1,0 +1,307 @@
+[
+  {
+    "path": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 27,
+    "text": "return <details className=\"account-evidence-group\">"
+  },
+  {
+    "path": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 36,
+    "text": "const [limit, setLimit] = useState(20)"
+  },
+  {
+    "path": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 37,
+    "text": "const shown = Math.min(limit, records.length)"
+  },
+  {
+    "path": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 40,
+    "text": "<div className=\"evidence-card-list\">{records.slice(0, limit)}</div>"
+  },
+  {
+    "path": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 98,
+    "text": "{jobs.length === 0 ? <div className=\"empty-inline\">No exact-BBL DOB NOW job filing was attached.</div> : <EvidenceRecordList key={detail.identity.system_id} label=\"filings\" records={jobs.map((job, index) => <details className=\"evidence-card\" key={`${job.job_filing_number ?? 'job'}-${index}`} open={index === 0}>"
+  },
+  {
+    "path": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 154,
+    "text": "<details className=\"evidence-provenance-details\"><summary><strong>Source &amp; provenance</strong><span>{detail.metadata.sources.length} datasets</span></summary><p>Generated {formatTimestamp(detail.metadata.generated_at)} \u00b7 Rules {detail.metadata.rules_version} \u00b7 Priority model {detail.metadata.priority_model_version}</p><EvidenceProvenanceJoins detail={detail} /><div className=\"evidence-card-list\">{detail.metadata.sources.map(source => <article className=\"evidence-card\" key={source.dataset_id}><strong>{source.name}</strong><span>{source.dataset_id} \u00b7 {source.source_record_count.toLocaleStrin"
+  },
+  {
+    "path": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 237,
+    "text": "<Group title=\"Procurement / Commercial\" summary={`${coverageWarnings.length ? 'At least ' : ''}${sourceFirmCount + (procurementFirmCount ?? 0)} source-observed/recorded/contract-linked firm roles${procurementError ? ' \u00b7 procurement unavailable' : procurementFirmCount == null ? ' \u00b7 procurement pending' : coverageWarnings.length ? ' \u00b7 incomplete procurement coverage' : ''} \u00b7 ${procurement?.record_count ?? '\u2014'} explicit procurement links${procurement && linkedProcurement.length < procurement.record_count ? ` \u00b7 ${linkedProcurement.length} loaded` : ''}`}><>{coverageWarnings.length > 0 && <div clas"
+  },
+  {
+    "path": "src/components/ClientSiteReport.tsx",
+    "line": 18,
+    "text": "const time = (v?: string | null) => v && /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}/.test(v) ? `${v.slice(11, 16)} UTC` : 'Not shown'"
+  },
+  {
+    "path": "src/components/ClientSiteReport.tsx",
+    "line": 74,
+    "text": "{m.cases.slice(0, 3).map((c, i) => <div className=\"tsr-case-row\" key={i}><div><h4>{c.title}</h4><p>{c.text}</p><small>{c.violation.violation_code || 'Code not shown'} \u00b7 Ticket {c.violation.summons_number || 'not shown'}</small></div><div><span className={`tsr-badge ${c.dismissed ? 'dismissed' : c.outcome ? 'verify' : 'unknown'}`}>{c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'}</span><h4>{c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`}</h4><p>Decision: {reportDate(c.outcome?.decision_date)}</p><p>{c.dismissed ? (m.dismissal"
+  },
+  {
+    "path": "src/components/ClientSiteReport.tsx",
+    "line": 96,
+    "text": "<aside className=\"tsr-return\"><div><h4>Return to the full account</h4><p>Snapshot: {reportDate(m.snapshot)} \u00b7 Priority model: {detail.scoring?.priority_model_version || 'Not shown'}</p><p>Published application: {applicationSha ? applicationSha.slice(0, 12) : 'Not shown'}{applicationSha && <> \u00b7 <a href={`https://github.com/JeremyHennessy/TowerSignal/commit/${applicationSha}`}>Release record</a></>}</p><a className=\"tsr-account-link\" href={accountUrl}>Open {m.address} in TowerSignal \u2192</a></div><a className=\"tsr-qr\" href={accountUrl}><Qr url={accountUrl} /><span>OPEN ACCOUNT</span></a></aside>"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 95,
+    "text": "return filtered.length ? filtered.sort().at(-1) ?? null : null"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 101,
+    "text": "? [...systems].sort((left, right) => right.priority_score - left.priority_score || left.system_id.localeCompare(right.system_id))[0]"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 105,
+    "text": "? [...samplingRows].sort((left, right) => (right.days_since_latest_sample ?? -1) - (left.days_since_latest_sample ?? -1))[0]"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 128,
+    "text": "institutionalTypes: [...new Set(systems.flatMap(row => row.cms_institutional_facility_types ?? []))].sort(),"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 201,
+    "text": "const boroughs = useMemo(() => [...new Set(allSiteViews.map(row => row.relationship.borough).filter((value): value is string => Boolean(value)))].sort(), [allSiteViews])"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 215,
+    "text": "const sortedSites = useMemo(() => [...filteredSites].sort((left, right) => {"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 222,
+    "text": "const visibleSites = useMemo(() => sortedSites.slice(activeSitePage * SITE_PAGE_SIZE, activeSitePage * SITE_PAGE_SIZE + SITE_PAGE_SIZE), [sortedSites, activeSitePage])"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 238,
+    "text": ".sort((a, b) => (recordDate(b) ?? '').localeCompare(recordDate(a) ?? ''))"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 242,
+    "text": "const visibleRecords = records.slice(activeProcurementPage * EVIDENCE_PAGE_SIZE, activeProcurementPage * EVIDENCE_PAGE_SIZE + EVIDENCE_PAGE_SIZE)"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 245,
+    "text": "const visibleAliases = detail?.aliases.slice(activeAliasPage * EVIDENCE_PAGE_SIZE, activeAliasPage * EVIDENCE_PAGE_SIZE + EVIDENCE_PAGE_SIZE) ?? []"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 345,
+    "text": "<td><span className={`firm-relationship-badge ${site.serviced ? 'serviced' : site.contracted ? 'contracted' : 'related'}`}>{siteRelationshipLabel(site)}</span><small>{site.roles.slice(0, 2).map(roleLabel).join(' \u00b7 ')}{site.roles.length > 2 ? ` \u00b7 +${site.roles.length - 2}` : ''}</small></td>"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 352,
+    "text": "<td>{row.evidenceConfidence ? <StatusBadge value={row.evidenceConfidence as 'CONFIRMED' | 'STRONG_SIGNAL' | 'VERIFY'} /> : <><span className=\"firm-source-evidence\">{site.evidence_classes.slice(0, 2).map(label).join(' \u00b7 ') || 'Source relationship'}</span><small>{number.format(site.observation_count)} firm observation{site.observation_count === 1 ? '' : 's'}</small></>}</td>"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 358,
+    "text": "<div className=\"pagination\"><button disabled={activeSitePage === 0} onClick={() => setSitePage(value => Math.max(0, value - 1))}>Previous</button><span>Page {activeSitePage + 1} of {siteMaxPage + 1}</span><button disabled={activeSitePage === siteMaxPage} onClick={() => setSitePage(value => Math.min(siteMaxPage, value + 1))}>Next</button></div>"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 386,
+    "text": "<div className=\"pagination\"><button disabled={activeAliasPage === 0} onClick={() => setAliasPage(value => Math.max(0, value - 1))}>Previous</button><span>Page {activeAliasPage + 1} of {aliasMaxPage + 1}</span><button disabled={activeAliasPage === aliasMaxPage} onClick={() => setAliasPage(value => Math.min(aliasMaxPage, value + 1))}>Next</button></div>"
+  },
+  {
+    "path": "src/components/CompanyProfilePage.tsx",
+    "line": 393,
+    "text": "{procurementError ? <div className=\"reference-empty-state compact\"><strong>Procurement record detail is unavailable.</strong><span>{procurementError}</span><span>Firm identity and site evidence above remain available from the generated firm dataset.</span></div> : procurement ? <><div className=\"table-scroll\"><table className=\"account-table company-procurement-table\"><thead><tr><th>Record</th><th>Source</th><th>Buyer</th><th>Service</th><th>Observed value</th><th>Date</th><th>Source evidence</th></tr></thead><tbody>{visibleRecords.map(row => <tr key={row.procurement_id}><td><strong>{row.title "
+  },
+  {
+    "path": "src/components/PortfoliosPage.tsx",
+    "line": 54,
+    "text": "return [...groups.values()].filter(group => group.rows.length > 1).sort((a, b) => b.rows.length - a.rows.length || b.towers - a.towers)"
+  },
+  {
+    "path": "src/components/PortfoliosPage.tsx",
+    "line": 72,
+    "text": "return <div className=\"reference-pagination\"><span>Page {safe} of {pages}</span><div><button disabled={safe <= 1} onClick={() => onPage(safe - 1)}>Previous</button><button disabled={safe >= pages} onClick={() => onPage(safe + 1)}>Next</button></div></div>"
+  },
+  {
+    "path": "src/components/PortfoliosPage.tsx",
+    "line": 97,
+    "text": "const sortedSelectedRows = useMemo(() => [...selectedRows].sort((a, b) => {"
+  },
+  {
+    "path": "src/components/PortfoliosPage.tsx",
+    "line": 111,
+    "text": "const visibleSelectedRows = sortedSelectedRows.slice((safePropertyPage - 1) * PAGE_SIZE, safePropertyPage * PAGE_SIZE)"
+  },
+  {
+    "path": "src/components/PortfoliosPage.tsx",
+    "line": 124,
+    "text": "const sortedCandidates = useMemo(() => [...candidateRows].sort((a, b) => {"
+  },
+  {
+    "path": "src/components/PortfoliosPage.tsx",
+    "line": 138,
+    "text": "const visibleCandidates = sortedCandidates.slice((safeCandidatePage - 1) * PAGE_SIZE, safeCandidatePage * PAGE_SIZE)"
+  },
+  {
+    "path": "src/components/PortfoliosPage.tsx",
+    "line": 175,
+    "text": "<aside className=\"portfolio-list\"><div className=\"portfolio-list-heading\"><span className=\"page-kicker\">Ownership groups</span><strong>{groups.length} multi-property {groups.length === 1 ? 'group' : 'groups'}</strong></div>{groups.slice(0, 20).map(group => <article key={group.key} className={selectedGroup?.key === group.key ? 'active' : ''}><button className=\"portfolio-group-button\" onClick={() => selectGroup(group)}><div><strong>{group.name}</strong><span>PLUTO owner-name context</span></div><dl><div><dt>Accounts</dt><dd>{group.rows.length}</dd></div><div><dt>Towers</dt><dd>{group.towers}</dd"
+  },
+  {
+    "path": "src/components/AccountUnifiedTimeline.tsx",
+    "line": 114,
+    "text": "return next.sort((a, b) => itemTime(b.date) - itemTime(a.date))"
+  },
+  {
+    "path": "src/components/AccountUnifiedTimeline.tsx",
+    "line": 118,
+    "text": "const visible = expanded ? matching : matching.slice(0, 18)"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 24,
+    "text": "const rows = Object.entries(values).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 51,
+    "text": "{context.water_311_requests.length > 0 && <details className=\"domestic-water-history\" open>"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 53,
+    "text": "<div className=\"signal-list\">{context.water_311_requests.slice(0, 8).map((row, index) => <article className=\"signal-card\" key={`${text(row, 'request_id')}-${index}`}>"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 61,
+    "text": "{context.hpd_open_water_violations.length > 0 && <details className=\"domestic-water-history\" open>"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 63,
+    "text": "<div className=\"signal-list\">{context.hpd_open_water_violations.slice(0, 8).map((row, index) => <article className=\"signal-card\" key={`${text(row, 'violation_id')}-${index}`}>"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 70,
+    "text": "{(context.dob_water_job_filings.length + context.dob_water_permits.length) > 0 && <details className=\"domestic-water-history\" open>"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 72,
+    "text": "<div className=\"signal-list\">{[...context.dob_water_job_filings, ...context.dob_water_permits].slice(0, 8).map((row, index) => <article className=\"signal-card\" key={`${text(row, 'activity_id')}-${index}`}>"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 79,
+    "text": "{context.ll84_water_benchmarks.length > 0 && <details className=\"domestic-water-history\">"
+  },
+  {
+    "path": "src/components/BuildingWaterSignalsSection.tsx",
+    "line": 81,
+    "text": "<div className=\"signal-list\">{context.ll84_water_benchmarks.slice(0, 8).map((row, index) => <article className=\"signal-card\" key={`${text(row, 'benchmark_id')}-${index}`}>"
+  },
+  {
+    "path": "src/components/salesKnownFirms.ts",
+    "line": 190,
+    "text": ".sort((left, right) => right.latestSortKey.localeCompare(left.latestSortKey) || left.name.localeCompare(right.name))"
+  },
+  {
+    "path": "src/components/salesKnownFirms.ts",
+    "line": 194,
+    "text": "roles: [...firm.roles].sort(),"
+  },
+  {
+    "path": "src/components/salesKnownFirms.ts",
+    "line": 197,
+    "text": "evidence: [...firm.evidence].sort(),"
+  },
+  {
+    "path": "src/domain/accountEvidence.ts",
+    "line": 57,
+    "text": "return [...byId.values()].sort((left, right) => {"
+  },
+  {
+    "path": "src/domain/accountEvidence.ts",
+    "line": 167,
+    "text": "return rows.sort((left, right) => {"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 6,
+    "text": "const date = new Date(`${value.slice(0, 10)}T12:00:00Z`)"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 15,
+    "text": "return value.replace(/\\b[A-Z]{2,}\\b/g, word => /^(LLC|LLP|LP|NYC|NYCHA|USA)$/.test(word) ? word : word[0] + word.slice(1).toLowerCase())"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 17,
+    "text": "const monthName = (value?: string | null) => value && reportDate(value) !== 'Not shown' ? new Intl.DateTimeFormat('en-GB', { month: 'long', timeZone: 'UTC' }).format(new Date(`${value.slice(0, 10)}T12:00:00Z`)) : ''"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 20,
+    "text": "const d = (Date.parse(b.slice(0, 10)) - Date.parse(a.slice(0, 10))) / 86400000"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 24,
+    "text": "const shorten = (s: string, max: number) => s.length <= max ? s : `${s.slice(0, max - 26).replace(/\\s+\\S*$/, '')}\u2026 Full text in account.`"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 35,
+    "text": "if (v.violation_code === 'AHK2' && dates.length && new Set(dates.map(x => x.slice(0, 4))).size === 1) {"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 37,
+    "text": "return { title: 'Missing reports for earlier sample dates', text: `The inspector cited unreported dates due in ${months.length > 1 ? `${months.slice(0, -1).join(', ')} and ${months.at(-1)}` : months[0]} ${dates[0].slice(0, 4)}.` }"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 45,
+    "text": "const dates = [...new Set(detail.sample_history.dates)].filter(d => reportDate(d) !== 'Not shown').sort()"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 49,
+    "text": "const inspection = [...detail.inspection_history].sort((a, b) => (b.inspection_date || '').localeCompare(a.inspection_date || ''))[0]"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 50,
+    "text": "const allCases = [...(detail.oath_case_history || [])].filter(c => c.match_basis === 'SUMMONS_NUMBER_EXACT').sort((a, b) => (b.decision_date || b.hearing_date || '').localeCompare(a.decision_date || a.hearing_date || ''))"
+  },
+  {
+    "path": "src/utils/accountReportModel.ts",
+    "line": 93,
+    "text": "const first = features[0]?.slice(0, -1).map(point)"
+  },
+  {
+    "path": "src/components/UserAccountPage.tsx",
+    "line": 8,
+    "text": "return (parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : source.slice(0, 2)).toUpperCase()"
+  },
+  {
+    "path": "src/components/UserAccountPage.tsx",
+    "line": 30,
+    "text": "<div className=\"account-avatar\" aria-hidden=\"true\">{avatar}</div>"
+  }
+]

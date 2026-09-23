@@ -1,0 +1,32 @@
+{
+  "mapping_rows": 99,
+  "normalized_fields": 87,
+  "source_fields": 85,
+  "consumed_mapping_rows": 57,
+  "unreferenced_mapping_rows": 42,
+  "consumer_files_checked": [
+    "src/components/AccountEvidenceWorkspace.tsx",
+    "src/components/ClientSiteReport.tsx",
+    "src/components/CompanyProfilePage.tsx",
+    "src/components/PortfoliosPage.tsx",
+    "src/components/AccountUnifiedTimeline.tsx",
+    "src/components/WorkflowAccountSection.tsx",
+    "src/components/WorkflowPanel.tsx",
+    "src/components/BuildingWaterSignalsSection.tsx",
+    "src/components/salesKnownFirms.ts",
+    "src/domain/accountEvidence.ts",
+    "src/utils/accountReportModel.ts",
+    "src/utils/prepareAccountReport.ts",
+    "src/utils/workflowExport.ts",
+    "src/components/UserAccountPage.tsx"
+  ],
+  "type_files_checked": [
+    "src/types/data.ts",
+    "src/types/company.ts",
+    "src/types/history.ts",
+    "src/types/workflow.ts",
+    "src/types/procurement.ts"
+  ],
+  "presentation_mechanics_count": 61,
+  "boundary": "Static code-path trace, not authenticated browser proof. A no-reference result is scoped to listed consumers only."
+}

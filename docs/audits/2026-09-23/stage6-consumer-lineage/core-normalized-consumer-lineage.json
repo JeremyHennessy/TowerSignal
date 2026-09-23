@@ -1,0 +1,3164 @@
+[
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "bin",
+    "normalized_field": "bin",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 77,
+        "text": "<section className=\"evidence-subsection\"><h4>Identity</h4><dl className=\"identity-grid\"><div><dt>System</dt><dd>{detail.identity.system_id}</dd></div><div><dt>BIN</dt><dd>{detail.identity.bin ?? '\u2014'}</dd></div><div><dt>BBL</dt><dd>{detail.identity.bbl ?? '\u2014'}</dd></div><div><dt>Active equipment</dt><dd>{detail.identity.active_equipment}</dd></div><div><dt>Coordinates</dt><dd>{detail.identity.coordinate_status === 'VALID' && detail.identity.latitude != null && detail.identity.longitude != null ? "
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 85,
+        "text": "<div className=\"tsr-identity\"><span><b>System:</b> {row.system_id}</span><span><b>Building ID (BIN):</b> {detail.identity.bin || 'Not shown'}</span><span><b>Tax lot (BBL):</b> {detail.identity.bbl || 'Not shown'}</span></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 313,
+        "text": "<span>{[selectedView.relationship.borough, selectedView.relationship.zip, selectedView.relationship.bin ? `BIN ${selectedView.relationship.bin}` : null].filter(Boolean).join(' \u00b7 ')}</span>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 66,
+        "text": "<dl className=\"identity-grid\"><div><dt>Class</dt><dd>{text(row, 'class')}</dd></div><div><dt>Status</dt><dd>{text(row, 'current_status')}</dd></div><div><dt>BBL/BIN</dt><dd>{[text(row, 'bbl'), text(row, 'bin')].filter(value => value !== '\u2014').join(' / ') || '\u2014'}</dd></div><div><dt>Linkage</dt><dd>{text(row, 'property_link_confidence')}</dd></div></dl>"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 97,
+        "text": "const bin = text(row.bin) ?? text(detail.identity.bin) ?? 'BIN not published'"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 78,
+        "text": "const outlines = (detail.building_footprints || []).filter(f => f.bin === detail.identity.bin && f.match_basis === 'BIN_EXACT')"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 79,
+        "text": "const towers = (detail.planimetric_building_tower_features || []).filter(f => f.bin === detail.identity.bin && f.match_basis === 'BIN_EXACT')"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 10,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 108,
+        "text": "bin: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 323,
+        "text": "bin: string"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 335,
+        "text": "bin: string"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 454,
+        "text": "bin: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 35,
+        "text": "bin: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "bin",
+    "normalized_field": "source_bin_raw",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "bbl",
+    "normalized_field": "bbl",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 77,
+        "text": "<section className=\"evidence-subsection\"><h4>Identity</h4><dl className=\"identity-grid\"><div><dt>System</dt><dd>{detail.identity.system_id}</dd></div><div><dt>BIN</dt><dd>{detail.identity.bin ?? '\u2014'}</dd></div><div><dt>BBL</dt><dd>{detail.identity.bbl ?? '\u2014'}</dd></div><div><dt>Active equipment</dt><dd>{detail.identity.active_equipment}</dd></div><div><dt>Coordinates</dt><dd>{detail.identity.coordinate_status === 'VALID' && detail.identity.latitude != null && detail.identity.longitude != null ? "
+      },
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 78,
+        "text": "{!detail.identity.bbl ? <div className=\"evidence-boundary\"><strong>Property-level BBL evidence unavailable.</strong><p>This cooling-tower record has no usable BBL. TowerSignal does not infer a parcel identity to attach PLUTO ownership, HPD contacts, DOB project roles or ACRIS parties.</p></div> : <>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 85,
+        "text": "<div className=\"tsr-identity\"><span><b>System:</b> {row.system_id}</span><span><b>Building ID (BIN):</b> {detail.identity.bin || 'Not shown'}</span><span><b>Tax lot (BBL):</b> {detail.identity.bbl || 'Not shown'}</span></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 56,
+        "text": "<dl className=\"identity-grid\"><div><dt>Status</dt><dd>{text(row, 'status')}</dd></div><div><dt>Request ID</dt><dd>{text(row, 'request_id')}</dd></div><div><dt>BBL</dt><dd>{text(row, 'bbl')}</dd></div><div><dt>Linkage</dt><dd>{text(row, 'property_link_confidence')}</dd></div></dl>"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 66,
+        "text": "<dl className=\"identity-grid\"><div><dt>Class</dt><dd>{text(row, 'class')}</dd></div><div><dt>Status</dt><dd>{text(row, 'current_status')}</dd></div><div><dt>BBL/BIN</dt><dd>{[text(row, 'bbl'), text(row, 'bin')].filter(value => value !== '\u2014').join(' / ') || '\u2014'}</dd></div><div><dt>Linkage</dt><dd>{text(row, 'property_link_confidence')}</dd></div></dl>"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 12,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 109,
+        "text": "bbl: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 259,
+        "text": "bbl: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 276,
+        "text": "bbl: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 357,
+        "text": "bbl: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 419,
+        "text": "bbl: string"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 453,
+        "text": "bbl: string"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 34,
+        "text": "bbl: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "date_registered",
+    "normalized_field": "date_registered",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "borough",
+    "normalized_field": "borough",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 201,
+        "text": "const boroughs = useMemo(() => [...new Set(allSiteViews.map(row => row.relationship.borough).filter((value): value is string => Boolean(value)))].sort(), [allSiteViews])"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 212,
+        "text": "if (boroughFilter !== 'ALL' && site.borough !== boroughFilter) return false"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 313,
+        "text": "<span>{[selectedView.relationship.borough, selectedView.relationship.zip, selectedView.relationship.bin ? `BIN ${selectedView.relationship.bin}` : null].filter(Boolean).join(' \u00b7 ')}</span>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 100,
+        "text": "if (propertySort.key === 'borough') return row.borough"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 128,
+        "text": "if (candidateSort.key === 'borough') return row.borough"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 13,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 116,
+        "text": "borough: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 236,
+        "text": "borough: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 37,
+        "text": "borough: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "zip",
+    "normalized_field": "zip",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 313,
+        "text": "<span>{[selectedView.relationship.borough, selectedView.relationship.zip, selectedView.relationship.bin ? `BIN ${selectedView.relationship.bin}` : null].filter(Boolean).join(' \u00b7 ')}</span>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 7,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 117,
+        "text": "zip: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 241,
+        "text": "zip: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "activeequipment",
+    "normalized_field": "active_equipment",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 77,
+        "text": "<section className=\"evidence-subsection\"><h4>Identity</h4><dl className=\"identity-grid\"><div><dt>System</dt><dd>{detail.identity.system_id}</dd></div><div><dt>BIN</dt><dd>{detail.identity.bin ?? '\u2014'}</dd></div><div><dt>BBL</dt><dd>{detail.identity.bbl ?? '\u2014'}</dd></div><div><dt>Active equipment</dt><dd>{detail.identity.active_equipment}</dd></div><div><dt>Coordinates</dt><dd>{detail.identity.coordinate_status === 'VALID' && detail.identity.latitude != null && detail.identity.longitude != null ? "
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 51,
+        "text": "<div><strong>{reportNumber(row.active_equipment)}</strong><b>Registered cooling unit{row.active_equipment === 1 ? '' : 's'} {ref('1')}</b><p>{active === 'Active' ? 'Listed as active in the register' : 'Confirm current operating status'}</p></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 117,
+        "text": "activeEquipment: systems.reduce((sum, row) => sum + row.active_equipment, 0),"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 48,
+        "text": "current.towers += row.active_equipment"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 102,
+        "text": "if (propertySort.key === 'towers') return row.active_equipment"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 119,
+        "text": "if (row.active_equipment < minTowers) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 129,
+        "text": "if (candidateSort.key === 'towers') return row.active_equipment"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      }
+    ],
+    "consumer_count": 9,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 118,
+        "text": "active_equipment: number"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 172,
+        "text": "active_equipment: number"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "community_board",
+    "normalized_field": "community_board",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "council_district",
+    "normalized_field": "council_district",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "census_tract",
+    "normalized_field": "census_tract",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/normalize.py",
+    "function": "normalize_registrations",
+    "source_field": "ntacode",
+    "normalized_field": "ntacode",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "bbl",
+    "normalized_field": "bbl",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 77,
+        "text": "<section className=\"evidence-subsection\"><h4>Identity</h4><dl className=\"identity-grid\"><div><dt>System</dt><dd>{detail.identity.system_id}</dd></div><div><dt>BIN</dt><dd>{detail.identity.bin ?? '\u2014'}</dd></div><div><dt>BBL</dt><dd>{detail.identity.bbl ?? '\u2014'}</dd></div><div><dt>Active equipment</dt><dd>{detail.identity.active_equipment}</dd></div><div><dt>Coordinates</dt><dd>{detail.identity.coordinate_status === 'VALID' && detail.identity.latitude != null && detail.identity.longitude != null ? "
+      },
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 78,
+        "text": "{!detail.identity.bbl ? <div className=\"evidence-boundary\"><strong>Property-level BBL evidence unavailable.</strong><p>This cooling-tower record has no usable BBL. TowerSignal does not infer a parcel identity to attach PLUTO ownership, HPD contacts, DOB project roles or ACRIS parties.</p></div> : <>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 85,
+        "text": "<div className=\"tsr-identity\"><span><b>System:</b> {row.system_id}</span><span><b>Building ID (BIN):</b> {detail.identity.bin || 'Not shown'}</span><span><b>Tax lot (BBL):</b> {detail.identity.bbl || 'Not shown'}</span></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 56,
+        "text": "<dl className=\"identity-grid\"><div><dt>Status</dt><dd>{text(row, 'status')}</dd></div><div><dt>Request ID</dt><dd>{text(row, 'request_id')}</dd></div><div><dt>BBL</dt><dd>{text(row, 'bbl')}</dd></div><div><dt>Linkage</dt><dd>{text(row, 'property_link_confidence')}</dd></div></dl>"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 66,
+        "text": "<dl className=\"identity-grid\"><div><dt>Class</dt><dd>{text(row, 'class')}</dd></div><div><dt>Status</dt><dd>{text(row, 'current_status')}</dd></div><div><dt>BBL/BIN</dt><dd>{[text(row, 'bbl'), text(row, 'bin')].filter(value => value !== '\u2014').join(' / ') || '\u2014'}</dd></div><div><dt>Linkage</dt><dd>{text(row, 'property_link_confidence')}</dd></div></dl>"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 12,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 109,
+        "text": "bbl: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 259,
+        "text": "bbl: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 276,
+        "text": "bbl: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 357,
+        "text": "bbl: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 419,
+        "text": "bbl: string"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 453,
+        "text": "bbl: string"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 34,
+        "text": "bbl: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "ownername",
+    "normalized_field": "owner_name",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 79,
+        "text": "<section className=\"evidence-subsection\"><h4>PLUTO property context</h4>{!detail.building_context ? <div className=\"empty-inline\">No exact BBL match was returned from NYC DCP PLUTO.</div> : <dl className=\"identity-grid\"><div><dt>Owner</dt><dd>{detail.building_context.owner_name ?? '\u2014'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '\u2014'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '\u2014'}</dd></div><div><dt>Year built</dt><dd>{detail"
+      },
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 233,
+        "text": "<Group title=\"Property / Ownership\" summary={`${detail.building_context?.owner_name ?? 'PLUTO owner not published'} \u00b7 ${detail.hpd_registration ? `${detail.hpd_registration.contacts.length} HPD contacts` : 'HPD contact attachment unavailable'}`}><PropertyOwnershipEvidence detail={detail} /></Group>"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 68,
+        "text": "const plutoOwner = reportName(detail.building_context?.owner_name)"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 69,
+        "text": "const owner = reportName(ownerContact?.corporation_name || ownerContact?.person_name || detail.building_context?.owner_name)"
+      }
+    ],
+    "consumer_count": 4,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 260,
+        "text": "owner_name: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "ownername",
+    "normalized_field": "source_owner_name_raw",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "landuse",
+    "normalized_field": "land_use",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 79,
+        "text": "<section className=\"evidence-subsection\"><h4>PLUTO property context</h4>{!detail.building_context ? <div className=\"empty-inline\">No exact BBL match was returned from NYC DCP PLUTO.</div> : <dl className=\"identity-grid\"><div><dt>Owner</dt><dd>{detail.building_context.owner_name ?? '\u2014'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '\u2014'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '\u2014'}</dd></div><div><dt>Year built</dt><dd>{detail"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 261,
+        "text": "land_use: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "bldgclass",
+    "normalized_field": "building_class",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 79,
+        "text": "<section className=\"evidence-subsection\"><h4>PLUTO property context</h4>{!detail.building_context ? <div className=\"empty-inline\">No exact BBL match was returned from NYC DCP PLUTO.</div> : <dl className=\"identity-grid\"><div><dt>Owner</dt><dd>{detail.building_context.owner_name ?? '\u2014'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '\u2014'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '\u2014'}</dd></div><div><dt>Year built</dt><dd>{detail"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 262,
+        "text": "building_class: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "lotarea",
+    "normalized_field": "lot_area_sqft",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 79,
+        "text": "<section className=\"evidence-subsection\"><h4>PLUTO property context</h4>{!detail.building_context ? <div className=\"empty-inline\">No exact BBL match was returned from NYC DCP PLUTO.</div> : <dl className=\"identity-grid\"><div><dt>Owner</dt><dd>{detail.building_context.owner_name ?? '\u2014'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '\u2014'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '\u2014'}</dd></div><div><dt>Year built</dt><dd>{detail"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 263,
+        "text": "lot_area_sqft: number | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "bldgarea",
+    "normalized_field": "building_area_sqft",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 79,
+        "text": "<section className=\"evidence-subsection\"><h4>PLUTO property context</h4>{!detail.building_context ? <div className=\"empty-inline\">No exact BBL match was returned from NYC DCP PLUTO.</div> : <dl className=\"identity-grid\"><div><dt>Owner</dt><dd>{detail.building_context.owner_name ?? '\u2014'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '\u2014'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '\u2014'}</dd></div><div><dt>Year built</dt><dd>{detail"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 83,
+        "text": "<div className=\"tsr-building\"><h3>Building snapshot {ref('4')}</h3><div className=\"tsr-building-stats\"><div><b>{reportNumber(detail.building_context?.floors)}</b><span>floors</span></div><div><b>{reportNumber(detail.building_context?.residential_units)}</b><span>residential units</span></div><div><b>{detail.building_context?.year_built || 'Not shown'}</b><span>year built</span></div></div><p className=\"tsr-area\">Published building area: <b>{reportNumber(detail.building_context?.building_area_sqf"
+      }
+    ],
+    "consumer_count": 2,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 264,
+        "text": "building_area_sqft: number | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "numfloors",
+    "normalized_field": "floors",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 79,
+        "text": "<section className=\"evidence-subsection\"><h4>PLUTO property context</h4>{!detail.building_context ? <div className=\"empty-inline\">No exact BBL match was returned from NYC DCP PLUTO.</div> : <dl className=\"identity-grid\"><div><dt>Owner</dt><dd>{detail.building_context.owner_name ?? '\u2014'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '\u2014'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '\u2014'}</dd></div><div><dt>Year built</dt><dd>{detail"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 83,
+        "text": "<div className=\"tsr-building\"><h3>Building snapshot {ref('4')}</h3><div className=\"tsr-building-stats\"><div><b>{reportNumber(detail.building_context?.floors)}</b><span>floors</span></div><div><b>{reportNumber(detail.building_context?.residential_units)}</b><span>residential units</span></div><div><b>{detail.building_context?.year_built || 'Not shown'}</b><span>year built</span></div></div><p className=\"tsr-area\">Published building area: <b>{reportNumber(detail.building_context?.building_area_sqf"
+      }
+    ],
+    "consumer_count": 2,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 265,
+        "text": "floors: number | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "unitsres",
+    "normalized_field": "residential_units",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 83,
+        "text": "<div className=\"tsr-building\"><h3>Building snapshot {ref('4')}</h3><div className=\"tsr-building-stats\"><div><b>{reportNumber(detail.building_context?.floors)}</b><span>floors</span></div><div><b>{reportNumber(detail.building_context?.residential_units)}</b><span>residential units</span></div><div><b>{detail.building_context?.year_built || 'Not shown'}</b><span>year built</span></div></div><p className=\"tsr-area\">Published building area: <b>{reportNumber(detail.building_context?.building_area_sqf"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 266,
+        "text": "residential_units: number | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "unitstotal",
+    "normalized_field": "total_units",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 79,
+        "text": "<section className=\"evidence-subsection\"><h4>PLUTO property context</h4>{!detail.building_context ? <div className=\"empty-inline\">No exact BBL match was returned from NYC DCP PLUTO.</div> : <dl className=\"identity-grid\"><div><dt>Owner</dt><dd>{detail.building_context.owner_name ?? '\u2014'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '\u2014'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '\u2014'}</dd></div><div><dt>Year built</dt><dd>{detail"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 267,
+        "text": "total_units: number | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "yearbuilt",
+    "normalized_field": "year_built",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 79,
+        "text": "<section className=\"evidence-subsection\"><h4>PLUTO property context</h4>{!detail.building_context ? <div className=\"empty-inline\">No exact BBL match was returned from NYC DCP PLUTO.</div> : <dl className=\"identity-grid\"><div><dt>Owner</dt><dd>{detail.building_context.owner_name ?? '\u2014'}</dd></div><div><dt>Land use</dt><dd>{detail.building_context.land_use ?? '\u2014'}</dd></div><div><dt>Building class</dt><dd>{detail.building_context.building_class ?? '\u2014'}</dd></div><div><dt>Year built</dt><dd>{detail"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 83,
+        "text": "<div className=\"tsr-building\"><h3>Building snapshot {ref('4')}</h3><div className=\"tsr-building-stats\"><div><b>{reportNumber(detail.building_context?.floors)}</b><span>floors</span></div><div><b>{reportNumber(detail.building_context?.residential_units)}</b><span>residential units</span></div><div><b>{detail.building_context?.year_built || 'Not shown'}</b><span>year built</span></div></div><p className=\"tsr-area\">Published building area: <b>{reportNumber(detail.building_context?.building_area_sqf"
+      }
+    ],
+    "consumer_count": 2,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 268,
+        "text": "year_built: number | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "yearalter1",
+    "normalized_field": "year_altered_1",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 269,
+        "text": "year_altered_1: number | null"
+      }
+    ],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/pluto.py",
+    "function": "normalize_pluto_record",
+    "source_field": "yearalter2",
+    "normalized_field": "year_altered_2",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 270,
+        "text": "year_altered_2: number | null"
+      }
+    ],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/hpd.py",
+    "function": "normalize_contact",
+    "source_field": "registrationcontactid",
+    "normalized_field": "registration_contact_id",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 83,
+        "text": "{detail.hpd_registration.contacts.length === 0 ? <div className=\"empty-inline\">An HPD registration matched this BBL, but no public contact rows were returned.</div> : <div className=\"evidence-card-list\">{detail.hpd_registration.contacts.map((contact, index) => <article className=\"evidence-card\" key={`${contact.registration_contact_id ?? 'contact'}-${index}`}>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 298,
+        "text": "registration_contact_id: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/hpd.py",
+    "function": "normalize_contact",
+    "source_field": "type",
+    "normalized_field": "type",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 84,
+        "text": "<strong>{contact.type ?? 'HPD contact'}</strong><span>{contact.description ?? 'Registered property contact'}</span>"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 66,
+        "text": "const ownerContact = detail.hpd_registration?.contacts.find(c => c.type === 'CorporateOwner' || c.type === 'IndividualOwner')"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 67,
+        "text": "const agentContact = detail.hpd_registration?.contacts.find(c => c.type === 'Agent')"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 80,
+        "text": "const rings = (g: PlanimetricGeometry) => (g.type === 'Polygon' ? [g.coordinates] : g.coordinates).flat()"
+      }
+    ],
+    "consumer_count": 4,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 193,
+        "text": "type: string"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 299,
+        "text": "type: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 317,
+        "text": "| { type: 'Polygon'; coordinates: number[][][] }"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 318,
+        "text": "| { type: 'MultiPolygon'; coordinates: number[][][][] }"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/hpd.py",
+    "function": "normalize_contact",
+    "source_field": "contactdescription",
+    "normalized_field": "description",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 84,
+        "text": "<strong>{contact.type ?? 'HPD contact'}</strong><span>{contact.description ?? 'Registered property contact'}</span>"
+      },
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 142,
+        "text": "<div><strong>{record.title ?? record.description ?? record.procurement_id}</strong><span>{date ? formatDate(date) : 'Date not published'}</span></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 393,
+        "text": "{procurementError ? <div className=\"reference-empty-state compact\"><strong>Procurement record detail is unavailable.</strong><span>{procurementError}</span><span>Firm identity and site evidence above remain available from the generated firm dataset.</span></div> : procurement ? <><div className=\"table-scroll\"><table className=\"account-table company-procurement-table\"><thead><tr><th>Record</th><th>Source</th><th>Buyer</th><th>Service</th><th>Observed value</th><th>Date</th><th>Source evidence</th"
+      }
+    ],
+    "consumer_count": 3,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 225,
+        "text": "description: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 300,
+        "text": "description: string | null"
+      },
+      {
+        "path": "src/types/procurement.ts",
+        "line": 42,
+        "text": "description?: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/hpd.py",
+    "function": "normalize_contact",
+    "source_field": "corporationname",
+    "normalized_field": "corporation_name",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 85,
+        "text": "<dl className=\"identity-grid\"><div><dt>Contact person</dt><dd>{contact.person_name ?? '\u2014'}</dd></div><div><dt>Title</dt><dd>{contact.title ?? '\u2014'}</dd></div><div><dt>Organization</dt><dd>{contact.corporation_name ?? '\u2014'}</dd></div><div><dt>Business address</dt><dd>{contact.business_address ?? '\u2014'}</dd></div></dl>"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 69,
+        "text": "const owner = reportName(ownerContact?.corporation_name || ownerContact?.person_name || detail.building_context?.owner_name)"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 70,
+        "text": "const agent = reportName(agentContact?.corporation_name || agentContact?.person_name)"
+      }
+    ],
+    "consumer_count": 3,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 301,
+        "text": "corporation_name: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/hpd.py",
+    "function": "normalize_contact",
+    "source_field": "title",
+    "normalized_field": "title",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 85,
+        "text": "<dl className=\"identity-grid\"><div><dt>Contact person</dt><dd>{contact.person_name ?? '\u2014'}</dd></div><div><dt>Title</dt><dd>{contact.title ?? '\u2014'}</dd></div><div><dt>Organization</dt><dd>{contact.corporation_name ?? '\u2014'}</dd></div><div><dt>Business address</dt><dd>{contact.business_address ?? '\u2014'}</dd></div></dl>"
+      },
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 142,
+        "text": "<div><strong>{record.title ?? record.description ?? record.procurement_id}</strong><span>{date ? formatDate(date) : 'Date not published'}</span></div>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 74,
+        "text": "{m.cases.slice(0, 3).map((c, i) => <div className=\"tsr-case-row\" key={i}><div><h4>{c.title}</h4><p>{c.text}</p><small>{c.violation.violation_code || 'Code not shown'} \u00b7 Ticket {c.violation.summons_number || 'not shown'}</small></div><div><span className={`tsr-badge ${c.dismissed ? 'dismissed' : c.outcome ? 'verify' : 'unknown'}`}>{c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'}</span><h4>{c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balan"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 393,
+        "text": "{procurementError ? <div className=\"reference-empty-state compact\"><strong>Procurement record detail is unavailable.</strong><span>{procurementError}</span><span>Firm identity and site evidence above remain available from the generated firm dataset.</span></div> : procurement ? <><div className=\"table-scroll\"><table className=\"account-table company-procurement-table\"><thead><tr><th>Record</th><th>Source</th><th>Buyer</th><th>Service</th><th>Observed value</th><th>Date</th><th>Source evidence</th"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 129,
+        "text": "{visible.length === 0 ? <div className=\"empty-inline\">No events match this timeline filter.</div> : <ol className=\"account-timeline-list\">{visible.map(item => <li key={item.key} className={`timeline-${item.category}`}><time>{item.detected ? formatTimestamp(item.date) : formatDate(item.date)}</time><div><span>{categoryLabels[item.category]}</span><strong>{item.title}</strong><p>{item.detail}</p><small>{item.source}</small></div></li>)}</ol>}"
+      }
+    ],
+    "consumer_count": 5,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 194,
+        "text": "title: string"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 303,
+        "text": "title: string | null"
+      },
+      {
+        "path": "src/types/procurement.ts",
+        "line": 41,
+        "text": "title?: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nys_registry.py",
+    "function": "normalize_nys_registry",
+    "source_field": "county",
+    "normalized_field": "source_county",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nys_registry.py",
+    "function": "normalize_nys_registry",
+    "source_field": "reg_comp",
+    "normalized_field": "regulation_compliance",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nys_registry.py",
+    "function": "normalize_nys_registry",
+    "source_field": "ct_status",
+    "normalized_field": "ct_status",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nys_registry.py",
+    "function": "normalize_nys_registry",
+    "source_field": "lastupdate",
+    "normalized_field": "last_update_days",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nys_registry.py",
+    "function": "normalize_nys_registry",
+    "source_field": "last_sampled_days",
+    "normalized_field": "last_sampled_days",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nys_registry.py",
+    "function": "normalize_nys_registry",
+    "source_field": "equipment_last_legionellla_sample_collection_date",
+    "normalized_field": "latest_sample_date",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 119,
+        "text": "missingSampleCount: systems.filter(row => !row.latest_sample_date).length,"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 121,
+        "text": "samplingDate: worstSamplingSystem?.latest_sample_date ?? null,"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 46,
+        "text": "const latest = detail.sample_history.latest_sample_date || dates.at(-1) || null"
+      }
+    ],
+    "consumer_count": 3,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 128,
+        "text": "latest_sample_date: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 520,
+        "text": "latest_sample_date: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nys_registry.py",
+    "function": "normalize_nys_registry",
+    "source_field": "equipment_last_legionella_test_result",
+    "normalized_field": "latest_sample_result",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nys_registry.py",
+    "function": "normalize_nys_registry",
+    "source_field": "equipment_tower_operation_duration",
+    "normalized_field": "operation_duration",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "job_filing_number",
+    "normalized_field": "activity_id",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 72,
+        "text": "<div className=\"signal-list\">{[...context.dob_water_job_filings, ...context.dob_water_permits].slice(0, 8).map((row, index) => <article className=\"signal-card\" key={`${text(row, 'activity_id')}-${index}`}>"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 132,
+        "text": "const record = text(raw.source_record_id) ?? text(raw.job_filing_number) ?? text(raw.activity_id) ?? 'record id not published'"
+      }
+    ],
+    "consumer_count": 2,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "job_filing_number",
+    "normalized_field": "source_record_id",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 393,
+        "text": "{procurementError ? <div className=\"reference-empty-state compact\"><strong>Procurement record detail is unavailable.</strong><span>{procurementError}</span><span>Firm identity and site evidence above remain available from the generated firm dataset.</span></div> : procurement ? <><div className=\"table-scroll\"><table className=\"account-table company-procurement-table\"><thead><tr><th>Record</th><th>Source</th><th>Buyer</th><th>Service</th><th>Observed value</th><th>Date</th><th>Source evidence</th"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 75,
+        "text": "<dl className=\"identity-grid\"><div><dt>Record</dt><dd>{text(row, 'source_record_id') !== '\u2014' ? text(row, 'source_record_id') : text(row, 'job_filing_number')}</dd></div><div><dt>Applicant business</dt><dd>{text(row, 'applicant_business_raw')}</dd></div><div><dt>Role evidence</dt><dd>{text(row, 'relationship_evidence')}</dd></div><div><dt>Service assignment</dt><dd>{text(row, 'service_assignment_confidence')}</dd></div></dl>"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 54,
+        "text": "const key = record.procurement_id || `${record.source}:${record.source_record_id}`"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 132,
+        "text": "const record = text(raw.source_record_id) ?? text(raw.job_filing_number) ?? text(raw.activity_id) ?? 'record id not published'"
+      }
+    ],
+    "consumer_count": 4,
+    "type_occurrences": [
+      {
+        "path": "src/types/procurement.ts",
+        "line": 30,
+        "text": "source_record_id: string"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "filing_status",
+    "normalized_field": "filing_status",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 101,
+        "text": "<div><dt>Job type</dt><dd>{job.job_type ?? '\u2014'}</dd></div><div><dt>Filing status</dt><dd>{job.filing_status ?? '\u2014'}</dd></div>"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 85,
+        "text": "detail: job.job_description ?? job.filing_status ?? 'Exact-BBL DOB project activity',"
+      }
+    ],
+    "consumer_count": 2,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 277,
+        "text": "filing_status: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "filing_date",
+    "normalized_field": "filing_date",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 103,
+        "text": "<div><dt>Filing date</dt><dd>{job.filing_date ? formatDate(job.filing_date) : '\u2014'}</dd></div><div><dt>Current status date</dt><dd>{job.current_status_date ? formatDate(job.current_status_date) : '\u2014'}</dd></div>"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 78,
+        "text": "const date = job.activity_date ?? job.current_status_date ?? job.filing_date"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 73,
+        "text": "<div className=\"signal-card-head\"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'issued_date', 'approved_date', 'filing_date')}</span></div>"
+      },
+      {
+        "path": "src/components/salesKnownFirms.ts",
+        "line": 183,
+        "text": "date: job.activity_date ?? job.first_permit_date ?? job.approved_date ?? job.filing_date,"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 160,
+        "text": "observedDate: job.activity_date ?? job.first_permit_date ?? job.approved_date ?? job.filing_date,"
+      }
+    ],
+    "consumer_count": 5,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 281,
+        "text": "filing_date: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "approved_date",
+    "normalized_field": "approved_date",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 104,
+        "text": "<div><dt>First permit date</dt><dd>{job.first_permit_date ? formatDate(job.first_permit_date) : '\u2014'}</dd></div><div><dt>Approved date</dt><dd>{job.approved_date ? formatDate(job.approved_date) : '\u2014'}</dd></div><div><dt>Signoff date</dt><dd>{job.signoff_date ? formatDate(job.signoff_date) : '\u2014'}</dd></div>"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 73,
+        "text": "<div className=\"signal-card-head\"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'issued_date', 'approved_date', 'filing_date')}</span></div>"
+      },
+      {
+        "path": "src/components/salesKnownFirms.ts",
+        "line": 183,
+        "text": "date: job.activity_date ?? job.first_permit_date ?? job.approved_date ?? job.filing_date,"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 160,
+        "text": "observedDate: job.activity_date ?? job.first_permit_date ?? job.approved_date ?? job.filing_date,"
+      }
+    ],
+    "consumer_count": 4,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 284,
+        "text": "approved_date: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "signoff_date",
+    "normalized_field": "signoff_date",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 104,
+        "text": "<div><dt>First permit date</dt><dd>{job.first_permit_date ? formatDate(job.first_permit_date) : '\u2014'}</dd></div><div><dt>Approved date</dt><dd>{job.approved_date ? formatDate(job.approved_date) : '\u2014'}</dd></div><div><dt>Signoff date</dt><dd>{job.signoff_date ? formatDate(job.signoff_date) : '\u2014'}</dd></div>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 285,
+        "text": "signoff_date: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "house_no",
+    "normalized_field": "address",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 40,
+        "text": "<footer className=\"tsr-footer\"><span><b>TowerSignal</b> &nbsp;\u00b7&nbsp; {m.address} &nbsp;\u00b7&nbsp; System {row.system_id}</span><span>ACCOUNT EXPORT &nbsp; / &nbsp; 0{index + 1} OF 04</span></footer>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 96,
+        "text": "<aside className=\"tsr-return\"><div><h4>Return to the full account</h4><p>Snapshot: {reportDate(m.snapshot)} \u00b7 Priority model: {detail.scoring?.priority_model_version || 'Not shown'}</p><p>Published application: {applicationSha ? applicationSha.slice(0, 12) : 'Not shown'}{applicationSha && <> \u00b7 <a href={`https://github.com/JeremyHennessy/TowerSignal/commit/${applicationSha}`}>Release record</a></>}</p><a className=\"tsr-account-link\" href={accountUrl}>Open {m.address} in TowerSignal \u2192</a></div><a "
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 133,
+        "text": "if (key === 'address') return row.relationship.address ?? row.relationship.site_id"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 217,
+        "text": "|| String(left.relationship.address ?? left.relationship.site_id).localeCompare(String(right.relationship.address ?? right.relationship.site_id))"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 312,
+        "text": "<strong>{selectedView.relationship.address ?? selectedView.relationship.site_id}</strong>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 99,
+        "text": "if (propertySort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 106,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 126,
+        "text": "if (candidateSort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 133,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 74,
+        "text": "return { address: reportName(row.address || detail.identity.address).replace(/\\bAve\\.?$/i, 'Avenue').replace(/\\bSt\\.?$/i, 'Street'), snapshot, dates, latest, previous, age, interval: days(previous, latest), inspection, cases, balance, balanceComplete, dismissed, unpaid, month, penaltyLine, decisionTitle, decisionText, owner, agent, ownerFromHpd: !!ownerContact, plutoOwner, scoreCopy, dismissalExcluded }"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 18,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 115,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 358,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/company.ts",
+        "line": 7,
+        "text": "address?: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 36,
+        "text": "address: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "street_name",
+    "normalized_field": "address",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 40,
+        "text": "<footer className=\"tsr-footer\"><span><b>TowerSignal</b> &nbsp;\u00b7&nbsp; {m.address} &nbsp;\u00b7&nbsp; System {row.system_id}</span><span>ACCOUNT EXPORT &nbsp; / &nbsp; 0{index + 1} OF 04</span></footer>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 96,
+        "text": "<aside className=\"tsr-return\"><div><h4>Return to the full account</h4><p>Snapshot: {reportDate(m.snapshot)} \u00b7 Priority model: {detail.scoring?.priority_model_version || 'Not shown'}</p><p>Published application: {applicationSha ? applicationSha.slice(0, 12) : 'Not shown'}{applicationSha && <> \u00b7 <a href={`https://github.com/JeremyHennessy/TowerSignal/commit/${applicationSha}`}>Release record</a></>}</p><a className=\"tsr-account-link\" href={accountUrl}>Open {m.address} in TowerSignal \u2192</a></div><a "
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 133,
+        "text": "if (key === 'address') return row.relationship.address ?? row.relationship.site_id"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 217,
+        "text": "|| String(left.relationship.address ?? left.relationship.site_id).localeCompare(String(right.relationship.address ?? right.relationship.site_id))"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 312,
+        "text": "<strong>{selectedView.relationship.address ?? selectedView.relationship.site_id}</strong>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 99,
+        "text": "if (propertySort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 106,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 126,
+        "text": "if (candidateSort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 133,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 74,
+        "text": "return { address: reportName(row.address || detail.identity.address).replace(/\\bAve\\.?$/i, 'Avenue').replace(/\\bSt\\.?$/i, 'Street'), snapshot, dates, latest, previous, age, interval: days(previous, latest), inspection, cases, balance, balanceComplete, dismissed, unpaid, month, penaltyLine, decisionTitle, decisionText, owner, agent, ownerFromHpd: !!ownerContact, plutoOwner, scoreCopy, dismissalExcluded }"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 18,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 115,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 358,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/company.ts",
+        "line": 7,
+        "text": "address?: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 36,
+        "text": "address: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "borough",
+    "normalized_field": "borough",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 201,
+        "text": "const boroughs = useMemo(() => [...new Set(allSiteViews.map(row => row.relationship.borough).filter((value): value is string => Boolean(value)))].sort(), [allSiteViews])"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 212,
+        "text": "if (boroughFilter !== 'ALL' && site.borough !== boroughFilter) return false"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 313,
+        "text": "<span>{[selectedView.relationship.borough, selectedView.relationship.zip, selectedView.relationship.bin ? `BIN ${selectedView.relationship.bin}` : null].filter(Boolean).join(' \u00b7 ')}</span>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 100,
+        "text": "if (propertySort.key === 'borough') return row.borough"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 128,
+        "text": "if (candidateSort.key === 'borough') return row.borough"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 13,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 116,
+        "text": "borough: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 236,
+        "text": "borough: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 37,
+        "text": "borough: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "plumbing_work_type",
+    "normalized_field": "plumbing_work_type",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "mechanical_systems_work_type_",
+    "normalized_field": "mechanical_work_type",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "boiler_equipment_work_type_",
+    "normalized_field": "boiler_work_type",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "job_description",
+    "normalized_field": "job_description",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 100,
+        "text": "<div className=\"violation-detail\"><p>{job.job_description ?? 'No job description published.'}</p><dl className=\"identity-grid\">"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 85,
+        "text": "detail: job.job_description ?? job.filing_status ?? 'Exact-BBL DOB project activity',"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 74,
+        "text": "<p>{text(row, 'job_description')}</p>"
+      }
+    ],
+    "consumer_count": 3,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 279,
+        "text": "job_description: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "applicant_license",
+    "normalized_field": "applicant_license",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "applicant_professional_title",
+    "normalized_field": "applicant_professional_title",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_job",
+    "source_field": "owner_s_business_name",
+    "normalized_field": "owner_business_name",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 106,
+        "text": "<div><dt>DOB owner business</dt><dd>{job.owner_business_name ?? '\u2014'}</dd></div><div><dt>Applicant business</dt><dd>{job.applicant_business_name ?? '\u2014'}</dd></div>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 291,
+        "text": "owner_business_name: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "job_filing_number",
+    "normalized_field": "job_filing_number",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 98,
+        "text": "{jobs.length === 0 ? <div className=\"empty-inline\">No exact-BBL DOB NOW job filing was attached.</div> : <EvidenceRecordList key={detail.identity.system_id} label=\"filings\" records={jobs.map((job, index) => <details className=\"evidence-card\" key={`${job.job_filing_number ?? 'job'}-${index}`} open={index === 0}>"
+      },
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 99,
+        "text": "<summary><span>{job.activity_date ? formatDate(job.activity_date) : 'Date not published'} \u00b7 <strong>{job.job_filing_number ?? 'DOB filing'}</strong></span><span>{job.explicit_cooling_tower_mention ? 'Explicit cooling-tower wording' : job.mechanical_systems || job.boiler_equipment ? 'Mechanical / boiler source flag' : 'Property project context'}</span></summary>"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 81,
+        "text": "key: `dob-${job.job_filing_number ?? index}-${date}`,"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 84,
+        "text": "title: `DOB ${job.job_filing_number ?? 'filing'} \u00b7 ${job.job_type ?? 'project activity'}`,"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 75,
+        "text": "<dl className=\"identity-grid\"><div><dt>Record</dt><dd>{text(row, 'source_record_id') !== '\u2014' ? text(row, 'source_record_id') : text(row, 'job_filing_number')}</dd></div><div><dt>Applicant business</dt><dd>{text(row, 'applicant_business_raw')}</dd></div><div><dt>Role evidence</dt><dd>{text(row, 'relationship_evidence')}</dd></div><div><dt>Service assignment</dt><dd>{text(row, 'service_assignment_confidence')}</dd></div></dl>"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 132,
+        "text": "const record = text(raw.source_record_id) ?? text(raw.job_filing_number) ?? text(raw.activity_id) ?? 'record id not published'"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 162,
+        "text": "sourceReference: `Job ${job.job_filing_number ?? 'number not published'} \u00b7 exact BBL`,"
+      }
+    ],
+    "consumer_count": 7,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 275,
+        "text": "job_filing_number: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "sequence_number",
+    "normalized_field": "sequence_number",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "filing_reason",
+    "normalized_field": "filing_reason",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "approved_date",
+    "normalized_field": "approved_date",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 104,
+        "text": "<div><dt>First permit date</dt><dd>{job.first_permit_date ? formatDate(job.first_permit_date) : '\u2014'}</dd></div><div><dt>Approved date</dt><dd>{job.approved_date ? formatDate(job.approved_date) : '\u2014'}</dd></div><div><dt>Signoff date</dt><dd>{job.signoff_date ? formatDate(job.signoff_date) : '\u2014'}</dd></div>"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 73,
+        "text": "<div className=\"signal-card-head\"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'issued_date', 'approved_date', 'filing_date')}</span></div>"
+      },
+      {
+        "path": "src/components/salesKnownFirms.ts",
+        "line": 183,
+        "text": "date: job.activity_date ?? job.first_permit_date ?? job.approved_date ?? job.filing_date,"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 160,
+        "text": "observedDate: job.activity_date ?? job.first_permit_date ?? job.approved_date ?? job.filing_date,"
+      }
+    ],
+    "consumer_count": 4,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 284,
+        "text": "approved_date: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "issued_date",
+    "normalized_field": "issued_date",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 73,
+        "text": "<div className=\"signal-card-head\"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'issued_date', 'approved_date', 'filing_date')}</span></div>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "expired_date",
+    "normalized_field": "expired_date",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "permit_status",
+    "normalized_field": "permit_status",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "house_no",
+    "normalized_field": "address",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 40,
+        "text": "<footer className=\"tsr-footer\"><span><b>TowerSignal</b> &nbsp;\u00b7&nbsp; {m.address} &nbsp;\u00b7&nbsp; System {row.system_id}</span><span>ACCOUNT EXPORT &nbsp; / &nbsp; 0{index + 1} OF 04</span></footer>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 96,
+        "text": "<aside className=\"tsr-return\"><div><h4>Return to the full account</h4><p>Snapshot: {reportDate(m.snapshot)} \u00b7 Priority model: {detail.scoring?.priority_model_version || 'Not shown'}</p><p>Published application: {applicationSha ? applicationSha.slice(0, 12) : 'Not shown'}{applicationSha && <> \u00b7 <a href={`https://github.com/JeremyHennessy/TowerSignal/commit/${applicationSha}`}>Release record</a></>}</p><a className=\"tsr-account-link\" href={accountUrl}>Open {m.address} in TowerSignal \u2192</a></div><a "
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 133,
+        "text": "if (key === 'address') return row.relationship.address ?? row.relationship.site_id"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 217,
+        "text": "|| String(left.relationship.address ?? left.relationship.site_id).localeCompare(String(right.relationship.address ?? right.relationship.site_id))"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 312,
+        "text": "<strong>{selectedView.relationship.address ?? selectedView.relationship.site_id}</strong>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 99,
+        "text": "if (propertySort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 106,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 126,
+        "text": "if (candidateSort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 133,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 74,
+        "text": "return { address: reportName(row.address || detail.identity.address).replace(/\\bAve\\.?$/i, 'Avenue').replace(/\\bSt\\.?$/i, 'Street'), snapshot, dates, latest, previous, age, interval: days(previous, latest), inspection, cases, balance, balanceComplete, dismissed, unpaid, month, penaltyLine, decisionTitle, decisionText, owner, agent, ownerFromHpd: !!ownerContact, plutoOwner, scoreCopy, dismissalExcluded }"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 18,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 115,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 358,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/company.ts",
+        "line": 7,
+        "text": "address?: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 36,
+        "text": "address: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "street_name",
+    "normalized_field": "address",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 40,
+        "text": "<footer className=\"tsr-footer\"><span><b>TowerSignal</b> &nbsp;\u00b7&nbsp; {m.address} &nbsp;\u00b7&nbsp; System {row.system_id}</span><span>ACCOUNT EXPORT &nbsp; / &nbsp; 0{index + 1} OF 04</span></footer>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 96,
+        "text": "<aside className=\"tsr-return\"><div><h4>Return to the full account</h4><p>Snapshot: {reportDate(m.snapshot)} \u00b7 Priority model: {detail.scoring?.priority_model_version || 'Not shown'}</p><p>Published application: {applicationSha ? applicationSha.slice(0, 12) : 'Not shown'}{applicationSha && <> \u00b7 <a href={`https://github.com/JeremyHennessy/TowerSignal/commit/${applicationSha}`}>Release record</a></>}</p><a className=\"tsr-account-link\" href={accountUrl}>Open {m.address} in TowerSignal \u2192</a></div><a "
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 133,
+        "text": "if (key === 'address') return row.relationship.address ?? row.relationship.site_id"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 217,
+        "text": "|| String(left.relationship.address ?? left.relationship.site_id).localeCompare(String(right.relationship.address ?? right.relationship.site_id))"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 312,
+        "text": "<strong>{selectedView.relationship.address ?? selectedView.relationship.site_id}</strong>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 99,
+        "text": "if (propertySort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 106,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 126,
+        "text": "if (candidateSort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 133,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 74,
+        "text": "return { address: reportName(row.address || detail.identity.address).replace(/\\bAve\\.?$/i, 'Avenue').replace(/\\bSt\\.?$/i, 'Street'), snapshot, dates, latest, previous, age, interval: days(previous, latest), inspection, cases, balance, balanceComplete, dismissed, unpaid, month, penaltyLine, decisionTitle, decisionText, owner, agent, ownerFromHpd: !!ownerContact, plutoOwner, scoreCopy, dismissalExcluded }"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 18,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 115,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 358,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/company.ts",
+        "line": 7,
+        "text": "address?: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 36,
+        "text": "address: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "borough",
+    "normalized_field": "borough",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 201,
+        "text": "const boroughs = useMemo(() => [...new Set(allSiteViews.map(row => row.relationship.borough).filter((value): value is string => Boolean(value)))].sort(), [allSiteViews])"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 212,
+        "text": "if (boroughFilter !== 'ALL' && site.borough !== boroughFilter) return false"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 313,
+        "text": "<span>{[selectedView.relationship.borough, selectedView.relationship.zip, selectedView.relationship.bin ? `BIN ${selectedView.relationship.bin}` : null].filter(Boolean).join(' \u00b7 ')}</span>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 100,
+        "text": "if (propertySort.key === 'borough') return row.borough"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 128,
+        "text": "if (candidateSort.key === 'borough') return row.borough"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 13,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 116,
+        "text": "borough: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 236,
+        "text": "borough: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 37,
+        "text": "borough: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "work_type",
+    "normalized_field": "work_type",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "job_description",
+    "normalized_field": "job_description",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 100,
+        "text": "<div className=\"violation-detail\"><p>{job.job_description ?? 'No job description published.'}</p><dl className=\"identity-grid\">"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 85,
+        "text": "detail: job.job_description ?? job.filing_status ?? 'Exact-BBL DOB project activity',"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 74,
+        "text": "<p>{text(row, 'job_description')}</p>"
+      }
+    ],
+    "consumer_count": 3,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 279,
+        "text": "job_description: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "estimated_job_costs",
+    "normalized_field": "estimated_job_costs",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "applicant_license",
+    "normalized_field": "applicant_license",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "permittee_s_license_type",
+    "normalized_field": "permittee_license_type",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_dob_permit",
+    "source_field": "owner_business_name",
+    "normalized_field": "owner_business_name",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 106,
+        "text": "<div><dt>DOB owner business</dt><dd>{job.owner_business_name ?? '\u2014'}</dd></div><div><dt>Applicant business</dt><dd>{job.applicant_business_name ?? '\u2014'}</dd></div>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 291,
+        "text": "owner_business_name: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "property_id",
+    "normalized_field": "benchmark_id",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 81,
+        "text": "<div className=\"signal-list\">{context.ll84_water_benchmarks.slice(0, 8).map((row, index) => <article className=\"signal-card\" key={`${text(row, 'benchmark_id')}-${index}`}>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "report_year",
+    "normalized_field": "benchmark_id",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 81,
+        "text": "<div className=\"signal-list\">{context.ll84_water_benchmarks.slice(0, 8).map((row, index) => <article className=\"signal-card\" key={`${text(row, 'benchmark_id')}-${index}`}>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "report_year",
+    "normalized_field": "report_year",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 82,
+        "text": "<div className=\"signal-card-head\"><strong>{text(row, 'property_name') !== '\u2014' ? text(row, 'property_name') : 'LL84 water benchmark'}</strong><span>{text(row, 'report_year')}</span></div>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "property_id",
+    "normalized_field": "property_id",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 83,
+        "text": "<dl className=\"identity-grid\"><div><dt>Property ID</dt><dd>{text(row, 'property_id')}</dd></div><div><dt>Metered areas</dt><dd>{text(row, 'metered_areas_water')}</dd></div><div><dt>All water use</dt><dd>{waterUse(row, 'water_use_all_sources_kgal')}</dd></div><div><dt>Municipal potable total</dt><dd>{waterUse(row, 'municipal_potable_total_kgal')}</dd></div></dl>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "property_name",
+    "normalized_field": "property_name",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 82,
+        "text": "<div className=\"signal-card-head\"><strong>{text(row, 'property_name') !== '\u2014' ? text(row, 'property_name') : 'LL84 water benchmark'}</strong><span>{text(row, 'report_year')}</span></div>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "year_ending",
+    "normalized_field": "year_ending",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "address_1",
+    "normalized_field": "address",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 40,
+        "text": "<footer className=\"tsr-footer\"><span><b>TowerSignal</b> &nbsp;\u00b7&nbsp; {m.address} &nbsp;\u00b7&nbsp; System {row.system_id}</span><span>ACCOUNT EXPORT &nbsp; / &nbsp; 0{index + 1} OF 04</span></footer>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 48,
+        "text": "<div className=\"tsr-hero\"><div className=\"tsr-rings\" /><p className=\"tsr-kicker\">COOLING-TOWER ACCOUNT REPORT</p><h1>{m.address}</h1><p>{reportName(row.borough)}, New York {row.zip}</p><div className=\"tsr-hero-meta\"><span>System <b>{row.system_id}</b></span><span>Data snapshot <b>{reportDate(m.snapshot)}</b></span><b>Account export</b></div></div>"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 96,
+        "text": "<aside className=\"tsr-return\"><div><h4>Return to the full account</h4><p>Snapshot: {reportDate(m.snapshot)} \u00b7 Priority model: {detail.scoring?.priority_model_version || 'Not shown'}</p><p>Published application: {applicationSha ? applicationSha.slice(0, 12) : 'Not shown'}{applicationSha && <> \u00b7 <a href={`https://github.com/JeremyHennessy/TowerSignal/commit/${applicationSha}`}>Release record</a></>}</p><a className=\"tsr-account-link\" href={accountUrl}>Open {m.address} in TowerSignal \u2192</a></div><a "
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 133,
+        "text": "if (key === 'address') return row.relationship.address ?? row.relationship.site_id"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 205,
+        "text": "const haystack = [site.address, site.borough, site.zip, site.bin, site.bbl, ...site.system_ids, ...site.roles].filter(Boolean).join(' ').toLowerCase()"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 217,
+        "text": "|| String(left.relationship.address ?? left.relationship.site_id).localeCompare(String(right.relationship.address ?? right.relationship.site_id))"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 312,
+        "text": "<strong>{selectedView.relationship.address ?? selectedView.relationship.site_id}</strong>"
+      },
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 344,
+        "text": "<td className=\"account-cell\"><strong>{site.address ?? site.site_id}</strong><span>{[site.borough, site.zip].filter(Boolean).join(' \u00b7 ') || 'Location not published'}</span><small>{[site.bin ? `BIN ${site.bin}` : null, site.bbl ? `BBL ${site.bbl}` : null].filter(Boolean).join(' \u00b7 ') || site.site_id}</small></td>"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 95,
+        "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 99,
+        "text": "if (propertySort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 106,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 120,
+        "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 126,
+        "text": "if (candidateSort.key === 'address') return row.address ?? row.system_id"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 133,
+        "text": "const result = compareValues(value(a), value(b)) || compareValues(a.address, b.address)"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 176,
+        "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className"
+      },
+      {
+        "path": "src/components/PortfoliosPage.tsx",
+        "line": 181,
+        "text": "<div className=\"reference-table-scroll\"><table className=\"reference-table\"><thead><tr><th><button onClick={() => changeCandidateSort('address')}>Account{candidateIndicator('address')}</button></th><th><button onClick={() => changeCandidateSort('owner')}>Owner context{candidateIndicator('owner')}</button></th><th><button onClick={() => changeCandidateSort('borough')}>Borough{candidateIndicator('borough')}</button></th><th><button onClick={() => changeCandidateSort('towers')}>Towers{candidateIndic"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 74,
+        "text": "return { address: reportName(row.address || detail.identity.address).replace(/\\bAve\\.?$/i, 'Avenue').replace(/\\bSt\\.?$/i, 'Street'), snapshot, dates, latest, previous, age, interval: days(previous, latest), inspection, cases, balance, balanceComplete, dismissed, unpaid, month, penaltyLine, decisionTitle, decisionText, owner, agent, ownerFromHpd: !!ownerContact, plutoOwner, scoreCopy, dismissalExcluded }"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 37,
+        "text": "row?.address,row?.borough,row?.zip,systemId,row?.bin,row?.bbl,row?.priority_score,row?.primary_signal,row?.evidence_confidence,"
+      }
+    ],
+    "consumer_count": 18,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 115,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 358,
+        "text": "address: string | null"
+      },
+      {
+        "path": "src/types/company.ts",
+        "line": 7,
+        "text": "address?: string | null"
+      },
+      {
+        "path": "src/types/history.ts",
+        "line": 36,
+        "text": "address: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "city",
+    "normalized_field": "city",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/CompanyProfilePage.tsx",
+        "line": 380,
+        "text": "<div className=\"table-scroll\"><table className=\"account-table firm-evidence-table\"><thead><tr><th>Registration</th><th>Location</th><th>Effective</th><th>Expiration</th><th>Status</th><th>Scope</th></tr></thead><tbody>{detail.qualifications.map(item => <tr key={item.qualification_id ?? item.registration_number ?? `${item.city}-${item.registration_expiration_date}`}><td><strong>{item.registration_number ?? '\u2014'}</strong></td><td>{[item.city, item.state].filter(Boolean).join(', ') || '\u2014'}</td><td>{"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "postal_code",
+    "normalized_field": "postal_code",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "metered_areas_water",
+    "normalized_field": "metered_areas_water",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 83,
+        "text": "<dl className=\"identity-grid\"><div><dt>Property ID</dt><dd>{text(row, 'property_id')}</dd></div><div><dt>Metered areas</dt><dd>{text(row, 'metered_areas_water')}</dd></div><div><dt>All water use</dt><dd>{waterUse(row, 'water_use_all_sources_kgal')}</dd></div><div><dt>Municipal potable total</dt><dd>{waterUse(row, 'municipal_potable_total_kgal')}</dd></div></dl>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "water_use_all_water_sources",
+    "normalized_field": "water_use_all_sources_kgal",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 83,
+        "text": "<dl className=\"identity-grid\"><div><dt>Property ID</dt><dd>{text(row, 'property_id')}</dd></div><div><dt>Metered areas</dt><dd>{text(row, 'metered_areas_water')}</dd></div><div><dt>All water use</dt><dd>{waterUse(row, 'water_use_all_sources_kgal')}</dd></div><div><dt>Municipal potable total</dt><dd>{waterUse(row, 'municipal_potable_total_kgal')}</dd></div></dl>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "indoor_water_use_all_water",
+    "normalized_field": "indoor_water_use_all_sources_kgal",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "outdoor_water_use_all_water",
+    "normalized_field": "outdoor_water_use_all_sources_kgal",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "municipally_supplied_potable",
+    "normalized_field": "municipal_potable_mixed_kgal",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "municipally_supplied_potable_1",
+    "normalized_field": "municipal_potable_total_kgal",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 83,
+        "text": "<dl className=\"identity-grid\"><div><dt>Property ID</dt><dd>{text(row, 'property_id')}</dd></div><div><dt>Metered areas</dt><dd>{text(row, 'metered_areas_water')}</dd></div><div><dt>All water use</dt><dd>{waterUse(row, 'water_use_all_sources_kgal')}</dd></div><div><dt>Municipal potable total</dt><dd>{waterUse(row, 'municipal_potable_total_kgal')}</dd></div></dl>"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "municipally_supplied_potable_2",
+    "normalized_field": "municipal_potable_indoor_kgal",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "municipally_supplied_potable_3",
+    "normalized_field": "municipal_potable_outdoor_kgal",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "estimated_values_water",
+    "normalized_field": "estimated_values_water",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "alert_water_meter_has_less",
+    "normalized_field": "water_meter_alert_less_than_12_months",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/nyc_water_signals.py",
+    "function": "normalize_ll84",
+    "source_field": "last_modified_date_water",
+    "normalized_field": "last_modified_date_water",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "inspection_date",
+    "normalized_field": "inspection_date",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 72,
+        "text": "<section className=\"tsr-cases\"><h3>{m.month || 'Inspection'} findings and later case outcomes {ref('2 3')}</h3><p className=\"tsr-case-intro\">NYC Health inspection: <b>{reportDate(m.inspection?.inspection_date, 'long')}.</b> Hearing outcomes below are matched by exact ticket number.{m.cases.length > 3 ? ` Showing 3 of ${m.cases.length} findings; all records are in the account.` : ''}</p>"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 53,
+        "text": "if (!inspection.inspection_date) return"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 55,
+        "text": "key: `inspection-${inspection.inspection_date}-${index}`,"
+      },
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 56,
+        "text": "date: inspection.inspection_date,"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 64,
+        "text": "<div className=\"signal-card-head\"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'inspection_date', 'current_status_date')}</span></div>"
+      },
+      {
+        "path": "src/components/salesKnownFirms.ts",
+        "line": 132,
+        "text": "const date = cleanText(row.inspection_date)"
+      },
+      {
+        "path": "src/domain/accountEvidence.ts",
+        "line": 95,
+        "text": "const date = text(row.inspection_date)"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 49,
+        "text": "const inspection = [...detail.inspection_history].sort((a, b) => (b.inspection_date || '').localeCompare(a.inspection_date || ''))[0]"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 61,
+        "text": "const month = monthName(inspection?.inspection_date)"
+      }
+    ],
+    "consumer_count": 9,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 214,
+        "text": "inspection_date: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "inspection_type",
+    "normalized_field": "inspection_type",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountUnifiedTimeline.tsx",
+        "line": 58,
+        "text": "title: `NYC Health inspection \u00b7 ${inspection.inspection_type}`,"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 200,
+        "text": "inspection_type?: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 215,
+        "text": "inspection_type: string"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "status",
+    "normalized_field": "status",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 46,
+        "text": "return manifest?.sources.filter(source => source.status !== 'LOADED').map(source => `${source.name}: ${source.reason ?? source.status}`) ?? []"
+      },
+      {
+        "path": "src/components/AccountEvidenceWorkspace.tsx",
+        "line": 237,
+        "text": "<Group title=\"Procurement / Commercial\" summary={`${coverageWarnings.length ? 'At least ' : ''}${sourceFirmCount + (procurementFirmCount ?? 0)} source-observed/recorded/contract-linked firm roles${procurementError ? ' \u00b7 procurement unavailable' : procurementFirmCount == null ? ' \u00b7 procurement pending' : coverageWarnings.length ? ' \u00b7 incomplete procurement coverage' : ''} \u00b7 ${procurement?.record_count ?? '\u2014'} explicit procurement links${procurement && linkedProcurement.length < procurement.record"
+      },
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 43,
+        "text": "const active = detail.inspection_history.find(i => i.status)?.status"
+      },
+      {
+        "path": "src/components/WorkflowAccountSection.tsx",
+        "line": 37,
+        "text": "setDraft(account ? { status: account.status, note: account.note, next_action_date: account.next_action_date } : DEFAULT_ACCOUNT)"
+      },
+      {
+        "path": "src/components/WorkflowAccountSection.tsx",
+        "line": 59,
+        "text": "<label>Status<select value={draft.status} onChange={event => { markEdited(); setDraft(current => ({ ...current, status: event.target.value as AccountDisposition })) }}>{STATUS_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>"
+      },
+      {
+        "path": "src/components/BuildingWaterSignalsSection.tsx",
+        "line": 56,
+        "text": "<dl className=\"identity-grid\"><div><dt>Status</dt><dd>{text(row, 'status')}</dd></div><div><dt>Request ID</dt><dd>{text(row, 'request_id')}</dd></div><div><dt>BBL</dt><dd>{text(row, 'bbl')}</dd></div><div><dt>Linkage</dt><dd>{text(row, 'property_link_confidence')}</dd></div></dl>"
+      },
+      {
+        "path": "src/utils/workflowExport.ts",
+        "line": 38,
+        "text": "workflow?.status ?? 'new',workflow?.note ?? '',workflow?.next_action_date ?? '',(watchlistsBySystem.get(systemId) ?? []).join(' | '),metadata.generated_at,"
+      }
+    ],
+    "consumer_count": 7,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 39,
+        "text": "status: SourceHealthStatus"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 216,
+        "text": "status: string | null"
+      },
+      {
+        "path": "src/types/data.ts",
+        "line": 326,
+        "text": "status: string | null"
+      },
+      {
+        "path": "src/types/company.ts",
+        "line": 47,
+        "text": "status: string"
+      },
+      {
+        "path": "src/types/workflow.ts",
+        "line": 28,
+        "text": "status: AccountDisposition"
+      },
+      {
+        "path": "src/types/workflow.ts",
+        "line": 49,
+        "text": "status: AccountDisposition"
+      },
+      {
+        "path": "src/types/procurement.ts",
+        "line": 6,
+        "text": "status: string"
+      },
+      {
+        "path": "src/types/procurement.ts",
+        "line": 63,
+        "text": "status?: string | null"
+      },
+      {
+        "path": "src/types/procurement.ts",
+        "line": 105,
+        "text": "status: string"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "active_equip",
+    "normalized_field": "active_equipment_at_publication",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 217,
+        "text": "active_equipment_at_publication: number"
+      }
+    ],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "violation_code",
+    "normalized_field": "violation_code",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 74,
+        "text": "{m.cases.slice(0, 3).map((c, i) => <div className=\"tsr-case-row\" key={i}><div><h4>{c.title}</h4><p>{c.text}</p><small>{c.violation.violation_code || 'Code not shown'} \u00b7 Ticket {c.violation.summons_number || 'not shown'}</small></div><div><span className={`tsr-badge ${c.dismissed ? 'dismissed' : c.outcome ? 'verify' : 'unknown'}`}>{c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'}</span><h4>{c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balan"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 29,
+        "text": "if (v.violation_code === 'AH8S' && /gap greater than 90 days/i.test(text) && dates.length >= 2) {"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 32,
+        "text": "if (v.violation_code === 'AHK0' && /within 5 days/i.test(text) && dates.length) {"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 35,
+        "text": "if (v.violation_code === 'AHK2' && dates.length && new Set(dates.map(x => x.slice(0, 4))).size === 1) {"
+      }
+    ],
+    "consumer_count": 4,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 204,
+        "text": "violation_code: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "law_section",
+    "normalized_field": "law_section",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 205,
+        "text": "law_section: string | null"
+      }
+    ],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "violation_text",
+    "normalized_field": "violation_text",
+    "consumer_occurrences": [
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 27,
+        "text": "const text = v.citation_text || v.violation_text || 'No inspection notes are included in the supplied record.'"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 39,
+        "text": "return { title: shorten(v.violation_text || 'Published inspection finding', 58), text: shorten(text, 150) }"
+      }
+    ],
+    "consumer_count": 2,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 206,
+        "text": "violation_text: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "violation_type",
+    "normalized_field": "violation_type",
+    "consumer_occurrences": [],
+    "consumer_count": 0,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 207,
+        "text": "violation_type: string | null"
+      }
+    ],
+    "consumer_disposition": "NO_REFERENCE_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "citation_text",
+    "normalized_field": "citation_text",
+    "consumer_occurrences": [
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 27,
+        "text": "const text = v.citation_text || v.violation_text || 'No inspection notes are included in the supplied record.'"
+      }
+    ],
+    "consumer_count": 1,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 208,
+        "text": "citation_text: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  },
+  {
+    "normalizer_file": "scripts/towersignal/inspections.py",
+    "function": "aggregate_inspections",
+    "source_field": "summons_number",
+    "normalized_field": "summons_number",
+    "consumer_occurrences": [
+      {
+        "path": "src/components/ClientSiteReport.tsx",
+        "line": 74,
+        "text": "{m.cases.slice(0, 3).map((c, i) => <div className=\"tsr-case-row\" key={i}><div><h4>{c.title}</h4><p>{c.text}</p><small>{c.violation.violation_code || 'Code not shown'} \u00b7 Ticket {c.violation.summons_number || 'not shown'}</small></div><div><span className={`tsr-badge ${c.dismissed ? 'dismissed' : c.outcome ? 'verify' : 'unknown'}`}>{c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'}</span><h4>{c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balan"
+      },
+      {
+        "path": "src/utils/accountReportModel.ts",
+        "line": 52,
+        "text": "const outcome = v.summons_number ? allCases.find(c => c.ticket_number === v.summons_number) : undefined"
+      }
+    ],
+    "consumer_count": 2,
+    "type_occurrences": [
+      {
+        "path": "src/types/data.ts",
+        "line": 209,
+        "text": "summons_number: string | null"
+      }
+    ],
+    "consumer_disposition": "CONSUMED_IN_AUDITED_SURFACES",
+    "limits": "Static reference scan; absence is not proof of no runtime use outside the audited consumer set."
+  }
+]
