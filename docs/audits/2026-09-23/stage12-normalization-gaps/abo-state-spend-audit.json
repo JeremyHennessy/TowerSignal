@@ -1,0 +1,1019 @@
+{
+  "served_state_authority_contracts": 566,
+  "candidate_source_rows": 9322,
+  "joined_exact_fingerprint_contracts": 566,
+  "missing_source_ids": [],
+  "source_nonblank_amount_expended_to_date": 481,
+  "source_nonblank_amount_expended_for_fiscal_year": 566,
+  "source_nonblank_current_or_outstanding_balance": 481,
+  "source_nonblank_transaction_number": 489,
+  "served_nonblank_spend_to_date": 0,
+  "source_to_date_present_but_served_spend_missing": 481,
+  "source_fy_present_but_served_spend_missing": 566,
+  "source_transaction_present_but_contract_id_missing": 489,
+  "examples": [
+    {
+      "source_record_id": "nys-abo-row-482d0a11e3efcf7850a4",
+      "vendor_raw": "DAIKIN APPLIED AMERICAS INC DBA DAIKIN APPLIED",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "25782.00",
+      "source_transaction_number": "4500371512",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-2c061ed9b532fdb7e88e",
+      "vendor_raw": "TUCKER MECHANICAL INC",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "130000.00",
+      "source_transaction_number": "100000000081782",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-7efd2b8e6b6994b88ad9",
+      "vendor_raw": "HAWK DRILLING CO INC",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "7933.00",
+      "source_transaction_number": "4400008530",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-9b7d1e87c4e0eae94b01",
+      "vendor_raw": "Cooling Guard Mechanical Corp.",
+      "source_amount_expended_to_date": "5760.00",
+      "source_amount_expended_for_fiscal_year": "5760.00",
+      "source_current_or_outstanding_balance": "850485.00",
+      "source_transaction_number": "C24-3365",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-0254ff471d0b4b73d577",
+      "vendor_raw": "BARCLAY WATER MGNT INC",
+      "source_amount_expended_to_date": "38821.55",
+      "source_amount_expended_for_fiscal_year": "38821.55",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "CT3DDCB",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-81b8e4757edb6c160422",
+      "vendor_raw": "LUCCAH CONSULTING LLC",
+      "source_amount_expended_to_date": "37908.00",
+      "source_amount_expended_for_fiscal_year": "37908.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "4000196235",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-4661301e7f2c129b8029",
+      "vendor_raw": "TUCKER MECHANICAL INC",
+      "source_amount_expended_to_date": "57953.72",
+      "source_amount_expended_for_fiscal_year": "57953.72",
+      "source_current_or_outstanding_balance": "313426.28",
+      "source_transaction_number": "100000000081568",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-5128620f8f61689a9472",
+      "vendor_raw": "P.J. Mechanical Service & Maintenance",
+      "source_amount_expended_to_date": "21812.00",
+      "source_amount_expended_for_fiscal_year": "21812.00",
+      "source_current_or_outstanding_balance": "21812.00",
+      "source_transaction_number": "4400000146",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-b29657384c47ca3376a3",
+      "vendor_raw": "LUCCAH CONSULTING LLC",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "25272.00",
+      "source_transaction_number": "4000194108",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-7cc0acabfe1482b05a1f",
+      "vendor_raw": "LUCCAH CONSULTING LLC",
+      "source_amount_expended_to_date": "25272.00",
+      "source_amount_expended_for_fiscal_year": "25272.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "4000194108",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-6d087ec20f89976ff369",
+      "vendor_raw": "ARUP LABORATORIES",
+      "source_amount_expended_to_date": "294018.37",
+      "source_amount_expended_for_fiscal_year": "294018.37",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "WMC05746",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-de32af938d7a81fe8fa5",
+      "vendor_raw": "ARUP LABORATORIES",
+      "source_amount_expended_to_date": "1262825.45",
+      "source_amount_expended_for_fiscal_year": "968807.08",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "WMC05746",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-3e5670fb021eae3b859f",
+      "vendor_raw": "Eckert Mechanical LLC",
+      "source_amount_expended_to_date": "173954.48",
+      "source_amount_expended_for_fiscal_year": "140852.40",
+      "source_current_or_outstanding_balance": "506365.52",
+      "source_transaction_number": "T23054",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-d953626f6df961f1fd03",
+      "vendor_raw": "Eckert Mechanical LLC",
+      "source_amount_expended_to_date": "33102.08",
+      "source_amount_expended_for_fiscal_year": "33102.08",
+      "source_current_or_outstanding_balance": "647217.92",
+      "source_transaction_number": "T23054",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-8f42a046e41e631c9402",
+      "vendor_raw": "VEOLIA WTS USA INC",
+      "source_amount_expended_to_date": "10605.00",
+      "source_amount_expended_for_fiscal_year": "10605.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "4500356841",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-09df46bec0c0ccc05673",
+      "vendor_raw": "GOTHAM REFINING CHEMICAL CORP",
+      "source_amount_expended_to_date": "196026.00",
+      "source_amount_expended_for_fiscal_year": "196026.00",
+      "source_current_or_outstanding_balance": "374249.00",
+      "source_transaction_number": "4600004445",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-5bcef0db4cf5821597af",
+      "vendor_raw": "GOTHAM REFINING CHEMICAL CORP",
+      "source_amount_expended_to_date": "568560.00",
+      "source_amount_expended_for_fiscal_year": "372534.00",
+      "source_current_or_outstanding_balance": "478650.00",
+      "source_transaction_number": "4600004445",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-3eead5feabcd92cf400f",
+      "vendor_raw": "ECO-CARE CORPORATION",
+      "source_amount_expended_to_date": "32750.00",
+      "source_amount_expended_for_fiscal_year": "32750.00",
+      "source_current_or_outstanding_balance": "317250.00",
+      "source_transaction_number": "4500353916",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-9cb103c55816e0997e8e",
+      "vendor_raw": "ECO-CARE CORPORATION",
+      "source_amount_expended_to_date": "66810.00",
+      "source_amount_expended_for_fiscal_year": "34060.00",
+      "source_current_or_outstanding_balance": "283190.00",
+      "source_transaction_number": "4500353916",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-3a26a72f1b6902072a62",
+      "vendor_raw": "M I S OF AMERICA INC",
+      "source_amount_expended_to_date": "0.01",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "9699.00",
+      "source_transaction_number": "A63511",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-14aaadb1a543bef9b401",
+      "vendor_raw": "Hyde-Stone Mechanical Contractor, Inc.",
+      "source_amount_expended_to_date": "39322.98",
+      "source_amount_expended_for_fiscal_year": "33748.98",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "Various",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-171f9415342cd4b58970",
+      "vendor_raw": "JOHN W DANFORTH SERVICE CO",
+      "source_amount_expended_to_date": "1346689.80",
+      "source_amount_expended_for_fiscal_year": "1346689.80",
+      "source_current_or_outstanding_balance": "137310.20",
+      "source_transaction_number": "A63318",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-f7cb6bd6ced10d5f5aea",
+      "vendor_raw": "JOHN W DANFORTH SERVICE CO",
+      "source_amount_expended_to_date": "0.01",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "1484000.00",
+      "source_transaction_number": "A63318",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-5102c88170ef59680c8a",
+      "vendor_raw": "Eurofins Viracor LLC",
+      "source_amount_expended_to_date": "563236.06",
+      "source_amount_expended_for_fiscal_year": "563236.06",
+      "source_current_or_outstanding_balance": "936763.94",
+      "source_transaction_number": "CON221801",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-ceb48e5162b2537cafd4",
+      "vendor_raw": "TRANE US INC",
+      "source_amount_expended_to_date": "654981.36",
+      "source_amount_expended_for_fiscal_year": "331308.05",
+      "source_current_or_outstanding_balance": "433193.64",
+      "source_transaction_number": "100000000081281",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-085ffd352b1918e0bddd",
+      "vendor_raw": "TRANE US INC",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "961471.00",
+      "source_transaction_number": "100000000081281",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-0a40e5bde6d8ee30f61c",
+      "vendor_raw": "TRANE US INC",
+      "source_amount_expended_to_date": "323673.31",
+      "source_amount_expended_for_fiscal_year": "323673.31",
+      "source_current_or_outstanding_balance": "637797.69",
+      "source_transaction_number": "1.00E+14",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-4c17827737ca1999b534",
+      "vendor_raw": "AFGO MECHANICAL SERVICES, INC.",
+      "source_amount_expended_to_date": "39650.00",
+      "source_amount_expended_for_fiscal_year": "39650.00",
+      "source_current_or_outstanding_balance": "140357.00",
+      "source_transaction_number": "7.00E+14",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-78675d66567c02737597",
+      "vendor_raw": "AFGO MECHANICAL SERVICES, INC.",
+      "source_amount_expended_to_date": "117100.00",
+      "source_amount_expended_for_fiscal_year": "77450.00",
+      "source_current_or_outstanding_balance": "62907.00",
+      "source_transaction_number": "700000000000220",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-9fbf15061958d4eced98",
+      "vendor_raw": "WENDEL WD ARCHITECTURE",
+      "source_amount_expended_to_date": "71695.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "A60548",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-0403a73b373b04610c89",
+      "vendor_raw": "DAIKIN APPLIED AMERICAS INC DBA DAIKIN APPLIED",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "16000.00",
+      "source_transaction_number": "4500344439",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-f6239c51230929da6ef0",
+      "vendor_raw": "DAIKIN APPLIED AMERICAS",
+      "source_amount_expended_to_date": "85800.00",
+      "source_amount_expended_for_fiscal_year": "85800.00",
+      "source_current_or_outstanding_balance": "195000.00",
+      "source_transaction_number": "26026",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-9be22e5447f2ce80ed8a",
+      "vendor_raw": "DAIKIN APPLIED AMERICAS",
+      "source_amount_expended_to_date": "179400.00",
+      "source_amount_expended_for_fiscal_year": "93600.00",
+      "source_current_or_outstanding_balance": "105008.00",
+      "source_transaction_number": "26026",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-74b585c2b3ca26e978f0",
+      "vendor_raw": "Converse Laboratories, Inc",
+      "source_amount_expended_to_date": "15790.93",
+      "source_amount_expended_for_fiscal_year": "8897.93",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "Various",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-c1a93fb8a29cacbc0ac4",
+      "vendor_raw": "M I S OF AMERICA INC",
+      "source_amount_expended_to_date": "13640.04",
+      "source_amount_expended_for_fiscal_year": "1104.17",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "A61813",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-29694c8c959cafc07527",
+      "vendor_raw": "M I S OF AMERICA INC",
+      "source_amount_expended_to_date": "12249.96",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "A60011",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-ca1c58b5b03e9cdd6e0f",
+      "vendor_raw": "GARRATT-CALLAHAN COMPANY CORP.",
+      "source_amount_expended_to_date": "23940.00",
+      "source_amount_expended_for_fiscal_year": "19950.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "25896",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-0c610cb94a9bfa83329f",
+      "vendor_raw": "GARRATT-CALLAHAN COMPANY CORP.",
+      "source_amount_expended_to_date": "3990.00",
+      "source_amount_expended_for_fiscal_year": "3990.00",
+      "source_current_or_outstanding_balance": "19950.00",
+      "source_transaction_number": "25896",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-e5e14212fc5a623a1ac9",
+      "vendor_raw": "HUNTS POINT MOTOR SERVICES, INC.",
+      "source_amount_expended_to_date": "26728.00",
+      "source_amount_expended_for_fiscal_year": "26728.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "WMC-03093-CMC-15421 - CAP",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-0d077d11d9b596145f9a",
+      "vendor_raw": "M I S OF AMERICA INC",
+      "source_amount_expended_to_date": "13640.04",
+      "source_amount_expended_for_fiscal_year": "11229.13",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "A61813",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-034003fc4dd79da8a22a",
+      "vendor_raw": "GUARDIAN SERVICE INDUSTRIES, INC.",
+      "source_amount_expended_to_date": "65876.00",
+      "source_amount_expended_for_fiscal_year": "65876.00",
+      "source_current_or_outstanding_balance": "764124.00",
+      "source_transaction_number": "600000000029414",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-34f74b0ba8d4b1d4157e",
+      "vendor_raw": "MIH SYSTEMS GROUP LLC",
+      "source_amount_expended_to_date": "27490.00",
+      "source_amount_expended_for_fiscal_year": "27490.00",
+      "source_current_or_outstanding_balance": "137450.00",
+      "source_transaction_number": "25680",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-c1b12fd9300106e5eedb",
+      "vendor_raw": "MIH SYSTEMS GROUP LLC",
+      "source_amount_expended_to_date": "165970.00",
+      "source_amount_expended_for_fiscal_year": "13745.00",
+      "source_current_or_outstanding_balance": "-1030.00",
+      "source_transaction_number": "25680",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-ace5895ce5758ccd0509",
+      "vendor_raw": "MIH SYSTEMS GROUP LLC",
+      "source_amount_expended_to_date": "152225.00",
+      "source_amount_expended_for_fiscal_year": "124735.00",
+      "source_current_or_outstanding_balance": "12715.00",
+      "source_transaction_number": "25680",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-4ff3782861e6c31a0100",
+      "vendor_raw": "GREENMAIDS SERVICE LLC",
+      "source_amount_expended_to_date": "835120.60",
+      "source_amount_expended_for_fiscal_year": "835120.60",
+      "source_current_or_outstanding_balance": "239879.40",
+      "source_transaction_number": "600000000029095",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-8c105f8688f9e1d90c2d",
+      "vendor_raw": "GREENMAIDS SERVICE LLC",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "372000.00",
+      "source_transaction_number": "600000000029095",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-b83cfc0ece684fa81b1b",
+      "vendor_raw": "Computer Cool Iceage Mechanical Corp.",
+      "source_amount_expended_to_date": "5974.00",
+      "source_amount_expended_for_fiscal_year": "3062.00",
+      "source_current_or_outstanding_balance": "938.00",
+      "source_transaction_number": "177158",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-d03d38bf95dc30872b95",
+      "vendor_raw": "CHEM TREAT, INC.",
+      "source_amount_expended_to_date": "12978.50",
+      "source_amount_expended_for_fiscal_year": "6413.50",
+      "source_current_or_outstanding_balance": "8535.50",
+      "source_transaction_number": "1.00E+14",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-5a49a79002041376e7e5",
+      "vendor_raw": "CHEM TREAT, INC.",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "42500.00",
+      "source_transaction_number": "MN208335",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-f63b04ca368892c35db0",
+      "vendor_raw": "CHEM TREAT, INC.",
+      "source_amount_expended_to_date": "20855.00",
+      "source_amount_expended_for_fiscal_year": "7876.50",
+      "source_current_or_outstanding_balance": "659.00",
+      "source_transaction_number": "100000000081089",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-3d4d24aaa121d20fd24b",
+      "vendor_raw": "CHEM TREAT, INC.",
+      "source_amount_expended_to_date": "1010.00",
+      "source_amount_expended_for_fiscal_year": "1010.00",
+      "source_current_or_outstanding_balance": "20504.00",
+      "source_transaction_number": "100000000081089",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-38a7654f48bec58557be",
+      "vendor_raw": "CHEM TREAT, INC.",
+      "source_amount_expended_to_date": "6565.00",
+      "source_amount_expended_for_fiscal_year": "5555.00",
+      "source_current_or_outstanding_balance": "14949.00",
+      "source_transaction_number": "100000000081089",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-ca79854b564a504431f1",
+      "vendor_raw": "R.A.M.S. MECHANICAL INC",
+      "source_amount_expended_to_date": "10037.94",
+      "source_amount_expended_for_fiscal_year": "10037.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "25336",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-69f2754c932662182a7c",
+      "vendor_raw": "Rochester Midland Corp.",
+      "source_amount_expended_to_date": "30549.00",
+      "source_amount_expended_for_fiscal_year": "30549.00",
+      "source_current_or_outstanding_balance": "4090.00",
+      "source_transaction_number": null,
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-e31bcafc3ba1b0fae098",
+      "vendor_raw": "Rochester Midland Corp.",
+      "source_amount_expended_to_date": "62532.00",
+      "source_amount_expended_for_fiscal_year": "31983.00",
+      "source_current_or_outstanding_balance": "85297.00",
+      "source_transaction_number": null,
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-6a12d9c382e8d75389e1",
+      "vendor_raw": "Rochester Midland Corp.",
+      "source_amount_expended_to_date": "62532.00",
+      "source_amount_expended_for_fiscal_year": "47123.00",
+      "source_current_or_outstanding_balance": "7625.00",
+      "source_transaction_number": null,
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-0c8b3f3fae7e3bec1534",
+      "vendor_raw": "Rochester Midland Corp.",
+      "source_amount_expended_to_date": "92264.00",
+      "source_amount_expended_for_fiscal_year": "29732.00",
+      "source_current_or_outstanding_balance": "49329.00",
+      "source_transaction_number": "CW051421",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-790412354d23a31e4b8d",
+      "vendor_raw": "BPI MECHANICAL SERVICE",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "90000.00",
+      "source_transaction_number": "4600004151",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-865da286c4133f639f3e",
+      "vendor_raw": "BMS CAT, INC.",
+      "source_amount_expended_to_date": "24738.60",
+      "source_amount_expended_for_fiscal_year": "24738.60",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "217644",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-0e647c0ff7deeb5365b8",
+      "vendor_raw": "Maxons Restorations, Inc.",
+      "source_amount_expended_to_date": "16386.93",
+      "source_amount_expended_for_fiscal_year": "16386.93",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "217635",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-e00753af09efb6597d83",
+      "vendor_raw": "EMCOR SERVICES BETLEM",
+      "source_amount_expended_to_date": "1113028.74",
+      "source_amount_expended_for_fiscal_year": "191111.73",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": null,
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-e4a2a8b785757b75b881",
+      "vendor_raw": "EMCOR SERVICES BETLEM",
+      "source_amount_expended_to_date": "454442.87",
+      "source_amount_expended_for_fiscal_year": "320047.28",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": null,
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-44ab8323fbbd7dd54380",
+      "vendor_raw": "EMCOR SERVICES BETLEM",
+      "source_amount_expended_to_date": "669928.03",
+      "source_amount_expended_for_fiscal_year": "215485.16",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": null,
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-0ed156c9d8c3763a5f1e",
+      "vendor_raw": "WENDEL WD ARCHITECTURE",
+      "source_amount_expended_to_date": "71695.00",
+      "source_amount_expended_for_fiscal_year": "1085.69",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "A60548",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-f35982a14ab1fe96460d",
+      "vendor_raw": "WENDEL WD ARCHITECTURE",
+      "source_amount_expended_to_date": "15652.05",
+      "source_amount_expended_for_fiscal_year": "15652.05",
+      "source_current_or_outstanding_balance": "56042.95",
+      "source_transaction_number": null,
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-29f60c0a48d17a1670cc",
+      "vendor_raw": "LiRo Engineers, Inc.",
+      "source_amount_expended_to_date": "4857141.19",
+      "source_amount_expended_for_fiscal_year": "3060396.93",
+      "source_current_or_outstanding_balance": "1809482.59",
+      "source_transaction_number": "217392",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-3e90b7a57425d63b7a1c",
+      "vendor_raw": "LiRo Engineers, Inc.",
+      "source_amount_expended_to_date": "7306307.13",
+      "source_amount_expended_for_fiscal_year": "685668.66",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "217392",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-8a7f0dd8313b68b4245a",
+      "vendor_raw": "LiRo Engineers, Inc.",
+      "source_amount_expended_to_date": "7210627.21",
+      "source_amount_expended_for_fiscal_year": "3560241.54",
+      "source_current_or_outstanding_balance": "95679.92",
+      "source_transaction_number": "217392",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-2a8de9659d321e555b35",
+      "vendor_raw": "DV BROWN & ASSOCIATES INC",
+      "source_amount_expended_to_date": "14900.00",
+      "source_amount_expended_for_fiscal_year": "14900.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": null,
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-e25ff9f653bda5cb1841",
+      "vendor_raw": "R.A.M.S. MECHANICAL INC",
+      "source_amount_expended_to_date": "12500.77",
+      "source_amount_expended_for_fiscal_year": "12500.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "25040",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-ab9b113d4e3ba87302a5",
+      "vendor_raw": "CHEM AQUA, INC.",
+      "source_amount_expended_to_date": "212397.06",
+      "source_amount_expended_for_fiscal_year": "103339.98",
+      "source_current_or_outstanding_balance": "395606.94",
+      "source_transaction_number": "6.00E+14",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-4f88321ef76e04a3766b",
+      "vendor_raw": "CHEM AQUA, INC.",
+      "source_amount_expended_to_date": "374132.82",
+      "source_amount_expended_for_fiscal_year": "161735.76",
+      "source_current_or_outstanding_balance": "553700.68",
+      "source_transaction_number": "600000000028389",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-4f60d51089680ddd6b95",
+      "vendor_raw": "CHEM AQUA, INC.",
+      "source_amount_expended_to_date": "109057.08",
+      "source_amount_expended_for_fiscal_year": "109057.08",
+      "source_current_or_outstanding_balance": "498946.92",
+      "source_transaction_number": "600000000028389",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-a31ddc977e0743eac030",
+      "vendor_raw": "CHEM AQUA, INC.",
+      "source_amount_expended_to_date": "0.00",
+      "source_amount_expended_for_fiscal_year": "0.00",
+      "source_current_or_outstanding_balance": "608004.00",
+      "source_transaction_number": "600000000028389",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-a6cc5d3d5268d540f1c0",
+      "vendor_raw": "DV BROWN & ASSOCIATES",
+      "source_amount_expended_to_date": "484825.00",
+      "source_amount_expended_for_fiscal_year": "484825.00",
+      "source_current_or_outstanding_balance": "4664210.00",
+      "source_transaction_number": "4500332650",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-d3cf0207ac67f0693fd6",
+      "vendor_raw": "DV BROWN & ASSOCIATES",
+      "source_amount_expended_to_date": "3424445.00",
+      "source_amount_expended_for_fiscal_year": "2939620.00",
+      "source_current_or_outstanding_balance": "2121926.00",
+      "source_transaction_number": "4500332650",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-943f9fe4fc155fe46837",
+      "vendor_raw": "DV BROWN & ASSOCIATES",
+      "source_amount_expended_to_date": "5672916.00",
+      "source_amount_expended_for_fiscal_year": "2248471.00",
+      "source_current_or_outstanding_balance": "75750.00",
+      "source_transaction_number": "4500332650",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-44c53aa3a3548f96e63a",
+      "vendor_raw": "CIRCLE JANITORIAL SUPPLIES INC",
+      "source_amount_expended_to_date": "27667.20",
+      "source_amount_expended_for_fiscal_year": "27667.20",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "4000160333",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-d6f959af25446074ebf5",
+      "vendor_raw": "CLEAR WATER INDUSTRIES",
+      "source_amount_expended_to_date": "109665.00",
+      "source_amount_expended_for_fiscal_year": "41505.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "WMC01709",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-40ecd45f26b0f47408ef",
+      "vendor_raw": "CLEAR WATER INDUSTRIES",
+      "source_amount_expended_to_date": "9240.00",
+      "source_amount_expended_for_fiscal_year": "9240.00",
+      "source_current_or_outstanding_balance": "18480.00",
+      "source_transaction_number": "WMC01709",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-4eb1a5c7cab5df43e2f0",
+      "vendor_raw": "CLEAR WATER INDUSTRIES",
+      "source_amount_expended_to_date": "68160.00",
+      "source_amount_expended_for_fiscal_year": "33060.00",
+      "source_current_or_outstanding_balance": "5775.00",
+      "source_transaction_number": "WMC01709",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-a41686f94a0289443e52",
+      "vendor_raw": "CLEAR WATER INDUSTRIES",
+      "source_amount_expended_to_date": "35100.00",
+      "source_amount_expended_for_fiscal_year": "25860.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "WMC01709",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-6c72ee893f1b30ccfa6c",
+      "vendor_raw": "Ayer Sales Inc",
+      "source_amount_expended_to_date": "24745.00",
+      "source_amount_expended_for_fiscal_year": "24745.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "Q21040",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-d36a9ab59382fa555edb",
+      "vendor_raw": "Converse Laboratories, Inc",
+      "source_amount_expended_to_date": "2085.00",
+      "source_amount_expended_for_fiscal_year": "2085.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "24635",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-5e3b7832fe28af589aba",
+      "vendor_raw": "Hyde-Stone Mechanical Contractor, Inc.",
+      "source_amount_expended_to_date": "25446.64",
+      "source_amount_expended_for_fiscal_year": "23809.30",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "Various",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-bc3b1849b6bea65006d7",
+      "vendor_raw": "CLEAN AIR QUALITY SERVICE INC",
+      "source_amount_expended_to_date": "32760.44",
+      "source_amount_expended_for_fiscal_year": "32484.44",
+      "source_current_or_outstanding_balance": "2139.56",
+      "source_transaction_number": "WMC-00193 - CAP",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-49a7b90fbbce83e9afb3",
+      "vendor_raw": "Hyde-Stone Mechanical Contractor, Inc.",
+      "source_amount_expended_to_date": "18820.06",
+      "source_amount_expended_for_fiscal_year": "18820.06",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "Various",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-9772b35f580ed9d9bc14",
+      "vendor_raw": "BLEJWAS ASSOCIATES",
+      "source_amount_expended_to_date": "15147.00",
+      "source_amount_expended_for_fiscal_year": "15147.00",
+      "source_current_or_outstanding_balance": "19852.00",
+      "source_transaction_number": "WMC00109",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-8a5d905bf7aa2b54a3c6",
+      "vendor_raw": "BLEJWAS ASSOCIATES",
+      "source_amount_expended_to_date": "29998.00",
+      "source_amount_expended_for_fiscal_year": "14851.00",
+      "source_current_or_outstanding_balance": "5001.00",
+      "source_transaction_number": "WMC00109",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-06e80cae3008db3d8d00",
+      "vendor_raw": "KNIGHT MARKETING CORPORATION OF NY",
+      "source_amount_expended_to_date": "6440.00",
+      "source_amount_expended_for_fiscal_year": "6440.00",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "24615",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-e59260dbfc74bf1c038b",
+      "vendor_raw": "Eckert Mechanical LLC",
+      "source_amount_expended_to_date": "25754.31",
+      "source_amount_expended_for_fiscal_year": "25754.31",
+      "source_current_or_outstanding_balance": "29145.66",
+      "source_transaction_number": "T20102",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-8a8d1ca966432d125f88",
+      "vendor_raw": "Eckert Mechanical LLC",
+      "source_amount_expended_to_date": "65451.20",
+      "source_amount_expended_for_fiscal_year": "39696.89",
+      "source_current_or_outstanding_balance": "437.01",
+      "source_transaction_number": "T20102",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-a428e4a408636ae056c6",
+      "vendor_raw": "DAIKIN APPLIED AMERICAS INC",
+      "source_amount_expended_to_date": "736452.00",
+      "source_amount_expended_for_fiscal_year": "736452.00",
+      "source_current_or_outstanding_balance": "4263548.00",
+      "source_transaction_number": "4600004021",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-c676b991cc289a990259",
+      "vendor_raw": "Eckert Mechanical LLC",
+      "source_amount_expended_to_date": "65888.21",
+      "source_amount_expended_for_fiscal_year": "437.01",
+      "source_current_or_outstanding_balance": "0.00",
+      "source_transaction_number": "T20102",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-b460d56b9243f71a0033",
+      "vendor_raw": "DAIKIN APPLIED AMERICAS INC DBA DAIKIN APPLIED",
+      "source_amount_expended_to_date": "1593226.00",
+      "source_amount_expended_for_fiscal_year": "311206.00",
+      "source_current_or_outstanding_balance": "307672.00",
+      "source_transaction_number": "4600004021",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-3ec06ec6aca1a0b336a4",
+      "vendor_raw": "DAIKIN APPLIED AMERICAS INC DBA DAIKIN APPLIED",
+      "source_amount_expended_to_date": "1282021.00",
+      "source_amount_expended_for_fiscal_year": "193473.00",
+      "source_current_or_outstanding_balance": "370661.00",
+      "source_transaction_number": "4600004021",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-833c6e485c7f9772e4d7",
+      "vendor_raw": "DAIKIN APPLIED AMERICAS INC DBA DAIKIN APPLIED",
+      "source_amount_expended_to_date": "1088548.00",
+      "source_amount_expended_for_fiscal_year": "352096.00",
+      "source_current_or_outstanding_balance": "212536.00",
+      "source_transaction_number": "4600004021",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-fd91e886774dd54b8fd1",
+      "vendor_raw": "Arctic Air Mechanical Corp",
+      "source_amount_expended_to_date": "12600.00",
+      "source_amount_expended_for_fiscal_year": "5600.00",
+      "source_current_or_outstanding_balance": "4200.00",
+      "source_transaction_number": "162337",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-89ddd4203a8e4ec40e66",
+      "vendor_raw": "Arctic Air Mechanical Corp",
+      "source_amount_expended_to_date": "1400.00",
+      "source_amount_expended_for_fiscal_year": "1400.00",
+      "source_current_or_outstanding_balance": "15400.00",
+      "source_transaction_number": "162337",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    },
+    {
+      "source_record_id": "nys-abo-row-37d1e9ab9d38e663d467",
+      "vendor_raw": "Arctic Air Mechanical Corp",
+      "source_amount_expended_to_date": "7000.00",
+      "source_amount_expended_for_fiscal_year": "5600.00",
+      "source_current_or_outstanding_balance": "9800.00",
+      "source_transaction_number": "162337",
+      "served_spend_to_date": null,
+      "served_source_contract_id": null
+    }
+  ],
+  "diagnosis": "CONFIRMED_NORMALIZATION_GAP",
+  "first_failing_stage": "scripts/towersignal/nys_authority_procurement.py normalize_row",
+  "boundary": "Exact source_record_id fingerprint joins only. Source values are procurement report values, never company revenue."
+}

@@ -1,0 +1,714 @@
+{
+  "source_rows": 1681,
+  "served_applicators": 1681,
+  "exact_key_matches": 1681,
+  "source_nonblank_region": 1681,
+  "served_nonblank_dec_region": 0,
+  "mismatch_count": 1681,
+  "mismatches": [
+    {
+      "cert_number": "C0621868",
+      "name": "MARK J BANDINI",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0630432",
+      "name": "MICHAEL GONYON",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0630846",
+      "name": "ANTHONY CERRANO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0673825",
+      "name": "JOSEPH TANTI",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0680618",
+      "name": "ERIC J DLUGOSZ",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0680707",
+      "name": "RUSSELL M BASKIN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0682457",
+      "name": "JEFFREY B KLEIN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0802062",
+      "name": "ALFONSO BARBA III",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0802160",
+      "name": "FABRIZIO FICILI",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0805876",
+      "name": "PAUL S SHANSKY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0810041",
+      "name": "DOMINICK TUZZO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0812766",
+      "name": "JOHN TRUGLIO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0814759",
+      "name": "ALFRED MAXWELL",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0816394",
+      "name": "AARON B ABERCROMBIE",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0820541",
+      "name": "RICHARD ELKIN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0820830",
+      "name": "JOHN HALL III",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0822822",
+      "name": "MARKVITO DISPIGNA",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0825110",
+      "name": "BRIAN A WARD",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0827518",
+      "name": "GUSTAV RIPP IV",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0830648",
+      "name": "THOMAS G LAYDEN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0831604",
+      "name": "HARRY W MAGOVENY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0835584",
+      "name": "OSCAR AMES",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0835684",
+      "name": "ROBERT GUTE",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0836280",
+      "name": "MATTHEW H SONAK",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0836943",
+      "name": "TODD A BROSAN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0837363",
+      "name": "GERARD FUSCHETTO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0837366",
+      "name": "HARIS KOJIC",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0837709",
+      "name": "MARK COLEMAN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0837714",
+      "name": "STEVEN J REILLY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0837738",
+      "name": "JAMES E MEISTER",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0838412",
+      "name": "THOMAS C MEGNA",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0838434",
+      "name": "MATTHEW S LOUGHMAN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0838467",
+      "name": "LARRY A POND",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0838482",
+      "name": "JOHNATHAN A RYDER",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0838488",
+      "name": "STEPHEN J BELLERO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0838831",
+      "name": "RONALD A LORIA",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0838866",
+      "name": "THOMAS A HARDY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0839196",
+      "name": "BRIAN E WAYMIRE",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0840506",
+      "name": "PETER A STEMPKOWSKI",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0840950",
+      "name": "KEITH ODONNELL",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0840954",
+      "name": "THOMAS J BURKE",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0840961",
+      "name": "IAN GAFFNEY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0849393",
+      "name": "JAMES BANHAM",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0851909",
+      "name": "MICHAEL P LOUGHMAN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0851912",
+      "name": "DAVID BERRIDGE",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0851932",
+      "name": "JOHN J LAFOUNTAIN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0851941",
+      "name": "GARRETT R HITCHCOCK",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0851942",
+      "name": "STEPHEN SIKKEMA",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0861171",
+      "name": "PAUL M ZIENKIEWICZ",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0861583",
+      "name": "ARTHUR W DUGAS III",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0862822",
+      "name": "RICHARD A DEMARTINO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0862944",
+      "name": "ALAIN LEBEAU",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0865412",
+      "name": "JOHN A NAGY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0867212",
+      "name": "STEVEN O SERRANO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0867481",
+      "name": "GRANT M HOPIAVUORI",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0867524",
+      "name": "PAUL HENLINE",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0867529",
+      "name": "TIMOTHY D HOLTZ",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0867773",
+      "name": "ALBERTO FLORES",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0871986",
+      "name": "RICHARD J GOETZ",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0872678",
+      "name": "STEPHEN L NOVOSAD",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0876790",
+      "name": "DAVID S LAMPART",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0876976",
+      "name": "JOHN S CAVANAUGH",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0879044",
+      "name": "AARON A VANDERBERG",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0881449",
+      "name": "JONATHAN D BERENSON",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0882776",
+      "name": "CHARLES BRYAN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0886249",
+      "name": "LAWRENCE R ABBOTT",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0887112",
+      "name": "ANDREW J RICKS",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0887514",
+      "name": "MARK J GALLO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0887547",
+      "name": "JOSEPH J BROWN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0887782",
+      "name": "PETER H TOMSHECK",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0888428",
+      "name": "ERIC L SHANER",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0888913",
+      "name": "JAMES G BREEDLOVE",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0888929",
+      "name": "NICHOLAS M HLIVAK",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0889336",
+      "name": "GREGORY S CIRALDO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0889339",
+      "name": "THOMAS A LIQUORI",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0891776",
+      "name": "JOSEPH A SANCHEZ",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0893330",
+      "name": "LEROI R YAFFEY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0893912",
+      "name": "PAUL HOLLIDAY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0894404",
+      "name": "MICHAEL IGUARAN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0894441",
+      "name": "RONALD L RAYNOR",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0895081",
+      "name": "MARTIN J JAKUBCZAK",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0895121",
+      "name": "TIMOTHY R CELLA",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0895309",
+      "name": "BRYAN ECCLESTON",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0895396",
+      "name": "ERIC P SWIST",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0896509",
+      "name": "EDUARDO J GARCIA",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0896596",
+      "name": "DAINIUS A VOLERTAS",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0898266",
+      "name": "GREGORY J DWYER",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0898284",
+      "name": "ROGER H LANDIS JR",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0898442",
+      "name": "STEPHEN C DUMONT",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0899538",
+      "name": "CHRISTOPHER J GUZMAN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0899960",
+      "name": "FRANCISCO A SOSA",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0900180",
+      "name": "ROBERT J REYNOLDS",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0900321",
+      "name": "CHRISTOPHER A EISENBARDT",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0900439",
+      "name": "DANNY GARCIA",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0901783",
+      "name": "JOSEPH A VARGOVIC",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0902741",
+      "name": "RONALD E JACOBY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0904001",
+      "name": "ANDREW NEUMANN",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0905127",
+      "name": "ALESSANDRO J SPADOTTO",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0905224",
+      "name": "SEAN R KENNEDY",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    },
+    {
+      "cert_number": "C0905830",
+      "name": "THOMAS VANDELINDER",
+      "source_region": "0",
+      "served_found": true,
+      "served_dec_region": null
+    }
+  ],
+  "diagnosis": "CONFIRMED_NORMALIZATION_DEFECT",
+  "first_failing_stage": "scripts/towersignal/domestic_water_market.py normalize_dec_applicator",
+  "source_field": "region",
+  "normalized_field": "dec_region"
+}
