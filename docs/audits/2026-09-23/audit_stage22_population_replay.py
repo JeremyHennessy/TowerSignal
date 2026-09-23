@@ -70,11 +70,13 @@ served_ids=Counter(str(r.get('source_record_id') or '') for r in served_permits 
 results['rbx6-tga4']={'retrieval':permit_meta,'source_rows':len(permit_rows),'served_rows':len(served_permits),'source_rows_with_work_permit':sum(src_ids.values()),'source_unique_work_permits':len(src_ids),'served_unique_source_record_ids':len(served_ids),'work_permit_multiset_equal':src_ids==served_ids,'source_only_ids':list((src_ids-served_ids).elements())[:50],'served_only_ids':list((served_ids-src_ids).elements())[:50]}
 
 # exact-bin DWT self reports and compliance; compare counts by valid BIN
+dwt_source_counts={}
 for id,key in [('gjm4-k24g','tank_inspections'),('rytv-g5ui','compliance_activity')]:
     rows,meta=scoped_union('data.cityofnewyork.us',id,in_clauses('bin',bins), '*', 'bin')
     source_counts=Counter(str(r.get('bin')) for r in rows if r.get('bin'))
+    dwt_source_counts[id]=source_counts
     served=water.get(key) or []
-    served_counts=Counter(str(r.get('bin')) for r in served if r.get('bin'))
+    served_counts=Counter(str(r.get('bin')) for r in served if r.get('bin') and str(r.get('bin')) in set(bins))
     results[id]={'retrieval':meta,'source_rows':len(rows),'served_rows':len(served),'source_bin_count':len(source_counts),'served_bin_count':len(served_counts),'bin_count_maps_equal':source_counts==served_counts,'source_only_count_delta':sum((source_counts-served_counts).values()),'served_only_count_delta':sum((served_counts-source_counts).values()),'delta_bins':sorted(set((source_counts-served_counts)|(served_counts-source_counts)))[:100]}
 
 # façade exact-bin source. Hosted detail comparison is expensive but bounded/current.
@@ -89,18 +91,40 @@ def detail(s):
     sid=str(s['system_id']);return get(LIVE+f"data/details/{sid[:2].lower()}/{sid}.json",60)
 with cf.ThreadPoolExecutor(max_workers=10) as pool:
     details=list(pool.map(detail,systems))
+# Compare one detail payload per assigned BIN so multiple cooling-tower systems in one building
+# do not multiply a single building-level source record.
+detail_by_bin={}
+for d in details:
+    b=str((d.get('identity') or {}).get('bin') or '')
+    if b and b not in detail_by_bin:
+        detail_by_bin[b]=d
+
 served_facade=Counter()
 served_plan=Counter()
-for d in details:
-    pe=d.get('property_enforcement') or {}
-    for r in pe.get('facade_filings') or []:
-        b=str(r.get('bin') or '')
-        if b:served_facade[b]+=1
-    for r in d.get('planimetric_cooling_towers') or []:
+served_compliance=Counter()
+for b,d in detail_by_bin.items():
+    pe=d.get('property_enforcement_context') or {}
+    facade=((pe.get('facade_compliance') or {}).get('records') or [])
+    served_facade[b]=len(facade)
+    for r in d.get('planimetric_building_tower_features') or []:
         gid=str(r.get('global_id') or '')
         if gid:served_plan[gid]+=1
-results['xubg-57si']={'retrieval':facade_meta,'source_rows':len(facade_rows),'served_attachment_rows':sum(served_facade.values()),'bin_count_maps_equal':source_facade==served_facade,'delta_source':sum((source_facade-served_facade).values()),'delta_served':sum((served_facade-source_facade).values())}
-results['x748-37q7']={'retrieval':plan_meta,'source_rows':len(plan_rows),'served_features':sum(served_plan.values()),'globalid_multiset_equal':source_plan==served_plan,'source_only':list((source_plan-served_plan).elements())[:50],'served_only':list((served_plan-source_plan).elements())[:50]}
+    domestic=d.get('domestic_water') or {}
+    served_compliance[b]=len(domestic.get('compliance_history') or [])
+
+results['xubg-57si']={'retrieval':facade_meta,'source_rows':len(facade_rows),'served_unique_bin_context_rows':sum(served_facade.values()),'bin_count_maps_equal':source_facade==served_facade,'delta_source':sum((source_facade-served_facade).values()),'delta_served':sum((served_facade-source_facade).values())}
+results['x748-37q7']={'retrieval':plan_meta,'source_rows':len(plan_rows),'served_unique_features':sum(served_plan.values()),'globalid_multiset_equal':source_plan==served_plan,'source_only':list((source_plan-served_plan).elements())[:50],'served_only':list((served_plan-source_plan).elements())[:50]}
+
+# Correct DWT compliance comparison: this source is attached directly to account details,
+# not published in the citywide provider/lab market cache.
+source_compliance_counts=dwt_source_counts['rytv-g5ui']
+results['rytv-g5ui'].update({
+  'served_detail_record_count':sum(served_compliance.values()),
+  'served_detail_bin_count':sum(1 for v in served_compliance.values() if v),
+  'detail_bin_count_maps_equal':source_compliance_counts==served_compliance,
+  'detail_source_only_count_delta':sum((source_compliance_counts-served_compliance).values()),
+  'detail_served_only_count_delta':sum((served_compliance-source_compliance_counts).values()),
+})
 
 # DEC 7G registered businesses
 dec_rows,dec_meta=socrata('data.ny.gov','h8u2-6ejg',"lower(pesticide_category_code)='7g'",'*','registration_number')
@@ -113,7 +137,7 @@ for id,key in [('k5us-nav4','free_lead_copper_samples'),('3wxk-qa8q','compliance
     rows,meta=socrata('data.cityofnewyork.us',id,None,'*',None)
     served=water.get(key) or []
     health=next((x for x in water.get('source_health') or [] if x.get('dataset_id')==id),{})
-    results[id]={'retrieval':meta,'source_rows':len(rows),'served_rows':len(served),'served_count_equal':len(rows)==len(served),'product_source_health_count':health.get('source_record_count'),'health_count_equal':health.get('source_record_count')==len(rows)}
+    results[id]={'retrieval':meta,'source_rows':len(rows),'published_raw_array_rows':len(served),'raw_array_published':bool(served),'product_source_health_count':health.get('source_record_count'),'health_count_equal':health.get('source_record_count')==len(rows),'population_acceptance_basis':'SOURCE_HEALTH_COUNT' if not served else 'RAW_ARRAY_AND_SOURCE_HEALTH'}
 
 # City Record declared scopes: reproduce IDs independent of production code.
 today=dt.date(2026,9,23)
