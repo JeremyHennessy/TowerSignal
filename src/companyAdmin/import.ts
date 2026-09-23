@@ -95,6 +95,115 @@ function checkAllowedKeys(value: Record<string, unknown>, allowed: Set<string>, 
   if (unknown.length) throw new Error(`${context} contains unsupported fields: ${unknown.join(', ')}`)
 }
 
+const revenueTypes = new Set(['reported', 'estimated', 'range', 'unknown'])
+const revenueConfidences = new Set(['confirmed', 'strong', 'verify', 'unknown'])
+const relationshipStatuses = new Set([
+  'uncontacted', 'researching', 'outreach-planned', 'contacted',
+  'engaged', 'opportunity', 'customer', 'not-pursuing',
+])
+
+function optionalText(value: unknown, context: string): string | null {
+  if (value == null || value === '') return null
+  if (typeof value !== 'string') throw new Error(`${context} must be text`)
+  const text = value.trim()
+  return text || null
+}
+
+function requireHttps(value: unknown, context: string): string {
+  const text = requiredText(value, context)
+  let url: URL
+  try {
+    url = new URL(text)
+  } catch {
+    throw new Error(`${context} must be a valid HTTPS URL`)
+  }
+  if (url.protocol !== 'https:') throw new Error(`${context} must use HTTPS`)
+  return text
+}
+
+function requireSource(profile: Record<string, unknown>, prefix: string, context: string) {
+  requiredText(profile[`${prefix}_source_name`], `${context}.${prefix}_source_name`)
+  requireHttps(profile[`${prefix}_source_url`], `${context}.${prefix}_source_url`)
+}
+
+function validateDate(value: unknown, context: string) {
+  const text = optionalText(value, context)
+  if (!text) return
+  if (Number.isNaN(Date.parse(text))) throw new Error(`${context} must be a valid date/time`)
+}
+
+function validateNumber(value: unknown, context: string): number | null {
+  if (value == null || value === '') return null
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+    throw new Error(`${context} must be a non-negative number`)
+  }
+  return value
+}
+
+function validateProfile(profile: Record<string, unknown>, known: Map<string, string>, context: string) {
+  const website = optionalText(profile.website, `${context}.website`)
+  if (website) {
+    requireHttps(website, `${context}.website`)
+    requireSource(profile, 'website', context)
+  }
+
+  const hasIdentity = ['legal_name', 'company_type'].some(key => optionalText(profile[key], `${context}.${key}`))
+  if (hasIdentity) requireSource(profile, 'identity', context)
+
+  const hasHeadquarters = [
+    'headquarters_address', 'headquarters_city', 'headquarters_region',
+    'headquarters_postal_code', 'headquarters_country',
+  ].some(key => optionalText(profile[key], `${context}.${key}`))
+  if (hasHeadquarters) requireSource(profile, 'headquarters', context)
+
+  const parentId = optionalText(profile.parent_company_id, `${context}.parent_company_id`)
+  const parentName = optionalText(profile.parent_company_name, `${context}.parent_company_name`)
+  if (parentId || parentName) {
+    if (parentId && !known.has(parentId)) throw new Error(`${context}.parent_company_id is not a known TowerSignal firm_id: ${parentId}`)
+    requireSource(profile, 'parent', context)
+  }
+
+  const rollupId = optionalText(profile.rollup_company_id, `${context}.rollup_company_id`)
+  const rollupName = optionalText(profile.rollup_name, `${context}.rollup_name`)
+  if (rollupId || rollupName) {
+    if (rollupId && !known.has(rollupId)) throw new Error(`${context}.rollup_company_id is not a known TowerSignal firm_id: ${rollupId}`)
+    requireSource(profile, 'rollup', context)
+  }
+
+  const amount = validateNumber(profile.revenue_amount, `${context}.revenue_amount`)
+  const low = validateNumber(profile.revenue_low, `${context}.revenue_low`)
+  const high = validateNumber(profile.revenue_high, `${context}.revenue_high`)
+  if (low != null && high != null && low > high) throw new Error(`${context} revenue range low cannot exceed high`)
+  const revenueType = profile.revenue_type == null ? 'unknown' : optionalText(profile.revenue_type, `${context}.revenue_type`) ?? 'unknown'
+  if (!revenueTypes.has(revenueType)) throw new Error(`${context}.revenue_type is invalid`)
+  const revenueConfidence = profile.revenue_confidence == null ? 'unknown' : optionalText(profile.revenue_confidence, `${context}.revenue_confidence`) ?? 'unknown'
+  if (!revenueConfidences.has(revenueConfidence)) throw new Error(`${context}.revenue_confidence is invalid`)
+  if (revenueType === 'range' && (low == null || high == null)) throw new Error(`${context} range revenue requires revenue_low and revenue_high`)
+  if (amount != null || low != null || high != null) {
+    const year = profile.revenue_year
+    if (typeof year !== 'number' || !Number.isInteger(year) || year < 1900 || year > 2100) {
+      throw new Error(`${context}.revenue_year is required for sourced revenue`)
+    }
+    requiredText(profile.revenue_source_name, `${context}.revenue_source_name`)
+    requireHttps(profile.revenue_source_url, `${context}.revenue_source_url`)
+    if (revenueType === 'unknown') throw new Error(`${context}.revenue_type cannot be unknown when a revenue value is present`)
+  }
+
+  const currency = optionalText(profile.revenue_currency, `${context}.revenue_currency`)
+  if (currency && !/^[A-Z]{3}$/.test(currency)) throw new Error(`${context}.revenue_currency must be a three-letter uppercase code`)
+
+  const relationship = profile.relationship_status == null
+    ? 'uncontacted'
+    : optionalText(profile.relationship_status, `${context}.relationship_status`) ?? 'uncontacted'
+  if (!relationshipStatuses.has(relationship)) throw new Error(`${context}.relationship_status is invalid`)
+
+  validateDate(profile.enrichment_checked_at, `${context}.enrichment_checked_at`)
+  validateDate(profile.last_contacted_at, `${context}.last_contacted_at`)
+  if (profile.next_action_date != null && !/^\d{4}-\d{2}-\d{2}$/.test(String(profile.next_action_date))) {
+    throw new Error(`${context}.next_action_date must be YYYY-MM-DD`)
+  }
+}
+
 export function parseCompanyAdminImport(text: string, knownFirms: KnownFirmSummaryRecord[]): CompanyAdminImportBundle {
   const root = record(JSON.parse(text), 'Import bundle')
   if (root.schema !== COMPANY_ADMIN_IMPORT_SCHEMA) {
@@ -116,8 +225,10 @@ export function parseCompanyAdminImport(text: string, knownFirms: KnownFirmSumma
     if (seen.has(companyId)) throw new Error(`Duplicate company_id in import: ${companyId}`)
     seen.add(companyId)
 
-    const profile = record(value.profile ?? {}, `companies[${index}].profile`)
-    checkAllowedKeys(profile, profileKeys as Set<string>, `companies[${index}].profile`)
+    const profileContext = `companies[${index}].profile`
+    const profile = record(value.profile ?? {}, profileContext)
+    checkAllowedKeys(profile, profileKeys as Set<string>, profileContext)
+    validateProfile(profile, known, profileContext)
 
     const contactsRaw = value.contacts ?? []
     if (!Array.isArray(contactsRaw)) throw new Error(`companies[${index}].contacts must be an array`)
@@ -125,8 +236,12 @@ export function parseCompanyAdminImport(text: string, knownFirms: KnownFirmSumma
     const contacts = contactsRaw.map((rawContact, contactIndex) => {
       const contact = record(rawContact, `companies[${index}].contacts[${contactIndex}]`)
       checkAllowedKeys(contact, contactKeys as Set<string>, `companies[${index}].contacts[${contactIndex}]`)
-      const contactId = requiredText(contact.contact_id, `companies[${index}].contacts[${contactIndex}].contact_id`)
-      const name = requiredText(contact.name, `companies[${index}].contacts[${contactIndex}].name`)
+      const contactContext = `companies[${index}].contacts[${contactIndex}]`
+      const contactId = requiredText(contact.contact_id, `${contactContext}.contact_id`)
+      const name = requiredText(contact.name, `${contactContext}.name`)
+      requiredText(contact.source_name, `${contactContext}.source_name`)
+      requireHttps(contact.source_url, `${contactContext}.source_url`)
+      validateDate(contact.verified_at, `${contactContext}.verified_at`)
       if (contactIds.has(contactId)) throw new Error(`Duplicate contact_id in company ${companyId}: ${contactId}`)
       contactIds.add(contactId)
       return {
