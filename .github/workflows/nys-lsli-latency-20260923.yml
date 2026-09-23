@@ -1,0 +1,54 @@
+name: Probe NYS LSLI latency
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/nys-lsli-latency-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe index and bounded detail sample
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, sys, time
+          from pathlib import Path
+          ROOT=Path.cwd()
+          sys.path.insert(0, str(ROOT/'scripts'))
+          from towersignal.nys_public_water import LSLI_INDEX_URL, fetch_html, parse_lsli_index
+          from towersignal.nys_lsli_detail import _fetch_detail_result
+
+          t0=time.time()
+          snap=fetch_html(LSLI_INDEX_URL, retries=2, timeout=30)
+          rows=parse_lsli_index(snap.html, source_url=LSLI_INDEX_URL)
+          print(json.dumps({"index_count":len(rows),"index_seconds":round(time.time()-t0,2)}, sort_keys=True), flush=True)
+
+          sample=rows[:18]
+          timings=[]
+          for row in sample:
+            s=time.time()
+            try:
+              kind, detail=_fetch_detail_result(row)
+              timings.append({"pws_id":row["pws_id"],"kind":kind,"seconds":round(time.time()-s,2)})
+            except Exception as exc:
+              timings.append({"pws_id":row["pws_id"],"error":type(exc).__name__,"seconds":round(time.time()-s,2)})
+          print(json.dumps({
+            "sample_count":len(sample),
+            "total_seconds":round(sum(x["seconds"] for x in timings),2),
+            "max_seconds":max((x["seconds"] for x in timings), default=0),
+            "failures":sum(1 for x in timings if "error" in x),
+            "timings":timings,
+          }, sort_keys=True), flush=True)
+          PY
