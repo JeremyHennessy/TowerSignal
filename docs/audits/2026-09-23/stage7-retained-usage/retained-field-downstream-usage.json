@@ -1,0 +1,455 @@
+[
+  {
+    "normalized_field": "active_equipment_at_publication",
+    "origin_files": [
+      "scripts/towersignal/inspections.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 1,
+    "downstream_references": [],
+    "type_references": [
+      {
+        "path": "src/types/data.ts",
+        "line": 217,
+        "kind": "TYPE_DECLARATION",
+        "text": "active_equipment_at_publication: number"
+      }
+    ],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "applicant_license",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "boiler_work_type",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "census_tract",
+    "origin_files": [
+      "scripts/towersignal/normalize.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "community_board",
+    "origin_files": [
+      "scripts/towersignal/normalize.py"
+    ],
+    "downstream_code_reference_count": 1,
+    "type_declaration_count": 0,
+    "downstream_references": [
+      {
+        "path": "scripts/towersignal/property_enforcement.py",
+        "line": 243,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"community_board\": _text(row.get(\"Community Board\")),"
+      }
+    ],
+    "type_references": [],
+    "status": "DOWNSTREAM_USED"
+  },
+  {
+    "normalized_field": "council_district",
+    "origin_files": [
+      "scripts/towersignal/normalize.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "date_registered",
+    "origin_files": [
+      "scripts/towersignal/normalize.py"
+    ],
+    "downstream_code_reference_count": 6,
+    "type_declaration_count": 0,
+    "downstream_references": [
+      {
+        "path": "scripts/build_history.py",
+        "line": 135,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"date_registered\": None,"
+      },
+      {
+        "path": "scripts/towersignal/history_store.py",
+        "line": 16,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"address\", \"borough\", \"zip\", \"date_registered\","
+      },
+      {
+        "path": "scripts/towersignal/historical.py",
+        "line": 34,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "registration_date = _iso_date(system.get(\"date_registered\"))"
+      },
+      {
+        "path": "scripts/towersignal/validate.py",
+        "line": 10,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"bin\", \"system_id\", \"date_registered\", \"number\", \"street\", \"borough\", \"zip\", \"sampledates\", \"activeequipment\""
+      },
+      {
+        "path": "scripts/towersignal/history.py",
+        "line": 211,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"date_registered\": system.get(\"date_registered\"), \"active_equipment\": system.get(\"active_equipment\", 0),"
+      },
+      {
+        "path": "scripts/towersignal/history.py",
+        "line": 417,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "new_events.append(_event(\"SYSTEM_FIRST_SEEN\", current, detected_at, \"NYC_COOLING_TOWER_REGISTRATIONS\", \"SYSTEM_ID_EXACT\", None, {\"present_in_snapshot\": True}, current.get(\"date_registered\")))"
+      }
+    ],
+    "type_references": [],
+    "status": "DOWNSTREAM_USED"
+  },
+  {
+    "normalized_field": "estimated_job_costs",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "estimated_values_water",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "expired_date",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 1,
+    "type_declaration_count": 0,
+    "downstream_references": [
+      {
+        "path": "scripts/attach_nyc_water_signals.py",
+        "line": 29,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"dob_water_permits\": (\"issued_date\", \"approved_date\", \"expired_date\"),"
+      }
+    ],
+    "type_references": [],
+    "status": "DOWNSTREAM_USED"
+  },
+  {
+    "normalized_field": "filing_reason",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "indoor_water_use_all_sources_kgal",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "last_modified_date_water",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 1,
+    "type_declaration_count": 0,
+    "downstream_references": [
+      {
+        "path": "scripts/attach_nyc_water_signals.py",
+        "line": 30,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"ll84_water_benchmarks\": (\"year_ending\", \"last_modified_date_water\", \"report_year\"),"
+      }
+    ],
+    "type_references": [],
+    "status": "DOWNSTREAM_USED"
+  },
+  {
+    "normalized_field": "mechanical_work_type",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "municipal_potable_indoor_kgal",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "municipal_potable_mixed_kgal",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "municipal_potable_outdoor_kgal",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "ntacode",
+    "origin_files": [
+      "scripts/towersignal/normalize.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "outdoor_water_use_all_sources_kgal",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "permit_status",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "permittee_license_type",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "plumbing_work_type",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "postal_code",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 2,
+    "type_declaration_count": 0,
+    "downstream_references": [
+      {
+        "path": "scripts/towersignal/nys_authority_procurement.py",
+        "line": 111,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "_first(row, \"vendor_postal_code\", \"zip\", \"postal_code\"),"
+      },
+      {
+        "path": "scripts/towersignal/cms_institutional.py",
+        "line": 202,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "result_zip = normalize_zip(first_value(properties, \"postalcode\", \"postal_code\", \"zip\"))"
+      }
+    ],
+    "type_references": [],
+    "status": "DOWNSTREAM_USED"
+  },
+  {
+    "normalized_field": "sequence_number",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "source_bin_raw",
+    "origin_files": [
+      "scripts/towersignal/normalize.py"
+    ],
+    "downstream_code_reference_count": 2,
+    "type_declaration_count": 0,
+    "downstream_references": [
+      {
+        "path": "scripts/build_data_live.py",
+        "line": 349,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"source_bin_raw\": system.get(\"source_bin_raw\"),"
+      },
+      {
+        "path": "scripts/build_data_live.py",
+        "line": 407,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"source_bin_raw\": system.get(\"source_bin_raw\"),"
+      }
+    ],
+    "type_references": [],
+    "status": "DOWNSTREAM_USED"
+  },
+  {
+    "normalized_field": "source_owner_name_raw",
+    "origin_files": [
+      "scripts/towersignal/pluto.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "water_meter_alert_less_than_12_months",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "work_type",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 0,
+    "downstream_references": [],
+    "type_references": [],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "year_altered_1",
+    "origin_files": [
+      "scripts/towersignal/pluto.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 1,
+    "downstream_references": [],
+    "type_references": [
+      {
+        "path": "src/types/data.ts",
+        "line": 269,
+        "kind": "TYPE_DECLARATION",
+        "text": "year_altered_1: number | null"
+      }
+    ],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "year_altered_2",
+    "origin_files": [
+      "scripts/towersignal/pluto.py"
+    ],
+    "downstream_code_reference_count": 0,
+    "type_declaration_count": 1,
+    "downstream_references": [],
+    "type_references": [
+      {
+        "path": "src/types/data.ts",
+        "line": 270,
+        "kind": "TYPE_DECLARATION",
+        "text": "year_altered_2: number | null"
+      }
+    ],
+    "status": "NO_DOWNSTREAM_CODE_REFERENCE"
+  },
+  {
+    "normalized_field": "year_ending",
+    "origin_files": [
+      "scripts/towersignal/nyc_water_signals.py"
+    ],
+    "downstream_code_reference_count": 1,
+    "type_declaration_count": 0,
+    "downstream_references": [
+      {
+        "path": "scripts/attach_nyc_water_signals.py",
+        "line": 30,
+        "kind": "DOWNSTREAM_CODE_REFERENCE",
+        "text": "\"ll84_water_benchmarks\": (\"year_ending\", \"last_modified_date_water\", \"report_year\"),"
+      }
+    ],
+    "type_references": [],
+    "status": "DOWNSTREAM_USED"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "target_fields": 31,
+  "downstream_used": 7,
+  "no_downstream_code_reference": 24,
+  "boundary": "Exact-name static scan across non-test scripts/src excluding each field normalizer origin. Dynamic access, generated files and semantic use under renamed keys require separate tracing."
+}
