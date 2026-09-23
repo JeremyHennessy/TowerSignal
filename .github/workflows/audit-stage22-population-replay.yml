@@ -1,0 +1,35 @@
+name: Replay nine current source populations independently
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/audit_stage22_population_replay.py
+      - .github/workflows/audit-stage22-population-replay.yml
+permissions:
+  contents: write
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Replay current bounded populations
+        run: python -u docs/audits/2026-09-23/audit_stage22_population_replay.py
+      - name: Persist results
+        if: always()
+        run: |
+          if [ -d .audit-stage22 ]; then
+            mkdir -p docs/audits/2026-09-23/stage22-population-replay
+            cp .audit-stage22/*.json docs/audits/2026-09-23/stage22-population-replay/ || true
+            git config user.name "TowerSignal Audit"
+            git config user.email "actions@users.noreply.github.com"
+            git add docs/audits/2026-09-23/stage22-population-replay
+            if ! git diff --cached --quiet; then
+              git commit -m "audit: persist bounded current source population replay"
+              git pull --rebase origin audit/full-lineage-20260923-1350
+              git push origin HEAD:audit/full-lineage-20260923-1350
+            fi
+          fi
