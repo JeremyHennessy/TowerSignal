@@ -1,0 +1,61 @@
+name: Refresh current-main application lineage through manual delta
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/build_current_manual_delta.py
+      - .github/workflows/audit-current-main-manual-delta.yml
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install parser dependencies
+        run: npm install --no-audit --no-fund
+      - name: Rebuild stages 13 through 19
+        run: |
+          node docs/audits/2026-09-23/build_stage13_application_register.mjs
+          rm -rf docs/audits/2026-09-23/stage13-application-register
+          mkdir -p docs/audits/2026-09-23/stage13-application-register
+          cp .audit-stage13/*.json docs/audits/2026-09-23/stage13-application-register/
+          python -u docs/audits/2026-09-23/build_stage14_application_lineage.py
+          rm -rf docs/audits/2026-09-23/stage14-application-lineage
+          mkdir -p docs/audits/2026-09-23/stage14-application-lineage
+          cp .audit-stage14/*.json docs/audits/2026-09-23/stage14-application-lineage/
+          python -u docs/audits/2026-09-23/build_stage16_application_backtrace.py
+          rm -rf docs/audits/2026-09-23/stage16-application-backtrace
+          mkdir -p docs/audits/2026-09-23/stage16-application-backtrace
+          cp .audit-stage16/*.json docs/audits/2026-09-23/stage16-application-backtrace/
+          python -u docs/audits/2026-09-23/build_stage17_callback_lineage.py
+          rm -rf docs/audits/2026-09-23/stage17-callback-lineage
+          mkdir -p docs/audits/2026-09-23/stage17-callback-lineage
+          cp .audit-stage17/*.json docs/audits/2026-09-23/stage17-callback-lineage/
+          python -u docs/audits/2026-09-23/build_stage18_expanded_application_lineage.py
+          rm -rf docs/audits/2026-09-23/stage18-expanded-application-lineage
+          mkdir -p docs/audits/2026-09-23/stage18-expanded-application-lineage
+          cp .audit-stage18/*.json docs/audits/2026-09-23/stage18-expanded-application-lineage/
+          python -u docs/audits/2026-09-23/build_stage19_typed_application_lineage.py
+          rm -rf docs/audits/2026-09-23/stage19-typed-application-lineage
+          mkdir -p docs/audits/2026-09-23/stage19-typed-application-lineage
+          cp .audit-stage19/*.json docs/audits/2026-09-23/stage19-typed-application-lineage/
+      - name: Reuse only exact prior manual signatures
+        run: python -u docs/audits/2026-09-23/build_current_manual_delta.py
+      - name: Persist refreshed stages and current manual delta
+        run: |
+          mkdir -p docs/audits/2026-09-23/current-main-manual-delta
+          cp .audit-current-manual/*.json docs/audits/2026-09-23/current-main-manual-delta/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage13-application-register docs/audits/2026-09-23/stage14-application-lineage docs/audits/2026-09-23/stage16-application-backtrace docs/audits/2026-09-23/stage17-callback-lineage docs/audits/2026-09-23/stage18-expanded-application-lineage docs/audits/2026-09-23/stage19-typed-application-lineage docs/audits/2026-09-23/current-main-manual-delta
+          git commit -m "audit: refresh current-main application lineage through manual delta"
+          git pull --rebase origin audit/full-lineage-20260923-1350
+          git push origin HEAD:audit/full-lineage-20260923-1350
