@@ -11,6 +11,13 @@ class PropertyIdentityReleaseContractTests(unittest.TestCase):
         self.assertIn("VITE_REPORT_APPLICATION_SHA: ${{ github.sha }}", workflow)
         self.assertIn("EXPECTED_REPORT_SHA: ${{ github.sha }}", workflow)
 
+    def test_full_data_release_requires_downstream_mapping_coherence(self):
+        workflow = (ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
+        self.assertIn(
+            "python scripts/validate_mapping_coherence.py --output public/data --require-production-volume",
+            workflow,
+        )
+
     def test_full_data_release_keeps_strict_property_acceptance(self):
         workflow = (ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
         self.assertIn(
