@@ -40,10 +40,12 @@ def _mappluto_candidates(footprints: list[dict[str, Any]]) -> set[str]:
 def resolve_system_bbl_identity(
     system: dict[str, Any],
     footprints: list[dict[str, Any]],
+    hpd_rows: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    registry_bbl = normalize_bbl(system.get("bbl"))
+    registry_bbl = normalize_bbl(system.get("registry_bbl") if "registry_bbl" in system else system.get("bbl"))
     registry_bbl = registry_bbl.zfill(10) if registry_bbl else None
     bin_value = normalize_bin(system.get("bin"))
+    footprints = [f for f in footprints if bin_value and (not f.get("bin") or normalize_bin(f.get("bin")) == bin_value)]
     candidates = _mappluto_candidates(footprints)
     base_context = sorted({
         value.zfill(10)
@@ -110,9 +112,43 @@ def resolve_system_bbl_identity(
                 source_dataset = "NYC_OTI_BUILDING_FOOTPRINTS"
                 source_field = "mappluto_bbl"
 
-    aliases = sorted({value for value in (canonical, registry_bbl) if value})
+    from .hpd import parts_to_bbl
+    hpd_candidates = {
+        b for row in (hpd_rows or [])
+        if bin_value and normalize_bin(row.get("bin")) == bin_value
+        and (b := parts_to_bbl(row.get("boroid"), row.get("block"), row.get("lot")))
+        and (not expected_prefix or b[0] == expected_prefix)
+    }
+    contradicted_registry = False
+    if bin_value and len(hpd_candidates) == 1:
+        hpd_bbl = next(iter(hpd_candidates))
+        if status == "REGISTRY_SOURCE_BBL_MAPPLUTO_CONFLICT" and candidates == {hpd_bbl}:
+            canonical = hpd_bbl
+            status = "RECONCILED_REGISTRY_CONFLICT_BY_FOOTPRINT_AND_HPD_EXACT_BIN"
+            identity_basis = "FOOTPRINT_AND_HPD_BBL_EXACT_BIN"
+            source_dataset = "NYC_OTI_BUILDING_FOOTPRINTS+NYC_HPD_MULTIPLE_DWELLING_REGISTRATIONS"
+            source_field = "mappluto_bbl+boroid/block/lot"
+            contradicted_registry = True
+        elif not canonical and not candidates:
+            canonical = hpd_bbl
+            status = "RECOVERED_EXACT_BIN_HPD_REGISTRATION_BBL"
+            identity_basis = "HPD_REGISTRATION_BBL_EXACT_BIN"
+            source_dataset = "NYC_HPD_MULTIPLE_DWELLING_REGISTRATIONS"
+            source_field = "boroid/block/lot"
+    aliases = {value for value in (canonical, None if contradicted_registry else registry_bbl) if value}
+    confirmed_base = None
+    if bin_value and canonical and candidates == {canonical} and len(base_context) == 1:
+        base = base_context[0]
+        if base[:6] == canonical[:6]:
+            aliases.add(base)
+            confirmed_base = base
+    aliases = sorted(aliases)
 
     return {
+        "hpd_bbl_candidates": sorted(hpd_candidates),
+        "hpd_identity_rows": hpd_rows or [],
+        "contradicted_registry_bbl_excluded": contradicted_registry,
+        "confirmed_footprint_base_alias": confirmed_base,
         "canonical_bbl": canonical,
         "property_bbl": canonical,
         "registry_bbl": registry_bbl,
@@ -139,6 +175,7 @@ def resolve_system_bbl_identity(
 def apply_bbl_identity_recovery(
     systems: list[dict[str, Any]],
     footprints_by_bin: dict[str, list[dict[str, Any]]],
+    hpd_by_bin: dict[str, list[dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
     status_counts: Counter[str] = Counter()
     recovered_by_borough: Counter[str] = Counter()
@@ -152,7 +189,7 @@ def apply_bbl_identity_recovery(
 
     for system in systems:
         bin_value = normalize_bin(system.get("bin"))
-        evidence = resolve_system_bbl_identity(system, footprints_by_bin.get(bin_value or "", []))
+        evidence = resolve_system_bbl_identity(system, footprints_by_bin.get(bin_value or "", []), (hpd_by_bin or {}).get(bin_value or "", []))
         system["registry_bbl"] = evidence["registry_bbl"]
         system["property_bbl"] = evidence["property_bbl"]
         system["bbl_aliases"] = evidence["bbl_aliases"]
@@ -173,12 +210,14 @@ def apply_bbl_identity_recovery(
             source_bbl_count += 1
             reconciled_count += 1
             reconciled_by_borough[borough] += 1
-        elif evidence["status"] == "RECOVERED_EXACT_BIN_MAPPLUTO_BBL":
+        elif evidence["status"] in {"RECOVERED_EXACT_BIN_MAPPLUTO_BBL", "RECOVERED_EXACT_BIN_HPD_REGISTRATION_BBL"}:
             recovered_count += 1
             recovered_by_borough[borough] += 1
         elif evidence["canonical_bbl"] is None:
             unresolved_count += 1
             unresolved_by_borough[borough] += 1
+        elif evidence["status"] == "RECONCILED_REGISTRY_CONFLICT_BY_FOOTPRINT_AND_HPD_EXACT_BIN":
+            source_bbl_count += 1
         else:
             # A registry BBL remains usable for provenance/enrichment when an
             # exact-BIN MapPLUTO relationship is ambiguous or conflicts, but the
@@ -221,7 +260,7 @@ def apply_bbl_identity_recovery(
             "address_matching_used": False,
             "fuzzy_matching_used": False,
             "registry_bbl_preserved_as_provenance": True,
-            "historical_bbl_aliases": "Canonical property BBL plus distinct registry/base BBL; aliases are exact identifiers, never fuzzy matches.",
+            "historical_bbl_aliases": "Canonical property, non-contradicted registry, and unique same-block exact-BIN footprint base lot agreeing with canonical MapPLUTO; never fuzzy matches.",
             "registry_bbl_reconciliation_rule": (
                 "When the exact-BIN footprint has one MapPLUTO BBL, the registry BBL "
                 "equals footprint base_bbl, and the MapPLUTO BBL differs, use the "

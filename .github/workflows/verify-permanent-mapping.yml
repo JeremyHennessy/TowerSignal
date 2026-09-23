@@ -1,0 +1,79 @@
+name: Permanent mapping acceptance
+on:
+  push:
+    branches: [fix/permanent-source-mapping-20260923]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: permanent-mapping-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve approved frontend and scoring implementation
+        run: |
+          git diff --exit-code 567afc00df97da06486b55b7749ca101ed069ec4 HEAD -- src package.json package-lock.json scripts/towersignal/reviewed_priority.py scripts/towersignal/scoring.py
+          if git diff --name-only 567afc00df97da06486b55b7749ca101ed069ec4 HEAD | grep -E '__pycache__|\.pyc$'; then exit 1; fi
+      - name: Run all Python regression tests
+        run: |
+          mkdir -p replay-evidence
+          set -o pipefail
+          python -m unittest discover -s tests/python -p 'test_*.py' -v 2>&1 | tee replay-evidence/regression-tests.log
+      - name: Replay all 4893 accounts against checksum-pinned independent sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import re,subprocess,textwrap,urllib.request,urllib.error
+          # This is the exact previously reviewed replay, pinned by commit.
+          # Only artifact redirect transport changes: never send GitHub's bearer
+          # credential to its signed object-storage download URL.
+          original=subprocess.check_output(['git','show','74b9e27b924bbf1d8215119b36c61d7f634e6f99:.github/workflows/publish-permanent-mapping-fix.yml'],text=True)
+          match=re.search(r'(          import os,json,gzip,[\s\S]*?)\n          PY',original)
+          if not match:raise RuntimeError('Pinned replay program is missing')
+          program=textwrap.dedent(match[1])
+          old='with urllib.request.urlopen(req,timeout=120) as r:raw=r.read()'
+          if program.count(old)!=1:raise RuntimeError('Pinned artifact request anchor changed')
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,req,fp,code,msg,headers,newurl):
+                  return None
+          def fetch_artifact(req):
+              try:
+                  with urllib.request.build_opener(NoRedirect).open(req,timeout=120) as r:
+                      return r.read()
+              except urllib.error.HTTPError as e:
+                  if e.code not in (301,302,303,307,308):raise
+                  location=e.headers.get('Location','')
+                  if not location.startswith('https://'):raise RuntimeError('Unsafe artifact redirect')
+              with urllib.request.urlopen(location,timeout=120) as r:
+                  return r.read()
+          program=program.replace(old,'raw=fetch_artifact(req)')
+          exec(compile(program,'pinned-independent-mapping-replay','exec'))
+          PY
+      - name: Preserve exact candidate source and diff
+        if: always()
+        run: |
+          mkdir -p replay-evidence
+          git rev-parse HEAD > replay-evidence/candidate-sha.txt
+          git diff 567afc00df97da06486b55b7749ca101ed069ec4 HEAD > replay-evidence/candidate.patch
+          git archive --format=tar.gz --output=replay-evidence/candidate-source.tar.gz HEAD
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: permanent-mapping-acceptance
+          path: replay-evidence
+          retention-days: 30
+          if-no-files-found: error

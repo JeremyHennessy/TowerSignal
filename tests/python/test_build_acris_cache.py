@@ -28,6 +28,7 @@ class BuildAcrisCacheTests(unittest.TestCase):
             ) as fetch,
             patch.object(build_acris_cache, "normalize_registrations", return_value=(systems, {})) as normalize,
             patch.object(build_acris_cache, "fetch_building_footprints_by_bin", return_value=(footprints, {})) as footprints_fetch,
+            patch.object(build_acris_cache, "fetch_registration_snapshot", return_value={"eligible_by_bin": {}}),
         ):
             bbls = build_acris_cache.tower_bbls_from_current_registrations()
 

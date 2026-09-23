@@ -17,7 +17,7 @@ from towersignal.bbl_identity import apply_bbl_identity_recovery  # noqa: E402
 from towersignal.dob_activity import fetch_dob_activity_by_bbl, summarize_dob_activity  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.historical import build_historical_profile  # noqa: E402
-from towersignal.hpd import fetch_hpd_contacts_by_bbl  # noqa: E402
+from towersignal.hpd_identity import fetch_registration_snapshot, fetch_contacts_for_systems  # noqa: E402
 from towersignal.inspections import aggregate_inspections  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
 from towersignal.oath import cases_for_system, fetch_oath_cases, summons_numbers_from_inspections  # noqa: E402
@@ -85,7 +85,8 @@ def build(output_dir: Path) -> dict:
     progress(f"Matched building footprints for {len(building_footprints_by_bin):,} BINs")
 
     progress("Reconciling registry/base BBL identity with exact-BIN published MapPLUTO property BBLs")
-    bbl_identity_meta = apply_bbl_identity_recovery(systems, building_footprints_by_bin)
+    hpd_index = fetch_registration_snapshot()
+    bbl_identity_meta = apply_bbl_identity_recovery(systems, building_footprints_by_bin, hpd_index["eligible_by_bin"])
     bbl_values = {system["bbl"] for system in systems if system.get("bbl")}
     bbl_alias_values = {
         alias
@@ -110,8 +111,8 @@ def build(output_dir: Path) -> dict:
     progress(f"Matched DOB NOW activity for {len(dob_by_bbl):,} BBLs")
 
     progress(f"Fetching HPD contacts for {len(bbl_values):,} canonical BBLs")
-    hpd_by_bbl, hpd_meta = fetch_hpd_contacts_by_bbl(bbl_values)
-    progress(f"Matched HPD contacts for {len(hpd_by_bbl):,} BBLs")
+    hpd_by_system, hpd_meta = fetch_contacts_for_systems(systems, hpd_index)
+    progress(f"Resolved HPD lookups for {len(hpd_by_system):,} systems")
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [
@@ -207,6 +208,7 @@ def build(output_dir: Path) -> dict:
         "snapshot_date": snapshot_date.isoformat(),
         "sources": sources,
         "normalized_system_count": len(systems),
+        "hpd_identity_lookup": hpd_meta,
         "source_duplicate_registration_rows": dedupe_meta["source_duplicate_rows"],
         "source_missing_registration_system_id_rows": dedupe_meta["source_missing_system_id_rows"],
         "invalid_coordinate_system_count": dedupe_meta["invalid_coordinate_system_count"],
@@ -292,7 +294,8 @@ def build(output_dir: Path) -> dict:
             reverse=True,
         )
         dob_summary = summarize_dob_activity(dob_activity, snapshot_date)
-        hpd_registration = hpd_by_bbl.get(bbl_key) if bbl_key else None
+        hpd_lookup = hpd_by_system[system["system_id"]]
+        hpd_registration = hpd_lookup["registration"]
         planimetric_building_tower_features = planimetric_by_bin.get(bin_key, []) if bin_key else []
         building_footprints = building_footprints_by_bin.get(bin_key, []) if bin_key else []
         if building_context:
@@ -343,6 +346,9 @@ def build(output_dir: Path) -> dict:
         row = {
             "system_id": system["system_id"],
             "bin": system["bin"],
+            "source_bin_raw": system.get("source_bin_raw"),
+            "number": system.get("number"),
+            "street": system.get("street"),
             "bbl": system["bbl"],
             "property_bbl": system.get("property_bbl"),
             "registry_bbl": system.get("registry_bbl"),
@@ -384,6 +390,7 @@ def build(output_dir: Path) -> dict:
             "dob_mechanical_or_boiler_count": dob_summary["mechanical_or_boiler_count"],
             "latest_dob_activity_date": dob_summary["latest_activity_date"],
             "hpd_contact_count": hpd_contact_count,
+            "hpd_lookup_status": hpd_lookup["status"],
             "planimetric_bin_match": bool(planimetric_building_tower_features),
             "planimetric_building_tower_count": len(planimetric_building_tower_features),
             "building_footprint_bin_match": bool(building_footprints),
@@ -397,6 +404,9 @@ def build(output_dir: Path) -> dict:
             "identity": {
                 "system_id": system["system_id"],
                 "bin": system["bin"],
+            "source_bin_raw": system.get("source_bin_raw"),
+            "number": system.get("number"),
+            "street": system.get("street"),
                 "bbl": system["bbl"],
                 "property_bbl": system.get("property_bbl"),
                 "registry_bbl": system.get("registry_bbl"),
@@ -418,6 +428,7 @@ def build(output_dir: Path) -> dict:
             "building_context": building_context,
             "dob_activity_history": dob_activity,
             "hpd_registration": hpd_registration,
+            "hpd_lookup_status": hpd_lookup["status"],
             "planimetric_building_tower_features": planimetric_building_tower_features,
             "building_footprints": building_footprints,
             "sample_history": {

@@ -153,6 +153,7 @@ def normalize_registrations(rows: list[dict[str, Any]]) -> tuple[list[dict[str, 
             {
                 "system_id": system_id,
                 "bin": normalize_bin(row.get("bin")),
+                "source_bin_raw": _clean(row.get("bin")),
                 "bbl": _clean(row.get("bbl")),
                 "date_registered": _clean(row.get("date_registered")),
                 "address": address,

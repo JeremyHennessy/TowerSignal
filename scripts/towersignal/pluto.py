@@ -79,7 +79,8 @@ def _text(value: Any) -> str | None:
 def normalize_pluto_record(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "bbl": normalize_bbl(row.get("bbl")),
-        "owner_name": _text(row.get("ownername")),
+        "owner_name": None if (_text(row.get("ownername")) or "").upper() == "UNAVAILABLE OWNER" else _text(row.get("ownername")),
+        "source_owner_name_raw": _text(row.get("ownername")),
         "land_use": _text(row.get("landuse")),
         "building_class": _text(row.get("bldgclass")),
         "lot_area_sqft": _number(row.get("lotarea")),

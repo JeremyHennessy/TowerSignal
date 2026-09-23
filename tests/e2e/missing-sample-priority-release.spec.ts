@@ -53,6 +53,16 @@ test('400 West 61st scores missing public sampling at 30 while remaining VERIFY'
 test('225 Broadway score remains unchanged by the missing-sample rule', async ({ page }, testInfo) => {
   await signInForProject(page, testInfo.project.name, '#/account/2000011002')
   await expectAccountDetailHydrated(page)
-  await expect(page.locator('.account-decision-summary .account-decision-score strong')).toHaveText('86')
+  const released = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/details/20/2000011002.json', location.href))
+    if (!response.ok) throw new Error(`Released account HTTP ${response.status}`)
+    return response.json()
+  })
+  // Live findings age across the model's recency boundaries. The independent
+  // generated-score gate validates the rules; this checks the displayed payload
+  // and proves the missing-date rule is not applied to an account with dates.
+  expect(released.sample_history.dates.length).toBeGreaterThan(0)
+  expect(released.scoring.components.some((c: { reason: string }) => /No usable public sample date/i.test(c.reason))).toBe(false)
+  await expect(page.locator('.account-decision-summary .account-decision-score strong')).toHaveText(String(released.scoring.score))
   await expectContained(page)
 })

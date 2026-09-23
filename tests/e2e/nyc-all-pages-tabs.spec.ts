@@ -92,10 +92,11 @@ test('NYC application page and tab visual inventory', async ({ page, browser }, 
   // authenticated desktop project state (confirmed in the retained failed trace).
   const publicContext=await browser.newContext({...(testInfo.project.name==='iphone'?devices['iPhone 13']: {viewport:{width:1440,height:1000}}),baseURL:String(testInfo.project.use.baseURL),storageState:{cookies:[],origins:[]}})
   const publicPage=await publicContext.newPage()
+  await publicPage.bringToFront()
   await installCandidateRoutes(publicPage)
-  await publicPage.goto('./',{waitUntil:'domcontentloaded'})
+  await publicPage.goto('./',{waitUntil:'networkidle'})
   await publicPage.screenshot({path:`${folder}/public-marketing.png`,scale:'css',fullPage:true})
-  await publicPage.goto('./#/companies',{waitUntil:'domcontentloaded'})
+  await publicPage.goto('./#/companies',{waitUntil:'networkidle'})
   await expect(publicPage.getByRole('heading',{name:'Sign in to TowerSignal',exact:true})).toBeVisible()
   await publicPage.screenshot({path:`${folder}/public-login.png`,scale:'css',fullPage:true})
   await publicPage.getByRole('tab',{name:'Create account',exact:true}).click()

@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from towersignal.acris import browser_property_context, load_cache, normalize_bbl, tower_bbl_hash  # noqa: E402
+from towersignal.acris_identity_cache import ensure_alignment  # noqa: E402
 
 ACRIS_DATASET_IDS = {"bnx9-e6tj", "8h5j-fqxa", "636b-3b5g"}
 
@@ -29,6 +30,17 @@ def attach(output_dir: Path, cache_path: Path | None) -> dict[str, Any]:
     cache = None
     if cache_path is not None and cache_path.exists():
         cache = load_cache(cache_path)
+
+    if metadata.get("hpd_identity_lookup"):
+        cache, rebuilt = ensure_alignment(cache, systems)
+        metadata["acris_mapping_property_graph_sha256"] = cache["mapping_property_graph_sha256"]
+        metadata["acris_cache_rebuilt_for_mapping"] = rebuilt
+        if rebuilt:
+            target = cache_path or output_dir / "acris-generated-cache.json"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            temporary = target.with_name(target.name + ".mapping-tmp")
+            temporary.write_text(json.dumps(cache, separators=(",", ":")), encoding="utf-8")
+            temporary.replace(target)
 
     sources = [source for source in metadata.get("sources", []) if source.get("dataset_id") not in ACRIS_DATASET_IDS]
     if cache is None:
@@ -106,7 +118,7 @@ def attach(output_dir: Path, cache_path: Path | None) -> dict[str, Any]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Attach last verified ACRIS cache to generated TowerSignal NYC payload")
+    parser = argparse.ArgumentParser(description="Attach verified ACRIS cache, rebuilding mismatched release identity scope")
     parser.add_argument("--output", type=Path, default=ROOT / "public/data")
     parser.add_argument("--cache", type=Path)
     args = parser.parse_args()

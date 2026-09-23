@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import re
 from typing import Any, Iterable
 
 from .fetch import SourceFetchError, fetch_count, fetch_metadata, fetch_where
@@ -26,15 +27,12 @@ FILTERED_QUERY_LIMIT = 50000
 
 
 def normalize_bin(value: Any) -> str | None:
-    if value is None:
+    """Only assigned NYC building IDs may create relationships; borough-only IDs are unknown."""
+    text = str(value).strip() if value is not None else ""
+    match = re.fullmatch(r"([1-5][0-9]{6})(?:\.0+)?", text)
+    if not match or match[1][1:] == "000000":
         return None
-    text = str(value).strip()
-    if text.endswith(".0") and text[:-2].isdigit():
-        text = text[:-2]
-    if not text.isdigit():
-        return None
-    return text
-
+    return match[1]
 
 def _string_or_none(value: Any) -> str | None:
     if value is None:
