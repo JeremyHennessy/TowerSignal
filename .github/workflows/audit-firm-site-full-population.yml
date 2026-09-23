@@ -102,6 +102,10 @@ jobs:
                       addresses={str(insp[x].get('address')) for x in site.get('source_record_ids',[]) if x in insp and insp[x].get('address')}
                       if len(bbls)>1:
                           mp.append({'firm_id':fid,'site_id':site.get('site_id'),'bbls':sorted(bbls),'addresses':sorted(addresses),'source_ids':site.get('source_record_ids',[])})
+          old_placeholder_source_ids={str(x) for _,site in old_placeholder for x in site.get('source_record_ids',[])}
+          old_target_multi=[m for m in old_multi if old_placeholder_source_ids.intersection(map(str,m.get('source_ids',[])))]
+          new_target_multi=[m for m in new_multi if old_placeholder_source_ids.intersection(map(str,m.get('source_ids',[])))]
+
           report={
             'base_run':35866906472,
             'base_sha':'f1cbdb925b704a8b7a34aaccd169be6649b80a92',
@@ -111,6 +115,8 @@ jobs:
             'new_placeholder_site_rows':len(new_placeholder),
             'old_multi_bbl_sites_proven_from_retained_ids':len(old_multi),
             'new_multi_bbl_sites_proven_from_retained_ids':len(new_multi),
+            'old_placeholder_multi_bbl_sites':len(old_target_multi),
+            'candidate_sites_from_placeholder_records_still_multi_bbl':len(new_target_multi),
             'baseline_vs_candidate_firm_identity_or_observation_changes':len(changed),
             'artifact_vs_same_input_baseline_rebuild_drift_count':len(rebuild_drift),
             'artifact_vs_same_input_baseline_rebuild_drift_examples':rebuild_drift[:20],
@@ -124,7 +130,9 @@ jobs:
           assert not changed, changed[:20]
           assert not record_loss, record_loss[:10]
           assert not tower_changes, tower_changes[:10]
-          assert len(new_multi)==0, new_multi[:10]
+          assert len(old_target_multi)==14, old_target_multi[:20]
+          assert len(new_target_multi)==0, new_target_multi[:20]
+          assert len(new_placeholder)==0, new_placeholder[:20]
           PY
       - name: Preserve proof
         if: always()
