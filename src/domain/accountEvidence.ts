@@ -39,6 +39,13 @@ function observationDate(row: Record<string, unknown>, ...keys: string[]): strin
   return null
 }
 
+function propertyMatchBasis(row: Record<string, unknown>): AccountFirmRoleEvidence['matchBasis'] | null {
+  const confidence = text(row.property_link_confidence)
+  if (confidence === 'CONFIRMED_SOURCE_BIN' || confidence === 'EXACT_SINGLE_BIN') return 'BIN_EXACT'
+  if (confidence === 'CONFIRMED_SOURCE_BBL' || confidence === 'EXACT_SINGLE_BBL') return 'BBL_EXACT'
+  return null
+}
+
 export function explicitAccountProcurementRecords(bundle: ProcurementBundle, systemId: string): ProcurementRecord[] {
   const records: ProcurementRecord[] = [
     ...bundle.cityRecord.notices,
@@ -127,19 +134,21 @@ export function collectAccountFirmRoleEvidence(detail: SystemDetailWithDomesticW
   const waterSignals = detail.nyc_building_water_signals
   const addDobWaterRole = (raw: Record<string, unknown>, datasetId: string, sourceName: string) => {
     const name = text(raw.applicant_business_raw)
-    if (!name) return
+    const matchBasis = propertyMatchBasis(raw)
+    if (!name || !matchBasis) return
     const category = humanize(raw.category)
     const record = text(raw.source_record_id) ?? text(raw.job_filing_number) ?? text(raw.activity_id) ?? 'record id not published'
+    const matchLabel = matchBasis === 'BIN_EXACT' ? 'exact BIN' : 'exact BBL'
     add({
       name,
       role: category ? `DOB ${category} applicant business` : 'DOB water-work applicant business',
       relationship: 'RECORDED_ROLE',
       sourceName,
       datasetId,
-      matchBasis: 'BBL_EXACT',
+      matchBasis,
       observedDate: observationDate(raw, 'issued_date', 'approved_date', 'filing_date'),
       observedYear: null,
-      sourceReference: `Record ${record} · exact BBL${humanize(raw.relationship_evidence) ? ` · ${humanize(raw.relationship_evidence)}` : ''}`,
+      sourceReference: `Record ${record} · ${matchLabel}${humanize(raw.relationship_evidence) ? ` · ${humanize(raw.relationship_evidence)}` : ''}`,
       serviceAssignmentBoundary: `${humanize(raw.service_assignment_confidence) ?? 'Not proof of service assignment'}. Recorded DOB applicant role only; not a current service-provider or contract claim.`,
     })
   }
