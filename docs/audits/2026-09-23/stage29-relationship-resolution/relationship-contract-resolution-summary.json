@@ -1,0 +1,21 @@
+{
+  "occurrences": 158,
+  "resolution_status_counts": {
+    "STATIC_LITERAL": 42,
+    "DYNAMIC_EXPRESSION_TRACED": 74,
+    "STATIC_BRANCH_OPTIONS": 26,
+    "LOCAL_ASSIGNMENT_TRACED": 4,
+    "MODULE_CONSTANT_RESOLVED": 10,
+    "PROPAGATED_RUNTIME_VALUE": 2
+  },
+  "resolved_semantic_counts": {
+    "STATIC_OTHER": 26,
+    "RUNTIME_OR_DERIVED": 43,
+    "CONFIRMING_OR_OBSERVED": 60,
+    "BOUNDARY_OR_NONCONFIRMING": 29
+  },
+  "formerly_dynamic_occurrences": 41,
+  "formerly_dynamic_with_static_resolution": 14,
+  "still_runtime_or_derived": 43,
+  "boundary": "This resolves code expressions/constants/options. It does not prove upstream source joins. Confirming labels require separate population/join evidence."
+}
