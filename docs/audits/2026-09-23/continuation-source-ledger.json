@@ -1,0 +1,25 @@
+{
+  "scope": "Continuation ledger, not the complete 55-entry combined inventory. A derived cache or market-scope row is not another independent publisher feed.",
+  "old_artifact": {"run":35848062959,"artifact":10747891216,"code":"567afc00df97da06486b55b7749ca101ed069ec4"},
+  "new_artifact": {"run":35866906472,"artifact":10759814013,"code":"f1cbdb925b704a8b7a34aaccd169be6649b80a92","sha256":"b989f5da4a4f37320a5ab026cb518391fb7556ddb8a324e928947c9e1826d66a"},
+  "defaults": {
+    "collector":"scripts/towersignal/nyc_water_signals.py",
+    "workflow":".github/workflows/pages.yml",
+    "captured_cache":"data/nyc-water-signals.json",
+    "query_evidence":"Previously captured source metadata and retained raw records; no new complete publisher query in this continuation",
+    "retrieval_status":"NOT_QUERIED_CURRENT_PUBLISHER_IN_THIS_CONTINUATION",
+    "verification":"Independent retained-raw conversion plus record/value multiset cache-to-account comparison",
+    "publisher_completeness":"UNVERIFIED_BY_THIS_CONTINUATION",
+    "visual_status":"AUTHENTICATED_RENDERER_NOT_CHECKED"
+  },
+  "sources":[
+    {"source_id":"erm2-nwe9","publisher":"NYC Open Data / 311","market":"NYC","entity":"311 service request","captured_array":"water_311_requests","retained_rows":190233,"attached_source_rows":2476,"nonbuilding_context_rows":111788,"other_no_target_or_nonexact_rows":75969,"array_accounting_is_source_rows_not_attachment_edges":true,"direct_fields_checked":12,"url":"https://data.cityofnewyork.us/resource/erm2-nwe9.json"},
+    {"source_id":"wvxf-dwi5","publisher":"NYC HPD","market":"NYC","entity":"Open water/plumbing violation","captured_array":"hpd_open_water_violations","retained_rows":184528,"attached_source_rows":995,"other_no_target_or_nonexact_rows":183533,"direct_fields_checked":11,"url":"https://data.cityofnewyork.us/resource/wvxf-dwi5.json"},
+    {"source_id":"w9ak-ipjd","publisher":"NYC DOB","market":"NYC","entity":"DOB NOW job filing water-work observation","captured_array":"dob_water_job_filings","retained_rows":75019,"attached_source_rows":12456,"other_no_target_or_nonexact_rows":62563,"direct_fields_checked":13,"url":"https://data.cityofnewyork.us/resource/w9ak-ipjd.json"},
+    {"source_id":"rbx6-tga4","publisher":"NYC DOB","market":"NYC","entity":"Approved permit issue/renewal observation","captured_array":"dob_water_permits","retained_rows":56028,"attached_source_rows":11046,"other_no_target_or_nonexact_rows":44982,"direct_fields_checked":14,"identity_limit":"Permit identity is not unique observation identity; sequence and issue date can differ","url":"https://data.cityofnewyork.us/resource/rbx6-tga4.json"},
+    {"source_id":"5zyy-y8am","publisher":"NYC LL84 benchmarking","market":"NYC","entity":"Self-reported annual building water-use observation","captured_array":"ll84_water_benchmarks","retained_rows":103259,"attached_source_rows":13245,"other_no_target_or_nonexact_rows":90014,"direct_fields_checked":18,"units":"kgal per captured official schema","identity_limit":"Report/property IDs can contain multiple submissions; multi-identifier rows are not automatically a single-property link","url":"https://data.cityofnewyork.us/resource/5zyy-y8am.json"},
+    {"source_id":"gjm4-k24g","publisher":"NYC DOHMH","market":"NYC","entity":"Self-reported drinking-water tank inspection","captured_cache":"data/domestic-water-market.json","new_artifact_normalized_inspection_rows_examined":62972,"verification":"Retained normalized inspection-ID to cached-record mapping; source addresses/BBLs used to demonstrate 14 surviving multi-parcel firm-site collapses","limit":"Per-firm retained source ID lists capped at25; this is a confirmed lower bound, not full publisher/firm-history reconciliation","url":"https://data.cityofnewyork.us/resource/gjm4-k24g.json"},
+    {"source_id":"24a4-muw7","publisher":"NYS Center for Environmental Health","market":"NYS excluding NYC","entity":"Registered equipment","collector":"scripts/towersignal/nys_registry.py","stored_equipment_checked":6244,"stored_summary_metrics_checked":18,"current_source_missing_cases":"UNRESOLVED:363 stored records lack date or result; raw publisher rows not recollected","published_scope":"Weekly self-reported registry snapshot; not full history","canonical_verifier":"verify_live_nys.py --sample-size 5; reuses production normalizer","outputs":"nys-systems.json;nys-metadata.json;NYS history","correction":"No per-equipment nys-details shards produced by inspected builder","url":"https://health.data.ny.gov/resource/24a4-muw7.json"},
+    {"source_id":"TORONTO_PREVIEW_SCOPE","kind":"IMPLEMENTATION_SCOPE_NOT_PUBLISHER_FEED","market":"Toronto","repository":"JeremyHennessy/TowerSignal-Toronto-Preview","verification":"Current repository README inspected; historical deployment claim only","reported_source_commit":"a535195e32eb2be7397eafd709ec0eba013e6890","reported_release_branch":"release/toronto-20260903-a535195","reported_run":33775765172,"reported_date":"2026-09-03","current_hosted_revision":"UNVERIFIED","complete_source_census":"UNVERIFIED","total_tower_denominator":"UNKNOWN"}
+  ]
+}
