@@ -16,6 +16,8 @@ const client = createClient({
   dataApi: { url: import.meta.env.VITE_NEON_DATA_API_URL || DEFAULT_DATA_API_URL },
 })
 
+export const companyAdminRuntimeEnabled = import.meta.env.MODE !== 'test'
+
 function message(error: unknown): string {
   if (error && typeof error === 'object' && 'message' in error) return String((error as { message?: unknown }).message ?? 'Unknown company database error')
   return String(error || 'Unknown company database error')
@@ -119,6 +121,7 @@ function noteFrom(row: Record<string, unknown>): CompanyAdminNote {
 }
 
 export async function loadCompanyAdminAccess(): Promise<boolean> {
+  if (!companyAdminRuntimeEnabled) return false
   const result = await client.from('company_admin_access').select('is_admin').limit(1)
   throwIfError('Unable to verify company-database access', result.error)
   const row = ((result.data ?? []) as Array<Record<string, unknown>>)[0]
