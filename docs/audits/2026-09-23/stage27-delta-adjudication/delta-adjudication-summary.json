@@ -1,0 +1,30 @@
+{
+  "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+  "hpd": {
+    "delta_ids": 166,
+    "current_records_found": 166,
+    "class_counts": {
+      "SERVED_SNAPSHOT_NOW_CLOSED": 66,
+      "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD": 100
+    },
+    "fully_explained_by_lifecycle_or_post_build": false
+  },
+  "dwt": {
+    "source_target_rows": 24525,
+    "source_unique_normalized_ids": 23248,
+    "served_citywide_rows": 62974,
+    "served_target_rows": 23248,
+    "source_only_ids": 0,
+    "served_only_ids": 0,
+    "source_only_after_build_by_inspection_date": 0
+  },
+  "facade": {
+    "source_raw_rows": 14178,
+    "source_unique_composite_identities": 13865,
+    "duplicate_raw_row_excess": 313,
+    "served_unique_composite_identities": 13865,
+    "identity_sets_equal": true,
+    "source_only_identities": 0,
+    "served_only_identities": 0
+  }
+}

@@ -1,0 +1,3228 @@
+[
+  {
+    "violation_id": "10563759",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "10563759",
+      "bbl": "1004840012",
+      "bin": "1007250",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2015-02-17T00:00:00.000",
+      "approveddate": "2015-02-18T00:00:00.000",
+      "novissueddate": "2015-02-19T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 3C, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "13286377",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "13286377",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2019-09-17T00:00:00.000",
+      "approveddate": "2019-09-20T00:00:00.000",
+      "novissueddate": "2019-09-23T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE REPLACE WITH NEW THE MISSING BATHTUB SPOUT IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "13286382",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "13286382",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2019-09-17T00:00:00.000",
+      "approveddate": "2019-09-20T00:00:00.000",
+      "novissueddate": "2019-09-23T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS CONTINUOUS RUNNING COLD WATER AT WASH BASIN IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "13286437",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "13286437",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2019-09-17T00:00:00.000",
+      "approveddate": "2019-09-20T00:00:00.000",
+      "novissueddate": "2019-09-23T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "13853176",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "13853176",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2020-10-09T00:00:00.000",
+      "approveddate": "2020-10-10T00:00:00.000",
+      "novissueddate": "2020-10-13T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 2A, 2nd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "13871041",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "13871041",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2020-10-27T00:00:00.000",
+      "approveddate": "2020-10-27T00:00:00.000",
+      "novissueddate": "2020-10-28T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION WASTELINE AT BATHTUB IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "14007241",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "14007241",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2021-01-27T00:00:00.000",
+      "approveddate": "2021-01-27T00:00:00.000",
+      "novissueddate": "2021-01-28T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF HOT WATER FOR THE FIXTURES AT WASHBASIN IN THE BATHROOM LOCATED AT APT 3C, 3rd STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "14007247",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "14007247",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2021-01-27T00:00:00.000",
+      "approveddate": "2021-01-27T00:00:00.000",
+      "novissueddate": "2021-01-28T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 3C, 3rd STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "14007276",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "14007276",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2021-01-27T00:00:00.000",
+      "approveddate": "2021-01-27T00:00:00.000",
+      "novissueddate": "2021-01-28T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION WASTELINE AT SINK IN THE KITCHEN LOCATED AT APT 3C, 3rd STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "15876976",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "15876976",
+      "bbl": "2028870088",
+      "bin": "2009297",
+      "boro": "BRONX",
+      "inspectiondate": "2023-04-01T00:00:00.000",
+      "approveddate": "2023-04-01T00:00:00.000",
+      "novissueddate": "2023-04-03T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF THE HOT WATER TEMPERATURE EXCEEDS OVER 130 DEGREES AT HOT WATER FIXTURES, IN THE KITCHEN LOCATED AT APT 3H, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST , SECTION ''SOUTH''",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "16560288",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "16560288",
+      "bbl": "4009090001",
+      "bin": "4020648",
+      "boro": "QUEENS",
+      "inspectiondate": "2023-12-27T00:00:00.000",
+      "approveddate": "2024-01-02T00:00:00.000",
+      "novissueddate": "2024-01-03T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF NON- GROUND FAULT CIRCUIT INTERRUPTER (G.F.C.I.) ELECTRICAL OUTLET AT WEST WALL WITHIN 6 FT. OF SINK CREATING A HAZARD IN THE KITCHEN LOCATED AT APT 15I, 5th STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "16778445",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "16778445",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2024-03-28T00:00:00.000",
+      "approveddate": "2024-03-29T00:00:00.000",
+      "novissueddate": "2024-04-01T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "16778450",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "16778450",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2024-03-28T00:00:00.000",
+      "approveddate": "2024-03-29T00:00:00.000",
+      "novissueddate": "2024-04-01T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION AT TOILET BOWL IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "17136418",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17136418",
+      "bbl": "4009090001",
+      "bin": "4020648",
+      "boro": "QUEENS",
+      "inspectiondate": "2024-07-23T00:00:00.000",
+      "approveddate": "2024-07-24T00:00:00.000",
+      "novissueddate": "2024-07-25T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPLACE THE BROKEN OR DEFECTIVE BATHTUB IN THE BATHROOM LOCATED AT APT 4E, 4th STORY, 2nd APARTMENT FROM EAST AT SOUTH , SECTION ''EAST''",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "17166662",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17166662",
+      "bbl": "4009090001",
+      "bin": "4020648",
+      "boro": "QUEENS",
+      "inspectiondate": "2024-07-31T00:00:00.000",
+      "approveddate": "2024-08-02T00:00:00.000",
+      "novissueddate": "2024-08-05T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 12M, 12th STORY, 3rd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "17336439",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17336439",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2024-10-09T00:00:00.000",
+      "approveddate": "2024-10-09T00:00:00.000",
+      "novissueddate": "2024-10-10T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "17336442",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17336442",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2024-10-09T00:00:00.000",
+      "approveddate": "2024-10-10T00:00:00.000",
+      "novissueddate": "2024-10-11T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS SINK IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "17339303",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17339303",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2024-10-07T00:00:00.000",
+      "approveddate": "2024-10-08T00:00:00.000",
+      "novissueddate": "2024-10-09T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS IN THE KITCHEN LOCATED AT APT 1E, 1st STORY",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "17344558",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17344558",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2024-10-13T00:00:00.000",
+      "approveddate": "2024-10-13T00:00:00.000",
+      "novissueddate": "2024-10-15T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE WOOD BASE SINK CABINET IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "17371081",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17371081",
+      "bbl": "3050470005",
+      "bin": "3115736",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2024-10-22T00:00:00.000",
+      "approveddate": "2024-10-25T00:00:00.000",
+      "novissueddate": "2024-10-28T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REMOVE ALL OBSTRUCTIONS AND REPAIR ALL DEFECTS IN SINK AT WASTELINE IN THE KITCHEN LOCATED AT APT 1C, 1st STORY, 2nd APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "17605624",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17605624",
+      "bbl": "2026750051",
+      "bin": "2004957",
+      "boro": "BRONX",
+      "inspectiondate": "2025-01-06T00:00:00.000",
+      "approveddate": "2025-01-08T00:00:00.000",
+      "novissueddate": "2025-01-09T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BASIN SINK IN THE BATHROOM LOCATED AT APT 11, 4th STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "17791034",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "17791034",
+      "bbl": "3011630063",
+      "bin": "3029019",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2025-03-29T00:00:00.000",
+      "approveddate": "2025-04-01T00:00:00.000",
+      "novissueddate": "2025-04-02T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF HOT WATER EXCEEDING 130 DEGREES IN THE ENTIRE APARTMENT LOCATED AT APT 3, 3rd STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18010043",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18010043",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2025-06-12T00:00:00.000",
+      "approveddate": "2025-06-12T00:00:00.000",
+      "novissueddate": "2025-06-13T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE RESET, SO AS TO SECURE A PROPER AND TIGHT CONNECTION, THE WATER CLOSET BOWL IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18010045",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18010045",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2025-06-12T00:00:00.000",
+      "approveddate": "2025-06-12T00:00:00.000",
+      "novissueddate": "2025-06-13T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS WASH BASIN IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18010046",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18010046",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2025-06-12T00:00:00.000",
+      "approveddate": "2025-06-12T00:00:00.000",
+      "novissueddate": "2025-06-13T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REMOVE ALL OBSTRUCTIONS AND REPAIR ALL DEFECTS IN BATHTUB IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "18010054",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18010054",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2025-06-12T00:00:00.000",
+      "approveddate": "2025-06-12T00:00:00.000",
+      "novissueddate": "2025-06-13T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 HMC: PROPERLY REPAIR OR REPLACE THE BROKEN OR DEFECTIVE SINK BASE CABINET IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18137716",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18137716",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2025-08-04T00:00:00.000",
+      "approveddate": "2025-08-05T00:00:00.000",
+      "novissueddate": "2025-08-06T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE SINKBASE LOWER WOODEN CABINET IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18137848",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18137848",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2025-08-05T00:00:00.000",
+      "approveddate": "2025-08-05T00:00:00.000",
+      "novissueddate": "2025-08-06T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS WASH BASIN IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18297635",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18297635",
+      "bbl": "4160260021",
+      "bin": "4302447",
+      "boro": "QUEENS",
+      "inspectiondate": "2025-10-14T00:00:00.000",
+      "approveddate": "2025-10-14T00:00:00.000",
+      "novissueddate": "2025-10-15T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADMIN. CODE: PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 2, 2nd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18310372",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18310372",
+      "bbl": "2028870088",
+      "bin": "2009297",
+      "boro": "BRONX",
+      "inspectiondate": "2025-10-19T00:00:00.000",
+      "approveddate": "2025-10-19T00:00:00.000",
+      "novissueddate": "2025-10-20T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 3H, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "18362159",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18362159",
+      "bbl": "4160260021",
+      "bin": "4302447",
+      "boro": "QUEENS",
+      "inspectiondate": "2025-11-11T00:00:00.000",
+      "approveddate": "2025-11-11T00:00:00.000",
+      "novissueddate": "2025-11-12T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADMIN. CODE: PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 1, 1st STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18604710",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18604710",
+      "bbl": "4009090001",
+      "bin": "4020648",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-01-27T00:00:00.000",
+      "approveddate": "2026-01-27T00:00:00.000",
+      "novissueddate": "2026-01-28T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 14H, 14th STORY, 1st APARTMENT FROM EAST AT SOUTH , SECTION AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "18618203",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18618203",
+      "bbl": "4009090001",
+      "bin": "4020648",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-02-02T00:00:00.000",
+      "approveddate": "2026-02-02T00:00:00.000",
+      "novissueddate": "2026-02-03T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 14H, 14th STORY",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "18618226",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18618226",
+      "bbl": "4009090001",
+      "bin": "4020648",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-02-02T00:00:00.000",
+      "approveddate": "2026-02-02T00:00:00.000",
+      "novissueddate": "2026-02-03T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 14H, 14th STORY",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "18638038",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18638038",
+      "bbl": "4009090001",
+      "bin": "4020648",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-02-10T00:00:00.000",
+      "approveddate": "2026-02-10T00:00:00.000",
+      "novissueddate": "2026-02-11T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 14H, 14th STORY, APARTMENT AT SOUTH , SECTION AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "18650835",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18650835",
+      "bbl": "2043520010",
+      "bin": "2050093",
+      "boro": "BRONX",
+      "inspectiondate": "2026-02-14T00:00:00.000",
+      "approveddate": "2026-02-16T00:00:00.000",
+      "novissueddate": "2026-02-17T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE CERAMIC TILES AT WEST WALL AT BATHTUB IN THE BATHROOM LOCATED AT APT 11A, 1st STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18650862",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18650862",
+      "bbl": "2043520010",
+      "bin": "2050093",
+      "boro": "BRONX",
+      "inspectiondate": "2026-02-14T00:00:00.000",
+      "approveddate": "2026-02-16T00:00:00.000",
+      "novissueddate": "2026-02-17T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 11A, 1st STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18997336",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18997336",
+      "bbl": "3013740033",
+      "bin": "3036609",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-06-05T00:00:00.000",
+      "approveddate": "2026-06-10T00:00:00.000",
+      "novissueddate": "2026-06-11T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 HMC: PROPERLY REPAIR OR REPLACE THE BROKEN OR DEFECTIVE BASE CABINET AT SINK IN THE KITCHEN LOCATED AT APT 2I, 2nd STORY, 1st APARTMENT FROM SOUTH AT WEST , SECTION ''SOUTH''",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "18999527",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "18999527",
+      "bbl": "3070500001",
+      "bin": "3321834",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-06-11T00:00:00.000",
+      "approveddate": "2026-06-12T00:00:00.000",
+      "novissueddate": "2026-06-15T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT WASHBASIN/SINK IN THE BATHROOM LOCATED AT APT 14E3, 14th STORY, 8th APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION DISMISSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19022967",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19022967",
+      "bbl": "4014100035",
+      "bin": "4034400",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-06-22T00:00:00.000",
+      "approveddate": "2026-06-22T00:00:00.000",
+      "novissueddate": "2026-06-23T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 1, 1st STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19026472",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19026472",
+      "bbl": "1010780055",
+      "bin": "1027039",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-06-17T00:00:00.000",
+      "approveddate": "2026-06-21T00:00:00.000",
+      "novissueddate": "2026-06-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 5FE, 5th STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19046840",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19046840",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-07-01T00:00:00.000",
+      "approveddate": "2026-07-02T00:00:00.000",
+      "novissueddate": "2026-07-06T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE WOOD BASE CABINET AT SINK IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19046845",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19046845",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-07-01T00:00:00.000",
+      "approveddate": "2026-07-02T00:00:00.000",
+      "novissueddate": "2026-07-06T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION AT WASTE LINE AT SINK IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19046848",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19046848",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-07-01T00:00:00.000",
+      "approveddate": "2026-07-02T00:00:00.000",
+      "novissueddate": "2026-07-06T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE REPAIR THE BROKEN OR DEFECTIVE PLASTERED SURFACES AND PAINT IN A UNIFORM COLOR AT SOUTH WALL UNDER SINK INSIDE WOOD BASE CABINET IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19051323",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19051323",
+      "bbl": "1010780055",
+      "bin": "1027039",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-07-03T00:00:00.000",
+      "approveddate": "2026-07-03T00:00:00.000",
+      "novissueddate": "2026-07-06T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE PORCELAIN ENAMEL FINISH BY METHOD OF REGLAZING AT BATHTUB IN THE BATHROOM LOCATED AT APT 3FW, 3rd STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19057791",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19057791",
+      "bbl": "2039730034",
+      "bin": "2041705",
+      "boro": "BRONX",
+      "inspectiondate": "2026-07-08T00:00:00.000",
+      "approveddate": "2026-07-08T00:00:00.000",
+      "novissueddate": "2026-07-09T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 2R, 2nd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION DISMISSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19057793",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19057793",
+      "bbl": "2039730034",
+      "bin": "2041705",
+      "boro": "BRONX",
+      "inspectiondate": "2026-07-08T00:00:00.000",
+      "approveddate": "2026-07-08T00:00:00.000",
+      "novissueddate": "2026-07-09T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 3R, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION DISMISSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19060231",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19060231",
+      "bbl": "1020610032",
+      "bin": "1061396",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-07-09T00:00:00.000",
+      "approveddate": "2026-07-10T00:00:00.000",
+      "novissueddate": "2026-07-13T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES LOCATED AT B-ROOM 6, 2nd STORY, 1st B-ROOM FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19069302",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19069302",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-07-14T00:00:00.000",
+      "approveddate": "2026-07-14T00:00:00.000",
+      "novissueddate": "2026-07-15T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE REPLACE WITH NEW THE MISSING DOORS AT SINK BASE CABINET IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19069303",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19069303",
+      "bbl": "4016080053",
+      "bin": "4040293",
+      "boro": "QUEENS",
+      "inspectiondate": "2026-07-14T00:00:00.000",
+      "approveddate": "2026-07-14T00:00:00.000",
+      "novissueddate": "2026-07-15T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE WOOD BOTTOM PANEL INSIDE SINK BASE CABINET IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19100607",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19100607",
+      "bbl": "1020450031",
+      "bin": "1060812",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-07-27T00:00:00.000",
+      "approveddate": "2026-07-27T00:00:00.000",
+      "novissueddate": "2026-07-28T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 5C, 5th STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19116893",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19116893",
+      "bbl": "3050430071",
+      "bin": "3115582",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-08-04T00:00:00.000",
+      "approveddate": "2026-08-05T00:00:00.000",
+      "novissueddate": "2026-08-05T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 HMC: PROPERLY REPAIR OR REPLACE THE BROKEN OR DEFECTIVE PORCELAIN ENAMEL FINISH AT BATHTUB IN THE BATHROOM LOCATED AT APT 2G, 2nd STORY, 4th APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19116901",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19116901",
+      "bbl": "3050430071",
+      "bin": "3115582",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-08-04T00:00:00.000",
+      "approveddate": "2026-08-05T00:00:00.000",
+      "novissueddate": "2026-08-05T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REMOVE ALL OBSTRUCTIONS AND REPAIR ALL DEFECTS IN WASTELINE AT BATHTUB IN THE BATHROOM LOCATED AT APT 2G, 2nd STORY, 4th APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19125077",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19125077",
+      "bbl": "2030680081",
+      "bin": "2011983",
+      "boro": "BRONX",
+      "inspectiondate": "2026-08-05T00:00:00.000",
+      "approveddate": "2026-08-05T00:00:00.000",
+      "novissueddate": "2026-08-06T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE REPLACE WITH NEW THE MISSING SHOWERHEAD IN THE BATHROOM LOCATED AT APT 3H, 3rd STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19125078",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19125078",
+      "bbl": "2030680081",
+      "bin": "2011983",
+      "boro": "BRONX",
+      "inspectiondate": "2026-08-05T00:00:00.000",
+      "approveddate": "2026-08-05T00:00:00.000",
+      "novissueddate": "2026-08-06T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE POERCELAIN ENAMEL FINISH BY WAY OF REGLAZE AT BATHTUB IN THE BATHROOM LOCATED AT APT 3H, 3rd STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19162205",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19162205",
+      "bbl": "1017280042",
+      "bin": "1081379",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-08-24T00:00:00.000",
+      "approveddate": "2026-08-24T00:00:00.000",
+      "novissueddate": "2026-08-25T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 3B, 3rd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19162207",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19162207",
+      "bbl": "1017280042",
+      "bin": "1081379",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-08-24T00:00:00.000",
+      "approveddate": "2026-08-29T00:00:00.000",
+      "novissueddate": "2026-08-31T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 1A, 1st STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19167890",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19167890",
+      "bbl": "1020410040",
+      "bin": "1060661",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-08-26T00:00:00.000",
+      "approveddate": "2026-08-26T00:00:00.000",
+      "novissueddate": "2026-08-27T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 7, 3rd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION DISMISSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19173459",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19173459",
+      "bbl": "2031960029",
+      "bin": "2014207",
+      "boro": "BRONX",
+      "inspectiondate": "2026-08-25T00:00:00.000",
+      "approveddate": "2026-08-26T00:00:00.000",
+      "novissueddate": "2026-08-27T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 1A, 1st STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19175193",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19175193",
+      "bbl": "3012340005",
+      "bin": "3031229",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-08-29T00:00:00.000",
+      "approveddate": "2026-09-04T00:00:00.000",
+      "novissueddate": "2026-09-08T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 15, 4th STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19175237",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19175237",
+      "bbl": "3014637501",
+      "bin": "3394974",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-08-29T00:00:00.000",
+      "approveddate": "2026-08-29T00:00:00.000",
+      "novissueddate": "2026-08-31T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 3B, 3rd STORY, 1st APARTMENT FROM NORTH AT EAST , SECTION ''1793''",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19175242",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19175242",
+      "bbl": "3014637501",
+      "bin": "3394974",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-08-29T00:00:00.000",
+      "approveddate": "2026-08-29T00:00:00.000",
+      "novissueddate": "2026-08-31T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 4A, 4th STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19175486",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19175486",
+      "bbl": "1018210064",
+      "bin": "1054970",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-08-29T00:00:00.000",
+      "approveddate": "2026-08-29T00:00:00.000",
+      "novissueddate": "2026-08-31T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 2H, 2nd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19175775",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19175775",
+      "bbl": "3040020033",
+      "bin": "3088943",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-08-29T00:00:00.000",
+      "approveddate": "2026-08-30T00:00:00.000",
+      "novissueddate": "2026-08-31T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 3A, 3rd STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19175782",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19175782",
+      "bbl": "3040020033",
+      "bin": "3088943",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-08-29T00:00:00.000",
+      "approveddate": "2026-08-30T00:00:00.000",
+      "novissueddate": "2026-08-31T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 2B, 2nd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19221109",
+    "prior_side": "SERVED_ONLY",
+    "classification": "SERVED_SNAPSHOT_NOW_CLOSED",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19221109",
+      "bbl": "3057910019",
+      "bin": "3143727",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-14T00:00:00.000",
+      "approveddate": "2026-09-15T00:00:00.000",
+      "novissueddate": "2026-09-16T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT H, 2nd STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION CLOSED",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Close",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19222934",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19222934",
+      "bbl": "3050310006",
+      "bin": "3114848",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-16T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPLACE THE BROKEN OR DEFECTIVE WATER CLOSET IN THE BATHROOM LOCATED AT APT F11, 6th STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-16T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19226166",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19226166",
+      "bbl": "3012800016",
+      "bin": "3033449",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF HOT WATER FOR THE FIXTURES , IN THE BATHROOM LOCATED AT APT 2C, 2nd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19226167",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19226167",
+      "bbl": "3012800016",
+      "bin": "3033449",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF HOT WATER FOR THE FIXTURES , IN THE KITCHEN LOCATED AT APT 2C, 2nd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19228600",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19228600",
+      "bbl": "3058850111",
+      "bin": "3146309",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE CAULKING AROUND BATHTUB IN THE BATHROOM LOCATED AT APT E1, 5th STORY, 1st APARTMENT FROM NORTH AT EAST , SECTION AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19228819",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19228819",
+      "bbl": "2050780018",
+      "bin": "2070937",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 HMC: PROPERLY REPAIR OR REPLACE THE BROKEN OR DEFECTIVE SHOWER DOOR IN THE BATHROOM LOCATED AT APT 1SIDE, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19228948",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19228948",
+      "bbl": "3060340060",
+      "bin": "3153133",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE WOOD BASAE CABINET UNDER SINK IN THE KITCHEN LOCATED AT APT 316, 3rd STORY, 3rd APARTMENT FROM SOUTH AT WEST , SECTION ''EAST''",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19229371",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19229371",
+      "bbl": "3012800004",
+      "bin": "3033447",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPLACE THE BROKEN OR DEFECTIVE WATER CLOSET TANK LID IN THE BATHROOM LOCATED AT APT 5B, 2nd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19229839",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19229839",
+      "bbl": "1021360167",
+      "bin": "1063335",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-21T00:00:00.000",
+      "novissueddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 6A, 6th STORY, 4th APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "NOV SENT OUT",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19229922",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19229922",
+      "bbl": "3030220025",
+      "bin": "3070801",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE WATER SUPPLY PIPE AT WATER CLOSET IN THE BATHROOM LOCATED AT APT 3A, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19229923",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19229923",
+      "bbl": "3030220025",
+      "bin": "3070801",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2017.3 HMC: TRACE AND REPAIR THE SOURCE AND ABATE THE VISIBLE MOLD CONDITION... LESS THAN 10 SQ FT OBSERVED AT SOUTH WALL UNDER SINK IN THE KITCHEN LOCATED AT APT 3A, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19229927",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19229927",
+      "bbl": "3030220025",
+      "bin": "3070801",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE PROCELAIN ENAMEL GLAZE AT BATHTUB IN THE BATHROOM LOCATED AT APT 3A, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19229937",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19229937",
+      "bbl": "3043020024",
+      "bin": "3096654",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF COLD WATER FOR THE FIXTURES AT SINK IN THE KITCHEN LOCATED AT APT 2F, 2nd STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19229938",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19229938",
+      "bbl": "3043020024",
+      "bin": "3096654",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-18T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF HOT WATER FOR THE FIXTURES AT BATHTUB IN THE BATHROOM LOCATED AT APT 2F, 2nd STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19230529",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19230529",
+      "bbl": "3046600001",
+      "bin": "3101525",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-19T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPLACE THE BROKEN OR DEFECTIVE WATER CLOSET IN THE BATHROOM LOCATED AT APT 1A, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-19T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19230530",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19230530",
+      "bbl": "3046600001",
+      "bin": "3101525",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-19T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE FLUSHING APPARATUS AND MAINTAIN SAME SO AS TO FLUSH EFFECTIVELY THE WATER CLOSET IN THE BATHROOM LOCATED AT APT 1A, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-19T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19232732",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19232732",
+      "bbl": "1014310031",
+      "bin": "1044080",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REMOVE ALL OBSTRUCTIONS FROM WATER CLOSET .. IN THE BATHROOM LOCATED AT APT 7B, 7th STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19232781",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19232781",
+      "bbl": "3014090068",
+      "bin": "3037997",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 1F, 1st STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19232785",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19232785",
+      "bbl": "3014090068",
+      "bin": "3037997",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE FLUSHING APPARATUS AND MAINTAIN SAME SO AS TO FLUSH EFFECTIVELY THE WATER CLOSET IN THE BATHROOM LOCATED AT APT 1F, 1st STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19232796",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19232796",
+      "bbl": "3059810055",
+      "bin": "3150985",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF HOT WATER FOR THE FIXTURES ... IN THE ENTIRE APARTMENT LOCATED AT APT 2F, 2nd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19232819",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19232819",
+      "bbl": "3053430037",
+      "bin": "3124823",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE RESET, SO AS TO SECURE A PROPER AND TIGHT CONNECTION, THE WATER CLOSET BOWL , IN THE BATHROOM LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19232825",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19232825",
+      "bbl": "3053430037",
+      "bin": "3124823",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 1E, 1st STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19232896",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19232896",
+      "bbl": "3018540059",
+      "bin": "3053470",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 2R, 2nd STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19233009",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19233009",
+      "bbl": "2047140005",
+      "bin": "2059984",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADMIN. CODE: REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 2, 2nd STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19233091",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19233091",
+      "bbl": "3022420017",
+      "bin": "3061302",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 1L, 1st STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19233150",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19233150",
+      "bbl": "2043220025",
+      "bin": "2049433",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 354, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST , SECTION ''2184''",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19233254",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19233254",
+      "bbl": "3036790030",
+      "bin": "3083426",
+      "boro": "BROOKLYN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE 3rd ROOM FROM NORTH LOCATED AT B-ROOM 208A, 6th STORY, 3rd B-ROOM FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19233330",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19233330",
+      "bbl": "2027960028",
+      "bin": "2007424",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION DRAIN PIPE UNDERNEATH KITCHEN SINK BASE CABINET IN THE KITCHEN LOCATED AT APT 3C, 4th STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19233377",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19233377",
+      "bbl": "2032870031",
+      "bin": "2016620",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novissueddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION WASTELINE AT SINK IN THE KITCHEN LOCATED AT APT 1K, 1st STORY, 2nd APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "NOV SENT OUT",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19233381",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19233381",
+      "bbl": "2032870031",
+      "bin": "2016620",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novissueddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 1K, 1st STORY, 2nd APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "NOV SENT OUT",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19233382",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19233382",
+      "bbl": "2032870031",
+      "bin": "2016620",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novissueddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 1K, 1st STORY, 2nd APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "NOV SENT OUT",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19234739",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19234739",
+      "bbl": "1017370069",
+      "bin": "1053940",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-16T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REMOVE ALL OBSTRUCTIONS AND REPAIR ALL DEFECTS IN AT SINK IN THE KITCHEN LOCATED AT APT 4L, 4th STORY, 6th APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-18T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19235327",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235327",
+      "bbl": "2030960061",
+      "bin": "2012701",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 2, 2nd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19235363",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235363",
+      "bbl": "2024967501",
+      "bin": "2130521",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION UNDER SINK IN THE KITCHEN LOCATED AT APT 602, 6th STORY, 2nd APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235374",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235374",
+      "bbl": "2028280005",
+      "bin": "2007910",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE PORCELAIN ENAMEL FINISH BY METHOD OF REGLAZING AT BATHTUB IN THE BATHROOM LOCATED AT APT 2F, 2nd STORY, 1st APARTMENT FROM NORTH AT EAST , SECTION ''SOUTH''",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235471",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235471",
+      "bbl": "2023820039",
+      "bin": "2001500",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE PORCELAIN ENAMEL FINISH BY METHOD OF REGLAZING AT BATHTUB IN THE BATHROOM LOCATED AT APT 3A, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235472",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235472",
+      "bbl": "2023820039",
+      "bin": "2001500",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE CAULKING AROUND BATHTUB IN THE BATHROOM LOCATED AT APT 3A, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235473",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235473",
+      "bbl": "2023820039",
+      "bin": "2001500",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPLACE THE BROKEN OR DEFECTIVE WATER CLOSET IN THE BATHROOM LOCATED AT APT 3A, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19235576",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235576",
+      "bbl": "2031990005",
+      "bin": "2014296",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 1A, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235655",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235655",
+      "bbl": "2028720320",
+      "bin": "2114112",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novissueddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT KITCHEN SINK IN THE KITCHEN LOCATED AT APT 8C, 8th STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "NOV SENT OUT",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235666",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235666",
+      "bbl": "2028800029",
+      "bin": "2092067",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 12M, 12th STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235703",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235703",
+      "bbl": "2027427501",
+      "bin": "2113354",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT WASHBASIN IN THE 1st BATHROOM FROM NORTH LOCATED AT APT 8M, 8th STORY, 2nd APARTMENT FROM NORTH AT EAST , SECTION ''NORTH''",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235725",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235725",
+      "bbl": "2026240070",
+      "bin": "2004455",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE RESET, SO AS TO SECURE A PROPER AND TIGHT CONNECTION, THE WATER CLOSET BOWL IN THE BATHROOM LOCATED AT BSMT-APT BA, 1st BSMT-APT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235726",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235726",
+      "bbl": "1021190036",
+      "bin": "1062836",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF SCALDING HOT WATER ABOVE 130 DEGREES IN THE ENTIRE APARTMENT LOCATED AT APT 1G, 1st STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235780",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235780",
+      "bbl": "2030710045",
+      "bin": "2128797",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE CAULKING AROUND BATHTUB IN THE BATHROOM LOCATED AT APT 2R, 2nd STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235781",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235781",
+      "bbl": "2030710045",
+      "bin": "2128797",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE RESET, SO AS TO SECURE A PROPER AND TIGHT CONNECTION, THE WATER CLOSET BOWL . IN THE BATHROOM LOCATED AT APT 2R, 2nd STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235868",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235868",
+      "bbl": "1020540012",
+      "bin": "1061164",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE REPLACE WITH NEW THE MISSING MECHANICAL STOPPER AT BATHTUB IN THE BATHROOM LOCATED AT APT 53, 5th STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235887",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235887",
+      "bbl": "2033260029",
+      "bin": "2017727",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADMIN. CODE: REPAIR THE BROKEN OR DEFECTIVE CONNECTION WASTE LINE DRAIN PIPE AT SINK IN THE KITCHEN LOCATED AT APT 1, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235889",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235889",
+      "bbl": "2033260029",
+      "bin": "2017727",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADMIN. CODE: PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE BROKEN CABNITS DOOR UNDER SINK IN THE KITCHEN LOCATED AT APT 1, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235979",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235979",
+      "bbl": "2043400001",
+      "bin": "2049739",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 5G, 5th STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235980",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235980",
+      "bbl": "2043400001",
+      "bin": "2049739",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE PORECLAIN ENAMEL FINISH BY METHOD OF REGLAZING AT BATHTUB IN THE BATHROOM LOCATED AT APT 5G, 5th STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19235986",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19235986",
+      "bbl": "2043400001",
+      "bin": "2049739",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE REPLACE WITH NEW THE MISSING WOOD SINK BASE CABINET IN THE KITCHEN LOCATED AT APT 6A, 6th STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236026",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236026",
+      "bbl": "2028050041",
+      "bin": "2007626",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF HOT WATER TEMPERATURE EXCEEDING OVER 130 DEGREES AT ALL PLUMBING FIXTURES IN THE KITCHEN LOCATED AT APT 5D, 5th STORY, 3rd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236047",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236047",
+      "bbl": "1022480092",
+      "bin": "1080547",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE ROTTED WOOD BOTTOM SHELF AT THE SINK BASE CABINET IN THE KITCHEN LOCATED AT APT 4B, 4th STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236057",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236057",
+      "bbl": "2042560031",
+      "bin": "2047878",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION WASTELINE PIPE AT SINK IN THE KITCHEN LOCATED AT BSMT-APT 17, 1st BSMT-APT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236112",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236112",
+      "bbl": "1020160050",
+      "bin": "1079771",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 HMC: PROPERLY REPAIR OR REPLACE THE BROKEN OR DEFECTIVE BASE CABINET AT SINK IN THE KITCHEN LOCATED AT APT 27J, 27th STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236114",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236114",
+      "bbl": "1020160050",
+      "bin": "1079771",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE FLUSHING APPARATUS AND MAINTAIN SAME SO AS TO FLUSH EFFECTIVELY THE WATER CLOSET IN THE BATHROOM LOCATED AT APT 27J, 27th STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19236127",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236127",
+      "bbl": "2033360011",
+      "bin": "2018042",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 2I, 2nd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236228",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236228",
+      "bbl": "2032780022",
+      "bin": "2016380",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE FLUSHING APPARATUS AND MAINTAIN SAME SO AS TO FLUSH EFFECTIVELY THE WATER CLOSET AT WATER CLOSET IN THE BATHROOM LOCATED AT APT 17F, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19236231",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236231",
+      "bbl": "2032780022",
+      "bin": "2016380",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF HOT WATER FOR THE FIXTURES AT HOT WATER FIXTURES IN THE BATHROOM LOCATED AT APT 16E, 3rd STORY, 2nd APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19236236",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236236",
+      "bbl": "2032780022",
+      "bin": "2016380",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF HOT WATER FOR THE FIXTURES AT SINK IN THE KITCHEN LOCATED AT APT 16E, 3rd STORY, 2nd APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19236237",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236237",
+      "bbl": "2032780022",
+      "bin": "2016380",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2024 ADM CODE PROVIDE ADEQUATE SUPPLY OF COLD WATER FOR THE FIXTURES AT SINK IN THE KITCHEN LOCATED AT APT 16E, 3rd STORY, 2nd APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19236242",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236242",
+      "bbl": "2028140001",
+      "bin": "2007762",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 1H, 1st STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236243",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236243",
+      "bbl": "2028140001",
+      "bin": "2007762",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE PORCELAIN ENAMEL GLAZE AT BATHTUB IN THE BATHROOM LOCATED AT APT 1H, 1st STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236348",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236348",
+      "bbl": "2028490063",
+      "bin": "2129185",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 3A, 3rd STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236380",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236380",
+      "bbl": "2024540011",
+      "bin": "2002705",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT WASH BASIN IN THE 1st BATHROOM FROM NORTH LOCATED AT APT 4H, 4th STORY, 1st APARTMENT FROM WEST AT NORTH , SECTION ''north''",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236457",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236457",
+      "bbl": "1019660104",
+      "bin": "1059558",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 4C, 4th STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236578",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236578",
+      "bbl": "1021360090",
+      "bin": "1063323",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE ROTTED WOOD BOTTOM SHELF AT THE SINK BASED CABINET IN THE KITCHEN LOCATED AT APT 1C, 1st STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19236730",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19236730",
+      "bbl": "1017300036",
+      "bin": "1053890",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE CAULKING AROUND BATHTUB IN THE 2nd BATHROOM FROM NORTH LOCATED AT APT 2E, 2nd STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19237126",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237126",
+      "bbl": "2032110021",
+      "bin": "2014583",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REMOVE ALL OBSTRUCTIONS AND REPAIR ALL DEFECTS IN DRAIN PIPE BATHTUB IN THE BATHROOM LOCATED AT APT 1C, 1st STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19237189",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237189",
+      "bbl": "1021740012",
+      "bin": "1064156",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT THE SINK IN THE KITCHEN LOCATED AT APT 4G, 4th STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19237191",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237191",
+      "bbl": "1021740012",
+      "bin": "1064156",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE ROTTED WOOD BOTTOM SHELF AT THE SINK BASE CABINET IN THE KITCHEN LOCATED AT APT 4G, 4th STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19237397",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237397",
+      "bbl": "2032820001",
+      "bin": "2016466",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 5D, 5th STORY, 1st APARTMENT FROM NORTH AT EAST , SECTION AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19237399",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237399",
+      "bbl": "2032820001",
+      "bin": "2016466",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 5A, 5th STORY, 2nd APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19237403",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237403",
+      "bbl": "2032820001",
+      "bin": "2016466",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 3D, 3rd STORY, 1st APARTMENT FROM NORTH AT EAST , SECTION AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19237536",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237536",
+      "bbl": "1019880098",
+      "bin": "1059792",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 1C, 1st STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19237538",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237538",
+      "bbl": "1019880098",
+      "bin": "1059792",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2031 ADM CODE PROVIDE HOT WATER AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 5A, 5th STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19237828",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237828",
+      "bbl": "2033000009",
+      "bin": "2016994",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE PORCELAIN ENAMEL BY MEANS OF REGLAZING AT BATHTUB IN THE BATHROOM LOCATED AT APT 3B, 3rd STORY, 2nd APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19237992",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19237992",
+      "bbl": "2033177501",
+      "bin": "2129358",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-22T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE 2nd BATHROOM FROM NORTH LOCATED AT APT 811, 8th STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240638",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240638",
+      "bbl": "1004040058",
+      "bin": "1005163",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-17T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE BROKEN OR DEFECTIVE CONNECTION FAUCET AT WASH BASIN IN THE BATHROOM LOCATED AT APT 1, 1st STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240673",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240673",
+      "bbl": "1004540059",
+      "bin": "1006505",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-17T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF SCADLING HOT WATER, EXCEEDING 130 DEGREES FEHRENHEIT IN THE ENTIRE APARTMENT LOCATED AT APT 5A, 5th STORY, 2nd APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240674",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240674",
+      "bbl": "2029480047",
+      "bin": "2009936",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-17T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 2F, 2nd STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240693",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240693",
+      "bbl": "1004540059",
+      "bin": "1006505",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-17T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF SCALDING HOT WATER, EXCEEDING 130 DEGREES FEHRENHEIT IN THE ENTIRE APARTMENT LOCATED AT APT 5B, 5th STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240698",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240698",
+      "bbl": "1004540059",
+      "bin": "1006505",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-17T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF SCALDING HOT WATER, EXCEEDING 130 DEGREES FEHRENHEIT IN THE ENTIRE APARTMENT LOCATED AT APT 3B, 3rd STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240839",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240839",
+      "bbl": "2032480173",
+      "bin": "2015296",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-17T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novissueddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE PORCELAIN ENAMEL GLAZE FINISH AT BATHTUB IN THE BATHROOM LOCATED AT APT 4J, 4th STORY, 2nd APARTMENT FROM SOUTH AT WEST , SECTION ''SOUTH''",
+      "currentstatus": "NOV SENT OUT",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240917",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240917",
+      "bbl": "2024460001",
+      "bin": "2002475",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE SINKING AND SAGGING CERAMIC FLOOR TILES IN THE BATHROOM LOCATED AT APT 1E, 2nd STORY, 2nd APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240919",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240919",
+      "bbl": "2024460001",
+      "bin": "2002475",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT WASH BASIN IN THE BATHROOM LOCATED AT APT 1E, 2nd STORY, 2nd APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19240985",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19240985",
+      "bbl": "2026910122",
+      "bin": "2114108",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT WASH BASIN IN THE BATHROOM LOCATED AT APT 4B, 4th STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241040",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241040",
+      "bbl": "2033200031",
+      "bin": "2017618",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT SINK IN THE KITCHEN LOCATED AT APT 3A, 4th STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241178",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241178",
+      "bbl": "2027850040",
+      "bin": "2088218",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF HOT WATER EXCEEDING 130 DEGREES FAHRENHEIT AT ALL FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT 203, 2nd STORY, 6th APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241216",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241216",
+      "bbl": "1003540020",
+      "bin": "1004313",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF HOT WATER TEMPERATURE EXCEEDING THE MAXIMUM ALLOWABLE TEMPERATURE OF 130F AT ALL HOT WATER FIXTURES IN THE ENTIRE APARTMENT LOCATED AT APT F, 1st STORY, 1st APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-21T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241289",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241289",
+      "bbl": "2048190042",
+      "bin": "2062833",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-17T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE & 309 M/D LAW ABATE THE NUISANCE CONSISTING OF SCALDING HOT WATER EXCEEDING 130 DEGREES AT ALL WATER FIXTURES AT TIME OF INSPECTION IN THE ENTIRE APARTMENT LOCATED AT APT 5L, 5th STORY, 2nd APARTMENT FROM WEST AT NORTH , SECTION ''NORTH''",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241295",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241295",
+      "bbl": "1020870016",
+      "bin": "1062290",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT BATHTUB IN THE BATHROOM LOCATED AT APT 31, 3rd STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241367",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241367",
+      "bbl": "2035590023",
+      "bin": "2021854",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REMOVE ALL OBSTRUCTIONS FROM WATER CLOSET ... IN THE BATHROOM LOCATED AT APT 1, 1st STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19241370",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241370",
+      "bbl": "2035590023",
+      "bin": "2021854",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REMOVE ALL OBSTRUCTIONS AND REPAIR ALL DEFECTS IN WASTE LINE DRAIN PIPE AT BATHTUB IN THE BATHROOM LOCATED AT APT 1, 1st STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "Y"
+    }
+  },
+  {
+    "violation_id": "19241381",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241381",
+      "bbl": "2035590023",
+      "bin": "2021854",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE CAULKING AT BATHTUB IN THE BATHROOM LOCATED AT APT 1, 1st STORY, 1st APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241391",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241391",
+      "bbl": "2033140051",
+      "bin": "2017427",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT WASH BASIN IN THE 2nd BATHROOM FROM EAST LOCATED AT APT 5J, 5th STORY, 2nd APARTMENT FROM NORTH AT EAST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241441",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241441",
+      "bbl": "2026660022",
+      "bin": "2004791",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 HMC: PROPERLY REPAIR OR REPLACE THE BROKEN OR DEFECTIVE SINK BASE CABINET DOOR IN THE KITCHEN LOCATED AT APT 4E, 4th STORY, 1st APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241462",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241462",
+      "bbl": "2026750035",
+      "bin": "2004943",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 HMC: PROPERLY REPAIR OR REPLACE THE BROKEN OR DEFECTIVE DEFFECTIVE ROTTED METAL SINK BASE CABINET IN THE KITCHEN LOCATED AT APT 2, 1st STORY, 1st APARTMENT FROM SOUTH AT WEST",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241537",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241537",
+      "bbl": "1021790005",
+      "bin": "1064332",
+      "boro": "MANHATTAN",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2005 ADM CODE PROPERLY REPAIR WITH SIMILAR MATERIAL THE BROKEN OR DEFECTIVE COUNTER TOP AT SINK BASE CABINET AT NORTH WALL IN THE KITCHEN LOCATED AT APT 15C, 14th STORY, 2nd APARTMENT FROM EAST AT SOUTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  },
+  {
+    "violation_id": "19241655",
+    "prior_side": "SOURCE_ONLY_CURRENT_OPEN",
+    "classification": "CURRENT_ONLY_EVENT_DATES_NOT_AFTER_BUILD",
+    "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+    "source_row": {
+      "violationid": "19241655",
+      "bbl": "2028660015",
+      "bin": "2008449",
+      "boro": "BRONX",
+      "inspectiondate": "2026-09-21T00:00:00.000",
+      "approveddate": "2026-09-22T00:00:00.000",
+      "novdescription": "\u00a7 27-2026 ADM CODE REPAIR THE LEAKY AND/OR DEFECTIVE FAUCETS AT WASH BASIN IN THE BATHROOM LOCATED AT APT 3BN, 3rd STORY, 2nd APARTMENT FROM WEST AT NORTH",
+      "currentstatus": "VIOLATION OPEN",
+      "currentstatusdate": "2026-09-22T00:00:00.000",
+      "violationstatus": "Open",
+      "rentimpairing": "N"
+    }
+  }
+]

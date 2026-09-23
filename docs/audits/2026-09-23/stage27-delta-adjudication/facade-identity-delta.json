@@ -1,0 +1,806 @@
+{
+  "duplicate_examples": [
+    {
+      "identity": "1000006|900005|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1000007|900004|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1000045|900020|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1000802|800059|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1000808|800063|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1000811|900066|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1000827|900088|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1000865|900112|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1001015|900134|1|Subsequent",
+      "count": 5
+    },
+    {
+      "identity": "1001017|900135|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1001018|900136|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1001116|900193|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1001227|900234|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1001228|900235|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1001228|900235|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1001232|900239|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1002002|914547|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1002735|919011||Auto-Generated",
+      "count": 2
+    },
+    {
+      "identity": "1007984|800967|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1008015|800970|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1008240|901003|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1009100|801156|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1010639|901353|1|Subsequent",
+      "count": 4
+    },
+    {
+      "identity": "1010899|801363|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1012223|1018518||Initial",
+      "count": 2
+    },
+    {
+      "identity": "1012493|901441|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1012493|901441|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1013552|912697|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1013562|801542|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1013643|801570|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1013643|901570|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1014306|801657|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1014501|901743|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1015060|901856|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1015266|901929|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1015292|801943|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1015409|901971|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1015575|902042|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1015725|802106|1|Amended",
+      "count": 3
+    },
+    {
+      "identity": "1015725|902106|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1016035|902242|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1016227|902340|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1016749|902377|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1016877|902381|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1017084|802476|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1017089|802478|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1017096|802482|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1017206|902520|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1017230|902524|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1017231|902525|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1017954|902588|1|Subsequent",
+      "count": 4
+    },
+    {
+      "identity": "1018102|902627|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1018471|802686|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1019821|902804|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1019864|902809|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1020579|813608|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1021925|902924|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1022051|802926|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1022581|903031|1|Amended",
+      "count": 3
+    },
+    {
+      "identity": "1022581|903031|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1022616|903038|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1022708|903075|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1023163|803082|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1023391|803094|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1023449|903101|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1023455|903104|1|Amended",
+      "count": 3
+    },
+    {
+      "identity": "1024665|712389|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1024737|803162|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1024742|812681|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1024811|903183|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1024898|903215|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1024899|903216|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1024909|903226|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1026863|903317|1|Subsequent",
+      "count": 4
+    },
+    {
+      "identity": "1027465|1003386|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1029777|903507|2|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1030280|903561|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1030544|803618|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1030930|903657|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1030972|903667|2|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1031371|803721|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1032491|803838|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1034199|904077|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1034206|804082|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1034497|804155|1|Initial",
+      "count": 3
+    },
+    {
+      "identity": "1034508|904163|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1035255|804241|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1035322|804255|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1035327|912641|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1035328|904259|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1035335|904264|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1035346|904273|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1035365|904289|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1035385|904302|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1035395|804311|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1035407|804318|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1035471|804351|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1035707|904360|1|Amended",
+      "count": 3
+    },
+    {
+      "identity": "1035707|904360|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1035733|904380|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1035738|904383|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1035744|904387|2|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1035751|904389|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1035758|904392|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1035762|904394|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1035773|904401|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1035794|804412|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1035794|904412|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1036068|904422|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1036150|904438|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1036177|904451|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1036185|904454|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1036223|904468|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1036441|904477|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1037546|904554|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1037550|904557|1|Subsequent",
+      "count": 4
+    },
+    {
+      "identity": "1037568|904569|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1037588|904575|1|Subsequent",
+      "count": 6
+    },
+    {
+      "identity": "1037986|904590|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1037986|904590|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1038040|914119|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1038549|904610|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1038613|804630|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1038650|904640|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1038669|904653|1|Subsequent",
+      "count": 6
+    },
+    {
+      "identity": "1038770|904662|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1040356|904777|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1040751|904825|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1040766|804837|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1040808|904844|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1040855|904847|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1041176|904886|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1041352|904920|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1041902|904998|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1042369|905031|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1042799|905069|1|Subsequent",
+      "count": 4
+    },
+    {
+      "identity": "1043149|805113|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1043163|805116|1|Amended",
+      "count": 3
+    },
+    {
+      "identity": "1043547|905148|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1043864|805157|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1043866|905158|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1043902|905171|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1044089|905213|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1044756|813811|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1046252|905368|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1046252|905368|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1046259|905395|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1046261|905399|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1046787|905448|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1046842|905470|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1046846|905472|1|Subsequent",
+      "count": 3
+    },
+    {
+      "identity": "1047052|805522|1|Amended",
+      "count": 3
+    },
+    {
+      "identity": "1048692|905728|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1050385|705821|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1050764|905862|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1050869|805869|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1051164|905880|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1051312|805898|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1057331|906636|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1059669|706810|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1059836|706866|3|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1066031|900100|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1072007|804841|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1076192|903164|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1076309|905188|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1079064|900221|2|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1080572|912301|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1080611|901934|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1080644|901986|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1080745|902252|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1080796|902543|1|Subsequent",
+      "count": 4
+    },
+    {
+      "identity": "1081163|804521|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1081164|804527|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1081582|806368|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1081598|919123||Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1082490|816786||Amended",
+      "count": 2
+    },
+    {
+      "identity": "1082634|800023|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1082718|803331|2|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1083181|904443|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1083717|903060|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1083796|803341|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1084771|904476|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1084771|904476|1|Subsequent",
+      "count": 5
+    },
+    {
+      "identity": "1084936|902541|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1085494|903064|1|Auto-Generated",
+      "count": 2
+    },
+    {
+      "identity": "1086104|813636|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1086247|813678|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1087241|913325|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1087264|813745|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1087268|914113|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1087501|813313|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1087613|814784|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1087707|914688|1|Amended",
+      "count": 2
+    },
+    {
+      "identity": "1087756|800268|1|Initial",
+      "count": 3
+    },
+    {
+      "identity": "1087804|914334|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1087840|814729|1|Initial",
+      "count": 2
+    },
+    {
+      "identity": "1087847|914894|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1087848|914893|1|Subsequent",
+      "count": 2
+    },
+    {
+      "identity": "1087953|918338||Initial",
+      "count": 2
+    },
+    {
+      "identity": "1088355|914715|1|Subsequent",
+      "count": 2
+    }
+  ],
+  "source_only": [],
+  "served_only": []
+}
