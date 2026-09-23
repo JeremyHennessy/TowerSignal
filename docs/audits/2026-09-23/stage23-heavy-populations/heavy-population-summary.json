@@ -1,0 +1,34 @@
+{
+  "sources": 3,
+  "all_snapshots_stable": true,
+  "results": {
+    "erm2-nwe9": {
+      "source_rows": 190233,
+      "served_rows": 190233,
+      "partitions": 21,
+      "all_partitions_stable": true,
+      "id_multiset_equal": true,
+      "source_only_count": 0,
+      "served_only_count": 0
+    },
+    "wvxf-dwi5": {
+      "source_rows": 184645,
+      "served_rows": 184528,
+      "partitions": 5,
+      "all_partitions_stable": true,
+      "id_multiset_equal": false,
+      "source_only_count": 183,
+      "served_only_count": 66
+    },
+    "jz4z-kudi": {
+      "source_agency_rows": 59432,
+      "source_unique_normalized_tickets": 59432,
+      "source_snapshot_stable": true,
+      "served_accounts_checked": 3988,
+      "served_oath_rows": 0,
+      "served_unique_tickets": 0,
+      "current_source_tickets_not_served_count": 59432,
+      "note": "Current agency source includes cases beyond TowerSignal requested summons universe; source-not-served is not a defect."
+    }
+  }
+}
