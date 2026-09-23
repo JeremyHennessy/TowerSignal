@@ -59,10 +59,10 @@ beforeEach(() => {
     notes:[{ note_id:'n1', company_id:'observed-company-alpha', note:'Existing private note', updated_at:'2026-09-20T00:00:00Z' }],
   })
   vi.mocked(adminClient.saveCompanyAdminProfile).mockImplementation(async (companyId, canonicalName, patch) => ({
-    company_id:companyId,
-    canonical_name:canonicalName,
     ...profile,
     ...patch,
+    company_id:companyId,
+    canonical_name:canonicalName,
   }))
   vi.mocked(adminClient.addCompanyNote).mockResolvedValue({ note_id:'n2', company_id:'observed-company-alpha', note:'New note' })
   vi.mocked(adminClient.updateCompanyNote).mockResolvedValue({ note_id:'n1', company_id:'observed-company-alpha', note:'Updated note' })
