@@ -1,0 +1,100 @@
+{
+  "finalized_at": "2026-09-23",
+  "relationship_contract_occurrences": 158,
+  "unique_relationship_contracts": 71,
+  "dynamic_contract_occurrences_reviewed": 41,
+  "dynamic_contract_occurrences_unresolved": 0,
+  "join_mechanism_occurrences": 539,
+  "join_key_classes": {
+    "SYSTEM_ID": {
+      "occurrences": 285,
+      "status": "STRUCTURALLY_ACCEPTED",
+      "evidence": [
+        "4,893/4,893 NYC system IDs reconciled in current population audits",
+        "Pages242 and prior captured population retained identical 4,893 system ID membership",
+        "Application/detail lookups use stable system_id as internal account identity"
+      ],
+      "boundary": "Internal TowerSignal identity; correctness still depends on the upstream source-to-system identity construction."
+    },
+    "BIN": {
+      "occurrences": 39,
+      "status": "ACCEPTED_WITH_KNOWN_DOWNSTREAM_FIRM_SITE_DEFECT",
+      "evidence": [
+        "Assigned-BIN validation now rejects borough-only placeholders in current account-level data",
+        "Pages242 removed the previously demonstrated 488 placeholder-BIN account attachments",
+        "Fresh stage4 hosted/current-source census preserved 4,893 details and no account-level bad-BIN regression"
+      ],
+      "known_defect": "Known-firm market-site construction still accepts placeholder source BINs for non-account firm sites; at least 14 sites across 10 firms collapse multiple parcels. Isolated repair branch exists and passes 518 Python tests.",
+      "boundary": "Do not interpret a nonempty source BIN as an assigned NYC building ID without normalize_bin/assigned-BIN validation."
+    },
+    "BBL": {
+      "occurrences": 38,
+      "status": "ACCEPTED_WITH_ALIAS_BOUNDARIES",
+      "evidence": [
+        "Current canonical and preserved source-backed alias mappings were replayed independently",
+        "1,237 base-lot opportunities validated in earlier replay; ambiguous candidates remained unpromoted",
+        "HPD stage4 false positives demonstrated why a supported parcel/base-lot alias does not automatically create building-specific contacts"
+      ],
+      "boundary": "Exact canonical/preserved source-supported aliases only. Base parcel context must remain parcel-level when another building BIN/registration is involved."
+    },
+    "REGISTRATION_ID": {
+      "occurrences": 57,
+      "status": "ACCEPTED_WITH_BUILDING_IDENTITY_GUARD",
+      "evidence": [
+        "Fresh complete HPD registration snapshot and exact registration-ID contact scope reconciled against all 4,893 hosted accounts",
+        "Registration ID 0 is explicitly unusable; 545 W 112th no longer receives unrelated contacts",
+        "Two apparent stage4 discrepancies were independently resolved as parcel/historical HPD records for different buildings, and product correctly did not attach them"
+      ],
+      "boundary": "Registration ID alone is insufficient when source building identity conflicts. Exact assigned-BIN/current-building semantics take precedence."
+    },
+    "SUMMONS_TICKET": {
+      "occurrences": 43,
+      "status": "BOUNDED_EXACT",
+      "evidence": [
+        "OATH module match basis is fixed SUMMONS_NUMBER_EXACT",
+        "OATH query logic validates requested tickets and rejects unexpected tickets",
+        "Exact-ticket fallback is explicit when the agency slice cannot produce a stable snapshot"
+      ],
+      "boundary": "Exact normalized summons/ticket identity only; hearing/compliance fields remain source lifecycle observations."
+    },
+    "SOURCE_RECORD_ID": {
+      "occurrences": 10,
+      "status": "ACCEPTED_WITH_OBSERVATION_GRAIN_BOUNDARY",
+      "evidence": [
+        "Source-row identity audit completed successfully",
+        "Repeated normalized activity IDs were shown to retain distinct publisher source-row identities and full value multiplicity",
+        "No current row loss was demonstrated in the audited caches/details"
+      ],
+      "boundary": "Normalized record ID is not always unique observation identity; permit sequence/revision/submission grain must remain explicit before dedup/upsert changes."
+    },
+    "COMPANY_FIRM": {
+      "occurrences": 71,
+      "status": "KNOWN_DEFECT_AND_BOUNDED_RESOLUTION",
+      "evidence": [
+        "Procurement company resolver has explicit CONFIRMED/STRONG/VERIFY/UNRESOLVED states and bounded resolution methods",
+        "Legal suffix/source-label ambiguity remains VERIFY rather than auto-merged",
+        "Known-firm relationship evidence distinguishes OBSERVED_SERVICE, RECORDED_ROLE, qualifications and procurement roles"
+      ],
+      "known_defect": "Firm-site identity can still collapse multiple parcels through placeholder BINs; 14 demonstrated multi-parcel sites across 10 firms. This prevents blanket acceptance of company/firm site relationships.",
+      "boundary": "Name resolution and site identity are separate. A resolved firm name does not prove a single building site or current service incumbency."
+    }
+  },
+  "representation_defects": {
+    "DOB_ROLE_MATCH_BASIS": {
+      "status": "KNOWN_DEFECT_REPAIR_CANDIDATE_GREEN",
+      "affected_rows": 33,
+      "description": "BIN-linked DOB water-work role rows are represented as exact BBL in current production client.",
+      "repair_branch": "repair/dob-provenance-20260923",
+      "validation": "Targeted tests + lint/typecheck + 112 frontend tests passed; unmerged."
+    },
+    "BUILDING_WATER_PREVIEW": {
+      "status": "KNOWN_PRESENTATION_DEFECT_REPAIR_CANDIDATE_GREEN",
+      "affected_accounts_no_permit_preview": 786,
+      "affected_accounts_newer_hidden_permit": 399,
+      "repair_branch": "repair/building-water-preview-20260923",
+      "validation": "Targeted test + lint/typecheck + 111 frontend tests passed; unmerged."
+    }
+  },
+  "final_status": "RELATIONSHIP_REGISTER_COMPLETE_WITH_KNOWN_DEFECTS",
+  "boundary": "Every enumerated relationship/confidence contract and join-key class has an explicit status and boundary. 'Complete' means classified/accounted-for, not defect-free. Known firm-site and DOB provenance/presentation defects remain open until separately merged, deployed, and accepted."
+}
