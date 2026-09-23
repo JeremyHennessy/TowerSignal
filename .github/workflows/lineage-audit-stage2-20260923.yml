@@ -1,0 +1,117 @@
+name: Read-only lineage census and browser evidence
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths: [.github/workflows/lineage-audit-stage2-20260923.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  identity-and-hosted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Independent full population and exact candidate queries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -u docs/audits/2026-09-23/collect_independent.py
+      - name: Preserve evidence even on incomplete query
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lineage-stage2-identity-hosted
+          path: .audit-stage2
+          include-hidden-files: true
+          retention-days: 14
+  hosted-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install repository-declared browser tools without changing repository dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+          mkdir -p .audit-browser
+          npm ls --all --json > .audit-browser/resolved-dependencies.json || true
+      - name: Read-only route, account-mode and tab renderer matrix
+        run: |
+          cat > .audit-browser/capture.mjs <<'JS'
+          import { chromium, webkit, devices } from '@playwright/test';
+          import fs from 'node:fs/promises';
+          const base='https://jeremyhennessy.github.io/TowerSignal/'; const out='.audit-browser';
+          const modes=['prospect','monitor','map','nys','nys-changes','opportunities','companies','water-quality','portfolios','workflow','source-health'];
+          const ids=['2000014227','2000001474','2000001046','2000003056','2000015473','2000011125','2000014447'];
+          const routes=[...modes.map(m=>'#/'+m),...ids.map(s=>'#/account/'+s),...['sales','field','evidence','history'].map(v=>'#/account/2000014227?view='+v)];
+          const results=[];
+          for(const [device,type,options] of [['desktop',chromium,{viewport:{width:1440,height:1000}}],['iphone',webkit,devices['iPhone 13']]]){
+            const browser=await type.launch();const context=await browser.newContext({...options,acceptDownloads:true});
+            await context.route('**/*',r=>['GET','HEAD','OPTIONS'].includes(r.request().method())?r.continue():r.abort('blockedbyclient'));
+            const page=await context.newPage();const network=[],errors=[];let n=0;
+            page.on('response',r=>network.push({url:r.url(),status:r.status(),method:r.request().method(),headers:r.headers()}));
+            page.on('requestfailed',r=>network.push({url:r.url(),failure:r.failure(),method:r.method()}));
+            page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+            async function capture(route,state='initial'){
+              const key=device+'-'+String(n++).padStart(3,'0');
+              const text=await page.locator('body').innerText();await fs.writeFile(out+'/'+key+'.txt',text);
+              await page.screenshot({path:out+'/'+key+'.png',fullPage:false,timeout:15000});
+              const controls=await page.locator('a,button,input,select,[role="tab"],th').evaluateAll(es=>es.map(e=>({tag:e.tagName,role:e.getAttribute('role'),text:(e.innerText||e.getAttribute('aria-label')||'').trim(),href:e.getAttribute('href'),type:e.getAttribute('type')})));
+              const record={device,route,state,key,url:page.url(),controls,horizontalOverflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),errors:[...errors],textLength:text.length};results.push(record);return record;
+            }
+            for(const route of routes){
+              try{
+                await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:45000});
+                await page.waitForTimeout(1800);
+                await capture(route);
+                const tabs=await page.getByRole('tab').allTextContents();
+                for(const label of tabs){
+                  try { const tab=page.getByRole('tab',{name:label.trim(),exact:true}).first();if(await tab.isVisible()){await tab.click({timeout:7000});await page.waitForTimeout(500);await capture(route,'tab:'+label.trim());}} catch(e){results.push({device,route,state:'tab:'+label,error:String(e)});}
+                }
+                if(route==='#/companies'){
+                  const links=await page.locator('a[href*="#/company/"]').evaluateAll(es=>es.slice(0,2).map(e=>e.getAttribute('href')));
+                  for(const link of links){await page.goto(base+link,{waitUntil:'domcontentloaded',timeout:45000});await page.waitForTimeout(1600);await capture(link,'company-detail');}
+                }
+                if(route==='#/prospect'){
+                  const search=page.getByRole('textbox').first();if(await search.isVisible()){
+                    await search.fill('400 West 61st');await page.waitForTimeout(500);await capture(route,'search-populated');
+                    await search.fill('AUDIT_NO_MATCH_7F928');await page.waitForTimeout(300);await capture(route,'search-empty');await search.fill('');
+                  }
+                  const selects=page.locator('select');const count=await selects.count();
+                  for(let i=0;i<Math.min(count,3);i++){
+                    const el=selects.nth(i);const options=await el.locator('option').evaluateAll(es=>es.map(e=>({value:e.value,label:e.textContent})));
+                    if(options.length>1 && await el.isVisible()){
+                      await el.selectOption(options[1].value);await page.waitForTimeout(400);await capture(route,'select:'+i+':'+options[1].label);await el.selectOption(options[0].value);
+                    }
+                  }
+                }
+              }catch(e){results.push({device,route,error:String(e)});}
+            }
+            await fs.writeFile(out+'/'+device+'-network.json',JSON.stringify(network,null,2));
+            await browser.close();
+          }
+          await fs.writeFile(out+'/results.json',JSON.stringify(results,null,2));
+          console.log('READ_ONLY_BROWSER_MATRIX',JSON.stringify(results.map(({device,route,state,key,error,horizontalOverflow})=>({device,route,state,key,error,horizontalOverflow}))));
+          JS
+          node .audit-browser/capture.mjs
+      - name: Browser skill independent desktop snapshot
+        continue-on-error: true
+        run: |
+          npx --yes agent-browser open https://jeremyhennessy.github.io/TowerSignal/
+          npx --yes agent-browser snapshot -i > .audit-browser/agent-browser-snapshot.txt
+          npx --yes agent-browser screenshot .audit-browser/agent-browser-desktop.png
+          npx --yes agent-browser close
+      - name: Preserve visual and network evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lineage-stage2-browser
+          path: .audit-browser
+          include-hidden-files: true
+          retention-days: 14
