@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { expect, test } from 'vitest'
 
-const sql = readFileSync(new URL('../../database/migrations/002_company_database.sql', import.meta.url), 'utf8')
+const sql = readFileSync('database/migrations/002_company_database.sql', 'utf8')
 
 test('company database migration enforces admin-only RLS for every private table', () => {
   expect(sql).toContain('neon_auth."user"')
