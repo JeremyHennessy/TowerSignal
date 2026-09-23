@@ -1,0 +1,108 @@
+{
+  "summary": {
+    "reviewed_fields": 16,
+    "counts": {
+      "UNUSED_POTENTIALLY_USEFUL": 5,
+      "INTENTIONALLY_EXCLUDED": 11
+    },
+    "boundary": "These are the only official fields in the final-source batch that current collectors do not request. Disposition does not change production."
+  },
+  "fields": [
+    {
+      "source_id": "j63k-4n92",
+      "official_field": ":@computed_region_9yqb_tdyd",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Socrata platform-generated computed-region column. The NYS service-line adapter explicitly defines the authoritative 20-field schema and excludes computed-region columns; locality/ZIP/location are preserved directly."
+    },
+    {
+      "source_id": "j63k-4n92",
+      "official_field": ":@computed_region_assa_msit",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Socrata platform-generated computed-region column. The NYS service-line adapter explicitly defines the authoritative 20-field schema and excludes computed-region columns; locality/ZIP/location are preserved directly."
+    },
+    {
+      "source_id": "j63k-4n92",
+      "official_field": ":@computed_region_5edz_4hdv",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Socrata platform-generated computed-region column. The NYS service-line adapter explicitly defines the authoritative 20-field schema and excludes computed-region columns; locality/ZIP/location are preserved directly."
+    },
+    {
+      "source_id": "j63k-4n92",
+      "official_field": ":@computed_region_v9ry_wcha",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Socrata platform-generated computed-region column. The NYS service-line adapter explicitly defines the authoritative 20-field schema and excludes computed-region columns; locality/ZIP/location are preserved directly."
+    },
+    {
+      "source_id": "j63k-4n92",
+      "official_field": ":@computed_region_43an_4dx5",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Socrata platform-generated computed-region column. The NYS service-line adapter explicitly defines the authoritative 20-field schema and excludes computed-region columns; locality/ZIP/location are preserved directly."
+    },
+    {
+      "source_id": "8h5j-fqxa",
+      "official_field": "record_type",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "ACRIS Legals record-type constant identifies the Legals table row class and adds no document/property scope beyond the dataset itself."
+    },
+    {
+      "source_id": "8h5j-fqxa",
+      "official_field": "easement",
+      "disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as source-native legal-scope qualifier so an ACRIS document is not overgeneralized to the entire parcel/property interest. Validate document-type semantics and downstream wording before integration."
+    },
+    {
+      "source_id": "8h5j-fqxa",
+      "official_field": "partial_lot",
+      "disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as source-native legal-scope qualifier so an ACRIS document is not overgeneralized to the entire parcel/property interest. Validate document-type semantics and downstream wording before integration."
+    },
+    {
+      "source_id": "8h5j-fqxa",
+      "official_field": "air_rights",
+      "disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as source-native legal-scope qualifier so an ACRIS document is not overgeneralized to the entire parcel/property interest. Validate document-type semantics and downstream wording before integration."
+    },
+    {
+      "source_id": "8h5j-fqxa",
+      "official_field": "subterranean_rights",
+      "disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as source-native legal-scope qualifier so an ACRIS document is not overgeneralized to the entire parcel/property interest. Validate document-type semantics and downstream wording before integration."
+    },
+    {
+      "source_id": "bnx9-e6tj",
+      "official_field": "reel_yr",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Pre-ACRIS reel reference fields are outside the current bounded recent-document timing cache and do not improve current exact document/property linkage."
+    },
+    {
+      "source_id": "bnx9-e6tj",
+      "official_field": "reel_nbr",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Pre-ACRIS reel reference fields are outside the current bounded recent-document timing cache and do not improve current exact document/property linkage."
+    },
+    {
+      "source_id": "bnx9-e6tj",
+      "official_field": "reel_pg",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Pre-ACRIS reel reference fields are outside the current bounded recent-document timing cache and do not improve current exact document/property linkage."
+    },
+    {
+      "source_id": "jqfp-uff7",
+      "official_field": "the_geom",
+      "disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Could support source-geometry QA/map context for a BBL-linked service-line record; exact source BBL remains the relationship key and geometry must not create proximity-only matches."
+    },
+    {
+      "source_id": "jqfp-uff7",
+      "official_field": "shape_area",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "GIS shape metric does not alter published material/category or exact BBL linkage and has no documented TowerSignal use."
+    },
+    {
+      "source_id": "jqfp-uff7",
+      "official_field": "shape_leng",
+      "disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "GIS shape metric does not alter published material/category or exact BBL linkage and has no documented TowerSignal use."
+    }
+  ]
+}
