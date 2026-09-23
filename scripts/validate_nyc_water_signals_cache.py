@@ -96,6 +96,10 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     second_identity_sha = str(summary.get("hpd_identity_second_pass_sha256") or "")
     if first_identity_count != hpd_unique or second_identity_count != hpd_unique:
         raise RuntimeError("HPD identity stability counts do not match the published violation population")
+    stability_attempt = int(summary.get("hpd_identity_stability_attempt") or 0)
+    stability_max_attempts = int(summary.get("hpd_identity_stability_max_attempts") or 0)
+    if stability_attempt < 1 or stability_max_attempts < 1 or stability_attempt > stability_max_attempts:
+        raise RuntimeError("HPD identity stability attempt metadata is invalid")
     if (
         len(first_identity_sha) != 64
         or len(second_identity_sha) != 64
