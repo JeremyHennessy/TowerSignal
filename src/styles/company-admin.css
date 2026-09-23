@@ -1,0 +1,324 @@
+.company-admin-directory-badge {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 8px;
+  padding: 5px 9px;
+  border: 1px solid rgba(45, 166, 153, 0.35);
+  border-radius: 999px;
+  background: rgba(45, 166, 153, 0.08);
+  color: var(--ink-strong, #12333a);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.company-admin-list-cell {
+  min-width: 210px;
+}
+
+.company-admin-list-cell strong,
+.company-admin-list-cell span,
+.company-admin-list-cell small {
+  display: block;
+}
+
+.company-admin-list-cell span,
+.company-admin-list-cell small {
+  margin-top: 3px;
+  color: var(--ink-muted, #65777b);
+}
+
+.company-admin-panel {
+  margin: 20px 0 24px;
+  padding: 22px;
+  border: 1px solid rgba(23, 72, 82, 0.18);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(246, 251, 250, 0.98), rgba(239, 247, 246, 0.98));
+  box-shadow: 0 12px 32px rgba(22, 55, 62, 0.08);
+}
+
+.company-admin-heading,
+.company-admin-card-heading,
+.company-admin-save-state,
+.company-admin-notes article > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.company-admin-heading {
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.company-admin-heading h2 {
+  margin: 4px 0 6px;
+}
+
+.company-admin-heading p,
+.company-admin-card-heading span,
+.company-admin-save-state small,
+.company-admin-empty {
+  color: var(--ink-muted, #65777b);
+}
+
+.company-admin-save-state {
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 150px;
+}
+
+.company-admin-save-state > span {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.company-admin-summary,
+.company-admin-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.company-admin-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 14px;
+}
+
+.company-admin-summary article,
+.company-admin-card {
+  border: 1px solid rgba(23, 72, 82, 0.12);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.company-admin-summary article {
+  padding: 14px;
+}
+
+.company-admin-summary small,
+.company-admin-summary strong,
+.company-admin-summary span {
+  display: block;
+}
+
+.company-admin-summary small {
+  color: var(--ink-muted, #65777b);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.company-admin-summary strong {
+  margin: 4px 0;
+}
+
+.company-admin-summary span {
+  color: var(--ink-muted, #65777b);
+  font-size: 0.78rem;
+}
+
+.company-admin-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.company-admin-card {
+  padding: 16px;
+}
+
+.company-admin-card-heading {
+  margin-bottom: 14px;
+}
+
+.company-admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.company-admin-form-grid label,
+.company-admin-new-note {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.company-admin-form-grid label > span {
+  color: var(--ink-muted, #65777b);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.company-admin-form-grid .wide {
+  grid-column: 1 / -1;
+}
+
+.company-admin-form-grid + .company-admin-form-grid {
+  margin-top: 10px;
+}
+
+.company-admin-panel input,
+.company-admin-panel select,
+.company-admin-panel textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(23, 72, 82, 0.18);
+  border-radius: 9px;
+  background: #fff;
+  padding: 9px 10px;
+  color: inherit;
+  font: inherit;
+}
+
+.company-admin-panel textarea {
+  resize: vertical;
+}
+
+.company-admin-panel button {
+  border: 0;
+  border-radius: 9px;
+  padding: 9px 12px;
+  background: #174852;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.company-admin-panel button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.company-admin-inline-form {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1.2fr 1fr auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.company-admin-inline-form.activity-form {
+  grid-template-columns: 0.7fr 1.2fr 1fr 0.9fr;
+}
+
+.company-admin-inline-form.activity-form textarea {
+  grid-column: 1 / 4;
+}
+
+.company-admin-list,
+.company-admin-timeline,
+.company-admin-notes {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.company-admin-list > div,
+.company-admin-timeline article,
+.company-admin-notes article {
+  padding: 10px 11px;
+  border: 1px solid rgba(23, 72, 82, 0.1);
+  border-radius: 10px;
+  background: rgba(247, 251, 250, 0.75);
+}
+
+.company-admin-list strong,
+.company-admin-list span,
+.company-admin-timeline strong,
+.company-admin-timeline span,
+.company-admin-timeline time,
+.company-admin-timeline small {
+  display: block;
+}
+
+.company-admin-list span,
+.company-admin-timeline time,
+.company-admin-timeline small {
+  color: var(--ink-muted, #65777b);
+  font-size: 0.8rem;
+}
+
+.company-admin-timeline p {
+  margin: 5px 0;
+}
+
+.company-admin-new-note {
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.company-admin-new-note textarea {
+  flex: 1;
+}
+
+.company-admin-notes-card {
+  grid-column: 1 / -1;
+}
+
+.company-admin-notes article > div {
+  margin-top: 7px;
+}
+
+.company-admin-error {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(176, 69, 49, 0.24);
+  border-radius: 10px;
+  background: rgba(176, 69, 49, 0.08);
+}
+
+@media (max-width: 980px) {
+  .company-admin-summary,
+  .company-admin-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .company-admin-inline-form,
+  .company-admin-inline-form.activity-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .company-admin-inline-form.activity-form textarea {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .company-admin-panel {
+    padding: 16px;
+  }
+
+  .company-admin-heading,
+  .company-admin-card-heading,
+  .company-admin-notes article > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .company-admin-save-state {
+    align-items: stretch;
+  }
+
+  .company-admin-summary,
+  .company-admin-grid,
+  .company-admin-form-grid,
+  .company-admin-inline-form,
+  .company-admin-inline-form.activity-form {
+    grid-template-columns: 1fr;
+  }
+
+  .company-admin-notes-card,
+  .company-admin-form-grid .wide,
+  .company-admin-inline-form.activity-form textarea {
+    grid-column: auto;
+  }
+
+  .company-admin-new-note {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
