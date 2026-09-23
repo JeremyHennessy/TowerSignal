@@ -1,0 +1,438 @@
+name: Expedite verified NYC property identity release
+
+on:
+  push:
+    branches:
+      - agent/expedited-property-identity-release-20260922
+    paths:
+      - .github/workflows/expedited-property-identity-release-20260922.yml
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: expedited-property-identity-release-20260922
+  cancel-in-progress: true
+
+env:
+  PRODUCT_SHA: 76046a033758168ce9b1d71e1e50e2071182eeba
+  VITE_REPORT_APPLICATION_SHA: 76046a033758168ce9b1d71e1e50e2071182eeba
+  EXPECTED_REPORT_SHA: 76046a033758168ce9b1d71e1e50e2071182eeba
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out exact merged product
+        uses: actions/checkout@v4
+        with:
+          ref: 76046a033758168ce9b1d71e1e50e2071182eeba
+          fetch-depth: 1
+
+      - name: Check out newly verified ACRIS cache
+        uses: actions/checkout@v4
+        with:
+          ref: data/towersignal-acris
+          path: .acris-store
+          fetch-depth: 1
+          sparse-checkout: data/acris
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install exact frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Download exact currently hosted verified site
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35793283170
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .accepted-site
+
+      - name: Restore accepted production site and data as release base
+        run: |
+          set -euo pipefail
+          mkdir -p .rollback public .proof
+          archive="$(find .accepted-site -type f | head -1)"
+          test -n "$archive"
+          tar -xf "$archive" -C .rollback
+          test -d .rollback/data
+          rm -rf public/data
+          cp -R .rollback/data public/data
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path('public/data')
+          hashes={
+              str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(root.rglob('*')) if p.is_file()
+          }
+          Path('.proof/accepted-data-files.json').write_text(json.dumps(hashes,sort_keys=True))
+          print(f"Accepted production base restored: {len(hashes):,} data files")
+          PY
+
+      - name: Generate fresh exact-BIN NYC property mapping snapshot
+        timeout-minutes: 20
+        run: python scripts/build_data.py --output .mapping-data
+
+      - name: Validate fresh full NYC mapping universe
+        run: python scripts/validate_bbl_identity.py --output .mapping-data --require-production-volume
+
+      - name: Validate fresh mapping account before overlay
+        run: python scripts/validate_property_identity_acceptance.py --output .mapping-data
+
+      - name: Snapshot all production fields that must remain unchanged
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+
+          root=Path('public/data')
+          systems=json.loads((root/'systems.json').read_text())
+          allowed_files={'systems.json','metadata.json','priority-model-review.json'}
+          file_hashes={
+              str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(root.rglob('*'))
+              if p.is_file()
+              and not str(p.relative_to(root)).startswith('details/')
+              and str(p.relative_to(root)) not in allowed_files
+          }
+
+          allowed_system_exact={
+              'bin','bbl','registry_bbl','property_bbl','bbl_aliases',
+              'bbl_identity_basis','bbl_identity_status','bbl_identity_evidence',
+              'priority_score','score_components','primary_signal','signal_types',
+              'official_building_evidence_count','official_building_followup'
+          }
+          def stable_system(row):
+              return {
+                  k:v for k,v in row.items()
+                  if k not in allowed_system_exact
+                  and not k.startswith('acris_')
+              }
+
+          allowed_detail={
+              'identity','building_footprints','building_context','hpd_registration',
+              'acris_activity','signals','scoring','priority_review_baseline',
+              'legionella_building_evidence','metadata'
+          }
+          def digest(value):
+              raw=json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
+              return hashlib.sha256(raw).hexdigest()
+
+          system_hashes={
+              str(row['system_id']):digest(stable_system(row))
+              for row in systems.get('systems',[])
+          }
+          detail_hashes={}
+          for row in systems.get('systems',[]):
+              sid=str(row['system_id'])
+              p=root/'details'/sid[:2]/f'{sid}.json'
+              d=json.loads(p.read_text())
+              stable={k:v for k,v in d.items() if k not in allowed_detail}
+              detail_hashes[sid]=digest(stable)
+
+          Path('.proof/unrelated-file-hashes.json').write_text(json.dumps(file_hashes,sort_keys=True))
+          Path('.proof/stable-system-hashes.json').write_text(json.dumps(system_hashes,sort_keys=True))
+          Path('.proof/stable-detail-hashes.json').write_text(json.dumps(detail_hashes,sort_keys=True))
+          print(f"Protected {len(file_hashes):,} unrelated files, {len(system_hashes):,} system projections and {len(detail_hashes):,} detail projections")
+          PY
+
+      - name: Overlay only verified identity, PLUTO, footprints and HPD fields
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          accepted_root=Path('public/data')
+          fresh_root=Path('.mapping-data')
+          accepted=json.loads((accepted_root/'systems.json').read_text())
+          fresh=json.loads((fresh_root/'systems.json').read_text())
+
+          old_rows={str(r['system_id']):r for r in accepted.get('systems',[])}
+          new_rows={str(r['system_id']):r for r in fresh.get('systems',[])}
+          if set(old_rows) != set(new_rows):
+              missing=sorted(set(old_rows)-set(new_rows))
+              added=sorted(set(new_rows)-set(old_rows))
+              raise SystemExit(f"Registry universe changed during expedited release; missing={missing[:10]} added={added[:10]}")
+
+          identity_keys=(
+              'bin','bbl','registry_bbl','property_bbl','bbl_aliases',
+              'bbl_identity_basis','bbl_identity_status','bbl_identity_evidence'
+          )
+          detail_keys=('identity','building_footprints','building_context','hpd_registration')
+
+          changed_identity=0
+          for sid, old in old_rows.items():
+              new=new_rows[sid]
+              before=tuple(json.dumps(old.get(k),sort_keys=True) for k in identity_keys)
+              for k in identity_keys:
+                  if k in new:
+                      old[k]=new[k]
+                  else:
+                      old.pop(k,None)
+              after=tuple(json.dumps(old.get(k),sort_keys=True) for k in identity_keys)
+              if before != after:
+                  changed_identity += 1
+
+              old_path=accepted_root/'details'/sid[:2]/f'{sid}.json'
+              new_path=fresh_root/'details'/sid[:2]/f'{sid}.json'
+              old_detail=json.loads(old_path.read_text())
+              new_detail=json.loads(new_path.read_text())
+              for k in detail_keys:
+                  if k in new_detail:
+                      old_detail[k]=new_detail[k]
+                  else:
+                      old_detail.pop(k,None)
+              old_path.write_text(json.dumps(old_detail,separators=(',',':'),ensure_ascii=False))
+
+          fresh_meta=fresh.get('metadata') or {}
+          old_meta=accepted.get('metadata') or {}
+          for k,v in fresh_meta.items():
+              lk=k.lower()
+              if 'bbl' in lk or 'identity' in lk:
+                  old_meta[k]=v
+          accepted['metadata']=old_meta
+          accepted['systems']=list(old_rows.values())
+          (accepted_root/'systems.json').write_text(json.dumps(accepted,separators=(',',':'),ensure_ascii=False))
+          (accepted_root/'metadata.json').write_text(json.dumps(old_meta,separators=(',',':'),ensure_ascii=False))
+          print(f"Overlay complete; identity changed for {changed_identity:,} systems while preserving accepted non-identity fields")
+          PY
+
+      - name: Attach newly persisted verified ACRIS cache to corrected aliases
+        run: python scripts/attach_acris.py --output public/data --cache .acris-store/data/acris/cache.json
+
+      - name: Apply current reviewed research-priority model
+        run: python scripts/attach_reviewed_intelligence.py --output public/data
+
+      - name: Validate final full identity universe and 400 West 61st enrichment
+        run: |
+          python scripts/validate_bbl_identity.py --output public/data --require-production-volume
+          python scripts/validate_acris_cache.py --cache .acris-store/data/acris/cache.json --max-age-days 2 --require-production-volume
+          python scripts/validate_property_identity_acceptance.py --output public/data --require-acris
+          python scripts/validate_reviewed_intelligence.py --output public/data
+
+      - name: Prove unrelated production data remained byte-for-byte and field-for-field stable
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+
+          root=Path('public/data')
+          before_files=json.loads(Path('.proof/unrelated-file-hashes.json').read_text())
+          after_files={
+              str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(root.rglob('*'))
+              if p.is_file()
+              and not str(p.relative_to(root)).startswith('details/')
+              and str(p.relative_to(root)) not in {'systems.json','metadata.json','priority-model-review.json'}
+          }
+          assert after_files == before_files, 'Expedited release changed an unrelated production data file'
+
+          allowed_system_exact={
+              'bin','bbl','registry_bbl','property_bbl','bbl_aliases',
+              'bbl_identity_basis','bbl_identity_status','bbl_identity_evidence',
+              'priority_score','score_components','primary_signal','signal_types',
+              'official_building_evidence_count','official_building_followup'
+          }
+          allowed_detail={
+              'identity','building_footprints','building_context','hpd_registration',
+              'acris_activity','signals','scoring','priority_review_baseline',
+              'legionella_building_evidence','metadata'
+          }
+          def digest(value):
+              raw=json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
+              return hashlib.sha256(raw).hexdigest()
+          systems=json.loads((root/'systems.json').read_text())
+          after_system={
+              str(r['system_id']):digest({
+                  k:v for k,v in r.items()
+                  if k not in allowed_system_exact and not k.startswith('acris_')
+              })
+              for r in systems.get('systems',[])
+          }
+          before_system=json.loads(Path('.proof/stable-system-hashes.json').read_text())
+          assert after_system == before_system, 'Expedited release changed an unrelated system field'
+
+          after_detail={}
+          for r in systems.get('systems',[]):
+              sid=str(r['system_id'])
+              p=root/'details'/sid[:2]/f'{sid}.json'
+              d=json.loads(p.read_text())
+              after_detail[sid]=digest({k:v for k,v in d.items() if k not in allowed_detail})
+          before_detail=json.loads(Path('.proof/stable-detail-hashes.json').read_text())
+          assert after_detail == before_detail, 'Expedited release changed an unrelated detail field'
+          print(f"PASS: unrelated data preserved across {len(after_system):,} systems and {len(after_detail):,} detail payloads")
+          PY
+
+      - name: Run product tests and build exact application
+        run: |
+          python -m unittest discover -s tests/python -p 'test_*.py' -v
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+          python scripts/validate_bbl_identity.py --output dist/data --require-production-volume
+          python scripts/validate_property_identity_acceptance.py --output dist/data --require-acris
+
+      - name: Install candidate browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify corrected Account, score, header and approved PDF before deploy
+        env:
+          BASE_URL: https://jeremyhennessy.github.io/TowerSignal/
+          CANDIDATE_ROOT: ${{ github.workspace }}/dist
+        run: |
+          npx playwright test             tests/e2e/missing-sample-priority-release.spec.ts             tests/e2e/account-header.spec.ts             tests/e2e/approved-account-pdf.spec.ts             tests/e2e/account-correction-acceptance.spec.ts             --project=desktop-chromium --project=iphone
+
+      - name: Inspect approved four-page PDF bytes
+        run: |
+          python -m pip install --quiet PyMuPDF==1.24.14
+          python scripts/verify-account-pdf.py
+
+      - name: Retain pre-deploy proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: expedited-property-identity-candidate-proof
+          path: |
+            .proof
+            playwright-report
+            test-results
+          retention-days: 30
+
+      - name: Upload expedited verified site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Stage exact prior hosted site for rollback
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: expedited-property-identity-rollback
+          path: .rollback
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy expedited verified property identity release
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out exact merged product
+        uses: actions/checkout@v4
+        with:
+          ref: 76046a033758168ce9b1d71e1e50e2071182eeba
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install hosted acceptance dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+
+      - name: Verify hosted 400 West 61st JSON identity and enrichment
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          python - <<'PY'
+          import json, os, time, urllib.parse, urllib.request
+          base=os.environ['BASE_URL']
+          if not base.endswith('/'):
+              base += '/'
+          url=urllib.parse.urljoin(base,'data/details/20/2000014227.json')
+          last=None
+          for attempt in range(30):
+              try:
+                  with urllib.request.urlopen(url + f'?acceptance={attempt}', timeout=30) as r:
+                      detail=json.load(r)
+                  identity=detail.get('identity') or {}
+                  building=detail.get('building_context') or {}
+                  hpd=detail.get('hpd_registration') or {}
+                  acris=detail.get('acris_activity') or {}
+                  assert str(identity.get('bin') or detail.get('bin') or '1089723') == '1089723'
+                  assert str(identity.get('registry_bbl') or '') == '1011710154'
+                  assert str(identity.get('property_bbl') or '') == '1011717513'
+                  assert sorted(str(v) for v in identity.get('bbl_aliases') or []) == ['1011710154','1011717513']
+                  assert identity.get('bbl_identity_status') == 'RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL'
+                  assert str(building.get('bbl') or '') == '1011717513'
+                  assert str(building.get('owner_name') or '').strip()
+                  assert hpd.get('registration_id')
+                  assert len(hpd.get('contacts') or []) > 0
+                  assert int(acris.get('recent_document_count') or 0) > 0
+                  assert len(acris.get('documents') or []) > 0
+                  print(json.dumps({
+                      'status':'PASS',
+                      'registry_bbl':identity.get('registry_bbl'),
+                      'property_bbl':identity.get('property_bbl'),
+                      'owner_name':building.get('owner_name'),
+                      'hpd_registration_id':hpd.get('registration_id'),
+                      'hpd_contact_count':len(hpd.get('contacts') or []),
+                      'acris_recent_document_count':acris.get('recent_document_count'),
+                  },indent=2))
+                  break
+              except Exception as exc:
+                  last=exc
+                  if attempt == 29:
+                      raise
+                  time.sleep(10)
+          PY
+
+      - name: Verify actual hosted Account, score, header and approved PDF on desktop and iPhone
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test             tests/e2e/missing-sample-priority-release.spec.ts             tests/e2e/account-header.spec.ts             tests/e2e/approved-account-pdf.spec.ts             tests/e2e/account-correction-acceptance.spec.ts             --project=desktop-chromium --project=iphone
+
+      - name: Inspect actual hosted four-page PDF bytes
+        run: |
+          python -m pip install --quiet PyMuPDF==1.24.14
+          python scripts/verify-account-pdf.py
+
+      - name: Retain hosted proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: expedited-property-identity-hosted-proof
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
+
+  rollback:
+    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
+    needs: [build, deploy, verify]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Restore exact prior hosted site
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: expedited-property-identity-rollback
