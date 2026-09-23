@@ -1,0 +1,135 @@
+{
+  "input_records": 1708,
+  "class_counts": {
+    "RESOLVED_WORKFLOW_OR_USER_STATE": 18,
+    "RESOLVED_SOURCE_PAYLOAD_OR_DERIVED_METRIC": 1108,
+    "STILL_UNRESOLVED": 366,
+    "RESOLVED_LOCAL_DERIVATION": 161,
+    "RESOLVED_NORMALIZED_SOURCE_DERIVATION": 55
+  },
+  "resolved_count": 1342,
+  "still_unresolved": 366,
+  "top_unresolved_files": [
+    [
+      "src/components/DetailPanel.tsx",
+      32
+    ],
+    [
+      "src/components/WorkflowScaleWorkspace.tsx",
+      28
+    ],
+    [
+      "src/components/LegionellaIntelligencePanel.tsx",
+      25
+    ],
+    [
+      "src/components/SourceHealthExpansion.tsx",
+      24
+    ],
+    [
+      "src/components/ChangesView.tsx",
+      22
+    ],
+    [
+      "src/App.tsx",
+      19
+    ],
+    [
+      "src/components/SourceHealthPage.tsx",
+      19
+    ],
+    [
+      "src/components/Filters.tsx",
+      18
+    ],
+    [
+      "src/components/ScoreExplanation.tsx",
+      15
+    ],
+    [
+      "src/components/AcrisActivitySection.tsx",
+      14
+    ],
+    [
+      "src/components/PlanimetricTowerSection.tsx",
+      14
+    ],
+    [
+      "src/components/AccountEvidenceWorkspace.tsx",
+      12
+    ],
+    [
+      "src/components/DomesticWaterSection.tsx",
+      11
+    ],
+    [
+      "src/components/NysRegistryView.tsx",
+      11
+    ],
+    [
+      "src/components/WorkflowQuickEditor.tsx",
+      9
+    ],
+    [
+      "src/components/CompanyProfilePage.tsx",
+      8
+    ],
+    [
+      "src/components/WorkflowAccountSection.tsx",
+      8
+    ],
+    [
+      "src/components/InstitutionalFacilitySection.tsx",
+      7
+    ],
+    [
+      "src/components/WorkflowWorkspacePage.tsx",
+      7
+    ],
+    [
+      "src/components/HomePage.tsx",
+      6
+    ],
+    [
+      "src/components/AccountDecisionSummary.tsx",
+      5
+    ],
+    [
+      "src/components/AccountUnifiedTimeline.tsx",
+      5
+    ],
+    [
+      "src/components/ClientSiteReport.tsx",
+      5
+    ],
+    [
+      "src/components/NysChangesView.tsx",
+      5
+    ],
+    [
+      "src/components/PortfoliosPage.tsx",
+      5
+    ],
+    [
+      "src/components/NysWaterMarketSubViews.tsx",
+      3
+    ],
+    [
+      "src/components/PortalNavigation.tsx",
+      3
+    ],
+    [
+      "src/components/SalesPreCallPack.tsx",
+      3
+    ],
+    [
+      "src/components/TechnicianFieldPack.tsx",
+      3
+    ],
+    [
+      "src/components/TopNavigation.tsx",
+      3
+    ]
+  ],
+  "boundary": "Recursive static local-definition and prop trace. Source-payload resolution does not prove rendered correctness or source completeness; STILL_UNRESOLVED requires deeper static trace or hosted state exercise."
+}
