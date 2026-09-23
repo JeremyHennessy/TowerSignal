@@ -42,7 +42,8 @@ describe('account evidence contracts', () => {
       nyc_building_water_signals: {
         dob_water_job_filings: [{
           applicant_business_raw: 'Mechanical Project Co.', category: 'DOMESTIC_WATER_TANK', filing_date: '2026-04-20',
-          source_record_id: 'DOB-WATER-1', relationship_evidence: 'RECORDED_DOB_ROLE', service_assignment_confidence: 'NOT_PROOF_OF_SERVICE_CONTRACT',
+          source_record_id: 'DOB-WATER-1', property_link_confidence: 'CONFIRMED_SOURCE_BBL',
+          relationship_evidence: 'RECORDED_DOB_ROLE', service_assignment_confidence: 'NOT_PROOF_OF_SERVICE_CONTRACT',
         }],
         dob_water_permits: [],
       },
@@ -67,4 +68,47 @@ describe('account evidence contracts', () => {
     expect(new Set(mechanical.map(row => row.datasetId))).toEqual(new Set(['w9ak-ipjd']))
     expect(mechanical.map(row => row.serviceAssignmentBoundary).join(' ')).toMatch(/not proof/i)
   })
+
+  it('labels DOB building-water role evidence with the actual exact source key', () => {
+    const detail = {
+      identity: { bin: '1087293', bbl: '1013730040' },
+      domestic_water: { self_report_history: [] },
+      nyc_building_water_signals: {
+        dob_water_job_filings: [{
+          applicant_business_raw: 'Reform Architecture PLLC',
+          category: 'PLUMBING_WATER_RELATED',
+          filing_date: '2026-04-20',
+          source_record_id: 'M01287692-S1',
+          bin: '1087293',
+          bbl: null,
+          property_link_confidence: 'CONFIRMED_SOURCE_BIN',
+          relationship_evidence: 'RECORDED_DOB_ROLE',
+          service_assignment_confidence: 'NOT_PROOF_OF_SERVICE_CONTRACT',
+        }],
+        dob_water_permits: [{
+          applicant_business_raw: 'Exact BBL Plumbing LLC',
+          category: 'PLUMBING_WATER_RELATED',
+          issued_date: '2026-05-01',
+          source_record_id: 'P-BBL-1',
+          bin: null,
+          bbl: '1013730040',
+          property_link_confidence: 'CONFIRMED_SOURCE_BBL',
+          relationship_evidence: 'RECORDED_DOB_ROLE',
+          service_assignment_confidence: 'NOT_PROOF_OF_SERVICE_CONTRACT',
+        }],
+      },
+      dob_activity_history: [],
+    } as unknown as SystemDetailWithDomesticWater
+
+    const rows = collectAccountFirmRoleEvidence(detail)
+    expect(rows.find(row => row.name === 'Reform Architecture PLLC')).toMatchObject({
+      matchBasis: 'BIN_EXACT',
+      sourceReference: expect.stringContaining('exact BIN'),
+    })
+    expect(rows.find(row => row.name === 'Exact BBL Plumbing LLC')).toMatchObject({
+      matchBasis: 'BBL_EXACT',
+      sourceReference: expect.stringContaining('exact BBL'),
+    })
+  })
+
 })
