@@ -142,13 +142,15 @@ def normalize_row(source: str, dataset_id: str, row: Mapping[str, Any], *, retri
         return None
 
     source_record_id = _source_row_fingerprint(dataset_id, row)
-    contract_number = normalize_space(str(_first(row, "procurement_number", "contract_number", "contract_id") or "")) or None
+    contract_number = normalize_space(str(_first(row, "procurement_number", "contract_number", "contract_id", "transaction_number") or "")) or None
     fiscal_year = parse_iso_date(_first(row, "fiscal_year_end_date"))
     award_date = parse_iso_date(_first(row, "award_date"))
     start_date = parse_iso_date(_first(row, "contract_begin_date", "contract_start_date", "begin_date", "start_date"))
     end_date = parse_iso_date(_first(row, "contract_end_date", "end_date"))
     amount = parse_money(_first(row, "contract_amount", "amount", "procurement_amount", "total_amount"))
-    expended = parse_money(_first(row, "amount_expended", "amount_spent", "expenditures", "spend_to_date"))
+    expended = parse_money(_first(row, "amount_expended_to_date", "amount_expended", "amount_spent", "expenditures", "spend_to_date"))
+    expended_for_fiscal_year = parse_money(_first(row, "amount_expended_for_fiscal_year"))
+    outstanding_balance = parse_money(_first(row, "current_or_outstanding_balance"))
 
     return {
         "schema_version": SCHEMA_VERSION,
@@ -174,6 +176,8 @@ def normalize_row(source: str, dataset_id: str, row: Mapping[str, Any], *, retri
         "original_amount": amount,
         "current_amount": amount,
         "spend_to_date": expended,
+        "spend_for_fiscal_year": expended_for_fiscal_year,
+        "current_or_outstanding_balance": outstanding_balance,
         "amount": amount,
         "amount_evidence": "Authority-reported procurement/contract amount; not company revenue." if amount is not None else None,
         "observed_value_evidence": "Public authority annual procurement report; values are source-reported procurement values, not vendor revenue.",
