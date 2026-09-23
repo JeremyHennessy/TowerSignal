@@ -1,0 +1,1358 @@
+[
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/cms-institutional-context.json",
+    "status": 200,
+    "bytes": 18346,
+    "sha256": "9a73b1253aec611dc28750707e351d5fca5314dc5dbb5d05fbbfd6624a41a011"
+  },
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/systems.json",
+    "status": 200,
+    "bytes": 16359451,
+    "sha256": "9ca884e7b9283856337fc81a63d6aa790b7a13f281823deacab614bc7cd95b7e"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0?offset=0&limit=1500",
+    "status": 200,
+    "bytes": 2028750,
+    "sha256": "9cf073b85ba870e5d264c15417b7bed2ae1b88335658c11610477c264c335dda"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0?offset=1500&limit=1500",
+    "status": 200,
+    "bytes": 2045057,
+    "sha256": "cdaf32336a68d3b823e3aca682bf4529e04dfaf5ceec81fbf623f39f259c3613"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0?offset=3000&limit=1500",
+    "status": 200,
+    "bytes": 2030477,
+    "sha256": "c17a57ed6c01c0dd29f291a8f11de19cc4da1d6913e15cfa0847690b23c70d76"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0?offset=4500&limit=1500",
+    "status": 200,
+    "bytes": 1257720,
+    "sha256": "bdca36fff44f0450966c4747301b2b78e3c9e47a5cd1ed411a4bf95e240d3e42"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=0&limit=1500",
+    "status": 200,
+    "bytes": 6581588,
+    "sha256": "a4d98022e2f64be8beb865d669f5979c6d020a4a4fad688564dce2a5dfd77067"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=1500&limit=1500",
+    "status": 200,
+    "bytes": 6580378,
+    "sha256": "bae344cfeb90430d24a891e0cc1dba3982cb7822c0908a381e86b4c6ff05ef58"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=3000&limit=1500",
+    "status": 200,
+    "bytes": 6566994,
+    "sha256": "5c82c6ed59c66ad0e3aaeed799eae0b6e07bf5d2809513cb29a094d43137c540"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=4500&limit=1500",
+    "status": 200,
+    "bytes": 6574364,
+    "sha256": "f2a13f3d7fa8afe6c202e726dc495f49b969f290f48fe4b1baffc85745e78293"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=6000&limit=1500",
+    "status": 200,
+    "bytes": 6567890,
+    "sha256": "f6c7f059dbda28e7d09beffec43041a17b5e404f472d47a48e23f60c4a536829"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=7500&limit=1500",
+    "status": 200,
+    "bytes": 6575693,
+    "sha256": "34c9b32be3c9d1e742e7a709c566c38c24d27998551c95d8baf52afb6433b886"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=9000&limit=1500",
+    "status": 200,
+    "bytes": 6566803,
+    "sha256": "e655f1c87820e3845637b084f9d1b1e78d7166af0e32215955acdc81a81745b2"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=10500&limit=1500",
+    "status": 200,
+    "bytes": 6576311,
+    "sha256": "b22b7ef39a322aa0e1cd7c81122c085d7a08ccc4d8e2fa516074fb550fadc6b7"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=12000&limit=1500",
+    "status": 200,
+    "bytes": 6570844,
+    "sha256": "77ce2c74d0eb3453c47aaf721b6dcc11012ce49a4ec8716cbeec4aab90cb31ab"
+  },
+  {
+    "url": "https://data.cms.gov/provider-data/api/1/datastore/query/4pq5-n9py/0?offset=13500&limit=1500",
+    "status": 200,
+    "bytes": 5220512,
+    "sha256": "dcf6a5f38ec4826720b433384d319821cb7675f04d8e3a90784afa17371dab2e"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=ONE+GUSTAVE+L+LEVY+PLACE+NEW+YORK+NY+10029&size=5",
+    "status": 200,
+    "bytes": 5485,
+    "sha256": "72afe231efa429a0a1b55b082e777d98b1b653e1b7c32b72fd9a698f36099f63"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2525+KINGS+HIGHWAY+BROOKLYN+NY+11229&size=5",
+    "status": 200,
+    "bytes": 5563,
+    "sha256": "466aa86f0174b273c4354170286afe3fb931e0c1155f54bbe76d009ffac90547"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=89TH+AVENUE+AND+VAN+WYCK+EXPRESSWAY+JAMAICA+NY+11418&size=5",
+    "status": 200,
+    "bytes": 638,
+    "sha256": "4c8ed26e03b6ed53bd19e6a616000f7031e68f3674ddfbdecdfeb9a922f29284"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1276+FULTON+AVENUE+BRONX+NY+10456&size=5",
+    "status": 200,
+    "bytes": 5527,
+    "sha256": "9ac1876504d6b9127c01e2a8bd8733e1379331785dee00832825274888224bfb"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=355+BARD+AVENUE+STATEN+ISLAND+NY+10310&size=5",
+    "status": 200,
+    "bytes": 5546,
+    "sha256": "e80dcc626384bdf9d2335f9b5e1fa118a668b8e047f118c0d0482bcc4facb408"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1000+TENTH+AVENUE+NEW+YORK+NY+10019&size=5",
+    "status": 200,
+    "bytes": 5488,
+    "sha256": "70f36a1212deb15b0774e6c55270202bf32f02e5ee5a12ec59c3ec5644f4df7f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=56-45+MAIN+STREET+FLUSHING+NY+11355&size=5",
+    "status": 200,
+    "bytes": 5467,
+    "sha256": "d0e4e39ac339642b07dab919c5aab950f49ccca0350083ff256170bbe4203788"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=121+DEKALB+AVENUE+BROOKLYN+NY+11201&size=5",
+    "status": 200,
+    "bytes": 5557,
+    "sha256": "a8ae42543ade9026022587647cd6a5cc8e5e6826effec5acda7adb83878e58d6"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=111+EAST+210TH+STREET+BRONX+NY+10467&size=5",
+    "status": 200,
+    "bytes": 5526,
+    "sha256": "298a5d996b466c35f63537aa4ffe43e481675c2fbe7fae1eeca55c6ac2b2c714"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=234+EAST+149TH+STREET+BRONX+NY+10451&size=5",
+    "status": 200,
+    "bytes": 5559,
+    "sha256": "d95a3e5dc3c1b0d5b6f325d20d44f6751e6d5b14c30eaeade06143c173b7b018"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=525+EAST+68TH+STREET+NEW+YORK+NY+10065&size=5",
+    "status": 200,
+    "bytes": 5533,
+    "sha256": "67a6e3394f1ec735277c35911d7e1bc022e25fdd7f4cc01f3f8299946a9daba5"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=230+SECOND+AVE+NEW+YORK+NY+10003&size=5",
+    "status": 200,
+    "bytes": 5447,
+    "sha256": "49306adcf4159ef1f3ea3357d3c69a273e96a23ddf3349c47beb3b3dc1a8f320"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1400+PELHAM+PARKWAY+SOUTH+BRONX+NY+10461&size=5",
+    "status": 200,
+    "bytes": 5639,
+    "sha256": "4c660135a3b7ddfeac845caad835cb9cac1d9be07534a08d28365bd27cb95fe3"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=100+EAST+77TH+STREET+NEW+YORK+NY+10075&size=5",
+    "status": 200,
+    "bytes": 5527,
+    "sha256": "77c6cf87531128eaa53d9934d815e9eb8a3d2a3a38ae0a3b2476fc67aa222e85"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=475+SEAVIEW+AVENUE+STATEN+ISLAND+NY+10305&size=5",
+    "status": 200,
+    "bytes": 5585,
+    "sha256": "df2311f89b0b9d784c57635d87aa89f904f7b85d598079fe7810b32be547307a"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=79-01+BROADWAY+ELMHURST+NY+11373&size=5",
+    "status": 200,
+    "bytes": 5382,
+    "sha256": "0172c2d0784ec3858c2547880b880efc6e6db42273ec3ef9d6f9a97362dd2762"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=130+WEST+KINGSBRIDGE+ROAD+BRONX+NY+10468&size=5",
+    "status": 200,
+    "bytes": 5648,
+    "sha256": "e3ea6c141076cc02d6e2431bdda94e0e00d52d90029e14d1f52b48e574a0b4d8"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=423+EAST+23RD+STREET+NEW+YORK+NY+10010&size=5",
+    "status": 200,
+    "bytes": 5511,
+    "sha256": "786450ca95f2fd9ff867496a0b9af24086bad408d2274bf8e4558ac88179667f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=45TH+AVENUE+AND+PARSONS+BOULEVARD+FLUSHING+NY+11355&size=5",
+    "status": 200,
+    "bytes": 635,
+    "sha256": "42fedd3176933b639aa16ca1b15dc7fea659e20d9bb2dbe8eee51281169247a5"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=281+1ST+AVE+NEW+YORK+NY+10003&size=5",
+    "status": 200,
+    "bytes": 5379,
+    "sha256": "fdcea75e4e1e5c196876081fc90d4dadcec439c30a390838ddf6df6827ce84a6"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=4802+TENTH+AVENUE+BROOKLYN+NY+11219&size=5",
+    "status": 200,
+    "bytes": 5573,
+    "sha256": "af6c665f59b9218fbbcfed69c645d22468a00fa224ed4dde0d3c29018dc23720"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1901+FIRST+AVENUE+NEW+YORK+NY+10029&size=5",
+    "status": 200,
+    "bytes": 5501,
+    "sha256": "f075f7d68d260b1fe903b2c181118eba619266204ded831d887ca2fea861cb5a"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2601+OCEAN+PARKWAY+BROOKLYN+NY+11235&size=5",
+    "status": 200,
+    "bytes": 5576,
+    "sha256": "3356fd1c4c48f62b5a35d680f41bddcc4e21f1e7f809ea46089670796240e775"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=451+CLARKSON+AVENUE+BROOKLYN+NY+11203&size=5",
+    "status": 200,
+    "bytes": 5608,
+    "sha256": "5dae24bd552b32a1d1dcec09e5d7f8c29bf1d0418b98270261f22a30593ea920"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=462+FIRST+AVENUE+NEW+YORK+NY+10016&size=5",
+    "status": 200,
+    "bytes": 5459,
+    "sha256": "619ec91b3e708c79a5dddc6f59addf5d954c8343510e272e179f80232f652c30"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=800+POLY+PLACE+BROOKLYN+NY+11209&size=5",
+    "status": 200,
+    "bytes": 5535,
+    "sha256": "4db212fc25114a87edb512c6a70e428f90db06376641047b201fb7923c01d82e"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=550+FIRST+AVENUE+NEW+YORK+NY+10016&size=5",
+    "status": 200,
+    "bytes": 5459,
+    "sha256": "c91f2b4960a09e235ed5a912a36f99bc7f8fa5ba13d5bb055701ef6d844d7217"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=374+STOCKHOLM+STREET+BROOKLYN+NY+11237&size=5",
+    "status": 200,
+    "bytes": 5602,
+    "sha256": "0109e82c76f395dcee425b5de5370062ddcf39403397f2cdb29a0976a915b837"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=82-68+164TH+STREET+JAMAICA+NY+11432&size=5",
+    "status": 200,
+    "bytes": 5540,
+    "sha256": "6fbfe27ae6d4b1a401385e678cf35c8be7f0ff3d1418bc0d0ac11acfb8b4b596"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1+BROOKDALE+PLAZA+BROOKLYN+NY+11212&size=5",
+    "status": 200,
+    "bytes": 5587,
+    "sha256": "fbdbfe90d031fc325c8eb5cc3cb24cecff7f435b2346033e43753c8bee3b438e"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=535+EAST+70TH+STREET+NEW+YORK+NY+10021&size=5",
+    "status": 200,
+    "bytes": 5532,
+    "sha256": "5bd6790fd9846f75a7cca624d4bcf6a4b141306f6c1465424feb118ce39c4cb4"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=506+LENOX+AVENUE+NEW+YORK+NY+10037&size=5",
+    "status": 200,
+    "bytes": 5488,
+    "sha256": "58c421e7d1381ce1ec5d038bb4946dd17f6f825946023ceb8cfb07e1b2aa4157"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=445+LENOX+ROAD+BROOKLYN+NY+11203&size=5",
+    "status": 200,
+    "bytes": 5522,
+    "sha256": "49939d9b0db5d8e29571ea9c80d5ddc8f72bbf86281125970da4f45b3b56bd61"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=327+BEACH+19TH+STREET+FAR+ROCKAWAY+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5560,
+    "sha256": "e9d005f3ea5edd8eef099c154f6c8f92c5abe351dc24a24f2ace18c1e8f18798"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=760+BROADWAY+BROOKLYN+NY+11206&size=5",
+    "status": 200,
+    "bytes": 5473,
+    "sha256": "06cf2b35e42dd093e5bea33d5d243484da9312cf0961854d14cb72ad67e930b6"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=4422+THIRD+AVENUE+BRONX+NY+10457&size=5",
+    "status": 200,
+    "bytes": 5489,
+    "sha256": "9fb2c2a35b0c47d168510318a18c01c72c688caac82f44ecdbcfe5e5e954d4c1"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=80-45+WINCHESTER+BLVD+BLDG+B+QUEENS+VILLAGE+NY+11427&size=5",
+    "status": 200,
+    "bytes": 5628,
+    "sha256": "cafa16192369eda989990417b33e6f221f811bf7be292cb2a48b9fea2fe19639"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=722+W+168TH+ST+NEW+YORK+NY+10032&size=5",
+    "status": 200,
+    "bytes": 5543,
+    "sha256": "362903459c844d917b597e0b1cad3cfed9973b138978706a0b266156bd3b288b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=777+SEAVIEW+AVE+STATEN+ISLAND+NY+10305&size=5",
+    "status": 200,
+    "bytes": 5593,
+    "sha256": "528084ee2682db04417276fbe7ba36c9f89df6779b74b85df6d8a8caaaf41af3"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=420+EAST+76+ST+NEW+YORK+NY+10021&size=5",
+    "status": 200,
+    "bytes": 5513,
+    "sha256": "3c18281c86bcf55c8790447ca512e439051c32b420e9a8b49d898de5a63fddf3"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1500+WATERS+PLACE+BRONX+NY+10461&size=5",
+    "status": 200,
+    "bytes": 5526,
+    "sha256": "b8aaddab654485e12564b785e21d9d4b61bab33175276ae14ca2ae131d6ed048"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=681+CLARKSON+AVENUE+BROOKLYN+NY+11203&size=5",
+    "status": 200,
+    "bytes": 5613,
+    "sha256": "453bb906ef03f6bc4264a80c6d88f4ee273601e4ef464d4694d9c3b551c3fc21"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=7403+COMMONWEALTH+BLVD+BELLEROSE+NY+11426&size=5",
+    "status": 200,
+    "bytes": 5645,
+    "sha256": "d49b6f7a71250a75c97a361b28e5747c508dcf0e90fdb51b8043dacce9945299"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=WARD+ISLAND+NEW+YORK+NY+10035&size=5",
+    "status": 200,
+    "bytes": 5367,
+    "sha256": "8d7529772fb04d0dc0cff3785715859a67497ba79539958e336f2510b78605bc"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=600+E+125TH+STREET+NEW+YORK+NY+10035&size=5",
+    "status": 200,
+    "bytes": 5535,
+    "sha256": "2cb8d117e213157bccdedf92b780c6f7daa4c5f9a078b8b7aa841e2e96394235"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=66+Van+Cortlandt%2C+Park+South+Bronx+NY+10463&size=5",
+    "status": 200,
+    "bytes": 5619,
+    "sha256": "b74e6d940527b87738158da366f7e141bb9b0122c39121e6e2ab1fb998557fb8"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2975+Independence+Avenue+Bronx+NY+10463&size=5",
+    "status": 200,
+    "bytes": 5667,
+    "sha256": "c3c0a22c81acd0492948dae3567720fd0b31cb884fe10242b7cd5b6e0bb8c682"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3200+Baychester+Avenue+Bronx+NY+10475&size=5",
+    "status": 200,
+    "bytes": 5598,
+    "sha256": "e56cb75bcb69186ec5484e478532317220d306e9bb14e00aa5a76c42142a565f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=5901+Palisade+Avenue+Riverdale+NY+10471&size=5",
+    "status": 200,
+    "bytes": 5566,
+    "sha256": "d4b5c0b91ac8b9286039384f9b2fbd0fa54524f06f388334045a50737093aadd"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3400+-26+Cannon+Place+Bronx+NY+10463&size=5",
+    "status": 200,
+    "bytes": 5513,
+    "sha256": "2a6f3c343dbf4476bcc202762f0f66373deb224bbb004bc3fda96c51a93f1aaf"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=214+W+HOUSTON+STREET+NEW+YORK+NY+10014&size=5",
+    "status": 200,
+    "bytes": 5549,
+    "sha256": "28927f4db55aebac99d8d0451cd75d8a20c18b3a7e21b5555c7d2a08e6ac3847"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3356+Perry+Avenue+Bronx+NY+10467&size=5",
+    "status": 200,
+    "bytes": 5491,
+    "sha256": "a6271371494dd66d831b27f8bd00fdbf537b9706b7f83a2e9938c4f31cb54fca"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=13+11+Virginia+Street+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5575,
+    "sha256": "2dcd1d6981827d973c5ef7fda4a4a13c4f94c2ab4fa5e6fb20ec411ac3170ba7"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1540+TOMLINSON+AVENUE+BRONX+NY+10461&size=5",
+    "status": 200,
+    "bytes": 5581,
+    "sha256": "a979129dce64065a4c10e103bc92a80b25137512bc6e65646ac7362350e6f47f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2505+Grand+Avenue+Bronx+NY+10468&size=5",
+    "status": 200,
+    "bytes": 5554,
+    "sha256": "3bbbd6f496693f2468a4c6bc62ae4b10c7a54ca56522ee8ea8bfaae1656e22b8"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1339+York+Avenue+New+York+NY+10021&size=5",
+    "status": 200,
+    "bytes": 5494,
+    "sha256": "26990daf0862b67e2b85616aeb3a8053421e6d8d1e02477142d439287ef1c699"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=900+Main+Street+Roosevelt+Island+NY+10044&size=5",
+    "status": 200,
+    "bytes": 599,
+    "sha256": "19d7566942059caec2fee90d0657e36301909c1ea2676ff2071b87769d5f6aed"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=835+Herkimer+Street+Brooklyn+NY+11233&size=5",
+    "status": 200,
+    "bytes": 5621,
+    "sha256": "f71f545f773b9313fac58e3a659ca6ec5ef73508297204e97ccab11f4e1d7b34"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2316+Bruner+Avenue+Bronx+NY+10469&size=5",
+    "status": 200,
+    "bytes": 5550,
+    "sha256": "b5ae8318d4da8c69278715d497c8917722ef689742524346cfccdd6346a1aef6"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1752+Park+Avenue+Manhattan+NY+10035&size=5",
+    "status": 200,
+    "bytes": 5488,
+    "sha256": "dedc118a5768d3e823785a5b407cb49149a18604db5409c094ac2dc3ab9cc1c7"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=128+Beach+115th+Street+Rockaway+Park+NY+11694&size=5",
+    "status": 200,
+    "bytes": 5567,
+    "sha256": "bb1df072210abfe10e4bd205d7a3b12f46204ef76961eb9c0c7c27992aee00d1"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=641+West+230th+Street+Bronx+NY+10463&size=5",
+    "status": 200,
+    "bytes": 5554,
+    "sha256": "dba11197820e6ff5b7ae9ec836d172aa8fc808aa4288f9172c79cc035f91226d"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=515+Audubon+Avenue+New+York+NY+10040&size=5",
+    "status": 200,
+    "bytes": 5543,
+    "sha256": "c8e0d783667c1092e345014ad7c2eee17f733dadad68f4b93b4efda6de993fd7"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=460+Brielle+Avenue+Staten+Island+NY+10314&size=5",
+    "status": 200,
+    "bytes": 5617,
+    "sha256": "14d4606069646639d351921a828bf08d5e543b068d4f3a11383d1136b06d4b32"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=5606+15th+Avenue+Brooklyn+NY+11219&size=5",
+    "status": 200,
+    "bytes": 5528,
+    "sha256": "7face3105ce4145bf5900df3b321b4014ccad30ededde48d78cdb69fea5ce42d"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=157-15+19th+Avenue+Whitesone+NY+11357&size=5",
+    "status": 200,
+    "bytes": 5464,
+    "sha256": "c018c21878969699027602b7762ddf568303f0885c3387f0b45002b753ada9dc"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=660+Louisiana+Avenue+Brooklyn+NY+11239&size=5",
+    "status": 200,
+    "bytes": 5631,
+    "sha256": "014664f9f9fd0efad1085ecb8f913645a569b188f67bf8f8389fa75bec33fb80"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=35-15+Parsons+Boulevard+Flushing+NY+11354&size=5",
+    "status": 200,
+    "bytes": 5572,
+    "sha256": "13964c34938277e6d243d4839042d357ff8fc9b58a33682a2f4e3cade7b6c556"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=405+Carlton+Avenue+Brooklyn+NY+11238&size=5",
+    "status": 200,
+    "bytes": 5576,
+    "sha256": "9938e40ac030413d20f72a78f0c6b95526580ce064a963cc5d81d3cf7fd3fcd4"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=71+44+Yellowstone+Boulevard+Forest+Hills+NY+11375&size=5",
+    "status": 200,
+    "bytes": 5681,
+    "sha256": "ce3ba149ad562b822e98c545db4489d5b58ba0eeb2979a37c2feb9780be475c0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=78-10+164the+Street+Flushing+NY+11366&size=5",
+    "status": 200,
+    "bytes": 5419,
+    "sha256": "02c9dda6088eab565e35567b5e40cc8954876cd2374f4efc40437471b28085ad"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=69+70+Grand+Central+Parkway+Forest+Hills+NY+11375&size=5",
+    "status": 200,
+    "bytes": 5750,
+    "sha256": "f4cc2acbf432924db1a5d9e534890cce148a1fb5199084fbe9d2bb5e36963060"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=119+15+27TH+AVENUE+FLUSHING+NY+11354&size=5",
+    "status": 200,
+    "bytes": 5457,
+    "sha256": "94577ff6e4565051bd4f6a1275400e7c6ceea44c805a98697be6b853873c933b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=144+S.+Oxford+Street+Brooklyn+NY+11217&size=5",
+    "status": 200,
+    "bytes": 5648,
+    "sha256": "259ecddf1486d0251d8acc7c08df913eb80a70bdf499cf26134820eff9aeab79"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=212+40+HILLSIDE+AVENUE+QUEENS+VILLAGE+NY+11427&size=5",
+    "status": 200,
+    "bytes": 5592,
+    "sha256": "25363bebda5806aae3b34110dedf7cf7c64f11e374f0a48fae6d2a385414e82d"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=22-41+New+Haven+Avenue+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5602,
+    "sha256": "e65ea4855a37507d11d7241e9926719c7a53b86a2b75a8f57dfc48cbc9545805"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=315+Beach+9th+Street+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5558,
+    "sha256": "2aae8980a3abaab9169460976f6f0f8fa59e942ef66695e75a77827f58836b15"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=380+Henry+Street+Brooklyn+NY+11201&size=5",
+    "status": 200,
+    "bytes": 5542,
+    "sha256": "2ddfa7fbb824e73a49b1203b920a6052941113fef827ab8caaa1f2e5e4b69c7f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=170+Buffalo+Avenue+Brooklyn+NY+11213&size=5",
+    "status": 200,
+    "bytes": 5577,
+    "sha256": "db1b62ca2e482d84f3ecced2185fe44981f1a4b94e0ea3783d297652c0a1334c"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3220+Henry+Hudson+Parkway+Bronx+NY+10463&size=5",
+    "status": 200,
+    "bytes": 5680,
+    "sha256": "652a8a9a9eff73285d26f5d91c316c8085edd5e776db14573d591128a23d2dbe"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=275+Castleton+Avenue+Staten+Island+NY+10301&size=5",
+    "status": 200,
+    "bytes": 5614,
+    "sha256": "eb2104fdd2ebac9d85c8496bd1b60993d6730a443a424e25b43a4fa40ee84f7a"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=612+Alllerton+Avenue+Bronx+NY+10467&size=5",
+    "status": 200,
+    "bytes": 5527,
+    "sha256": "778bbed7152f088cfbaff93e0261980d07c2a91533f3b50a44870aabe60b8ed3"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=430+Beach+68th+Street+Arverne+NY+11692&size=5",
+    "status": 200,
+    "bytes": 5475,
+    "sha256": "f3aeb5ae512980e9bf3c06802e3976901bad97bf7b437b7959fa24054ca4a577"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2700+EASTCHESTER+ROAD+BRONX+NY+10469&size=5",
+    "status": 200,
+    "bytes": 5603,
+    "sha256": "63893f7aa528695286576bf50e17ace37afb6fb06ecba36c6e8154e9aee014a0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3155+GRACE+AVENUE+BRONX+NY+10469&size=5",
+    "status": 200,
+    "bytes": 5507,
+    "sha256": "75815e0dc7da2e007fdaacc1c3faa4ef43c27da1af89e9b4d71652c444a9358e"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=211+EAST+79+ST+NEW+YORK+CITY+NY+10075&size=5",
+    "status": 200,
+    "bytes": 5523,
+    "sha256": "397ca8417757ec374495ec9ed62183e44f447377c080aff5f92fdc912e479d5b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=25+Fanning+Street+Staten+Island+NY+10314&size=5",
+    "status": 200,
+    "bytes": 5573,
+    "sha256": "6fe7e783dc2ead6ad30d19742c19c43b1bd84b411b491e908c1daedeb6dbc7a0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1312+Caton+Avenue+Brooklyn+NY+11226&size=5",
+    "status": 200,
+    "bytes": 5552,
+    "sha256": "c3dee11dd86329667d4bf3a626d60d4a0ca1b249eaf97c504512b3da6702133c"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=666+Kappock+Street+Riverdale+NY+10463&size=5",
+    "status": 200,
+    "bytes": 5556,
+    "sha256": "a4a64388898ac8121dcb5f38fa9f20671466ebb8bad398ab72987acb7dc27c8f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=801+West+190th+Street+New+York+NY+10040&size=5",
+    "status": 200,
+    "bytes": 5569,
+    "sha256": "f28ab9628b86966d0d1e8c10b97ab138c52049f73fdd43e24a8c1ea1ef4c4df7"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=119+09+26TH+AVENUE+FLUSHING+NY+11354&size=5",
+    "status": 200,
+    "bytes": 5485,
+    "sha256": "d86ed714883b933269b2825d50d45faecfa40ddc7877dca4062f47a4dc123709"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=100+CASTLETON+AVENUE+STATEN+ISLAND+NY+10301&size=5",
+    "status": 200,
+    "bytes": 5614,
+    "sha256": "377a6487a40df81bcd6f378b746925a82fb4258a55d92fc189448953e939623b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=6585+Broadway+Riverdale+NY+10471&size=5",
+    "status": 200,
+    "bytes": 5426,
+    "sha256": "97fd98ee406de14574ef82e6824104719860a6c328de72e0c90686219fd9aa39"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2865+Brighton+3rd+Street+Brooklyn+NY+11235&size=5",
+    "status": 200,
+    "bytes": 5672,
+    "sha256": "9092656318c255dc771f20b004e0cae705329d9b7d07626e35eb59f23eb0aa95"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3457+Nostrand+Avenue+Brooklyn+NY+11229&size=5",
+    "status": 200,
+    "bytes": 5635,
+    "sha256": "d2f615adedbc7095e2de87da5c4fa6d61579041c834fe462d53b05d6d5102816"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=144-61+38th+Avenue+Flushing+NY+11354&size=5",
+    "status": 200,
+    "bytes": 5448,
+    "sha256": "da66f68070e3fe19fcca888f9dfb043189bad6e26b87d001f02dd0f797d081fe"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=140+Beach+114th+Street+Rockaway+Park+NY+11694&size=5",
+    "status": 200,
+    "bytes": 5572,
+    "sha256": "1b5d071e5190d93407fdeaddd21dbc51dc3bb1e3a150c1082baed8b56f9dc243"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=260+01+79th+Avenue+Glen+Oaks+NY+11004&size=5",
+    "status": 200,
+    "bytes": 5468,
+    "sha256": "7f6de297ad8bda041a49640d06f68e9335843bd0b5c65233f49d143233782e36"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=71+20+110th+Street+Forest+Hills+NY+11375&size=5",
+    "status": 200,
+    "bytes": 5490,
+    "sha256": "2f4edb78d5eaa5d40a5829d7ebcf8809c97f71a889dc494e8250b58fb1b65d43"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3525+Baychester+Avenue+Bronx+NY+10466&size=5",
+    "status": 200,
+    "bytes": 5588,
+    "sha256": "9a23484da18f13ec307bbc83289b535c7bfcc3315509aaf573f358b1112b09ba"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=59+20+Van+Doren+Street+Corona+NY+11368&size=5",
+    "status": 200,
+    "bytes": 5572,
+    "sha256": "ce4aa097f0dcdfb06df8e7afe8b49599e95f18dbbb70d7029eec075ef31fd62f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=143+10+20th+Avenue+Whitestone+NY+11357&size=5",
+    "status": 200,
+    "bytes": 5472,
+    "sha256": "bcae47c77b650317eb2034fa707345c09a0d7b3b096d091e50d8274f8ca34439"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=615+Avenue+C+Brooklyn+NY+11218&size=5",
+    "status": 200,
+    "bytes": 5466,
+    "sha256": "3d84d4ada63cea38d8002b1bb08544c3d3f504c2d9c46d9bb608fef596fae3e4"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=191+06+Hillside+Avenue+Hollis+NY+11423&size=5",
+    "status": 200,
+    "bytes": 5522,
+    "sha256": "c6ff5126678e53501505107a9293e85ab06cf719ee526e7657aacf5e4eb3f4f1"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=140+Meisner+Avenue+Staten+Island+NY+10306&size=5",
+    "status": 200,
+    "bytes": 5606,
+    "sha256": "4c31c6c5bad1b1a509aec8b7c61ac9ad4a9ae9eca67437f0ba2390076ef055c0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=150+Riverside+Drive+New+York+NY+10024&size=5",
+    "status": 200,
+    "bytes": 5536,
+    "sha256": "970c83095f1471ffc74b8e0616de2b305d87f795fc5256c9f45006f49aed04ce"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=164+11+Chapin+Parkway+Jamaica+NY+11432&size=5",
+    "status": 200,
+    "bytes": 5557,
+    "sha256": "111e9476d73485a0db9c31b3e9f05b2cd9e4a07768b0cab7122647bf97dc2b47"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1235+Pelham+Parkway+North+Bronx+NY+10469&size=5",
+    "status": 200,
+    "bytes": 5665,
+    "sha256": "67e9aa41c7569e1c9747738292333d069f3a2fa67880c235c8271f8d1c6e09db"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=119+-+19+Graham+Court+Flushing+NY+11354&size=5",
+    "status": 200,
+    "bytes": 5532,
+    "sha256": "d56aba2e0c137326a6af437f5818332d87c009fe2db26ab66588fef0a629c220"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3845+Carpenter+Avenue+Bronx+NY+10467&size=5",
+    "status": 200,
+    "bytes": 5569,
+    "sha256": "b61e118355ef460d9fbeba88874fa4c4aad6ad2f3b6db3556dcb9adceaf6cc2d"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=42+41+201st+Street+Bayside+NY+11361&size=5",
+    "status": 200,
+    "bytes": 5429,
+    "sha256": "1fe43283d1bbee846bc5274e0864c4d752acb831ccb93664b87fd4a23032779e"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=135+Vanderbilt+Avenue+Staten+Island+NY+10304&size=5",
+    "status": 200,
+    "bytes": 5618,
+    "sha256": "b2824933e00f88c892d60a4e688a9276995bb464ada983a74bede26660c516c0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=111-26+Corona+Avenue+Flushing+NY+11368&size=5",
+    "status": 200,
+    "bytes": 5562,
+    "sha256": "e15a3d1c931bf100a8decdffb7ac729fc339cb22217a591b853862e98ca3d36f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3518+Bainbridge+Avenue+Bronx+NY+10467&size=5",
+    "status": 200,
+    "bytes": 5583,
+    "sha256": "1b94eece0e0bf69d2d7ca055dbfec2f13266c7023bfa7fcb13ed06bb37236ae1"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=555+Rockaway+Parkway+Brooklyn+NY+11212&size=5",
+    "status": 200,
+    "bytes": 5610,
+    "sha256": "6987f9f3b65422fb6959217b21bba660a1de30a540ee10f1ff9d60d940f2b2b6"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=50+15+Beach+Channel+Drive+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5622,
+    "sha256": "b2765b4a8e684895a0cc5731057671683bfb0b5435e502ee936511394b0c7798"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1050+EAST+230th+Street+Bronx+NY+10466&size=5",
+    "status": 200,
+    "bytes": 5549,
+    "sha256": "26a64ad6047049bc02d0e2e1473bb22d41b4c91257507e6faf51983801244100"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3035+West+24th+Street+Brooklyn+NY+11224&size=5",
+    "status": 200,
+    "bytes": 5614,
+    "sha256": "5adcbc431938915a4cba48e0df588ba4ff0ec23a2835579b48b5949e87b82898"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=350+Beach+54th+Street+Arverne+NY+11692&size=5",
+    "status": 200,
+    "bytes": 5487,
+    "sha256": "d631affd3387b108cfb12d25474f18fa8d0f22ea915b6a24dc9b08276263d7c0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=142+27+Franklin+Avenue+Flushing+NY+11355&size=5",
+    "status": 200,
+    "bytes": 5538,
+    "sha256": "604be4ca2233bf2ac970550509bffa587e6ffa52e89b3a77f44096f51bc84f79"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=61+35+Dry+Harbor+Road+Middle+Village+NY+11379&size=5",
+    "status": 200,
+    "bytes": 5631,
+    "sha256": "f83b643e113849ad6f16c6f7a3d5010f4da0ca97a2391b6d55c04f1a279b52c6"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=260+19+Nassau+Boulevard+Little+Neck+NY+11362&size=5",
+    "status": 200,
+    "bytes": 5587,
+    "sha256": "2f7749d87eafedd55474c70c9c887c025618475e72c34e677a995faf0c954458"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=89-40+135th+Street+Jamaica+NY+11418&size=5",
+    "status": 200,
+    "bytes": 5495,
+    "sha256": "d18139366abb84eb05745c51cba8492c82a08bbc530d363df780fb919c49b6c5"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1160+Teller+Avenue+Bronx+NY+10456&size=5",
+    "status": 200,
+    "bytes": 5542,
+    "sha256": "04dfdeb896cec44feaa8021f56774e7e6740b4b542d50552808d5af531d96482"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=139+66+35th+Avenue+Flushing+NY+11354&size=5",
+    "status": 200,
+    "bytes": 5439,
+    "sha256": "60d6ae09a67eab50b99e35cf3d1e7a5ab80f2d1df4e65e4019c589ad0fea0a20"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=88+Old+Town+Road+Staten+Island+NY+10304&size=5",
+    "status": 200,
+    "bytes": 5544,
+    "sha256": "47dd26dfe572efd302ef85ab04a6d0bcc9516d52c99063981a6058707c66eabf"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=520+Beach+19th+Street+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5560,
+    "sha256": "e53d50f1e2cc338c409a48dc51eaa658858706eb2af1d24b0499b22316d66796"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=227+Madison+Street+New+York+NY+10002&size=5",
+    "status": 200,
+    "bytes": 5515,
+    "sha256": "772a276f880017d7861a2df0c9b8bf6785d7f88727ef1195d1df45a9cdecb609"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=100+West+Kingsbridge+Road+Bronx+NY+10468&size=5",
+    "status": 200,
+    "bytes": 5684,
+    "sha256": "0fed4e5e9d0a1bf932925878aecabed78b43103848cc74efcc306672d92d4e9b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=4915+10th+Avenue+Brooklyn+NY+11219&size=5",
+    "status": 200,
+    "bytes": 5525,
+    "sha256": "94450e1e5a1fe0212215151c4474e6e983b19351b08e41c3f19050459609906e"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=69+95+Queens+Midtown+Expressway+Maspeth+NY+11378&size=5",
+    "status": 200,
+    "bytes": 5725,
+    "sha256": "fdb4e7cf4edfb4ea5b4000a0f75fab82941e12e54f1612d3f66f990d5de69872"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1000+Pelham+Parkway+South+Bronx+NY+10461&size=5",
+    "status": 200,
+    "bytes": 5673,
+    "sha256": "bc2ac2402b49847f3723a7b431ca4d3a742484ecfc4096cb0333543b52358232"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2401+Laconia+Avenue+Bronx+NY+10469&size=5",
+    "status": 200,
+    "bytes": 5533,
+    "sha256": "3a43d275c3ce7697196bc990b8bce3e800d0339a5423a27b6a1bc1f6d3597c71"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=120+West+106th+Street+New+York+NY+10025&size=5",
+    "status": 200,
+    "bytes": 5543,
+    "sha256": "11296495c6d3e43726544a38f9b5a7011b8da3918930c0107f7da3829a9b96d8"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1072+Grand+Concourse+Bronx+NY+10456&size=5",
+    "status": 200,
+    "bytes": 5571,
+    "sha256": "ae0cad91ef63dbe993f77f7c4370976b7fbaa77cf7a8062d1c683bcb0229c189"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3530+WAYNE+AVENUE+BRONX+NY+10467&size=5",
+    "status": 200,
+    "bytes": 5493,
+    "sha256": "528433e65eac121f75d3db80a5c0fdf65a34723ffae70198ea82efb277218234"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=191+Bradley+Avenue+Staten+Island+NY+10314&size=5",
+    "status": 200,
+    "bytes": 5597,
+    "sha256": "268a264c41e7e4f34eda197ebd197f497a04c2b66413e0e6753a39034dc2a26b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=195+44+Woodhull+Avenue+Hollis+NY+11423&size=5",
+    "status": 200,
+    "bytes": 5513,
+    "sha256": "1e7e489062b4ae416b8db40eab98f35a4dd329ad82864b946f6a49944bc01642"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=91+31+175th+Street+Jamaica+NY+11432&size=5",
+    "status": 200,
+    "bytes": 5421,
+    "sha256": "f203135e66c6b42e384a5c6e4093cdfebf5b51419709e3bae8eeda0c32f4ac0a"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1010+Underhill+Avenue+Bronx+NY+10472&size=5",
+    "status": 200,
+    "bytes": 5573,
+    "sha256": "7cb62da635297f5c975a73b687aef466bbc108a0485806baaddee1a739403e0f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=140+St.+Edwards+Street+Brooklyn+NY+11201&size=5",
+    "status": 200,
+    "bytes": 5654,
+    "sha256": "01d67516845a52c8633a0072569821e3256d405b3b1da0a96d09502e6ce061ac"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3015+West+29th+Street+Brooklyn+NY+11224&size=5",
+    "status": 200,
+    "bytes": 5604,
+    "sha256": "f8378c366e4d42a880d52a1738271a309da1aafda5ec71db5089b75ac0bca7c0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=25+Bialystoker+Place+New+York+NY+10002&size=5",
+    "status": 200,
+    "bytes": 5541,
+    "sha256": "3350eb41c4db0c2de2c27d89be82c72dacd121646dd11669e1c8c91c03f1ed75"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1250+67th+Street+Brooklyn+NY+11219&size=5",
+    "status": 200,
+    "bytes": 5516,
+    "sha256": "75d12ad42a4e70db93090c94ac186946c1159c53909fb2539a706c64f20c6a72"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=4499+Manhattan+College+Parkway+Bronx+NY+10471&size=5",
+    "status": 200,
+    "bytes": 5735,
+    "sha256": "7f62d859c720fb6ef4b69ce457f039462ccd5bcf61e07db192b4bcce40a157ff"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=30+West+138th+Street+New+York+NY+10037&size=5",
+    "status": 200,
+    "bytes": 5527,
+    "sha256": "87baf22488cd288e7c87e64e02c29140af2412bb3c28f2dd5c002be2bfef7b80"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=182+15+Hillside+Avenue+Jamaica+Estates+NY+11432&size=5",
+    "status": 200,
+    "bytes": 5612,
+    "sha256": "3e6c7809e582a6004e086fc47ab749e5bab2e522dfb023ecf2a767f19fe5e4bf"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=585+Schenectady+Avenue+Brooklyn+NY+11203&size=5",
+    "status": 200,
+    "bytes": 5653,
+    "sha256": "7a2f47e817c7d2a7c149e23f0420ebc9ea0bbecd3838587fd3e9c931b70b93cb"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2266+Cropsey+Avenue+Brooklyn+NY+11214&size=5",
+    "status": 200,
+    "bytes": 5595,
+    "sha256": "29c84be2d8a97a28e3b700c3ffe8b65904f2085712bc54eaee71ee8a34857963"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=300+Madison+Street+Brooklyn+NY+11216&size=5",
+    "status": 200,
+    "bytes": 5610,
+    "sha256": "609e050bd8ef0640e5cfa73229f0125c37120cdaaa1ad31cb639d199f5267bd7"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1072+Havemeyer+Avenue+Bronx+NY+10462&size=5",
+    "status": 200,
+    "bytes": 5574,
+    "sha256": "d78dcd4ab42915cf32262a9f15b7dff75056460e0d64327e8e6726b40667c41a"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1740+84th+Street+Brooklyn+NY+11214&size=5",
+    "status": 200,
+    "bytes": 5519,
+    "sha256": "057e924d5eb8adcc092a7252d3aff55fb03fed59ae5293dcc8773c41339d9ba0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=200+Lafayette+Avenue+Staten+Island+NY+10301&size=5",
+    "status": 200,
+    "bytes": 5623,
+    "sha256": "4b9792b89d59e0dc651046461e49b8dc27e1134565eebc9f61d8d95bfbebb9eb"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=135+Linden+Boulevard+Brooklyn+NY+11226&size=5",
+    "status": 200,
+    "bytes": 5635,
+    "sha256": "dfa4525bee268ffbc6d6d54880db7b2bd2f3b4cdba6fe804f5eff5e0edaf1a85"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1060+Amsterdam+Avenue+New+York+NY+10025&size=5",
+    "status": 200,
+    "bytes": 5573,
+    "sha256": "257d333a842d92aa721b2da492663e6eb69582fef9b04472203c40fd1c98cabf"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=801+Co-op+City+Boulevardd+Bronx+NY+10475&size=5",
+    "status": 200,
+    "bytes": 2593,
+    "sha256": "8f41907c42d8fbc8c9d91b9a1ab939ff617f176fe8be62f57d84e3213d773f50"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=353+Beach+48th+Street+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5518,
+    "sha256": "be1c553b4713bca870832a270527c5d0f205189e04db7ca84e7da9328f572977"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=250+Beach+17th+Street+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5557,
+    "sha256": "669d4d2eadb493d9e5e0256449131d8187495c2fce01dc20c0e159f83a5b6a85"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=3304+Waterbury+Avenue+Bronx+NY+10465&size=5",
+    "status": 200,
+    "bytes": 5589,
+    "sha256": "4b55106a190aac92aede7509862cc07df34d1e5eb824f13b66e96d34637924a8"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1485+Dumont+Avenue+Brooklyn+NY+11208&size=5",
+    "status": 200,
+    "bytes": 5587,
+    "sha256": "e24207a179b5a53053012f3b8754c3a95c279293d2adbe3e0e1ca3d0b44acb18"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=110-30+221st+Street+Queens+Village+NY+11429&size=5",
+    "status": 200,
+    "bytes": 5560,
+    "sha256": "162c1d6fdb4f70875930a8cc2107f8760372d1477238c723a9ac434d5d005874"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=520+Prospect+Place+Brooklyn+NY+11238&size=5",
+    "status": 200,
+    "bytes": 5588,
+    "sha256": "6f96df0d6b68e6afdbb4d000bc37574ec5ba42fed8485c7b48017f436202c8d5"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=810+20+St.+Marks+Avenue+Brooklyn+NY+11213&size=5",
+    "status": 200,
+    "bytes": 5622,
+    "sha256": "b08de32607852c6e8e8f5b4ba44232abd911397b05f3bb7a5cb188120c8ff28f"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=165+01+Chapin+Parkway+Jamaica+NY+11432&size=5",
+    "status": 200,
+    "bytes": 5566,
+    "sha256": "b69910dad30dfb547226dc35ecbb8faca18a263d8337897298bc5d24decfa9df"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=40+Heyward+Street+Brooklyn+NY+11249&size=5",
+    "status": 200,
+    "bytes": 5570,
+    "sha256": "17184bf95b28872cc4052dfa9a25ca33d1e367a0d6ee3a3c6592a92fa7acc279"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2749+Linden+Boulevard+Brooklyn+NY+11208&size=5",
+    "status": 200,
+    "bytes": 5649,
+    "sha256": "59f7045bdb55ac68e4004caced99ba32cf0ec79556c13ff7fa2f9685bfb285b7"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2000+East+Gunhill+Road+Bronx+NY+10469&size=5",
+    "status": 200,
+    "bytes": 5605,
+    "sha256": "d5711d18dbe883c1e7b6fdf90857d38f002801e695aa37ceee28ee6ba18da582"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2107+Ditmas+Avenue+Brooklyn+NY+11226&size=5",
+    "status": 200,
+    "bytes": 5567,
+    "sha256": "a5abb33fd0352ccd822685aad9772e3099291e1e09acfd6ca755b01a53cf64dd"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1516+Oriental+Boulevard+Brooklyn+NY+11235&size=5",
+    "status": 200,
+    "bytes": 5666,
+    "sha256": "8036dc0b2af24a707d258e6242d9ee7ba8daef1376b2556136815b55f8fa8fe9"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2340+Cropsey+Avenue+Brooklyn+NY+11214&size=5",
+    "status": 200,
+    "bytes": 5593,
+    "sha256": "f13fea63bbe9952b8545759c3fe4bd22f7bf1fe65f6dafa27b0eb20c52b1e320"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2678+Kingsbridge+Terrace+Bronx+NY+10463&size=5",
+    "status": 200,
+    "bytes": 5632,
+    "sha256": "1967bc2dc9a2cbd2fa5cd0eb19f438c200f84376954af1f5b28587d21a164207"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1441+Gateway+Boulevard+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5600,
+    "sha256": "9c905edda38d4805b4be8f6b227ccbe4227493a046759c47d13dfe6449696893"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=29+38+Far+Rockaway+Boulevard+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5701,
+    "sha256": "3e52c758a01311726d303d7a3420db7d249cad6fbe8c7c875c0865d514acb2e2"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1555+Rockaway+Parkway+Brooklyn+NY+11236&size=5",
+    "status": 200,
+    "bytes": 5632,
+    "sha256": "5486b1b6c43aaee7ce7cf7c7f5ad9e48b56b5e7035c26833ac0a871052da0133"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1249+Fifth+Avenue+New+York+NY+10029&size=5",
+    "status": 200,
+    "bytes": 5507,
+    "sha256": "9decac268af66f7eee315eed36b93ea889d2c5f58e40001b170db800a89daecf"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2840+Knapp+Street+Brooklyn+NY+11235&size=5",
+    "status": 200,
+    "bytes": 5580,
+    "sha256": "ebca20cbc0eb1a0a3b219c5cdbe0458a9c1ec1872ef0f8ea3122b22462b7629e"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=50+Sheffield+Avenue+Brooklyn+NY+11207&size=5",
+    "status": 200,
+    "bytes": 5618,
+    "sha256": "41633842a0847216b745383bfb96953bc44bfe47d47dcded8cf89d8715ae3700"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=311+West+231st+Street+Bronx+NY+10463&size=5",
+    "status": 200,
+    "bytes": 5547,
+    "sha256": "79f1aef0ba63b572f25015cb74ed85a1e5abd929c49607cc0eb3abb9e63b3360"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=17+11+Brookhaven+Avenue+Far+Rockaway+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5626,
+    "sha256": "5b5ea9ed48f28a4a9a07b0ea3cece039243a89bff6e9503edb3114632fe5f58b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2323+Eastchester+Road+Bronx+NY+10469&size=5",
+    "status": 200,
+    "bytes": 5604,
+    "sha256": "5412a9b0e0a4509fe65b92aaff58eca07240a03c6196099b46d19496f3cb19b3"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=691+92nd+Street+Brooklyn+NY+11228&size=5",
+    "status": 200,
+    "bytes": 5511,
+    "sha256": "9a12d38ac060fefd0fec4868f78ee178028bc480b5112d20773b1e1c30d72880"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=630+E+104TH+Street+Brooklyn+NY+11236&size=5",
+    "status": 200,
+    "bytes": 5570,
+    "sha256": "8fafbb650398b25992b36f0dbd31f17522cb1e944cbfb9f87934d7bc17b6b896"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=144+45+87th+Avenue+Jamaica+NY+11435&size=5",
+    "status": 200,
+    "bytes": 5437,
+    "sha256": "0bc8721ecf912949f7d6092577edbe0566e6ece681d23bd4e02ee571061af67d"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1410+SEAGIRT+BLVD+FAR+ROCKAWAY+NY+11691&size=5",
+    "status": 200,
+    "bytes": 5578,
+    "sha256": "0794464d4ebff87d4554959cfc88c845a34acae1bd1279edb1ca581e0bcc2ccb"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1401+University+Avenue+Bronx+NY+10452&size=5",
+    "status": 200,
+    "bytes": 5579,
+    "sha256": "f8e522efe6822c976764d7e6b8077ef1d7ddbf7b3738a8449871192b735942f4"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=140+Beach+113th+Street+Far+Rockaway+NY+11694&size=5",
+    "status": 200,
+    "bytes": 5589,
+    "sha256": "03a8f024aae9939eb052817a77f2c8b5dee3a0317119f1107f73025b02f8a62b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=64+11+Beach+Channel+Drive+Arverne+NY+11692&size=5",
+    "status": 200,
+    "bytes": 5569,
+    "sha256": "5cc1098a434711cd6b955cce5007d2c3a3d53c17e48c35d5645000ffecd19982"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=700+White+Plains+Road+Bronx+NY+10473&size=5",
+    "status": 200,
+    "bytes": 5571,
+    "sha256": "faa26d7fb47edb2d6f5e10339730c33b43f98024f60e553d2159cc929260421b"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=936+Woodycrest+Avenue+Bronx+NY+10452&size=5",
+    "status": 200,
+    "bytes": 5573,
+    "sha256": "c0b7dbe5f2cb90fc77d119d648f628a7ecfe62f860b23d50816eb4dbebe9a1db"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2720+Surf+Avenue+Brooklyn+NY+11224&size=5",
+    "status": 200,
+    "bytes": 5548,
+    "sha256": "33273534c9a06ae364dae9521e732a3157f68479b7bc51d12aa06561e8da72e5"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=1265+Fulton+Avenue+Bronx+NY+10456&size=5",
+    "status": 200,
+    "bytes": 5525,
+    "sha256": "a0c58165bb95c33314ab6a287d9114014b2446fa0aa4f0598c34d1202207bc5c"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=178-50+Linden+Boulevard+Jamaica+NY+11434&size=5",
+    "status": 200,
+    "bytes": 5590,
+    "sha256": "b5e064707e73715e2a5b17e5d93454c9513e8cb4de633a5f6716603f74b90c37"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=516+West+126th+Street+New+York+NY+10027&size=5",
+    "status": 200,
+    "bytes": 5549,
+    "sha256": "96a95d3b266855b65adf39f1237b0b7b40b92ba07d913542848a343ba426720c"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=900+Intervale+Avenue+Bronx+NY+10459&size=5",
+    "status": 200,
+    "bytes": 5560,
+    "sha256": "04af3cafe4a20d2c45a6375af6b9c4885f0eb8f921941ce91b794343e9ba5581"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=707+Throgs+Neck+Expressway+Bronx+NY+10465&size=5",
+    "status": 200,
+    "bytes": 5701,
+    "sha256": "d999b33b96deb5719e19c410540917961622bfd81a15b5df4d58d678e8e592e5"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2175+Quarry+Road+Bronx+NY+10457&size=5",
+    "status": 200,
+    "bytes": 5470,
+    "sha256": "12fd2f58152f77282ea93514d1f8edadfc397f867b1dff5fefbee5c7562436ec"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=308+East+175th+Street+Bronx+NY+10457&size=5",
+    "status": 200,
+    "bytes": 5553,
+    "sha256": "fa4c94abad4aad4e333fd882489a2636bbc41eaf152d4f736187acbe9b9f7aff"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=91+Tompkins+Avenue+Staten+Island+NY+10304&size=5",
+    "status": 200,
+    "bytes": 5561,
+    "sha256": "0edb0b72dac9a851e2aaeb172338f56261376d9ff74092b44b9a7ab248b42dfa"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=33+23+Union+Street+Flushing+NY+11354&size=5",
+    "status": 200,
+    "bytes": 5470,
+    "sha256": "2805473355e3c7dd3463ea662ee362363220ecf02e487fa1a948c629bceeb8a5"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=116+East+125th+Street+New+York+NY+10035&size=5",
+    "status": 200,
+    "bytes": 5537,
+    "sha256": "6a58c803046a7be1b9b356a9cc212944d0a732841570459f8b9fca177eb510ea"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=36-17+Parsons+Boulevard+Flushing+NY+11354&size=5",
+    "status": 200,
+    "bytes": 5571,
+    "sha256": "cbe1a27a10aabc57ad48b3ce7f3193ca7dd10f989e5742caf37da847a326a039"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=61+11+Queens+Boulevard+Woodside+NY+11377&size=5",
+    "status": 200,
+    "bytes": 5545,
+    "sha256": "50c5bcbf4bc4567167d17aa5cb472e8f0a1bfe39373af14b57db8dbf70dc2cf3"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=594+Albany+Avenue+Brooklyn+NY+11203&size=5",
+    "status": 200,
+    "bytes": 5556,
+    "sha256": "115dd5e503f6db9b8c1e36adb3343f377ffebc0946e58d58f6de80ec220b2985"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=2237+Linden+Boulevard+Brooklyn+NY+11207&size=5",
+    "status": 200,
+    "bytes": 5648,
+    "sha256": "dbc71bbca55a56607a0a40e4d1d6f06a6159862ef566453212ad56a0c436738e"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=100+17+23rd+Avenue+East+Elmhurst+NY+11369&size=5",
+    "status": 200,
+    "bytes": 5497,
+    "sha256": "cda5bd01546a2820e7d9fb6cf71fae6f9e8ad2ac3ff330e3d260542cc57c53c0"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=70-05+35th+Avenue+Jackson+Heights+NY+11372&size=5",
+    "status": 200,
+    "bytes": 5528,
+    "sha256": "7fab1cb70473bfe2a049293eff590dc6c776effedd895ab5c13f27b0908faecd"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=155+Dean+Street+Brooklyn+NY+11217&size=5",
+    "status": 200,
+    "bytes": 5507,
+    "sha256": "d124a0f77376d3a3681e986bc77e3fd35231097801b0f115817a33417c42dd62"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=48+Cedar+Street+Brooklyn+NY+11221&size=5",
+    "status": 200,
+    "bytes": 5512,
+    "sha256": "0a87ff3a68b9ae99126bd86f08d6218c7234a8eec50e4b120c7a7a2e6ac8b291"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=26-13+21st+Street+Astoria+NY+11102&size=5",
+    "status": 200,
+    "bytes": 5420,
+    "sha256": "7ec0346dc220071ffde53ba0f70ca98fd8726c2479316fab86fc817c9aca18d3"
+  },
+  {
+    "url": "https://geosearch.planninglabs.nyc/v2/search?text=29+01+216th+Street+Bayside+NY+11360&size=5",
+    "status": 200,
+    "bytes": 5420,
+    "sha256": "3a1557d5c8a093c09969534a9cefee3140dd2f23d6ff520fae47adc39b03019b"
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "served_generated_at": "2026-09-23T17:19:38.790006Z",
+  "current_source_counts": {
+    "xubh-q36u": 5419,
+    "4pq5-n9py": 14690
+  },
+  "served_source_counts": {
+    "xubh-q36u": 5419,
+    "4pq5-n9py": 14690
+  },
+  "source_counts_equal": true,
+  "nyc_candidate_facilities": 210,
+  "resolution_status_counts": {
+    "RESOLVED_UNIQUE_PAD_EXACT_ADDRESS": 116,
+    "UNRESOLVED_NO_EXACT_PAD_RESULT": 93,
+    "UNRESOLVED_MULTIPLE_PAD_PROPERTIES": 1
+  },
+  "current_tower_overlap_edges": 46,
+  "served_tower_overlap_edges": 46,
+  "relationship_sets_equal": true,
+  "current_only_edges": 0,
+  "served_only_edges": 0,
+  "current_only_examples": [],
+  "served_only_examples": [],
+  "boundary": "Independent current CMS + NYC GeoSearch exact house/street/ZIP/single-BBL replay. Equality proves current relationship set when source populations are unchanged; source count drift is reported separately."
+}
