@@ -6,6 +6,7 @@ import type { CompanyAdminProfile } from '../types/companyAdmin'
 import type { KnownFirmPayload, KnownFirmRole, KnownFirmSummaryRecord } from '../types/firm'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
+import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
 
 const number = new Intl.NumberFormat('en-US')
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -188,6 +189,11 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
 
     {error && <div className="reference-empty-state"><strong>Known-company intelligence is unavailable.</strong><span>{error}</span><span>TowerSignal will not substitute disconnected provider or vendor lists when the normalized dataset is missing.</span></div>}
     {!payload && !error && <div className="reference-empty-state"><strong>Loading normalized company intelligence…</strong></div>}
+
+    {payload && adminAccess && <CompanyAdminImportPanel
+      firms={payload.firms}
+      onImported={async () => { setAdminProfiles(await loadCompanyAdminDirectory()) }}
+    />}
 
     {payload && <div className="table-card account-table-card known-firms-master-card">
       <div className="firm-master-toolbar">

@@ -322,3 +322,23 @@
     align-items: stretch;
   }
 }
+
+
+.company-admin-import-card {
+  margin: 0 0 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  display: grid;
+  gap: .8rem;
+}
+.company-admin-import-card strong { display: block; margin-top: .15rem; }
+.company-admin-import-card p { margin: .35rem 0 0; max-width: 76rem; color: var(--muted); }
+.company-admin-import-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.company-admin-import-actions input[type="file"] { max-width: 34rem; }
+.company-admin-import-preview,
+.company-admin-import-success,
+.company-admin-import-error { font-size: .85rem; }
+.company-admin-import-success { color: var(--success, #157347); }
+.company-admin-import-error { color: var(--danger, #b42318); }
