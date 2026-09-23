@@ -74,9 +74,8 @@ jobs:
               d=json.loads(p.read_text())
               c=d.get('nyc_building_water_signals') or {}
               n=len(c.get('dob_water_job_filings') or [])+len(c.get('dob_water_permits') or [])
-              if n>8:
+              if n>8 and (chosen is None or n < chosen[2]):
                   chosen=(p,d,n)
-                  break
           if not chosen: raise SystemExit('No >8-row DOB account found')
           p,d,n=chosen
           Path('src/audit-preview-data.json').write_text(json.dumps(d))
@@ -117,10 +116,10 @@ jobs:
             if(!(await summary.isVisible())) throw new Error(name+': full-list summary missing')
             const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)
             const visibleBefore=await page.locator('.signal-card:visible').count()
-            await page.screenshot({path:`.preview-proof/${name}-collapsed.png`,fullPage:true})
+            await page.screenshot({path:`.preview-proof/${name}-collapsed.png`,fullPage:false})
             await summary.click()
             const visibleAfter=await page.locator('.signal-card:visible').count()
-            await page.screenshot({path:`.preview-proof/${name}-expanded.png`,fullPage:true})
+            await page.screenshot({path:`.preview-proof/${name}-expanded.png`,fullPage:false})
             results.push({name,overflow,visibleBefore,visibleAfter,errors})
             if(overflow || errors.length || visibleBefore!==8 || visibleAfter<=8) throw new Error(JSON.stringify(results.at(-1)))
             await browser.close()
