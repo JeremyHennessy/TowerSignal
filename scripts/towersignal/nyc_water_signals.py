@@ -432,6 +432,20 @@ def classify_dob_work(row: Mapping[str, Any]) -> str:
         return "BOILER_WATER_ADJACENT"
     if "plumb" in text:
         return "PLUMBING_WATER_RELATED"
+
+    source_flags = [
+        name
+        for name, value in (
+            ("PLUMBING_WATER_RELATED", row.get("plumbing_work_type")),
+            ("MECHANICAL_WATER_RELATED", row.get("mechanical_systems_work_type_")),
+            ("BOILER_WATER_ADJACENT", row.get("boiler_equipment_work_type_")),
+        )
+        if normalize_space(value).upper() == "YES"
+    ]
+    if len(source_flags) == 1:
+        return source_flags[0]
+    if len(source_flags) > 1:
+        return "MULTI_WATER_MECHANICAL_SOURCE_SCOPE"
     return "OTHER_WATER_MECHANICAL"
 
 
