@@ -1,0 +1,32 @@
+name: Read-only current-release source census
+
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/collect_stage4_current.py
+      - .github/workflows/lineage-audit-stage4-current.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fresh independent hosted, HPD, PLUTO and NYS census
+        run: python -u docs/audits/2026-09-23/collect_stage4_current.py
+      - name: Preserve census evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lineage-stage4-current-source-census
+          path: .audit-stage4
+          include-hidden-files: true
+          retention-days: 14
