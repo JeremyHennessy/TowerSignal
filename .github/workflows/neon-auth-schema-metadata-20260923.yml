@@ -1,0 +1,24 @@
+name: Inspect Neon Auth schema metadata
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/neon-auth-schema-metadata-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: List Neon Auth tables and columns
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || exit 2
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select table_name || '|' || string_agg(column_name, ',' order by ordinal_position) from information_schema.columns where table_schema='neon_auth' group by table_name order by table_name;"
