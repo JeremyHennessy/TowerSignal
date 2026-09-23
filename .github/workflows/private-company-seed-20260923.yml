@@ -1,0 +1,47 @@
+name: Prepare private company seed
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/private-company-seed-20260923.yml'
+      - '.ops/company-seed.enc'
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Derive one-way seed encryption public key
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          python - <<'PY'
+          import base64, hashlib, os
+          from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
+          from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+
+          seed = hashlib.sha256(
+              b"TowerSignal private company seed key v1\0" + os.environ["DATABASE_URL"].encode()
+          ).digest()
+          private = X25519PrivateKey.from_private_bytes(seed)
+          public = private.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+          print("TOWERSIGNAL_SEED_PUBLIC_KEY=" + base64.b64encode(public).decode())
+          PY
+
+      - name: Seed payload status
+        shell: bash
+        run: |
+          if [ -f .ops/company-seed.enc ]; then
+            echo "ENCRYPTED_SEED=PRESENT"
+          else
+            echo "ENCRYPTED_SEED=ABSENT"
+          fi
