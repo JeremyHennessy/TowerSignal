@@ -1,0 +1,160 @@
+name: Building-water preview full-population and visual proof
+
+on:
+  push:
+    branches: [agent/audit-repair-building-water-preview-20260923]
+    paths:
+      - src/components/BuildingWaterSignalsSection.tsx
+      - src/components/BuildingWaterSignalsSection.test.tsx
+      - .github/workflows/audit-building-water-preview-proof.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35866906472
+          github-token: ${{ github.token }}
+          path: .pages242
+      - name: Extract fixed account population
+        run: |
+          mkdir -p .fixed .preview-proof
+          tar -xf .pages242/artifact.tar -C .fixed --wildcards './data/details/*/*.json'
+          npm install --no-audit --no-fund
+      - name: Reconcile ordering against all 4,893 account details
+        run: |
+          cat > src/components/auditBuildingWaterFullPopulation.test.ts <<'TS'
+          import fs from 'node:fs'
+          import path from 'node:path'
+          import { describe, expect, it } from 'vitest'
+          import { orderedDobWaterRows } from './BuildingWaterSignalsSection'
+
+          function walk(dir: string): string[] {
+            return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>{
+              const p=path.join(dir,e.name)
+              return e.isDirectory()?walk(p):e.isFile()&&e.name.endsWith('.json')?[p]:[]
+            })
+          }
+          function date(row: Record<string,unknown>): string {
+            for(const k of ['issued_date','approved_date','filing_date']){
+              const v=row[k]; if(typeof v==='string' && /^\\d{4}-\\d{2}-\\d{2}/.test(v)) return v.slice(0,10)
+            }
+            return ''
+          }
+          describe('full Pages242 DOB preview population',()=>{
+            it('preserves all rows and never hides a newer record behind an older preview card',()=>{
+              const files=walk('.fixed/data/details')
+              expect(files.length).toBe(4893)
+              let accountsWithDob=0, totalRows=0, remainingRows=0, newerHidden=0, noPermitInPreview=0
+              const failures:unknown[]=[]
+              for(const file of files){
+                const d=JSON.parse(fs.readFileSync(file,'utf8'))
+                const c=d.nyc_building_water_signals
+                if(!c) continue
+                const jobs=(c.dob_water_job_filings??[]) as Record<string,unknown>[]
+                const permits=(c.dob_water_permits??[]) as Record<string,unknown>[]
+                if(!jobs.length && !permits.length) continue
+                accountsWithDob++
+                const ordered=orderedDobWaterRows(jobs,permits)
+                totalRows+=ordered.length
+                remainingRows+=Math.max(0,ordered.length-8)
+                if(ordered.length!==jobs.length+permits.length) failures.push({file,kind:'loss'})
+                const preview=ordered.slice(0,8), hidden=ordered.slice(8)
+                const oldestShown=preview.map(date).filter(Boolean).sort()[0]??''
+                if(hidden.some(row=>date(row)>oldestShown)){ newerHidden++; failures.push({file,kind:'newer-hidden',oldestShown}) }
+                if(permits.length && !preview.some(row=>permits.includes(row))) noPermitInPreview++
+              }
+              fs.writeFileSync('.preview-proof/full-population.json',JSON.stringify({files:4893,accountsWithDob,totalRows,remainingRows,newerHidden,noPermitInPreview,failures},null,2))
+              expect(failures).toEqual([])
+              expect(newerHidden).toBe(0)
+            })
+          })
+          TS
+          npx vitest run src/components/auditBuildingWaterFullPopulation.test.ts
+          rm src/components/auditBuildingWaterFullPopulation.test.ts
+      - name: Prepare actual-data visual harness
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          chosen=None
+          for p in Path('.fixed/data/details').glob('*/*.json'):
+              d=json.loads(p.read_text())
+              c=d.get('nyc_building_water_signals') or {}
+              n=len(c.get('dob_water_job_filings') or [])+len(c.get('dob_water_permits') or [])
+              if n>8:
+                  chosen=(p,d,n)
+                  break
+          if not chosen: raise SystemExit('No >8-row DOB account found')
+          p,d,n=chosen
+          Path('src/audit-preview-data.json').write_text(json.dumps(d))
+          Path('.preview-proof/visual-fixture.json').write_text(json.dumps({'source':str(p),'system_id':(d.get('identity') or {}).get('system_id'),'dob_rows':n},indent=2))
+          PY
+          cat > audit-preview.html <<'HTML'
+          <!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Audit preview</title></head><body><div id="root"></div><script type="module" src="/src/audit-preview.tsx"></script></body></html>
+          HTML
+          cat > src/audit-preview.tsx <<'TSX'
+          import React from 'react'
+          import ReactDOM from 'react-dom/client'
+          import { BuildingWaterSignalsSection } from './components/BuildingWaterSignalsSection'
+          import detail from './audit-preview-data.json'
+          import './styles/app.css'
+          import './styles/redesign.css'
+          import './styles/product-redesign.css'
+          import './styles/ui-polish.css'
+          import './styles/account-detail-polish.css'
+          import './styles/account-evidence-workspace.css'
+          ReactDOM.createRoot(document.getElementById('root')!).render(<main style={{maxWidth:1100,margin:'0 auto',padding:24}}><BuildingWaterSignalsSection detail={detail as any}/></main>)
+          TSX
+      - name: Capture desktop and iPhone candidate renderer
+        run: |
+          npx playwright install --with-deps chromium webkit
+          npx vite --host 127.0.0.1 --port 4173 > .preview-proof/vite.log 2>&1 &
+          echo $! > .preview-proof/vite.pid
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/audit-preview.html >/dev/null && break; sleep 1; done
+          cat > .preview-proof/capture.mjs <<'JS'
+          import { chromium, webkit, devices } from '@playwright/test'
+          import fs from 'node:fs/promises'
+          const results=[]
+          for(const [name,type,opts] of [['desktop',chromium,{viewport:{width:1440,height:1000}}],['iphone',webkit,devices['iPhone 13']]]){
+            const browser=await type.launch()
+            const page=await browser.newPage(opts)
+            const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())})
+            await page.goto('http://127.0.0.1:4173/audit-preview.html',{waitUntil:'networkidle'})
+            const summary=page.getByText(/View remaining DOB water work records/)
+            if(!(await summary.isVisible())) throw new Error(name+': full-list summary missing')
+            const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)
+            const visibleBefore=await page.locator('.signal-card:visible').count()
+            await page.screenshot({path:`.preview-proof/${name}-collapsed.png`,fullPage:true})
+            await summary.click()
+            const visibleAfter=await page.locator('.signal-card:visible').count()
+            await page.screenshot({path:`.preview-proof/${name}-expanded.png`,fullPage:true})
+            results.push({name,overflow,visibleBefore,visibleAfter,errors})
+            if(overflow || errors.length || visibleBefore!==8 || visibleAfter<=8) throw new Error(JSON.stringify(results.at(-1)))
+            await browser.close()
+          }
+          await fs.writeFile('.preview-proof/browser.json',JSON.stringify(results,null,2))
+          JS
+          node .preview-proof/capture.mjs
+      - name: Prove approved PDF implementation was not changed
+        run: |
+          git diff --exit-code f1cbdb925b704a8b7a34aaccd169be6649b80a92 -- src/components/ClientSiteReport.tsx src/styles/client-site-report.css src/styles/account-report.css src/styles/account-report-density-final.css
+      - name: Preserve proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: building-water-preview-full-population-visual-proof
+          path: .preview-proof
+          include-hidden-files: true
+          retention-days: 14
