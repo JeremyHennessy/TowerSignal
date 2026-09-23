@@ -1,8 +1,19 @@
 import { useState, type FormEvent } from 'react'
+import '../styles/marketing-demo-deck.css'
 
 type MarketingSection = 'platform' | 'workflow' | 'markets' | 'audience' | 'book-demo'
 
 const asset = (name: string) => `${import.meta.env.BASE_URL}marketing/${name}`
+
+function DemoFigure({ name, title, description, page, eager = false }: { name: string; title: string; description: string; page: number; eager?: boolean }) {
+  const src = asset(`demo-deck-20260922/${name}.webp`)
+  return <figure className="marketing-deck-figure" data-demo-page={page}>
+    <a className="marketing-deck-image-link" href={src} target="_blank" rel="noopener noreferrer" aria-label={`View ${title} at full size (opens in a new tab)`}>
+      <img src={src} alt={description} width={1672} height={page === 8 ? 940 : 941} loading={eager ? 'eager' : 'lazy'} decoding="async" fetchPriority={eager ? 'high' : 'auto'} />
+    </a>
+    <figcaption><span><strong>{title}</strong><small>September 2026 demo · Slide {page}</small></span><a href={src} target="_blank" rel="noopener noreferrer" aria-label={`Enlarge ${title} (opens in a new tab)`}>View full size <span aria-hidden="true">↗</span></a></figcaption>
+  </figure>
+}
 
 function scrollToSection(section: MarketingSection) {
   document.getElementById(section)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -16,7 +27,7 @@ export function MarketingLandingPage() {
     setDemoSubmitted(true)
   }
 
-  return <main className="marketing-page">
+  return <main className="marketing-page marketing-deck-page">
     <header className="marketing-nav">
       <button className="marketing-brand" type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="TowerSignal home">
         <img src={asset('towersignal-logo.webp')} alt="TowerSignal" />
@@ -35,9 +46,9 @@ export function MarketingLandingPage() {
 
     <section className="marketing-hero" aria-labelledby="marketing-hero-title">
       <div className="marketing-hero-copy">
-        <span className="marketing-kicker"><i /> Property, compliance &amp; service intelligence</span>
+        <span className="marketing-kicker"><i /> Public data. Real signals. Bigger opportunities.</span>
         <h1 id="marketing-hero-title">Find the buildings that <em>need you next.</em></h1>
-        <p>TowerSignal turns fragmented public records into actionable property intelligence for water-treatment companies, cooling-tower service providers, consultants and field teams.</p>
+        <p>Prospect faster, qualify earlier, and prepare every conversation with context. Source-backed cooling-tower opportunity intelligence for water-treatment, service, consulting and field teams.</p>
         <div className="marketing-hero-actions">
           <button className="marketing-primary" type="button" onClick={() => scrollToSection('book-demo')}>Book a demo <span aria-hidden="true">→</span></button>
           <a className="marketing-secondary" href="#/login">Log in to TowerSignal</a>
@@ -47,19 +58,15 @@ export function MarketingLandingPage() {
         </div>
       </div>
 
-      <div className="marketing-hero-product" aria-label="TowerSignal product preview">
-        <div className="marketing-browser marketing-browser-main">
-          <div className="marketing-browser-bar"><i /><i /><i /><span>app.towersignal</span></div>
-          <img src={asset('towersignal-prospect-mobile.svg')} alt="TowerSignal Prospect workspace showing prioritized cooling-tower accounts" />
-        </div>
-        <div className="marketing-float-card marketing-float-card-top"><small>PRIORITY SIGNAL</small><strong>Why this property, why now</strong><span>Recent public-record activity stays attached to the account.</span></div>
-        <div className="marketing-float-card marketing-float-card-bottom"><small>RELATIONSHIPS</small><strong>Owner + contractor context</strong><span>Move from a building to the people and companies around it.</span></div>
+      <div className="marketing-deck-hero" aria-label="TowerSignal product preview">
+        <DemoFigure name="demo-cover" title="TowerSignal at a glance" description="TowerSignal demo cover with New York City skyline, Prospect workspace, account context and Workflow previews" page={1} eager />
+        <p className="marketing-deck-notice">Images from our September 2026 demo. Figures shown belong to the presentation, not the current live dataset.</p>
       </div>
     </section>
 
-    <section className="marketing-brand-banner" aria-label="TowerSignal brand">
-      <img src={asset('towersignal-hero.webp')} alt="TowerSignal" />
-      <div><span>One searchable workspace</span><strong>Property. Compliance. Relationships. Opportunity.</strong></div>
+    <section className="marketing-brand-banner marketing-deck-overview" aria-label="TowerSignal demo overview">
+      <div><span>One searchable workspace</span><strong>See signals. Find opportunities. Take action.</strong><p>Explore the market, open an account with context, manage follow-up and understand the evidence behind it.</p></div>
+      <DemoFigure name="demo-overview" title="The demo at a glance" description="Four views from the demo: Prospect, Account summary, Workflow, and Source Health and Coverage" page={8} />
     </section>
 
     <section className="marketing-statement" id="platform">
@@ -82,7 +89,7 @@ export function MarketingLandingPage() {
         <p>Filter the market by priority, cooling-tower status, violations, sampling follow-up, recent property activity and other account criteria. The goal is a smaller, explainable working set—not another giant spreadsheet.</p>
         <ul><li>Map and market-wide screening</li><li>Deterministic priority signals</li><li>Fast drill-through to source evidence</li></ul>
       </div>
-      <div className="marketing-product-frame marketing-frame-light"><img src={asset('towersignal-prospect-mobile.svg')} alt="TowerSignal Prospect workspace" /></div>
+      <DemoFigure name="demo-prospect" title="Find the best opportunities first" description="Prospect demo showing timing filters, priority signals, contact context and source-backed accounts" page={2} />
     </section>
 
     <section className="marketing-product-story marketing-product-story-reverse">
@@ -90,13 +97,22 @@ export function MarketingLandingPage() {
         <span className="marketing-eyebrow">PROPERTY PROFILE</span>
         <h2>See the property, the signal and the source trail together.</h2>
         <p>Open a building to understand equipment, ownership, violations, maintenance signals, linked documents and account workflow without losing the evidence that made the property interesting.</p>
-        <ul><li>Property and equipment context</li><li>Ownership and contractor relationships</li><li>Source documents and historical activity</li></ul>
+        <ul><li>Property and equipment context</li><li>Contact paths and coverage gaps</li><li>Source documents and historical activity</li></ul>
       </div>
-      <div className="marketing-product-frame marketing-frame-dark"><img src={asset('towersignal-account-mobile.svg')} alt="TowerSignal property account profile" /></div>
+      <DemoFigure name="demo-account-summary" title="See what matters next" description="1813 Oriental Boulevard account demo with the next-step summary, property scale, project activity and explicit contact coverage" page={3} />
+    </section>
+
+    <section className="marketing-deck-gallery" aria-labelledby="marketing-deck-context-title">
+      <div className="marketing-section-heading"><span className="marketing-eyebrow">ACCOUNT CONTEXT</span><h2 id="marketing-deck-context-title">Prepare the conversation. Prepare the visit.</h2><p>Keep the timing signal, contact path, property scale and recent activity together, so sales and field teams can work from the same context.</p></div>
+      <div className="marketing-deck-gallery-grid">
+        <DemoFigure name="demo-account-context" title="Prepare the conversation" description="16 East 39th Street demo connecting account priority, a contact path, observed changes and project filings" page={4} />
+        <DemoFigure name="demo-field" title="Understand the site before the visit" description="1 Central Park South demo showing active equipment, mapped roof footprints, contact context and project activity" page={5} />
+      </div>
     </section>
 
     <section className="marketing-workflow" id="workflow">
       <div className="marketing-workflow-heading"><span className="marketing-eyebrow">HOW IT WORKS</span><h2>From fragmented source data to a defensible next action.</h2><p>TowerSignal keeps collection, identity resolution, prioritization and evidence separate so a useful signal does not become an unexplained score.</p></div>
+      <div className="marketing-deck-workflow"><DemoFigure name="demo-workflow" title="Keep follow-up in a private workspace" description="Workflow demo with Accounts, Changes and Actions, saved views, watchlists, and map and table views" page={6} /></div>
       <div className="marketing-process-grid">
         <article><span>1</span><div><h3>Collect</h3><p>Bring together public cooling-tower, building, property, ownership and procurement records.</p></div></article>
         <article><span>2</span><div><h3>Connect</h3><p>Normalize records around properties and link identities only where the evidence supports the relationship.</p></div></article>
@@ -106,13 +122,15 @@ export function MarketingLandingPage() {
     </section>
 
     <section className="marketing-evidence">
-      <div className="marketing-evidence-copy"><span className="marketing-eyebrow">EVIDENCE FIRST</span><h2>Know why a signal exists.</h2><p>Every useful commercial signal should be traceable to the public record behind it. TowerSignal is designed to expose source evidence and keep uncertainty visible instead of manufacturing a relationship.</p></div>
-      <div className="marketing-source-stack" aria-label="Example TowerSignal source families">
-        <div><strong>Cooling-tower records</strong><span>Registrations, inspections and equipment context</span></div>
-        <div><strong>Building &amp; compliance</strong><span>DOB, OATH and related property activity</span></div>
-        <div><strong>Ownership &amp; property</strong><span>Recorded property changes, deeds and ownership evidence</span></div>
-        <div><strong>Procurement</strong><span>Solicitations, awards, contracts, buyers and observed vendors</span></div>
+      <div className="marketing-evidence-copy"><span className="marketing-eyebrow">EVIDENCE FIRST</span><h2>Know why a signal exists.</h2><p>Check source freshness, review account coverage and see evidence gaps before taking action. The Source Health view makes the strength and limits of the dataset visible.</p>
+        <div className="marketing-source-stack" aria-label="Example TowerSignal source families">
+          <div><strong>Cooling-tower records</strong><span>Registrations, inspections and equipment context</span></div>
+          <div><strong>Building &amp; compliance</strong><span>DOB, OATH and related property activity</span></div>
+          <div><strong>Ownership &amp; property</strong><span>Recorded property changes and ownership evidence</span></div>
+          <div><strong>Procurement</strong><span>Solicitations, awards, contracts and observed vendors</span></div>
+        </div>
       </div>
+      <DemoFigure name="demo-source-health" title="Trust the evidence" description="Source Health and Coverage demo showing freshness, identity coverage, source diagnostics and visible warnings" page={7} />
     </section>
 
     <section className="marketing-markets" id="markets">
