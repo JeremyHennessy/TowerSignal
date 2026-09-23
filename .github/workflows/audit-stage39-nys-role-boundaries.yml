@@ -1,0 +1,30 @@
+name: Audit NYS public-water role boundaries
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/audit_stage39_nys_role_boundaries.py
+      - .github/workflows/audit-stage39-nys-role-boundaries.yml
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit statewide PWS/operator/LSLI role boundaries
+        run: python -u docs/audits/2026-09-23/audit_stage39_nys_role_boundaries.py
+      - name: Persist results
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage39-nys-role-boundaries
+          cp .audit-stage39/*.json docs/audits/2026-09-23/stage39-nys-role-boundaries/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage39-nys-role-boundaries
+          git commit -m "audit: persist NYS role-boundary census"
+          git pull --rebase origin audit/full-lineage-20260923-1350
+          git push origin HEAD:audit/full-lineage-20260923-1350
