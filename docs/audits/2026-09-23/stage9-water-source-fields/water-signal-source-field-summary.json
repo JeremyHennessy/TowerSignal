@@ -1,0 +1,61 @@
+{
+  "field_rows": 495,
+  "sources": {
+    "erm2-nwe9": {
+      "label": "NYC 311 service requests",
+      "published_fields": 48,
+      "requested_fields": 15,
+      "semantic_referenced_fields": 15,
+      "dispositions": {
+        "USED": 15,
+        "UNRESOLVED": 33
+      },
+      "source_updated_at": 1790127495
+    },
+    "wvxf-dwi5": {
+      "label": "NYC HPD violations",
+      "published_fields": 41,
+      "requested_fields": 16,
+      "semantic_referenced_fields": 16,
+      "dispositions": {
+        "USED": 16,
+        "UNRESOLVED": 25
+      },
+      "source_updated_at": 1790175419
+    },
+    "w9ak-ipjd": {
+      "label": "NYC DOB NOW job application filings",
+      "published_fields": 95,
+      "requested_fields": 21,
+      "semantic_referenced_fields": 21,
+      "dispositions": {
+        "USED": 21,
+        "UNRESOLVED": 74
+      },
+      "source_updated_at": 1790109422
+    },
+    "rbx6-tga4": {
+      "label": "NYC DOB NOW approved permits",
+      "published_fields": 46,
+      "requested_fields": 22,
+      "semantic_referenced_fields": 23,
+      "dispositions": {
+        "USED": 23,
+        "UNRESOLVED": 23
+      },
+      "source_updated_at": 1790102548
+    },
+    "5zyy-y8am": {
+      "label": "NYC LL84 benchmarking",
+      "published_fields": 265,
+      "requested_fields": 20,
+      "semantic_referenced_fields": 20,
+      "dispositions": {
+        "USED": 20,
+        "UNRESOLVED": 245
+      },
+      "source_updated_at": 1764097355
+    }
+  },
+  "boundary": "Schema/collector/normalizer field audit. UNRESOLVED means not yet field-reviewed, not missing data. Scope filters remain separately audited."
+}
