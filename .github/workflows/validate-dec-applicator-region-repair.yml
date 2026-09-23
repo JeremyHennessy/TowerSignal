@@ -1,0 +1,18 @@
+name: Validate DEC applicator region repair
+on:
+  push:
+    branches: [repair/dec-applicator-region-20260923]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Targeted DEC region regression
+        run: python -m unittest tests.python.test_domestic_water_market_normalization -v
+      - name: Full Python suite
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
