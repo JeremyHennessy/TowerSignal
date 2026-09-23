@@ -1,0 +1,14 @@
+{
+  "registry_systems": 4893,
+  "registry_sha256": "9ca884e7b9283856337fc81a63d6aa790b7a13f281823deacab614bc7cd95b7e",
+  "artifact_registry_sha256": "96b8a13a7d337df5d824e376f60bef6bfa6956ce6bfe43a6801892b00120c5c9",
+  "artifact_registry_equal_current": false,
+  "matched_observations": 167,
+  "unresolved_observations": 0,
+  "issue_count": 0,
+  "relationship_replay_exact": true,
+  "match_basis_expected": "NORMALIZED_ADDRESS_BOROUGH_SINGLE_BIN",
+  "scope_expected": "NAMED_BUILDING_NOT_INDIVIDUAL_SYSTEM",
+  "all_served_match_basis_correct": true,
+  "boundary": "Independent replay of observation-to-current-registry relationship only. It does not re-extract the official NYC Health documents or attribute an observation to an individual tower within the matched building."
+}
