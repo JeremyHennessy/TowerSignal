@@ -199,7 +199,8 @@ jobs:
           html="$(curl --fail --silent --show-error --location "$BASE_URL")"
           asset="$(printf '%s' "$html" | grep -oE 'assets/index-[^"]+\.js' | head -1)"
           test -n "$asset"
-          curl --fail --silent --show-error --location "${BASE_URL%/}/$asset" | grep -q "Import sourced company enrichment"
+          curl --fail --silent --show-error --location "${BASE_URL%/}/$asset" --output /tmp/towersignal-importer-index.js
+          grep -Fq "Import sourced company enrichment" /tmp/towersignal-importer-index.js
       - name: Retain hosted importer proof
         if: always()
         uses: actions/upload-artifact@v4
