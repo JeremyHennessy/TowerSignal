@@ -37,3 +37,4 @@ jobs:
           name: audit-proposed-regression-failures
           path: .audit-regressions
           retention-days: 14
+          include-hidden-files: true
