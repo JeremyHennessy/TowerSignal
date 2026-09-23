@@ -1,0 +1,384 @@
+{
+  "summary": {
+    "reviewed": 24,
+    "counts": {
+      "UNUSED_POTENTIALLY_USEFUL": 12,
+      "INTENTIONALLY_EXCLUDED": 3,
+      "RETAINED_NOT_DISPLAYED": 9
+    },
+    "opportunities": [
+      "active_equipment_at_publication",
+      "applicant_license",
+      "boiler_work_type",
+      "estimated_job_costs",
+      "estimated_values_water",
+      "filing_reason",
+      "mechanical_work_type",
+      "permit_status",
+      "permittee_license_type",
+      "plumbing_work_type",
+      "sequence_number",
+      "water_meter_alert_less_than_12_months"
+    ],
+    "note": "A field can be retained without a current consumer and still be intentionally retained for provenance. Potentially useful means a concrete validated integration path exists; it is not authorization to change production."
+  },
+  "fields": [
+    {
+      "normalized_field": "active_equipment_at_publication",
+      "origin_files": [
+        "scripts/towersignal/inspections.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 1,
+      "downstream_references": [],
+      "type_references": [
+        {
+          "path": "src/types/data.ts",
+          "line": 217,
+          "kind": "TYPE_DECLARATION",
+          "text": "active_equipment_at_publication: number"
+        }
+      ],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as historical inspection-time equipment-count evidence to detect equipment-count changes; never overwrite current registry active equipment.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "applicant_license",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as source-native corroboration for DOB applicant identity/role resolution, with license type and temporal record context; not proof of service responsibility.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "boiler_work_type",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Explicit DOB job work-type flag is collected but does not currently drive job category; use in a reviewed classification rule after population validation.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "census_tract",
+      "origin_files": [
+        "scripts/towersignal/normalize.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Retained source geography but not required for current TowerSignal identity, compliance, service, contact or timing claims; no current runtime consumer.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "council_district",
+      "origin_files": [
+        "scripts/towersignal/normalize.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Retained source geography but not required for current TowerSignal identity, compliance, service, contact or timing claims; no current runtime consumer.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "estimated_job_costs",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Could support source-labelled project-size/prioritization context; must remain a DOB estimated project cost, not company revenue or service-contract value.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "estimated_values_water",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as an LL84 data-quality qualifier so estimated water figures are visibly distinguished from measured/self-reported values.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "filing_reason",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use to distinguish initial/amended/renewal permit observations and strengthen observation identity/history semantics.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "indoor_water_use_all_sources_kgal",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "Detailed LL84 component retained; current product displays total/mapped potable measures. Keep available for a future water-use profile without implying sampling or compliance.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "mechanical_work_type",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Explicit DOB job work-type flag is collected but does not currently drive job category; use in a reviewed classification rule after population validation.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "municipal_potable_indoor_kgal",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "Detailed LL84 potable-water component retained but not currently displayed; not needed for current property identity or cooling-tower sampling claims.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "municipal_potable_mixed_kgal",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "Detailed LL84 potable-water component retained but not currently displayed; not needed for current property identity or cooling-tower sampling claims.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "municipal_potable_outdoor_kgal",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "Detailed LL84 potable-water component retained but not currently displayed; not needed for current property identity or cooling-tower sampling claims.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "ntacode",
+      "origin_files": [
+        "scripts/towersignal/normalize.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "INTENTIONALLY_EXCLUDED",
+      "reason": "Retained source neighborhood code but not required for current TowerSignal identity, compliance, service, contact or timing claims; no current runtime consumer.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "outdoor_water_use_all_sources_kgal",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "Detailed LL84 component retained; current product does not expose an indoor/outdoor water-use profile.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "permit_status",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use with issued/expired dates to qualify whether a DOB permit observation is active, expired or historical; do not infer service incumbency.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "permittee_license_type",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as role/identity corroboration for the permittee/applicant; not a service-contract claim.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "plumbing_work_type",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Explicit DOB job work-type flag is collected but does not currently drive job category; use in a reviewed classification rule after population validation.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "sequence_number",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use in permit observation identity because one permit/work-permit identifier can have multiple source sequences/issue observations.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "source_owner_name_raw",
+      "origin_files": [
+        "scripts/towersignal/pluto.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "Preserved for provenance and normalization audit. Display normalized owner by default; expose raw source text only for conflict/review diagnostics.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "water_meter_alert_less_than_12_months",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "UNUSED_POTENTIALLY_USEFUL",
+      "reason": "Use as LL84 data-quality/freshness warning so incomplete meter coverage is not interpreted as complete annual water use.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "work_type",
+      "origin_files": [
+        "scripts/towersignal/nyc_water_signals.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 0,
+      "downstream_references": [],
+      "type_references": [],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "The permit source work type contributes to normalization/category logic; the stored copy itself has no downstream runtime consumer.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "year_altered_1",
+      "origin_files": [
+        "scripts/towersignal/pluto.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 1,
+      "downstream_references": [],
+      "type_references": [
+        {
+          "path": "src/types/data.ts",
+          "line": 269,
+          "kind": "TYPE_DECLARATION",
+          "text": "year_altered_1: number | null"
+        }
+      ],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "PLUTO alteration year retained as property context but not used by current TowerSignal evidence/scoring/display surfaces.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    },
+    {
+      "normalized_field": "year_altered_2",
+      "origin_files": [
+        "scripts/towersignal/pluto.py"
+      ],
+      "downstream_code_reference_count": 0,
+      "type_declaration_count": 1,
+      "downstream_references": [],
+      "type_references": [
+        {
+          "path": "src/types/data.ts",
+          "line": 270,
+          "kind": "TYPE_DECLARATION",
+          "text": "year_altered_2: number | null"
+        }
+      ],
+      "status": "NO_DOWNSTREAM_CODE_REFERENCE",
+      "reviewed_disposition": "RETAINED_NOT_DISPLAYED",
+      "reason": "PLUTO second alteration year retained as property context but not used by current TowerSignal evidence/scoring/display surfaces.",
+      "boundary": "Normalized-field disposition; no production behavior is changed by this audit."
+    }
+  ]
+}
