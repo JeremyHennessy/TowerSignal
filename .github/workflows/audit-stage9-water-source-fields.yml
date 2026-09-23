@@ -1,0 +1,30 @@
+name: Build building-water source-field ledger batch
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/build_stage9_water_source_fields.py
+      - .github/workflows/audit-stage9-water-source-fields.yml
+permissions:
+  contents: write
+jobs:
+  ledger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build five-source field ledger
+        run: python -u docs/audits/2026-09-23/build_stage9_water_source_fields.py
+      - name: Persist ledger
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage9-water-source-fields
+          cp .audit-stage9/*.json docs/audits/2026-09-23/stage9-water-source-fields/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage9-water-source-fields
+          git commit -m "audit: persist building-water source-field ledger"
+          git pull --rebase origin audit/full-lineage-20260923-1350
+          git push origin HEAD:audit/full-lineage-20260923-1350
