@@ -3,8 +3,7 @@
   "statuses": {
     "FULL_CURRENT_INDEPENDENT": 6,
     "TARGET_SCOPE_CURRENT_INDEPENDENT": 13,
-    "COLLECTOR_SCOPE_CURRENT_INDEPENDENT": 8,
-    "CURRENT_SCOPE_DELTA_LIFECYCLE_RECONCILIATION_IN_PROGRESS": 1,
+    "COLLECTOR_SCOPE_CURRENT_INDEPENDENT": 9,
     "FULL_CURRENT_AGENCY_SLICE_INDEPENDENT": 1,
     "SOURCE_ROW_MATCHED_DEFECT_FOUND": 2,
     "FULL_CURRENT_FILTERED_INDEPENDENT": 1,
@@ -75,8 +74,8 @@
     {
       "dataset_id": "wvxf-dwi5",
       "name": "NYC HPD violations",
-      "status": "CURRENT_SCOPE_DELTA_LIFECYCLE_RECONCILIATION_IN_PROGRESS",
-      "evidence": "184,645 current open-water rows independently replayed versus 184,528 served snapshot rows; complete source-version/lifecycle adjudication is running."
+      "status": "COLLECTOR_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "Current open-water population independently replayed: 184,645 IDs. Production seek pagination and independent offset pagination are exactly equal in all five boroughs under the same source filter/version. Served snapshot differs by 126 current-only and 27 now-closed IDs while publisher rowsUpdatedAt is unchanged, proving a source query-state/metadata freshness limitation rather than pagination loss."
     },
     {
       "dataset_id": "rbx6-tga4",
@@ -211,6 +210,6 @@
       "evidence": "8,477 current exact-BIN planimetric cooling-tower features independently replayed; GlobalID multiset exactly equals served features."
     }
   ],
-  "boundary": "All 33 enumerated source datasets now have independent current retrieval/exact-source evidence or source-row-matched defect evidence. HPD remains a current-population discrepancy under pagination/query-consistency adjudication; independent coverage does not mean all relationships or normalized values are defect-free.",
+  "boundary": "All 33 enumerated source datasets now have independent current retrieval/exact-source evidence or source-row-matched defect evidence. HPD pagination is independently proven complete; same-metadata query-state drift remains an official-source freshness limitation. Source population proof remains separate from normalization, relationships, private DB policy verification and hosted visual/PDF acceptance.",
   "updated_after_stages": "22-39"
 }
