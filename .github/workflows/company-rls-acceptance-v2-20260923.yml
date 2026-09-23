@@ -1,0 +1,120 @@
+name: Validate company admin RLS v2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/company-rls-acceptance-v2-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Verify admin and non-admin RLS isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          DO $$
+          DECLARE
+            admin_id text;
+            nonadmin_id text;
+            inserted_count integer;
+            visible_count integer;
+          BEGIN
+            SELECT id::text INTO admin_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin'
+            ORDER BY "createdAt"
+            LIMIT 1;
+
+            SELECT id::text INTO nonadmin_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,'')) <> 'admin'
+            ORDER BY "createdAt"
+            LIMIT 1;
+
+            IF admin_id IS NULL OR nonadmin_id IS NULL THEN
+              RAISE EXCEPTION 'RLS acceptance requires one admin and one non-admin';
+            END IF;
+
+            EXECUTE 'SET LOCAL ROLE authenticated';
+            PERFORM set_config('request.jwt.claims', json_build_object('sub', admin_id, 'role', 'authenticated')::text, true);
+
+            INSERT INTO public.company_private_profiles (
+              company_id,
+              canonical_name,
+              legal_name,
+              internal_summary
+            ) VALUES (
+              '__rls_acceptance__',
+              'RLS acceptance probe',
+              'RLS acceptance probe',
+              'temporary'
+            );
+
+            SELECT count(*) INTO inserted_count
+            FROM public.company_private_profiles
+            WHERE company_id='__rls_acceptance__';
+
+            IF inserted_count <> 1 THEN
+              RAISE EXCEPTION 'Admin insert/read failed';
+            END IF;
+
+            PERFORM set_config('request.jwt.claims', json_build_object('sub', nonadmin_id, 'role', 'authenticated')::text, true);
+
+            SELECT count(*) INTO visible_count
+            FROM public.company_private_profiles
+            WHERE company_id='__rls_acceptance__';
+
+            IF visible_count <> 0 THEN
+              RAISE EXCEPTION 'Non-admin could read admin private row';
+            END IF;
+
+            BEGIN
+              INSERT INTO public.company_private_profiles (
+                company_id,
+                canonical_name,
+                legal_name,
+                internal_summary
+              ) VALUES (
+                '__rls_nonadmin_should_fail__',
+                'RLS non-admin probe',
+                'RLS non-admin probe',
+                'temporary'
+              );
+              RAISE EXCEPTION 'Non-admin insert unexpectedly succeeded';
+            EXCEPTION
+              WHEN insufficient_privilege THEN NULL;
+              WHEN check_violation THEN NULL;
+            END;
+
+            PERFORM set_config('request.jwt.claims', json_build_object('sub', admin_id, 'role', 'authenticated')::text, true);
+
+            DELETE FROM public.company_private_profiles
+            WHERE company_id='__rls_acceptance__';
+
+            IF EXISTS (
+              SELECT 1 FROM public.company_private_profiles
+              WHERE company_id IN ('__rls_acceptance__','__rls_nonadmin_should_fail__')
+            ) THEN
+              RAISE EXCEPTION 'Acceptance probe cleanup failed';
+            END IF;
+          END $$;
+
+          ROLLBACK;
+
+          SELECT 'COMPANY_RLS_ACCEPTANCE=PASS' AS result,
+                 (SELECT count(*) FROM neon_auth."user") AS users,
+                 (SELECT count(*) FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin') AS admins,
+                 (SELECT count(*) FROM public.company_private_profiles) AS private_profiles;
+          SQL
