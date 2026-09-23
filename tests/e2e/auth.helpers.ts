@@ -11,7 +11,7 @@ export function authStatePath(projectName: string): string {
   return `${AUTH_STATE_DIR}/${family(projectName)}.json`
 }
 
-export function testCredentials(_projectName: string) {
+export function testCredentials() {
   const email = process.env.TOWERSIGNAL_E2E_EMAIL?.trim()
   const password = process.env.TOWERSIGNAL_E2E_PASSWORD
   if (!email || !password) {
@@ -43,7 +43,7 @@ async function gotoHosted(page: Page, targetHash: string): Promise<void> {
 }
 
 export async function submitSignIn(page: Page, projectName: string): Promise<void> {
-  const credentials = testCredentials(projectName)
+  const credentials = testCredentials()
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
   const attempts = process.env.CI && family(projectName) === 'iphone' ? 2 : 1
 
