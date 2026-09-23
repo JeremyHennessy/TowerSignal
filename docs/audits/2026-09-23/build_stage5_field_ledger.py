@@ -55,8 +55,8 @@ for path,text in code_files:
 
 # Source-specific current retrieval semantics established from inspected builders.
 retrieval={
- 'y4fw-iqfr':{'mode':'FULL_ROW_FETCH','collector':'scripts/towersignal/build_data_live.py -> fetch_dataset','selected':'ALL_PUBLISHED_FIELDS'},
- 'f9wb-g8mb':{'mode':'FULL_ROW_FETCH','collector':'scripts/towersignal/build_data_live.py -> fetch_dataset','selected':'ALL_PUBLISHED_FIELDS'},
+ 'y4fw-iqfr':{'mode':'FULL_ROW_FETCH','collector':'scripts/build_data_live.py -> fetch_dataset','selected':'ALL_PUBLISHED_FIELDS'},
+ 'f9wb-g8mb':{'mode':'FULL_ROW_FETCH','collector':'scripts/build_data_live.py -> fetch_dataset','selected':'ALL_PUBLISHED_FIELDS'},
  'tesw-yqqr':{'mode':'EXPLICIT_SELECT','collector':'scripts/towersignal/hpd_identity.py','select_key':('scripts/towersignal/hpd.py','REGISTRATION_SELECT')},
  'feu5-w2e2':{'mode':'EXPLICIT_SELECT','collector':'scripts/towersignal/hpd_identity.py','select_key':('scripts/towersignal/hpd.py','CONTACT_SELECT')},
  '64uk-42ks':{'mode':'EXPLICIT_SELECT','collector':'scripts/towersignal/pluto.py','select_key':('scripts/towersignal/pluto.py','PLUTO_SELECT')},
@@ -65,8 +65,8 @@ retrieval={
 
 # Explicit row.get references by source family files.
 family_files={
- 'y4fw-iqfr':['scripts/towersignal/normalize.py','scripts/towersignal/build_data_live.py'],
- 'f9wb-g8mb':['scripts/towersignal/inspections.py','scripts/towersignal/build_data_live.py'],
+ 'y4fw-iqfr':['scripts/towersignal/normalize.py','scripts/build_data_live.py'],
+ 'f9wb-g8mb':['scripts/towersignal/inspections.py','scripts/build_data_live.py'],
  'tesw-yqqr':['scripts/towersignal/hpd_identity.py','scripts/towersignal/hpd.py'],
  'feu5-w2e2':['scripts/towersignal/hpd_identity.py','scripts/towersignal/hpd.py'],
  '64uk-42ks':['scripts/towersignal/pluto.py'],
