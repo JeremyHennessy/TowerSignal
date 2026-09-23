@@ -205,15 +205,36 @@ def current_pointer(store):
     except FileNotFoundError:
         return None, None, None
     value = json.loads(data)
-    require(value.get('schema_version') == 1 and value.get('domain') == 'TOWERSIGNAL_BLOB_RELEASE' and
-            type(value.get('source', {}).get('run_number')) is int and
-            value['source'].get('workflow_id') == 339705737,
-            'Existing current pointer is not a recognized Pages release')
+    source = value.get('source') if isinstance(value.get('source'), dict) else {}
+    pages_source = (
+        source.get('workflow_id') == 339705737
+        and source.get('kind') in (None, '')
+        and source.get('workflow_path') in (None, '', '.github/workflows/pages.yml')
+    )
+    data_only_source = (
+        source.get('kind') == 'data-only'
+        and source.get('workflow_path') == '.github/workflows/azure-data-refresh.yml'
+    )
+    require(
+        value.get('schema_version') == 1
+        and value.get('domain') == 'TOWERSIGNAL_BLOB_RELEASE'
+        and type(source.get('run_id')) is int and source['run_id'] > 0
+        and type(source.get('run_number')) is int and source['run_number'] > 0
+        and re.fullmatch(r'[0-9a-f]{40}', str(source.get('source_sha') or ''))
+        and isinstance(source.get('created_at'), str) and source['created_at']
+        and (pages_source or data_only_source),
+        'Existing current pointer is not a recognized TowerSignal release',
+    )
     return value, etag, data
 
 
-def promote(store, source, runtime, history, *, bootstrap=False):
-    """One ETag-guarded JSON change selects BOTH runtime and matching durable history."""
+def promote(store, source, runtime, history, *, bootstrap=False, cross_workflow_source=None):
+    """One ETag-guarded JSON change selects BOTH runtime and matching durable history.
+
+    A caller may prevalidate one exact cross-workflow source object. Promotion still
+    re-reads the pointer and requires that same source before the CAS, so an
+    intervening data refresh cannot be overwritten by a stale prevalidation.
+    """
     for kind, desc in [('runtime', runtime), ('history', history)]:
         validate_descriptor(store, desc, kind, source)
     candidate = {'schema_version': 1, 'domain': 'TOWERSIGNAL_BLOB_RELEASE',
@@ -223,9 +244,12 @@ def promote(store, source, runtime, history, *, bootstrap=False):
         if all(old.get(k) == v for k, v in candidate.items()):
             return {'status': 'ALREADY_CURRENT', 'current': old, 'etag': etag}
         require(not bootstrap, 'Bootstrap cannot replace an existing current pointer')
-        require(source['workflow_id'] == old['source']['workflow_id'] and
-                source['run_number'] > old['source']['run_number'],
-                'Refusing an older or conflicting same-run publication')
+        if source.get('workflow_id') == old['source'].get('workflow_id'):
+            require(source['run_number'] > old['source']['run_number'],
+                    'Refusing an older or conflicting same-workflow publication')
+        else:
+            require(cross_workflow_source is not None and old['source'] == cross_workflow_source,
+                    'Cross-workflow current pointer was not prevalidated or changed before promotion')
     # These stable selectors cannot drift independently into mixed release states.
     for kind in ('runtime', 'history'):
         immutable_json(store, f'{ROOT}/pointers/{kind}-current.json',
