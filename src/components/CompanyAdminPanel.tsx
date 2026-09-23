@@ -56,16 +56,14 @@ function emptyProfile(): CompanyAdminProfilePatch {
 
 function patchFrom(profile: CompanyAdminProfile | null): CompanyAdminProfilePatch {
   if (!profile) return emptyProfile()
-  const {
-    company_id: _companyId,
-    canonical_name: _canonicalName,
-    created_at: _createdAt,
-    updated_at: _updatedAt,
-    created_by: _createdBy,
-    updated_by: _updatedBy,
-    ...patch
-  } = profile
-  return patch
+  const patch = { ...profile } as Partial<CompanyAdminProfile>
+  delete patch.company_id
+  delete patch.canonical_name
+  delete patch.created_at
+  delete patch.updated_at
+  delete patch.created_by
+  delete patch.updated_by
+  return patch as CompanyAdminProfilePatch
 }
 
 function text(value: string): string | null {
