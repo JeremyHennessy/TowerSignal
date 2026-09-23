@@ -178,6 +178,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
+      const savedProfile = await saveCompanyAdminProfile(companyId, canonicalName, profile)
+      setProfile(patchFrom(savedProfile))
       await addCompanyContact(companyId, {
         name: contactName.trim(),
         title: text(contactTitle),
@@ -204,6 +206,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
+      await saveCompanyAdminProfile(companyId, canonicalName, profile)
       const occurredAt = new Date(activityDate).toISOString()
       await addCompanyActivity(companyId, {
         activity_type: activityType,
@@ -239,6 +242,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
+      const savedProfile = await saveCompanyAdminProfile(companyId, canonicalName, profile)
+      setProfile(patchFrom(savedProfile))
       await addCompanyNote(companyId, newNote.trim())
       setNewNote('')
       await reload()
