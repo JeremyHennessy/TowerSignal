@@ -79,6 +79,17 @@ for sid,paths in family_files.items():
         for m in re.finditer(r'''(?:row|record)\.get\(["']([^"']+)["']\)''', text):
             field_refs[sid][m.group(1)].append({'path':path,'offset':m.start()})
 
+# Account for source fields accessed through audited dynamic field tuples.
+inspection_text=Path('scripts/towersignal/inspections.py').read_text()
+inspection_tree=ast.parse(inspection_text)
+for node in inspection_tree.body:
+    if isinstance(node, ast.Assign) and any(isinstance(t,ast.Name) and t.id=='VIOLATION_FIELDS' for t in node.targets):
+        try:
+            for field in ast.literal_eval(node.value):
+                field_refs['f9wb-g8mb'][field].append({'path':'scripts/towersignal/inspections.py','dynamic_contract':'VIOLATION_FIELDS'})
+        except Exception:
+            pass
+
 rows=[]
 source_summary={}
 for sid,(host,label) in SOURCES.items():
