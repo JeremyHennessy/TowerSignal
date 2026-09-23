@@ -1,0 +1,98 @@
+name: Read-only source row identity audit
+
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - .github/workflows/lineage-audit-source-row-identity.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch complete relevant source populations with Socrata row IDs
+        run: |
+          mkdir -p .source-row-id
+          python -u - <<'PY'
+          import json,hashlib,time
+          from collections import defaultdict
+          from pathlib import Path
+          import urllib.request as ur, urllib.parse as up
+          ROOT='https://data.cityofnewyork.us'
+          DOB='w9ak-ipjd'; LL84='5zyy-y8am'
+          DOB_WHERE="filing_date >= '2024-01-01T00:00:00.000' AND (plumbing_work_type='YES' OR mechanical_systems_work_type_='YES' OR boiler_equipment_work_type_='YES') AND (lower(job_description) like '%water%' OR lower(job_description) like '%plumb%' OR lower(job_description) like '%backflow%' OR lower(job_description) like '%rpz%' OR lower(job_description) like '%booster%' OR lower(job_description) like '%pump%' OR lower(job_description) like '%tank%')"
+          reqs=[]
+          def get(url):
+              rec={'url':url}
+              for attempt in range(3):
+                  try:
+                      with ur.urlopen(ur.Request(url,headers={'User-Agent':'TowerSignal-readonly-row-id-audit'}),timeout=90) as r:b=r.read()
+                      rec.update(status=r.status,bytes=len(b),sha256=hashlib.sha256(b).hexdigest());reqs.append(rec)
+                      return json.loads(b)
+                  except Exception as ex:
+                      rec.update(error=str(ex));time.sleep(2*(attempt+1))
+              reqs.append(rec);raise RuntimeError(rec)
+          def fetch(ident,where,order):
+              meta0=get(f'{ROOT}/api/views/{ident}.json')
+              base=f'{ROOT}/resource/{ident}.json'
+              countp={'$select':'count(*) as n'}
+              if where:countp['$where']=where
+              c0=int(get(base+'?'+up.urlencode(countp))[0]['n'])
+              rows=[];offset=0
+              while True:
+                  p={'$select':'*,:id as source_row_id','$order':order,'$limit':50000,'$offset':offset}
+                  if where:p['$where']=where
+                  page=get(base+'?'+up.urlencode(p))
+                  rows.extend(page)
+                  if len(page)<50000:break
+                  offset+=50000
+              c1=int(get(base+'?'+up.urlencode(countp))[0]['n'])
+              meta1=get(f'{ROOT}/api/views/{ident}.json')
+              ids=[str(r.get('source_row_id')) for r in rows]
+              return rows,{'dataset_id':ident,'count_before':c0,'count_after':c1,'retrieved':len(rows),'unique_source_row_ids':len(set(ids)),
+                'rows_updated_before':meta0.get('rowsUpdatedAt'),'rows_updated_after':meta1.get('rowsUpdatedAt'),
+                'stable_complete':c0==c1==len(rows)==len(set(ids)) and meta0.get('rowsUpdatedAt')==meta1.get('rowsUpdatedAt')}
+          dob,dobmeta=fetch(DOB,DOB_WHERE,'job_filing_number,:id')
+          ll,llmeta=fetch(LL84,None,'report_year,property_id,:id')
+          def clean(v):return '' if v is None else str(v).strip()
+          def stable(prefix,*parts):return prefix+'-'+hashlib.sha256('|'.join(clean(p) for p in parts).encode()).hexdigest()[:20]
+          # Group exactly by the current TowerSignal IDs.
+          groups={}
+          for name,rows,idfn in [
+              ('dob_water_job_filings',dob,lambda r:stable('dob-job-water',r.get('job_filing_number'))),
+              ('ll84_water_benchmarks',ll,lambda r:stable('ll84-water',r.get('report_year'),r.get('property_id'))),
+          ]:
+              by=defaultdict(list)
+              for r in rows:by[idfn(r)].append(r)
+              repeated={k:g for k,g in by.items() if len(g)>1}
+              report=[]
+              for k,g in repeated.items():
+                  source_ids=[str(r.get('source_row_id')) for r in g]
+                  report.append({'current_id':k,'rows':len(g),'unique_source_row_ids':len(set(source_ids)),
+                    'source_row_ids':source_ids[:20],
+                    'job_filing_number':clean(g[0].get('job_filing_number')) or None,
+                    'report_year':clean(g[0].get('report_year')) or None,
+                    'property_id':clean(g[0].get('property_id')) or None})
+              groups[name]={'rows':len(rows),'current_repeated_groups':len(repeated),
+                'all_repeated_groups_have_unique_source_row_ids':all(x['rows']==x['unique_source_row_ids'] for x in report),
+                'repeated_groups':report}
+          out={'retrieval':{'dob':dobmeta,'ll84':llmeta},'identity':groups,'requests':reqs}
+          Path('.source-row-id/source-row-identity-report.json').write_text(json.dumps(out,indent=2))
+          print(json.dumps({'retrieval':{'dob':dobmeta,'ll84':llmeta},'identity':{
+            k:{'rows':v['rows'],'repeated_groups':v['current_repeated_groups'],'source_row_ids_unique_within_groups':v['all_repeated_groups_have_unique_source_row_ids']} for k,v in groups.items()}},indent=2))
+          PY
+      - name: Preserve report
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-row-identity-audit
+          path: .source-row-id/source-row-identity-report.json
+          retention-days: 14
