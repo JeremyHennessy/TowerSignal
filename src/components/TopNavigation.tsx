@@ -65,7 +65,6 @@ export function TopNavigation({
   authBusy: boolean
   authError: string | null
   onSignIn: (email: string, password: string) => Promise<void>
-  onSignUp: (email: string, password: string) => Promise<void>
   onSignOut: () => Promise<void>
 }) {
   const [moreOpen, setMoreOpen] = useState(false)
