@@ -30,6 +30,13 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     if not isinstance(systems, list) or not isinstance(by_bbl, dict):
         raise RuntimeError("CMS institutional attachment inputs are malformed")
 
+    requested_aliases = {
+        bbl
+        for system in systems
+        if isinstance(system, dict)
+        for value in (system.get("bbl_aliases") if isinstance(system.get("bbl_aliases"), list) else [system.get("bbl")])
+        if (bbl := _normalize_bbl(value))
+    }
     attached_systems = 0
     attached_facilities = 0
     for system in systems:
@@ -75,9 +82,16 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     if not isinstance(metadata, dict):
         raise RuntimeError("TowerSignal systems metadata is malformed")
     summary = cache.get("summary") or {}
+    cache_requested = int(summary.get("requested_tower_bbl_count") or 0)
+    if cache_requested != len(requested_aliases):
+        raise RuntimeError(
+            f"CMS context was built against {cache_requested:,} TowerSignal BBLs, "
+            f"but the current exact alias universe contains {len(requested_aliases):,}"
+        )
     metadata.update({
         "cms_institutional_context_available": True,
         "cms_institutional_match_basis": "PAD_EXACT_ADDRESS_BBL_ALIAS",
+        "cms_institutional_requested_bbl_count": cache_requested,
         "cms_institutional_exact_resolved_facility_count": int(summary.get("exact_resolved_facility_count") or 0),
         "cms_institutional_tower_overlap_facility_count": attached_facilities,
         "cms_institutional_systems_attached": attached_systems,
