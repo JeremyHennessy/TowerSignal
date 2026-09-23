@@ -1,0 +1,4318 @@
+[
+  {
+    "file": "scripts/build_data.py",
+    "line": 20,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id: inspections_by_system.get(system_id, [])"
+  },
+  {
+    "file": "scripts/build_data.py",
+    "line": 38,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "current_system_ids.update(str(system[\"system_id\"]) for system in systems)"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 54,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in str(system_id) if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 83,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "raise RuntimeError(\"Hosted system count does not match verified-history registration count\")"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 102,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str((detail.get(\"identity\") or {}).get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 111,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "cases = [dict(item) for item in (detail.get(\"oath_case_history\") or []) if item.get(\"ticket_number\")]"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 122,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_ids = [str(item.get(\"system_id\") or \"\") for item in hosted_systems.get(\"systems\") or []]"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 137,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Hosted detail identity mismatch: {expected_system_id} != {system_id}\")"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 140,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "ticket = normalize_ticket_number(case.get(\"ticket_number\"))"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 168,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "str(oath_source.get(\"source_query_scope\") or \"OATH exact summons lifecycle\")"
+  },
+  {
+    "file": "scripts/bootstrap_oath_cache_from_verified_pages.py",
+    "line": 169,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "+ \"; bootstrap restricted to summons attached to the verified current TowerSignal registry systems\""
+  },
+  {
+    "file": "scripts/attach_nyc_water_signals.py",
+    "line": 44,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_nyc_water_signals.py",
+    "line": 84,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "return sorted(rows, key=lambda row: (_row_date(row, key), str(row.get(\"source_record_id\") or row.get(\"request_id\") or row.get(\"violation_id\") or row.get(\"activity_id\") or row.get(\"benchmark_id\") or \"\")), reverse=True)"
+  },
+  {
+    "file": "scripts/attach_nyc_water_signals.py",
+    "line": 96,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(system.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/attach_nyc_water_signals.py",
+    "line": 99,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "contexts.setdefault(system_id, _empty_collections())[key].append(compact)"
+  },
+  {
+    "file": "scripts/attach_nyc_water_signals.py",
+    "line": 223,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(system.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/attach_nyc_water_signals.py",
+    "line": 224,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "context = _context(contexts.get(system_id, _empty_collections()), signal_payload)"
+  },
+  {
+    "file": "scripts/attach_nyc_water_signals.py",
+    "line": 233,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Missing account detail while attaching NYC building-water signals: {system_id}\")"
+  },
+  {
+    "file": "scripts/verify_live_planimetrics.py",
+    "line": 28,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, list[dict]] = {}"
+  },
+  {
+    "file": "scripts/verify_live_planimetrics.py",
+    "line": 45,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin.setdefault(bin_value, []).append(feature)"
+  },
+  {
+    "file": "scripts/verify_live_planimetrics.py",
+    "line": 51,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "features = [feature for bin_features in by_bin.values() for feature in bin_features]"
+  },
+  {
+    "file": "scripts/verify_live_planimetrics.py",
+    "line": 86,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "unmatched_bins = len(requested_bins) - len(by_bin)"
+  },
+  {
+    "file": "scripts/verify_live_planimetrics.py",
+    "line": 89,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "for bin_value in sorted(by_bin, key=int)[:5]:"
+  },
+  {
+    "file": "scripts/verify_live_planimetrics.py",
+    "line": 90,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "for feature in by_bin[bin_value][:2]:"
+  },
+  {
+    "file": "scripts/verify_live_planimetrics.py",
+    "line": 116,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "\"matched_bin_count\": len(by_bin),"
+  },
+  {
+    "file": "scripts/validate_domestic_water_market_cache.py",
+    "line": 56,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "provider_ids = {str(row.get(\"provider_id\")) for row in payload[\"providers\"] if row.get(\"provider_id\")}"
+  },
+  {
+    "file": "scripts/validate_domestic_water_market_cache.py",
+    "line": 64,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "raise RuntimeError(f\"Invalid provider profile {provider.get('provider_id')}\")"
+  },
+  {
+    "file": "scripts/validate_domestic_water_market_cache.py",
+    "line": 67,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "raise RuntimeError(f\"Provider alias count mismatch for {provider.get('provider_id')}\")"
+  },
+  {
+    "file": "scripts/probe_elap_search.py",
+    "line": 146,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "result.append({\"url\": url, \"lab_id\": lab_ids[0] if lab_ids else None})"
+  },
+  {
+    "file": "scripts/probe_elap_search.py",
+    "line": 241,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "item for item in detail_links if item.get(\"lab_id\") and str(item[\"lab_id\"]).isdigit()"
+  },
+  {
+    "file": "scripts/attach_legacy_dob_project_context.py",
+    "line": 12,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_legacy_dob_project_context.py",
+    "line": 28,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "def _merge_alias_contexts(by_bbl: dict[str, Any], aliases: list[str]) -> tuple[dict[str, Any] | None, list[str]]:"
+  },
+  {
+    "file": "scripts/attach_legacy_dob_project_context.py",
+    "line": 32,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "context = by_bbl.get(bbl)"
+  },
+  {
+    "file": "scripts/attach_legacy_dob_project_context.py",
+    "line": 68,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl = cache.get(\"by_bbl\") or {}"
+  },
+  {
+    "file": "scripts/attach_legacy_dob_project_context.py",
+    "line": 79,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "context, matched_aliases = _merge_alias_contexts(by_bbl, aliases)"
+  },
+  {
+    "file": "scripts/attach_legacy_dob_project_context.py",
+    "line": 96,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail_path = safe_detail_path(output_dir, str(row[\"system_id\"]))"
+  },
+  {
+    "file": "scripts/verify_live_domestic_water.py",
+    "line": 21,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/verify_live_domestic_water.py",
+    "line": 100,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail_path = safe_detail_path(output_dir, str(row[\"system_id\"]))"
+  },
+  {
+    "file": "scripts/attach_historical_311_context.py",
+    "line": 18,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_historical_311_context.py",
+    "line": 74,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "profiles = cache.get(\"by_bbl\")"
+  },
+  {
+    "file": "scripts/attach_historical_311_context.py",
+    "line": 83,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(system.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/attach_historical_311_context.py",
+    "line": 88,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Missing account detail while attaching historical 311 context: {system_id}\")"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 30,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 47,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = displayed[\"system_id\"]"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 56,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "source_inspections = aggregate_inspections(inspection_rows).get(system_id, [])"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 60,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": displayed[\"system_id\"] == source[\"system_id\"],"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 69,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "results.append({\"system_id\": system_id, \"address\": displayed[\"address\"], \"checks\": checks, \"result\": \"PASS\"})"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 75,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail = json.loads(detail_path(details_dir, displayed[\"system_id\"]).read_text(encoding=\"utf-8\"))"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 78,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Summary reports OATH cases but detail is empty for {displayed['system_id']}\")"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 80,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "ticket = generated_case[\"ticket_number\"]"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 86,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "\"ticket_number\": live_case[\"ticket_number\"] == generated_case[\"ticket_number\"],"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 97,
+    "join_key_classes": [
+      "SYSTEM_ID",
+      "SUMMONS_TICKET"
+    ],
+    "text": "oath_results.append({\"system_id\": displayed[\"system_id\"], \"ticket_number\": ticket, \"checks\": checks, \"result\": \"PASS\"})"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 108,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"HPD candidate lacks usable BBL for {displayed['system_id']}\")"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 109,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail = json.loads(detail_path(details_dir, displayed[\"system_id\"]).read_text(encoding=\"utf-8\"))"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 112,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Summary reports HPD contacts but detail is empty for {displayed['system_id']}\")"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 115,
+    "join_key_classes": [
+      "SYSTEM_ID",
+      "REGISTRATION_ID"
+    ],
+    "text": "live = live_results[displayed[\"system_id\"]][\"registration\"]"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 118,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"registration_id\": bool(live) and live[\"registration_id\"] == generated[\"registration_id\"],"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 125,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "hpd_results.append({\"system_id\": displayed[\"system_id\"], \"bbl\": bbl, \"checks\": checks, \"result\": \"PASS\"})"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 141,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail = json.loads(detail_path(details_dir, displayed[\"system_id\"]).read_text(encoding=\"utf-8\"))"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 158,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": displayed[\"system_id\"],"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 179,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail = json.loads(detail_path(details_dir, displayed[\"system_id\"]).read_text(encoding=\"utf-8\"))"
+  },
+  {
+    "file": "scripts/verify_live_data_live.py",
+    "line": 196,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": displayed[\"system_id\"],"
+  },
+  {
+    "file": "scripts/validate_bbl_identity.py",
+    "line": 16,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/validate_bbl_identity.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(row.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/validate_bbl_identity.py",
+    "line": 53,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "f\"System {system_id} exact BBL alias mismatch: aliases={aliases} expected={expected_aliases}\""
+  },
+  {
+    "file": "scripts/validate_bbl_identity.py",
+    "line": 58,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "f\"System {system_id} canonical bbl/property_bbl mismatch: {canonical!r} != {property_bbl!r}\""
+  },
+  {
+    "file": "scripts/validate_bbl_identity.py",
+    "line": 67,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"System {system_id} summary/detail canonical BBL mismatch\")"
+  },
+  {
+    "file": "scripts/validate_bbl_identity.py",
+    "line": 69,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"System {system_id} summary/detail registry BBL mismatch\")"
+  },
+  {
+    "file": "scripts/validate_bbl_identity.py",
+    "line": 71,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"System {system_id} summary/detail property BBL mismatch\")"
+  },
+  {
+    "file": "scripts/validate_bbl_identity.py",
+    "line": 78,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"System {system_id} summary/detail BBL alias mismatch\")"
+  },
+  {
+    "file": "scripts/validate_legacy_dob_project_cache.py",
+    "line": 17,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl = payload.get(\"by_bbl\")"
+  },
+  {
+    "file": "scripts/validate_legacy_dob_project_cache.py",
+    "line": 26,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "if int(summary.get(\"retained_bbl_count\") or 0) != len(by_bbl):"
+  },
+  {
+    "file": "scripts/validate_reviewed_intelligence.py",
+    "line": 14,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "rows=p['systems']; assert len({r['system_id'] for r in rows})==len(rows)==m['normalized_system_count']"
+  },
+  {
+    "file": "scripts/validate_reviewed_intelligence.py",
+    "line": 15,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "oldrows={r['system_id']:r for r in read(baseline/'systems.json')['systems']} if baseline else {}"
+  },
+  {
+    "file": "scripts/validate_reviewed_intelligence.py",
+    "line": 16,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if baseline: assert set(oldrows)=={r['system_id'] for r in rows}"
+  },
+  {
+    "file": "scripts/validate_reviewed_intelligence.py",
+    "line": 19,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "rel=Path('details')/r['system_id'][:2]/(r['system_id']+'.json');d=read(root/rel)"
+  },
+  {
+    "file": "scripts/validate_reviewed_intelligence.py",
+    "line": 37,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if k not in ('scoring','metadata','signals'): assert old[k]==d[k], f'Account source fact changed: {r[\"system_id\"]}/{k}'"
+  },
+  {
+    "file": "scripts/validate_reviewed_intelligence.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "for k in oldrows[r['system_id']]:"
+  },
+  {
+    "file": "scripts/validate_reviewed_intelligence.py",
+    "line": 40,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if k not in ('priority_score','score_components','signal_types','primary_signal'): assert r[k]==oldrows[r['system_id']][k]"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 15,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "return output / \"details\" / system_id[:2] / f\"{system_id}.json\""
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 21,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "str(row.get(\"system_id\")): row"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 23,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if isinstance(row, dict) and row.get(\"system_id\")"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 25,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "row = rows.get(SYSTEM_ID)"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 40,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"{SYSTEM_ID} {field} mismatch: {actual!r} != {value!r}\")"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 44,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"{SYSTEM_ID} BBL aliases mismatch: {aliases}\")"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 53,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"{SYSTEM_ID} detail identity {field} mismatch: {actual!r} != {value!r}\")"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 59,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"{SYSTEM_ID} property identity used prohibited fuzzy/address matching\")"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 65,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"{SYSTEM_ID} PLUTO context is attached to the wrong BBL: {building.get('bbl')!r}\")"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 70,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "if not isinstance(hpd, dict) or not hpd.get(\"registration_id\"):"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 99,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"{SYSTEM_ID} ACRIS activity contains an unapproved match basis\")"
+  },
+  {
+    "file": "scripts/validate_property_identity_acceptance.py",
+    "line": 111,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"hpd_registration_id\": hpd.get(\"registration_id\"),"
+  },
+  {
+    "file": "scripts/attach_reviewed_intelligence.py",
+    "line": 24,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "for r in matches['by_system'].get(row['system_id'], {}).get('building_observations', []):"
+  },
+  {
+    "file": "scripts/attach_reviewed_intelligence.py",
+    "line": 26,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "assert row['system_id'] in r['system_ids'] and canonical_bin(row['bin']) == r['bin']"
+  },
+  {
+    "file": "scripts/attach_reviewed_intelligence.py",
+    "line": 33,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "links.append({'system_id': row['system_id'], 'system_address': row['address'], 'address': r['address'],"
+  },
+  {
+    "file": "scripts/attach_reviewed_intelligence.py",
+    "line": 55,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "path = root/'details'/row['system_id'][:2]/(row['system_id']+'.json')"
+  },
+  {
+    "file": "scripts/attach_reviewed_intelligence.py",
+    "line": 63,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "changed.append({'system_id': row['system_id'], 'address': row['address'], 'before': prior['priority_score'], 'after': revised['score'], 'components': revised['components']})"
+  },
+  {
+    "file": "scripts/attach_reviewed_intelligence.py",
+    "line": 92,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "payload['systems'].sort(key=lambda r:(-r['priority_score'],r['system_id']))"
+  },
+  {
+    "file": "scripts/attach_reviewed_intelligence.py",
+    "line": 93,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "changed.sort(key=lambda entry: entry['system_id'])"
+  },
+  {
+    "file": "scripts/validate_known_firms.py",
+    "line": 67,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "firm_id = str(row.get(\"firm_id\") or \"\")"
+  },
+  {
+    "file": "scripts/validate_known_firms.py",
+    "line": 81,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "if firm_id in set(row.get(\"candidate_related_company_ids\") or []):"
+  },
+  {
+    "file": "scripts/validate_known_firms.py",
+    "line": 89,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "if detail_firm.get(\"firm_id\") != firm_id:"
+  },
+  {
+    "file": "scripts/validate_known_firms.py",
+    "line": 90,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "raise RuntimeError(f\"Known-firm detail identity mismatch for {firm_id}\")"
+  },
+  {
+    "file": "scripts/validate_known_firms.py",
+    "line": 93,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "raise RuntimeError(f\"Known-firm {firm_id} detail site count does not match summary\")"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 19,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 25,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous_by_id = {item[\"system_id\"]: item for item in (previous_snapshot or {}).get(\"systems\", [])}"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 27,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous = previous_by_id.get(observation[\"system_id\"])"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 40,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "current_by_id = {item[\"system_id\"]: item for item in observations}"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 41,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous_by_id = {item[\"system_id\"]: item for item in (previous_snapshot or {}).get(\"systems\", [])}"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 48,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "current = current_by_id.get(event.get(\"system_id\"))"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 49,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous = previous_by_id.get(event.get(\"system_id\"))"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 98,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous_by_id = {item[\"system_id\"]: item for item in previous_systems}"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 105,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous = previous_by_id.get(event.get(\"system_id\"))"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 128,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail_path = safe_detail_path(output_dir, row[\"system_id\"])"
+  },
+  {
+    "file": "scripts/build_history.py",
+    "line": 130,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Missing detail payload for historical observation: {row['system_id']}\")"
+  },
+  {
+    "file": "scripts/attach_property_enforcement.py",
+    "line": 14,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_property_enforcement.py",
+    "line": 52,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "def _merge_hpd_alias_contexts(by_bbl: dict[str, Any], aliases: list[str]) -> tuple[dict[str, Any] | None, list[str]]:"
+  },
+  {
+    "file": "scripts/attach_property_enforcement.py",
+    "line": 56,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "context = by_bbl.get(bbl)"
+  },
+  {
+    "file": "scripts/attach_property_enforcement.py",
+    "line": 97,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl = cache.get(\"by_bbl\") or {}"
+  },
+  {
+    "file": "scripts/attach_property_enforcement.py",
+    "line": 98,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin = cache.get(\"by_bin\") or {}"
+  },
+  {
+    "file": "scripts/attach_property_enforcement.py",
+    "line": 109,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "hpd_context, hpd_matched_aliases = _merge_hpd_alias_contexts(by_bbl, aliases)"
+  },
+  {
+    "file": "scripts/attach_property_enforcement.py",
+    "line": 110,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "bin_context = by_bin.get(bin_value) or {}"
+  },
+  {
+    "file": "scripts/attach_property_enforcement.py",
+    "line": 145,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail_path = safe_detail_path(output_dir, str(row[\"system_id\"]))"
+  },
+  {
+    "file": "scripts/validate_property_enforcement_cache.py",
+    "line": 34,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl = payload.get(\"by_bbl\")"
+  },
+  {
+    "file": "scripts/validate_property_enforcement_cache.py",
+    "line": 35,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin = payload.get(\"by_bin\")"
+  },
+  {
+    "file": "scripts/build_known_firms.py",
+    "line": 35,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in str(system_id) if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/build_known_firms.py",
+    "line": 58,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if not isinstance(row, dict) or not row.get(\"system_id\"):"
+  },
+  {
+    "file": "scripts/build_known_firms.py",
+    "line": 60,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(row[\"system_id\"])"
+  },
+  {
+    "file": "scripts/build_known_firms.py",
+    "line": 64,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "details_by_system[system_id] = detail"
+  },
+  {
+    "file": "scripts/build_legacy_dob_project_cache.py",
+    "line": 237,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl: dict[str, Any] = {}"
+  },
+  {
+    "file": "scripts/build_legacy_dob_project_cache.py",
+    "line": 250,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl[bbl] = {"
+  },
+  {
+    "file": "scripts/build_legacy_dob_project_cache.py",
+    "line": 283,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "\"retained_record_count\": sum(item[\"summary\"][\"record_count\"] for item in by_bbl.values()),"
+  },
+  {
+    "file": "scripts/attach_nyc_service_lines.py",
+    "line": 25,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_nyc_service_lines.py",
+    "line": 113,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "systems_by_id = {str(system.get(\"system_id\") or \"\"): system for system in systems}"
+  },
+  {
+    "file": "scripts/attach_nyc_service_lines.py",
+    "line": 119,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(system.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/attach_nyc_service_lines.py",
+    "line": 122,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "aliases_by_system.setdefault(system_id, set()).add(bbl)"
+  },
+  {
+    "file": "scripts/attach_nyc_service_lines.py",
+    "line": 123,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "bucket = records_by_system.setdefault(system_id, {})"
+  },
+  {
+    "file": "scripts/attach_nyc_service_lines.py",
+    "line": 130,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "records = list(records_by_system.get(system_id, {}).values())"
+  },
+  {
+    "file": "scripts/attach_nyc_service_lines.py",
+    "line": 133,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "context[\"matched_bbl_aliases\"] = sorted(aliases_by_system.get(system_id, set()))"
+  },
+  {
+    "file": "scripts/attach_nyc_service_lines.py",
+    "line": 143,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Missing account detail while attaching service-line records: {system_id}\")"
+  },
+  {
+    "file": "scripts/validate_cms_institutional_context.py",
+    "line": 13,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl = payload.get(\"by_bbl\")"
+  },
+  {
+    "file": "scripts/validate_cms_institutional_context.py",
+    "line": 46,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "if len(by_bbl) != int(summary.get(\"tower_overlap_bbl_count\") or 0):"
+  },
+  {
+    "file": "scripts/validate_historical_311_context.py",
+    "line": 13,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "profiles = payload.get(\"by_bbl\")"
+  },
+  {
+    "file": "scripts/validate_labor_law_decisions.py",
+    "line": 25,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system = payload.get(\"by_system\") or {}"
+  },
+  {
+    "file": "scripts/validate_labor_law_decisions.py",
+    "line": 67,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if int(summary.get(\"matched_system_count\") or 0) != len(by_system):"
+  },
+  {
+    "file": "scripts/validate_labor_law_decisions.py",
+    "line": 70,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "result = {\"decision_count\": len(decisions), \"matched_system_count\": len(by_system), \"attached_record_count\": attached}"
+  },
+  {
+    "file": "scripts/attach_labor_law_decisions.py",
+    "line": 13,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_labor_law_decisions.py",
+    "line": 31,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system = cache.get(\"by_system\") or {}"
+  },
+  {
+    "file": "scripts/attach_labor_law_decisions.py",
+    "line": 38,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(row.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/attach_labor_law_decisions.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "records = by_system.get(system_id) or []"
+  },
+  {
+    "file": "scripts/attach_acris.py",
+    "line": 19,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_acris.py",
+    "line": 88,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail_path = safe_detail_path(output_dir, str(row.get(\"system_id\") or \"\"))"
+  },
+  {
+    "file": "scripts/attach_cms_institutional_context.py",
+    "line": 18,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_cms_institutional_context.py",
+    "line": 29,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl = cache.get(\"by_bbl\")"
+  },
+  {
+    "file": "scripts/attach_cms_institutional_context.py",
+    "line": 45,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(system.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/attach_cms_institutional_context.py",
+    "line": 51,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "rows = by_bbl.get(bbl, [])"
+  },
+  {
+    "file": "scripts/attach_cms_institutional_context.py",
+    "line": 59,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "identity = str(row.get(\"facility_id\") or row.get(\"ccn\") or row.get(\"provider_id\") or f\"{bbl}:{index}\")"
+  },
+  {
+    "file": "scripts/attach_cms_institutional_context.py",
+    "line": 69,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Missing account detail while attaching CMS context: {system_id}\")"
+  },
+  {
+    "file": "scripts/build_legionella_matches.py",
+    "line": 40,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if not systems or len({r['system_id'] for r in systems}) != len(systems):"
+  },
+  {
+    "file": "scripts/build_legionella_matches.py",
+    "line": 48,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "ids = {str(r['system_id']) for r in systems}"
+  },
+  {
+    "file": "scripts/build_account_procurement.py",
+    "line": 81,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "ids = [row['system_id'] for row in systems['systems']]"
+  },
+  {
+    "file": "scripts/build_account_procurement.py",
+    "line": 97,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "key = record.get('procurement_id') or f\"{record.get('source')}:{record.get('source_record_id')}\""
+  },
+  {
+    "file": "scripts/build_account_procurement.py",
+    "line": 111,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if detail['identity']['system_id'] != sid:"
+  },
+  {
+    "file": "scripts/build_data_live.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/build_data_live.py",
+    "line": 180,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"source_query_scope\": \"Exact registration_id contacts for HPD registrations matched to cooling-tower BBLs\","
+  },
+  {
+    "file": "scripts/build_data_live.py",
+    "line": 272,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "inspections = inspections_by_system.get(system[\"system_id\"], [])"
+  },
+  {
+    "file": "scripts/build_data_live.py",
+    "line": 297,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "hpd_lookup = hpd_by_system[system[\"system_id\"]]"
+  },
+  {
+    "file": "scripts/build_data_live.py",
+    "line": 298,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "hpd_registration = hpd_lookup[\"registration\"]"
+  },
+  {
+    "file": "scripts/build_data_live.py",
+    "line": 347,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": system[\"system_id\"],"
+  },
+  {
+    "file": "scripts/build_data_live.py",
+    "line": 405,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": system[\"system_id\"],"
+  },
+  {
+    "file": "scripts/build_data_live.py",
+    "line": 449,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe_detail_path(detail_dir, system[\"system_id\"]).write_text(json.dumps(detail, separators=(\",\", \":\")), encoding=\"utf-8\")"
+  },
+  {
+    "file": "scripts/build_source_health.py",
+    "line": 24,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/build_source_health.py",
+    "line": 80,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "health_entry(source_key=\"inspections\", dataset_id=str(insp.get(\"dataset_id\") or \"f9wb-g8mb\"), name=str(insp.get(\"name\") or \"NYC Cooling Tower System Inspection Results\"), entity_unit=\"current cooling tower systems with published inspection history\", retrieved_record_count=int(insp.get(\"source_record_count\") or 0), requested_entity_count=normalized_system_count, normalized_entity_count=inspection_count, matched_entity_count=inspection_systems, attached_entity_count=inspection_systems, displayed_entity_count=inspection_systems, previous_coverage_percentage=previous_coverage(\"inspections\"), coverage_note=\"Coverage is the share of current systems with at least one exact system_id inspection hist"
+  },
+  {
+    "file": "scripts/build_source_health.py",
+    "line": 81,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "health_entry(source_key=\"oath\", dataset_id=str(oath.get(\"dataset_id\") or \"jz4z-kudi\"), name=str(oath.get(\"name\") or \"OATH Hearings Division Case Status\"), entity_unit=\"summons/ticket identifiers\", retrieved_record_count=int(oath.get(\"source_record_count\") or 0), requested_entity_count=int(metadata.get(\"oath_requested_ticket_count\") or 0), normalized_entity_count=int(metadata.get(\"oath_matched_ticket_count\") or 0), matched_entity_count=int(metadata.get(\"oath_matched_ticket_count\") or 0), attached_entity_count=oath_systems, displayed_entity_count=oath_systems, previous_coverage_percentage=previous_coverage(\"oath\"), coverage_note=\"Coverage is exact NYC Health summons_number to OATH ticket_numbe"
+  },
+  {
+    "file": "scripts/build_source_health.py",
+    "line": 101,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "health_entry(source_key=\"hpd_registrations\", dataset_id=str(hpd_reg.get(\"dataset_id\") or \"tesw-yqqr\"), name=str(hpd_reg.get(\"name\") or \"NYC HPD Multiple Dwelling Registrations\"), entity_unit=\"BBLs\", retrieved_record_count=int(hpd_reg.get(\"source_record_count\") or 0), requested_entity_count=int(metadata.get(\"hpd_requested_bbl_count\") or 0), normalized_entity_count=int(metadata.get(\"hpd_matched_registration_bbl_count\") or 0), matched_entity_count=int(metadata.get(\"hpd_matched_registration_bbl_count\") or 0), attached_entity_count=hpd_registration_systems, displayed_entity_count=hpd_registration_systems, previous_coverage_percentage=previous_coverage(\"hpd_registrations\"), coverage_note=\"Coverage"
+  },
+  {
+    "file": "scripts/build_source_health.py",
+    "line": 102,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "health_entry(source_key=\"hpd_contacts\", dataset_id=str(hpd_contacts.get(\"dataset_id\") or \"feu5-w2e2\"), name=str(hpd_contacts.get(\"name\") or \"NYC HPD Registration Contacts\"), entity_unit=\"matched HPD registration BBLs\", retrieved_record_count=int(hpd_contacts.get(\"source_record_count\") or 0), requested_entity_count=int(metadata.get(\"hpd_matched_registration_bbl_count\") or 0), normalized_entity_count=int(metadata.get(\"hpd_matched_contact_bbl_count\") or 0), matched_entity_count=int(metadata.get(\"hpd_matched_contact_bbl_count\") or 0), attached_entity_count=hpd_contact_systems, displayed_entity_count=hpd_contact_systems, previous_coverage_percentage=previous_coverage(\"hpd_contacts\"), coverage_not"
+  },
+  {
+    "file": "scripts/build_source_health.py",
+    "line": 194,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail_path = safe_detail_path(output_dir, row[\"system_id\"])"
+  },
+  {
+    "file": "scripts/build_source_health.py",
+    "line": 197,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Missing generated detail payload for source-health attachment verification: {row['system_id']}\")"
+  },
+  {
+    "file": "scripts/attach_domestic_water_health.py",
+    "line": 28,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_domestic_water_health.py",
+    "line": 133,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail_path = safe_detail_path(output_dir, str(row.get(\"system_id\") or \"\"))"
+  },
+  {
+    "file": "scripts/attach_domestic_water_health.py",
+    "line": 136,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Missing generated detail payload while attaching domestic-water source health: {row.get('system_id')}\")"
+  },
+  {
+    "file": "scripts/build_oath_cache.py",
+    "line": 34,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "current_system_ids = {str(system[\"system_id\"]) for system in systems}"
+  },
+  {
+    "file": "scripts/build_oath_cache.py",
+    "line": 36,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id: inspections_by_system.get(system_id, [])"
+  },
+  {
+    "file": "scripts/build_coverage_audit.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"registrations\": {\"identity_key\": \"system_id\", \"scope\": \"AUTHORITATIVE_CURRENT_UNIVERSE\", \"decisions\": [\"WHO_TO_PURSUE\"]},"
+  },
+  {
+    "file": "scripts/build_coverage_audit.py",
+    "line": 40,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"inspections\": {\"identity_key\": \"system_id\", \"scope\": \"OBSERVED_PREVALENCE_NOT_COMPLETENESS\", \"decisions\": [\"WHEN_TO_ACT\", \"WHY_ACCOUNT_MATTERS\"]},"
+  },
+  {
+    "file": "scripts/build_coverage_audit.py",
+    "line": 41,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "\"oath\": {\"identity_key\": \"summons_number -> ticket_number exact\", \"scope\": \"EXACT_IDENTIFIER_MATCH\", \"decisions\": [\"WHEN_TO_ACT\", \"WHY_ACCOUNT_MATTERS\"]},"
+  },
+  {
+    "file": "scripts/build_coverage_audit.py",
+    "line": 45,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"hpd_contacts\": {\"identity_key\": \"registration_id exact after BBL match\", \"scope\": \"QUALIFYING_MULTIPLE_DWELLING_SCOPE\", \"decisions\": [\"WHO_TO_PURSUE\"]},"
+  },
+  {
+    "file": "scripts/build_coverage_audit.py",
+    "line": 246,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"interpretation\": \"HPD registration/contact data applies to qualifying multiple dwellings. Non-match is not missing owner/manager evidence and cannot be filled by invented contacts.\","
+  },
+  {
+    "file": "scripts/validate_checkbook_cache.py",
+    "line": 92,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "if contract.get(\"company_id\") is not None:"
+  },
+  {
+    "file": "scripts/validate_mapping_coherence.py",
+    "line": 51,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/validate_mapping_coherence.py",
+    "line": 116,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(row.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/verify_nyc_evidence_release.py",
+    "line": 29,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "names += [f'data/details/{sid[:2]}/{sid}.json' for sid, value in sorted(matches['by_system'].items()) if value['building_observations']]"
+  },
+  {
+    "file": "scripts/build_property_enforcement_cache.py",
+    "line": 94,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, Any] = {}"
+  },
+  {
+    "file": "scripts/build_property_enforcement_cache.py",
+    "line": 99,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin[bin_value] = {"
+  },
+  {
+    "file": "scripts/build_property_enforcement_cache.py",
+    "line": 125,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "\"hpd_matched_bbl_count\": len(by_bbl),"
+  },
+  {
+    "file": "scripts/build_property_enforcement_cache.py",
+    "line": 126,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "\"hpd_violation_count\": sum(item[\"summary\"][\"record_count\"] for item in by_bbl.values()),"
+  },
+  {
+    "file": "scripts/build_property_enforcement_cache.py",
+    "line": 127,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "\"hpd_open_violation_count\": sum(item[\"summary\"][\"open_count\"] for item in by_bbl.values()),"
+  },
+  {
+    "file": "scripts/build_property_enforcement_cache.py",
+    "line": 128,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "\"hpd_open_class_c_count\": sum(item[\"summary\"][\"open_class_c_count\"] for item in by_bbl.values()),"
+  },
+  {
+    "file": "scripts/validate_nycha_water_cache.py",
+    "line": 51,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "record_id = str(row.get(\"source_record_id\") or \"\")"
+  },
+  {
+    "file": "scripts/validate_nycha_water_cache.py",
+    "line": 57,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "if row.get(\"company_id\") is not None or row.get(\"company_match_confidence\") not in {\"UNRESOLVED\", None}:"
+  },
+  {
+    "file": "scripts/attach_acris_health.py",
+    "line": 21,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/attach_acris_health.py",
+    "line": 116,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "detail_path = safe_detail_path(output_dir, str(row.get(\"system_id\") or \"\"))"
+  },
+  {
+    "file": "scripts/validate_company_intelligence.py",
+    "line": 67,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company_id = str(company.get(\"company_id\") or \"\").strip()"
+  },
+  {
+    "file": "scripts/validate_company_intelligence.py",
+    "line": 81,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "raise SystemExit(f\"Company {company_id} is missing procurement_ids[]\")"
+  },
+  {
+    "file": "scripts/validate_company_intelligence.py",
+    "line": 83,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "raise SystemExit(f\"Company {company_id} procurement_observation_count does not match procurement_ids[]\")"
+  },
+  {
+    "file": "scripts/build_labor_law_decisions.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system, unmatched = match_decisions_to_systems(decisions, systems)"
+  },
+  {
+    "file": "scripts/build_labor_law_decisions.py",
+    "line": 40,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "attached_record_count = sum(len(rows) for rows in by_system.values())"
+  },
+  {
+    "file": "scripts/build_labor_law_decisions.py",
+    "line": 65,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"matched_system_count\": len(by_system),"
+  },
+  {
+    "file": "scripts/build_domestic_water_data.py",
+    "line": 26,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/build_domestic_water_data.py",
+    "line": 106,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(row.get(\"system_id\") or \"\")"
+  },
+  {
+    "file": "scripts/build_domestic_water_data.py",
+    "line": 137,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Missing account detail while attaching domestic water data: {system_id}\")"
+  },
+  {
+    "file": "scripts/towersignal/checkbook_recent.py",
+    "line": 436,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "contract[\"company_id\"] = None"
+  },
+  {
+    "file": "scripts/towersignal/checkbook_recent.py",
+    "line": 593,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"unresolved_vendor_count\": sum(1 for row in all_contracts if row.get(\"vendor_raw\") and not row.get(\"company_id\")),"
+  },
+  {
+    "file": "scripts/towersignal/oath.py",
+    "line": 90,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "ticket_number = normalize_ticket_number(row.get(\"ticket_number\"))"
+  },
+  {
+    "file": "scripts/towersignal/oath.py",
+    "line": 95,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "\"ticket_number_source_raw\": row.get(\"ticket_number\"),"
+  },
+  {
+    "file": "scripts/towersignal/oath.py",
+    "line": 166,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "where = f\"ticket_number in ({quoted})\""
+  },
+  {
+    "file": "scripts/towersignal/oath.py",
+    "line": 226,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "ticket = case[\"ticket_number\"]"
+  },
+  {
+    "file": "scripts/towersignal/oath.py",
+    "line": 381,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "raw_tickets = [str(row.get(\"ticket_number\") or \"\").strip() for row in rows]"
+  },
+  {
+    "file": "scripts/towersignal/oath.py",
+    "line": 400,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "ticket = case[\"ticket_number\"]"
+  },
+  {
+    "file": "scripts/towersignal/oath.py",
+    "line": 527,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "return sorted(cases, key=lambda item: (item.get(\"violation_date\") or \"\", item[\"ticket_number\"]), reverse=True)"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 58,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "safe = \"\".join(ch for ch in firm_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 66,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = normalize_space(str(row.get(\"system_id\") or \"\"))"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 134,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_ids\": sorted({str(row.get(\"system_id\")) for row in rows if row.get(\"system_id\")}),"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 163,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"procurement_company_id\": procurement_company.get(\"company_id\") if procurement_company else None,"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 246,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "existing[\"source_record_ids\"].add(str(source_record_id))"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 269,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "systems_by_id = {str(row.get(\"system_id\")): row for row in systems if row.get(\"system_id\")}"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 270,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "systems_by_bin: dict[str, list[Mapping[str, Any]]] = defaultdict(list)"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 271,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "systems_by_bbl: dict[str, list[Mapping[str, Any]]] = defaultdict(list)"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 274,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "systems_by_bin[str(row[\"bin\"])].append(row)"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 276,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "systems_by_bbl[str(row[\"bbl\"])].append(row)"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 284,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company_id = str(company.get(\"company_id\") or \"\")"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 318,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "firms[company_id] = firm"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 322,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "procurement_alias_index[strict].add(company_id)"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 342,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "firms[firm_id] = _new_firm("
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 348,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "firms[firm_id][\"candidate_related_company_ids\"].update(procurement_candidates)"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 349,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "external_strict_index[strict] = firm_id"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 350,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "return firms[firm_id]"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 364,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system = systems_by_id.get(str(system_id))"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 370,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "for system in systems_by_bin.get(normalized_bin, []):"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 374,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "for system in systems_by_bbl.get(normalized_bbl, []):"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 416,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "source_record_id=str(inspection.get(\"inspection_id\") or \"\") or None,"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 436,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "source_record_id=str(inspection.get(\"inspection_id\") or \"\") or None,"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 476,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "procurement_id = str(record.get(\"procurement_id\") or record.get(\"source_record_id\") or \"\")"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 499,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system = systems_by_id.get(system_id)"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 508,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_ids=[system_id],"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 525,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "for system_id, detail in (details_by_system or {}).items():"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 526,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system = systems_by_id.get(str(system_id))"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 535,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_ids=[str(system_id)],"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 550,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "dedupe = (firm[\"firm_id\"], role, source_id, str(site[\"site_id\"]))"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 582,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "dedupe = (firm[\"firm_id\"], \"LEGACY_DOB_OWNER_BUSINESS\", source_id, str(site[\"site_id\"]))"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 675,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"firm_id\": firm[\"firm_id\"],"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 705,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"detail_path\": _safe_firm_detail_path(str(firm[\"firm_id\"])),"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 708,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "details[str(firm[\"firm_id\"])] = {"
+  },
+  {
+    "file": "scripts/towersignal/known_firms.py",
+    "line": 721,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"company_id\": procurement.get(\"company_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 309,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company_by_id = {str(company[\"company_id\"]): company for company in companies}"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 320,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company_ids = sorted({str(alias.get(\"company_id\")) for alias in id_matches if alias.get(\"company_id\") in company_by_id})"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 328,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company_ids = sorted({str(alias.get(\"company_id\")) for alias in name_matches if alias.get(\"company_id\") in company_by_id})"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 331,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company_id = company_ids[0]"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 332,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company = company_by_id[company_id]"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 335,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "for alias in name_matches if str(alias.get(\"company_id\")) == company_id"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 339,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "return CompanyResolution(company_id, str(company.get(\"canonical_name\")), \"STRONG\", \"NORMALIZED_NAME_AND_ADDRESS\", normalized)"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 344,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "alias_confidences = {str(alias.get(\"confidence\") or \"\") for alias in name_matches if str(alias.get(\"company_id\")) == company_id}"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 346,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "return CompanyResolution(company_id, str(company.get(\"canonical_name\")), \"CONFIRMED\", \"AUTHORITATIVE_ALIAS\", normalized)"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 347,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "return CompanyResolution(company_id, str(company.get(\"canonical_name\")), \"STRONG\", \"NORMALIZED_DISTINCTIVE_NAME\", normalized)"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 348,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "return CompanyResolution(company_id, str(company.get(\"canonical_name\")), \"VERIFY\", \"AMBIGUOUS_NORMALIZED_NAME\", normalized)"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 360,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "return CompanyResolution(str(company[\"company_id\"]), str(company.get(\"canonical_name\")), confidence, \"CANONICAL_NAME_EXACT_NORMALIZED\", normalized)"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 362,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "ids = tuple(sorted(str(company[\"company_id\"]) for company in canonical_matches))"
+  },
+  {
+    "file": "scripts/towersignal/procurement.py",
+    "line": 729,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"company_id\": now.get(\"company_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/acris_identity_cache.py",
+    "line": 13,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "for system in sorted(systems, key=lambda row: str(row.get(\"system_id\") or \"\")):"
+  },
+  {
+    "file": "scripts/towersignal/acris_identity_cache.py",
+    "line": 20,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": system.get(\"system_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/company_intelligence.py",
+    "line": 84,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company_id_by_strict_key[strict_key] = company_id"
+  },
+  {
+    "file": "scripts/towersignal/company_intelligence.py",
+    "line": 87,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "base_name_to_company_ids[base_name].append(company_id)"
+  },
+  {
+    "file": "scripts/towersignal/company_intelligence.py",
+    "line": 94,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "company_id = company_id_by_strict_key[strict_key]"
+  },
+  {
+    "file": "scripts/towersignal/company_intelligence.py",
+    "line": 144,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "candidate_ids = sorted(set(base_name_to_company_ids.get(base_name, ())) - {company_id})"
+  },
+  {
+    "file": "scripts/towersignal/labor_law.py",
+    "line": 222,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system: dict[str, list[dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/labor_law.py",
+    "line": 233,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "property_system_ids = sorted(str(row[\"system_id\"]) for row in rows)"
+  },
+  {
+    "file": "scripts/towersignal/labor_law.py",
+    "line": 235,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system.setdefault(str(system[\"system_id\"]), []).append({"
+  },
+  {
+    "file": "scripts/towersignal/labor_law.py",
+    "line": 258,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "return by_system, unmatched"
+  },
+  {
+    "file": "scripts/towersignal/checkbook_nycha.py",
+    "line": 490,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "record_id = str(normalized[\"source_record_id\"])"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 56,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "ids = [str(row.get(\"system_id\") or \"\") for row in rows]"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 95,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "f\"History segmentation does not own new durable fields for {row.get('system_id')}: {unknown}. \""
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 121,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"History oath_cases must be a list for {row.get('system_id')}\")"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 128,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": row[\"system_id\"],"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 224,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_id = {row[\"system_id\"]: row for row in core}"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 229,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_id[system_id].update(row)"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 231,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "oath_indexed_by_system: dict[str, dict[int, Any]] = {system_id: {} for system_id in ids}"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 234,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = str(row.get(\"system_id\"))"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 237,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"History {shard} oath_cases_indexed must be a list for {system_id}\")"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 240,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"History {shard} has invalid OATH index record for {system_id}\")"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 242,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if index in oath_indexed_by_system[system_id]:"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 243,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"Duplicate OATH list index {index} across shards for {system_id}\")"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 244,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "oath_indexed_by_system[system_id][index] = case"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 246,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "indexed = oath_indexed_by_system[system_id]"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 250,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise RuntimeError(f\"OATH shard indexes are not contiguous for {system_id}: {actual_indexes[:10]}\")"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 251,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_id[system_id][\"oath_cases\"] = [indexed[index] for index in expected_indexes]"
+  },
+  {
+    "file": "scripts/towersignal/history_store.py",
+    "line": 261,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"systems\": [by_id[system_id] for system_id in ids],"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 118,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "return (_date_only(row.get(\"lastregistrationdate\")) or \"\", int(float(row.get(\"registrationid\") or 0)))"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 147,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "registration_ids = sorted({str(row[\"registrationid\"]).strip() for row in latest_registration_by_bbl.values() if str(row.get(\"registrationid\") or \"\").strip().isdigit() and int(row[\"registrationid\"]) > 0})"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 156,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "where=f\"registrationid in ({','.join(batch)})\","
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 163,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "registration_id = str(row.get(\"registrationid\") or \"\").strip()"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 166,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "contacts_by_registration.setdefault(registration_id, []).append(normalize_contact(row))"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 170,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "registration_id = str(registration.get(\"registrationid\") or \"\").strip()"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 171,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "contacts = contacts_by_registration.get(registration_id, [])"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 175,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"building_id\": _text(registration.get(\"buildingid\")),"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 176,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"last_registration_date\": _date_only(registration.get(\"lastregistrationdate\")),"
+  },
+  {
+    "file": "scripts/towersignal/hpd.py",
+    "line": 200,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"source_query_scope\": \"Exact BBL subset of cooling-tower properties, then exact HPD registration_id contact lookup\","
+  },
+  {
+    "file": "scripts/towersignal/validate.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "populated_ids = sum(1 for row in registrations if str(row.get(\"system_id\") or \"\").strip())"
+  },
+  {
+    "file": "scripts/towersignal/validate.py",
+    "line": 50,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "ids = [item[\"system_id\"] for item in systems]"
+  },
+  {
+    "file": "scripts/towersignal/validate.py",
+    "line": 66,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise DataValidationError(f\"Unknown coordinate status for system {system['system_id']}: {status}\")"
+  },
+  {
+    "file": "scripts/towersignal/validate.py",
+    "line": 71,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise DataValidationError(f\"Invalid normalized NYC latitude for system {system['system_id']}: {lat}\")"
+  },
+  {
+    "file": "scripts/towersignal/validate.py",
+    "line": 73,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise DataValidationError(f\"Invalid normalized NYC longitude for system {system['system_id']}: {lon}\")"
+  },
+  {
+    "file": "scripts/towersignal/validate.py",
+    "line": 75,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise DataValidationError(f\"Unusable coordinates were not quarantined for system {system['system_id']}\")"
+  },
+  {
+    "file": "scripts/towersignal/validate.py",
+    "line": 81,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "raise DataValidationError(f\"Future public sample date for system {system['system_id']}: {latest}\")"
+  },
+  {
+    "file": "scripts/towersignal/validate.py",
+    "line": 90,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if len({item[\"system_id\"] for item in payload[\"systems\"]}) != len(payload[\"systems\"]):"
+  },
+  {
+    "file": "scripts/towersignal/building_footprints.py",
+    "line": 109,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, list[dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/building_footprints.py",
+    "line": 137,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin.setdefault(bin_value, []).append(footprint)"
+  },
+  {
+    "file": "scripts/towersignal/building_footprints.py",
+    "line": 142,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "matched_feature_count = sum(len(features) for features in by_bin.values())"
+  },
+  {
+    "file": "scripts/towersignal/building_footprints.py",
+    "line": 152,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "\"matched_bin_count\": len(by_bin),"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": current[\"system_id\"], \"bbl\": current.get(\"bbl\"), \"bin\": current.get(\"bin\"),"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 207,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": system[\"system_id\"], \"bin\": system.get(\"bin\"), \"bbl\": system.get(\"bbl\"),"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 216,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "\"oath_cases\": [_compact_oath_case(item) for item in oath_cases if item.get(\"ticket_number\")],"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 218,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"hpd_registration_id\": (hpd_registration or {}).get(\"registration_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 233,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "return {str(item.get(\"ticket_number\")): item for item in items if item.get(\"ticket_number\")}"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 363,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "events.append(_event(\"OATH_CASE_ADDED\", current, detected_at, \"NYC_OATH_HEARINGS_DIVISION_CASE_STATUS\", \"SUMMONS_TICKET_EXACT\", None, {\"ticket_number\": ticket, \"hearing_status\": case.get(\"hearing_status\"), \"hearing_result\": case.get(\"hearing_result\")}, case.get(\"decision_date\") or case.get(\"hearing_date\") or case.get(\"violation_date\")))"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 367,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "events.append(_event(event_type, current, detected_at, \"NYC_OATH_HEARINGS_DIVISION_CASE_STATUS\", \"SUMMONS_TICKET_EXACT\", {\"ticket_number\": ticket, field: old.get(field)}, {\"ticket_number\": ticket, field: case.get(field)}, case.get(\"decision_date\") or case.get(\"hearing_date\")))"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 403,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "current_by_id = {item[\"system_id\"]: item for item in current_observations}"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 404,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous_by_id = {item[\"system_id\"]: item for item in (previous_snapshot or {}).get(\"systems\", [])}"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 415,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous = previous_by_id.get(system_id)"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 439,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "retained.sort(key=lambda item: (item.get(\"detected_at\") or \"\", item.get(\"system_id\") or \"\", item.get(\"event_type\") or \"\"), reverse=True)"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 446,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"systems\": sorted((_durable_observation(item) for item in current_observations), key=lambda item: item[\"system_id\"]),"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 466,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system: dict[str, list[dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 468,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system.setdefault(event[\"system_id\"], []).append(event)"
+  },
+  {
+    "file": "scripts/towersignal/history.py",
+    "line": 471,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "safe = \"\".join(ch for ch in system_id if ch.isalnum() or ch in (\"-\", \"_\"))"
+  },
+  {
+    "file": "scripts/towersignal/bbl_identity.py",
+    "line": 240,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "f\"{system.get('system_id')}: {evidence}\""
+  },
+  {
+    "file": "scripts/towersignal/oath_cache.py",
+    "line": 62,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "case_ticket = normalize_ticket_number(case.get(\"ticket_number\"))"
+  },
+  {
+    "file": "scripts/towersignal/oath_cache.py",
+    "line": 188,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "ticket = normalize_ticket_number(case.get(\"ticket_number\"))"
+  },
+  {
+    "file": "scripts/towersignal/oath_cache.py",
+    "line": 190,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "raise ValueError(f\"OATH cache case {index} is missing ticket_number\")"
+  },
+  {
+    "file": "scripts/towersignal/oath_cache.py",
+    "line": 238,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "raise ValueError(\"OATH cache matched summons volume is below production threshold\")"
+  },
+  {
+    "file": "scripts/towersignal/oath_cache.py",
+    "line": 267,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "scope = str(metadata.get(\"source_query_scope\") or \"OATH exact summons lifecycle\")"
+  },
+  {
+    "file": "scripts/towersignal/oath_cache.py",
+    "line": 268,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "metadata[\"source_query_scope\"] = scope + \"; verified durable cache aligned to current inspection summons universe\""
+  },
+  {
+    "file": "scripts/towersignal/reviewed_priority.py",
+    "line": 24,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "dismissed = {str(c['ticket_number']) for c in detail.get('oath_case_history', [])"
+  },
+  {
+    "file": "scripts/towersignal/reviewed_priority.py",
+    "line": 46,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "'NYC cooling-tower inspection / exact summons OATH status', inspection['inspection_date']))"
+  },
+  {
+    "file": "scripts/towersignal/reviewed_priority.py",
+    "line": 76,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "'beyond 31 days plus the 5-day reporting allowance. Operating status remains unverified.', 'NYC tower registration', row['latest_sample_date']))"
+  },
+  {
+    "file": "scripts/towersignal/normalize.py",
+    "line": 130,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = _clean(row.get(\"system_id\"))"
+  },
+  {
+    "file": "scripts/towersignal/normalize.py",
+    "line": 134,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "existing = best.get(system_id)"
+  },
+  {
+    "file": "scripts/towersignal/normalize.py",
+    "line": 136,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "best[system_id] = row"
+  },
+  {
+    "file": "scripts/towersignal/normalize.py",
+    "line": 140,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "best[system_id] = row"
+  },
+  {
+    "file": "scripts/towersignal/normalize.py",
+    "line": 181,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "normalized.sort(key=lambda item: item[\"system_id\"])"
+  },
+  {
+    "file": "scripts/towersignal/provider_resolution.py",
+    "line": 100,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"left_provider_id\": left.get(\"provider_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/provider_resolution.py",
+    "line": 103,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"right_provider_id\": right.get(\"provider_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/provider_resolution.py",
+    "line": 113,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"suggested_canonical_provider_id\": dominant.get(\"provider_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/provider_resolution.py",
+    "line": 115,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"secondary_provider_id\": secondary.get(\"provider_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/provider_resolution.py",
+    "line": 155,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"match_id\": stable_id(\"provider-dec-name-match\", provider.get(\"provider_id\"), dec.get(\"registration_number\")),"
+  },
+  {
+    "file": "scripts/towersignal/provider_resolution.py",
+    "line": 156,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"provider_id\": provider.get(\"provider_id\"),"
+  },
+  {
+    "file": "scripts/towersignal/provider_resolution.py",
+    "line": 194,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"providers_with_dec_name_match\": len({str(row[\"provider_id\"]) for row in dec_matches}),"
+  },
+  {
+    "file": "scripts/towersignal/dob_activity.py",
+    "line": 145,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl: dict[str, dict[str, dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/dob_activity.py",
+    "line": 171,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl.setdefault(bbl, {})[str(identity)] = normalized"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 526,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "provider_id = row.get(\"provider_id\")"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 581,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "lab_id = row.get(\"lab_id\")"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 637,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "if row.get(\"provider_id\"):"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 638,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "profile[\"provider_ids\"].add(str(row[\"provider_id\"]))"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 639,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "if row.get(\"lab_id\"):"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 640,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "profile[\"lab_ids\"].add(str(row[\"lab_id\"]))"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 648,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "profile[\"current_observed_provider_id\"] = row.get(\"provider_id\")"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 650,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "profile[\"current_observed_lab_id\"] = row.get(\"lab_id\")"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 820,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"inspection_rows_with_provider\": sum(1 for row in inspections if row[\"provider_id\"]),"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water_market.py",
+    "line": 821,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"inspection_rows_with_lab\": sum(1 for row in inspections if row[\"lab_id\"]),"
+  },
+  {
+    "file": "scripts/towersignal/checkbook.py",
+    "line": 602,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "unresolved = sum(1 for row in contracts if row.get(\"vendor_raw\") and not row.get(\"company_id\"))"
+  },
+  {
+    "file": "scripts/towersignal/checkbook.py",
+    "line": 738,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "\"unresolved_vendor_count\": sum(1 for row in all_contracts if row.get(\"vendor_raw\") and not row.get(\"company_id\")),"
+  },
+  {
+    "file": "scripts/towersignal/historical_311_context.py",
+    "line": 173,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "recurrent_count = sum(1 for profile in by_bbl.values() if profile[\"recurrent_history\"])"
+  },
+  {
+    "file": "scripts/towersignal/historical_311_context.py",
+    "line": 174,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "activity_2024_count = sum(1 for profile in by_bbl.values() if profile[\"has_2024_activity\"])"
+  },
+  {
+    "file": "scripts/towersignal/historical_311_context.py",
+    "line": 188,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "\"matched_bbl_count\": len(by_bbl),"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water.py",
+    "line": 226,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, list[dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water.py",
+    "line": 264,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin.setdefault(bin_value, []).append(normalized)"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water.py",
+    "line": 279,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "\"matched_bin_count\": len(by_bin),"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water.py",
+    "line": 280,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "\"matched_feature_count\": sum(len(features) for features in by_bin.values()),"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water.py",
+    "line": 369,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, list[dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water.py",
+    "line": 385,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin.setdefault(bin_value, []).append(normalized)"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water.py",
+    "line": 397,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "\"matched_bin_count\": len(by_bin),"
+  },
+  {
+    "file": "scripts/towersignal/domestic_water.py",
+    "line": 398,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "\"matched_record_count\": sum(len(records) for records in by_bin.values()),"
+  },
+  {
+    "file": "scripts/towersignal/inspections.py",
+    "line": 19,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = _clean(row.get(\"system_id\")) or \"\""
+  },
+  {
+    "file": "scripts/towersignal/inspections.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "system_id = _clean(row.get(\"system_id\"))"
+  },
+  {
+    "file": "scripts/towersignal/inspections.py",
+    "line": 61,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system: dict[str, list[dict[str, Any]]] = defaultdict(list)"
+  },
+  {
+    "file": "scripts/towersignal/inspections.py",
+    "line": 71,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system[inspection[\"system_id\"]].append(inspection)"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 36,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "rid = positive_id(row.get(\"registrationid\"))"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 38,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl[bbl].append(row)"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 40,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin[bin_value].append(row)"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 45,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "bin_value: [r for r in group if positive_id(r.get(\"registrationid\"))"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 46,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "and positive_id(r.get(\"registrationid\")) not in conflicts and registration_bbl(r)]"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 75,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "exact = index[\"by_bin\"].get(bin_value, []) if bin_value else []"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 82,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "candidates, basis = index[\"by_bbl\"].get(bbl, []) if bbl else [], \"BBL_PARCEL_EXACT\""
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 86,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "rid = positive_id(row.get(\"registrationid\"))"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 97,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "rid = positive_id(row.get(\"registrationid\"))"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 103,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "sid = str(system[\"system_id\"])"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 105,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "result[sid] = {\"registration\": None, \"status\": basis}"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 107,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "rid = positive_id(row.get(\"registrationid\"))"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 113,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "result[sid] = {\"status\": status, \"registration\": {"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 115,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"source_registration_id_raw\": row.get(\"registrationid\"),"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 133,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "ids.add(positive_id(row.get(\"registrationid\")))"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 138,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "found = fetch_where(HPD_CONTACTS_DATASET_ID, f\"registrationid in ({','.join(batch)})\","
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 140,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "if len(found) >= 50000 or any(positive_id(r.get(\"registrationid\")) not in batch for r in found):"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 141,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "raise SourceFetchError(\"HPD contact lookup hit row cap or returned an unrequested registration\")"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 143,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system = assemble_contacts(systems, index, rows)"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 161,
+    "join_key_classes": [
+      "SYSTEM_ID",
+      "REGISTRATION_ID"
+    ],
+    "text": "\"matched_registration_bbl_count\": len({s.get(\"bbl\") for s in systems if by_system[str(s[\"system_id\"])][\"registration\"] and s.get(\"bbl\")}),"
+  },
+  {
+    "file": "scripts/towersignal/hpd_identity.py",
+    "line": 162,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"matched_contact_bbl_count\": len({s.get(\"bbl\") for s in systems if by_system[str(s[\"system_id\"])][\"status\"] == \"MATCHED\" and s.get(\"bbl\")}),"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 159,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"registration_id\": _text(row.get(\"registrationid\")),"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 184,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl: dict[str, dict[str, dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 200,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl.setdefault(bbl, {})[normalized[\"violation_id\"]] = normalized"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 289,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, dict[str, dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 298,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin.setdefault(bin_value, {})[identity] = normalized"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 370,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, dict[str, dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 387,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin.setdefault(bin_value, {})[identity] = normalized"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 447,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, dict[str, dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/property_enforcement.py",
+    "line": 464,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin.setdefault(bin_value, {})[identity] = normalized"
+  },
+  {
+    "file": "scripts/towersignal/legionella_matching.py",
+    "line": 174,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system = {str(r['system_id']): {'building_observations': [], 'area_context': []} for r in systems}"
+  },
+  {
+    "file": "scripts/towersignal/legionella_matching.py",
+    "line": 182,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "unresolved.append({**observation, 'match_status': 'UNMATCHED' if not candidates else 'AMBIGUOUS', 'candidate_system_ids': sorted(str(r['system_id']) for r in candidates)})"
+  },
+  {
+    "file": "scripts/towersignal/legionella_matching.py",
+    "line": 186,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "'system_ids': sorted(str(r['system_id']) for r in candidates), 'evidence_boundary': BOUNDARY}"
+  },
+  {
+    "file": "scripts/towersignal/legionella_matching.py",
+    "line": 189,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system[sid]['building_observations'].append(record)"
+  },
+  {
+    "file": "scripts/towersignal/legionella_matching.py",
+    "line": 193,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "by_system[str(row['system_id'])]['area_context'].append(area)"
+  },
+  {
+    "file": "scripts/towersignal/legionella_matching.py",
+    "line": 195,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "'sources': documents['sources'], 'matched_observations': matched, 'unresolved': unresolved, 'by_system': by_system,"
+  },
+  {
+    "file": "scripts/towersignal/legionella_matching.py",
+    "line": 198,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "'systems_with_named_building_evidence': sum(bool(v['building_observations']) for v in by_system.values()),"
+  },
+  {
+    "file": "scripts/towersignal/legionella_matching.py",
+    "line": 199,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "'systems_with_area_context': sum(bool(v['area_context']) for v in by_system.values())}}"
+  },
+  {
+    "file": "scripts/towersignal/cms_institutional.py",
+    "line": 254,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl: dict[str, list[dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/cms_institutional.py",
+    "line": 270,
+    "join_key_classes": [
+      "BBL"
+    ],
+    "text": "by_bbl.setdefault(bbl, []).append(compact)"
+  },
+  {
+    "file": "scripts/towersignal/nyc_water_signals.py",
+    "line": 259,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "\"registration_id\": normalize_space(row.get(\"registrationid\")) or None,"
+  },
+  {
+    "file": "scripts/towersignal/nyc_water_signals.py",
+    "line": 353,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "\"source_record_id\": normalize_space(row.get(\"job_filing_number\")) or None,"
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 16,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": row[\"system_id\"],"
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 39,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"system_id\": current[\"system_id\"],"
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 78,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous_by_id = {item[\"system_id\"]: item for item in (previous_snapshot or {}).get(\"systems\", [])}"
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 80,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous = previous_by_id.get(observation[\"system_id\"])"
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 89,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "current_by_id = {item[\"system_id\"]: item for item in current_observations}"
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 90,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous_by_id = {item[\"system_id\"]: item for item in (previous_snapshot or {}).get(\"systems\", [])}"
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 98,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "previous = previous_by_id.get(system_id)"
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 124,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "item.get(\"system_id\") or \"\","
+  },
+  {
+    "file": "scripts/towersignal/nys_history.py",
+    "line": 132,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "\"systems\": sorted(current_observations, key=lambda item: item[\"system_id\"]),"
+  },
+  {
+    "file": "scripts/towersignal/planimetrics.py",
+    "line": 106,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin: dict[str, list[dict[str, Any]]] = {}"
+  },
+  {
+    "file": "scripts/towersignal/planimetrics.py",
+    "line": 137,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "by_bin.setdefault(bin_value, []).append(feature)"
+  },
+  {
+    "file": "scripts/towersignal/planimetrics.py",
+    "line": 142,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "matched_feature_count = sum(len(features) for features in by_bin.values())"
+  },
+  {
+    "file": "scripts/towersignal/planimetrics.py",
+    "line": 161,
+    "join_key_classes": [
+      "BIN"
+    ],
+    "text": "\"matched_bin_count\": len(by_bin),"
+  },
+  {
+    "file": "scripts/towersignal/oath_cache_consumer.py",
+    "line": 34,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "scope = str(metadata.get(\"source_query_scope\") or \"OATH exact summons lifecycle\")"
+  },
+  {
+    "file": "src/App.tsx",
+    "line": 262,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const workflowAccount = selected ? workflow.accountBySystemId.get(selected.system_id) : undefined"
+  },
+  {
+    "file": "src/App.tsx",
+    "line": 263,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const workflowMembershipIds = selected ? workflow.watchlistIdsBySystemId.get(selected.system_id) ?? new Set<string>() : new Set<string>()"
+  },
+  {
+    "file": "src/App.tsx",
+    "line": 335,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "{mode === 'account' && <section className=\"product-page account-profile-page\"><div className=\"account-profile-toolbar\"><div><button className=\"breadcrumb-back\" onClick={() => navigate(returnMode === 'account' || returnMode === 'nys-account' || returnMode === 'company' ? 'prospect' : returnMode)}>{returnMode === 'workflow' ? '\u2190 Back to Workflow' : '\u2190 Back'}</button><span>New York City \u00b7 account profile</span></div><div className=\"page-actions\"><ShareButton url={currentShareUrl} label=\"Copy account link\" /><button onClick={() => exportCsv(selected ? [selected] : [], payload.metadata)} disabled={!selected}>Export account</button></div></div>{selected ? <DetailPanel row={selected} metadata={payl"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 137,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const accountById = useMemo(() => new Map(accounts.map(account => [account.system_id, account])), [accounts])"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 138,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const rowById = useMemo(() => new Map(systems.map(row => [row.system_id, row])), [systems])"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 144,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const current = result.get(membership.system_id) ?? []"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 154,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const account = accountById.get(row.system_id)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 157,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const changed = systems.filter(row => (eventsBySystem.get(row.system_id)?.length ?? 0) > 0).length"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 161,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const account = accountById.get(row.system_id)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 172,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const status = accountById.get(row.system_id)?.status ?? 'none'"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 190,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const account = accountById.get(row.system_id)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 191,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const membershipIds = membershipIdsBySystem.get(row.system_id) ?? []"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 194,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const searchable = [row.address, row.borough, row.zip, row.system_id, row.pluto_owner_name, account?.note, ...watchlistNames]"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 203,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if (attentionFilter === 'changed' && (eventsBySystem.get(row.system_id)?.length ?? 0) === 0) return false"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 212,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const accountA = accountById.get(a.system_id)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 213,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const accountB = accountById.get(b.system_id)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 219,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if (sort.key === 'changes') result = (eventsBySystem.get(a.system_id)?.length ?? 0) - (eventsBySystem.get(b.system_id)?.length ?? 0)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 228,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const filteredIds = useMemo(() => new Set(filteredRows.map(row => row.system_id)), [filteredRows])"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 229,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const filteredEvents = useMemo(() => recentEvents.filter(event => filteredIds.has(event.system_id)).sort((a, b) => b.detected_at.localeCompare(a.detected_at)), [filteredIds, recentEvents])"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 234,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const account = accountById.get(row.system_id)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 237,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const accountA = accountById.get(a.system_id)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 238,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const accountB = accountById.get(b.system_id)"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 250,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const selectedAccount = selectedRow ? accountById.get(selectedRow.system_id) : undefined"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 251,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const selectedEvents = selectedRow ? (eventsBySystem.get(selectedRow.system_id) ?? []) : []"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 252,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const selectedWatchlists = selectedRow ? (membershipIdsBySystem.get(selectedRow.system_id) ?? []).map(id => watchlistById.get(id)).filter((name): name is string => Boolean(name)) : []"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 315,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "{tab === 'accounts' && <><div className=\"workflow-account-view-toggle\" aria-label=\"Account view mode\"><span>Account view</span>{(['split', 'table', 'map'] as AccountView[]).map(value => <button key={value} className={accountView === value ? 'active' : ''} onClick={() => setAccountView(value)}>{value === 'split' ? 'Map + table' : value === 'table' ? 'Table' : 'Map'}</button>)}</div>{filteredRows.length === 0 ? <div className=\"reference-empty-state compact\"><strong>No workflow accounts match these filters.</strong><span>Clear or widen the filters to return accounts to the workspace.</span></div> : <>{accountView !== 'table' && <div className=\"workflow-command-map\"><TowerMap systems={filteredRo"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 317,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "{tab === 'changes' && <div className=\"table-card workflow-command-table-card\"><div className=\"table-heading\"><div><strong>{filteredEvents.length.toLocaleString()}</strong> source changes in the current 7-day monitor window</div><span>{counts.changed.toLocaleString()} affected workflow accounts</span></div>{filteredEvents.length === 0 ? <div className=\"empty-state\"><strong>No recent source changes match these filters.</strong><span>Widen the account filters or return to all workflow accounts.</span></div> : <div className=\"table-scroll\"><table className=\"workflow-command-table workflow-change-table\"><thead><tr><th>Detected</th><th>Account</th><th>Change</th><th>Source observation</th><th>Prio"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 319,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "{tab === 'actions' && <div className=\"table-card workflow-command-table-card\"><div className=\"table-heading\"><div><strong>{actionRows.length.toLocaleString()}</strong> accounts requiring or carrying a next action</div><span>Overdue first \u00b7 then due today \u00b7 scheduled \u00b7 active status without a date</span></div>{actionRows.length === 0 ? <div className=\"empty-state\"><strong>No action items match these filters.</strong><span>Set a workflow status or next-action date from an account profile.</span></div> : <div className=\"table-scroll\"><table className=\"workflow-command-table workflow-actions-table\"><thead><tr><th>Next action</th><th>Account</th><th>Status</th><th>Priority</th><th>Changes \u00b7 7d</t"
+  },
+  {
+    "file": "src/components/WorkflowScaleWorkspace.tsx",
+    "line": 322,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "<aside className=\"workflow-account-inspector\" aria-live=\"polite\">{selectedRow ? <><div className=\"workflow-inspector-head\"><div><span className=\"page-kicker\">{selectedRow.workflow_external_lead ? 'Selected research lead' : 'Selected account'}</span><strong>{selectedRow.address ?? selectedRow.system_id}</strong><small>{[selectedRow.borough, selectedRow.zip].filter(Boolean).join(' \u00b7 ') || selectedRow.system_id}</small></div><span className={`workflow-inspector-score ${!selectedRow.workflow_external_lead && selectedRow.priority_score >= 70 ? 'high' : ''}`}>{selectedRow.workflow_external_lead ? 'External' : `P${selectedRow.priority_score}`}</span></div><div className=\"workflow-inspector-signals\""
+  },
+  {
+    "file": "src/components/OpportunitiesPage.tsx",
+    "line": 90,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if (query && ![row.address, row.borough, row.zip, row.system_id, row.primary_signal].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+  },
+  {
+    "file": "src/components/OpportunitiesPage.tsx",
+    "line": 167,
+    "join_key_classes": [
+      "COMPANY_FIRM"
+    ],
+    "text": "const unresolved = procurementRows.filter(row => row.vendor_raw && !row.company_id).length"
+  },
+  {
+    "file": "src/components/OpportunitiesPage.tsx",
+    "line": 254,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "<td><strong>{row.address ?? row.system_id}</strong><small>{[row.borough, row.zip].filter(Boolean).join(' \u00b7 ')} \u00b7 {row.system_id}</small></td>"
+  },
+  {
+    "file": "src/components/NysRegistryView.tsx",
+    "line": 28,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const haystack = [row.address, row.city, row.zip, row.source_county, row.source_equipment_id, row.system_id]"
+  },
+  {
+    "file": "src/components/NysChangesView.tsx",
+    "line": 59,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const systemsById = useMemo(() => new Map(systems.map(row => [row.system_id, row])), [systems])"
+  },
+  {
+    "file": "src/components/NysChangesView.tsx",
+    "line": 63,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const current = systemsById.get(event.system_id)"
+  },
+  {
+    "file": "src/components/NysChangesView.tsx",
+    "line": 79,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const current = systemsById.get(event.system_id)"
+  },
+  {
+    "file": "src/components/NysChangesView.tsx",
+    "line": 147,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "</tr></thead><tbody>{pageRows.map((event, index) => <NysChangeRow key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} current={systemsById.get(event.system_id) ?? null} onSelect={onSelect} />)}</tbody></table></div>}"
+  },
+  {
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 10,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "['NYC Health inspection results', 'Findings, inspection notes and summons numbers.', 'f9wb-g8mb'],"
+  },
+  {
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 13,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "['Housing registration and contacts', 'Recorded corporate owner and agent.', 'tesw-yqqr', 'feu5-w2e2'],"
+  },
+  {
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 40,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "<footer className=\"tsr-footer\"><span><b>TowerSignal</b> &nbsp;\u00b7&nbsp; {m.address} &nbsp;\u00b7&nbsp; System {row.system_id}</span><span>ACCOUNT EXPORT &nbsp; / &nbsp; 0{index + 1} OF 04</span></footer>"
+  },
+  {
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 82,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "<section className=\"tsr-context\"><figure className=\"tsr-map\">{shape ? <svg viewBox=\"0 0 280 230\" role=\"img\" aria-label=\"Published building outline and mapped cooling-tower features\"><defs><pattern id={`tsr-grid-${row.system_id}`} width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0H0V20\" fill=\"none\" stroke=\"#eaf0f8\" strokeWidth=\".7\" /></pattern></defs><rect width=\"280\" height=\"230\" fill={`url(#tsr-grid-${row.system_id})`} /><path d={shape.buildingPath} fill=\"#dbe6f4\" stroke=\"#527193\" strokeWidth=\"1.5\" fillRule=\"evenodd\" /><path d={shape.towerPath} fill=\"#ff6a13\" stroke=\"#a74612\" strokeWidth=\"1\" />{shape.marker && <><circle cx={shape.marker[0]} cy={shape.marker[1]} r=\"11\" fill="
+  },
+  {
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 88,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "['ASK THE PERSON HANDLING THE CASE', m.unpaid.length === 1 ? `Confirm the status of ticket ${m.unpaid[0].ticket_number}.` : 'Confirm the latest inspection and case status.', 'Check the current balance and any payment receipt. Separately, ask for records showing how the cited issue was addressed.', 'Complete when both the case status and the corrective-action record are checked.'],"
+  },
+  {
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 95,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "<table className=\"tsr-sources\"><thead><tr><th>NO.</th><th>SOURCE AND WHAT IT SUPPORTS</th><th>SOURCE UPDATED</th></tr></thead><tbody>{sourceSpecs.map(([name, description, ...ids], i) => <tr key={name} id={`tsr-source-${i + 1}`}><td>{`0${i + 1}`}</td><td><a href={safeUrl(source(ids[0])?.url) || `https://data.cityofnewyork.us/d/${ids[0]}`}>{name}</a><p>{i === 1 && m.month ? `${m.month} findings, inspection notes and summons numbers.` : description} &nbsp; {ids.map((id, j) => <span key={id}>{j > 0 && ' + '}<a href={safeUrl(source(id)?.url) || `https://data.cityofnewyork.us/d/${id}`}>{id}</a></span>)}</p></td><td>{reportDate(source(ids[0])?.source_last_updated_at)}<small>{source(ids[0]) ? `Retri"
+  },
+  {
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 97,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "<section className=\"tsr-guide\"><h4>How to read this report</h4><p><b>Recorded:</b> a public source says it. <b>Verify:</b> ask for current proof. <b>Not shown:</b> the available record does not answer the question.</p><p>Records are matched by system ID, exact ticket number, building ID, tax lot or housing registration\u2014not by a similar name.</p><h4>What this report does not establish</h4><p>This report uses the published account snapshot, not a new inspection. It does not establish water safety, current operation, completed repairs or compliance. Verify current conditions and case status before relying on it.</p></section>"
+  },
+  {
+    "file": "src/components/PortfoliosPage.tsx",
+    "line": 95,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "return source.filter(row => !query || [row.address, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query))"
+  },
+  {
+    "file": "src/components/PortfoliosPage.tsx",
+    "line": 120,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if (query && ![row.address, row.pluto_owner_name, row.borough, row.zip, row.system_id, row.bbl].filter(Boolean).join(' ').toLowerCase().includes(query)) return false"
+  },
+  {
+    "file": "src/components/PortfoliosPage.tsx",
+    "line": 176,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "{selectedGroup && <div className=\"portfolio-detail\"><div className=\"portfolio-detail-heading\"><div><span className=\"confidence-chip\">CONTEXT \u00b7 PLUTO OWNER NAME</span><h2>{selectedGroup.name}</h2><p>{selectedGroup.rows.length} cooling-tower accounts \u00b7 {selectedGroup.towers} active equipment \u00b7 {selectedGroup.contactReady} contact-ready{selectedGroup.buildingAreaSqft > 0 ? ` \u00b7 ${number.format(Math.round(selectedGroup.buildingAreaSqft))} sq ft PLUTO building area` : ''}</p></div></div><div className=\"reference-table-card\"><div className=\"reference-table-heading\"><div><strong>Portfolio properties</strong><span>{number.format(sortedSelectedRows.length)} matching \u00b7 {number.format(visibleSelectedRow"
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "line": 37,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "{detail.metadata.oath_match_basis && <p className=\"microcopy\">OATH lifecycle join: exact summons/ticket identity only \u00b7 {detail.metadata.oath_matched_ticket_count?.toLocaleString() ?? 0} matched of {detail.metadata.oath_requested_ticket_count?.toLocaleString() ?? 0} cooling-tower summons numbers.</p>}"
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "line": 40,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "{detail.metadata.hpd_requested_bbl_count != null && <p className=\"microcopy\">HPD contact join: exact BBL to registration, then exact registration ID to contacts \u00b7 {detail.metadata.hpd_matched_registration_bbl_count?.toLocaleString() ?? 0} registration matches and {detail.metadata.hpd_matched_contact_bbl_count?.toLocaleString() ?? 0} BBLs with contacts from {detail.metadata.hpd_requested_bbl_count.toLocaleString()} usable cooling-tower BBLs.</p>}"
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "line": 101,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "{isFullAccountReport && !detail.identity.bbl ? <section className=\"property-context-section property-coverage-summary\"><h3>Property records</h3><div className=\"property-coverage-callout\"><strong>Property-level BBL context is unavailable for this cooling-tower record.</strong><p>The current source record has no usable BBL, so TowerSignal does not infer a parcel identity to attach property, contact, project, or recorded-document evidence.</p></div><dl className=\"property-source-list\"><div><dt>PLUTO building context</dt><dd>Requires an exact BBL attachment</dd></div><div><dt>HPD registered contacts</dt><dd>Requires exact BBL \u2192 registration identity</dd></div><div><dt>DOB NOW project activity</d"
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "line": 103,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "<section><h3>HPD registered contacts</h3>{!detail.hpd_registration ? <div className=\"empty-inline\">No exact BBL match was found in NYC HPD Multiple Dwelling Registrations. HPD coverage applies to qualifying residential properties, so no match does not mean no owner or manager exists.</div> : <><p>Registration {detail.hpd_registration.registration_id ?? '\u2014'}{detail.hpd_registration.last_registration_date ? ` \u00b7 processed ${formatDate(detail.hpd_registration.last_registration_date)}` : ''}</p>{detail.hpd_registration.contacts.length === 0 ? <div className=\"empty-inline\">An HPD registration matched this BBL, but no contact rows were returned for that registration.</div> : <div className=\"signal-"
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "line": 110,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "<section><h3>Historical profile</h3>{!detail.historical_profile ? <div className=\"empty-inline\">Historical profile is not available in this generated record.</div> : <><dl className=\"identity-grid\"><div><dt>Registered</dt><dd>{detail.historical_profile.registration_date ? formatDate(detail.historical_profile.registration_date) : '\u2014'}</dd></div><div><dt>Registration age</dt><dd>{daysAsYears(detail.historical_profile.registration_age_days)}</dd></div><div><dt>First public evidence</dt><dd>{detail.historical_profile.first_public_evidence_date ? formatDate(detail.historical_profile.first_public_evidence_date) : '\u2014'}</dd></div><div><dt>Reported samples</dt><dd>{detail.historical_profile.sample.re"
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "line": 111,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "<section><h3>Sample history</h3>{detail.sample_history.dates.length === 0 ? <div className=\"empty-inline\">No usable public sample history is present in this registration record.</div> : <ol className=\"timeline\">{[...detail.sample_history.dates].reverse().map((dateValue,index,dates) => <li key={dateValue}><strong>{formatDate(dateValue)}</strong>{index === 0 && <span className=\"latest-tag\">Latest</span>}{index < dates.length - 1 && <small>{Math.round((new Date(`${dates[index]}T00:00:00`).getTime()-new Date(`${dates[index+1]}T00:00:00`).getTime())/86400000)} days since prior reported sample</small>}</li>)}</ol>}{detail.sample_history.malformed_values.length > 0 && <p className=\"warning-note\">Un"
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "line": 112,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "<section><h3>NYC Health inspection history</h3>{detail.inspection_history.length === 0 ? <div className=\"empty-inline\">No published NYC Health inspection history was joined to this system.</div> : detail.inspection_history.map((inspection,index) => <details key={`${inspection.inspection_date}-${inspection.inspection_type}-${index}`} open={index===0}><summary><span>{formatDate(inspection.inspection_date)} \u00b7 {inspection.inspection_type}</span><strong>{inspection.violation_count} violation{inspection.violation_count === 1 ? '' : 's'}</strong></summary>{inspection.violation_count === 0 ? <p className=\"inspection-clear\">Published row contains no violation/citation values.</p> : inspection.violati"
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "line": 113,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "<section><h3>OATH case lifecycle</h3>{!detail.oath_case_history?.length ? <div className=\"empty-inline\">No OATH case was exact-matched to this system's published NYC Health summons numbers.</div> : <>{detail.oath_case_history.map((oathCase,index) => <details key={oathCase.ticket_number} open={index===0}><summary><span>Ticket {oathCase.ticket_number}{oathCase.violation_date ? ` \u00b7 ${formatDate(oathCase.violation_date)}` : ''}</span><strong>{oathCase.hearing_status ?? 'Status not published'}</strong></summary><div className=\"violation-detail\"><p>{oathCase.violation_description ?? oathCase.charges[0]?.description ?? 'No OATH violation description published.'}</p><dl className=\"identity-grid\"><di"
+  },
+  {
+    "file": "src/components/Filters.tsx",
+    "line": 21,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if (q && ![row.address,row.system_id,row.bin,row.bbl,row.zip,row.borough].some((value) => String(value ?? '').toLowerCase().includes(q))) return false"
+  },
+  {
+    "file": "src/components/SalesPreCallPack.tsx",
+    "line": 289,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "<p>The brief uses the same account-level public evidence shown below: cooling-tower registration, reported sampling dates, NYC Health inspections, exact-matched building/contact/project/property activity when available, physical planimetric evidence, domestic-water context, source-named drinking-water inspection/testing firms and exact-BBL DOB applicant roles. It does not infer an incumbent vendor, contract renewal date, procurement authority, current compliance state or current equipment configuration when those facts are not published.</p>"
+  },
+  {
+    "file": "src/components/AccountUnifiedTimeline.tsx",
+    "line": 68,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "key: `oath-${oathCase.ticket_number}-${index}`,"
+  },
+  {
+    "file": "src/components/AccountUnifiedTimeline.tsx",
+    "line": 73,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "source: 'OATH exact summons match',"
+  },
+  {
+    "file": "src/components/WorkflowWorkspacePage.tsx",
+    "line": 108,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const byId = new Map(systems.map(row => [row.system_id, row]))"
+  },
+  {
+    "file": "src/components/WorkflowWorkspacePage.tsx",
+    "line": 109,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const workflowAccountById = new Map(accounts.map(account => [account.system_id, account]))"
+  },
+  {
+    "file": "src/components/WorkflowWorkspacePage.tsx",
+    "line": 113,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const scopeIds = new Set([...accounts.map(account => account.system_id), ...memberships.map(item => item.system_id)])"
+  },
+  {
+    "file": "src/components/WorkflowWorkspacePage.tsx",
+    "line": 115,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const scopedRows = [...systems.filter(row => scopeIds.has(row.system_id)), ...externalRows]"
+  },
+  {
+    "file": "src/components/WorkflowWorkspacePage.tsx",
+    "line": 121,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const current = eventsBySystem.get(event.system_id) ?? []"
+  },
+  {
+    "file": "src/components/WorkflowWorkspacePage.tsx",
+    "line": 150,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "{ title: 'Commercial readiness', metrics: [{ label: 'High priority', value: highPriority.length }, { label: 'Contact-ready', value: contactReady.length }, { label: 'Private account states', value: accounts.length }, { label: 'Watchlisted accounts', value: new Set(memberships.map(item => item.system_id)).size }] },"
+  },
+  {
+    "file": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 51,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "{detail.metadata.oath_match_basis && <p className=\"microcopy\">OATH lifecycle join: exact summons/ticket identity only \u00b7 {detail.metadata.oath_matched_ticket_count?.toLocaleString() ?? 0} matched of {detail.metadata.oath_requested_ticket_count?.toLocaleString() ?? 0} cooling-tower summons numbers.</p>}"
+  },
+  {
+    "file": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 54,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "{detail.metadata.hpd_requested_bbl_count != null && <p className=\"microcopy\">HPD contact join: exact BBL to registration, then exact registration ID to contacts \u00b7 {detail.metadata.hpd_matched_registration_bbl_count?.toLocaleString() ?? 0} registration matches and {detail.metadata.hpd_matched_contact_bbl_count?.toLocaleString() ?? 0} BBLs with contacts from {detail.metadata.hpd_requested_bbl_count.toLocaleString()} usable cooling-tower BBLs.</p>}"
+  },
+  {
+    "file": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 83,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "{detail.hpd_registration.contacts.length === 0 ? <div className=\"empty-inline\">An HPD registration matched this BBL, but no public contact rows were returned.</div> : <div className=\"evidence-card-list\">{detail.hpd_registration.contacts.map((contact, index) => <article className=\"evidence-card\" key={`${contact.registration_contact_id ?? 'contact'}-${index}`}>"
+  },
+  {
+    "file": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 98,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "{jobs.length === 0 ? <div className=\"empty-inline\">No exact-BBL DOB NOW job filing was attached.</div> : <EvidenceRecordList key={detail.identity.system_id} label=\"filings\" records={jobs.map((job, index) => <details className=\"evidence-card\" key={`${job.job_filing_number ?? 'job'}-${index}`} open={index === 0}>"
+  },
+  {
+    "file": "src/components/AccountEvidenceWorkspace.tsx",
+    "line": 153,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "{profile ? <div className=\"account-evidence-metrics\"><article><small>Registered</small><strong>{profile.registration_date ? formatDate(profile.registration_date) : '\u2014'}</strong><span>Source registration date</span></article><article><small>Reported samples</small><strong>{profile.sample.reported_sample_count.toLocaleString()}</strong><span>Full chronology remains in History</span></article><article><small>NYC Health inspections</small><strong>{profile.inspection.inspection_count.toLocaleString()}</strong><span>{profile.inspection.violation_citation_count.toLocaleString()} cited violation rows</span></article><article><small>OATH balance due</small><strong>{money.format(profile.oath.balance_d"
+  },
+  {
+    "file": "src/components/ChangesView.tsx",
+    "line": 161,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "</tr></thead><tbody>{pageRows.map((event, index) => <ChangeRow key={`${event.detected_at}-${event.system_id}-${event.event_type}-${index}`} event={event} today={today} onSelectSystem={onSelectSystem} />)}</tbody></table></div>}"
+  },
+  {
+    "file": "src/components/ChangesView.tsx",
+    "line": 177,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "{violation ? <div className=\"monitor-event-detail\"><strong>{readableValue(record.description ?? record.violation_text ?? record.citation_text ?? 'Violation description not published')}</strong><span>{[record.violation_code ? `Code ${record.violation_code}` : null, record.law_section, record.violation_type].filter(Boolean).join(' \u00b7 ')}</span><span>{record.summons_number ? `Summons ${record.summons_number}` : 'No summons number published'}</span></div>"
+  },
+  {
+    "file": "src/components/SourceHealthExpansion.tsx",
+    "line": 57,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "scope: 'OATH summons lifecycle evidence; current exact summons matches are also queried during the NYC production build.',"
+  },
+  {
+    "file": "src/components/SourceHealthExpansion.tsx",
+    "line": 109,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "<div className=\"disclaimer\"><strong>Evidence gaps remain explicit.</strong> HPD registration/contact coverage is a different source from HPD violations. DOB complaint dispositions are event evidence, not an active-order ledger. The official DOB issued/rescinded snapshot is a dated 2022\u20132024 observation and does not establish current 2026 SWO status. FISP is Local Law 11, not generic Labor Law. Official Reports published decisions are complete for appellate decisions but only selected trial-court decisions, so they are not a comprehensive Supreme Court/NYSCEF filing feed. A missing match is not proof of no violation, no filing or no enforcement.</div>"
+  },
+  {
+    "file": "src/components/NysDetailPanel.tsx",
+    "line": 25,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "<section><h3>Location & identity</h3><dl className=\"identity-grid\"><div><dt>TowerSignal ID</dt><dd className=\"mono\">{row.system_id}</dd></div><div><dt>Source Equipment_ID</dt><dd className=\"mono\">{row.source_equipment_id}</dd></div><div><dt>Published county</dt><dd>{row.source_county ?? '\u2014'}</dd></div><div><dt>Coordinate status</dt><dd>{row.coordinate_status}</dd></div><div><dt>Coordinates</dt><dd>{row.latitude != null && row.longitude != null ? `${row.latitude.toFixed(5)}, ${row.longitude.toFixed(5)}` : 'Not mapped'}</dd></div><div><dt>Exact property key</dt><dd>{row.property_key ?? '\u2014'}</dd></div></dl><p className=\"microcopy\">Published county is preserved for provenance but is not used alo"
+  },
+  {
+    "file": "src/components/CompanyProfilePage.tsx",
+    "line": 101,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "? [...systems].sort((left, right) => right.priority_score - left.priority_score || left.system_id.localeCompare(right.system_id))[0]"
+  },
+  {
+    "file": "src/components/CompanyProfilePage.tsx",
+    "line": 199,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const systemsById = useMemo(() => new Map(systems.map(row => [row.system_id, row])), [systems])"
+  },
+  {
+    "file": "src/components/CompanyProfilePage.tsx",
+    "line": 380,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "<div className=\"table-scroll\"><table className=\"account-table firm-evidence-table\"><thead><tr><th>Registration</th><th>Location</th><th>Effective</th><th>Expiration</th><th>Status</th><th>Scope</th></tr></thead><tbody>{detail.qualifications.map(item => <tr key={item.qualification_id ?? item.registration_number ?? `${item.city}-${item.registration_expiration_date}`}><td><strong>{item.registration_number ?? '\u2014'}</strong></td><td>{[item.city, item.state].filter(Boolean).join(', ') || '\u2014'}</td><td>{item.registration_effective_date ? formatDate(item.registration_effective_date) : '\u2014'}</td><td>{item.registration_expiration_date ? formatDate(item.registration_expiration_date) : '\u2014'}</td><td><span c"
+  },
+  {
+    "file": "src/components/CompanyProfilePage.tsx",
+    "line": 393,
+    "join_key_classes": [
+      "SOURCE_RECORD_ID"
+    ],
+    "text": "{procurementError ? <div className=\"reference-empty-state compact\"><strong>Procurement record detail is unavailable.</strong><span>{procurementError}</span><span>Firm identity and site evidence above remain available from the generated firm dataset.</span></div> : procurement ? <><div className=\"table-scroll\"><table className=\"account-table company-procurement-table\"><thead><tr><th>Record</th><th>Source</th><th>Buyer</th><th>Service</th><th>Observed value</th><th>Date</th><th>Source evidence</th></tr></thead><tbody>{visibleRecords.map(row => <tr key={row.procurement_id}><td><strong>{row.title ?? row.description ?? row.source_record_id}</strong><small>{row.source_contract_id ?? row.notice_id "
+  },
+  {
+    "file": "src/utils/workflowExport.ts",
+    "line": 16,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const rowMap = new Map(rows.map(row => [row.system_id, row]))"
+  },
+  {
+    "file": "src/utils/workflowExport.ts",
+    "line": 17,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const accountMap = new Map(accounts.map(account => [account.system_id, account]))"
+  },
+  {
+    "file": "src/utils/workflowExport.ts",
+    "line": 21,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const names = watchlistsBySystem.get(item.system_id) ?? []"
+  },
+  {
+    "file": "src/utils/accountReportModel.ts",
+    "line": 43,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "if (row.system_id !== detail.identity.system_id) throw new Error('Account report identity mismatch')"
+  },
+  {
+    "file": "src/utils/accountReportModel.ts",
+    "line": 55,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "const uniqueOutcomes = [...new Map(cases.flatMap(c => c.outcome ? [[c.outcome.ticket_number, c.outcome] as const] : [])).values()]"
+  },
+  {
+    "file": "src/utils/export.ts",
+    "line": 30,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const headers = ['address','borough','zip','system_id','bin','bbl','active_equipment','registration_date','reported_sample_count','inspection_count','violation_citation_count','latest_violation_date','oath_balance_due_total','latest_public_sample_date','days_since_sample','signal_type','confirmed_violation','latest_inspection_date','oath_exact_match_count','pluto_exact_bbl_match','dob_job_filing_count','dob_recent_activity_count_365d','dob_explicit_cooling_tower_count','dob_mechanical_or_boiler_count','latest_dob_activity_date','hpd_registered_contact_count','acris_recent_document_count_365d','latest_acris_recorded_date','acris_deed_count','acris_mortgage_count','acris_lease_count','acris_re"
+  },
+  {
+    "file": "src/utils/export.ts",
+    "line": 52,
+    "join_key_classes": [
+      "SUMMONS_TICKET"
+    ],
+    "text": "const oath = (row.oath_case_count ?? 0) > 0 ? `${row.oath_case_count} exact summons/ticket match${row.oath_case_count === 1 ? '' : 'es'} in OATH case-status data.` : 'No exact OATH summons/ticket match identified.'"
+  },
+  {
+    "file": "src/utils/export.ts",
+    "line": 101,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "lines.push('HPD registration: No exact BBL match in Multiple Dwelling Registrations')"
+  },
+  {
+    "file": "src/utils/export.ts",
+    "line": 103,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "lines.push(`HPD registration: ${detail.hpd_registration.registration_id ?? 'matched'}; no contact rows returned`)"
+  },
+  {
+    "file": "src/utils/export.ts",
+    "line": 105,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "lines.push(`HPD registration: ${detail.hpd_registration.registration_id ?? 'matched'}${detail.hpd_registration.last_registration_date ? `; processed ${detail.hpd_registration.last_registration_date}` : ''}`)"
+  },
+  {
+    "file": "src/utils/export.ts",
+    "line": 168,
+    "join_key_classes": [
+      "REGISTRATION_ID"
+    ],
+    "text": "lines.push('', `Evidence: NYC Cooling Tower Registrations; NYC Cooling Tower System Inspection Results; OATH Hearings Division Case Status (exact ticket matches only); NYC DCP PLUTO (exact BBL); DOB NOW Job Application Filings (exact BBL); NYC HPD Multiple Dwelling Registrations and Registration Contacts (exact BBL / registration ID where available)${acrisMeta.acris_cache_available ? '; NYC ACRIS Real Property Master, Legals and Parties (exact BBL / document ID from independently verified bounded cache)' : ''}`)"
+  },
+  {
+    "file": "src/data/accountProcurement.ts",
+    "line": 51,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "requireValid(object(value) && value.domain === domain && value.schema_version === 1 && value.system_id === systemId, 'manifest identity/schema mismatch')"
+  },
+  {
+    "file": "src/data/accountProcurement.ts",
+    "line": 78,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "requireValid(object(value) && value.domain === domain + '_PAGE' && value.schema_version === 1 && value.system_id === manifest.system_id && value.generated_at === manifest.generated_at, 'page identity/snapshot mismatch')"
+  },
+  {
+    "file": "src/data/accountProcurement.ts",
+    "line": 80,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "for (const record of value.records) requireValid(object(record) && Array.isArray(record.tower_account_system_ids) && record.tower_account_system_ids.includes(manifest.system_id) && ['CONFIRMED', 'STRONG'].includes(String(record.tower_link_confidence)) && typeof record.procurement_id === 'string' && typeof record.source === 'string', 'record lacks an exact confirmed/strong account link')"
+  },
+  {
+    "file": "src/domain/changePresentation.ts",
+    "line": 66,
+    "join_key_classes": [
+      "REGISTRATION_ID",
+      "SUMMONS_TICKET"
+    ],
+    "text": "return value.split(';').map(v => ({ SYSTEM_ID_EXACT: 'Exact system ID', BBL_EXACT: 'Exact property BBL', BIN_EXACT: 'Exact building BIN', SUMMONS_TICKET_EXACT: 'Exact summons / ticket', JOB_FILING_NUMBER_EXACT: 'Exact filing', REGISTRATION_ID_EXACT: 'Exact registration', DETERMINISTIC_RULE_CHANGE: 'Rule-based signal change', JOB_DESCRIPTION_EXPLICIT_COOLING_TOWER_TEXT: 'Explicit cooling-tower text' }[v.trim()] ?? v.trim().replaceAll('_', ' ').toLowerCase())).join(' \u00b7 ')"
+  },
+  {
+    "file": "src/workflow/useWorkflow.ts",
+    "line": 58,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const byId = new Map(remote.map(account => [account.system_id, account]))"
+  },
+  {
+    "file": "src/workflow/useWorkflow.ts",
+    "line": 263,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "setAccounts(current => [...current.filter(item => item.system_id !== systemId), next])"
+  },
+  {
+    "file": "src/workflow/useWorkflow.ts",
+    "line": 282,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": ": [...current, { system_id: systemId, watchlist_id: watchlistId, added_at: new Date().toISOString() }]"
+  },
+  {
+    "file": "src/workflow/useWorkflow.ts",
+    "line": 293,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const accountBySystemId = useMemo(() => new Map(accounts.map(account => [account.system_id, account])), [accounts])"
+  },
+  {
+    "file": "src/workflow/useWorkflow.ts",
+    "line": 294,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const watchedSystemIds = useMemo(() => new Set(memberships.map(item => item.system_id)), [memberships])"
+  },
+  {
+    "file": "src/workflow/useWorkflow.ts",
+    "line": 298,
+    "join_key_classes": [
+      "SYSTEM_ID"
+    ],
+    "text": "const ids = map.get(item.system_id) ?? new Set<string>()"
+  }
+]

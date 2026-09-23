@@ -1,0 +1,428 @@
+[
+  {
+    "key": "company_match_confidence",
+    "value": "Attribute",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "company_match_confidence",
+    "value": "IfExp",
+    "semantic_class": "OTHER",
+    "occurrences": 3
+  },
+  {
+    "key": "company_match_confidence",
+    "value": "UNRESOLVED",
+    "semantic_class": "NONCONFIRMING_OR_BOUNDARY",
+    "occurrences": 1
+  },
+  {
+    "key": "confidence",
+    "value": "Attribute",
+    "semantic_class": "OTHER",
+    "occurrences": 2
+  },
+  {
+    "key": "confidence",
+    "value": "CONFIRMED",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 5
+  },
+  {
+    "key": "confidence",
+    "value": "DYNAMIC_EXPRESSION:ProcurementConfidence | 'VERIFY'",
+    "semantic_class": "NONCONFIRMING_OR_BOUNDARY",
+    "occurrences": 1
+  },
+  {
+    "key": "confidence",
+    "value": "DYNAMIC_EXPRESSION:record.tower_link_confidence === 'CONFIRMED' ? 'CONFIRMED' : 'STRONG_SIGNAL'",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 1
+  },
+  {
+    "key": "confidence",
+    "value": "DYNAMIC_EXPRESSION:string",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "confidence",
+    "value": "STRONG",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 3
+  },
+  {
+    "key": "confidence",
+    "value": "VARIABLE:confidence",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 3
+  },
+  {
+    "key": "cross_source_resolution_method",
+    "value": "DYNAMIC_EXPRESSION:string",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "cross_source_resolution_method",
+    "value": "VARIABLE:resolution_method",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "evidence_class",
+    "value": "PUBLISHED_DECISION_PARTIAL_COVERAGE",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "facility_match_confidence",
+    "value": "IfExp",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "facility_match_confidence",
+    "value": "UNLINKED",
+    "semantic_class": "NONCONFIRMING_OR_BOUNDARY",
+    "occurrences": 2
+  },
+  {
+    "key": "facility_match_confidence",
+    "value": "VARIABLE:facility_match_confidence",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "factClass",
+    "value": "CONFIRMED_FACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 4
+  },
+  {
+    "key": "identity_confidence",
+    "value": "DYNAMIC_EXPRESSION:KnownFirmIdentityConfidence",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "identity_confidence",
+    "value": "DYNAMIC_EXPRESSION:string",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "identity_confidence",
+    "value": "Subscript",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "identity_confidence",
+    "value": "VARIABLE:identity_confidence",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 2
+  },
+  {
+    "key": "identity_confidence",
+    "value": "VERIFY",
+    "semantic_class": "NONCONFIRMING_OR_BOUNDARY",
+    "occurrences": 4
+  },
+  {
+    "key": "matchBasis",
+    "value": "BBL_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 2
+  },
+  {
+    "key": "matchBasis",
+    "value": "BIN_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 3
+  },
+  {
+    "key": "matchBasis",
+    "value": "SYSTEM_ID_EXPLICIT",
+    "semantic_class": "OTHER",
+    "occurrences": 2
+  },
+  {
+    "key": "match_basis",
+    "value": "BBL_ALIAS_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 5
+  },
+  {
+    "key": "match_basis",
+    "value": "BBL_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 4
+  },
+  {
+    "key": "match_basis",
+    "value": "BBL_EXACT_DOCUMENT_ID_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 1
+  },
+  {
+    "key": "match_basis",
+    "value": "BIN_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 10
+  },
+  {
+    "key": "match_basis",
+    "value": "BOROUGH_BLOCK_LOT_TO_BBL_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 1
+  },
+  {
+    "key": "match_basis",
+    "value": "BoolOp",
+    "semantic_class": "OTHER",
+    "occurrences": 2
+  },
+  {
+    "key": "match_basis",
+    "value": "Call",
+    "semantic_class": "OTHER",
+    "occurrences": 3
+  },
+  {
+    "key": "match_basis",
+    "value": "Compare",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "match_basis",
+    "value": "DYNAMIC_EXPRESSION:string",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 2
+  },
+  {
+    "key": "match_basis",
+    "value": "EXACT_SOURCE_BBL_ALIAS_OR_BIN",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 1
+  },
+  {
+    "key": "match_basis",
+    "value": "IfExp",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "match_basis",
+    "value": "NORMALIZED_ADDRESS_BOROUGH_SINGLE_BIN",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "match_basis",
+    "value": "PAD_EXACT_ADDRESS_BBL_ALIAS",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 1
+  },
+  {
+    "key": "match_basis",
+    "value": "PUBLISHED_DECISION_EXPLICIT_WORKSITE_ADDRESS_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 2
+  },
+  {
+    "key": "match_basis",
+    "value": "SUMMONS_NUMBER_EXACT",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 1
+  },
+  {
+    "key": "match_basis",
+    "value": "Subscript",
+    "semantic_class": "OTHER",
+    "occurrences": 2
+  },
+  {
+    "key": "match_basis",
+    "value": "VARIABLE:MATCH_BASIS",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 11
+  },
+  {
+    "key": "match_basis",
+    "value": "VARIABLE:match_basis",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 2
+  },
+  {
+    "key": "property_link_confidence",
+    "value": "CONFIRMED_EXACT_BBL_ALIAS",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 1
+  },
+  {
+    "key": "property_link_confidence",
+    "value": "CONFIRMED_PAD_EXACT_ADDRESS_BBL",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 2
+  },
+  {
+    "key": "property_link_confidence",
+    "value": "CONFIRMED_SOURCE_BBL",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 2
+  },
+  {
+    "key": "property_link_confidence",
+    "value": "IfExp",
+    "semantic_class": "OTHER",
+    "occurrences": 3
+  },
+  {
+    "key": "property_link_confidence",
+    "value": "UNLINKED",
+    "semantic_class": "NONCONFIRMING_OR_BOUNDARY",
+    "occurrences": 2
+  },
+  {
+    "key": "property_link_confidence",
+    "value": "UNLINKED_SAMPLE_SITE",
+    "semantic_class": "NONCONFIRMING_OR_BOUNDARY",
+    "occurrences": 3
+  },
+  {
+    "key": "property_link_confidence",
+    "value": "VARIABLE:link",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 2
+  },
+  {
+    "key": "relationship",
+    "value": "CONTRACT_AWARD_EVIDENCE",
+    "semantic_class": "OTHER",
+    "occurrences": 2
+  },
+  {
+    "key": "relationship",
+    "value": "DYNAMIC_EXPRESSION:KnownFirmSiteRelationship",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "relationship",
+    "value": "DYNAMIC_EXPRESSION:SalesKnownFirm['relationship']",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 2
+  },
+  {
+    "key": "relationship",
+    "value": "DYNAMIC_EXPRESSION:firm.relationship",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "relationship",
+    "value": "DYNAMIC_EXPRESSION:observation.relationship",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "relationship",
+    "value": "DYNAMIC_EXPRESSION:site",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  },
+  {
+    "key": "relationship",
+    "value": "OBSERVED_SERVICE",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 6
+  },
+  {
+    "key": "relationship",
+    "value": "RECORDED_ROLE",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 4
+  },
+  {
+    "key": "relationship_evidence",
+    "value": "BoolOp",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "relationship_evidence",
+    "value": "CROSS_SOURCE_NAME_MATCH_ONLY",
+    "semantic_class": "OTHER",
+    "occurrences": 2
+  },
+  {
+    "key": "relationship_evidence",
+    "value": "IfExp",
+    "semantic_class": "OTHER",
+    "occurrences": 4
+  },
+  {
+    "key": "relationship_evidence",
+    "value": "QUALIFIED_OPERATOR",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "relationship_evidence",
+    "value": "QUALIFIED_PROVIDER",
+    "semantic_class": "CONFIRMING_OR_OBSERVED",
+    "occurrences": 3
+  },
+  {
+    "key": "relationship_evidence",
+    "value": "RECORDED_DOB_ROLE",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "resolution_method",
+    "value": "DYNAMIC_EXPRESSION:string",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 3
+  },
+  {
+    "key": "resolution_method",
+    "value": "Subscript",
+    "semantic_class": "OTHER",
+    "occurrences": 1
+  },
+  {
+    "key": "resolution_method",
+    "value": "VARIABLE:resolution_method",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 3
+  },
+  {
+    "key": "service_assignment_confidence",
+    "value": "IfExp",
+    "semantic_class": "OTHER",
+    "occurrences": 2
+  },
+  {
+    "key": "service_assignment_confidence",
+    "value": "NOT_PROOF_OF_SERVICE_CONTRACT",
+    "semantic_class": "NONCONFIRMING_OR_BOUNDARY",
+    "occurrences": 1
+  },
+  {
+    "key": "tower_link_confidence",
+    "value": "UNLINKED",
+    "semantic_class": "NONCONFIRMING_OR_BOUNDARY",
+    "occurrences": 3
+  },
+  {
+    "key": "tower_link_confidence",
+    "value": "VARIABLE:tower_link_confidence",
+    "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+    "occurrences": 1
+  }
+]

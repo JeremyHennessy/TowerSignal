@@ -1,0 +1,38 @@
+{
+  "contract_occurrences": 158,
+  "unique_key_value_contracts": 71,
+  "semantic_counts": {
+    "CONFIRMING_OR_OBSERVED": 62,
+    "DYNAMIC_REQUIRES_TRACE": 41,
+    "OTHER": 38,
+    "NONCONFIRMING_OR_BOUNDARY": 17
+  },
+  "keys": {
+    "match_basis": 51,
+    "property_link_confidence": 15,
+    "confidence": 16,
+    "identity_confidence": 9,
+    "resolution_method": 7,
+    "relationship_evidence": 12,
+    "company_match_confidence": 5,
+    "facility_match_confidence": 4,
+    "tower_link_confidence": 4,
+    "cross_source_resolution_method": 2,
+    "evidence_class": 1,
+    "service_assignment_confidence": 3,
+    "relationship": 18,
+    "factClass": 4,
+    "matchBasis": 7
+  },
+  "join_mechanism_occurrences": 539,
+  "join_key_class_counts": {
+    "SYSTEM_ID": 285,
+    "REGISTRATION_ID": 57,
+    "SUMMONS_TICKET": 43,
+    "SOURCE_RECORD_ID": 10,
+    "BIN": 39,
+    "COMPANY_FIRM": 71,
+    "BBL": 38
+  },
+  "boundary": "Static contract inventory. A CONFIRMING_OR_OBSERVED literal is not independently validated merely by appearing in code; each relationship still depends on the upstream join and source-population evidence."
+}
