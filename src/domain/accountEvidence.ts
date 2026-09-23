@@ -130,16 +130,19 @@ export function collectAccountFirmRoleEvidence(detail: SystemDetailWithDomesticW
     if (!name) return
     const category = humanize(raw.category)
     const record = text(raw.source_record_id) ?? text(raw.job_filing_number) ?? text(raw.activity_id) ?? 'record id not published'
+    const sourceLink = text(raw.property_link_confidence)
+    const matchBasis: AccountFirmRoleEvidence['matchBasis'] = sourceLink === 'CONFIRMED_SOURCE_BIN' ? 'BIN_EXACT' : 'BBL_EXACT'
+    const matchLabel = matchBasis === 'BIN_EXACT' ? 'exact BIN' : 'exact BBL'
     add({
       name,
       role: category ? `DOB ${category} applicant business` : 'DOB water-work applicant business',
       relationship: 'RECORDED_ROLE',
       sourceName,
       datasetId,
-      matchBasis: 'BBL_EXACT',
+      matchBasis,
       observedDate: observationDate(raw, 'issued_date', 'approved_date', 'filing_date'),
       observedYear: null,
-      sourceReference: `Record ${record} · exact BBL${humanize(raw.relationship_evidence) ? ` · ${humanize(raw.relationship_evidence)}` : ''}`,
+      sourceReference: `Record ${record} · ${matchLabel}${humanize(raw.relationship_evidence) ? ` · ${humanize(raw.relationship_evidence)}` : ''}`,
       serviceAssignmentBoundary: `${humanize(raw.service_assignment_confidence) ?? 'Not proof of service assignment'}. Recorded DOB applicant role only; not a current service-provider or contract claim.`,
     })
   }
