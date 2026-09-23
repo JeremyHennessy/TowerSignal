@@ -2,6 +2,7 @@ name: Read-only all-source mapping audit
 on:
   push:
     branches: [audit/source-mapping-20260923]
+    paths: [.github/workflows/source-mapping-audit-20260923.yml]
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,112 +13,81 @@ concurrency:
 jobs:
   capture:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Capture code, hosted baseline and independent official evidence
-        env:
-          PYTHONUNBUFFERED: '1'
+      - name: Independent supplementary evidence
         run: |
-          mkdir -p audit-evidence
-          git archive --format=tar.gz --output=audit-evidence/repository-source.tar.gz HEAD
+          mkdir -p supplementary-evidence
           python - <<'PY'
-          import json, gzip, hashlib, time, urllib.request, urllib.parse, concurrent.futures
+          import json,gzip,time,hashlib,urllib.request,urllib.parse,concurrent.futures
           from pathlib import Path
-          from datetime import datetime, timezone
-          OUT=Path('audit-evidence'); evidence=[]; errors=[]
-          def request(url):
-              for attempt in range(3):
+          from datetime import datetime,timezone
+          O=Path('supplementary-evidence'); evidence=[]; errors=[]
+          def save(n,v):
+              with gzip.open(O/(n+'.json.gz'),'wt') as f:json.dump(v,f,separators=(',',':'))
+          def get(url,label):
+              for a in range(3):
                   try:
-                      with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'TowerSignal-read-only-source-audit/1.0'}),timeout=100) as r:
-                          raw=r.read(); headers=dict(r.headers)
-                      return raw,headers
-                  except Exception as e:
-                      if attempt==2: raise
-                      time.sleep(5*(attempt+1))
-          def save(name,data):
-              raw=json.dumps(data,separators=(',',':')).encode()
-              with gzip.open(OUT/(name+'.json.gz'),'wb') as f:f.write(raw)
-          def fetch_json(url,label):
-              raw,headers=request(url); value=json.loads(raw)
-              evidence.append({'label':label,'url':url,'retrieved_at':datetime.now(timezone.utc).isoformat(),'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'last_modified':headers.get('Last-Modified'),'etag':headers.get('ETag')})
-              return value
-          base='https://jeremyhennessy.github.io/TowerSignal/data/'
-          hosted={}
-          for name in ['systems','metadata','source-health','verification','coverage-audit','nyc-water-signals','cms-institutional-context','property-enforcement','legacy-dob-projects','domestic-water-market','nyc-building-water-signal-coverage','domestic-water-coverage','nyc-service-line-coverage','historical-311-context-coverage']:
-              try:
-                  value=fetch_json(base+name+'.json','hosted/'+name); save('hosted-'+name,value); hosted[name]=value
-                  print('HOSTED',name, 'captured',flush=True)
-              except Exception as e: errors.append({'source':'hosted/'+name,'error':str(e)})
-          systems=hosted['systems']['systems']
-          value=fetch_json(base+'details/20/2000014227.json','hosted-target');save('hosted-target',value)
-          def full(dataset,order,select='*',where=None,label=None):
-              label=label or dataset
-              before=fetch_json('https://data.cityofnewyork.us/api/views/'+dataset+'.json',label+'/metadata-before')
-              save(label+'-metadata',before)
-              rows=[]; offset=0; pages=0
+                      with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'TowerSignal-independent-mapping-audit/1.0'}),timeout=100) as r:raw=r.read()
+                      v=json.loads(raw);evidence.append({'label':label,'url':url,'retrieved_at':datetime.now(timezone.utc).isoformat(),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)});return v
+                  except Exception:
+                      if a==2:raise
+                      time.sleep(5*(a+1))
+          def source(host,dataset,label,where=None):
+              before=get(host+'/api/views/'+dataset+'.json',label+'/metadata');save(label+'-metadata',before)
+              rows=[];offset=0
               while True:
-                  args={'$limit':50000,'$offset':offset,'$order':order,'$select':select}
+                  args={'$limit':50000,'$offset':offset,'$order':':id'}
                   if where:args['$where']=where
-                  url='https://data.cityofnewyork.us/resource/'+dataset+'.json?'+urllib.parse.urlencode(args)
-                  chunk=fetch_json(url,label+'/page-'+str(pages))
-                  if not isinstance(chunk,list):raise RuntimeError('Not a row array: '+label)
-                  rows.extend(chunk);pages+=1
+                  chunk=get(host+'/resource/'+dataset+'.json?'+urllib.parse.urlencode(args),label+'/rows-'+str(offset))
+                  if not isinstance(chunk,list):raise RuntimeError('Expected rows '+label)
+                  rows.extend(chunk)
                   if len(chunk)<50000:break
                   offset+=len(chunk)
-                  if pages>30:raise RuntimeError('Refusing silent truncation '+label)
-              after=fetch_json('https://data.cityofnewyork.us/api/views/'+dataset+'.json',label+'/metadata-after')
-              count=None
-              try:
-                  args={'$select':'count(*)'}
-                  if where:args['$where']=where
-                  count=int(fetch_json('https://data.cityofnewyork.us/resource/'+dataset+'.json?'+urllib.parse.urlencode(args),label+'/filtered-count')[0]['count'])
-              except Exception as e:errors.append({'source':label+'/count','error':str(e),'telemetry_only':True})
-              status={'dataset_id':dataset,'rows':len(rows),'count':count,'pages':pages,'exhausted':True,'source_unchanged':before.get('rowsUpdatedAt')==after.get('rowsUpdatedAt'),'count_matches':None if count is None else count==len(rows),'where':where}
-              save(label,rows);save(label+'-coverage',status);print('OFFICIAL',json.dumps(status),flush=True)
-              return rows
-          tasks=[('y4fw-iqfr','system_id,:id','*','registry'),('f9wb-g8mb','system_id,inspection_date,:id','*','inspections'),('tesw-yqqr','registrationid,:id','registrationid,buildingid,boroid,boro,block,lot,bin,lastregistrationdate','hpd-registrations')]
-          results={}
+                  if offset>2000000:raise RuntimeError('Refusing truncated source '+label)
+              after=get(host+'/api/views/'+dataset+'.json',label+'/metadata-after')
+              args={'$select':'count(*)'}
+              if where:args['$where']=where
+              count=int(get(host+'/resource/'+dataset+'.json?'+urllib.parse.urlencode(args),label+'/count')[0]['count'])
+              status={'dataset_id':dataset,'rows':len(rows),'count':count,'count_matches':count==len(rows),'source_unchanged':before.get('rowsUpdatedAt')==after.get('rowsUpdatedAt'),'where':where,'exhausted':True}
+              save(label,rows);save(label+'-coverage',status);print('OFFICIAL',label,json.dumps(status),flush=True)
+              if not status['count_matches'] or not status['source_unchanged']:raise RuntimeError('Source did not remain complete/stable '+label)
+              return len(rows)
+          city='https://data.cityofnewyork.us';state='https://health.data.ny.gov';site='https://jeremyhennessy.github.io/TowerSignal/data/'
+          hosted=get(site+'systems.json','hosted/systems');save('hosted-systems',hosted)
+          save('hosted-nys-systems',get(site+'nys-systems.json','hosted/nys-systems'))
+          bins=sorted({s['bin'] for s in hosted['systems'] if s.get('bin') and len(s['bin'])==7 and s['bin'][1:]!='000000' and (s.get('hpd_contact_count')==0 or 'CONFLICT' in str(s.get('bbl_identity_status')) or 'UNRESOLVED' in str(s.get('bbl_identity_status')))}|{'1089723','1088152','1088432','1016877'})
+          tasks=[(state,'24a4-muw7','nys-registry',None),(city,'gjm4-k24g','dwt-self-reports',None),(city,'rytv-g5ui','dwt-compliance',None),(city,'feu5-w2e2','hpd-zero-contacts','registrationid=0'),(city,'tesw-yqqr','hpd-zero-registrations','registrationid=0')]
           with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
-              futures={pool.submit(full,d,o,s,None,label):label for d,o,s,label in tasks}
-              for f in concurrent.futures.as_completed(futures):
-                  label=futures[f]
-                  try: results[label]=f.result()
-                  except Exception as e:errors.append({'source':label,'error':str(e)});print('SOURCE_ERROR',label,str(e),flush=True)
-          def norm(v):
-              try:return str(int(float(v)))
-              except (ValueError,TypeError):return None
-          bbls={norm(b) for s in systems for b in [s.get('bbl'),s.get('registry_bbl'),*(s.get('bbl_aliases') or [])] if norm(b)}
-          bins={norm(s.get('bin')) for s in systems if norm(s.get('bin'))}
-          def regbbl(r):
-              try:return str(int(r['boroid']))+str(int(r['block'])).zfill(5)+str(int(r['lot'])).zfill(4)
-              except Exception:return None
-          relevant=[r for r in results.get('hpd-registrations',[]) if regbbl(r) in bbls or norm(r.get('bin')) in bins]
-          save('hpd-relevant-registrations',relevant)
-          ids=sorted({norm(r.get('registrationid')) for r in relevant if norm(r.get('registrationid'))},key=int)
-          contacts=[]
-          for start in range(0,len(ids),250):
-              subset=ids[start:start+250]
+              fs={pool.submit(source,*t):t[2] for t in tasks}
+              for f in concurrent.futures.as_completed(fs):
+                  try:f.result()
+                  except Exception as e:errors.append({'source':fs[f],'error':str(e)})
+          # Full HPD address fields for the independently identified contact/identity review cases.
+          candidate_bins=['3000417','1090462','1089237','1016877','1048068','1089723','1056989']
+          source(city,'tesw-yqqr','hpd-review-full','bin in ('+','.join(candidate_bins)+')')
+          # Query missing-contact and ambiguous-identity properties by non-placeholder BIN.
+          footprint_rows=[]
+          for start in range(0,len(bins),150):
+              batch=bins[start:start+150]
+              args={'$where':'bin in ('+','.join(batch)+')','$limit':50000,'$order':'bin,objectid','$select':'bin,base_bbl,mappluto_bbl,objectid,name,the_geom'}
               try:
-                  args={'$where':'registrationid in ('+','.join(subset)+')','$order':'registrationid,registrationcontactid','$limit':50000}
-                  url='https://data.cityofnewyork.us/resource/feu5-w2e2.json?'+urllib.parse.urlencode(args)
-                  chunk=fetch_json(url,'hpd-contacts/'+str(start));
-                  if len(chunk)>=50000:raise RuntimeError('Contact chunk hit cap')
-                  contacts.extend(chunk)
-              except Exception as e:errors.append({'source':'hpd-contacts','registration_ids':subset,'error':str(e)})
-          save('hpd-contacts',contacts)
-          print('HPD_SCOPE',json.dumps({'all_registration_rows':len(results.get('hpd-registrations',[])),'relevant_registration_rows':len(relevant),'registration_ids':len(ids),'contacts':len(contacts)}),flush=True)
+                  chunk=get(city+'/resource/5zhs-2jue.json?'+urllib.parse.urlencode(args),'footprints/'+str(start))
+                  if len(chunk)>=50000:raise RuntimeError('Footprint query hit cap')
+                  footprint_rows.extend(chunk)
+              except Exception as e:errors.append({'source':'footprints','bins':batch,'error':str(e)})
+          save('review-footprints',footprint_rows)
           save('request-evidence',evidence);save('errors',errors)
-          (OUT/'capture-summary.json').write_text(json.dumps({'source_head':'${{ github.sha }}','hosted_systems':len(systems),'hosted_metadata':hosted['systems']['metadata'],'independent_rows':{k:len(v) for k,v in results.items()},'hpd_relevant_registrations':len(relevant),'hpd_contacts':len(contacts),'errors':errors},indent=2))
-          print('CAPTURE_COMPLETE',json.dumps({'systems':len(systems),'independent_rows':{k:len(v) for k,v in results.items()},'hpd_contacts':len(contacts),'errors':errors}),flush=True)
+          print('SUPPLEMENT_COMPLETE',json.dumps({'requested_nonplaceholder_bins':len(bins),'footprint_rows':len(footprint_rows),'errors':errors}),flush=True)
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: source-mapping-audit-capture
-          path: audit-evidence
+          name: source-mapping-supplement
+          path: supplementary-evidence
           retention-days: 14
           if-no-files-found: error
