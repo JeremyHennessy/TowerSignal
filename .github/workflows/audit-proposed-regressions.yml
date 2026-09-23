@@ -1,0 +1,39 @@
+name: Audit proposed regression failures
+
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/proposed_regression_failures.py
+      - .github/workflows/audit-proposed-regressions.yml
+
+permissions:
+  contents: read
+
+jobs:
+  demonstrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Demonstrate all three current failure mechanisms
+        run: |
+          mkdir -p .audit-regressions
+          set +e
+          python docs/audits/2026-09-23/proposed_regression_failures.py 2>&1 | tee .audit-regressions/current-failures.txt
+          status=${PIPESTATUS[0]}
+          set -e
+          test "$status" -ne 0
+          test "$(grep -c '^FAIL:' .audit-regressions/current-failures.txt)" -eq 3
+          grep -q 'test_placeholder_bin_is_not_a_unique_firm_site_identity' .audit-regressions/current-failures.txt
+          grep -q 'test_dob_role_provenance_is_not_hardcoded_to_exact_bbl' .audit-regressions/current-failures.txt
+          grep -q 'test_dob_preview_does_not_hide_newer_permits_behind_jobs' .audit-regressions/current-failures.txt
+      - name: Preserve diagnostic result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-proposed-regression-failures
+          path: .audit-regressions
+          retention-days: 14
