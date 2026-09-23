@@ -240,6 +240,8 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, Any]:
     metadata.update({
         "nyc_water_signal_cache_available": True,
         "nyc_water_signal_match_basis": "EXACT_SOURCE_BBL_ALIAS_OR_BIN",
+        "nyc_water_signal_requested_bbl_count": len(bbl_to_systems),
+        "nyc_water_signal_requested_bin_count": len(bin_to_systems),
         "nyc_water_signal_source_record_count": sum(
             int(source.get("source_record_count") or 0)
             for source in signal_payload.get("source_health", [])
