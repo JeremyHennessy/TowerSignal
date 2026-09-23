@@ -1,0 +1,32 @@
+{
+  "current_manual_records": 109,
+  "prior_manual_records": 97,
+  "reused_exact_signature": 91,
+  "unmatched_current_records": 12,
+  "ambiguous_signature_records": 6,
+  "unmatched_by_file": [
+    [
+      "src/components/CompanyAdminPanel.tsx",
+      7
+    ],
+    [
+      "src/components/ClientSiteReport.tsx",
+      3
+    ],
+    [
+      "src/components/AuthLandingPage.tsx",
+      1
+    ],
+    [
+      "src/components/SourceHealthExpansion.tsx",
+      1
+    ]
+  ],
+  "ambiguous_by_file": [
+    [
+      "src/App.tsx",
+      6
+    ]
+  ],
+  "boundary": "Prior manual classifications are reused only for exact file/kind/attribute/expression/property-chain signatures. New or ambiguous current-main expressions remain explicitly unclassified for fresh review."
+}

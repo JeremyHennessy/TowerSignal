@@ -50,7 +50,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_FILTER_STATE",
+    "manual_lineage_reason": "Prospect filter preset state; not a source field.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "ffcfbd94137095b15900"
   },
   {
     "application_field_id": "9859c58ca276e91ea1ae",
@@ -159,7 +165,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "NYC_SYSTEM_SELECTION",
+    "manual_lineage_reason": "Selected NYC SystemSummary/account payload passed to account/map/detail consumers.",
+    "manual_domain": "SYSTEM_ACCOUNT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "9e2fe5c33bca1239add5"
   },
   {
     "application_field_id": "60f4347f63c34bc07112",
@@ -220,7 +232,13 @@
         "declared_type": "number"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY",
+    "manual_lineage_reason": "Derived from the NYS changes/history artifact passed through App.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "0a58061f3b6b857abb1a"
   },
   {
     "application_field_id": "cfa8cbd0a5fea4069f6e",
@@ -308,7 +326,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY",
+    "manual_lineage_reason": "Derived from the NYS changes/history artifact passed through App.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "76049c9c31bd5780a112"
   },
   {
     "application_field_id": "cc955a342aea7e46fb48",
@@ -396,7 +420,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY",
+    "manual_lineage_reason": "Derived from the NYS changes/history artifact passed through App.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "373145b363464bbe9f5e"
   },
   {
     "application_field_id": "ae15e4c814b80600e992",
@@ -484,7 +514,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY",
+    "manual_lineage_reason": "Derived from the NYS changes/history artifact passed through App.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "98b7bfb587d753a65398"
   },
   {
     "application_field_id": "6d481cd238a926484b01",
@@ -572,7 +608,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY",
+    "manual_lineage_reason": "Derived from the NYS changes/history artifact passed through App.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "6c7601b834da4720e5e7"
   },
   {
     "application_field_id": "d2ffad61abb226833f46",
@@ -612,244 +654,13 @@
     "stage19_reason": "No property-to-type candidate and prior trace unresolved",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "f206a0c0b0c21bcaf00a",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/App.tsx",
-    "line": 334,
-    "route_hints": [
-      "#/"
-    ],
-    "label": null,
-    "attribute": "row",
-    "expression": "selected",
-    "property_chains": [],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
-    "classification_reasons": [
-      "Runtime data-bearing expression without a direct core normalized-field candidate"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "selected",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [],
-    "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "f31b3f82f185a5552f99",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/App.tsx",
-    "line": 334,
-    "route_hints": [
-      "#/"
-    ],
-    "label": null,
-    "attribute": "historyEvents",
-    "expression": "changes.events.filter(event => event.system_id === selected.system_id)",
-    "property_chains": [
-      "changes.events.filter",
-      "event.system_id",
-      "selected.system_id"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "changes.events.filter(event => event.system_id === selected.system_id)",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
-    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
-    "field_properties": [
-      "events",
-      "system_id"
-    ],
-    "type_candidates": [
-      {
-        "property": "events",
-        "type": "NysChangesPayload",
-        "domain": "MULTI:NYS,HISTORY_CHANGE",
-        "file": "src/types/nys.ts",
-        "line": 111,
-        "declared_type": "NysChangeEvent[]"
-      },
-      {
-        "property": "events",
-        "type": "ChangesPayload",
-        "domain": "HISTORY_CHANGE",
-        "file": "src/types/history.ts",
-        "line": 55,
-        "declared_type": "ChangeEvent[]"
-      },
-      {
-        "property": "system_id",
-        "type": "NysSystem",
-        "domain": "MULTI:NYS,SYSTEM_ACCOUNT",
-        "file": "src/types/nys.ts",
-        "line": 4,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "NysChangeEvent",
-        "domain": "MULTI:NYS,HISTORY_CHANGE",
-        "file": "src/types/nys.ts",
-        "line": 91,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "WorkflowAccountState",
-        "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
-        "file": "src/types/workflow.ts",
-        "line": 27,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "WorkflowMembership",
-        "domain": "WORKFLOW",
-        "file": "src/types/workflow.ts",
-        "line": 37,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "SystemSummary",
-        "domain": "SYSTEM_ACCOUNT",
-        "file": "src/types/data.ts",
-        "line": 107,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "Inspection",
-        "domain": "UNKNOWN",
-        "file": "src/types/data.ts",
-        "line": 213,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "ChangeEvent",
-        "domain": "HISTORY_CHANGE",
-        "file": "src/types/history.ts",
-        "line": 33,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "LegionellaBuildingLink",
-        "domain": "LEGIONELLA",
-        "file": "src/types/enforcement.ts",
-        "line": 114,
-        "declared_type": "string"
-      }
-    ],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "2896baa490a58751df2f",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/App.tsx",
-    "line": 334,
-    "route_hints": [
-      "#/"
-    ],
-    "label": null,
-    "attribute": "historyStartedAt",
-    "expression": "changes.history_started_at",
-    "property_chains": [
-      "changes.history_started_at"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "changes.history_started_at",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
-    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
-    "field_properties": [
-      "history_started_at"
-    ],
-    "type_candidates": [
-      {
-        "property": "history_started_at",
-        "type": "CoverageAuditPayload",
-        "domain": "SOURCE_HEALTH",
-        "file": "src/types/coverage.ts",
-        "line": 76,
-        "declared_type": "string | null"
-      },
-      {
-        "property": "history_started_at",
-        "type": "NysChangesPayload",
-        "domain": "MULTI:NYS,HISTORY_CHANGE",
-        "file": "src/types/nys.ts",
-        "line": 107,
-        "declared_type": "string"
-      },
-      {
-        "property": "history_started_at",
-        "type": "ChangesPayload",
-        "domain": "HISTORY_CHANGE",
-        "file": "src/types/history.ts",
-        "line": 51,
-        "declared_type": "string"
-      }
-    ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY",
+    "manual_lineage_reason": "Derived from the NYS changes/history artifact passed through App.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "7229903f4c76e804446e"
   },
   {
     "application_field_id": "77d147d0ebb9153b8ee3",
@@ -889,7 +700,13 @@
     "stage19_reason": "No property-to-type candidate and prior trace unresolved",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "NYS_SYSTEM_SELECTION",
+    "manual_lineage_reason": "Selected NYS system payload passed to the NYS detail surface.",
+    "manual_domain": "NYS",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "c554c73093496e2adc3b"
   },
   {
     "application_field_id": "110cfe107f613cbc0dfa",
@@ -950,7 +767,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY",
+    "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "e4c2c0a184d29ac28ca3"
   },
   {
     "application_field_id": "13c8cf40ef5005c98bcd",
@@ -1011,244 +834,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "f6abb9dc502d1420a78f",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/App.tsx",
-    "line": 342,
-    "route_hints": [
-      "#/"
-    ],
-    "label": null,
-    "attribute": "row",
-    "expression": "selected",
-    "property_chains": [],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
-    "classification_reasons": [
-      "Runtime data-bearing expression without a direct core normalized-field candidate"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "selected",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [],
-    "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "9e65d6266ac2df46017d",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/App.tsx",
-    "line": 342,
-    "route_hints": [
-      "#/"
-    ],
-    "label": null,
-    "attribute": "historyEvents",
-    "expression": "changes.events.filter(event => event.system_id === selected.system_id)",
-    "property_chains": [
-      "changes.events.filter",
-      "event.system_id",
-      "selected.system_id"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "changes.events.filter(event => event.system_id === selected.system_id)",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
-    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
-    "field_properties": [
-      "events",
-      "system_id"
-    ],
-    "type_candidates": [
-      {
-        "property": "events",
-        "type": "NysChangesPayload",
-        "domain": "MULTI:NYS,HISTORY_CHANGE",
-        "file": "src/types/nys.ts",
-        "line": 111,
-        "declared_type": "NysChangeEvent[]"
-      },
-      {
-        "property": "events",
-        "type": "ChangesPayload",
-        "domain": "HISTORY_CHANGE",
-        "file": "src/types/history.ts",
-        "line": 55,
-        "declared_type": "ChangeEvent[]"
-      },
-      {
-        "property": "system_id",
-        "type": "NysSystem",
-        "domain": "MULTI:NYS,SYSTEM_ACCOUNT",
-        "file": "src/types/nys.ts",
-        "line": 4,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "NysChangeEvent",
-        "domain": "MULTI:NYS,HISTORY_CHANGE",
-        "file": "src/types/nys.ts",
-        "line": 91,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "WorkflowAccountState",
-        "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
-        "file": "src/types/workflow.ts",
-        "line": 27,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "WorkflowMembership",
-        "domain": "WORKFLOW",
-        "file": "src/types/workflow.ts",
-        "line": 37,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "SystemSummary",
-        "domain": "SYSTEM_ACCOUNT",
-        "file": "src/types/data.ts",
-        "line": 107,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "Inspection",
-        "domain": "UNKNOWN",
-        "file": "src/types/data.ts",
-        "line": 213,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "ChangeEvent",
-        "domain": "HISTORY_CHANGE",
-        "file": "src/types/history.ts",
-        "line": 33,
-        "declared_type": "string"
-      },
-      {
-        "property": "system_id",
-        "type": "LegionellaBuildingLink",
-        "domain": "LEGIONELLA",
-        "file": "src/types/enforcement.ts",
-        "line": 114,
-        "declared_type": "string"
-      }
-    ],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "92e17c4aaf3822529d0a",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/App.tsx",
-    "line": 342,
-    "route_hints": [
-      "#/"
-    ],
-    "label": null,
-    "attribute": "historyStartedAt",
-    "expression": "changes.history_started_at",
-    "property_chains": [
-      "changes.history_started_at"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "changes.history_started_at",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
-    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
-    "field_properties": [
-      "history_started_at"
-    ],
-    "type_candidates": [
-      {
-        "property": "history_started_at",
-        "type": "CoverageAuditPayload",
-        "domain": "SOURCE_HEALTH",
-        "file": "src/types/coverage.ts",
-        "line": 76,
-        "declared_type": "string | null"
-      },
-      {
-        "property": "history_started_at",
-        "type": "NysChangesPayload",
-        "domain": "MULTI:NYS,HISTORY_CHANGE",
-        "file": "src/types/nys.ts",
-        "line": 107,
-        "declared_type": "string"
-      },
-      {
-        "property": "history_started_at",
-        "type": "ChangesPayload",
-        "domain": "HISTORY_CHANGE",
-        "file": "src/types/history.ts",
-        "line": 51,
-        "declared_type": "string"
-      }
-    ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY",
+    "manual_lineage_reason": "Derived from the NYS changes/history artifact passed through App.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "137fb795ac5ff9ce8528"
   },
   {
     "application_field_id": "742adc6c57f0b72a7b11",
@@ -1295,7 +887,13 @@
       "length"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY",
+    "manual_lineage_reason": "Count/pluralization derived from preserved account history events.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "742adc6c57f0b72a7b11"
   },
   {
     "application_field_id": "1ceeae414b037753cd22",
@@ -1342,7 +940,13 @@
       "length"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY",
+    "manual_lineage_reason": "Count/pluralization derived from preserved account history events.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "1ceeae414b037753cd22"
   },
   {
     "application_field_id": "24375cb4a5f0036cb7ff",
@@ -1395,7 +999,13 @@
       "points"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_PRIORITY_SCORE",
+    "manual_lineage_reason": "Score-explanation component points derived from deterministic Priority Score model components.",
+    "manual_domain": "PRIORITY_SCORE",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "24375cb4a5f0036cb7ff"
   },
   {
     "application_field_id": "2d538098745e4b28ba7e",
@@ -1437,7 +1047,13 @@
       "length"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_ACCOUNT_PROCUREMENT",
+    "manual_lineage_reason": "Count of procurement records already linked to the account snapshot.",
+    "manual_domain": "PROCUREMENT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "2d538098745e4b28ba7e"
   },
   {
     "application_field_id": "c6f5aba5b9d66388689c",
@@ -1480,7 +1096,13 @@
       "keys"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_TIMELINE_PRESENTATION",
+    "manual_lineage_reason": "Local timeline category/filter presentation state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "c6f5aba5b9d66388689c"
   },
   {
     "application_field_id": "7b0f529e312fe719deef",
@@ -1560,7 +1182,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_ACCOUNT_TIMELINE",
+    "manual_lineage_reason": "Timeline item key/category derived from normalized account evidence assembled into TimelineItem.",
+    "manual_domain": "ACCOUNT_TIMELINE",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "7b0f529e312fe719deef"
   },
   {
     "application_field_id": "96f1e42556c3c03897ad",
@@ -1611,50 +1239,13 @@
         "declared_type": "TimelineCategory"
       }
     ],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "dd5eaf2ad4137bb5a60c",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/components/AuthLandingPage.tsx",
-    "line": 65,
-    "route_hints": [],
-    "label": null,
-    "attribute": "disabled",
-    "expression": "busy || !email.trim() || password.length < 8",
-    "property_chains": [
-      "email.trim",
-      "password.length"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "busy || !email.trim() || password.length < 8",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [
-      "length"
-    ],
-    "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_TIMELINE_PRESENTATION",
+    "manual_lineage_reason": "Local timeline category/filter presentation state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "96f1e42556c3c03897ad"
   },
   {
     "application_field_id": "799de9b2f999b56d92c8",
@@ -1736,7 +1327,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "799de9b2f999b56d92c8"
   },
   {
     "application_field_id": "1cd17dc6ec92285cacea",
@@ -1818,7 +1415,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "1cd17dc6ec92285cacea"
   },
   {
     "application_field_id": "c570187411c28ad98fa4",
@@ -1861,7 +1464,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_SORT_STATE",
+    "manual_lineage_reason": "Local Monitor sort control state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "c570187411c28ad98fa4"
   },
   {
     "application_field_id": "8d895df37a12d11ee291",
@@ -1982,7 +1591,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "8d895df37a12d11ee291"
   },
   {
     "application_field_id": "06d1dec00b17dc975c65",
@@ -2048,7 +1663,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "06d1dec00b17dc975c65"
   },
   {
     "application_field_id": "abcf0457e8358c78da00",
@@ -2130,7 +1751,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "abcf0457e8358c78da00"
   },
   {
     "application_field_id": "b2bfb712590fc25ef452",
@@ -2179,7 +1806,13 @@
       "previous"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "b2bfb712590fc25ef452"
   },
   {
     "application_field_id": "755752616b3eb6212344",
@@ -2228,7 +1861,13 @@
       "previous"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "755752616b3eb6212344"
   },
   {
     "application_field_id": "43bc90e46cc637194443",
@@ -2277,7 +1916,13 @@
       "previous"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "43bc90e46cc637194443"
   },
   {
     "application_field_id": "5bd129c982dad1219619",
@@ -2343,7 +1988,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group/monitor field values are derived from NYC ChangeEvent records by monitorFields/grouping logic.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "5bd129c982dad1219619"
   },
   {
     "application_field_id": "2593c14ef1a2af94dff6",
@@ -2387,7 +2038,13 @@
       "BASE_URL"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "PRESENTATION_ASSET",
+    "manual_lineage_reason": "Static report logo asset URL.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "2593c14ef1a2af94dff6"
   },
   {
     "application_field_id": "28660f8520f701c830bf",
@@ -2436,493 +2093,13 @@
       "text"
     ],
     "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "124b8ad26eeff79a02bf",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/ClientSiteReport.tsx",
-    "line": 74,
-    "route_hints": [
-      "#/account/"
-    ],
-    "label": null,
-    "attribute": null,
-    "expression": "c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'",
-    "property_chains": [
-      "c.outcome.hearing_result.toUpperCase"
-    ],
-    "conditional_visibility": true,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'",
-    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
-    "stage17_reason": "Callback parameter c iterates over 0, 3",
-    "callback_trace": {
-      "line": 74,
-      "param": "c",
-      "collection": "0, 3",
-      "text": "{m.cases.slice(0, 3).map((c, i) => <div className=\"tsr-case-row\" key={i}><div><h4>{c.title}</h4><p>{c.text}</p><small>{c.violation.violation_code || 'Code not shown'} \u00b7 Ticket {c.violation.summons_number || 'not shown'}</small></div><div><span className={`tsr-badge ${c.dismissed ? 'dismissed' : c.outcome ? 'verify' : 'unknown'}`}>{c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'}</span><h4>{c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`}</h4><p>Decision: {reportDate(c.outcome?.decision_date)}</p><p>{c.dismissed ? (m.dismissalExcluded ? 'Excluded from the findings score' : 'Dismissal shown in the case record') : c.outcome?.c"
-    },
-    "stage18_class": "COMPONENT_SCOPED_DATA_DERIVATION",
-    "stage18_reason": "Unresolved expression is confined to a data-bearing component; exact field derivation still requires local manual trace",
-    "expanded_collection": "0, 3",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
-    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
-    "field_properties": [
-      "outcome",
-      "hearing_result"
-    ],
-    "type_candidates": [
-      {
-        "property": "outcome",
-        "type": "CompanyAdminActivity",
-        "domain": "COMPANY_FIRM",
-        "file": "src/types/companyAdmin.ts",
-        "line": 90,
-        "declared_type": "string | null"
-      },
-      {
-        "property": "hearing_result",
-        "type": "OathCase",
-        "domain": "OATH",
-        "file": "src/types/data.ts",
-        "line": 244,
-        "declared_type": "string | null"
-      }
-    ],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "f0877ba39eb2a3172aed",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/ClientSiteReport.tsx",
-    "line": 74,
-    "route_hints": [
-      "#/account/"
-    ],
-    "label": null,
-    "attribute": null,
-    "expression": "c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`",
-    "property_chains": [
-      "c.outcome.balance_due"
-    ],
-    "conditional_visibility": true,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`",
-    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
-    "stage17_reason": "Callback parameter c iterates over 0, 3",
-    "callback_trace": {
-      "line": 74,
-      "param": "c",
-      "collection": "0, 3",
-      "text": "{m.cases.slice(0, 3).map((c, i) => <div className=\"tsr-case-row\" key={i}><div><h4>{c.title}</h4><p>{c.text}</p><small>{c.violation.violation_code || 'Code not shown'} \u00b7 Ticket {c.violation.summons_number || 'not shown'}</small></div><div><span className={`tsr-badge ${c.dismissed ? 'dismissed' : c.outcome ? 'verify' : 'unknown'}`}>{c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'}</span><h4>{c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`}</h4><p>Decision: {reportDate(c.outcome?.decision_date)}</p><p>{c.dismissed ? (m.dismissalExcluded ? 'Excluded from the findings score' : 'Dismissal shown in the case record') : c.outcome?.c"
-    },
-    "stage18_class": "COMPONENT_SCOPED_DATA_DERIVATION",
-    "stage18_reason": "Unresolved expression is confined to a data-bearing component; exact field derivation still requires local manual trace",
-    "expanded_collection": "0, 3",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
-    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
-    "field_properties": [
-      "outcome",
-      "balance_due"
-    ],
-    "type_candidates": [
-      {
-        "property": "outcome",
-        "type": "CompanyAdminActivity",
-        "domain": "COMPANY_FIRM",
-        "file": "src/types/companyAdmin.ts",
-        "line": 90,
-        "declared_type": "string | null"
-      },
-      {
-        "property": "balance_due",
-        "type": "OathCase",
-        "domain": "OATH",
-        "file": "src/types/data.ts",
-        "line": 252,
-        "declared_type": "number | null"
-      }
-    ],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "0331378b3243bc0d6b56",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/ClientSiteReport.tsx",
-    "line": 74,
-    "route_hints": [
-      "#/account/"
-    ],
-    "label": "Decision:",
-    "attribute": null,
-    "expression": "reportDate(c.outcome?.decision_date)",
-    "property_chains": [
-      "c.outcome.decision_date"
-    ],
-    "conditional_visibility": true,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "reportDate(c.outcome?.decision_date)",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "COMPONENT_SCOPED_DATA_DERIVATION",
-    "stage18_reason": "Unresolved expression is confined to a data-bearing component; exact field derivation still requires local manual trace",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
-    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
-    "field_properties": [
-      "outcome",
-      "decision_date"
-    ],
-    "type_candidates": [
-      {
-        "property": "outcome",
-        "type": "CompanyAdminActivity",
-        "domain": "COMPANY_FIRM",
-        "file": "src/types/companyAdmin.ts",
-        "line": 90,
-        "declared_type": "string | null"
-      },
-      {
-        "property": "decision_date",
-        "type": "OathCase",
-        "domain": "OATH",
-        "file": "src/types/data.ts",
-        "line": 246,
-        "declared_type": "string | null"
-      }
-    ],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "ff44e2ea7a7395b1f055",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/CompanyAdminPanel.tsx",
-    "line": 301,
-    "route_hints": [],
-    "label": null,
-    "attribute": null,
-    "expression": "savedAt && <small>Saved {new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</small>",
-    "property_chains": [
-      "toLocaleTimeString"
-    ],
-    "conditional_visibility": true,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "savedAt && <small>Saved {new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</small>",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [],
-    "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "fc5eada1188952f36386",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/CompanyAdminPanel.tsx",
-    "line": 301,
-    "route_hints": [],
-    "label": "Saved",
-    "attribute": null,
-    "expression": "new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })",
-    "property_chains": [
-      "toLocaleTimeString"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [],
-    "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "b3e2802c62645d497a6f",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/CompanyAdminPanel.tsx",
-    "line": 368,
-    "route_hints": [],
-    "label": null,
-    "attribute": null,
-    "expression": "relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)",
-    "property_chains": [
-      "relationshipStatuses.map"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [
-      {
-        "identifier": "value",
-        "definition": "noteDrafts[noteId]?.trim()",
-        "expanded_definition": "noteDrafts[noteId]?.trim()"
-      }
-    ],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [],
-    "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "3c781162e9813a90c7e1",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/components/CompanyAdminPanel.tsx",
-    "line": 383,
-    "route_hints": [],
-    "label": "Add contact",
-    "attribute": "disabled",
-    "expression": "busy || !contactName.trim()",
-    "property_chains": [
-      "contactName.trim"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
-    "classification_reasons": [
-      "Runtime data-bearing expression without a direct core normalized-field candidate"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "busy || !contactName.trim()",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [],
-    "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "b4e06b6695e353e51897",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/CompanyAdminPanel.tsx",
-    "line": 394,
-    "route_hints": [],
-    "label": "logged interactions",
-    "attribute": null,
-    "expression": "activities.length",
-    "property_chains": [
-      "activities.length"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "activities.length",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [
-      "length"
-    ],
-    "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "500a1496f1bc2bddcba1",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/CompanyAdminPanel.tsx",
-    "line": 407,
-    "route_hints": [],
-    "label": "notes \u00b7 private",
-    "attribute": null,
-    "expression": "notes.length",
-    "property_chains": [
-      "notes.length"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "notes.length",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [
-      "length"
-    ],
-    "type_candidates": [],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "2513b352f9ed44626cd5",
-    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
-    "file": "src/components/CompanyAdminPanel.tsx",
-    "line": 408,
-    "route_hints": [],
-    "label": "Add note",
-    "attribute": "disabled",
-    "expression": "busy || !newNote.trim()",
-    "property_chains": [
-      "newNote.trim"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "busy || !newNote.trim()",
-    "stage17_class": "STILL_UNRESOLVED",
-    "stage17_reason": "No nearby callback collection established",
-    "callback_trace": null,
-    "stage18_class": "STILL_UNRESOLVED",
-    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
-    "expanded_collection": "",
-    "collection_definition_trace": [],
-    "expression_definition_trace": [],
-    "stage19_class": "NO_TYPE_FIELD_TRACE",
-    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
-    "field_properties": [],
-    "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_REPORT_COPY",
+    "manual_lineage_reason": "Report callout text generated by the account report model before rendering.",
+    "manual_domain": "REPORT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "28660f8520f701c830bf"
   },
   {
     "application_field_id": "32ec26a2b8bd973db854",
@@ -2967,7 +2144,13 @@
       "round"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_SAMPLE_INTERVAL",
+    "manual_lineage_reason": "Day interval computed from normalized reported sample-date array.",
+    "manual_domain": "SAMPLING",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "32ec26a2b8bd973db854"
   },
   {
     "application_field_id": "983d526b95eca107f775",
@@ -3012,7 +2195,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY",
+    "manual_lineage_reason": "Rendered from account ChangeEvent/history payload.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "983d526b95eca107f775"
   },
   {
     "application_field_id": "ec1ed869f105b2d22303",
@@ -3099,7 +2288,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY",
+    "manual_lineage_reason": "Rendered from account ChangeEvent/history payload.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "ec1ed869f105b2d22303"
   },
   {
     "application_field_id": "b170b24ad6c860b4a1c0",
@@ -3160,7 +2355,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY",
+    "manual_lineage_reason": "Rendered from account ChangeEvent/history payload.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "b170b24ad6c860b4a1c0"
   },
   {
     "application_field_id": "8d4a10d6b53ac7aa200d",
@@ -3221,7 +2422,13 @@
         "declared_type": "string | null"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY",
+    "manual_lineage_reason": "Rendered from account ChangeEvent/history payload.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "8d4a10d6b53ac7aa200d"
   },
   {
     "application_field_id": "e36d75d47a6b80a43fd5",
@@ -3287,7 +2494,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYC_HISTORY",
+    "manual_lineage_reason": "Rendered from account ChangeEvent/history payload.",
+    "manual_domain": "NYC_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "e36d75d47a6b80a43fd5"
   },
   {
     "application_field_id": "0a2738395de4110d62b3",
@@ -3338,7 +2551,13 @@
         "declared_type": "string | null"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_OR_DERIVED_DWT_SELF_REPORT",
+    "manual_lineage_reason": "Latest/older rows are grouped from exact-BIN DOHMH self-reported drinking-water tank inspections.",
+    "manual_domain": "DWT_SELF_REPORT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "0a2738395de4110d62b3"
   },
   {
     "application_field_id": "1365ba96359b0a14a8c2",
@@ -3389,7 +2608,13 @@
         "declared_type": "string | null"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_OR_DERIVED_DWT_SELF_REPORT",
+    "manual_lineage_reason": "Latest/older rows are grouped from exact-BIN DOHMH self-reported drinking-water tank inspections.",
+    "manual_domain": "DWT_SELF_REPORT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "1365ba96359b0a14a8c2"
   },
   {
     "application_field_id": "689b3234c1b98870c7fd",
@@ -3440,7 +2665,13 @@
         "declared_type": "string | null"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_OR_DERIVED_DWT_SELF_REPORT",
+    "manual_lineage_reason": "Latest/older rows are grouped from exact-BIN DOHMH self-reported drinking-water tank inspections.",
+    "manual_domain": "DWT_SELF_REPORT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "689b3234c1b98870c7fd"
   },
   {
     "application_field_id": "e6f4191ef459134b0587",
@@ -3482,7 +2713,13 @@
       "length"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_OR_DERIVED_DWT_SELF_REPORT",
+    "manual_lineage_reason": "Latest/older rows are grouped from exact-BIN DOHMH self-reported drinking-water tank inspections.",
+    "manual_domain": "DWT_SELF_REPORT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "e6f4191ef459134b0587"
   },
   {
     "application_field_id": "2db45ba154049f7f3602",
@@ -3524,7 +2761,13 @@
       "length"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_OR_DERIVED_DWT_SELF_REPORT",
+    "manual_lineage_reason": "Latest/older rows are grouped from exact-BIN DOHMH self-reported drinking-water tank inspections.",
+    "manual_domain": "DWT_SELF_REPORT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "2db45ba154049f7f3602"
   },
   {
     "application_field_id": "43ec618f8f738b8a320b",
@@ -3564,7 +2807,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_OR_DERIVED_DWT_SELF_REPORT",
+    "manual_lineage_reason": "Latest/older rows are grouped from exact-BIN DOHMH self-reported drinking-water tank inspections.",
+    "manual_domain": "DWT_SELF_REPORT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "43ec618f8f738b8a320b"
   },
   {
     "application_field_id": "24fafb8f2e18c5b88a08",
@@ -3628,7 +2877,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_PLANIMETRIC_WATER_TANK",
+    "manual_lineage_reason": "Field is from PlanimetricWaterTankFeature in the domestic-water context.",
+    "manual_domain": "PLANIMETRIC_DOMESTIC_WATER",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "24fafb8f2e18c5b88a08"
   },
   {
     "application_field_id": "71301ccd3243ddf533d6",
@@ -3666,7 +2921,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_LIST_PRESENTATION",
+    "manual_lineage_reason": "List index/pluralization presentation over domestic-water evidence.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "71301ccd3243ddf533d6"
   },
   {
     "application_field_id": "3c32510754573d18dd3f",
@@ -3730,7 +2991,13 @@
         "declared_type": "2022"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_PLANIMETRIC_WATER_TANK",
+    "manual_lineage_reason": "Field is from PlanimetricWaterTankFeature in the domestic-water context.",
+    "manual_domain": "PLANIMETRIC_DOMESTIC_WATER",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "3c32510754573d18dd3f"
   },
   {
     "application_field_id": "7051f366c44d1a3a50b3",
@@ -3794,7 +3061,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_PLANIMETRIC_WATER_TANK",
+    "manual_lineage_reason": "Field is from PlanimetricWaterTankFeature in the domestic-water context.",
+    "manual_domain": "PLANIMETRIC_DOMESTIC_WATER",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "7051f366c44d1a3a50b3"
   },
   {
     "application_field_id": "57294436f1f4abef080f",
@@ -3858,7 +3131,13 @@
         "declared_type": "string | null"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_PLANIMETRIC_WATER_TANK",
+    "manual_lineage_reason": "Field is from PlanimetricWaterTankFeature in the domestic-water context.",
+    "manual_domain": "PLANIMETRIC_DOMESTIC_WATER",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "57294436f1f4abef080f"
   },
   {
     "application_field_id": "eede3e1402a30262da7d",
@@ -3917,7 +3196,13 @@
         "declared_type": "number"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_HOME_SUMMARY",
+    "manual_lineage_reason": "HomeSummary metric derived upstream from system, priority, history, procurement, or company payloads; not a raw publisher field.",
+    "manual_domain": "HOME_SUMMARY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "eede3e1402a30262da7d"
   },
   {
     "application_field_id": "15838cde77842b26412a",
@@ -3976,7 +3261,13 @@
         "declared_type": "number"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_HOME_SUMMARY",
+    "manual_lineage_reason": "HomeSummary metric derived upstream from system, priority, history, procurement, or company payloads; not a raw publisher field.",
+    "manual_domain": "HOME_SUMMARY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "15838cde77842b26412a"
   },
   {
     "application_field_id": "4955786e1dde58b8bf92",
@@ -4035,7 +3326,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_HOME_SUMMARY",
+    "manual_lineage_reason": "HomeSummary metric derived upstream from system, priority, history, procurement, or company payloads; not a raw publisher field.",
+    "manual_domain": "HOME_SUMMARY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "4955786e1dde58b8bf92"
   },
   {
     "application_field_id": "a1fd023c63eb2502d718",
@@ -4094,7 +3391,13 @@
         "declared_type": "number"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_HOME_SUMMARY",
+    "manual_lineage_reason": "HomeSummary metric derived upstream from system, priority, history, procurement, or company payloads; not a raw publisher field.",
+    "manual_domain": "HOME_SUMMARY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "a1fd023c63eb2502d718"
   },
   {
     "application_field_id": "1986d041937f5976f37c",
@@ -4153,7 +3456,13 @@
         "declared_type": "number"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_HOME_SUMMARY",
+    "manual_lineage_reason": "HomeSummary metric derived upstream from system, priority, history, procurement, or company payloads; not a raw publisher field.",
+    "manual_domain": "HOME_SUMMARY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "1986d041937f5976f37c"
   },
   {
     "application_field_id": "0b6f9b633f5b8af6411f",
@@ -4212,7 +3521,13 @@
         "declared_type": "number"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_HOME_SUMMARY",
+    "manual_lineage_reason": "HomeSummary metric derived upstream from system, priority, history, procurement, or company payloads; not a raw publisher field.",
+    "manual_domain": "HOME_SUMMARY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "0b6f9b633f5b8af6411f"
   },
   {
     "application_field_id": "69fadeee705b35f93805",
@@ -4289,7 +3604,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DIRECT_CMS_INSTITUTIONAL_CONTEXT",
+    "manual_lineage_reason": "Facility source dataset/facility IDs come from CmsInstitutionalContext records.",
+    "manual_domain": "CMS",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "69fadeee705b35f93805"
   },
   {
     "application_field_id": "be7857bffa5b14e6d3b2",
@@ -4361,7 +3682,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_VIEW_OPTION",
+    "manual_lineage_reason": "Local panel view option key/label.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "be7857bffa5b14e6d3b2"
   },
   {
     "application_field_id": "9f814a239b8a86a17311",
@@ -4422,7 +3749,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_VIEW_OPTION",
+    "manual_lineage_reason": "Local panel view option key/label.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "9f814a239b8a86a17311"
   },
   {
     "application_field_id": "98e53925ce028fa4b486",
@@ -4510,7 +3843,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_VIEW_OPTION",
+    "manual_lineage_reason": "Local panel view option key/label.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "98e53925ce028fa4b486"
   },
   {
     "application_field_id": "fdaa4d5979d096d0a10b",
@@ -4555,7 +3894,13 @@
       "length"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_LEGIONELLA_EVIDENCE",
+    "manual_lineage_reason": "Building count derived from official Legionella intelligence evidence model.",
+    "manual_domain": "LEGIONELLA",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "fdaa4d5979d096d0a10b"
   },
   {
     "application_field_id": "d17a2bba83e49d0c411b",
@@ -4600,7 +3945,13 @@
       "length"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_LEGIONELLA_EVIDENCE",
+    "manual_lineage_reason": "Building count derived from official Legionella intelligence evidence model.",
+    "manual_domain": "LEGIONELLA",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "d17a2bba83e49d0c411b"
   },
   {
     "application_field_id": "f82d5ea4c7d3d9f74367",
@@ -4640,7 +3991,13 @@
     "stage19_reason": "No property-to-type candidate and prior trace unresolved",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "MARKETING_FORM_STATE",
+    "manual_lineage_reason": "Marketing form validation/status state; not TowerSignal intelligence data.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "f82d5ea4c7d3d9f74367"
   },
   {
     "application_field_id": "9061f1c1bc78aefd4d90",
@@ -4685,7 +4042,13 @@
     "stage19_reason": "No property-to-type candidate and prior trace unresolved",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "MARKETING_FORM_STATE",
+    "manual_lineage_reason": "Marketing form validation/status state; not TowerSignal intelligence data.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "9061f1c1bc78aefd4d90"
   },
   {
     "application_field_id": "45a34ab08e601791ab8f",
@@ -4723,7 +4086,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_NYS_HISTORY_FILTER",
+    "manual_lineage_reason": "Current tower-status filter control derived from available NYS statuses.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "45a34ab08e601791ab8f"
   },
   {
     "application_field_id": "0c0061d719d5df84a16a",
@@ -4803,7 +4172,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group label generated from NYS change-event grouping.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "0c0061d719d5df84a16a"
   },
   {
     "application_field_id": "21cbdc6863ec4a1ac230",
@@ -4883,7 +4258,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_NYS_HISTORY_PRESENTATION",
+    "manual_lineage_reason": "Group label generated from NYS change-event grouping.",
+    "manual_domain": "NYS_HISTORY",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "21cbdc6863ec4a1ac230"
   },
   {
     "application_field_id": "f04639e3f0de459c262f",
@@ -4921,7 +4302,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_NYS_SUBVIEW_STATE",
+    "manual_lineage_reason": "Local tab/subview selection state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "f04639e3f0de459c262f"
   },
   {
     "application_field_id": "bce1c3f9c25cc6b313ae",
@@ -4959,7 +4346,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_NYS_SUBVIEW_STATE",
+    "manual_lineage_reason": "Local tab/subview selection state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "bce1c3f9c25cc6b313ae"
   },
   {
     "application_field_id": "3a1eacb1811a6147b590",
@@ -4997,7 +4390,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_NYS_SUBVIEW_STATE",
+    "manual_lineage_reason": "Local tab/subview selection state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "3a1eacb1811a6147b590"
   },
   {
     "application_field_id": "e797d0e44083c8785c6f",
@@ -5035,7 +4434,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_NYS_SUBVIEW_STATE",
+    "manual_lineage_reason": "Local tab/subview selection state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "e797d0e44083c8785c6f"
   },
   {
     "application_field_id": "4eb648ea3b6d656b9a58",
@@ -5073,7 +4478,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "NYS_PUBLIC_WATER_PAYLOAD",
+    "manual_lineage_reason": "NYS public-water artifact passed to its subview.",
+    "manual_domain": "NYS_PUBLIC_WATER",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "4eb648ea3b6d656b9a58"
   },
   {
     "application_field_id": "04d86775dd8d09370198",
@@ -5111,7 +4522,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "NYS_LSLI_DETAIL_PAYLOAD",
+    "manual_lineage_reason": "NYS LSLI detail artifact passed to its subview.",
+    "manual_domain": "NYS_LSLI",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "04d86775dd8d09370198"
   },
   {
     "application_field_id": "8c95099409c16a9f3689",
@@ -5149,7 +4566,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "NYS_SERVICE_LINE_SUMMARY_PAYLOAD",
+    "manual_lineage_reason": "NYS address-level service-line inventory payload passed to its subview.",
+    "manual_domain": "NYS_SERVICE_LINES",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "8c95099409c16a9f3689"
   },
   {
     "application_field_id": "0242f26813fdf406715c",
@@ -5187,7 +4610,13 @@
     "stage19_reason": "No property-to-type candidate and prior trace unresolved",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_OPPORTUNITY_FILTER_STATE",
+    "manual_lineage_reason": "Contact-ready opportunity filter checkbox state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "0242f26813fdf406715c"
   },
   {
     "application_field_id": "38bdb8995ade713272f5",
@@ -5253,7 +4682,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_OWNER_PORTFOLIO",
+    "manual_lineage_reason": "OwnerGroup fields are aggregated from SystemSummary rows grouped by owner.",
+    "manual_domain": "PORTFOLIO",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "38bdb8995ade713272f5"
   },
   {
     "application_field_id": "eab0abff0a38e50d0acf",
@@ -5439,7 +4874,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_OWNER_PORTFOLIO",
+    "manual_lineage_reason": "OwnerGroup fields are aggregated from SystemSummary rows grouped by owner.",
+    "manual_domain": "PORTFOLIO",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "eab0abff0a38e50d0acf"
   },
   {
     "application_field_id": "edb6fbbde0de501cede3",
@@ -5498,7 +4939,13 @@
         "declared_type": "SystemSummary[]"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_OWNER_PORTFOLIO",
+    "manual_lineage_reason": "OwnerGroup fields are aggregated from SystemSummary rows grouped by owner.",
+    "manual_domain": "PORTFOLIO",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "edb6fbbde0de501cede3"
   },
   {
     "application_field_id": "bf15beb0f68c6e04fcba",
@@ -5556,7 +5003,13 @@
         "declared_type": "number"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_OWNER_PORTFOLIO",
+    "manual_lineage_reason": "OwnerGroup fields are aggregated from SystemSummary rows grouped by owner.",
+    "manual_domain": "PORTFOLIO",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "bf15beb0f68c6e04fcba"
   },
   {
     "application_field_id": "5df1cf106f54f48a25c3",
@@ -5614,7 +5067,13 @@
         "declared_type": "number"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_OWNER_PORTFOLIO",
+    "manual_lineage_reason": "OwnerGroup fields are aggregated from SystemSummary rows grouped by owner.",
+    "manual_domain": "PORTFOLIO",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "5df1cf106f54f48a25c3"
   },
   {
     "application_field_id": "953fdf8530ed32aa2287",
@@ -5689,7 +5148,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_SALES_FACT",
+    "manual_lineage_reason": "SalesFact label/value generated from account evidence for the pre-call pack.",
+    "manual_domain": "SALES_PACK",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "953fdf8530ed32aa2287"
   },
   {
     "application_field_id": "1160bc9c1e2d3c8d5aa1",
@@ -5764,7 +5229,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_SALES_FACT",
+    "manual_lineage_reason": "SalesFact label/value generated from account evidence for the pre-call pack.",
+    "manual_domain": "SALES_PACK",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "1160bc9c1e2d3c8d5aa1"
   },
   {
     "application_field_id": "8b87bf4f53076b61618f",
@@ -5823,7 +5294,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_SALES_FACT",
+    "manual_lineage_reason": "SalesFact label/value generated from account evidence for the pre-call pack.",
+    "manual_domain": "SALES_PACK",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "8b87bf4f53076b61618f"
   },
   {
     "application_field_id": "d797f3170dda9680ef34",
@@ -5876,7 +5353,13 @@
       "cadence"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "SOURCE_METHODOLOGY_CONTRACT",
+    "manual_lineage_reason": "Static/source-health methodology contract metadata (cadence/path/scope), not source business data.",
+    "manual_domain": "SOURCE_HEALTH",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "d797f3170dda9680ef34"
   },
   {
     "application_field_id": "2ddf98bb7badd0ceeddf",
@@ -5929,7 +5412,13 @@
       "path"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "SOURCE_METHODOLOGY_CONTRACT",
+    "manual_lineage_reason": "Static/source-health methodology contract metadata (cadence/path/scope), not source business data.",
+    "manual_domain": "SOURCE_HEALTH",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "2ddf98bb7badd0ceeddf"
   },
   {
     "application_field_id": "e34db4c4ad56eb798a37",
@@ -5999,85 +5488,13 @@
         "declared_type": "'BUILDING_LEVEL'"
       }
     ],
-    "chosen_domain": null
-  },
-  {
-    "application_field_id": "d70f43e4111c4845eaa7",
-    "field_kind": "JSX_CHILD_EXPRESSION",
-    "file": "src/components/SourceHealthExpansion.tsx",
-    "line": 121,
-    "route_hints": [],
-    "label": null,
-    "attribute": null,
-    "expression": "contract.note",
-    "property_chains": [
-      "contract.note"
-    ],
-    "conditional_visibility": false,
-    "verification": "STATIC_CURRENT_RUNTIME_AST",
-    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
-    "source_lineage_candidates": [],
-    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
-    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
-    "classification_reasons": [
-      "No reliable static category assigned"
-    ],
-    "stage16_class": "STILL_UNRESOLVED",
-    "stage16_reason": "No recursive local definition or typed/source root established",
-    "typed_props": [],
-    "resolved_definitions": [],
-    "resolved_text": "contract.note",
-    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
-    "stage17_reason": "Callback parameter contract iterates over refreshContracts",
-    "callback_trace": {
-      "line": 116,
-      "param": "contract",
-      "collection": "refreshContracts",
-      "text": "{refreshContracts.map(contract => <tr key={contract.source}>"
-    },
-    "stage18_class": "COMPONENT_SCOPED_DATA_DERIVATION",
-    "stage18_reason": "Unresolved expression is confined to a data-bearing component; exact field derivation still requires local manual trace",
-    "expanded_collection": "refreshContracts\n/* refreshContracts := [ */",
-    "collection_definition_trace": [
-      {
-        "identifier": "refreshContracts",
-        "definition": "[",
-        "expanded_definition": "["
-      }
-    ],
-    "expression_definition_trace": [],
-    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
-    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
-    "field_properties": [
-      "note"
-    ],
-    "type_candidates": [
-      {
-        "property": "note",
-        "type": "CompanyAdminNote",
-        "domain": "COMPANY_FIRM",
-        "file": "src/types/companyAdmin.ts",
-        "line": 99,
-        "declared_type": "string"
-      },
-      {
-        "property": "note",
-        "type": "WorkflowAccountState",
-        "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
-        "file": "src/types/workflow.ts",
-        "line": 29,
-        "declared_type": "string"
-      },
-      {
-        "property": "note",
-        "type": "WorkflowAccountPatch",
-        "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
-        "file": "src/types/workflow.ts",
-        "line": 50,
-        "declared_type": "string"
-      }
-    ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "SOURCE_METHODOLOGY_CONTRACT",
+    "manual_lineage_reason": "Static/source-health methodology contract metadata (cadence/path/scope), not source business data.",
+    "manual_domain": "SOURCE_HEALTH",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "e34db4c4ad56eb798a37"
   },
   {
     "application_field_id": "f470ac04f5202d64a4bd",
@@ -6173,7 +5590,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "SOURCE_RETRIEVAL_ERROR_STATE",
+    "manual_lineage_reason": "Source retrieval error URL/message from source-health diagnostic payload.",
+    "manual_domain": "SOURCE_HEALTH",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "f470ac04f5202d64a4bd"
   },
   {
     "application_field_id": "01abe9cc4afac8eafa6d",
@@ -6215,7 +5638,13 @@
       "error"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "SOURCE_RETRIEVAL_ERROR_STATE",
+    "manual_lineage_reason": "Source retrieval error URL/message from source-health diagnostic payload.",
+    "manual_domain": "SOURCE_HEALTH",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "01abe9cc4afac8eafa6d"
   },
   {
     "application_field_id": "791f4498790b7d8c4abe",
@@ -6262,7 +5691,13 @@
       "replace"
     ],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "PRESENTATION_FORMATTING",
+    "manual_lineage_reason": "Formatting of a status value already supplied by caller.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "791f4498790b7d8c4abe"
   },
   {
     "application_field_id": "26c8cd4ef1715972a529",
@@ -6326,7 +5761,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_TABLE_DISPLAY_ITEM",
+    "manual_lineage_reason": "Local label/value display item derived from SystemSummary row fields.",
+    "manual_domain": "SYSTEM_ACCOUNT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "26c8cd4ef1715972a529"
   },
   {
     "application_field_id": "14ecdfe252dd965aca40",
@@ -6406,7 +5847,13 @@
         "declared_type": "string"
       }
     ],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "DERIVED_TABLE_DISPLAY_ITEM",
+    "manual_lineage_reason": "Local label/value display item derived from SystemSummary row fields.",
+    "manual_domain": "SYSTEM_ACCOUNT",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "14ecdfe252dd965aca40"
   },
   {
     "application_field_id": "26b7e4aa03c7fef75cda",
@@ -6444,7 +5891,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "LOCAL_WATER_QUALITY_VIEW_STATE",
+    "manual_lineage_reason": "Local water-quality workspace tab state.",
+    "manual_domain": "PRESENTATION",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "26b7e4aa03c7fef75cda"
   },
   {
     "application_field_id": "8f465ef3e5a0ff9c4558",
@@ -6484,7 +5937,13 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "SOURCE_FETCH_ERROR_AGGREGATE",
+    "manual_lineage_reason": "Aggregated source-fetch error messages for water-quality artifacts.",
+    "manual_domain": "SOURCE_HEALTH",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "8f465ef3e5a0ff9c4558"
   },
   {
     "application_field_id": "1883312a4a73752bdbf9",
@@ -6522,6 +5981,12 @@
     "stage19_reason": "Data component known, but property chain did not map to a declared type field",
     "field_properties": [],
     "type_candidates": [],
-    "chosen_domain": null
+    "chosen_domain": null,
+    "manual_lineage_class": "NYS_ARTIFACT_AVAILABILITY_STATE",
+    "manual_lineage_reason": "Explicit absence state for NYS LSLI/service-line artifacts; no property inference is made.",
+    "manual_domain": "NYS_SERVICE_LINES",
+    "manual_review_status": "RESOLVED",
+    "manual_reuse_basis": "EXACT_FILE_KIND_ATTRIBUTE_EXPRESSION_PROPERTY_CHAINS",
+    "prior_application_field_id": "1883312a4a73752bdbf9"
   }
 ]

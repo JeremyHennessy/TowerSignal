@@ -1,24 +1,24 @@
 {
-  "records": 3021,
+  "records": 3122,
   "class_counts": {
-    "LOCAL_DERIVED_OR_PRESENTATION": 573,
-    "ROUTING_OR_PRESENTATION_STATE": 40,
-    "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE": 716,
+    "LOCAL_DERIVED_OR_PRESENTATION": 596,
+    "ROUTING_OR_PRESENTATION_STATE": 29,
+    "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE": 730,
     "SOURCE_HEALTH_OR_PROVENANCE": 128,
     "WORKFLOW_OR_USER_STATE": 121,
-    "DERIVED_DATA_METRIC_NEEDS_BACKTRACE": 306,
-    "UNRESOLVED_APPLICATION_EXPRESSION": 686,
-    "PRESENTATION_OR_CONTROL": 89,
-    "DIRECT_CORE_SOURCE_LINEAGE": 330,
+    "DERIVED_DATA_METRIC_NEEDS_BACKTRACE": 307,
+    "UNRESOLVED_APPLICATION_EXPRESSION": 755,
+    "PRESENTATION_OR_CONTROL": 90,
+    "DIRECT_CORE_SOURCE_LINEAGE": 334,
     "ROUTING_OR_LINK_TARGET": 32
   },
-  "needs_backtrace_count": 1708,
-  "files": 57,
-  "files_with_needs_backtrace": 53,
+  "needs_backtrace_count": 1792,
+  "files": 58,
+  "files_with_needs_backtrace": 55,
   "top_needs_backtrace_files": [
     [
       "src/components/CompanyProfilePage.tsx",
-      126
+      128
     ],
     [
       "src/components/DetailPanel.tsx",
@@ -49,6 +49,10 @@
       76
     ],
     [
+      "src/components/CompanyAdminPanel.tsx",
+      72
+    ],
+    [
       "src/components/OpportunitiesPage.tsx",
       68
     ],
@@ -69,6 +73,10 @@
       52
     ],
     [
+      "src/components/CompaniesPage.tsx",
+      49
+    ],
+    [
       "src/components/LegionellaIntelligencePanel.tsx",
       49
     ],
@@ -79,10 +87,6 @@
     [
       "src/components/ChangesView.tsx",
       44
-    ],
-    [
-      "src/components/CompaniesPage.tsx",
-      40
     ],
     [
       "src/components/PortfoliosPage.tsx",
@@ -131,10 +135,6 @@
     [
       "src/components/WorkflowWorkspacePage.tsx",
       15
-    ],
-    [
-      "src/components/HistoricalWaterContextSection.tsx",
-      12
     ]
   ],
   "boundary": "Static application-expression classification. DIRECT_CORE_SOURCE_LINEAGE means at least one direct candidate exists, not that the visible value is fully source-verified. NEEDS_BACKTRACE expressions require explicit derivation tracing or browser/state verification."

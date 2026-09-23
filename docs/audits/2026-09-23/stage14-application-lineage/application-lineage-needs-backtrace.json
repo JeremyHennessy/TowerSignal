@@ -22,10 +22,10 @@
     ]
   },
   {
-    "application_field_id": "ceb08d6315506c54f855",
+    "application_field_id": "c754a90ce5c791cbef64",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 296,
+    "line": 295,
     "route_hints": [
       "#/"
     ],
@@ -46,10 +46,10 @@
     ]
   },
   {
-    "application_field_id": "6e26729374cd87fd4e44",
+    "application_field_id": "17b6656168f5717872fd",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 302,
+    "line": 301,
     "route_hints": [
       "#/"
     ],
@@ -70,10 +70,10 @@
     ]
   },
   {
-    "application_field_id": "c0fc6727c049c1e94bce",
+    "application_field_id": "568b846507378b8d0081",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 303,
+    "line": 302,
     "route_hints": [
       "#/"
     ],
@@ -94,10 +94,10 @@
     ]
   },
   {
-    "application_field_id": "b7ee9f4406a9af4cd5f8",
+    "application_field_id": "9651949d0a1d373ddb5c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 304,
+    "line": 303,
     "route_hints": [
       "#/"
     ],
@@ -118,10 +118,10 @@
     ]
   },
   {
-    "application_field_id": "8f8a5bf8121e60d6a25e",
+    "application_field_id": "955b8b1ef413ee208622",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 305,
+    "line": 304,
     "route_hints": [
       "#/"
     ],
@@ -142,10 +142,10 @@
     ]
   },
   {
-    "application_field_id": "4531f765f0cedbbc5ebd",
+    "application_field_id": "4e38026b2d6152e2bd15",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 306,
+    "line": 305,
     "route_hints": [
       "#/"
     ],
@@ -166,10 +166,10 @@
     ]
   },
   {
-    "application_field_id": "61e1a060f12a0d8191d7",
+    "application_field_id": "e9bd75185f04438066a3",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 310,
+    "line": 309,
     "route_hints": [
       "#/"
     ],
@@ -190,10 +190,10 @@
     ]
   },
   {
-    "application_field_id": "908d8d1d9fc3e8e92215",
+    "application_field_id": "ac5ec977238d0c1ec5c8",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 311,
+    "line": 310,
     "route_hints": [
       "#/"
     ],
@@ -214,10 +214,10 @@
     ]
   },
   {
-    "application_field_id": "73c71186525c132c1eff",
+    "application_field_id": "e87d32024a517798312d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 311,
+    "line": 310,
     "route_hints": [
       "#/"
     ],
@@ -238,10 +238,10 @@
     ]
   },
   {
-    "application_field_id": "ffcfbd94137095b15900",
+    "application_field_id": "3f3164c98d25bbdcec82",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 314,
+    "line": 313,
     "route_hints": [
       "#/"
     ],
@@ -262,10 +262,10 @@
     ]
   },
   {
-    "application_field_id": "f906aa3aa1964fbba03a",
+    "application_field_id": "412e535c6315048fd254",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 318,
+    "line": 317,
     "route_hints": [
       "#/"
     ],
@@ -286,10 +286,10 @@
     ]
   },
   {
-    "application_field_id": "38aca2d9b99c594cc8b2",
+    "application_field_id": "0aa6cc276c393dedca42",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 318,
+    "line": 317,
     "route_hints": [
       "#/"
     ],
@@ -310,10 +310,10 @@
     ]
   },
   {
-    "application_field_id": "9cede812ecad6b5cf8f8",
+    "application_field_id": "fbad69392f5705cb9180",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 318,
+    "line": 317,
     "route_hints": [
       "#/"
     ],
@@ -334,10 +334,10 @@
     ]
   },
   {
-    "application_field_id": "9a7f715647137b010484",
+    "application_field_id": "2311914e178328768009",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 318,
+    "line": 317,
     "route_hints": [
       "#/"
     ],
@@ -358,10 +358,10 @@
     ]
   },
   {
-    "application_field_id": "5f0508e27f065d078453",
+    "application_field_id": "10920e82c26d560a6fcb",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 318,
+    "line": 317,
     "route_hints": [
       "#/"
     ],
@@ -382,10 +382,10 @@
     ]
   },
   {
-    "application_field_id": "beb1bd1c3eed2ffddcb3",
+    "application_field_id": "e846136114dc17fd7dcd",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 318,
+    "line": 317,
     "route_hints": [
       "#/"
     ],
@@ -404,10 +404,10 @@
     ]
   },
   {
-    "application_field_id": "acc9964b28d25d5773b0",
+    "application_field_id": "8fc24d305f6456560c14",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -435,10 +435,10 @@
     ]
   },
   {
-    "application_field_id": "d70116753ddcf5bc77de",
+    "application_field_id": "69b41e57861bd9e908b1",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -461,10 +461,10 @@
     ]
   },
   {
-    "application_field_id": "a5925b828168a87c05f4",
+    "application_field_id": "6a8552764e3efdc6ba35",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -487,10 +487,10 @@
     ]
   },
   {
-    "application_field_id": "9a700aa96a3ef64dc2f6",
+    "application_field_id": "6df2f783734a56347104",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -513,10 +513,10 @@
     ]
   },
   {
-    "application_field_id": "99c93ffb00cc762d0b33",
+    "application_field_id": "98224efe55b736921479",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -537,10 +537,10 @@
     ]
   },
   {
-    "application_field_id": "61ddfdd3e89ca15922c9",
+    "application_field_id": "75d7c5f615fae05ffedd",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -561,10 +561,10 @@
     ]
   },
   {
-    "application_field_id": "6e62ea1ab48ca5a9d03b",
+    "application_field_id": "d7863a6d42b0025e6ba3",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -583,10 +583,10 @@
     ]
   },
   {
-    "application_field_id": "9e2fe5c33bca1239add5",
+    "application_field_id": "9859c58ca276e91ea1ae",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -607,10 +607,10 @@
     ]
   },
   {
-    "application_field_id": "e15988b96b8d7b30d493",
+    "application_field_id": "6caa5a6e3980c90d662e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 322,
+    "line": 321,
     "route_hints": [
       "#/"
     ],
@@ -631,10 +631,10 @@
     ]
   },
   {
-    "application_field_id": "78250a7f2b15086de8d1",
+    "application_field_id": "63819e56a622dff081a4",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 322,
+    "line": 321,
     "route_hints": [
       "#/"
     ],
@@ -655,10 +655,10 @@
     ]
   },
   {
-    "application_field_id": "622390e0a21684607d1a",
+    "application_field_id": "57a9740173a4ba9b3a90",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 322,
+    "line": 321,
     "route_hints": [
       "#/"
     ],
@@ -679,10 +679,10 @@
     ]
   },
   {
-    "application_field_id": "850a94b02e035ff5ac9c",
+    "application_field_id": "6ed2c22805bf309c643f",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 322,
+    "line": 321,
     "route_hints": [
       "#/"
     ],
@@ -703,10 +703,10 @@
     ]
   },
   {
-    "application_field_id": "d2adf511fdc5efc3f31f",
+    "application_field_id": "9caec329b23a75c19983",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 322,
+    "line": 321,
     "route_hints": [
       "#/"
     ],
@@ -725,10 +725,10 @@
     ]
   },
   {
-    "application_field_id": "d621806994d4770886bb",
+    "application_field_id": "725bf1bc9878958a6b4a",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -753,10 +753,10 @@
     ]
   },
   {
-    "application_field_id": "0a58061f3b6b857abb1a",
+    "application_field_id": "60f4347f63c34bc07112",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -777,10 +777,10 @@
     ]
   },
   {
-    "application_field_id": "76049c9c31bd5780a112",
+    "application_field_id": "cfa8cbd0a5fea4069f6e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -803,10 +803,10 @@
     ]
   },
   {
-    "application_field_id": "373145b363464bbe9f5e",
+    "application_field_id": "cc955a342aea7e46fb48",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -829,10 +829,10 @@
     ]
   },
   {
-    "application_field_id": "98b7bfb587d753a65398",
+    "application_field_id": "ae15e4c814b80600e992",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -855,10 +855,10 @@
     ]
   },
   {
-    "application_field_id": "6c7601b834da4720e5e7",
+    "application_field_id": "6d481cd238a926484b01",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -881,10 +881,10 @@
     ]
   },
   {
-    "application_field_id": "7229903f4c76e804446e",
+    "application_field_id": "d2ffad61abb226833f46",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -903,10 +903,10 @@
     ]
   },
   {
-    "application_field_id": "1827cb6c8cbd986e1607",
+    "application_field_id": "2be5622ffe4085df5ac5",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -927,10 +927,10 @@
     ]
   },
   {
-    "application_field_id": "9caf1c69072a9d0e9b04",
+    "application_field_id": "1a79b41c2000fe0b38d0",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 326,
+    "line": 325,
     "route_hints": [
       "#/"
     ],
@@ -949,10 +949,10 @@
     ]
   },
   {
-    "application_field_id": "8a9c3e7fa1d4e5d70715",
+    "application_field_id": "ff4bcb3878ec7a10a71a",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 326,
+    "line": 325,
     "route_hints": [
       "#/"
     ],
@@ -971,10 +971,10 @@
     ]
   },
   {
-    "application_field_id": "738f86d700b650e6305d",
+    "application_field_id": "c8537e36d311ad80e3eb",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 328,
+    "line": 327,
     "route_hints": [
       "#/"
     ],
@@ -993,10 +993,10 @@
     ]
   },
   {
-    "application_field_id": "80db99d47121da81493a",
+    "application_field_id": "dce2eea741b9651024f3",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 329,
+    "line": 328,
     "route_hints": [
       "#/"
     ],
@@ -1015,10 +1015,10 @@
     ]
   },
   {
-    "application_field_id": "7912a02aa55410d54847",
+    "application_field_id": "e463572c87b11b726350",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 330,
+    "line": 329,
     "route_hints": [
       "#/"
     ],
@@ -1037,10 +1037,10 @@
     ]
   },
   {
-    "application_field_id": "ccb40f8d7727289cab60",
+    "application_field_id": "30141a15e19f96c0f9ef",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 331,
+    "line": 330,
     "route_hints": [
       "#/"
     ],
@@ -1059,10 +1059,10 @@
     ]
   },
   {
-    "application_field_id": "4c87d361024597a2d07a",
+    "application_field_id": "db269349735de46e0339",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 332,
+    "line": 331,
     "route_hints": [
       "#/"
     ],
@@ -1083,10 +1083,10 @@
     ]
   },
   {
-    "application_field_id": "04b62bd144630d284e31",
+    "application_field_id": "278fca46c380883daa84",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 333,
+    "line": 332,
     "route_hints": [
       "#/"
     ],
@@ -1105,10 +1105,10 @@
     ]
   },
   {
-    "application_field_id": "065f204402ac5622523c",
+    "application_field_id": "abd152eb6faa68ca82a5",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 333,
+    "line": 332,
     "route_hints": [
       "#/"
     ],
@@ -1127,10 +1127,10 @@
     ]
   },
   {
-    "application_field_id": "7ded85dce0478dd4b5e9",
+    "application_field_id": "f206a0c0b0c21bcaf00a",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 335,
+    "line": 334,
     "route_hints": [
       "#/"
     ],
@@ -1149,10 +1149,10 @@
     ]
   },
   {
-    "application_field_id": "4c24e35b835521f27b7c",
+    "application_field_id": "f31b3f82f185a5552f99",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 335,
+    "line": 334,
     "route_hints": [
       "#/"
     ],
@@ -1175,10 +1175,10 @@
     ]
   },
   {
-    "application_field_id": "dd9dd36267f40a948f67",
+    "application_field_id": "2896baa490a58751df2f",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 335,
+    "line": 334,
     "route_hints": [
       "#/"
     ],
@@ -1199,10 +1199,10 @@
     ]
   },
   {
-    "application_field_id": "c554c73093496e2adc3b",
+    "application_field_id": "77d147d0ebb9153b8ee3",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 337,
+    "line": 336,
     "route_hints": [
       "#/"
     ],
@@ -1221,10 +1221,10 @@
     ]
   },
   {
-    "application_field_id": "24778d4352840956a9e9",
+    "application_field_id": "9ede108d7c776980e8df",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 340,
+    "line": 339,
     "route_hints": [
       "#/"
     ],
@@ -1245,10 +1245,10 @@
     ]
   },
   {
-    "application_field_id": "b787205b1966a77c6d1e",
+    "application_field_id": "123973fd12693ac3c6ea",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 340,
+    "line": 339,
     "route_hints": [
       "#/"
     ],
@@ -1269,10 +1269,10 @@
     ]
   },
   {
-    "application_field_id": "0e590c55f1711af67c0b",
+    "application_field_id": "de0f13aa570e69eb74cf",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 340,
+    "line": 339,
     "route_hints": [
       "#/"
     ],
@@ -1291,10 +1291,10 @@
     ]
   },
   {
-    "application_field_id": "8e594acfd1e214278716",
+    "application_field_id": "f959222009a33ed6efbe",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 340,
+    "line": 339,
     "route_hints": [
       "#/"
     ],
@@ -1313,10 +1313,10 @@
     ]
   },
   {
-    "application_field_id": "e4c2c0a184d29ac28ca3",
+    "application_field_id": "110cfe107f613cbc0dfa",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 340,
+    "line": 339,
     "route_hints": [
       "#/"
     ],
@@ -1337,10 +1337,10 @@
     ]
   },
   {
-    "application_field_id": "137fb795ac5ff9ce8528",
+    "application_field_id": "13c8cf40ef5005c98bcd",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 340,
+    "line": 339,
     "route_hints": [
       "#/"
     ],
@@ -1361,10 +1361,10 @@
     ]
   },
   {
-    "application_field_id": "ba1d9375f0e9ba442ecf",
+    "application_field_id": "f6abb9dc502d1420a78f",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 343,
+    "line": 342,
     "route_hints": [
       "#/"
     ],
@@ -1383,10 +1383,10 @@
     ]
   },
   {
-    "application_field_id": "396dc5278f17fbe8ddfe",
+    "application_field_id": "9e65d6266ac2df46017d",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 343,
+    "line": 342,
     "route_hints": [
       "#/"
     ],
@@ -1409,10 +1409,10 @@
     ]
   },
   {
-    "application_field_id": "65ccee5096a0108047fb",
+    "application_field_id": "92e17c4aaf3822529d0a",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 343,
+    "line": 342,
     "route_hints": [
       "#/"
     ],
@@ -5235,6 +5235,29 @@
     "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
     "classification_reasons": [
       "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "dd5eaf2ad4137bb5a60c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/AuthLandingPage.tsx",
+    "line": 65,
+    "route_hints": [],
+    "label": null,
+    "attribute": "disabled",
+    "expression": "busy || !email.trim() || password.length < 8",
+    "property_chains": [
+      "email.trim",
+      "password.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
     ]
   },
   {
@@ -9318,10 +9341,32 @@
     ]
   },
   {
-    "application_field_id": "c3d1027b7fd7977d6ba5",
+    "application_field_id": "c5c309ae21df90ccde14",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 145,
+    "line": 184,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": null,
+    "attribute": null,
+    "expression": "adminAccess && <span className=\"company-admin-directory-badge\">Admin company database \u00b7 private fields enabled</span>",
+    "property_chains": [],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "11173915362417345c84",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 189,
     "route_hints": [
       "#/company/"
     ],
@@ -9340,10 +9385,10 @@
     ]
   },
   {
-    "application_field_id": "d43b5026f974ee3204bb",
+    "application_field_id": "bc4e31e98ec2d5ccd002",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 146,
+    "line": 190,
     "route_hints": [
       "#/company/"
     ],
@@ -9362,10 +9407,10 @@
     ]
   },
   {
-    "application_field_id": "c84a355de7e2d8ffa794",
+    "application_field_id": "e921b394da71f4487314",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 151,
+    "line": 195,
     "route_hints": [
       "#/company/"
     ],
@@ -9387,10 +9432,10 @@
     ]
   },
   {
-    "application_field_id": "d5643b29d96a3e3aa123",
+    "application_field_id": "bd2295b25cb43bc157d0",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 151,
+    "line": 195,
     "route_hints": [
       "#/company/"
     ],
@@ -9412,10 +9457,10 @@
     ]
   },
   {
-    "application_field_id": "99772b7754915d451c55",
+    "application_field_id": "49c777f20e12e4d23925",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 156,
+    "line": 200,
     "route_hints": [
       "#/company/"
     ],
@@ -9436,10 +9481,10 @@
     ]
   },
   {
-    "application_field_id": "1fd9a095e9ccdacd17c7",
+    "application_field_id": "caff5dce5e7922885781",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 156,
+    "line": 200,
     "route_hints": [
       "#/company/"
     ],
@@ -9461,10 +9506,10 @@
     ]
   },
   {
-    "application_field_id": "5ee1193e79137c5ce88f",
+    "application_field_id": "fb13feab5ab3e232f1f4",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 165,
+    "line": 209,
     "route_hints": [
       "#/company/"
     ],
@@ -9485,16 +9530,16 @@
     ]
   },
   {
-    "application_field_id": "6d0081555b1b8b895456",
+    "application_field_id": "32c042785989bb5dd210",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 187,
+    "line": 231,
     "route_hints": [
       "#/company/"
     ],
     "label": null,
     "attribute": null,
-    "expression": "sorted.length === 0 ? <div className=\"empty-state\"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className=\"table-scroll\"><table className=\"account-table known-firms-master-table\"><thead><tr> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('canonical_name')}>Company / firm{sortIndicator('canonical_name')}</button></th> <th scope=\"col\" role=\"columnheader\">Role</th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('serviced_site_count')}>Service footprint{sortIndicator('serviced_site_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('tower_account_count')}>Tower accounts{sortIndicator('tower_account_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('latest_observed_date')}>Last active{sortIndicator('latest_observed_date')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('observed_contract_count')}>Public contracts{sortIndicator('observed_contract_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('observed_customer_count')}>Buyers{sortIndicator('observed_customer_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('active_qualification_count')}>7G{sortIndicator('active_qualification_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('identity_confidence')}>Identity{sortIndicator('identity_confidence')}</button></th> <th scope=\"col\" role=\"columnheader\" aria-label=\"Open firm\" /> </tr></thead><tbody>{visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') openFirm(firm) }}> <td className=\"account-cell firm-name-cell\"> <strong>{firm.canonical_name}</strong> <span>{number.format(firm.observation_count)} public-record observation{firm.observation_count === 1 ? '' : 's'}</span> <small>{firm.source_classes.slice(0, 3).map(label).join(' \u00b7 ') || 'Source observed'}</small> </td> <td><strong>{roleLabel(firm.primary_role)}</strong><small>{firm.roles.length > 1 ? `${firm.roles.length} observed roles` : 'Primary observed role'}</small></td> <td><strong>{number.format(firm.serviced_site_count)} serviced</strong><small>{number.format(firm.observed_site_count)} related \u00b7 {number.format(firm.contracted_site_count)} contracted \u00b7 {number.format(firm.project_site_count)} project</small></td> <td><strong>{number.format(firm.tower_account_count)}</strong><small>{number.format(firm.mapped_site_count)} mapped relationships</small></td> <td><strong>{firm.latest_observed_date ? formatDate(firm.latest_observed_date) : '\u2014'}</strong><small>{firm.active_last_12m ? 'Observed \u226412 months' : firm.first_observed_date ? `First ${formatDate(firm.first_observed_date)}` : 'No dated observation'}</small></td> <td><strong>{number.format(firm.observed_contract_count)}</strong><small>{number.format(firm.active_contract_count)} active \u00b7 {firm.observed_contract_value ? currency.format(firm.observed_contract_value) : 'no published value'}</small></td> <td><strong>{number.format(firm.observed_customer_count)}</strong><small>{number.format(firm.repeat_buyer_count)} repeat buyer{firm.repeat_buyer_count === 1 ? '' : 's'}</small></td> <td><strong>{number.format(firm.active_qualification_count)}</strong><small>{number.format(firm.qualification_count)} observed registration{firm.qualification_count === 1 ? '' : 's'}</small></td> <td><span className={`health-badge health-${firm.identity_confidence === 'VERIFY' || firm.identity_confidence === 'UNRESOLVED' ? 'warning' : 'healthy'}`}>{firm.identity_confidence}</span><small>{label(firm.resolution_method)}</small></td> <td className=\"row-arrow\">\u203a</td> </tr>)}</tbody></table></div>",
+    "expression": "sorted.length === 0 ? <div className=\"empty-state\"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className=\"table-scroll\"><table className=\"account-table known-firms-master-table\"><thead><tr> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('canonical_name')}>Company / firm{sortIndicator('canonical_name')}</button></th> <th scope=\"col\" role=\"columnheader\">Role</th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('serviced_site_count')}>Service footprint{sortIndicator('serviced_site_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('tower_account_count')}>Tower accounts{sortIndicator('tower_account_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('latest_observed_date')}>Last active{sortIndicator('latest_observed_date')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('observed_contract_count')}>Public contracts{sortIndicator('observed_contract_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('observed_customer_count')}>Buyers{sortIndicator('observed_customer_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('active_qualification_count')}>7G{sortIndicator('active_qualification_count')}</button></th> <th scope=\"col\" role=\"columnheader\"><button onClick={() => changeSort('identity_confidence')}>Identity{sortIndicator('identity_confidence')}</button></th> {adminAccess && <th scope=\"col\" role=\"columnheader\">Admin database</th>} <th scope=\"col\" role=\"columnheader\" aria-label=\"Open firm\" /> </tr></thead><tbody>{visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') openFirm(firm) }}> <td className=\"account-cell firm-name-cell\"> <strong>{firm.canonical_name}</strong> <span>{number.format(firm.observation_count)} public-record observation{firm.observation_count === 1 ? '' : 's'}</span> <small>{firm.source_classes.slice(0, 3).map(label).join(' \u00b7 ') || 'Source observed'}</small> </td> <td><strong>{roleLabel(firm.primary_role)}</strong><small>{firm.roles.length > 1 ? `${firm.roles.length} observed roles` : 'Primary observed role'}</small></td> <td><strong>{number.format(firm.serviced_site_count)} serviced</strong><small>{number.format(firm.observed_site_count)} related \u00b7 {number.format(firm.contracted_site_count)} contracted \u00b7 {number.format(firm.project_site_count)} project</small></td> <td><strong>{number.format(firm.tower_account_count)}</strong><small>{number.format(firm.mapped_site_count)} mapped relationships</small></td> <td><strong>{firm.latest_observed_date ? formatDate(firm.latest_observed_date) : '\u2014'}</strong><small>{firm.active_last_12m ? 'Observed \u226412 months' : firm.first_observed_date ? `First ${formatDate(firm.first_observed_date)}` : 'No dated observation'}</small></td> <td><strong>{number.format(firm.observed_contract_count)}</strong><small>{number.format(firm.active_contract_count)} active \u00b7 {firm.observed_contract_value ? currency.format(firm.observed_contract_value) : 'no published value'}</small></td> <td><strong>{number.format(firm.observed_customer_count)}</strong><small>{number.format(firm.repeat_buyer_count)} repeat buyer{firm.repeat_buyer_count === 1 ? '' : 's'}</small></td> <td><strong>{number.format(firm.active_qualification_count)}</strong><small>{number.format(firm.qualification_count)} observed registration{firm.qualification_count === 1 ? '' : 's'}</small></td> <td><span className={`health-badge health-${firm.identity_confidence === 'VERIFY' || firm.identity_confidence === 'UNRESOLVED' ? 'warning' : 'healthy'}`}>{firm.identity_confidence}</span><small>{label(firm.resolution_method)}</small></td> {adminAccess && (() => { const profile = adminByCompanyId.get(firm.firm_id) return <td className=\"company-admin-list-cell\">{profile ? <> <strong>{profile.rollup_name || profile.legal_name || firm.canonical_name}</strong> <span>{profile.website ? profile.website.replace(/^https?:\\/\\//, '').replace(/\\/$/, '') : adminLocation(profile)}</span> <small>{adminRevenue(profile)}{profile.revenue_year ? ` \u00b7 ${profile.revenue_year}` : ''} \u00b7 {relationshipLabel(profile.relationship_status)}</small> {profile.parent_company_name && <small>Parent: {profile.parent_company_name}</small>} </> : <><strong>Not enriched</strong><span>Open profile to add private company data</span></>}</td> })()} <td className=\"row-arrow\">\u203a</td> </tr>)}</tbody></table></div>",
     "property_chains": [
       "sorted.length",
       "visible.map",
@@ -9526,7 +9571,16 @@
       "firm.active_qualification_count",
       "firm.qualification_count",
       "firm.identity_confidence",
-      "firm.resolution_method"
+      "firm.resolution_method",
+      "adminByCompanyId.get",
+      "profile.rollup_name",
+      "profile.legal_name",
+      "profile.website",
+      "replace",
+      "profile.website.replace",
+      "profile.revenue_year",
+      "profile.relationship_status",
+      "profile.parent_company_name"
     ],
     "conditional_visibility": true,
     "verification": "STATIC_CURRENT_RUNTIME_AST",
@@ -9539,10 +9593,10 @@
     ]
   },
   {
-    "application_field_id": "6b407aff67b21780eb4a",
+    "application_field_id": "30b412e7170b5f99c4d1",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 188,
+    "line": 232,
     "route_hints": [
       "#/company/"
     ],
@@ -9561,10 +9615,10 @@
     ]
   },
   {
-    "application_field_id": "d2624e862d77d45c5857",
+    "application_field_id": "2f8e431cd7b16585bcde",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 191,
+    "line": 235,
     "route_hints": [
       "#/company/"
     ],
@@ -9583,16 +9637,16 @@
     ]
   },
   {
-    "application_field_id": "c696fd773f2f8cb84449",
+    "application_field_id": "3374cc3a9bdadb37c932",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 198,
+    "line": 243,
     "route_hints": [
       "#/company/"
     ],
     "label": null,
     "attribute": null,
-    "expression": "visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') openFirm(firm) }}> <td className=\"account-cell firm-name-cell\"> <strong>{firm.canonical_name}</strong> <span>{number.format(firm.observation_count)} public-record observation{firm.observation_count === 1 ? '' : 's'}</span> <small>{firm.source_classes.slice(0, 3).map(label).join(' \u00b7 ') || 'Source observed'}</small> </td> <td><strong>{roleLabel(firm.primary_role)}</strong><small>{firm.roles.length > 1 ? `${firm.roles.length} observed roles` : 'Primary observed role'}</small></td> <td><strong>{number.format(firm.serviced_site_count)} serviced</strong><small>{number.format(firm.observed_site_count)} related \u00b7 {number.format(firm.contracted_site_count)} contracted \u00b7 {number.format(firm.project_site_count)} project</small></td> <td><strong>{number.format(firm.tower_account_count)}</strong><small>{number.format(firm.mapped_site_count)} mapped relationships</small></td> <td><strong>{firm.latest_observed_date ? formatDate(firm.latest_observed_date) : '\u2014'}</strong><small>{firm.active_last_12m ? 'Observed \u226412 months' : firm.first_observed_date ? `First ${formatDate(firm.first_observed_date)}` : 'No dated observation'}</small></td> <td><strong>{number.format(firm.observed_contract_count)}</strong><small>{number.format(firm.active_contract_count)} active \u00b7 {firm.observed_contract_value ? currency.format(firm.observed_contract_value) : 'no published value'}</small></td> <td><strong>{number.format(firm.observed_customer_count)}</strong><small>{number.format(firm.repeat_buyer_count)} repeat buyer{firm.repeat_buyer_count === 1 ? '' : 's'}</small></td> <td><strong>{number.format(firm.active_qualification_count)}</strong><small>{number.format(firm.qualification_count)} observed registration{firm.qualification_count === 1 ? '' : 's'}</small></td> <td><span className={`health-badge health-${firm.identity_confidence === 'VERIFY' || firm.identity_confidence === 'UNRESOLVED' ? 'warning' : 'healthy'}`}>{firm.identity_confidence}</span><small>{label(firm.resolution_method)}</small></td> <td className=\"row-arrow\">\u203a</td> </tr>)",
+    "expression": "visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') openFirm(firm) }}> <td className=\"account-cell firm-name-cell\"> <strong>{firm.canonical_name}</strong> <span>{number.format(firm.observation_count)} public-record observation{firm.observation_count === 1 ? '' : 's'}</span> <small>{firm.source_classes.slice(0, 3).map(label).join(' \u00b7 ') || 'Source observed'}</small> </td> <td><strong>{roleLabel(firm.primary_role)}</strong><small>{firm.roles.length > 1 ? `${firm.roles.length} observed roles` : 'Primary observed role'}</small></td> <td><strong>{number.format(firm.serviced_site_count)} serviced</strong><small>{number.format(firm.observed_site_count)} related \u00b7 {number.format(firm.contracted_site_count)} contracted \u00b7 {number.format(firm.project_site_count)} project</small></td> <td><strong>{number.format(firm.tower_account_count)}</strong><small>{number.format(firm.mapped_site_count)} mapped relationships</small></td> <td><strong>{firm.latest_observed_date ? formatDate(firm.latest_observed_date) : '\u2014'}</strong><small>{firm.active_last_12m ? 'Observed \u226412 months' : firm.first_observed_date ? `First ${formatDate(firm.first_observed_date)}` : 'No dated observation'}</small></td> <td><strong>{number.format(firm.observed_contract_count)}</strong><small>{number.format(firm.active_contract_count)} active \u00b7 {firm.observed_contract_value ? currency.format(firm.observed_contract_value) : 'no published value'}</small></td> <td><strong>{number.format(firm.observed_customer_count)}</strong><small>{number.format(firm.repeat_buyer_count)} repeat buyer{firm.repeat_buyer_count === 1 ? '' : 's'}</small></td> <td><strong>{number.format(firm.active_qualification_count)}</strong><small>{number.format(firm.qualification_count)} observed registration{firm.qualification_count === 1 ? '' : 's'}</small></td> <td><span className={`health-badge health-${firm.identity_confidence === 'VERIFY' || firm.identity_confidence === 'UNRESOLVED' ? 'warning' : 'healthy'}`}>{firm.identity_confidence}</span><small>{label(firm.resolution_method)}</small></td> {adminAccess && (() => { const profile = adminByCompanyId.get(firm.firm_id) return <td className=\"company-admin-list-cell\">{profile ? <> <strong>{profile.rollup_name || profile.legal_name || firm.canonical_name}</strong> <span>{profile.website ? profile.website.replace(/^https?:\\/\\//, '').replace(/\\/$/, '') : adminLocation(profile)}</span> <small>{adminRevenue(profile)}{profile.revenue_year ? ` \u00b7 ${profile.revenue_year}` : ''} \u00b7 {relationshipLabel(profile.relationship_status)}</small> {profile.parent_company_name && <small>Parent: {profile.parent_company_name}</small>} </> : <><strong>Not enriched</strong><span>Open profile to add private company data</span></>}</td> })()} <td className=\"row-arrow\">\u203a</td> </tr>)",
     "property_chains": [
       "visible.map",
       "firm.firm_id",
@@ -9623,7 +9677,16 @@
       "firm.active_qualification_count",
       "firm.qualification_count",
       "firm.identity_confidence",
-      "firm.resolution_method"
+      "firm.resolution_method",
+      "adminByCompanyId.get",
+      "profile.rollup_name",
+      "profile.legal_name",
+      "profile.website",
+      "replace",
+      "profile.website.replace",
+      "profile.revenue_year",
+      "profile.relationship_status",
+      "profile.parent_company_name"
     ],
     "conditional_visibility": true,
     "verification": "STATIC_CURRENT_RUNTIME_AST",
@@ -9636,10 +9699,10 @@
     ]
   },
   {
-    "application_field_id": "597b334848ce00a70dc1",
+    "application_field_id": "8a621c92cf10d212c571",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 198,
+    "line": 243,
     "route_hints": [
       "#/company/"
     ],
@@ -9660,10 +9723,10 @@
     ]
   },
   {
-    "application_field_id": "be4789b1c6d847410048",
+    "application_field_id": "1c37dc642438fb67d4d8",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 200,
+    "line": 245,
     "route_hints": [
       "#/company/"
     ],
@@ -9684,10 +9747,10 @@
     ]
   },
   {
-    "application_field_id": "7b6fb5bf07fd9e36e753",
+    "application_field_id": "912e9f5448bbf8217f64",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 201,
+    "line": 246,
     "route_hints": [
       "#/company/"
     ],
@@ -9709,10 +9772,10 @@
     ]
   },
   {
-    "application_field_id": "11231ae71e19187ef0c3",
+    "application_field_id": "6c6d1c3f17c71fdc807e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 201,
+    "line": 246,
     "route_hints": [
       "#/company/"
     ],
@@ -9733,10 +9796,10 @@
     ]
   },
   {
-    "application_field_id": "6ef5a94c99395c78b9f6",
+    "application_field_id": "75a820bc9ad6d434e297",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 202,
+    "line": 247,
     "route_hints": [
       "#/company/"
     ],
@@ -9759,10 +9822,10 @@
     ]
   },
   {
-    "application_field_id": "6276484e14bf449054a4",
+    "application_field_id": "26e2968385626d4b9b99",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 204,
+    "line": 249,
     "route_hints": [
       "#/company/"
     ],
@@ -9783,10 +9846,10 @@
     ]
   },
   {
-    "application_field_id": "afe278c8779dc04f2e9a",
+    "application_field_id": "a6706cdc3832e8e2f92e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 204,
+    "line": 249,
     "route_hints": [
       "#/company/"
     ],
@@ -9807,10 +9870,10 @@
     ]
   },
   {
-    "application_field_id": "a532e32dccfbff9328ce",
+    "application_field_id": "d9fbffda32aa398646f5",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 205,
+    "line": 250,
     "route_hints": [
       "#/company/"
     ],
@@ -9832,10 +9895,10 @@
     ]
   },
   {
-    "application_field_id": "3657ff834b93375dde83",
+    "application_field_id": "99020507f1c31890ca0e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 205,
+    "line": 250,
     "route_hints": [
       "#/company/"
     ],
@@ -9857,10 +9920,10 @@
     ]
   },
   {
-    "application_field_id": "852ad2921bd031f0132c",
+    "application_field_id": "c6fb6dadfde90e8148a6",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 205,
+    "line": 250,
     "route_hints": [
       "#/company/"
     ],
@@ -9882,10 +9945,10 @@
     ]
   },
   {
-    "application_field_id": "3fdc91fa752e23089a99",
+    "application_field_id": "d01e112a86932c913fed",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 205,
+    "line": 250,
     "route_hints": [
       "#/company/"
     ],
@@ -9907,10 +9970,10 @@
     ]
   },
   {
-    "application_field_id": "03fd4addb8b039fe448d",
+    "application_field_id": "8c105606f57796168fa4",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 206,
+    "line": 251,
     "route_hints": [
       "#/company/"
     ],
@@ -9932,10 +9995,10 @@
     ]
   },
   {
-    "application_field_id": "2d3fc646b6401c000ae2",
+    "application_field_id": "be2f07c5657e65bd03e1",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 206,
+    "line": 251,
     "route_hints": [
       "#/company/"
     ],
@@ -9957,10 +10020,10 @@
     ]
   },
   {
-    "application_field_id": "e62b9d9d555daee48492",
+    "application_field_id": "f59498e47a5bce8f910b",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 207,
+    "line": 252,
     "route_hints": [
       "#/company/"
     ],
@@ -9981,10 +10044,10 @@
     ]
   },
   {
-    "application_field_id": "835e28c10eb97cbf1267",
+    "application_field_id": "53739525ab5e8d3858d6",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 207,
+    "line": 252,
     "route_hints": [
       "#/company/"
     ],
@@ -10006,10 +10069,10 @@
     ]
   },
   {
-    "application_field_id": "e9e0587454706e814683",
+    "application_field_id": "5039a8aaff4da8fd7411",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 208,
+    "line": 253,
     "route_hints": [
       "#/company/"
     ],
@@ -10031,10 +10094,10 @@
     ]
   },
   {
-    "application_field_id": "49e564d15f46ca7f08ef",
+    "application_field_id": "fed5450d7108045ee64e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 208,
+    "line": 253,
     "route_hints": [
       "#/company/"
     ],
@@ -10056,10 +10119,10 @@
     ]
   },
   {
-    "application_field_id": "e6c364603b36846129fa",
+    "application_field_id": "34ec998009c521a42b33",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 208,
+    "line": 253,
     "route_hints": [
       "#/company/"
     ],
@@ -10081,10 +10144,10 @@
     ]
   },
   {
-    "application_field_id": "d6a789d5a342233c6354",
+    "application_field_id": "f6a48c17f6e9771bcd57",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 209,
+    "line": 254,
     "route_hints": [
       "#/company/"
     ],
@@ -10106,10 +10169,10 @@
     ]
   },
   {
-    "application_field_id": "75f57f9259e13a97075b",
+    "application_field_id": "594353103c8fae3ab65c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 209,
+    "line": 254,
     "route_hints": [
       "#/company/"
     ],
@@ -10131,10 +10194,10 @@
     ]
   },
   {
-    "application_field_id": "94e730597ca39623674f",
+    "application_field_id": "ea8d412a35bda8518635",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 209,
+    "line": 254,
     "route_hints": [
       "#/company/"
     ],
@@ -10155,10 +10218,10 @@
     ]
   },
   {
-    "application_field_id": "50d9eab4cde7dda4a66c",
+    "application_field_id": "72410f690ad555c9869d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 210,
+    "line": 255,
     "route_hints": [
       "#/company/"
     ],
@@ -10180,10 +10243,10 @@
     ]
   },
   {
-    "application_field_id": "fc9c90cc23159026a821",
+    "application_field_id": "44865b9ba10493748bcb",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 210,
+    "line": 255,
     "route_hints": [
       "#/company/"
     ],
@@ -10205,10 +10268,10 @@
     ]
   },
   {
-    "application_field_id": "f045353eb124be82acdd",
+    "application_field_id": "2c5c908fed7c4cf1ea67",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 210,
+    "line": 255,
     "route_hints": [
       "#/company/"
     ],
@@ -10229,10 +10292,10 @@
     ]
   },
   {
-    "application_field_id": "d3e0036b23c4d36b6358",
+    "application_field_id": "e6db77af619546df0cbc",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 211,
+    "line": 256,
     "route_hints": [
       "#/company/"
     ],
@@ -10253,10 +10316,10 @@
     ]
   },
   {
-    "application_field_id": "a633d24c4797aeadba1a",
+    "application_field_id": "607de53597641189cff4",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 211,
+    "line": 256,
     "route_hints": [
       "#/company/"
     ],
@@ -10277,10 +10340,10 @@
     ]
   },
   {
-    "application_field_id": "9ab17f2a8221e0ed2bad",
+    "application_field_id": "9cb69e3dcb7e3e953dc4",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 211,
+    "line": 256,
     "route_hints": [
       "#/company/"
     ],
@@ -10301,10 +10364,224 @@
     ]
   },
   {
-    "application_field_id": "16e58c7e23f71e773954",
+    "application_field_id": "4b62cc02fb64f5c9b976",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 219,
+    "line": 257,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": null,
+    "attribute": null,
+    "expression": "adminAccess && (() => { const profile = adminByCompanyId.get(firm.firm_id) return <td className=\"company-admin-list-cell\">{profile ? <> <strong>{profile.rollup_name || profile.legal_name || firm.canonical_name}</strong> <span>{profile.website ? profile.website.replace(/^https?:\\/\\//, '').replace(/\\/$/, '') : adminLocation(profile)}</span> <small>{adminRevenue(profile)}{profile.revenue_year ? ` \u00b7 ${profile.revenue_year}` : ''} \u00b7 {relationshipLabel(profile.relationship_status)}</small> {profile.parent_company_name && <small>Parent: {profile.parent_company_name}</small>} </> : <><strong>Not enriched</strong><span>Open profile to add private company data</span></>}</td> })()",
+    "property_chains": [
+      "adminByCompanyId.get",
+      "firm.firm_id",
+      "profile.rollup_name",
+      "profile.legal_name",
+      "firm.canonical_name",
+      "profile.website",
+      "replace",
+      "profile.website.replace",
+      "profile.revenue_year",
+      "profile.relationship_status",
+      "profile.parent_company_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "016d0d4d2a228c964630",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 259,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": null,
+    "attribute": null,
+    "expression": "profile ? <> <strong>{profile.rollup_name || profile.legal_name || firm.canonical_name}</strong> <span>{profile.website ? profile.website.replace(/^https?:\\/\\//, '').replace(/\\/$/, '') : adminLocation(profile)}</span> <small>{adminRevenue(profile)}{profile.revenue_year ? ` \u00b7 ${profile.revenue_year}` : ''} \u00b7 {relationshipLabel(profile.relationship_status)}</small> {profile.parent_company_name && <small>Parent: {profile.parent_company_name}</small>} </> : <><strong>Not enriched</strong><span>Open profile to add private company data</span></>",
+    "property_chains": [
+      "profile.rollup_name",
+      "profile.legal_name",
+      "firm.canonical_name",
+      "profile.website",
+      "replace",
+      "profile.website.replace",
+      "profile.revenue_year",
+      "profile.relationship_status",
+      "profile.parent_company_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "6ced562c28ff11f5411b",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 260,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.rollup_name || profile.legal_name || firm.canonical_name",
+    "property_chains": [
+      "profile.rollup_name",
+      "profile.legal_name",
+      "firm.canonical_name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "7e52eccbcda7b2c9bc86",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 261,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.website ? profile.website.replace(/^https?:\\/\\//, '').replace(/\\/$/, '') : adminLocation(profile)",
+    "property_chains": [
+      "profile.website",
+      "replace",
+      "profile.website.replace"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "b107a506b7d527404a67",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 262,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": "\u00b7",
+    "attribute": null,
+    "expression": "profile.revenue_year ? ` \u00b7 ${profile.revenue_year}` : ''",
+    "property_chains": [
+      "profile.revenue_year"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "4c18d4c8b3f07fd90f5e",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 262,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": "\u00b7",
+    "attribute": null,
+    "expression": "relationshipLabel(profile.relationship_status)",
+    "property_chains": [
+      "profile.relationship_status"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "03cdbbd94c931013961d",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 263,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.parent_company_name && <small>Parent: {profile.parent_company_name}</small>",
+    "property_chains": [
+      "profile.parent_company_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "bfd85d5c15cfca7129b2",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 263,
+    "route_hints": [
+      "#/company/"
+    ],
+    "label": "Parent:",
+    "attribute": null,
+    "expression": "profile.parent_company_name",
+    "property_chains": [
+      "profile.parent_company_name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "43bcf9358b7e36c1e67d",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompaniesPage.tsx",
+    "line": 273,
     "route_hints": [
       "#/company/"
     ],
@@ -10325,10 +10602,10 @@
     ]
   },
   {
-    "application_field_id": "a2bfcd5dddc5e0b5a0c1",
+    "application_field_id": "24c6143f484df2c45711",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompaniesPage.tsx",
-    "line": 219,
+    "line": 273,
     "route_hints": [
       "#/company/"
     ],
@@ -10350,10 +10627,1605 @@
     ]
   },
   {
-    "application_field_id": "69c376da200016fb822c",
+    "application_field_id": "900b9ee6272cd152e641",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 300,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "relationshipLabel(profile.relationship_status)",
+    "property_chains": [
+      "profile.relationship_status"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "ff44e2ea7a7395b1f055",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 301,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "savedAt && <small>Saved {new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</small>",
+    "property_chains": [
+      "toLocaleTimeString"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "fc5eada1188952f36386",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 301,
+    "route_hints": [],
+    "label": "Saved",
+    "attribute": null,
+    "expression": "new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })",
+    "property_chains": [
+      "toLocaleTimeString"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e448d223faa1822020a6",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 302,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "busy ? 'Saving\u2026' : 'Save company'",
+    "property_chains": [],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "b11e2f33a30f668bd7d3",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 306,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "error && <div className=\"company-admin-error\"><strong>Private company database error.</strong><span>{error}</span></div>",
+    "property_chains": [],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "43e4d8de6e6ba78049c7",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 309,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.rollup_name || canonicalName",
+    "property_chains": [
+      "profile.rollup_name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "ae468490c493d385e312",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 309,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.rollup_company_id || 'No explicit rollup ID'",
+    "property_chains": [
+      "profile.rollup_company_id"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e5758defc5ca1b5a13ea",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 310,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.headquarters_address || 'Street address not recorded'",
+    "property_chains": [
+      "profile.headquarters_address"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e750c6d5db83de709fc0",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 311,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.parent_company_name || 'Independent / not recorded'",
+    "property_chains": [
+      "profile.parent_company_name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "c1adac1d493bf6327930",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 311,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.parent_company_id || 'No parent ID'",
+    "property_chains": [
+      "profile.parent_company_id"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "aba4cf7f624cb44771c5",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 312,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.revenue_year ? `${profile.revenue_year} \u00b7 ${relationshipLabel(profile.revenue_type)}` : 'Year/source not recorded'",
+    "property_chains": [
+      "profile.revenue_year",
+      "profile.revenue_type"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "1452e1b8c9031c0ed88e",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 319,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.legal_name ?? ''",
+    "property_chains": [
+      "profile.legal_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e3a8b00e597bb1507141",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 320,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.rollup_name ?? ''",
+    "property_chains": [
+      "profile.rollup_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "c2d0be25b39394da51c5",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 321,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.rollup_company_id ?? ''",
+    "property_chains": [
+      "profile.rollup_company_id"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "7ea733bc46b7f3574b78",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 322,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.website ?? ''",
+    "property_chains": [
+      "profile.website"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "45afa82ed2800e89dd6d",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 323,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.company_type ?? ''",
+    "property_chains": [
+      "profile.company_type"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "f25e8963171724937a01",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 324,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.parent_company_name ?? ''",
+    "property_chains": [
+      "profile.parent_company_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "25eda966f5b5123dba05",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 325,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.parent_company_id ?? ''",
+    "property_chains": [
+      "profile.parent_company_id"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "1de68667e9fd6be59c35",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 328,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_address ?? ''",
+    "property_chains": [
+      "profile.headquarters_address"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "694d4721deadeec2e82e",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 329,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_city ?? ''",
+    "property_chains": [
+      "profile.headquarters_city"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "2ea23571dcd60606b7b1",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 330,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_region ?? ''",
+    "property_chains": [
+      "profile.headquarters_region"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "03356169092ff686332c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 331,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_postal_code ?? ''",
+    "property_chains": [
+      "profile.headquarters_postal_code"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "beeadcf02b9ed66a5551",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 332,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_country ?? ''",
+    "property_chains": [
+      "profile.headquarters_country"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "bf715c81d322147e181d",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 336,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.identity_source_name ?? ''",
+    "property_chains": [
+      "profile.identity_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "d530ca0cf6512d469358",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 337,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.identity_source_url ?? ''",
+    "property_chains": [
+      "profile.identity_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "822772f018955d5f85e0",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 338,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.website_source_name ?? ''",
+    "property_chains": [
+      "profile.website_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "a38f325afde8918ede6b",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 339,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.website_source_url ?? ''",
+    "property_chains": [
+      "profile.website_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "95616d8eca98dcc74190",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 340,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.rollup_source_name ?? ''",
+    "property_chains": [
+      "profile.rollup_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "449ae7e5d5dffe88b853",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 341,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.rollup_source_url ?? ''",
+    "property_chains": [
+      "profile.rollup_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e753d9dd693a0951f778",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 342,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_source_name ?? ''",
+    "property_chains": [
+      "profile.headquarters_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e02ab1d2d4b114827b3b",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 343,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_source_url ?? ''",
+    "property_chains": [
+      "profile.headquarters_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "d2b8bae940c3233302a8",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 344,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.parent_source_name ?? ''",
+    "property_chains": [
+      "profile.parent_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "c8d73536ae238c869c73",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 345,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.parent_source_url ?? ''",
+    "property_chains": [
+      "profile.parent_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "dc7b9b8b81ad437cee9b",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 346,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "localDateTime(profile.enrichment_checked_at)",
+    "property_chains": [
+      "profile.enrichment_checked_at"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "9a6d4a94cfbf20bac769",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 353,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_type",
+    "property_chains": [
+      "profile.revenue_type"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "89ebe7c5e515a88de99c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 354,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_amount ?? ''",
+    "property_chains": [
+      "profile.revenue_amount"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e5f0865477651254a814",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 355,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_low ?? ''",
+    "property_chains": [
+      "profile.revenue_low"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "aa1ca74beadb55c923f8",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 356,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_high ?? ''",
+    "property_chains": [
+      "profile.revenue_high"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "bee4ece789efdb5ba65c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 357,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_currency",
+    "property_chains": [
+      "profile.revenue_currency"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "77d4c9636e8d783fa154",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 358,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_year ?? ''",
+    "property_chains": [
+      "profile.revenue_year"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "92ce352bb12e41479300",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 359,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_confidence",
+    "property_chains": [
+      "profile.revenue_confidence"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "1046cf86cf83eb0500e5",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 360,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_source_name ?? ''",
+    "property_chains": [
+      "profile.revenue_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "7a9c3ec432d4942a6731",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 361,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_source_url ?? ''",
+    "property_chains": [
+      "profile.revenue_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "7fa683e0a14e817c6751",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 368,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.relationship_status",
+    "property_chains": [
+      "profile.relationship_status"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "b3e2802c62645d497a6f",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 368,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)",
+    "property_chains": [
+      "relationshipStatuses.map"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e6b816a35fce211e3687",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 369,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.account_owner ?? ''",
+    "property_chains": [
+      "profile.account_owner"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "8e9c6b94c0ec2e788c0a",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 370,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "localDateTime(profile.last_contacted_at)",
+    "property_chains": [
+      "profile.last_contacted_at"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "a1ad3435b2fa7ab048e0",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 371,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.next_action_date ?? ''",
+    "property_chains": [
+      "profile.next_action_date"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "d0aacba5e1a246580374",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 372,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.internal_summary ?? ''",
+    "property_chains": [
+      "profile.internal_summary"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "fc9ecf0c32132fe5a59e",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 377,
+    "route_hints": [],
+    "label": "saved",
+    "attribute": null,
+    "expression": "contacts.length",
+    "property_chains": [
+      "contacts.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "3c781162e9813a90c7e1",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 383,
+    "route_hints": [],
+    "label": "Add contact",
+    "attribute": "disabled",
+    "expression": "busy || !contactName.trim()",
+    "property_chains": [
+      "contactName.trim"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "ad2d9e298c18f8f1a55a",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 390,
+    "route_hints": [],
+    "label": null,
+    "attribute": "key",
+    "expression": "contact.contact_id",
+    "property_chains": [
+      "contact.contact_id"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "23dd5040d09e4dd657ff",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 390,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "contact.name",
+    "property_chains": [
+      "contact.name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "f6081af1ae578d840d6a",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 390,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "contact.source_name && <small>{contact.source_name}{contact.verified_at ? ' \u00b7 verified ' + new Date(contact.verified_at).toLocaleDateString() : ''}</small>",
+    "property_chains": [
+      "contact.source_name",
+      "contact.verified_at",
+      "toLocaleDateString"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "2e89593ba358606462f2",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 390,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "contact.source_name",
+    "property_chains": [
+      "contact.source_name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "04f6fbfcef672603bfed",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 390,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "contact.verified_at ? ' \u00b7 verified ' + new Date(contact.verified_at).toLocaleDateString() : ''",
+    "property_chains": [
+      "contact.verified_at",
+      "toLocaleDateString"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "b4e06b6695e353e51897",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 394,
+    "route_hints": [],
+    "label": "logged interactions",
+    "attribute": null,
+    "expression": "activities.length",
+    "property_chains": [
+      "activities.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "bbc6e966805176ce27d4",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "new Date(activity.occurred_at).toLocaleString()",
+    "property_chains": [
+      "toLocaleString",
+      "activity.occurred_at"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "d779d993eff26500a424",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "relationshipLabel(activity.activity_type)",
+    "property_chains": [
+      "activity.activity_type"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e07ca34fb9fb035f27c2",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.outcome && <span>{activity.outcome}</span>",
+    "property_chains": [
+      "activity.outcome"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "6774a14c9e37168a77c6",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.outcome",
+    "property_chains": [
+      "activity.outcome"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "160fc4d9e9973eb1ea5c",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.details && <p>{activity.details}</p>",
+    "property_chains": [
+      "activity.details"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "9f29f636efe36197cfb8",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.details",
+    "property_chains": [
+      "activity.details"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "3430127228d1144afa7d",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.next_action_date && <small>Next action {activity.next_action_date}</small>",
+    "property_chains": [
+      "activity.next_action_date"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "e50ad3fc1b76c6cc2553",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": "Next action",
+    "attribute": null,
+    "expression": "activity.next_action_date",
+    "property_chains": [
+      "activity.next_action_date"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "500a1496f1bc2bddcba1",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 407,
+    "route_hints": [],
+    "label": "notes \u00b7 private",
+    "attribute": null,
+    "expression": "notes.length",
+    "property_chains": [
+      "notes.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "2513b352f9ed44626cd5",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 408,
+    "route_hints": [],
+    "label": "Add note",
+    "attribute": "disabled",
+    "expression": "busy || !newNote.trim()",
+    "property_chains": [
+      "newNote.trim"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "6004053186c108d0f489",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "notes.length ? notes.map(note => <article key={note.note_id}><textarea aria-label={`Edit note ${note.note_id}`} rows={3} value={noteDrafts[note.note_id] ?? note.note} onChange={event => setNoteDrafts(value => ({ ...value, [note.note_id]:event.target.value }))} /><div><small>{note.updated_at ? new Date(note.updated_at).toLocaleString() : 'Saved note'}</small><button onClick={() => saveNote(note.note_id)} disabled={busy || !(noteDrafts[note.note_id] ?? '').trim()}>Save note</button></div></article>) : <span className=\"company-admin-empty\">No private notes recorded.</span>",
+    "property_chains": [
+      "notes.length",
+      "notes.map",
+      "note.note_id",
+      "note.note",
+      "event.target.value",
+      "note.updated_at",
+      "toLocaleString",
+      "trim"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DERIVED_DATA_METRIC_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Derived count/aggregate/formatting expression over runtime data"
+    ]
+  },
+  {
+    "application_field_id": "91454f226994f92863af",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": null,
+    "attribute": "key",
+    "expression": "note.note_id",
+    "property_chains": [
+      "note.note_id"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "b897eb2785076451a940",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "noteDrafts[note.note_id] ?? note.note",
+    "property_chains": [
+      "note.note_id",
+      "note.note"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "ff5154f78c6fc6014c24",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "note.updated_at ? new Date(note.updated_at).toLocaleString() : 'Saved note'",
+    "property_chains": [
+      "note.updated_at",
+      "toLocaleString"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "b5c5f21c4093ef6fe9e8",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": "Save note",
+    "attribute": "disabled",
+    "expression": "busy || !(noteDrafts[note.note_id] ?? '').trim()",
+    "property_chains": [
+      "trim",
+      "note.note_id"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ]
+  },
+  {
+    "application_field_id": "1a32517e038bfa29b6ae",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 266,
+    "line": 267,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10375,10 +12247,10 @@
     ]
   },
   {
-    "application_field_id": "c3c0a1fcca51670eb703",
+    "application_field_id": "6b11f9fa185f6c69367e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 266,
+    "line": 267,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10400,10 +12272,10 @@
     ]
   },
   {
-    "application_field_id": "b0d00c5c8a2e054f82de",
+    "application_field_id": "341da6e52c384b2fe877",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 267,
+    "line": 268,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10425,10 +12297,10 @@
     ]
   },
   {
-    "application_field_id": "167835828c2d6e29e655",
+    "application_field_id": "c44bca3f2cd2cf2a2f7a",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 268,
+    "line": 269,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10451,10 +12323,10 @@
     ]
   },
   {
-    "application_field_id": "7607e4b526c33d14fb4b",
+    "application_field_id": "c476adfc9d2117cab7ef",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 268,
+    "line": 269,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10477,10 +12349,10 @@
     ]
   },
   {
-    "application_field_id": "fbeba67a3851aa2795a9",
+    "application_field_id": "46a61935ea34ff279496",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 269,
+    "line": 270,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10502,10 +12374,10 @@
     ]
   },
   {
-    "application_field_id": "86d9c77b45f609a44afb",
+    "application_field_id": "a49b861a26accda4293d",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 272,
+    "line": 273,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10527,10 +12399,10 @@
     ]
   },
   {
-    "application_field_id": "39d0c0e53380b13b73c8",
+    "application_field_id": "0ebf75e1510952f5539e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 272,
+    "line": 273,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10552,10 +12424,10 @@
     ]
   },
   {
-    "application_field_id": "429028525a7b211e547f",
+    "application_field_id": "22bd83cfc30dc8d74c42",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 274,
+    "line": 275,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10577,10 +12449,10 @@
     ]
   },
   {
-    "application_field_id": "64fb1b69507d9367e09e",
+    "application_field_id": "029f1dc7703f6f1f5794",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 275,
+    "line": 276,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10602,10 +12474,10 @@
     ]
   },
   {
-    "application_field_id": "d56f20e7515271333b7a",
+    "application_field_id": "f52181a27f8c0edc0ef5",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 280,
+    "line": 281,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10628,10 +12500,10 @@
     ]
   },
   {
-    "application_field_id": "4b5f2b8f0030499295b0",
+    "application_field_id": "701c636b503911c0b706",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 281,
+    "line": 282,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10654,10 +12526,10 @@
     ]
   },
   {
-    "application_field_id": "f58b03a2651926c854df",
+    "application_field_id": "c2ec09f1854059c0f95d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 281,
+    "line": 282,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10680,10 +12552,10 @@
     ]
   },
   {
-    "application_field_id": "4ea6b8517e9458657190",
+    "application_field_id": "2d7eb6c188a42b18193d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 282,
+    "line": 283,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10706,10 +12578,10 @@
     ]
   },
   {
-    "application_field_id": "c3d85d9babeaaf575d7b",
+    "application_field_id": "2d41c4b57976aecdf239",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 282,
+    "line": 283,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10732,10 +12604,10 @@
     ]
   },
   {
-    "application_field_id": "b54fe25ffe616557165e",
+    "application_field_id": "c90b4f8298b46f1fe24e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 282,
+    "line": 283,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10758,10 +12630,10 @@
     ]
   },
   {
-    "application_field_id": "1b28a839654a7fdc9666",
+    "application_field_id": "c2bc6ed337a448c9c3cb",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 283,
+    "line": 284,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10784,10 +12656,10 @@
     ]
   },
   {
-    "application_field_id": "a7e8283edd53071e29ff",
+    "application_field_id": "219d468535b6b4055767",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 283,
+    "line": 284,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10810,10 +12682,10 @@
     ]
   },
   {
-    "application_field_id": "807bfd4b01c0b97fafd6",
+    "application_field_id": "435c60788ea5702839f8",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 283,
+    "line": 284,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10836,10 +12708,10 @@
     ]
   },
   {
-    "application_field_id": "24a4e967eb4664e5a431",
+    "application_field_id": "d757938af2c424ef7d7b",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 284,
+    "line": 285,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10862,10 +12734,10 @@
     ]
   },
   {
-    "application_field_id": "c4ef20ce77afdca1fcaa",
+    "application_field_id": "145a02c7b7ca513e2a78",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 285,
+    "line": 286,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10888,10 +12760,10 @@
     ]
   },
   {
-    "application_field_id": "f2dfd0f5cfe1d57ed395",
+    "application_field_id": "c803138556b5ce00f4f7",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 285,
+    "line": 286,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10914,10 +12786,60 @@
     ]
   },
   {
-    "application_field_id": "b3d87b040abef2a30f4c",
+    "application_field_id": "f0a01fee8d124cf09506",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyProfilePage.tsx",
+    "line": 289,
+    "route_hints": [
+      "#/company/",
+      "#/account/"
+    ],
+    "label": null,
+    "attribute": "companyId",
+    "expression": "firm.firm_id",
+    "property_chains": [
+      "firm.firm_id"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "2e176d134c60f98a8550",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyProfilePage.tsx",
+    "line": 289,
+    "route_hints": [
+      "#/company/",
+      "#/account/"
+    ],
+    "label": null,
+    "attribute": "canonicalName",
+    "expression": "firm.canonical_name",
+    "property_chains": [
+      "firm.canonical_name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ]
+  },
+  {
+    "application_field_id": "c0ee89d9583b28310c9a",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 290,
+    "line": 293,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10939,10 +12861,10 @@
     ]
   },
   {
-    "application_field_id": "a86ae659db438bd978ae",
+    "application_field_id": "2647811bbef4c040e041",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 290,
+    "line": 293,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10965,10 +12887,10 @@
     ]
   },
   {
-    "application_field_id": "354df027c91f56f58da6",
+    "application_field_id": "2b681757288a224bb2cb",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 303,
+    "line": 306,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -10990,10 +12912,10 @@
     ]
   },
   {
-    "application_field_id": "58e7d51e7da3b9d02204",
+    "application_field_id": "b6a1324f6c77170240d4",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 315,
+    "line": 318,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11016,10 +12938,10 @@
     ]
   },
   {
-    "application_field_id": "52fae6e064006a8b9500",
+    "application_field_id": "3d2db4239371396cb636",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 315,
+    "line": 318,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11041,10 +12963,10 @@
     ]
   },
   {
-    "application_field_id": "805db540400e6a2f2cba",
+    "application_field_id": "40a4269a03f49a5201a9",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 316,
+    "line": 319,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11067,10 +12989,10 @@
     ]
   },
   {
-    "application_field_id": "eb18b209f55dd82d4a12",
+    "application_field_id": "e010760b92f270f95277",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 316,
+    "line": 319,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11092,10 +13014,10 @@
     ]
   },
   {
-    "application_field_id": "abcb534222fdc4f8cf0a",
+    "application_field_id": "eb291fc9aff71a3c36ed",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 319,
+    "line": 322,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11117,10 +13039,10 @@
     ]
   },
   {
-    "application_field_id": "d5d3e214b5194ecaaac7",
+    "application_field_id": "6ac0e3c6c572ce2b5084",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 320,
+    "line": 323,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11144,10 +13066,10 @@
     ]
   },
   {
-    "application_field_id": "fa0574ad3f6a3450696f",
+    "application_field_id": "de736eb105657ff46c67",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 321,
+    "line": 324,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11170,10 +13092,10 @@
     ]
   },
   {
-    "application_field_id": "7baf032837625639493a",
+    "application_field_id": "eea6fccf7ac2b0a22cbc",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 322,
+    "line": 325,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11198,10 +13120,10 @@
     ]
   },
   {
-    "application_field_id": "f4c9494d20a27c042369",
+    "application_field_id": "57691ee34319f450a9b8",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 323,
+    "line": 326,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11224,10 +13146,10 @@
     ]
   },
   {
-    "application_field_id": "122f588f45378b38365a",
+    "application_field_id": "52d64770fd993e3e76a8",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 323,
+    "line": 326,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11250,10 +13172,10 @@
     ]
   },
   {
-    "application_field_id": "da780d38ed378cfcc57e",
+    "application_field_id": "6c9e416bb8ba195d346c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 323,
+    "line": 326,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11276,10 +13198,10 @@
     ]
   },
   {
-    "application_field_id": "18c3b99381fe0362e58a",
+    "application_field_id": "1076dbbbeeaf7135ae51",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 324,
+    "line": 327,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11302,10 +13224,10 @@
     ]
   },
   {
-    "application_field_id": "af585e2ae3e760acebee",
+    "application_field_id": "cdb9e85a47b69f97a3ca",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 326,
+    "line": 329,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11328,10 +13250,10 @@
     ]
   },
   {
-    "application_field_id": "6878b29f30660f8535fb",
+    "application_field_id": "0a605bcbba4335d577c8",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 326,
+    "line": 329,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11353,10 +13275,10 @@
     ]
   },
   {
-    "application_field_id": "baa13a065fcf9df9088b",
+    "application_field_id": "84dc1cc0262171ed72fb",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 343,
+    "line": 346,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11378,10 +13300,10 @@
     ]
   },
   {
-    "application_field_id": "25367bf7d5014dd4b21c",
+    "application_field_id": "b9adc1a1198fc7c6e459",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 343,
+    "line": 346,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11403,10 +13325,10 @@
     ]
   },
   {
-    "application_field_id": "8d5bf252e151f711be2a",
+    "application_field_id": "0e9c3b1b0f01612b79ba",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 345,
+    "line": 348,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11429,10 +13351,10 @@
     ]
   },
   {
-    "application_field_id": "efa080911fdf20efa04a",
+    "application_field_id": "e561037cb71d3e4cc0a2",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 345,
+    "line": 348,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11456,10 +13378,10 @@
     ]
   },
   {
-    "application_field_id": "4af4cf58d7da875d0414",
+    "application_field_id": "7c81baf359f957c4a7dd",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 345,
+    "line": 348,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11481,10 +13403,10 @@
     ]
   },
   {
-    "application_field_id": "fb1d6171ae754cb78955",
+    "application_field_id": "c581e67ab156bf8285ff",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 346,
+    "line": 349,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11507,10 +13429,10 @@
     ]
   },
   {
-    "application_field_id": "7a688c365ed732d296c5",
+    "application_field_id": "2a3748f70b29e70029c0",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 346,
+    "line": 349,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11532,10 +13454,10 @@
     ]
   },
   {
-    "application_field_id": "71a2874eb951c7c21549",
+    "application_field_id": "55bd7aaf41181e453e78",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 346,
+    "line": 349,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11557,10 +13479,10 @@
     ]
   },
   {
-    "application_field_id": "3a9ba18358f4492fee09",
+    "application_field_id": "59cb1c94f002c07c6079",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 346,
+    "line": 349,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11583,10 +13505,10 @@
     ]
   },
   {
-    "application_field_id": "9b3189f7fffc0cbd68b3",
+    "application_field_id": "cad1ec64c9ba02a0c4e3",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 347,
+    "line": 350,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11610,10 +13532,10 @@
     ]
   },
   {
-    "application_field_id": "1dfda0a022343010e0b8",
+    "application_field_id": "babfb7848614e406245c",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 347,
+    "line": 350,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11635,10 +13557,10 @@
     ]
   },
   {
-    "application_field_id": "4f594819565bb39125fd",
+    "application_field_id": "632ea4b19e2242938445",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 347,
+    "line": 350,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11660,10 +13582,10 @@
     ]
   },
   {
-    "application_field_id": "e8cea2cdfa6d2aa3f5aa",
+    "application_field_id": "9544f2b50f86cb5eaa01",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 347,
+    "line": 350,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11685,10 +13607,10 @@
     ]
   },
   {
-    "application_field_id": "23e41354055a2cadb88e",
+    "application_field_id": "5d5c87c5c9e845390ab3",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 348,
+    "line": 351,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11712,10 +13634,10 @@
     ]
   },
   {
-    "application_field_id": "fd21aa0aa592d5014a4b",
+    "application_field_id": "84fbed57dc18e4888e38",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 348,
+    "line": 351,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11738,10 +13660,10 @@
     ]
   },
   {
-    "application_field_id": "d2d1f9125a2bd33f493d",
+    "application_field_id": "8d029631a8d93b8943b0",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 348,
+    "line": 351,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11763,10 +13685,10 @@
     ]
   },
   {
-    "application_field_id": "3bfbb730f6c6eb4ff53a",
+    "application_field_id": "b4a1b8f2fa60842a730b",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 348,
+    "line": 351,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11789,10 +13711,10 @@
     ]
   },
   {
-    "application_field_id": "a135bd6b3b88de61f371",
+    "application_field_id": "6b537e64abf02d3dd6de",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 348,
+    "line": 351,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11814,10 +13736,10 @@
     ]
   },
   {
-    "application_field_id": "10ef2b16239f9b3082ef",
+    "application_field_id": "d44ee3d8adc797dd356c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 349,
+    "line": 352,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11840,10 +13762,10 @@
     ]
   },
   {
-    "application_field_id": "b40da1aca8b3a39304d5",
+    "application_field_id": "42f6d4f0799c0cd4e58c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 349,
+    "line": 352,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11866,10 +13788,10 @@
     ]
   },
   {
-    "application_field_id": "9367d4bb7b408a2756d5",
+    "application_field_id": "8695894a222424ee36da",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 349,
+    "line": 352,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11891,10 +13813,10 @@
     ]
   },
   {
-    "application_field_id": "2236c230a46bddf097c6",
+    "application_field_id": "a6068fb1f6b57794787e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 350,
+    "line": 353,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11919,10 +13841,10 @@
     ]
   },
   {
-    "application_field_id": "d2f38ca9d273ee3d0589",
+    "application_field_id": "aa3eca92bddcdf9b8daa",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 350,
+    "line": 353,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11945,10 +13867,10 @@
     ]
   },
   {
-    "application_field_id": "8b07e277ee8cd7023864",
+    "application_field_id": "fbaa49fcf30e12e884bd",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 350,
+    "line": 353,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11970,10 +13892,10 @@
     ]
   },
   {
-    "application_field_id": "53c0b1fdbf790d7ff2c4",
+    "application_field_id": "849722955e7594575991",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 350,
+    "line": 353,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -11995,10 +13917,10 @@
     ]
   },
   {
-    "application_field_id": "7273749f54e2f4963c90",
+    "application_field_id": "ed648a3ce1b37fb9fa1d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 350,
+    "line": 353,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12021,10 +13943,10 @@
     ]
   },
   {
-    "application_field_id": "9b8bcf8597d7c06526ba",
+    "application_field_id": "df7d65956e42197224e9",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 351,
+    "line": 354,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12047,10 +13969,10 @@
     ]
   },
   {
-    "application_field_id": "3c87c81282f5993a6c6a",
+    "application_field_id": "4695ad98386efb99ff6a",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 351,
+    "line": 354,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12073,10 +13995,10 @@
     ]
   },
   {
-    "application_field_id": "45dee43957c2bccc53b1",
+    "application_field_id": "655d7e4b508742e05692",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 351,
+    "line": 354,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12099,10 +14021,10 @@
     ]
   },
   {
-    "application_field_id": "f1f9fa8a20ed3818eb98",
+    "application_field_id": "fe414dd8c150c4ca3d8b",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 351,
+    "line": 354,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12125,10 +14047,10 @@
     ]
   },
   {
-    "application_field_id": "8a9bdb91b8fbf0dc82d0",
+    "application_field_id": "1fd46b4ed4d765c8932a",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 351,
+    "line": 354,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12151,10 +14073,10 @@
     ]
   },
   {
-    "application_field_id": "48cbfbfb6853b31e9f7e",
+    "application_field_id": "58a9d101fa6ec5877b83",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 351,
+    "line": 354,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12177,10 +14099,10 @@
     ]
   },
   {
-    "application_field_id": "f9773ce6dbf45000b629",
+    "application_field_id": "3113ee4a97ef3cc8fc11",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 351,
+    "line": 354,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12202,10 +14124,10 @@
     ]
   },
   {
-    "application_field_id": "70965d551b9f4a9b03a9",
+    "application_field_id": "b39266753d8dc9fa7f1e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 352,
+    "line": 355,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12232,10 +14154,10 @@
     ]
   },
   {
-    "application_field_id": "e3f0bafa34ee42d141f0",
+    "application_field_id": "b0e314ab23e8b1cd3fed",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 352,
+    "line": 355,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12257,10 +14179,10 @@
     ]
   },
   {
-    "application_field_id": "328242cb958d8b94cff8",
+    "application_field_id": "2f33a4d83c82709331e6",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 352,
+    "line": 355,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12284,10 +14206,10 @@
     ]
   },
   {
-    "application_field_id": "dfc65d9c2a30cb620eb0",
+    "application_field_id": "6c8b667d57f1f5499c23",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 352,
+    "line": 355,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12310,10 +14232,10 @@
     ]
   },
   {
-    "application_field_id": "d67bfe70e91b9d3c3f2b",
+    "application_field_id": "993ce77a34f8810f41ef",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 352,
+    "line": 355,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12335,10 +14257,10 @@
     ]
   },
   {
-    "application_field_id": "064d69b81916597d202d",
+    "application_field_id": "73870210d4bac6c24cbe",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 353,
+    "line": 356,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12362,10 +14284,10 @@
     ]
   },
   {
-    "application_field_id": "790b7fe855969c971d3e",
+    "application_field_id": "402b6b8070f7260a0d0d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 366,
+    "line": 369,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12388,10 +14310,10 @@
     ]
   },
   {
-    "application_field_id": "d43611dca8f9c7cff643",
+    "application_field_id": "955de6d43db64b649aa1",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 367,
+    "line": 370,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12413,10 +14335,10 @@
     ]
   },
   {
-    "application_field_id": "8a04f783709157262a36",
+    "application_field_id": "507458484b817790e685",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 367,
+    "line": 370,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12438,10 +14360,10 @@
     ]
   },
   {
-    "application_field_id": "090f42aae707ad43dc45",
+    "application_field_id": "2d86f0855eea696c7fcc",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 367,
+    "line": 370,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12463,10 +14385,10 @@
     ]
   },
   {
-    "application_field_id": "38914fd1b98ca09447a6",
+    "application_field_id": "114fcffdcda72b36ac40",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 367,
+    "line": 370,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12488,10 +14410,10 @@
     ]
   },
   {
-    "application_field_id": "3f657340b4cd6ea5aa88",
+    "application_field_id": "a75179c6cb8a34853fb4",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 367,
+    "line": 370,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12513,10 +14435,10 @@
     ]
   },
   {
-    "application_field_id": "4a1a92de3019db627201",
+    "application_field_id": "5c957e386ee5dfc48ed5",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 367,
+    "line": 370,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12539,10 +14461,10 @@
     ]
   },
   {
-    "application_field_id": "4893c85954c859194003",
+    "application_field_id": "6a4f0f0be21637a3e46b",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 368,
+    "line": 371,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12566,10 +14488,10 @@
     ]
   },
   {
-    "application_field_id": "32de4a399b850a37cc3a",
+    "application_field_id": "c24fd6efee4d706d28cf",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 368,
+    "line": 371,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12592,10 +14514,10 @@
     ]
   },
   {
-    "application_field_id": "bb9a6bc41f316b78a5be",
+    "application_field_id": "fd87a402584cf636d4e9",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 372,
+    "line": 375,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12618,10 +14540,10 @@
     ]
   },
   {
-    "application_field_id": "9ee76deef0876316a464",
+    "application_field_id": "4fd4c5cf619596fdc739",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 372,
+    "line": 375,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12644,10 +14566,10 @@
     ]
   },
   {
-    "application_field_id": "ff191c84f7c4200edb90",
+    "application_field_id": "027a08401738b6d027ff",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 372,
+    "line": 375,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12670,10 +14592,10 @@
     ]
   },
   {
-    "application_field_id": "7f875c6edc5f4f4b83c0",
+    "application_field_id": "320b5e35b28eca733169",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 372,
+    "line": 375,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12696,10 +14618,10 @@
     ]
   },
   {
-    "application_field_id": "e09a3523a22ef8c31630",
+    "application_field_id": "57a8eef88ca926e1fbef",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 372,
+    "line": 375,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12722,10 +14644,10 @@
     ]
   },
   {
-    "application_field_id": "644165a0d02e3717ba4d",
+    "application_field_id": "76f5b6243b7f45e64abd",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 372,
+    "line": 375,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12748,10 +14670,10 @@
     ]
   },
   {
-    "application_field_id": "041fa778c5a42a50356e",
+    "application_field_id": "a8812b1826feaf3f866a",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 373,
+    "line": 376,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12774,10 +14696,10 @@
     ]
   },
   {
-    "application_field_id": "9b39a9af2fcc23bd83d1",
+    "application_field_id": "d17d34c65419481f59c6",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 373,
+    "line": 376,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12799,10 +14721,10 @@
     ]
   },
   {
-    "application_field_id": "0e536c9731b75a145b24",
+    "application_field_id": "d1a9b33f8104c74a8e61",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 374,
+    "line": 377,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12825,10 +14747,10 @@
     ]
   },
   {
-    "application_field_id": "975f18f7ca4b186e5eef",
+    "application_field_id": "fbcfd6f98743d2813c10",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 374,
+    "line": 377,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12850,10 +14772,10 @@
     ]
   },
   {
-    "application_field_id": "4b39e294d55a9014e28c",
+    "application_field_id": "7c402bdb8106b06ef904",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 379,
+    "line": 382,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12876,10 +14798,10 @@
     ]
   },
   {
-    "application_field_id": "1fd31afa376f1ddf2112",
+    "application_field_id": "bb266862de50d528375a",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 380,
+    "line": 383,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12901,10 +14823,10 @@
     ]
   },
   {
-    "application_field_id": "4f119a1dfcfdcfd7522f",
+    "application_field_id": "9da3984a81aeef257179",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 380,
+    "line": 383,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12926,10 +14848,10 @@
     ]
   },
   {
-    "application_field_id": "5e8bf1cf7e9968a8b918",
+    "application_field_id": "4639357cc082eeb62c0c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 380,
+    "line": 383,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12951,10 +14873,10 @@
     ]
   },
   {
-    "application_field_id": "9e5e388b095984d5da24",
+    "application_field_id": "021e3d846d9bb16183fb",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 380,
+    "line": 383,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -12976,10 +14898,10 @@
     ]
   },
   {
-    "application_field_id": "d77301e52d038b0edf08",
+    "application_field_id": "b180b0c7a7d10e157003",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 380,
+    "line": 383,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13001,10 +14923,10 @@
     ]
   },
   {
-    "application_field_id": "20ad90816a38dcd79425",
+    "application_field_id": "ce558273a6e3fbf7de19",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 384,
+    "line": 387,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13027,10 +14949,10 @@
     ]
   },
   {
-    "application_field_id": "a382d715c61d41c8945a",
+    "application_field_id": "a090793980704fa99f47",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 385,
+    "line": 388,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13057,10 +14979,10 @@
     ]
   },
   {
-    "application_field_id": "720d34eb7b97f735d8e2",
+    "application_field_id": "e171444b104178a0811f",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 385,
+    "line": 388,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13084,10 +15006,10 @@
     ]
   },
   {
-    "application_field_id": "d111015acadbbbae09b6",
+    "application_field_id": "480c3f0466a53d8a9c58",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 385,
+    "line": 388,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13109,10 +15031,10 @@
     ]
   },
   {
-    "application_field_id": "612c7819462423a022d3",
+    "application_field_id": "f160da3653e3311390b7",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 385,
+    "line": 388,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13134,10 +15056,10 @@
     ]
   },
   {
-    "application_field_id": "b9a07f8792bf7e9606a4",
+    "application_field_id": "0b3749317a9f5c05b5ae",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 385,
+    "line": 388,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13159,10 +15081,10 @@
     ]
   },
   {
-    "application_field_id": "3aa27b68adcb4f08a994",
+    "application_field_id": "d04c7fc68dee02e401a5",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 385,
+    "line": 388,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13185,10 +15107,10 @@
     ]
   },
   {
-    "application_field_id": "3a83a5ce83c309567ab2",
+    "application_field_id": "7bbe87b35c62a124031d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 389,
+    "line": 392,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13211,10 +15133,10 @@
     ]
   },
   {
-    "application_field_id": "09800a137bb8f7a4e540",
+    "application_field_id": "993a24f05543e52ddd1d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 389,
+    "line": 392,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13236,10 +15158,10 @@
     ]
   },
   {
-    "application_field_id": "0ec3910f223e8ede8ed2",
+    "application_field_id": "d07f6f93208b68290e4c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 392,
+    "line": 395,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13262,10 +15184,10 @@
     ]
   },
   {
-    "application_field_id": "c76ef09387c4a1161181",
+    "application_field_id": "cda6191536b6f548e12a",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13287,10 +15209,10 @@
     ]
   },
   {
-    "application_field_id": "5872fe58ea6f0e9864a0",
+    "application_field_id": "62b443131ed21a75661b",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13310,10 +15232,10 @@
     ]
   },
   {
-    "application_field_id": "3a894ebdb829610d2720",
+    "application_field_id": "020d2fe7618be9dea89c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13336,10 +15258,10 @@
     ]
   },
   {
-    "application_field_id": "3a5cab32a04d820385c9",
+    "application_field_id": "8b666ef131fbaeb64560",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13362,10 +15284,10 @@
     ]
   },
   {
-    "application_field_id": "cf632ca3d58b2bee2a09",
+    "application_field_id": "1248011dacaf73973bb3",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13387,10 +15309,10 @@
     ]
   },
   {
-    "application_field_id": "72d44228b07f79995581",
+    "application_field_id": "4dd9799785ef3a75826d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13412,10 +15334,10 @@
     ]
   },
   {
-    "application_field_id": "773c5763d43542d26a69",
+    "application_field_id": "76561c38e297225af67d",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13437,10 +15359,10 @@
     ]
   },
   {
-    "application_field_id": "578289b12d7b084806a1",
+    "application_field_id": "500ae2c5c3aa02991f5a",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13463,10 +15385,10 @@
     ]
   },
   {
-    "application_field_id": "06e6e5171618f2495113",
+    "application_field_id": "077a6659f5a0fe4d47cb",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13486,10 +15408,10 @@
     ]
   },
   {
-    "application_field_id": "0de2d85dbf5ab638cf75",
+    "application_field_id": "75b3deff68db5b6fc973",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13511,10 +15433,10 @@
     ]
   },
   {
-    "application_field_id": "d5db37625759a0c34dd3",
+    "application_field_id": "eaaf87e0841cbe2ebd74",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13536,10 +15458,10 @@
     ]
   },
   {
-    "application_field_id": "b1009ff72681d5912963",
+    "application_field_id": "3628f37895bcc6e1969e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 393,
+    "line": 396,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -13562,10 +15484,10 @@
     ]
   },
   {
-    "application_field_id": "d6e4a989a3c29a743202",
+    "application_field_id": "d2686f43d351384baf0c",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 396,
+    "line": 399,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -34088,10 +36010,10 @@
     ]
   },
   {
-    "application_field_id": "44851bdbf1121f574db8",
+    "application_field_id": "74a83c2c03de3ad29ff9",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 126,
+    "line": 125,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -34113,10 +36035,10 @@
     ]
   },
   {
-    "application_field_id": "903e69b69c6de9f5473a",
+    "application_field_id": "5e1bca05ad47c332c8fc",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 127,
+    "line": 126,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -34138,10 +36060,10 @@
     ]
   },
   {
-    "application_field_id": "a2b7adc5fe50c86f2ffb",
+    "application_field_id": "61525d1d0ef85b5cb583",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 130,
+    "line": 129,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -34166,10 +36088,10 @@
     ]
   },
   {
-    "application_field_id": "65bb8577c99b8bacecba",
+    "application_field_id": "9d8d20275e491e64452f",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 133,
+    "line": 132,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -34194,10 +36116,10 @@
     ]
   },
   {
-    "application_field_id": "6c24c19e58e614c9f7f3",
+    "application_field_id": "acc14dc96366dc218446",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 133,
+    "line": 132,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -34219,10 +36141,10 @@
     ]
   },
   {
-    "application_field_id": "8e5fed92231e8e54ec1c",
+    "application_field_id": "1a0ec773818fab4d3cd9",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 133,
+    "line": 132,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -34244,10 +36166,10 @@
     ]
   },
   {
-    "application_field_id": "f25a744e898585e61628",
+    "application_field_id": "523743a3a40bc26d9f40",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 150,
+    "line": 149,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -34269,10 +36191,10 @@
     ]
   },
   {
-    "application_field_id": "beeecf6f384c15222726",
+    "application_field_id": "74eaf6b995544581ce40",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 159,
+    "line": 158,
     "route_hints": [
       "#/home",
       "#/my-account"

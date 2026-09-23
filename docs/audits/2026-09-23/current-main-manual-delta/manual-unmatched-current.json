@@ -1,0 +1,609 @@
+[
+  {
+    "application_field_id": "dd5eaf2ad4137bb5a60c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/AuthLandingPage.tsx",
+    "line": 65,
+    "route_hints": [],
+    "label": null,
+    "attribute": "disabled",
+    "expression": "busy || !email.trim() || password.length < 8",
+    "property_chains": [
+      "email.trim",
+      "password.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "busy || !email.trim() || password.length < 8",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "STILL_UNRESOLVED",
+    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "NO_TYPE_FIELD_TRACE",
+    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+    "field_properties": [
+      "length"
+    ],
+    "type_candidates": [],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "124b8ad26eeff79a02bf",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 74,
+    "route_hints": [
+      "#/account/"
+    ],
+    "label": null,
+    "attribute": null,
+    "expression": "c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'",
+    "property_chains": [
+      "c.outcome.hearing_result.toUpperCase"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter c iterates over 0, 3",
+    "callback_trace": {
+      "line": 74,
+      "param": "c",
+      "collection": "0, 3",
+      "text": "{m.cases.slice(0, 3).map((c, i) => <div className=\"tsr-case-row\" key={i}><div><h4>{c.title}</h4><p>{c.text}</p><small>{c.violation.violation_code || 'Code not shown'} \u00b7 Ticket {c.violation.summons_number || 'not shown'}</small></div><div><span className={`tsr-badge ${c.dismissed ? 'dismissed' : c.outcome ? 'verify' : 'unknown'}`}>{c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'}</span><h4>{c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`}</h4><p>Decision: {reportDate(c.outcome?.decision_date)}</p><p>{c.dismissed ? (m.dismissalExcluded ? 'Excluded from the findings score' : 'Dismissal shown in the case record') : c.outcome?.c"
+    },
+    "stage18_class": "COMPONENT_SCOPED_DATA_DERIVATION",
+    "stage18_reason": "Unresolved expression is confined to a data-bearing component; exact field derivation still requires local manual trace",
+    "expanded_collection": "0, 3",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+    "field_properties": [
+      "outcome",
+      "hearing_result"
+    ],
+    "type_candidates": [
+      {
+        "property": "outcome",
+        "type": "CompanyAdminActivity",
+        "domain": "COMPANY_FIRM",
+        "file": "src/types/companyAdmin.ts",
+        "line": 90,
+        "declared_type": "string | null"
+      },
+      {
+        "property": "hearing_result",
+        "type": "OathCase",
+        "domain": "OATH",
+        "file": "src/types/data.ts",
+        "line": 244,
+        "declared_type": "string | null"
+      }
+    ],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "f0877ba39eb2a3172aed",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 74,
+    "route_hints": [
+      "#/account/"
+    ],
+    "label": null,
+    "attribute": null,
+    "expression": "c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`",
+    "property_chains": [
+      "c.outcome.balance_due"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter c iterates over 0, 3",
+    "callback_trace": {
+      "line": 74,
+      "param": "c",
+      "collection": "0, 3",
+      "text": "{m.cases.slice(0, 3).map((c, i) => <div className=\"tsr-case-row\" key={i}><div><h4>{c.title}</h4><p>{c.text}</p><small>{c.violation.violation_code || 'Code not shown'} \u00b7 Ticket {c.violation.summons_number || 'not shown'}</small></div><div><span className={`tsr-badge ${c.dismissed ? 'dismissed' : c.outcome ? 'verify' : 'unknown'}`}>{c.outcome?.hearing_result?.toUpperCase() || 'NOT SHOWN'}</span><h4>{c.outcome?.balance_due == null ? 'Balance not shown' : `${reportMoney(c.outcome.balance_due)} balance shown`}</h4><p>Decision: {reportDate(c.outcome?.decision_date)}</p><p>{c.dismissed ? (m.dismissalExcluded ? 'Excluded from the findings score' : 'Dismissal shown in the case record') : c.outcome?.c"
+    },
+    "stage18_class": "COMPONENT_SCOPED_DATA_DERIVATION",
+    "stage18_reason": "Unresolved expression is confined to a data-bearing component; exact field derivation still requires local manual trace",
+    "expanded_collection": "0, 3",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+    "field_properties": [
+      "outcome",
+      "balance_due"
+    ],
+    "type_candidates": [
+      {
+        "property": "outcome",
+        "type": "CompanyAdminActivity",
+        "domain": "COMPANY_FIRM",
+        "file": "src/types/companyAdmin.ts",
+        "line": 90,
+        "declared_type": "string | null"
+      },
+      {
+        "property": "balance_due",
+        "type": "OathCase",
+        "domain": "OATH",
+        "file": "src/types/data.ts",
+        "line": 252,
+        "declared_type": "number | null"
+      }
+    ],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "0331378b3243bc0d6b56",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/ClientSiteReport.tsx",
+    "line": 74,
+    "route_hints": [
+      "#/account/"
+    ],
+    "label": "Decision:",
+    "attribute": null,
+    "expression": "reportDate(c.outcome?.decision_date)",
+    "property_chains": [
+      "c.outcome.decision_date"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "reportDate(c.outcome?.decision_date)",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "COMPONENT_SCOPED_DATA_DERIVATION",
+    "stage18_reason": "Unresolved expression is confined to a data-bearing component; exact field derivation still requires local manual trace",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+    "field_properties": [
+      "outcome",
+      "decision_date"
+    ],
+    "type_candidates": [
+      {
+        "property": "outcome",
+        "type": "CompanyAdminActivity",
+        "domain": "COMPANY_FIRM",
+        "file": "src/types/companyAdmin.ts",
+        "line": 90,
+        "declared_type": "string | null"
+      },
+      {
+        "property": "decision_date",
+        "type": "OathCase",
+        "domain": "OATH",
+        "file": "src/types/data.ts",
+        "line": 246,
+        "declared_type": "string | null"
+      }
+    ],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "ff44e2ea7a7395b1f055",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 301,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "savedAt && <small>Saved {new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</small>",
+    "property_chains": [
+      "toLocaleTimeString"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "savedAt && <small>Saved {new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</small>",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "STILL_UNRESOLVED",
+    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "NO_TYPE_FIELD_TRACE",
+    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+    "field_properties": [],
+    "type_candidates": [],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "fc5eada1188952f36386",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 301,
+    "route_hints": [],
+    "label": "Saved",
+    "attribute": null,
+    "expression": "new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })",
+    "property_chains": [
+      "toLocaleTimeString"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "STILL_UNRESOLVED",
+    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "NO_TYPE_FIELD_TRACE",
+    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+    "field_properties": [],
+    "type_candidates": [],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "b3e2802c62645d497a6f",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 368,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)",
+    "property_chains": [
+      "relationshipStatuses.map"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "STILL_UNRESOLVED",
+    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [
+      {
+        "identifier": "value",
+        "definition": "noteDrafts[noteId]?.trim()",
+        "expanded_definition": "noteDrafts[noteId]?.trim()"
+      }
+    ],
+    "stage19_class": "NO_TYPE_FIELD_TRACE",
+    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+    "field_properties": [],
+    "type_candidates": [],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "3c781162e9813a90c7e1",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 383,
+    "route_hints": [],
+    "label": "Add contact",
+    "attribute": "disabled",
+    "expression": "busy || !contactName.trim()",
+    "property_chains": [
+      "contactName.trim"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "busy || !contactName.trim()",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "STILL_UNRESOLVED",
+    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "NO_TYPE_FIELD_TRACE",
+    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+    "field_properties": [],
+    "type_candidates": [],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "b4e06b6695e353e51897",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 394,
+    "route_hints": [],
+    "label": "logged interactions",
+    "attribute": null,
+    "expression": "activities.length",
+    "property_chains": [
+      "activities.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "activities.length",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "STILL_UNRESOLVED",
+    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "NO_TYPE_FIELD_TRACE",
+    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+    "field_properties": [
+      "length"
+    ],
+    "type_candidates": [],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "500a1496f1bc2bddcba1",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 407,
+    "route_hints": [],
+    "label": "notes \u00b7 private",
+    "attribute": null,
+    "expression": "notes.length",
+    "property_chains": [
+      "notes.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "notes.length",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "STILL_UNRESOLVED",
+    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "NO_TYPE_FIELD_TRACE",
+    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+    "field_properties": [
+      "length"
+    ],
+    "type_candidates": [],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "2513b352f9ed44626cd5",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 408,
+    "route_hints": [],
+    "label": "Add note",
+    "attribute": "disabled",
+    "expression": "busy || !newNote.trim()",
+    "property_chains": [
+      "newNote.trim"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "busy || !newNote.trim()",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null,
+    "stage18_class": "STILL_UNRESOLVED",
+    "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+    "expanded_collection": "",
+    "collection_definition_trace": [],
+    "expression_definition_trace": [],
+    "stage19_class": "NO_TYPE_FIELD_TRACE",
+    "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+    "field_properties": [],
+    "type_candidates": [],
+    "chosen_domain": null
+  },
+  {
+    "application_field_id": "d70f43e4111c4845eaa7",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/SourceHealthExpansion.tsx",
+    "line": 121,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "contract.note",
+    "property_chains": [
+      "contract.note"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "contract.note",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter contract iterates over refreshContracts",
+    "callback_trace": {
+      "line": 116,
+      "param": "contract",
+      "collection": "refreshContracts",
+      "text": "{refreshContracts.map(contract => <tr key={contract.source}>"
+    },
+    "stage18_class": "COMPONENT_SCOPED_DATA_DERIVATION",
+    "stage18_reason": "Unresolved expression is confined to a data-bearing component; exact field derivation still requires local manual trace",
+    "expanded_collection": "refreshContracts\n/* refreshContracts := [ */",
+    "collection_definition_trace": [
+      {
+        "identifier": "refreshContracts",
+        "definition": "[",
+        "expanded_definition": "["
+      }
+    ],
+    "expression_definition_trace": [],
+    "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+    "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+    "field_properties": [
+      "note"
+    ],
+    "type_candidates": [
+      {
+        "property": "note",
+        "type": "CompanyAdminNote",
+        "domain": "COMPANY_FIRM",
+        "file": "src/types/companyAdmin.ts",
+        "line": 99,
+        "declared_type": "string"
+      },
+      {
+        "property": "note",
+        "type": "WorkflowAccountState",
+        "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
+        "file": "src/types/workflow.ts",
+        "line": 29,
+        "declared_type": "string"
+      },
+      {
+        "property": "note",
+        "type": "WorkflowAccountPatch",
+        "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
+        "file": "src/types/workflow.ts",
+        "line": 50,
+        "declared_type": "string"
+      }
+    ],
+    "chosen_domain": null
+  }
+]

@@ -1,10 +1,10 @@
 {
-  "runtime_source_files": 89,
-  "jsx_expression_fields": 3041,
+  "runtime_source_files": 92,
+  "jsx_expression_fields": 3143,
   "report_export_fields": 7,
-  "deduplicated_application_expression_records": 3021,
-  "records_with_direct_core_source_name_candidates": 330,
-  "records_without_direct_core_source_name_candidates": 2691,
+  "deduplicated_application_expression_records": 3122,
+  "records_with_direct_core_source_name_candidates": 334,
+  "records_without_direct_core_source_name_candidates": 2788,
   "route_literal_files": 14,
   "route_literals": [
     "#/",

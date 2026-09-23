@@ -1,15 +1,19 @@
 {
-  "input_records": 1708,
+  "input_records": 1792,
   "class_counts": {
     "RESOLVED_WORKFLOW_OR_USER_STATE": 18,
-    "RESOLVED_SOURCE_PAYLOAD_OR_DERIVED_METRIC": 1108,
-    "STILL_UNRESOLVED": 366,
+    "RESOLVED_SOURCE_PAYLOAD_OR_DERIVED_METRIC": 1127,
+    "STILL_UNRESOLVED": 431,
     "RESOLVED_LOCAL_DERIVATION": 161,
     "RESOLVED_NORMALIZED_SOURCE_DERIVATION": 55
   },
-  "resolved_count": 1342,
-  "still_unresolved": 366,
+  "resolved_count": 1361,
+  "still_unresolved": 431,
   "top_unresolved_files": [
+    [
+      "src/components/CompanyAdminPanel.tsx",
+      64
+    ],
     [
       "src/components/DetailPanel.tsx",
       32
@@ -124,10 +128,6 @@
     ],
     [
       "src/components/TechnicianFieldPack.tsx",
-      3
-    ],
-    [
-      "src/components/TopNavigation.tsx",
       3
     ]
   ],

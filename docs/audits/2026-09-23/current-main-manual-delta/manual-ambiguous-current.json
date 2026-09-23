@@ -1,0 +1,1496 @@
+[
+  {
+    "current": {
+      "application_field_id": "f206a0c0b0c21bcaf00a",
+      "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+      "file": "src/App.tsx",
+      "line": 334,
+      "route_hints": [
+        "#/"
+      ],
+      "label": null,
+      "attribute": "row",
+      "expression": "selected",
+      "property_chains": [],
+      "conditional_visibility": false,
+      "verification": "STATIC_CURRENT_RUNTIME_AST",
+      "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+      "source_lineage_candidates": [],
+      "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+      "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+      "classification_reasons": [
+        "Runtime data-bearing expression without a direct core normalized-field candidate"
+      ],
+      "stage16_class": "STILL_UNRESOLVED",
+      "stage16_reason": "No recursive local definition or typed/source root established",
+      "typed_props": [],
+      "resolved_definitions": [],
+      "resolved_text": "selected",
+      "stage17_class": "STILL_UNRESOLVED",
+      "stage17_reason": "No nearby callback collection established",
+      "callback_trace": null,
+      "stage18_class": "STILL_UNRESOLVED",
+      "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+      "expanded_collection": "",
+      "collection_definition_trace": [],
+      "expression_definition_trace": [],
+      "stage19_class": "NO_TYPE_FIELD_TRACE",
+      "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+      "field_properties": [],
+      "type_candidates": [],
+      "chosen_domain": null
+    },
+    "prior_matches": [
+      {
+        "application_field_id": "7ded85dce0478dd4b5e9",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 335,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "row",
+        "expression": "selected",
+        "property_chains": [],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+        "classification_reasons": [
+          "Runtime data-bearing expression without a direct core normalized-field candidate"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "selected",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "NO_TYPE_FIELD_TRACE",
+        "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+        "field_properties": [],
+        "type_candidates": [],
+        "chosen_domain": null,
+        "manual_lineage_class": "NYC_SYSTEM_SELECTION",
+        "manual_lineage_reason": "Selected NYC SystemSummary/account payload passed to account/map/detail consumers.",
+        "manual_domain": "SYSTEM_ACCOUNT",
+        "manual_review_status": "RESOLVED"
+      },
+      {
+        "application_field_id": "ba1d9375f0e9ba442ecf",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 343,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "row",
+        "expression": "selected",
+        "property_chains": [],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+        "classification_reasons": [
+          "Runtime data-bearing expression without a direct core normalized-field candidate"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "selected",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "NO_TYPE_FIELD_TRACE",
+        "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+        "field_properties": [],
+        "type_candidates": [],
+        "chosen_domain": null,
+        "manual_lineage_class": "NYC_SYSTEM_SELECTION",
+        "manual_lineage_reason": "Selected NYC SystemSummary/account payload passed to account/map/detail consumers.",
+        "manual_domain": "SYSTEM_ACCOUNT",
+        "manual_review_status": "RESOLVED"
+      }
+    ]
+  },
+  {
+    "current": {
+      "application_field_id": "f31b3f82f185a5552f99",
+      "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+      "file": "src/App.tsx",
+      "line": 334,
+      "route_hints": [
+        "#/"
+      ],
+      "label": null,
+      "attribute": "historyEvents",
+      "expression": "changes.events.filter(event => event.system_id === selected.system_id)",
+      "property_chains": [
+        "changes.events.filter",
+        "event.system_id",
+        "selected.system_id"
+      ],
+      "conditional_visibility": false,
+      "verification": "STATIC_CURRENT_RUNTIME_AST",
+      "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+      "source_lineage_candidates": [],
+      "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+      "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+      "classification_reasons": [
+        "No reliable static category assigned"
+      ],
+      "stage16_class": "STILL_UNRESOLVED",
+      "stage16_reason": "No recursive local definition or typed/source root established",
+      "typed_props": [],
+      "resolved_definitions": [],
+      "resolved_text": "changes.events.filter(event => event.system_id === selected.system_id)",
+      "stage17_class": "STILL_UNRESOLVED",
+      "stage17_reason": "No nearby callback collection established",
+      "callback_trace": null,
+      "stage18_class": "STILL_UNRESOLVED",
+      "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+      "expanded_collection": "",
+      "collection_definition_trace": [],
+      "expression_definition_trace": [],
+      "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+      "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+      "field_properties": [
+        "events",
+        "system_id"
+      ],
+      "type_candidates": [
+        {
+          "property": "events",
+          "type": "NysChangesPayload",
+          "domain": "MULTI:NYS,HISTORY_CHANGE",
+          "file": "src/types/nys.ts",
+          "line": 111,
+          "declared_type": "NysChangeEvent[]"
+        },
+        {
+          "property": "events",
+          "type": "ChangesPayload",
+          "domain": "HISTORY_CHANGE",
+          "file": "src/types/history.ts",
+          "line": 55,
+          "declared_type": "ChangeEvent[]"
+        },
+        {
+          "property": "system_id",
+          "type": "NysSystem",
+          "domain": "MULTI:NYS,SYSTEM_ACCOUNT",
+          "file": "src/types/nys.ts",
+          "line": 4,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "NysChangeEvent",
+          "domain": "MULTI:NYS,HISTORY_CHANGE",
+          "file": "src/types/nys.ts",
+          "line": 91,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "WorkflowAccountState",
+          "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
+          "file": "src/types/workflow.ts",
+          "line": 27,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "WorkflowMembership",
+          "domain": "WORKFLOW",
+          "file": "src/types/workflow.ts",
+          "line": 37,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "SystemSummary",
+          "domain": "SYSTEM_ACCOUNT",
+          "file": "src/types/data.ts",
+          "line": 107,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "Inspection",
+          "domain": "UNKNOWN",
+          "file": "src/types/data.ts",
+          "line": 213,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "ChangeEvent",
+          "domain": "HISTORY_CHANGE",
+          "file": "src/types/history.ts",
+          "line": 33,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "LegionellaBuildingLink",
+          "domain": "LEGIONELLA",
+          "file": "src/types/enforcement.ts",
+          "line": 114,
+          "declared_type": "string"
+        }
+      ],
+      "chosen_domain": null
+    },
+    "prior_matches": [
+      {
+        "application_field_id": "4c24e35b835521f27b7c",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 335,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "historyEvents",
+        "expression": "changes.events.filter(event => event.system_id === selected.system_id)",
+        "property_chains": [
+          "changes.events.filter",
+          "event.system_id",
+          "selected.system_id"
+        ],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+        "classification_reasons": [
+          "No reliable static category assigned"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "changes.events.filter(event => event.system_id === selected.system_id)",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+        "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+        "field_properties": [
+          "events",
+          "system_id"
+        ],
+        "type_candidates": [
+          {
+            "property": "events",
+            "type": "NysChangesPayload",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 111,
+            "declared_type": "NysChangeEvent[]"
+          },
+          {
+            "property": "events",
+            "type": "ChangesPayload",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 55,
+            "declared_type": "ChangeEvent[]"
+          },
+          {
+            "property": "system_id",
+            "type": "NysSystem",
+            "domain": "MULTI:NYS,SYSTEM_ACCOUNT",
+            "file": "src/types/nys.ts",
+            "line": 4,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "NysChangeEvent",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 91,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "WorkflowAccountState",
+            "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
+            "file": "src/types/workflow.ts",
+            "line": 27,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "WorkflowMembership",
+            "domain": "WORKFLOW",
+            "file": "src/types/workflow.ts",
+            "line": 37,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "SystemSummary",
+            "domain": "SYSTEM_ACCOUNT",
+            "file": "src/types/data.ts",
+            "line": 107,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "Inspection",
+            "domain": "UNKNOWN",
+            "file": "src/types/data.ts",
+            "line": 213,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "ChangeEvent",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 33,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "LegionellaBuildingLink",
+            "domain": "LEGIONELLA",
+            "file": "src/types/enforcement.ts",
+            "line": 114,
+            "declared_type": "string"
+          }
+        ],
+        "chosen_domain": null,
+        "manual_lineage_class": "DERIVED_NYC_HISTORY",
+        "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+        "manual_domain": "NYC_HISTORY",
+        "manual_review_status": "RESOLVED"
+      },
+      {
+        "application_field_id": "396dc5278f17fbe8ddfe",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 343,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "historyEvents",
+        "expression": "changes.events.filter(event => event.system_id === selected.system_id)",
+        "property_chains": [
+          "changes.events.filter",
+          "event.system_id",
+          "selected.system_id"
+        ],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+        "classification_reasons": [
+          "No reliable static category assigned"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "changes.events.filter(event => event.system_id === selected.system_id)",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+        "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+        "field_properties": [
+          "events",
+          "system_id"
+        ],
+        "type_candidates": [
+          {
+            "property": "events",
+            "type": "NysChangesPayload",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 111,
+            "declared_type": "NysChangeEvent[]"
+          },
+          {
+            "property": "events",
+            "type": "ChangesPayload",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 55,
+            "declared_type": "ChangeEvent[]"
+          },
+          {
+            "property": "system_id",
+            "type": "NysSystem",
+            "domain": "MULTI:NYS,SYSTEM_ACCOUNT",
+            "file": "src/types/nys.ts",
+            "line": 4,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "NysChangeEvent",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 91,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "WorkflowAccountState",
+            "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
+            "file": "src/types/workflow.ts",
+            "line": 27,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "WorkflowMembership",
+            "domain": "WORKFLOW",
+            "file": "src/types/workflow.ts",
+            "line": 37,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "SystemSummary",
+            "domain": "SYSTEM_ACCOUNT",
+            "file": "src/types/data.ts",
+            "line": 107,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "Inspection",
+            "domain": "UNKNOWN",
+            "file": "src/types/data.ts",
+            "line": 213,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "ChangeEvent",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 33,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "LegionellaBuildingLink",
+            "domain": "LEGIONELLA",
+            "file": "src/types/enforcement.ts",
+            "line": 114,
+            "declared_type": "string"
+          }
+        ],
+        "chosen_domain": null,
+        "manual_lineage_class": "DERIVED_NYC_HISTORY",
+        "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+        "manual_domain": "NYC_HISTORY",
+        "manual_review_status": "RESOLVED"
+      }
+    ]
+  },
+  {
+    "current": {
+      "application_field_id": "2896baa490a58751df2f",
+      "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+      "file": "src/App.tsx",
+      "line": 334,
+      "route_hints": [
+        "#/"
+      ],
+      "label": null,
+      "attribute": "historyStartedAt",
+      "expression": "changes.history_started_at",
+      "property_chains": [
+        "changes.history_started_at"
+      ],
+      "conditional_visibility": false,
+      "verification": "STATIC_CURRENT_RUNTIME_AST",
+      "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+      "source_lineage_candidates": [],
+      "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+      "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+      "classification_reasons": [
+        "No reliable static category assigned"
+      ],
+      "stage16_class": "STILL_UNRESOLVED",
+      "stage16_reason": "No recursive local definition or typed/source root established",
+      "typed_props": [],
+      "resolved_definitions": [],
+      "resolved_text": "changes.history_started_at",
+      "stage17_class": "STILL_UNRESOLVED",
+      "stage17_reason": "No nearby callback collection established",
+      "callback_trace": null,
+      "stage18_class": "STILL_UNRESOLVED",
+      "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+      "expanded_collection": "",
+      "collection_definition_trace": [],
+      "expression_definition_trace": [],
+      "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+      "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+      "field_properties": [
+        "history_started_at"
+      ],
+      "type_candidates": [
+        {
+          "property": "history_started_at",
+          "type": "CoverageAuditPayload",
+          "domain": "SOURCE_HEALTH",
+          "file": "src/types/coverage.ts",
+          "line": 76,
+          "declared_type": "string | null"
+        },
+        {
+          "property": "history_started_at",
+          "type": "NysChangesPayload",
+          "domain": "MULTI:NYS,HISTORY_CHANGE",
+          "file": "src/types/nys.ts",
+          "line": 107,
+          "declared_type": "string"
+        },
+        {
+          "property": "history_started_at",
+          "type": "ChangesPayload",
+          "domain": "HISTORY_CHANGE",
+          "file": "src/types/history.ts",
+          "line": 51,
+          "declared_type": "string"
+        }
+      ],
+      "chosen_domain": null
+    },
+    "prior_matches": [
+      {
+        "application_field_id": "dd9dd36267f40a948f67",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 335,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "historyStartedAt",
+        "expression": "changes.history_started_at",
+        "property_chains": [
+          "changes.history_started_at"
+        ],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+        "classification_reasons": [
+          "No reliable static category assigned"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "changes.history_started_at",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+        "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+        "field_properties": [
+          "history_started_at"
+        ],
+        "type_candidates": [
+          {
+            "property": "history_started_at",
+            "type": "CoverageAuditPayload",
+            "domain": "SOURCE_HEALTH",
+            "file": "src/types/coverage.ts",
+            "line": 76,
+            "declared_type": "string | null"
+          },
+          {
+            "property": "history_started_at",
+            "type": "NysChangesPayload",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 107,
+            "declared_type": "string"
+          },
+          {
+            "property": "history_started_at",
+            "type": "ChangesPayload",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 51,
+            "declared_type": "string"
+          }
+        ],
+        "chosen_domain": null,
+        "manual_lineage_class": "DERIVED_NYC_HISTORY",
+        "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+        "manual_domain": "NYC_HISTORY",
+        "manual_review_status": "RESOLVED"
+      },
+      {
+        "application_field_id": "65ccee5096a0108047fb",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 343,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "historyStartedAt",
+        "expression": "changes.history_started_at",
+        "property_chains": [
+          "changes.history_started_at"
+        ],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+        "classification_reasons": [
+          "No reliable static category assigned"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "changes.history_started_at",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+        "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+        "field_properties": [
+          "history_started_at"
+        ],
+        "type_candidates": [
+          {
+            "property": "history_started_at",
+            "type": "CoverageAuditPayload",
+            "domain": "SOURCE_HEALTH",
+            "file": "src/types/coverage.ts",
+            "line": 76,
+            "declared_type": "string | null"
+          },
+          {
+            "property": "history_started_at",
+            "type": "NysChangesPayload",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 107,
+            "declared_type": "string"
+          },
+          {
+            "property": "history_started_at",
+            "type": "ChangesPayload",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 51,
+            "declared_type": "string"
+          }
+        ],
+        "chosen_domain": null,
+        "manual_lineage_class": "DERIVED_NYC_HISTORY",
+        "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+        "manual_domain": "NYC_HISTORY",
+        "manual_review_status": "RESOLVED"
+      }
+    ]
+  },
+  {
+    "current": {
+      "application_field_id": "f6abb9dc502d1420a78f",
+      "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+      "file": "src/App.tsx",
+      "line": 342,
+      "route_hints": [
+        "#/"
+      ],
+      "label": null,
+      "attribute": "row",
+      "expression": "selected",
+      "property_chains": [],
+      "conditional_visibility": false,
+      "verification": "STATIC_CURRENT_RUNTIME_AST",
+      "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+      "source_lineage_candidates": [],
+      "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+      "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+      "classification_reasons": [
+        "Runtime data-bearing expression without a direct core normalized-field candidate"
+      ],
+      "stage16_class": "STILL_UNRESOLVED",
+      "stage16_reason": "No recursive local definition or typed/source root established",
+      "typed_props": [],
+      "resolved_definitions": [],
+      "resolved_text": "selected",
+      "stage17_class": "STILL_UNRESOLVED",
+      "stage17_reason": "No nearby callback collection established",
+      "callback_trace": null,
+      "stage18_class": "STILL_UNRESOLVED",
+      "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+      "expanded_collection": "",
+      "collection_definition_trace": [],
+      "expression_definition_trace": [],
+      "stage19_class": "NO_TYPE_FIELD_TRACE",
+      "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+      "field_properties": [],
+      "type_candidates": [],
+      "chosen_domain": null
+    },
+    "prior_matches": [
+      {
+        "application_field_id": "7ded85dce0478dd4b5e9",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 335,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "row",
+        "expression": "selected",
+        "property_chains": [],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+        "classification_reasons": [
+          "Runtime data-bearing expression without a direct core normalized-field candidate"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "selected",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "NO_TYPE_FIELD_TRACE",
+        "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+        "field_properties": [],
+        "type_candidates": [],
+        "chosen_domain": null,
+        "manual_lineage_class": "NYC_SYSTEM_SELECTION",
+        "manual_lineage_reason": "Selected NYC SystemSummary/account payload passed to account/map/detail consumers.",
+        "manual_domain": "SYSTEM_ACCOUNT",
+        "manual_review_status": "RESOLVED"
+      },
+      {
+        "application_field_id": "ba1d9375f0e9ba442ecf",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 343,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "row",
+        "expression": "selected",
+        "property_chains": [],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+        "classification_reasons": [
+          "Runtime data-bearing expression without a direct core normalized-field candidate"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "selected",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "NO_TYPE_FIELD_TRACE",
+        "stage19_reason": "No property-to-type candidate and prior trace unresolved",
+        "field_properties": [],
+        "type_candidates": [],
+        "chosen_domain": null,
+        "manual_lineage_class": "NYC_SYSTEM_SELECTION",
+        "manual_lineage_reason": "Selected NYC SystemSummary/account payload passed to account/map/detail consumers.",
+        "manual_domain": "SYSTEM_ACCOUNT",
+        "manual_review_status": "RESOLVED"
+      }
+    ]
+  },
+  {
+    "current": {
+      "application_field_id": "9e65d6266ac2df46017d",
+      "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+      "file": "src/App.tsx",
+      "line": 342,
+      "route_hints": [
+        "#/"
+      ],
+      "label": null,
+      "attribute": "historyEvents",
+      "expression": "changes.events.filter(event => event.system_id === selected.system_id)",
+      "property_chains": [
+        "changes.events.filter",
+        "event.system_id",
+        "selected.system_id"
+      ],
+      "conditional_visibility": false,
+      "verification": "STATIC_CURRENT_RUNTIME_AST",
+      "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+      "source_lineage_candidates": [],
+      "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+      "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+      "classification_reasons": [
+        "No reliable static category assigned"
+      ],
+      "stage16_class": "STILL_UNRESOLVED",
+      "stage16_reason": "No recursive local definition or typed/source root established",
+      "typed_props": [],
+      "resolved_definitions": [],
+      "resolved_text": "changes.events.filter(event => event.system_id === selected.system_id)",
+      "stage17_class": "STILL_UNRESOLVED",
+      "stage17_reason": "No nearby callback collection established",
+      "callback_trace": null,
+      "stage18_class": "STILL_UNRESOLVED",
+      "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+      "expanded_collection": "",
+      "collection_definition_trace": [],
+      "expression_definition_trace": [],
+      "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+      "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+      "field_properties": [
+        "events",
+        "system_id"
+      ],
+      "type_candidates": [
+        {
+          "property": "events",
+          "type": "NysChangesPayload",
+          "domain": "MULTI:NYS,HISTORY_CHANGE",
+          "file": "src/types/nys.ts",
+          "line": 111,
+          "declared_type": "NysChangeEvent[]"
+        },
+        {
+          "property": "events",
+          "type": "ChangesPayload",
+          "domain": "HISTORY_CHANGE",
+          "file": "src/types/history.ts",
+          "line": 55,
+          "declared_type": "ChangeEvent[]"
+        },
+        {
+          "property": "system_id",
+          "type": "NysSystem",
+          "domain": "MULTI:NYS,SYSTEM_ACCOUNT",
+          "file": "src/types/nys.ts",
+          "line": 4,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "NysChangeEvent",
+          "domain": "MULTI:NYS,HISTORY_CHANGE",
+          "file": "src/types/nys.ts",
+          "line": 91,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "WorkflowAccountState",
+          "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
+          "file": "src/types/workflow.ts",
+          "line": 27,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "WorkflowMembership",
+          "domain": "WORKFLOW",
+          "file": "src/types/workflow.ts",
+          "line": 37,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "SystemSummary",
+          "domain": "SYSTEM_ACCOUNT",
+          "file": "src/types/data.ts",
+          "line": 107,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "Inspection",
+          "domain": "UNKNOWN",
+          "file": "src/types/data.ts",
+          "line": 213,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "ChangeEvent",
+          "domain": "HISTORY_CHANGE",
+          "file": "src/types/history.ts",
+          "line": 33,
+          "declared_type": "string"
+        },
+        {
+          "property": "system_id",
+          "type": "LegionellaBuildingLink",
+          "domain": "LEGIONELLA",
+          "file": "src/types/enforcement.ts",
+          "line": 114,
+          "declared_type": "string"
+        }
+      ],
+      "chosen_domain": null
+    },
+    "prior_matches": [
+      {
+        "application_field_id": "4c24e35b835521f27b7c",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 335,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "historyEvents",
+        "expression": "changes.events.filter(event => event.system_id === selected.system_id)",
+        "property_chains": [
+          "changes.events.filter",
+          "event.system_id",
+          "selected.system_id"
+        ],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+        "classification_reasons": [
+          "No reliable static category assigned"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "changes.events.filter(event => event.system_id === selected.system_id)",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+        "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+        "field_properties": [
+          "events",
+          "system_id"
+        ],
+        "type_candidates": [
+          {
+            "property": "events",
+            "type": "NysChangesPayload",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 111,
+            "declared_type": "NysChangeEvent[]"
+          },
+          {
+            "property": "events",
+            "type": "ChangesPayload",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 55,
+            "declared_type": "ChangeEvent[]"
+          },
+          {
+            "property": "system_id",
+            "type": "NysSystem",
+            "domain": "MULTI:NYS,SYSTEM_ACCOUNT",
+            "file": "src/types/nys.ts",
+            "line": 4,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "NysChangeEvent",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 91,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "WorkflowAccountState",
+            "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
+            "file": "src/types/workflow.ts",
+            "line": 27,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "WorkflowMembership",
+            "domain": "WORKFLOW",
+            "file": "src/types/workflow.ts",
+            "line": 37,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "SystemSummary",
+            "domain": "SYSTEM_ACCOUNT",
+            "file": "src/types/data.ts",
+            "line": 107,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "Inspection",
+            "domain": "UNKNOWN",
+            "file": "src/types/data.ts",
+            "line": 213,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "ChangeEvent",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 33,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "LegionellaBuildingLink",
+            "domain": "LEGIONELLA",
+            "file": "src/types/enforcement.ts",
+            "line": 114,
+            "declared_type": "string"
+          }
+        ],
+        "chosen_domain": null,
+        "manual_lineage_class": "DERIVED_NYC_HISTORY",
+        "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+        "manual_domain": "NYC_HISTORY",
+        "manual_review_status": "RESOLVED"
+      },
+      {
+        "application_field_id": "396dc5278f17fbe8ddfe",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 343,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "historyEvents",
+        "expression": "changes.events.filter(event => event.system_id === selected.system_id)",
+        "property_chains": [
+          "changes.events.filter",
+          "event.system_id",
+          "selected.system_id"
+        ],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+        "classification_reasons": [
+          "No reliable static category assigned"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "changes.events.filter(event => event.system_id === selected.system_id)",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+        "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+        "field_properties": [
+          "events",
+          "system_id"
+        ],
+        "type_candidates": [
+          {
+            "property": "events",
+            "type": "NysChangesPayload",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 111,
+            "declared_type": "NysChangeEvent[]"
+          },
+          {
+            "property": "events",
+            "type": "ChangesPayload",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 55,
+            "declared_type": "ChangeEvent[]"
+          },
+          {
+            "property": "system_id",
+            "type": "NysSystem",
+            "domain": "MULTI:NYS,SYSTEM_ACCOUNT",
+            "file": "src/types/nys.ts",
+            "line": 4,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "NysChangeEvent",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 91,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "WorkflowAccountState",
+            "domain": "MULTI:SYSTEM_ACCOUNT,WORKFLOW",
+            "file": "src/types/workflow.ts",
+            "line": 27,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "WorkflowMembership",
+            "domain": "WORKFLOW",
+            "file": "src/types/workflow.ts",
+            "line": 37,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "SystemSummary",
+            "domain": "SYSTEM_ACCOUNT",
+            "file": "src/types/data.ts",
+            "line": 107,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "Inspection",
+            "domain": "UNKNOWN",
+            "file": "src/types/data.ts",
+            "line": 213,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "ChangeEvent",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 33,
+            "declared_type": "string"
+          },
+          {
+            "property": "system_id",
+            "type": "LegionellaBuildingLink",
+            "domain": "LEGIONELLA",
+            "file": "src/types/enforcement.ts",
+            "line": 114,
+            "declared_type": "string"
+          }
+        ],
+        "chosen_domain": null,
+        "manual_lineage_class": "DERIVED_NYC_HISTORY",
+        "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+        "manual_domain": "NYC_HISTORY",
+        "manual_review_status": "RESOLVED"
+      }
+    ]
+  },
+  {
+    "current": {
+      "application_field_id": "92e17c4aaf3822529d0a",
+      "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+      "file": "src/App.tsx",
+      "line": 342,
+      "route_hints": [
+        "#/"
+      ],
+      "label": null,
+      "attribute": "historyStartedAt",
+      "expression": "changes.history_started_at",
+      "property_chains": [
+        "changes.history_started_at"
+      ],
+      "conditional_visibility": false,
+      "verification": "STATIC_CURRENT_RUNTIME_AST",
+      "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+      "source_lineage_candidates": [],
+      "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+      "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+      "classification_reasons": [
+        "No reliable static category assigned"
+      ],
+      "stage16_class": "STILL_UNRESOLVED",
+      "stage16_reason": "No recursive local definition or typed/source root established",
+      "typed_props": [],
+      "resolved_definitions": [],
+      "resolved_text": "changes.history_started_at",
+      "stage17_class": "STILL_UNRESOLVED",
+      "stage17_reason": "No nearby callback collection established",
+      "callback_trace": null,
+      "stage18_class": "STILL_UNRESOLVED",
+      "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+      "expanded_collection": "",
+      "collection_definition_trace": [],
+      "expression_definition_trace": [],
+      "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+      "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+      "field_properties": [
+        "history_started_at"
+      ],
+      "type_candidates": [
+        {
+          "property": "history_started_at",
+          "type": "CoverageAuditPayload",
+          "domain": "SOURCE_HEALTH",
+          "file": "src/types/coverage.ts",
+          "line": 76,
+          "declared_type": "string | null"
+        },
+        {
+          "property": "history_started_at",
+          "type": "NysChangesPayload",
+          "domain": "MULTI:NYS,HISTORY_CHANGE",
+          "file": "src/types/nys.ts",
+          "line": 107,
+          "declared_type": "string"
+        },
+        {
+          "property": "history_started_at",
+          "type": "ChangesPayload",
+          "domain": "HISTORY_CHANGE",
+          "file": "src/types/history.ts",
+          "line": 51,
+          "declared_type": "string"
+        }
+      ],
+      "chosen_domain": null
+    },
+    "prior_matches": [
+      {
+        "application_field_id": "dd9dd36267f40a948f67",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 335,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "historyStartedAt",
+        "expression": "changes.history_started_at",
+        "property_chains": [
+          "changes.history_started_at"
+        ],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+        "classification_reasons": [
+          "No reliable static category assigned"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "changes.history_started_at",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+        "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+        "field_properties": [
+          "history_started_at"
+        ],
+        "type_candidates": [
+          {
+            "property": "history_started_at",
+            "type": "CoverageAuditPayload",
+            "domain": "SOURCE_HEALTH",
+            "file": "src/types/coverage.ts",
+            "line": 76,
+            "declared_type": "string | null"
+          },
+          {
+            "property": "history_started_at",
+            "type": "NysChangesPayload",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 107,
+            "declared_type": "string"
+          },
+          {
+            "property": "history_started_at",
+            "type": "ChangesPayload",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 51,
+            "declared_type": "string"
+          }
+        ],
+        "chosen_domain": null,
+        "manual_lineage_class": "DERIVED_NYC_HISTORY",
+        "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+        "manual_domain": "NYC_HISTORY",
+        "manual_review_status": "RESOLVED"
+      },
+      {
+        "application_field_id": "65ccee5096a0108047fb",
+        "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+        "file": "src/App.tsx",
+        "line": 343,
+        "route_hints": [
+          "#/"
+        ],
+        "label": null,
+        "attribute": "historyStartedAt",
+        "expression": "changes.history_started_at",
+        "property_chains": [
+          "changes.history_started_at"
+        ],
+        "conditional_visibility": false,
+        "verification": "STATIC_CURRENT_RUNTIME_AST",
+        "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+        "source_lineage_candidates": [],
+        "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+        "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+        "classification_reasons": [
+          "No reliable static category assigned"
+        ],
+        "stage16_class": "STILL_UNRESOLVED",
+        "stage16_reason": "No recursive local definition or typed/source root established",
+        "typed_props": [],
+        "resolved_definitions": [],
+        "resolved_text": "changes.history_started_at",
+        "stage17_class": "STILL_UNRESOLVED",
+        "stage17_reason": "No nearby callback collection established",
+        "callback_trace": null,
+        "stage18_class": "STILL_UNRESOLVED",
+        "stage18_reason": "Mixed component with no reliable source/workflow/presentation resolution",
+        "expanded_collection": "",
+        "collection_definition_trace": [],
+        "expression_definition_trace": [],
+        "stage19_class": "TYPE_CANDIDATES_AMBIGUOUS",
+        "stage19_reason": "Property names exist in multiple typed domains; manual disambiguation required",
+        "field_properties": [
+          "history_started_at"
+        ],
+        "type_candidates": [
+          {
+            "property": "history_started_at",
+            "type": "CoverageAuditPayload",
+            "domain": "SOURCE_HEALTH",
+            "file": "src/types/coverage.ts",
+            "line": 76,
+            "declared_type": "string | null"
+          },
+          {
+            "property": "history_started_at",
+            "type": "NysChangesPayload",
+            "domain": "MULTI:NYS,HISTORY_CHANGE",
+            "file": "src/types/nys.ts",
+            "line": 107,
+            "declared_type": "string"
+          },
+          {
+            "property": "history_started_at",
+            "type": "ChangesPayload",
+            "domain": "HISTORY_CHANGE",
+            "file": "src/types/history.ts",
+            "line": 51,
+            "declared_type": "string"
+          }
+        ],
+        "chosen_domain": null,
+        "manual_lineage_class": "DERIVED_NYC_HISTORY",
+        "manual_lineage_reason": "Derived from the NYC changes/history artifact passed through App.",
+        "manual_domain": "NYC_HISTORY",
+        "manual_review_status": "RESOLVED"
+      }
+    ]
+  }
+]

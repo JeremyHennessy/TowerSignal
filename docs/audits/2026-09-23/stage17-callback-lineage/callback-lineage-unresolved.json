@@ -1,9 +1,9 @@
 [
   {
-    "application_field_id": "ffcfbd94137095b15900",
+    "application_field_id": "3f3164c98d25bbdcec82",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 314,
+    "line": 313,
     "route_hints": [
       "#/"
     ],
@@ -32,10 +32,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "9e2fe5c33bca1239add5",
+    "application_field_id": "9859c58ca276e91ea1ae",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 320,
+    "line": 319,
     "route_hints": [
       "#/"
     ],
@@ -64,10 +64,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "0a58061f3b6b857abb1a",
+    "application_field_id": "60f4347f63c34bc07112",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -96,10 +96,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "76049c9c31bd5780a112",
+    "application_field_id": "cfa8cbd0a5fea4069f6e",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -130,10 +130,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "373145b363464bbe9f5e",
+    "application_field_id": "cc955a342aea7e46fb48",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -164,10 +164,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "98b7bfb587d753a65398",
+    "application_field_id": "ae15e4c814b80600e992",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -198,10 +198,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "6c7601b834da4720e5e7",
+    "application_field_id": "6d481cd238a926484b01",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -232,10 +232,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "7229903f4c76e804446e",
+    "application_field_id": "d2ffad61abb226833f46",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 324,
+    "line": 323,
     "route_hints": [
       "#/"
     ],
@@ -262,10 +262,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "7ded85dce0478dd4b5e9",
+    "application_field_id": "f206a0c0b0c21bcaf00a",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 335,
+    "line": 334,
     "route_hints": [
       "#/"
     ],
@@ -292,10 +292,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "4c24e35b835521f27b7c",
+    "application_field_id": "f31b3f82f185a5552f99",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 335,
+    "line": 334,
     "route_hints": [
       "#/"
     ],
@@ -326,10 +326,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "dd9dd36267f40a948f67",
+    "application_field_id": "2896baa490a58751df2f",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 335,
+    "line": 334,
     "route_hints": [
       "#/"
     ],
@@ -358,10 +358,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "c554c73093496e2adc3b",
+    "application_field_id": "77d147d0ebb9153b8ee3",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 337,
+    "line": 336,
     "route_hints": [
       "#/"
     ],
@@ -388,10 +388,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "e4c2c0a184d29ac28ca3",
+    "application_field_id": "110cfe107f613cbc0dfa",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 340,
+    "line": 339,
     "route_hints": [
       "#/"
     ],
@@ -420,10 +420,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "137fb795ac5ff9ce8528",
+    "application_field_id": "13c8cf40ef5005c98bcd",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 340,
+    "line": 339,
     "route_hints": [
       "#/"
     ],
@@ -452,10 +452,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "ba1d9375f0e9ba442ecf",
+    "application_field_id": "f6abb9dc502d1420a78f",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 343,
+    "line": 342,
     "route_hints": [
       "#/"
     ],
@@ -482,10 +482,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "396dc5278f17fbe8ddfe",
+    "application_field_id": "9e65d6266ac2df46017d",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 343,
+    "line": 342,
     "route_hints": [
       "#/"
     ],
@@ -516,10 +516,10 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "65ccee5096a0108047fb",
+    "application_field_id": "92e17c4aaf3822529d0a",
     "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
     "file": "src/App.tsx",
-    "line": 343,
+    "line": 342,
     "route_hints": [
       "#/"
     ],
@@ -1539,6 +1539,37 @@
     "typed_props": [],
     "resolved_definitions": [],
     "resolved_text": "(document.parties.length - 8).toLocaleString()",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "dd5eaf2ad4137bb5a60c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/AuthLandingPage.tsx",
+    "line": 65,
+    "route_hints": [],
+    "label": null,
+    "attribute": "disabled",
+    "expression": "busy || !email.trim() || password.length < 8",
+    "property_chains": [
+      "email.trim",
+      "password.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "busy || !email.trim() || password.length < 8",
     "stage17_class": "STILL_UNRESOLVED",
     "stage17_reason": "No nearby callback collection established",
     "callback_trace": null
@@ -2570,10 +2601,1980 @@
     "callback_trace": null
   },
   {
-    "application_field_id": "d111015acadbbbae09b6",
+    "application_field_id": "900b9ee6272cd152e641",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 300,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "relationshipLabel(profile.relationship_status)",
+    "property_chains": [
+      "profile.relationship_status"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "relationshipLabel(profile.relationship_status)",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "ff44e2ea7a7395b1f055",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 301,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "savedAt && <small>Saved {new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</small>",
+    "property_chains": [
+      "toLocaleTimeString"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "savedAt && <small>Saved {new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</small>",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "fc5eada1188952f36386",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 301,
+    "route_hints": [],
+    "label": "Saved",
+    "attribute": null,
+    "expression": "new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })",
+    "property_chains": [
+      "toLocaleTimeString"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "43e4d8de6e6ba78049c7",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 309,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.rollup_name || canonicalName",
+    "property_chains": [
+      "profile.rollup_name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [
+      {
+        "name": "canonicalName",
+        "type": "string"
+      }
+    ],
+    "resolved_definitions": [],
+    "resolved_text": "profile.rollup_name || canonicalName",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "ae468490c493d385e312",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 309,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.rollup_company_id || 'No explicit rollup ID'",
+    "property_chains": [
+      "profile.rollup_company_id"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.rollup_company_id || 'No explicit rollup ID'",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "e5758defc5ca1b5a13ea",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 310,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.headquarters_address || 'Street address not recorded'",
+    "property_chains": [
+      "profile.headquarters_address"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.headquarters_address || 'Street address not recorded'",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "e750c6d5db83de709fc0",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 311,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.parent_company_name || 'Independent / not recorded'",
+    "property_chains": [
+      "profile.parent_company_name"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.parent_company_name || 'Independent / not recorded'",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "c1adac1d493bf6327930",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 311,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.parent_company_id || 'No parent ID'",
+    "property_chains": [
+      "profile.parent_company_id"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.parent_company_id || 'No parent ID'",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "aba4cf7f624cb44771c5",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 312,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "profile.revenue_year ? `${profile.revenue_year} \u00b7 ${relationshipLabel(profile.revenue_type)}` : 'Year/source not recorded'",
+    "property_chains": [
+      "profile.revenue_year",
+      "profile.revenue_type"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_year ? `${profile.revenue_year} \u00b7 ${relationshipLabel(profile.revenue_type)}` : 'Year/source not recorded'",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "1452e1b8c9031c0ed88e",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 319,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.legal_name ?? ''",
+    "property_chains": [
+      "profile.legal_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.legal_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "e3a8b00e597bb1507141",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 320,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.rollup_name ?? ''",
+    "property_chains": [
+      "profile.rollup_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.rollup_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "c2d0be25b39394da51c5",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 321,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.rollup_company_id ?? ''",
+    "property_chains": [
+      "profile.rollup_company_id"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.rollup_company_id ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "7ea733bc46b7f3574b78",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 322,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.website ?? ''",
+    "property_chains": [
+      "profile.website"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.website ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "45afa82ed2800e89dd6d",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 323,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.company_type ?? ''",
+    "property_chains": [
+      "profile.company_type"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.company_type ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "f25e8963171724937a01",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 324,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.parent_company_name ?? ''",
+    "property_chains": [
+      "profile.parent_company_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.parent_company_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "25eda966f5b5123dba05",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 325,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.parent_company_id ?? ''",
+    "property_chains": [
+      "profile.parent_company_id"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.parent_company_id ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "1de68667e9fd6be59c35",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 328,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_address ?? ''",
+    "property_chains": [
+      "profile.headquarters_address"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.headquarters_address ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "694d4721deadeec2e82e",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 329,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_city ?? ''",
+    "property_chains": [
+      "profile.headquarters_city"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.headquarters_city ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "2ea23571dcd60606b7b1",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 330,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_region ?? ''",
+    "property_chains": [
+      "profile.headquarters_region"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.headquarters_region ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "03356169092ff686332c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 331,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_postal_code ?? ''",
+    "property_chains": [
+      "profile.headquarters_postal_code"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.headquarters_postal_code ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "beeadcf02b9ed66a5551",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 332,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_country ?? ''",
+    "property_chains": [
+      "profile.headquarters_country"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.headquarters_country ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "bf715c81d322147e181d",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 336,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.identity_source_name ?? ''",
+    "property_chains": [
+      "profile.identity_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.identity_source_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "d530ca0cf6512d469358",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 337,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.identity_source_url ?? ''",
+    "property_chains": [
+      "profile.identity_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.identity_source_url ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "822772f018955d5f85e0",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 338,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.website_source_name ?? ''",
+    "property_chains": [
+      "profile.website_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.website_source_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "a38f325afde8918ede6b",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 339,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.website_source_url ?? ''",
+    "property_chains": [
+      "profile.website_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.website_source_url ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "95616d8eca98dcc74190",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 340,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.rollup_source_name ?? ''",
+    "property_chains": [
+      "profile.rollup_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.rollup_source_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "449ae7e5d5dffe88b853",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 341,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.rollup_source_url ?? ''",
+    "property_chains": [
+      "profile.rollup_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.rollup_source_url ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "e753d9dd693a0951f778",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 342,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_source_name ?? ''",
+    "property_chains": [
+      "profile.headquarters_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.headquarters_source_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "e02ab1d2d4b114827b3b",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 343,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.headquarters_source_url ?? ''",
+    "property_chains": [
+      "profile.headquarters_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.headquarters_source_url ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "d2b8bae940c3233302a8",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 344,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.parent_source_name ?? ''",
+    "property_chains": [
+      "profile.parent_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.parent_source_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "c8d73536ae238c869c73",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 345,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.parent_source_url ?? ''",
+    "property_chains": [
+      "profile.parent_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.parent_source_url ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "dc7b9b8b81ad437cee9b",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 346,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "localDateTime(profile.enrichment_checked_at)",
+    "property_chains": [
+      "profile.enrichment_checked_at"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "localDateTime(profile.enrichment_checked_at)",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "9a6d4a94cfbf20bac769",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 353,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_type",
+    "property_chains": [
+      "profile.revenue_type"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_type",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "89ebe7c5e515a88de99c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 354,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_amount ?? ''",
+    "property_chains": [
+      "profile.revenue_amount"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_amount ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "e5f0865477651254a814",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 355,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_low ?? ''",
+    "property_chains": [
+      "profile.revenue_low"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_low ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "aa1ca74beadb55c923f8",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 356,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_high ?? ''",
+    "property_chains": [
+      "profile.revenue_high"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_high ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "bee4ece789efdb5ba65c",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 357,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_currency",
+    "property_chains": [
+      "profile.revenue_currency"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_currency",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "77d4c9636e8d783fa154",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 358,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_year ?? ''",
+    "property_chains": [
+      "profile.revenue_year"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_year ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "92ce352bb12e41479300",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 359,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_confidence",
+    "property_chains": [
+      "profile.revenue_confidence"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_confidence",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "1046cf86cf83eb0500e5",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 360,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_source_name ?? ''",
+    "property_chains": [
+      "profile.revenue_source_name"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_source_name ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "7a9c3ec432d4942a6731",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 361,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.revenue_source_url ?? ''",
+    "property_chains": [
+      "profile.revenue_source_url"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.revenue_source_url ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "7fa683e0a14e817c6751",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 368,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.relationship_status",
+    "property_chains": [
+      "profile.relationship_status"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.relationship_status",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "b3e2802c62645d497a6f",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 368,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)",
+    "property_chains": [
+      "relationshipStatuses.map"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "e6b816a35fce211e3687",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 369,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.account_owner ?? ''",
+    "property_chains": [
+      "profile.account_owner"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.account_owner ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "8e9c6b94c0ec2e788c0a",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 370,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "localDateTime(profile.last_contacted_at)",
+    "property_chains": [
+      "profile.last_contacted_at"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "localDateTime(profile.last_contacted_at)",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "a1ad3435b2fa7ab048e0",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 371,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.next_action_date ?? ''",
+    "property_chains": [
+      "profile.next_action_date"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.next_action_date ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "d0aacba5e1a246580374",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 372,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "profile.internal_summary ?? ''",
+    "property_chains": [
+      "profile.internal_summary"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "profile.internal_summary ?? ''",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "fc9ecf0c32132fe5a59e",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 377,
+    "route_hints": [],
+    "label": "saved",
+    "attribute": null,
+    "expression": "contacts.length",
+    "property_chains": [
+      "contacts.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "contacts.length",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "3c781162e9813a90c7e1",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 383,
+    "route_hints": [],
+    "label": "Add contact",
+    "attribute": "disabled",
+    "expression": "busy || !contactName.trim()",
+    "property_chains": [
+      "contactName.trim"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE",
+    "classification_reasons": [
+      "Runtime data-bearing expression without a direct core normalized-field candidate"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "busy || !contactName.trim()",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "b4e06b6695e353e51897",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 394,
+    "route_hints": [],
+    "label": "logged interactions",
+    "attribute": null,
+    "expression": "activities.length",
+    "property_chains": [
+      "activities.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "activities.length",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "bbc6e966805176ce27d4",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "new Date(activity.occurred_at).toLocaleString()",
+    "property_chains": [
+      "toLocaleString",
+      "activity.occurred_at"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "new Date(activity.occurred_at).toLocaleString()",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "d779d993eff26500a424",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "relationshipLabel(activity.activity_type)",
+    "property_chains": [
+      "activity.activity_type"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "relationshipLabel(activity.activity_type)",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "e07ca34fb9fb035f27c2",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.outcome && <span>{activity.outcome}</span>",
+    "property_chains": [
+      "activity.outcome"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "activity.outcome && <span>{activity.outcome}</span>",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter activity iterates over activities",
+    "callback_trace": {
+      "line": 403,
+      "param": "activity",
+      "collection": "activities",
+      "text": "<div className=\"company-admin-timeline\">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className=\"company-admin-empty\">No outreach or interaction history recorded.</span>}</div>"
+    }
+  },
+  {
+    "application_field_id": "6774a14c9e37168a77c6",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.outcome",
+    "property_chains": [
+      "activity.outcome"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "activity.outcome",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter activity iterates over activities",
+    "callback_trace": {
+      "line": 403,
+      "param": "activity",
+      "collection": "activities",
+      "text": "<div className=\"company-admin-timeline\">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className=\"company-admin-empty\">No outreach or interaction history recorded.</span>}</div>"
+    }
+  },
+  {
+    "application_field_id": "160fc4d9e9973eb1ea5c",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.details && <p>{activity.details}</p>",
+    "property_chains": [
+      "activity.details"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "activity.details && <p>{activity.details}</p>",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter activity iterates over activities",
+    "callback_trace": {
+      "line": 403,
+      "param": "activity",
+      "collection": "activities",
+      "text": "<div className=\"company-admin-timeline\">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className=\"company-admin-empty\">No outreach or interaction history recorded.</span>}</div>"
+    }
+  },
+  {
+    "application_field_id": "9f29f636efe36197cfb8",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.details",
+    "property_chains": [
+      "activity.details"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "activity.details",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter activity iterates over activities",
+    "callback_trace": {
+      "line": 403,
+      "param": "activity",
+      "collection": "activities",
+      "text": "<div className=\"company-admin-timeline\">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className=\"company-admin-empty\">No outreach or interaction history recorded.</span>}</div>"
+    }
+  },
+  {
+    "application_field_id": "3430127228d1144afa7d",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "activity.next_action_date && <small>Next action {activity.next_action_date}</small>",
+    "property_chains": [
+      "activity.next_action_date"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "activity.next_action_date && <small>Next action {activity.next_action_date}</small>",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter activity iterates over activities",
+    "callback_trace": {
+      "line": 403,
+      "param": "activity",
+      "collection": "activities",
+      "text": "<div className=\"company-admin-timeline\">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className=\"company-admin-empty\">No outreach or interaction history recorded.</span>}</div>"
+    }
+  },
+  {
+    "application_field_id": "e50ad3fc1b76c6cc2553",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 403,
+    "route_hints": [],
+    "label": "Next action",
+    "attribute": null,
+    "expression": "activity.next_action_date",
+    "property_chains": [
+      "activity.next_action_date"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "activity.next_action_date",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter activity iterates over activities",
+    "callback_trace": {
+      "line": 403,
+      "param": "activity",
+      "collection": "activities",
+      "text": "<div className=\"company-admin-timeline\">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className=\"company-admin-empty\">No outreach or interaction history recorded.</span>}</div>"
+    }
+  },
+  {
+    "application_field_id": "500a1496f1bc2bddcba1",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 407,
+    "route_hints": [],
+    "label": "notes \u00b7 private",
+    "attribute": null,
+    "expression": "notes.length",
+    "property_chains": [
+      "notes.length"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "notes.length",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "2513b352f9ed44626cd5",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 408,
+    "route_hints": [],
+    "label": "Add note",
+    "attribute": "disabled",
+    "expression": "busy || !newNote.trim()",
+    "property_chains": [
+      "newNote.trim"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "busy || !newNote.trim()",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "91454f226994f92863af",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": null,
+    "attribute": "key",
+    "expression": "note.note_id",
+    "property_chains": [
+      "note.note_id"
+    ],
+    "conditional_visibility": false,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "note.note_id",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter note iterates over notes",
+    "callback_trace": {
+      "line": 409,
+      "param": "note",
+      "collection": "notes",
+      "text": "<div className=\"company-admin-notes\">{notes.length ? notes.map(note => <article key={note.note_id}><textarea aria-label={`Edit note ${note.note_id}`} rows={3} value={noteDrafts[note.note_id] ?? note.note} onChange={event => setNoteDrafts(value => ({ ...value, [note.note_id]:event.target.value }))} /><div><small>{note.updated_at ? new Date(note.updated_at).toLocaleString() : 'Saved note'}</small><button onClick={() => saveNote(note.note_id)} disabled={busy || !(noteDrafts[note.note_id] ?? '').trim()}>Save note</button></div></article>) : <span className=\"company-admin-empty\">No private notes recorded.</span>}</div>"
+    }
+  },
+  {
+    "application_field_id": "b897eb2785076451a940",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": null,
+    "attribute": "value",
+    "expression": "noteDrafts[note.note_id] ?? note.note",
+    "property_chains": [
+      "note.note_id",
+      "note.note"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "noteDrafts[note.note_id] ?? note.note",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "ff5154f78c6fc6014c24",
+    "field_kind": "JSX_CHILD_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": null,
+    "attribute": null,
+    "expression": "note.updated_at ? new Date(note.updated_at).toLocaleString() : 'Saved note'",
+    "property_chains": [
+      "note.updated_at",
+      "toLocaleString"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "note.updated_at ? new Date(note.updated_at).toLocaleString() : 'Saved note'",
+    "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
+    "stage17_reason": "Callback parameter note iterates over notes",
+    "callback_trace": {
+      "line": 409,
+      "param": "note",
+      "collection": "notes",
+      "text": "<div className=\"company-admin-notes\">{notes.length ? notes.map(note => <article key={note.note_id}><textarea aria-label={`Edit note ${note.note_id}`} rows={3} value={noteDrafts[note.note_id] ?? note.note} onChange={event => setNoteDrafts(value => ({ ...value, [note.note_id]:event.target.value }))} /><div><small>{note.updated_at ? new Date(note.updated_at).toLocaleString() : 'Saved note'}</small><button onClick={() => saveNote(note.note_id)} disabled={busy || !(noteDrafts[note.note_id] ?? '').trim()}>Save note</button></div></article>) : <span className=\"company-admin-empty\">No private notes recorded.</span>}</div>"
+    }
+  },
+  {
+    "application_field_id": "b5c5f21c4093ef6fe9e8",
+    "field_kind": "JSX_ATTRIBUTE_EXPRESSION",
+    "file": "src/components/CompanyAdminPanel.tsx",
+    "line": 409,
+    "route_hints": [],
+    "label": "Save note",
+    "attribute": "disabled",
+    "expression": "busy || !(noteDrafts[note.note_id] ?? '').trim()",
+    "property_chains": [
+      "trim",
+      "note.note_id"
+    ],
+    "conditional_visibility": true,
+    "verification": "STATIC_CURRENT_RUNTIME_AST",
+    "boundary": "Expression inventory; static presence does not prove the state was visually rendered or that every property chain is source-derived.",
+    "source_lineage_candidates": [],
+    "lineage_status": "NO_DIRECT_SOURCE_MAPPING_FROM_CORE_NORMALIZED_MAP",
+    "application_lineage_class": "UNRESOLVED_APPLICATION_EXPRESSION",
+    "classification_reasons": [
+      "No reliable static category assigned"
+    ],
+    "stage16_class": "STILL_UNRESOLVED",
+    "stage16_reason": "No recursive local definition or typed/source root established",
+    "typed_props": [],
+    "resolved_definitions": [],
+    "resolved_text": "busy || !(noteDrafts[note.note_id] ?? '').trim()",
+    "stage17_class": "STILL_UNRESOLVED",
+    "stage17_reason": "No nearby callback collection established",
+    "callback_trace": null
+  },
+  {
+    "application_field_id": "480c3f0466a53d8a9c58",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 385,
+    "line": 388,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -2601,17 +4602,17 @@
     "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
     "stage17_reason": "Callback parameter alias iterates over visibleAliases",
     "callback_trace": {
-      "line": 385,
+      "line": 388,
       "param": "alias",
       "collection": "visibleAliases",
       "text": "<div className=\"table-scroll\"><table className=\"account-table firm-evidence-table\"><thead><tr><th>Observed label</th><th>Role</th><th>Source class</th><th>Observations</th></tr></thead><tbody>{visibleAliases.map((alias, index) => <tr key={`${alias.source_class}-${alias.role}-${alias.name}-${activeAliasPage}-${index}`}><td><strong>{alias.name}</strong></td><td>{roleLabel(alias.role)}</td><td>{label(alias.source_class)}</td><td>{number.format(alias.observation_count)}</td></tr>)}</tbody></table></div>"
     }
   },
   {
-    "application_field_id": "612c7819462423a022d3",
+    "application_field_id": "f160da3653e3311390b7",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/CompanyProfilePage.tsx",
-    "line": 385,
+    "line": 388,
     "route_hints": [
       "#/company/",
       "#/account/"
@@ -2639,7 +4640,7 @@
     "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
     "stage17_reason": "Callback parameter roleLabel iterates over 0, 2",
     "callback_trace": {
-      "line": 345,
+      "line": 348,
       "param": "roleLabel",
       "collection": "0, 2",
       "text": "<td><span className={`firm-relationship-badge ${site.serviced ? 'serviced' : site.contracted ? 'contracted' : 'related'}`}>{siteRelationshipLabel(site)}</span><small>{site.roles.slice(0, 2).map(roleLabel).join(' \u00b7 ')}{site.roles.length > 2 ? ` \u00b7 +${site.roles.length - 2}` : ''}</small></td>"
@@ -8704,10 +10705,10 @@
     }
   },
   {
-    "application_field_id": "44851bdbf1121f574db8",
+    "application_field_id": "74a83c2c03de3ad29ff9",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 126,
+    "line": 125,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -8735,17 +10736,17 @@
     "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
     "stage17_reason": "Callback parameter item iterates over primaryNavigation",
     "callback_trace": {
-      "line": 126,
+      "line": 125,
       "param": "item",
       "collection": "primaryNavigation",
       "text": "{primaryNavigation.map(item => <button key={item.mode} className={primaryActive(item) ? 'active' : ''} onClick={() => navigate(item)}>{item.label}</button>)}"
     }
   },
   {
-    "application_field_id": "6c24c19e58e614c9f7f3",
+    "application_field_id": "acc14dc96366dc218446",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 133,
+    "line": 132,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -8773,17 +10774,17 @@
     "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
     "stage17_reason": "Callback parameter item iterates over secondaryNavigation",
     "callback_trace": {
-      "line": 133,
+      "line": 132,
       "param": "item",
       "collection": "secondaryNavigation",
       "text": "{secondaryNavigation.map(item => <button key={item.mode} role=\"menuitem\" aria-label={item.label} className={mode === item.mode ? 'active' : ''} onClick={() => navigate(item)}><span>{item.label}</span><small>{item.detail}</small></button>)}"
     }
   },
   {
-    "application_field_id": "beeecf6f384c15222726",
+    "application_field_id": "74eaf6b995544581ce40",
     "field_kind": "JSX_CHILD_EXPRESSION",
     "file": "src/components/TopNavigation.tsx",
-    "line": 159,
+    "line": 158,
     "route_hints": [
       "#/home",
       "#/my-account"
@@ -8811,7 +10812,7 @@
     "stage17_class": "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE",
     "stage17_reason": "Callback parameter item iterates over allNavigation",
     "callback_trace": {
-      "line": 159,
+      "line": 158,
       "param": "item",
       "collection": "allNavigation",
       "text": "{allNavigation.map(item => <button key={item.mode} className={primaryActive(item) || mode === item.mode ? 'active' : ''} onClick={() => navigate(item)}><span>{item.label}</span>{(primaryActive(item) || mode === item.mode) && <small>Current</small>}</button>)}"

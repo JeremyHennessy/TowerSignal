@@ -187,7 +187,12 @@
   {
     "from": "src/auth/AuthGate.tsx",
     "module": "../workflow/client",
-    "names": "{ getWorkflowSession, signInWorkflow, signOutWorkflow, signUpWorkflow }"
+    "names": "{ getWorkflowSession, signInWorkflow, signOutWorkflow }"
+  },
+  {
+    "from": "src/companyAdmin/client.ts",
+    "module": "../types/companyAdmin",
+    "names": "{ CompanyAdminActivity, CompanyAdminContact, CompanyAdminNote, CompanyAdminProfile, CompanyAdminProfilePatch, CompanyAdminSnapshot, }"
   },
   {
     "from": "src/components/AccountDecisionSummary.tsx",
@@ -386,8 +391,18 @@
   },
   {
     "from": "src/components/CompaniesPage.tsx",
+    "module": "../companyAdmin/client",
+    "names": "{ loadCompanyAdminAccess, loadCompanyAdminDirectory }"
+  },
+  {
+    "from": "src/components/CompaniesPage.tsx",
     "module": "../types/company",
     "names": "{ CompanyIntelligenceRecord }"
+  },
+  {
+    "from": "src/components/CompaniesPage.tsx",
+    "module": "../types/companyAdmin",
+    "names": "{ CompanyAdminProfile }"
   },
   {
     "from": "src/components/CompaniesPage.tsx",
@@ -403,6 +418,16 @@
     "from": "src/components/CompaniesPage.tsx",
     "module": "./ShareButton",
     "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/CompanyAdminPanel.tsx",
+    "module": "../companyAdmin/client",
+    "names": "{ addCompanyActivity, addCompanyContact, addCompanyNote, loadCompanyAdminAccess, loadCompanyAdminSnapshot, saveCompanyAdminProfile, updateCompanyNote, }"
+  },
+  {
+    "from": "src/components/CompanyAdminPanel.tsx",
+    "module": "../types/companyAdmin",
+    "names": "{ CompanyAdminActivity, CompanyAdminContact, CompanyAdminNote, CompanyAdminProfile, CompanyAdminProfilePatch, CompanyRelationshipStatus, }"
   },
   {
     "from": "src/components/CompanyProfilePage.tsx",
@@ -448,6 +473,11 @@
     "from": "src/components/CompanyProfilePage.tsx",
     "module": "./StatusBadge",
     "names": "{ StatusBadge }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "./CompanyAdminPanel",
+    "names": "{ CompanyAdminPanel }"
   },
   {
     "from": "src/components/DetailPanel.tsx",
@@ -1337,6 +1367,6 @@
   {
     "from": "src/workflow/useWorkflow.ts",
     "module": "./client",
-    "names": "{ createRemoteWatchlist, deleteRemoteView, deleteRemoteWatchlist, getWorkflowSession, loadWorkflowSnapshot, saveRemoteAccount, saveRemoteView, setRemoteMembership, signInWorkflow, signOutWorkflow, signUpWorkflow, workflowRuntimeEnabled, }"
+    "names": "{ createRemoteWatchlist, deleteRemoteView, deleteRemoteWatchlist, getWorkflowSession, loadWorkflowSnapshot, saveRemoteAccount, saveRemoteView, setRemoteMembership, signInWorkflow, signOutWorkflow, workflowRuntimeEnabled, }"
   }
 ]
