@@ -162,11 +162,13 @@ export function collectKnownAccountFirms(detail: SystemDetailWithDomesticWater):
     const category = humanize(sourceText(row, 'category'))
     const relationshipEvidence = humanize(sourceText(row, 'relationship_evidence'))
     const serviceAssignment = humanize(sourceText(row, 'service_assignment_confidence'))
+    const sourceLink = sourceText(row, 'property_link_confidence')
+    const matchLabel = sourceLink === 'CONFIRMED_SOURCE_BIN' ? 'exact BIN' : 'exact BBL'
     addObservation(firms, {
       name,
       role: category ? `DOB ${category} applicant business` : 'DOB water-work applicant business',
       date: sourceDate(row, 'issued_date', 'approved_date', 'filing_date'),
-      evidence: `NYC DOB water-work record · exact BBL${relationshipEvidence ? ` · ${relationshipEvidence}` : ''}${serviceAssignment ? ` · ${serviceAssignment}` : ' · not proof of service assignment'}.`,
+      evidence: `NYC DOB water-work record · ${matchLabel}${relationshipEvidence ? ` · ${relationshipEvidence}` : ''}${serviceAssignment ? ` · ${serviceAssignment}` : ' · not proof of service assignment'}.`,
       relationship: 'RECORDED_ROLE',
     })
   }
