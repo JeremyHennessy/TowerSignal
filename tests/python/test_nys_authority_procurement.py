@@ -40,6 +40,35 @@ class NysAuthorityProcurementTests(unittest.TestCase):
         self.assertIn("not vendor revenue", record["observed_value_evidence"].lower())
         self.assertEqual(record["source_url"], "https://data.ny.gov/d/ehig-g5x3")
 
+
+    def test_state_authority_schema_preserves_published_spend_and_transaction_identity(self) -> None:
+        row = {
+            "authority_name": "Example State Authority",
+            "fiscal_year_end_date": "2025-12-31T00:00:00.000",
+            "vendor_name": "Example Water LLC",
+            "procurement_description": "Cooling tower water treatment",
+            "type_of_procurement": "Other Professional Services",
+            "award_process": "Authority Contract - Competitive Bid",
+            "contract_amount": "608004.00",
+            "amount_expended_for_fiscal_year": "109057.08",
+            "amount_expended_to_date": "374132.82",
+            "current_or_outstanding_balance": "233871.18",
+            "transaction_number": "600000000028389",
+        }
+        record = normalize_row(
+            "NYS_ABO_STATE_AUTHORITIES",
+            "ehig-g5x3",
+            row,
+            retrieved_at="2026-09-23T00:00:00Z",
+        )
+        self.assertIsNotNone(record)
+        assert record is not None
+        self.assertEqual(record["source_contract_id"], "600000000028389")
+        self.assertEqual(record["spend_to_date"], 374132.82)
+        self.assertEqual(record["spend_for_fiscal_year"], 109057.08)
+        self.assertEqual(record["current_or_outstanding_balance"], 233871.18)
+        self.assertIn("not vendor revenue", record["observed_value_evidence"].lower())
+
     def test_unrelated_row_is_rejected(self) -> None:
         row = {
             "authority_name": "Example Authority",
