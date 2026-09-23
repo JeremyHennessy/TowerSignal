@@ -187,7 +187,10 @@ class KnownFirmsTests(unittest.TestCase):
         self.assertGreaterEqual(summary["firms_with_dwt_service_evidence"], 3)
 
     def test_placeholder_bin_does_not_merge_distinct_bbl_sites(self):
-        systems = {"metadata": {"generated_at": "2026-09-23T00:00:00Z"}, "systems": []}
+        systems = {"metadata": {"generated_at": "2026-09-23T00:00:00Z"}, "systems": [
+            {"system_id": "tower-a", "bin": "1001111", "bbl": "1005977503", "address": "110 CHARLTON STREET", "borough": "Manhattan", "zip": "10014"},
+            {"system_id": "tower-b", "bin": "1002222", "bbl": "1007290060", "address": "395 9TH AVENUE", "borough": "Manhattan", "zip": "10001"},
+        ]}
         domestic = {
             "tank_inspections": [
                 {
@@ -235,6 +238,7 @@ class KnownFirmsTests(unittest.TestCase):
         self.assertEqual({site["site_id"] for site in sites}, {"NYC-BBL-1005977503", "NYC-BBL-1007290060"})
         self.assertTrue(all(site["bin"] is None for site in sites))
         self.assertEqual({site["bbl"] for site in sites}, {"1005977503", "1007290060"})
+        self.assertTrue(all(site["system_ids"] == [] for site in sites))
 
 
 if __name__ == "__main__":
