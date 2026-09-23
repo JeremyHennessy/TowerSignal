@@ -1,0 +1,17 @@
+{
+  "started_at": "2026-09-23T15:59:50.562744+00:00",
+  "finished_at": "2026-09-23T16:02:31.951176+00:00",
+  "hosted_system_count": 4893,
+  "hosted_details_retrieved": 4893,
+  "hosted_summary_stable": true,
+  "hpd_registration_source_stable": true,
+  "hpd_contact_scope_stable": true,
+  "hpd_product_status_discrepancies": 2,
+  "pluto_scope_stable": true,
+  "pluto_owner_discrepancies": 0,
+  "nys_source_stable": true,
+  "nys_value_mismatches": 0,
+  "nys_fresh_only_ids": 0,
+  "nys_hosted_only_ids": 0,
+  "requests_recorded": 4952
+}

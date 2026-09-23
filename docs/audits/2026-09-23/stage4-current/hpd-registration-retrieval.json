@@ -1,0 +1,3422 @@
+{
+  "dataset_id": "tesw-yqqr",
+  "host": "data.cityofnewyork.us",
+  "expected_before": 203887,
+  "expected_after": 203887,
+  "retrieved": 203887,
+  "unique_row_ids": 203887,
+  "pagination_completed": true,
+  "rows_updated_before": 1786546841,
+  "rows_updated_after": 1786546841,
+  "stable_complete_snapshot": true,
+  "metadata_before": {
+    "id": "tesw-yqqr",
+    "name": "Multiple Dwelling Registrations",
+    "assetType": "dataset",
+    "attribution": "Department of Housing Preservation and Development (HPD)",
+    "attributionLink": "http://www.nyc.gov/html/hpd/html/pr/HPD-Open-Data.shtml",
+    "averageRating": 0,
+    "category": "Housing & Development",
+    "createdAt": 1384802000,
+    "description": "Pursuant to New York City’s Housing Maintenance Code, the Department of Housing \r\nPreservation and Development (HPD) collects registration information from owners of \r\nresidential rental units. Owners are required to register if they own residential buildings \r\nwith three or more units or if they own one- or two-family homes and neither they nor \r\nmembers of their immediate family live there. Registrations are required upon taking \r\nownership of a qualifying building, and once a year thereafter.",
+    "diciBackend": false,
+    "displayType": "table",
+    "downloadCount": 15437,
+    "hideFromCatalog": false,
+    "hideFromDataJson": false,
+    "locked": false,
+    "newBackend": true,
+    "numberOfComments": 4,
+    "oid": 40326693,
+    "provenance": "official",
+    "publicationAppendEnabled": true,
+    "publicationDate": 1704141046,
+    "publicationGroup": 1359994,
+    "publicationStage": "published",
+    "rowsUpdatedAt": 1786546841,
+    "rowsUpdatedBy": "5fuc-pqz2",
+    "tableId": 19415300,
+    "totalTimesRated": 0,
+    "viewCount": 59121,
+    "viewLastModified": 1788290713,
+    "viewType": "tabular",
+    "approvals": [
+      {
+        "reviewedAt": 1565273861,
+        "reviewedAutomatically": true,
+        "state": "approved",
+        "submissionId": 6032859,
+        "submissionObject": "public_audience_request",
+        "submissionOutcome": "change_audience",
+        "submittedAt": 1565273861,
+        "targetAudience": "public",
+        "workflowId": 2285,
+        "submissionDetails": {
+          "permissionType": "READ"
+        },
+        "submissionOutcomeApplication": {
+          "failureCount": 0,
+          "status": "success"
+        },
+        "submitter": {
+          "id": "5fuc-pqz2",
+          "displayName": "NYC OpenData"
+        }
+      }
+    ],
+    "clientContext": {
+      "clientContextVariables": [],
+      "inheritedVariables": {}
+    },
+    "columns": [
+      {
+        "id": 587736404,
+        "name": "RegistrationID",
+        "dataTypeName": "number",
+        "description": "Unique identifier of Registration\n",
+        "fieldName": "registrationid",
+        "position": 1,
+        "renderTypeName": "number",
+        "tableColumnId": 16363925,
+        "width": 158,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "999995",
+          "null": "0",
+          "top": [
+            {
+              "item": "911741",
+              "count": "1448"
+            },
+            {
+              "item": "912547",
+              "count": "892"
+            },
+            {
+              "item": "913236",
+              "count": "698"
+            },
+            {
+              "item": "911726",
+              "count": "496"
+            },
+            {
+              "item": "911715",
+              "count": "465"
+            },
+            {
+              "item": "913994",
+              "count": "449"
+            },
+            {
+              "item": "912546",
+              "count": "404"
+            },
+            {
+              "item": "920659",
+              "count": "343"
+            },
+            {
+              "item": "911735",
+              "count": "275"
+            },
+            {
+              "item": "913319",
+              "count": "259"
+            },
+            {
+              "item": "911737",
+              "count": "240"
+            },
+            {
+              "item": "911743",
+              "count": "233"
+            },
+            {
+              "item": "911747",
+              "count": "230"
+            },
+            {
+              "item": "911756",
+              "count": "199"
+            },
+            {
+              "item": "911742",
+              "count": "192"
+            },
+            {
+              "item": "911709",
+              "count": "188"
+            },
+            {
+              "item": "911754",
+              "count": "154"
+            },
+            {
+              "item": "911767",
+              "count": "150"
+            },
+            {
+              "item": "911765",
+              "count": "144"
+            },
+            {
+              "item": "911736",
+              "count": "144"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736405,
+        "name": "BuildingID",
+        "dataTypeName": "number",
+        "description": "Unique identifier of building being registered\n",
+        "fieldName": "buildingid",
+        "position": 2,
+        "renderTypeName": "number",
+        "tableColumnId": 16363926,
+        "width": 150,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "1022273",
+          "null": "0",
+          "top": [
+            {
+              "item": "941028",
+              "count": "2"
+            },
+            {
+              "item": "940896",
+              "count": "2"
+            },
+            {
+              "item": "941039",
+              "count": "2"
+            },
+            {
+              "item": "941012",
+              "count": "2"
+            },
+            {
+              "item": "941041",
+              "count": "2"
+            },
+            {
+              "item": "940955",
+              "count": "2"
+            },
+            {
+              "item": "941044",
+              "count": "2"
+            },
+            {
+              "item": "459503",
+              "count": "2"
+            },
+            {
+              "item": "929456",
+              "count": "2"
+            },
+            {
+              "item": "940914",
+              "count": "2"
+            },
+            {
+              "item": "940952",
+              "count": "2"
+            },
+            {
+              "item": "940979",
+              "count": "2"
+            },
+            {
+              "item": "941009",
+              "count": "2"
+            },
+            {
+              "item": "941087",
+              "count": "2"
+            },
+            {
+              "item": "707130",
+              "count": "2"
+            },
+            {
+              "item": "815164",
+              "count": "2"
+            },
+            {
+              "item": "941050",
+              "count": "2"
+            },
+            {
+              "item": "940922",
+              "count": "2"
+            },
+            {
+              "item": "941046",
+              "count": "2"
+            },
+            {
+              "item": "941013",
+              "count": "2"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736406,
+        "name": "BoroID",
+        "dataTypeName": "number",
+        "description": "Unique identifier of a borough",
+        "fieldName": "boroid",
+        "position": 3,
+        "renderTypeName": "number",
+        "tableColumnId": 22109493,
+        "width": 126,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "5",
+          "null": "0",
+          "top": [
+            {
+              "item": "3",
+              "count": "83736"
+            },
+            {
+              "item": "4",
+              "count": "56725"
+            },
+            {
+              "item": "1",
+              "count": "30433"
+            },
+            {
+              "item": "2",
+              "count": "26376"
+            },
+            {
+              "item": "5",
+              "count": "6617"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {}
+      },
+      {
+        "id": 587736407,
+        "name": "Boro",
+        "dataTypeName": "text",
+        "description": "Boro code (1 = Manhattan, 2 = Bronx, 3 = Brooklyn, 4 = Queens, 5 = Staten Island)\n",
+        "fieldName": "boro",
+        "position": 4,
+        "renderTypeName": "text",
+        "tableColumnId": 16363927,
+        "width": 149,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "STATEN ISLAND",
+          "null": "0",
+          "top": [
+            {
+              "item": "BROOKLYN",
+              "count": "83736"
+            },
+            {
+              "item": "QUEENS",
+              "count": "56725"
+            },
+            {
+              "item": "MANHATTAN",
+              "count": "30433"
+            },
+            {
+              "item": "BRONX",
+              "count": "26376"
+            },
+            {
+              "item": "STATEN ISLAND",
+              "count": "6617"
+            }
+          ],
+          "smallest": "BRONX",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736408,
+        "name": "HouseNumber",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "housenumber",
+        "position": 5,
+        "renderTypeName": "text",
+        "tableColumnId": 16363928,
+        "width": 167,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "9A",
+          "null": "0",
+          "top": [
+            {
+              "item": "15",
+              "count": "326"
+            },
+            {
+              "item": "20",
+              "count": "310"
+            },
+            {
+              "item": "25",
+              "count": "302"
+            },
+            {
+              "item": "30",
+              "count": "284"
+            },
+            {
+              "item": "18",
+              "count": "280"
+            },
+            {
+              "item": "19",
+              "count": "278"
+            },
+            {
+              "item": "115",
+              "count": "275"
+            },
+            {
+              "item": "11",
+              "count": "275"
+            },
+            {
+              "item": "50",
+              "count": "272"
+            },
+            {
+              "item": "120",
+              "count": "270"
+            },
+            {
+              "item": "17",
+              "count": "268"
+            },
+            {
+              "item": "14",
+              "count": "267"
+            },
+            {
+              "item": "21",
+              "count": "266"
+            },
+            {
+              "item": "111",
+              "count": "266"
+            },
+            {
+              "item": "100",
+              "count": "262"
+            },
+            {
+              "item": "16",
+              "count": "259"
+            },
+            {
+              "item": "35",
+              "count": "258"
+            },
+            {
+              "item": "125",
+              "count": "255"
+            },
+            {
+              "item": "24",
+              "count": "254"
+            },
+            {
+              "item": "40",
+              "count": "251"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736409,
+        "name": "LowHouseNumber",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "lowhousenumber",
+        "position": 6,
+        "renderTypeName": "text",
+        "tableColumnId": 16363929,
+        "width": 179,
+        "cachedContents": {
+          "non_null": "203839",
+          "largest": "xxxxxxx",
+          "null": "48",
+          "top": [
+            {
+              "item": "15",
+              "count": "298"
+            },
+            {
+              "item": "20",
+              "count": "297"
+            },
+            {
+              "item": "18",
+              "count": "288"
+            },
+            {
+              "item": "19",
+              "count": "279"
+            },
+            {
+              "item": "25",
+              "count": "279"
+            },
+            {
+              "item": "21",
+              "count": "273"
+            },
+            {
+              "item": "14",
+              "count": "272"
+            },
+            {
+              "item": "11",
+              "count": "272"
+            },
+            {
+              "item": "30",
+              "count": "267"
+            },
+            {
+              "item": "17",
+              "count": "266"
+            },
+            {
+              "item": "111",
+              "count": "261"
+            },
+            {
+              "item": "115",
+              "count": "261"
+            },
+            {
+              "item": "28",
+              "count": "253"
+            },
+            {
+              "item": "24",
+              "count": "251"
+            },
+            {
+              "item": "16",
+              "count": "251"
+            },
+            {
+              "item": "120",
+              "count": "251"
+            },
+            {
+              "item": "29",
+              "count": "248"
+            },
+            {
+              "item": "50",
+              "count": "248"
+            },
+            {
+              "item": "12",
+              "count": "247"
+            },
+            {
+              "item": "35",
+              "count": "247"
+            }
+          ],
+          "smallest": "`",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736410,
+        "name": "HighHouseNumber",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "highhousenumber",
+        "position": 7,
+        "renderTypeName": "text",
+        "tableColumnId": 16363930,
+        "width": 186,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "9B",
+          "null": "0",
+          "top": [
+            {
+              "item": "15",
+              "count": "319"
+            },
+            {
+              "item": "19",
+              "count": "301"
+            },
+            {
+              "item": "20",
+              "count": "297"
+            },
+            {
+              "item": "25",
+              "count": "279"
+            },
+            {
+              "item": "18",
+              "count": "277"
+            },
+            {
+              "item": "30",
+              "count": "273"
+            },
+            {
+              "item": "16",
+              "count": "272"
+            },
+            {
+              "item": "14",
+              "count": "268"
+            },
+            {
+              "item": "21",
+              "count": "267"
+            },
+            {
+              "item": "17",
+              "count": "262"
+            },
+            {
+              "item": "115",
+              "count": "261"
+            },
+            {
+              "item": "11",
+              "count": "260"
+            },
+            {
+              "item": "50",
+              "count": "257"
+            },
+            {
+              "item": "29",
+              "count": "257"
+            },
+            {
+              "item": "28",
+              "count": "254"
+            },
+            {
+              "item": "111",
+              "count": "254"
+            },
+            {
+              "item": "24",
+              "count": "251"
+            },
+            {
+              "item": "26",
+              "count": "249"
+            },
+            {
+              "item": "35",
+              "count": "247"
+            },
+            {
+              "item": "40",
+              "count": "247"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736411,
+        "name": "StreetName",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "streetname",
+        "position": 8,
+        "renderTypeName": "text",
+        "tableColumnId": 16363931,
+        "width": 142,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "ZULETTE AVENUE",
+          "null": "0",
+          "top": [
+            {
+              "item": "BROADWAY",
+              "count": "954"
+            },
+            {
+              "item": "3 AVENUE",
+              "count": "930"
+            },
+            {
+              "item": "5 AVENUE",
+              "count": "905"
+            },
+            {
+              "item": "GREENE AVENUE",
+              "count": "784"
+            },
+            {
+              "item": "2 AVENUE",
+              "count": "722"
+            },
+            {
+              "item": "BEDFORD AVENUE",
+              "count": "715"
+            },
+            {
+              "item": "MADISON STREET",
+              "count": "662"
+            },
+            {
+              "item": "PUTNAM AVENUE",
+              "count": "644"
+            },
+            {
+              "item": "FULTON STREET",
+              "count": "603"
+            },
+            {
+              "item": "JEFFERSON AVENUE",
+              "count": "602"
+            },
+            {
+              "item": "JAMAICA AVENUE",
+              "count": "586"
+            },
+            {
+              "item": "LEXINGTON AVENUE",
+              "count": "578"
+            },
+            {
+              "item": "1 AVENUE",
+              "count": "574"
+            },
+            {
+              "item": "6 AVENUE",
+              "count": "574"
+            },
+            {
+              "item": "HANCOCK STREET",
+              "count": "567"
+            },
+            {
+              "item": "BERGEN STREET",
+              "count": "558"
+            },
+            {
+              "item": "PACIFIC STREET",
+              "count": "554"
+            },
+            {
+              "item": "8 AVENUE",
+              "count": "552"
+            },
+            {
+              "item": "NOSTRAND AVENUE",
+              "count": "541"
+            },
+            {
+              "item": "7 AVENUE",
+              "count": "529"
+            }
+          ],
+          "smallest": "100 AVENUE",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736412,
+        "name": "StreetCode",
+        "dataTypeName": "number",
+        "description": "Address information for the building\n",
+        "fieldName": "streetcode",
+        "position": 9,
+        "renderTypeName": "number",
+        "tableColumnId": 16363932,
+        "width": 157,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "99900",
+          "null": "0",
+          "top": [
+            {
+              "item": "0",
+              "count": "2900"
+            },
+            {
+              "item": "18630",
+              "count": "816"
+            },
+            {
+              "item": "10110",
+              "count": "717"
+            },
+            {
+              "item": "45930",
+              "count": "686"
+            },
+            {
+              "item": "5580",
+              "count": "612"
+            },
+            {
+              "item": "10010",
+              "count": "586"
+            },
+            {
+              "item": "42730",
+              "count": "582"
+            },
+            {
+              "item": "53030",
+              "count": "572"
+            },
+            {
+              "item": "19230",
+              "count": "543"
+            },
+            {
+              "item": "68930",
+              "count": "536"
+            },
+            {
+              "item": "51090",
+              "count": "535"
+            },
+            {
+              "item": "47030",
+              "count": "533"
+            },
+            {
+              "item": "67030",
+              "count": "530"
+            },
+            {
+              "item": "10210",
+              "count": "505"
+            },
+            {
+              "item": "72930",
+              "count": "504"
+            },
+            {
+              "item": "13610",
+              "count": "496"
+            },
+            {
+              "item": "31830",
+              "count": "490"
+            },
+            {
+              "item": "5430",
+              "count": "485"
+            },
+            {
+              "item": "80430",
+              "count": "474"
+            },
+            {
+              "item": "11710",
+              "count": "470"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736413,
+        "name": "Zip",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "zip",
+        "position": 10,
+        "renderTypeName": "text",
+        "tableColumnId": 16363933,
+        "width": 108,
+        "cachedContents": {
+          "non_null": "203880",
+          "largest": "418",
+          "null": "7",
+          "top": [
+            {
+              "item": "11385",
+              "count": "4730"
+            },
+            {
+              "item": "11221",
+              "count": "4564"
+            },
+            {
+              "item": "11215",
+              "count": "3884"
+            },
+            {
+              "item": "11233",
+              "count": "3827"
+            },
+            {
+              "item": "11207",
+              "count": "3822"
+            },
+            {
+              "item": "11216",
+              "count": "3548"
+            },
+            {
+              "item": "11211",
+              "count": "3280"
+            },
+            {
+              "item": "11368",
+              "count": "3132"
+            },
+            {
+              "item": "11219",
+              "count": "3123"
+            },
+            {
+              "item": "11220",
+              "count": "3111"
+            },
+            {
+              "item": "11222",
+              "count": "2992"
+            },
+            {
+              "item": "11214",
+              "count": "2969"
+            },
+            {
+              "item": "11208",
+              "count": "2965"
+            },
+            {
+              "item": "11238",
+              "count": "2742"
+            },
+            {
+              "item": "11237",
+              "count": "2722"
+            },
+            {
+              "item": "11212",
+              "count": "2683"
+            },
+            {
+              "item": "11206",
+              "count": "2617"
+            },
+            {
+              "item": "11231",
+              "count": "2485"
+            },
+            {
+              "item": "11204",
+              "count": "2419"
+            },
+            {
+              "item": "11364",
+              "count": "2305"
+            }
+          ],
+          "smallest": "10001",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736414,
+        "name": "Block",
+        "dataTypeName": "number",
+        "description": "Tax block for building\n",
+        "fieldName": "block",
+        "position": 11,
+        "renderTypeName": "number",
+        "tableColumnId": 16363934,
+        "width": 118,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "16317",
+          "null": "0",
+          "top": [
+            {
+              "item": "7117",
+              "count": "593"
+            },
+            {
+              "item": "3432",
+              "count": "319"
+            },
+            {
+              "item": "8276",
+              "count": "297"
+            },
+            {
+              "item": "8401",
+              "count": "268"
+            },
+            {
+              "item": "7632",
+              "count": "239"
+            },
+            {
+              "item": "7914",
+              "count": "230"
+            },
+            {
+              "item": "5843",
+              "count": "184"
+            },
+            {
+              "item": "7115",
+              "count": "176"
+            },
+            {
+              "item": "6548",
+              "count": "174"
+            },
+            {
+              "item": "2450",
+              "count": "160"
+            },
+            {
+              "item": "6656",
+              "count": "156"
+            },
+            {
+              "item": "6715",
+              "count": "150"
+            },
+            {
+              "item": "7754",
+              "count": "149"
+            },
+            {
+              "item": "6494",
+              "count": "147"
+            },
+            {
+              "item": "5740",
+              "count": "146"
+            },
+            {
+              "item": "5863",
+              "count": "146"
+            },
+            {
+              "item": "7742",
+              "count": "145"
+            },
+            {
+              "item": "8358",
+              "count": "145"
+            },
+            {
+              "item": "4452",
+              "count": "142"
+            },
+            {
+              "item": "6485",
+              "count": "141"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736415,
+        "name": "Lot",
+        "dataTypeName": "number",
+        "description": "Tax lot for building\n",
+        "fieldName": "lot",
+        "position": 12,
+        "renderTypeName": "number",
+        "tableColumnId": 16363935,
+        "width": 136,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "9080",
+          "null": "0",
+          "top": [
+            {
+              "item": "1",
+              "count": "9780"
+            },
+            {
+              "item": "7501",
+              "count": "7086"
+            },
+            {
+              "item": "2",
+              "count": "4852"
+            },
+            {
+              "item": "3",
+              "count": "3325"
+            },
+            {
+              "item": "10",
+              "count": "3003"
+            },
+            {
+              "item": "6",
+              "count": "2998"
+            },
+            {
+              "item": "20",
+              "count": "2841"
+            },
+            {
+              "item": "12",
+              "count": "2782"
+            },
+            {
+              "item": "25",
+              "count": "2769"
+            },
+            {
+              "item": "7",
+              "count": "2735"
+            },
+            {
+              "item": "11",
+              "count": "2696"
+            },
+            {
+              "item": "21",
+              "count": "2658"
+            },
+            {
+              "item": "23",
+              "count": "2630"
+            },
+            {
+              "item": "15",
+              "count": "2629"
+            },
+            {
+              "item": "8",
+              "count": "2616"
+            },
+            {
+              "item": "30",
+              "count": "2614"
+            },
+            {
+              "item": "29",
+              "count": "2610"
+            },
+            {
+              "item": "28",
+              "count": "2609"
+            },
+            {
+              "item": "7502",
+              "count": "2604"
+            },
+            {
+              "item": "17",
+              "count": "2599"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736416,
+        "name": "BIN",
+        "dataTypeName": "number",
+        "description": "DCP Building Identification Number for building\n",
+        "fieldName": "bin",
+        "position": 13,
+        "renderTypeName": "number",
+        "tableColumnId": 16363937,
+        "width": 136,
+        "cachedContents": {
+          "non_null": "203854",
+          "largest": "34228732",
+          "null": "33",
+          "top": [
+            {
+              "item": "0",
+              "count": "347"
+            },
+            {
+              "item": "3000000",
+              "count": "211"
+            },
+            {
+              "item": "4445478",
+              "count": "103"
+            },
+            {
+              "item": "2000000",
+              "count": "59"
+            },
+            {
+              "item": "1000000",
+              "count": "51"
+            },
+            {
+              "item": "4000000",
+              "count": "34"
+            },
+            {
+              "item": "4454129",
+              "count": "27"
+            },
+            {
+              "item": "4147370",
+              "count": "23"
+            },
+            {
+              "item": "4448352",
+              "count": "18"
+            },
+            {
+              "item": "4458866",
+              "count": "18"
+            },
+            {
+              "item": "4456016",
+              "count": "17"
+            },
+            {
+              "item": "4454128",
+              "count": "16"
+            },
+            {
+              "item": "4315317",
+              "count": "16"
+            },
+            {
+              "item": "4315313",
+              "count": "16"
+            },
+            {
+              "item": "4455901",
+              "count": "15"
+            },
+            {
+              "item": "4446424",
+              "count": "14"
+            },
+            {
+              "item": "4455963",
+              "count": "12"
+            },
+            {
+              "item": "4455924",
+              "count": "12"
+            },
+            {
+              "item": "4455936",
+              "count": "12"
+            },
+            {
+              "item": "4147320",
+              "count": "12"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736417,
+        "name": "CommunityBoard",
+        "dataTypeName": "number",
+        "description": "Community Board for building\n",
+        "fieldName": "communityboard",
+        "position": 14,
+        "renderTypeName": "number",
+        "tableColumnId": 16363938,
+        "width": 190,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "86",
+          "null": "0",
+          "top": [
+            {
+              "item": "1",
+              "count": "22094"
+            },
+            {
+              "item": "3",
+              "count": "18316"
+            },
+            {
+              "item": "12",
+              "count": "17113"
+            },
+            {
+              "item": "11",
+              "count": "15218"
+            },
+            {
+              "item": "7",
+              "count": "15144"
+            },
+            {
+              "item": "5",
+              "count": "15070"
+            },
+            {
+              "item": "4",
+              "count": "14754"
+            },
+            {
+              "item": "8",
+              "count": "13351"
+            },
+            {
+              "item": "2",
+              "count": "13055"
+            },
+            {
+              "item": "6",
+              "count": "12249"
+            },
+            {
+              "item": "10",
+              "count": "11564"
+            },
+            {
+              "item": "9",
+              "count": "10678"
+            },
+            {
+              "item": "13",
+              "count": "6782"
+            },
+            {
+              "item": "14",
+              "count": "4930"
+            },
+            {
+              "item": "17",
+              "count": "4820"
+            },
+            {
+              "item": "16",
+              "count": "3385"
+            },
+            {
+              "item": "15",
+              "count": "2850"
+            },
+            {
+              "item": "18",
+              "count": "2475"
+            },
+            {
+              "item": "0",
+              "count": "12"
+            },
+            {
+              "item": "41",
+              "count": "4"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736418,
+        "name": "LastRegistrationDate",
+        "dataTypeName": "calendar_date",
+        "description": "Date on which the registration information was processed\n",
+        "fieldName": "lastregistrationdate",
+        "position": 15,
+        "renderTypeName": "calendar_date",
+        "tableColumnId": 16363939,
+        "width": 188,
+        "cachedContents": {
+          "non_null": "200545",
+          "largest": "2026-07-31T00:00:00.000",
+          "null": "3342",
+          "top": [
+            {
+              "item": "2025-09-05T00:00:00.000",
+              "count": "3108"
+            },
+            {
+              "item": "2025-08-26T00:00:00.000",
+              "count": "2193"
+            },
+            {
+              "item": "2025-10-11T00:00:00.000",
+              "count": "2114"
+            },
+            {
+              "item": "2025-08-28T00:00:00.000",
+              "count": "1911"
+            },
+            {
+              "item": "2025-09-11T00:00:00.000",
+              "count": "1844"
+            },
+            {
+              "item": "2025-08-27T00:00:00.000",
+              "count": "1812"
+            },
+            {
+              "item": "2025-08-24T00:00:00.000",
+              "count": "1797"
+            },
+            {
+              "item": "2025-08-19T00:00:00.000",
+              "count": "1756"
+            },
+            {
+              "item": "2025-08-25T00:00:00.000",
+              "count": "1709"
+            },
+            {
+              "item": "2025-08-23T00:00:00.000",
+              "count": "1695"
+            },
+            {
+              "item": "2025-08-29T00:00:00.000",
+              "count": "1648"
+            },
+            {
+              "item": "2025-10-16T00:00:00.000",
+              "count": "1630"
+            },
+            {
+              "item": "2025-09-10T00:00:00.000",
+              "count": "1598"
+            },
+            {
+              "item": "2025-09-09T00:00:00.000",
+              "count": "1598"
+            },
+            {
+              "item": "2025-08-20T00:00:00.000",
+              "count": "1568"
+            },
+            {
+              "item": "2025-09-03T00:00:00.000",
+              "count": "1520"
+            },
+            {
+              "item": "2025-09-15T00:00:00.000",
+              "count": "1452"
+            },
+            {
+              "item": "2026-07-29T00:00:00.000",
+              "count": "1447"
+            },
+            {
+              "item": "2026-07-23T00:00:00.000",
+              "count": "1431"
+            },
+            {
+              "item": "2026-07-27T00:00:00.000",
+              "count": "1397"
+            }
+          ],
+          "smallest": "1993-04-01T00:00:00.000",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "view": "date",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736419,
+        "name": "RegistrationEndDate",
+        "dataTypeName": "calendar_date",
+        "description": "Expiration date of registration record\n",
+        "fieldName": "registrationenddate",
+        "position": 16,
+        "renderTypeName": "calendar_date",
+        "tableColumnId": 16363940,
+        "width": 201,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "2027-09-01T00:00:00.000",
+          "null": "0",
+          "top": [
+            {
+              "item": "2026-09-01T00:00:00.000",
+              "count": "130690"
+            },
+            {
+              "item": "2027-09-01T00:00:00.000",
+              "count": "23560"
+            },
+            {
+              "item": "2025-09-01T00:00:00.000",
+              "count": "11734"
+            },
+            {
+              "item": "2024-09-30T00:00:00.000",
+              "count": "5325"
+            },
+            {
+              "item": "2020-11-01T00:00:00.000",
+              "count": "3820"
+            },
+            {
+              "item": "2023-09-01T00:00:00.000",
+              "count": "3691"
+            },
+            {
+              "item": "2022-09-01T00:00:00.000",
+              "count": "3484"
+            },
+            {
+              "item": "2019-09-01T00:00:00.000",
+              "count": "3003"
+            },
+            {
+              "item": "2021-09-01T00:00:00.000",
+              "count": "2677"
+            },
+            {
+              "item": "2018-09-01T00:00:00.000",
+              "count": "2615"
+            },
+            {
+              "item": "2016-09-01T00:00:00.000",
+              "count": "1716"
+            },
+            {
+              "item": "2017-09-01T00:00:00.000",
+              "count": "1597"
+            },
+            {
+              "item": "2015-09-01T00:00:00.000",
+              "count": "1450"
+            },
+            {
+              "item": "2014-09-01T00:00:00.000",
+              "count": "888"
+            },
+            {
+              "item": "1994-09-30T00:00:00.000",
+              "count": "861"
+            },
+            {
+              "item": "2013-09-15T00:00:00.000",
+              "count": "795"
+            },
+            {
+              "item": "2012-10-01T00:00:00.000",
+              "count": "659"
+            },
+            {
+              "item": "1994-05-31T00:00:00.000",
+              "count": "558"
+            },
+            {
+              "item": "2011-10-01T00:00:00.000",
+              "count": "381"
+            },
+            {
+              "item": "2010-10-01T00:00:00.000",
+              "count": "317"
+            }
+          ],
+          "smallest": "1994-05-31T00:00:00.000",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "view": "date",
+          "align": "left"
+        }
+      }
+    ],
+    "grants": [
+      {
+        "inherited": false,
+        "type": "viewer",
+        "flags": [
+          "public"
+        ]
+      }
+    ],
+    "metadata": {
+      "rdfSubject": "0",
+      "attachments": [
+        {
+          "filename": "HPD Registration Open Data.pdf",
+          "assetId": "54b2086b-b656-49cb-8db8-14b3f1dcf05b",
+          "name": "HPD Registration Open Data.pdf"
+        }
+      ],
+      "custom_fields": {
+        "Update": {
+          "Automation": "Yes",
+          "Date Made Public": "2/14/2014",
+          "Update Frequency": "Monthly"
+        },
+        "Legislative Compliance": {
+          "Geo-coding Attached?": ""
+        },
+        "Dataset Information": {
+          "Agency": "Department of Housing Preservation and Development (HPD)"
+        }
+      },
+      "rowLabel": "Multiple Dwelling Registration",
+      "availableDisplayTypes": [
+        "table",
+        "fatrow",
+        "page"
+      ],
+      "renderTypeConfig": {
+        "visible": {
+          "table": true
+        }
+      }
+    },
+    "owner": {
+      "id": "5fuc-pqz2",
+      "displayName": "NYC OpenData",
+      "profileImageUrlLarge": "/api/users/5fuc-pqz2/profile_images/LARGE",
+      "profileImageUrlMedium": "/api/users/5fuc-pqz2/profile_images/THUMB",
+      "profileImageUrlSmall": "/api/users/5fuc-pqz2/profile_images/TINY",
+      "screenName": "NYC OpenData",
+      "type": "interactive",
+      "flags": [
+        "acceptedEula",
+        "mayBeStoriesCoOwner"
+      ]
+    },
+    "query": {},
+    "rights": [
+      "read"
+    ],
+    "tableAuthor": {
+      "id": "5fuc-pqz2",
+      "displayName": "NYC OpenData",
+      "profileImageUrlLarge": "/api/users/5fuc-pqz2/profile_images/LARGE",
+      "profileImageUrlMedium": "/api/users/5fuc-pqz2/profile_images/THUMB",
+      "profileImageUrlSmall": "/api/users/5fuc-pqz2/profile_images/TINY",
+      "screenName": "NYC OpenData",
+      "type": "interactive",
+      "flags": [
+        "acceptedEula",
+        "mayBeStoriesCoOwner"
+      ]
+    },
+    "tags": [
+      "registrations",
+      "department of housing preservation and development",
+      "hpd",
+      "housing"
+    ],
+    "flags": [
+      "default",
+      "ownerMayBeContacted",
+      "restorable",
+      "restorePossibleForType"
+    ]
+  },
+  "metadata_after": {
+    "id": "tesw-yqqr",
+    "name": "Multiple Dwelling Registrations",
+    "assetType": "dataset",
+    "attribution": "Department of Housing Preservation and Development (HPD)",
+    "attributionLink": "http://www.nyc.gov/html/hpd/html/pr/HPD-Open-Data.shtml",
+    "averageRating": 0,
+    "category": "Housing & Development",
+    "createdAt": 1384802000,
+    "description": "Pursuant to New York City’s Housing Maintenance Code, the Department of Housing \r\nPreservation and Development (HPD) collects registration information from owners of \r\nresidential rental units. Owners are required to register if they own residential buildings \r\nwith three or more units or if they own one- or two-family homes and neither they nor \r\nmembers of their immediate family live there. Registrations are required upon taking \r\nownership of a qualifying building, and once a year thereafter.",
+    "diciBackend": false,
+    "displayType": "table",
+    "downloadCount": 15437,
+    "hideFromCatalog": false,
+    "hideFromDataJson": false,
+    "locked": false,
+    "newBackend": true,
+    "numberOfComments": 4,
+    "oid": 40326693,
+    "provenance": "official",
+    "publicationAppendEnabled": true,
+    "publicationDate": 1704141046,
+    "publicationGroup": 1359994,
+    "publicationStage": "published",
+    "rowsUpdatedAt": 1786546841,
+    "rowsUpdatedBy": "5fuc-pqz2",
+    "tableId": 19415300,
+    "totalTimesRated": 0,
+    "viewCount": 59121,
+    "viewLastModified": 1788290713,
+    "viewType": "tabular",
+    "approvals": [
+      {
+        "reviewedAt": 1565273861,
+        "reviewedAutomatically": true,
+        "state": "approved",
+        "submissionId": 6032859,
+        "submissionObject": "public_audience_request",
+        "submissionOutcome": "change_audience",
+        "submittedAt": 1565273861,
+        "targetAudience": "public",
+        "workflowId": 2285,
+        "submissionDetails": {
+          "permissionType": "READ"
+        },
+        "submissionOutcomeApplication": {
+          "failureCount": 0,
+          "status": "success"
+        },
+        "submitter": {
+          "id": "5fuc-pqz2",
+          "displayName": "NYC OpenData"
+        }
+      }
+    ],
+    "clientContext": {
+      "clientContextVariables": [],
+      "inheritedVariables": {}
+    },
+    "columns": [
+      {
+        "id": 587736404,
+        "name": "RegistrationID",
+        "dataTypeName": "number",
+        "description": "Unique identifier of Registration\n",
+        "fieldName": "registrationid",
+        "position": 1,
+        "renderTypeName": "number",
+        "tableColumnId": 16363925,
+        "width": 158,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "999995",
+          "null": "0",
+          "top": [
+            {
+              "item": "911741",
+              "count": "1448"
+            },
+            {
+              "item": "912547",
+              "count": "892"
+            },
+            {
+              "item": "913236",
+              "count": "698"
+            },
+            {
+              "item": "911726",
+              "count": "496"
+            },
+            {
+              "item": "911715",
+              "count": "465"
+            },
+            {
+              "item": "913994",
+              "count": "449"
+            },
+            {
+              "item": "912546",
+              "count": "404"
+            },
+            {
+              "item": "920659",
+              "count": "343"
+            },
+            {
+              "item": "911735",
+              "count": "275"
+            },
+            {
+              "item": "913319",
+              "count": "259"
+            },
+            {
+              "item": "911737",
+              "count": "240"
+            },
+            {
+              "item": "911743",
+              "count": "233"
+            },
+            {
+              "item": "911747",
+              "count": "230"
+            },
+            {
+              "item": "911756",
+              "count": "199"
+            },
+            {
+              "item": "911742",
+              "count": "192"
+            },
+            {
+              "item": "911709",
+              "count": "188"
+            },
+            {
+              "item": "911754",
+              "count": "154"
+            },
+            {
+              "item": "911767",
+              "count": "150"
+            },
+            {
+              "item": "911765",
+              "count": "144"
+            },
+            {
+              "item": "911736",
+              "count": "144"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736405,
+        "name": "BuildingID",
+        "dataTypeName": "number",
+        "description": "Unique identifier of building being registered\n",
+        "fieldName": "buildingid",
+        "position": 2,
+        "renderTypeName": "number",
+        "tableColumnId": 16363926,
+        "width": 150,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "1022273",
+          "null": "0",
+          "top": [
+            {
+              "item": "941028",
+              "count": "2"
+            },
+            {
+              "item": "940896",
+              "count": "2"
+            },
+            {
+              "item": "941039",
+              "count": "2"
+            },
+            {
+              "item": "941012",
+              "count": "2"
+            },
+            {
+              "item": "941041",
+              "count": "2"
+            },
+            {
+              "item": "940955",
+              "count": "2"
+            },
+            {
+              "item": "941044",
+              "count": "2"
+            },
+            {
+              "item": "459503",
+              "count": "2"
+            },
+            {
+              "item": "929456",
+              "count": "2"
+            },
+            {
+              "item": "940914",
+              "count": "2"
+            },
+            {
+              "item": "940952",
+              "count": "2"
+            },
+            {
+              "item": "940979",
+              "count": "2"
+            },
+            {
+              "item": "941009",
+              "count": "2"
+            },
+            {
+              "item": "941087",
+              "count": "2"
+            },
+            {
+              "item": "707130",
+              "count": "2"
+            },
+            {
+              "item": "815164",
+              "count": "2"
+            },
+            {
+              "item": "941050",
+              "count": "2"
+            },
+            {
+              "item": "940922",
+              "count": "2"
+            },
+            {
+              "item": "941046",
+              "count": "2"
+            },
+            {
+              "item": "941013",
+              "count": "2"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736406,
+        "name": "BoroID",
+        "dataTypeName": "number",
+        "description": "Unique identifier of a borough",
+        "fieldName": "boroid",
+        "position": 3,
+        "renderTypeName": "number",
+        "tableColumnId": 22109493,
+        "width": 126,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "5",
+          "null": "0",
+          "top": [
+            {
+              "item": "3",
+              "count": "83736"
+            },
+            {
+              "item": "4",
+              "count": "56725"
+            },
+            {
+              "item": "1",
+              "count": "30433"
+            },
+            {
+              "item": "2",
+              "count": "26376"
+            },
+            {
+              "item": "5",
+              "count": "6617"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {}
+      },
+      {
+        "id": 587736407,
+        "name": "Boro",
+        "dataTypeName": "text",
+        "description": "Boro code (1 = Manhattan, 2 = Bronx, 3 = Brooklyn, 4 = Queens, 5 = Staten Island)\n",
+        "fieldName": "boro",
+        "position": 4,
+        "renderTypeName": "text",
+        "tableColumnId": 16363927,
+        "width": 149,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "STATEN ISLAND",
+          "null": "0",
+          "top": [
+            {
+              "item": "BROOKLYN",
+              "count": "83736"
+            },
+            {
+              "item": "QUEENS",
+              "count": "56725"
+            },
+            {
+              "item": "MANHATTAN",
+              "count": "30433"
+            },
+            {
+              "item": "BRONX",
+              "count": "26376"
+            },
+            {
+              "item": "STATEN ISLAND",
+              "count": "6617"
+            }
+          ],
+          "smallest": "BRONX",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736408,
+        "name": "HouseNumber",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "housenumber",
+        "position": 5,
+        "renderTypeName": "text",
+        "tableColumnId": 16363928,
+        "width": 167,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "9A",
+          "null": "0",
+          "top": [
+            {
+              "item": "15",
+              "count": "326"
+            },
+            {
+              "item": "20",
+              "count": "310"
+            },
+            {
+              "item": "25",
+              "count": "302"
+            },
+            {
+              "item": "30",
+              "count": "284"
+            },
+            {
+              "item": "18",
+              "count": "280"
+            },
+            {
+              "item": "19",
+              "count": "278"
+            },
+            {
+              "item": "115",
+              "count": "275"
+            },
+            {
+              "item": "11",
+              "count": "275"
+            },
+            {
+              "item": "50",
+              "count": "272"
+            },
+            {
+              "item": "120",
+              "count": "270"
+            },
+            {
+              "item": "17",
+              "count": "268"
+            },
+            {
+              "item": "14",
+              "count": "267"
+            },
+            {
+              "item": "21",
+              "count": "266"
+            },
+            {
+              "item": "111",
+              "count": "266"
+            },
+            {
+              "item": "100",
+              "count": "262"
+            },
+            {
+              "item": "16",
+              "count": "259"
+            },
+            {
+              "item": "35",
+              "count": "258"
+            },
+            {
+              "item": "125",
+              "count": "255"
+            },
+            {
+              "item": "24",
+              "count": "254"
+            },
+            {
+              "item": "40",
+              "count": "251"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736409,
+        "name": "LowHouseNumber",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "lowhousenumber",
+        "position": 6,
+        "renderTypeName": "text",
+        "tableColumnId": 16363929,
+        "width": 179,
+        "cachedContents": {
+          "non_null": "203839",
+          "largest": "xxxxxxx",
+          "null": "48",
+          "top": [
+            {
+              "item": "15",
+              "count": "298"
+            },
+            {
+              "item": "20",
+              "count": "297"
+            },
+            {
+              "item": "18",
+              "count": "288"
+            },
+            {
+              "item": "19",
+              "count": "279"
+            },
+            {
+              "item": "25",
+              "count": "279"
+            },
+            {
+              "item": "21",
+              "count": "273"
+            },
+            {
+              "item": "14",
+              "count": "272"
+            },
+            {
+              "item": "11",
+              "count": "272"
+            },
+            {
+              "item": "30",
+              "count": "267"
+            },
+            {
+              "item": "17",
+              "count": "266"
+            },
+            {
+              "item": "111",
+              "count": "261"
+            },
+            {
+              "item": "115",
+              "count": "261"
+            },
+            {
+              "item": "28",
+              "count": "253"
+            },
+            {
+              "item": "24",
+              "count": "251"
+            },
+            {
+              "item": "16",
+              "count": "251"
+            },
+            {
+              "item": "120",
+              "count": "251"
+            },
+            {
+              "item": "29",
+              "count": "248"
+            },
+            {
+              "item": "50",
+              "count": "248"
+            },
+            {
+              "item": "12",
+              "count": "247"
+            },
+            {
+              "item": "35",
+              "count": "247"
+            }
+          ],
+          "smallest": "`",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736410,
+        "name": "HighHouseNumber",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "highhousenumber",
+        "position": 7,
+        "renderTypeName": "text",
+        "tableColumnId": 16363930,
+        "width": 186,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "9B",
+          "null": "0",
+          "top": [
+            {
+              "item": "15",
+              "count": "319"
+            },
+            {
+              "item": "19",
+              "count": "301"
+            },
+            {
+              "item": "20",
+              "count": "297"
+            },
+            {
+              "item": "25",
+              "count": "279"
+            },
+            {
+              "item": "18",
+              "count": "277"
+            },
+            {
+              "item": "30",
+              "count": "273"
+            },
+            {
+              "item": "16",
+              "count": "272"
+            },
+            {
+              "item": "14",
+              "count": "268"
+            },
+            {
+              "item": "21",
+              "count": "267"
+            },
+            {
+              "item": "17",
+              "count": "262"
+            },
+            {
+              "item": "115",
+              "count": "261"
+            },
+            {
+              "item": "11",
+              "count": "260"
+            },
+            {
+              "item": "50",
+              "count": "257"
+            },
+            {
+              "item": "29",
+              "count": "257"
+            },
+            {
+              "item": "28",
+              "count": "254"
+            },
+            {
+              "item": "111",
+              "count": "254"
+            },
+            {
+              "item": "24",
+              "count": "251"
+            },
+            {
+              "item": "26",
+              "count": "249"
+            },
+            {
+              "item": "35",
+              "count": "247"
+            },
+            {
+              "item": "40",
+              "count": "247"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736411,
+        "name": "StreetName",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "streetname",
+        "position": 8,
+        "renderTypeName": "text",
+        "tableColumnId": 16363931,
+        "width": 142,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "ZULETTE AVENUE",
+          "null": "0",
+          "top": [
+            {
+              "item": "BROADWAY",
+              "count": "954"
+            },
+            {
+              "item": "3 AVENUE",
+              "count": "930"
+            },
+            {
+              "item": "5 AVENUE",
+              "count": "905"
+            },
+            {
+              "item": "GREENE AVENUE",
+              "count": "784"
+            },
+            {
+              "item": "2 AVENUE",
+              "count": "722"
+            },
+            {
+              "item": "BEDFORD AVENUE",
+              "count": "715"
+            },
+            {
+              "item": "MADISON STREET",
+              "count": "662"
+            },
+            {
+              "item": "PUTNAM AVENUE",
+              "count": "644"
+            },
+            {
+              "item": "FULTON STREET",
+              "count": "603"
+            },
+            {
+              "item": "JEFFERSON AVENUE",
+              "count": "602"
+            },
+            {
+              "item": "JAMAICA AVENUE",
+              "count": "586"
+            },
+            {
+              "item": "LEXINGTON AVENUE",
+              "count": "578"
+            },
+            {
+              "item": "1 AVENUE",
+              "count": "574"
+            },
+            {
+              "item": "6 AVENUE",
+              "count": "574"
+            },
+            {
+              "item": "HANCOCK STREET",
+              "count": "567"
+            },
+            {
+              "item": "BERGEN STREET",
+              "count": "558"
+            },
+            {
+              "item": "PACIFIC STREET",
+              "count": "554"
+            },
+            {
+              "item": "8 AVENUE",
+              "count": "552"
+            },
+            {
+              "item": "NOSTRAND AVENUE",
+              "count": "541"
+            },
+            {
+              "item": "7 AVENUE",
+              "count": "529"
+            }
+          ],
+          "smallest": "100 AVENUE",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736412,
+        "name": "StreetCode",
+        "dataTypeName": "number",
+        "description": "Address information for the building\n",
+        "fieldName": "streetcode",
+        "position": 9,
+        "renderTypeName": "number",
+        "tableColumnId": 16363932,
+        "width": 157,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "99900",
+          "null": "0",
+          "top": [
+            {
+              "item": "0",
+              "count": "2900"
+            },
+            {
+              "item": "18630",
+              "count": "816"
+            },
+            {
+              "item": "10110",
+              "count": "717"
+            },
+            {
+              "item": "45930",
+              "count": "686"
+            },
+            {
+              "item": "5580",
+              "count": "612"
+            },
+            {
+              "item": "10010",
+              "count": "586"
+            },
+            {
+              "item": "42730",
+              "count": "582"
+            },
+            {
+              "item": "53030",
+              "count": "572"
+            },
+            {
+              "item": "19230",
+              "count": "543"
+            },
+            {
+              "item": "68930",
+              "count": "536"
+            },
+            {
+              "item": "51090",
+              "count": "535"
+            },
+            {
+              "item": "47030",
+              "count": "533"
+            },
+            {
+              "item": "67030",
+              "count": "530"
+            },
+            {
+              "item": "10210",
+              "count": "505"
+            },
+            {
+              "item": "72930",
+              "count": "504"
+            },
+            {
+              "item": "13610",
+              "count": "496"
+            },
+            {
+              "item": "31830",
+              "count": "490"
+            },
+            {
+              "item": "5430",
+              "count": "485"
+            },
+            {
+              "item": "80430",
+              "count": "474"
+            },
+            {
+              "item": "11710",
+              "count": "470"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736413,
+        "name": "Zip",
+        "dataTypeName": "text",
+        "description": "Address information for the building\n",
+        "fieldName": "zip",
+        "position": 10,
+        "renderTypeName": "text",
+        "tableColumnId": 16363933,
+        "width": 108,
+        "cachedContents": {
+          "non_null": "203880",
+          "largest": "418",
+          "null": "7",
+          "top": [
+            {
+              "item": "11385",
+              "count": "4730"
+            },
+            {
+              "item": "11221",
+              "count": "4564"
+            },
+            {
+              "item": "11215",
+              "count": "3884"
+            },
+            {
+              "item": "11233",
+              "count": "3827"
+            },
+            {
+              "item": "11207",
+              "count": "3822"
+            },
+            {
+              "item": "11216",
+              "count": "3548"
+            },
+            {
+              "item": "11211",
+              "count": "3280"
+            },
+            {
+              "item": "11368",
+              "count": "3132"
+            },
+            {
+              "item": "11219",
+              "count": "3123"
+            },
+            {
+              "item": "11220",
+              "count": "3111"
+            },
+            {
+              "item": "11222",
+              "count": "2992"
+            },
+            {
+              "item": "11214",
+              "count": "2969"
+            },
+            {
+              "item": "11208",
+              "count": "2965"
+            },
+            {
+              "item": "11238",
+              "count": "2742"
+            },
+            {
+              "item": "11237",
+              "count": "2722"
+            },
+            {
+              "item": "11212",
+              "count": "2683"
+            },
+            {
+              "item": "11206",
+              "count": "2617"
+            },
+            {
+              "item": "11231",
+              "count": "2485"
+            },
+            {
+              "item": "11204",
+              "count": "2419"
+            },
+            {
+              "item": "11364",
+              "count": "2305"
+            }
+          ],
+          "smallest": "10001",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736414,
+        "name": "Block",
+        "dataTypeName": "number",
+        "description": "Tax block for building\n",
+        "fieldName": "block",
+        "position": 11,
+        "renderTypeName": "number",
+        "tableColumnId": 16363934,
+        "width": 118,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "16317",
+          "null": "0",
+          "top": [
+            {
+              "item": "7117",
+              "count": "593"
+            },
+            {
+              "item": "3432",
+              "count": "319"
+            },
+            {
+              "item": "8276",
+              "count": "297"
+            },
+            {
+              "item": "8401",
+              "count": "268"
+            },
+            {
+              "item": "7632",
+              "count": "239"
+            },
+            {
+              "item": "7914",
+              "count": "230"
+            },
+            {
+              "item": "5843",
+              "count": "184"
+            },
+            {
+              "item": "7115",
+              "count": "176"
+            },
+            {
+              "item": "6548",
+              "count": "174"
+            },
+            {
+              "item": "2450",
+              "count": "160"
+            },
+            {
+              "item": "6656",
+              "count": "156"
+            },
+            {
+              "item": "6715",
+              "count": "150"
+            },
+            {
+              "item": "7754",
+              "count": "149"
+            },
+            {
+              "item": "6494",
+              "count": "147"
+            },
+            {
+              "item": "5740",
+              "count": "146"
+            },
+            {
+              "item": "5863",
+              "count": "146"
+            },
+            {
+              "item": "7742",
+              "count": "145"
+            },
+            {
+              "item": "8358",
+              "count": "145"
+            },
+            {
+              "item": "4452",
+              "count": "142"
+            },
+            {
+              "item": "6485",
+              "count": "141"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736415,
+        "name": "Lot",
+        "dataTypeName": "number",
+        "description": "Tax lot for building\n",
+        "fieldName": "lot",
+        "position": 12,
+        "renderTypeName": "number",
+        "tableColumnId": 16363935,
+        "width": 136,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "9080",
+          "null": "0",
+          "top": [
+            {
+              "item": "1",
+              "count": "9780"
+            },
+            {
+              "item": "7501",
+              "count": "7086"
+            },
+            {
+              "item": "2",
+              "count": "4852"
+            },
+            {
+              "item": "3",
+              "count": "3325"
+            },
+            {
+              "item": "10",
+              "count": "3003"
+            },
+            {
+              "item": "6",
+              "count": "2998"
+            },
+            {
+              "item": "20",
+              "count": "2841"
+            },
+            {
+              "item": "12",
+              "count": "2782"
+            },
+            {
+              "item": "25",
+              "count": "2769"
+            },
+            {
+              "item": "7",
+              "count": "2735"
+            },
+            {
+              "item": "11",
+              "count": "2696"
+            },
+            {
+              "item": "21",
+              "count": "2658"
+            },
+            {
+              "item": "23",
+              "count": "2630"
+            },
+            {
+              "item": "15",
+              "count": "2629"
+            },
+            {
+              "item": "8",
+              "count": "2616"
+            },
+            {
+              "item": "30",
+              "count": "2614"
+            },
+            {
+              "item": "29",
+              "count": "2610"
+            },
+            {
+              "item": "28",
+              "count": "2609"
+            },
+            {
+              "item": "7502",
+              "count": "2604"
+            },
+            {
+              "item": "17",
+              "count": "2599"
+            }
+          ],
+          "smallest": "1",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736416,
+        "name": "BIN",
+        "dataTypeName": "number",
+        "description": "DCP Building Identification Number for building\n",
+        "fieldName": "bin",
+        "position": 13,
+        "renderTypeName": "number",
+        "tableColumnId": 16363937,
+        "width": 136,
+        "cachedContents": {
+          "non_null": "203854",
+          "largest": "34228732",
+          "null": "33",
+          "top": [
+            {
+              "item": "0",
+              "count": "347"
+            },
+            {
+              "item": "3000000",
+              "count": "211"
+            },
+            {
+              "item": "4445478",
+              "count": "103"
+            },
+            {
+              "item": "2000000",
+              "count": "59"
+            },
+            {
+              "item": "1000000",
+              "count": "51"
+            },
+            {
+              "item": "4000000",
+              "count": "34"
+            },
+            {
+              "item": "4454129",
+              "count": "27"
+            },
+            {
+              "item": "4147370",
+              "count": "23"
+            },
+            {
+              "item": "4448352",
+              "count": "18"
+            },
+            {
+              "item": "4458866",
+              "count": "18"
+            },
+            {
+              "item": "4456016",
+              "count": "17"
+            },
+            {
+              "item": "4454128",
+              "count": "16"
+            },
+            {
+              "item": "4315317",
+              "count": "16"
+            },
+            {
+              "item": "4315313",
+              "count": "16"
+            },
+            {
+              "item": "4455901",
+              "count": "15"
+            },
+            {
+              "item": "4446424",
+              "count": "14"
+            },
+            {
+              "item": "4455963",
+              "count": "12"
+            },
+            {
+              "item": "4455924",
+              "count": "12"
+            },
+            {
+              "item": "4455936",
+              "count": "12"
+            },
+            {
+              "item": "4147320",
+              "count": "12"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736417,
+        "name": "CommunityBoard",
+        "dataTypeName": "number",
+        "description": "Community Board for building\n",
+        "fieldName": "communityboard",
+        "position": 14,
+        "renderTypeName": "number",
+        "tableColumnId": 16363938,
+        "width": 190,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "86",
+          "null": "0",
+          "top": [
+            {
+              "item": "1",
+              "count": "22094"
+            },
+            {
+              "item": "3",
+              "count": "18316"
+            },
+            {
+              "item": "12",
+              "count": "17113"
+            },
+            {
+              "item": "11",
+              "count": "15218"
+            },
+            {
+              "item": "7",
+              "count": "15144"
+            },
+            {
+              "item": "5",
+              "count": "15070"
+            },
+            {
+              "item": "4",
+              "count": "14754"
+            },
+            {
+              "item": "8",
+              "count": "13351"
+            },
+            {
+              "item": "2",
+              "count": "13055"
+            },
+            {
+              "item": "6",
+              "count": "12249"
+            },
+            {
+              "item": "10",
+              "count": "11564"
+            },
+            {
+              "item": "9",
+              "count": "10678"
+            },
+            {
+              "item": "13",
+              "count": "6782"
+            },
+            {
+              "item": "14",
+              "count": "4930"
+            },
+            {
+              "item": "17",
+              "count": "4820"
+            },
+            {
+              "item": "16",
+              "count": "3385"
+            },
+            {
+              "item": "15",
+              "count": "2850"
+            },
+            {
+              "item": "18",
+              "count": "2475"
+            },
+            {
+              "item": "0",
+              "count": "12"
+            },
+            {
+              "item": "41",
+              "count": "4"
+            }
+          ],
+          "smallest": "0",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "precisionStyle": "standard",
+          "noCommas": "true",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736418,
+        "name": "LastRegistrationDate",
+        "dataTypeName": "calendar_date",
+        "description": "Date on which the registration information was processed\n",
+        "fieldName": "lastregistrationdate",
+        "position": 15,
+        "renderTypeName": "calendar_date",
+        "tableColumnId": 16363939,
+        "width": 188,
+        "cachedContents": {
+          "non_null": "200545",
+          "largest": "2026-07-31T00:00:00.000",
+          "null": "3342",
+          "top": [
+            {
+              "item": "2025-09-05T00:00:00.000",
+              "count": "3108"
+            },
+            {
+              "item": "2025-08-26T00:00:00.000",
+              "count": "2193"
+            },
+            {
+              "item": "2025-10-11T00:00:00.000",
+              "count": "2114"
+            },
+            {
+              "item": "2025-08-28T00:00:00.000",
+              "count": "1911"
+            },
+            {
+              "item": "2025-09-11T00:00:00.000",
+              "count": "1844"
+            },
+            {
+              "item": "2025-08-27T00:00:00.000",
+              "count": "1812"
+            },
+            {
+              "item": "2025-08-24T00:00:00.000",
+              "count": "1797"
+            },
+            {
+              "item": "2025-08-19T00:00:00.000",
+              "count": "1756"
+            },
+            {
+              "item": "2025-08-25T00:00:00.000",
+              "count": "1709"
+            },
+            {
+              "item": "2025-08-23T00:00:00.000",
+              "count": "1695"
+            },
+            {
+              "item": "2025-08-29T00:00:00.000",
+              "count": "1648"
+            },
+            {
+              "item": "2025-10-16T00:00:00.000",
+              "count": "1630"
+            },
+            {
+              "item": "2025-09-10T00:00:00.000",
+              "count": "1598"
+            },
+            {
+              "item": "2025-09-09T00:00:00.000",
+              "count": "1598"
+            },
+            {
+              "item": "2025-08-20T00:00:00.000",
+              "count": "1568"
+            },
+            {
+              "item": "2025-09-03T00:00:00.000",
+              "count": "1520"
+            },
+            {
+              "item": "2025-09-15T00:00:00.000",
+              "count": "1452"
+            },
+            {
+              "item": "2026-07-29T00:00:00.000",
+              "count": "1447"
+            },
+            {
+              "item": "2026-07-23T00:00:00.000",
+              "count": "1431"
+            },
+            {
+              "item": "2026-07-27T00:00:00.000",
+              "count": "1397"
+            }
+          ],
+          "smallest": "1993-04-01T00:00:00.000",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "view": "date",
+          "align": "left"
+        }
+      },
+      {
+        "id": 587736419,
+        "name": "RegistrationEndDate",
+        "dataTypeName": "calendar_date",
+        "description": "Expiration date of registration record\n",
+        "fieldName": "registrationenddate",
+        "position": 16,
+        "renderTypeName": "calendar_date",
+        "tableColumnId": 16363940,
+        "width": 201,
+        "cachedContents": {
+          "non_null": "203887",
+          "largest": "2027-09-01T00:00:00.000",
+          "null": "0",
+          "top": [
+            {
+              "item": "2026-09-01T00:00:00.000",
+              "count": "130690"
+            },
+            {
+              "item": "2027-09-01T00:00:00.000",
+              "count": "23560"
+            },
+            {
+              "item": "2025-09-01T00:00:00.000",
+              "count": "11734"
+            },
+            {
+              "item": "2024-09-30T00:00:00.000",
+              "count": "5325"
+            },
+            {
+              "item": "2020-11-01T00:00:00.000",
+              "count": "3820"
+            },
+            {
+              "item": "2023-09-01T00:00:00.000",
+              "count": "3691"
+            },
+            {
+              "item": "2022-09-01T00:00:00.000",
+              "count": "3484"
+            },
+            {
+              "item": "2019-09-01T00:00:00.000",
+              "count": "3003"
+            },
+            {
+              "item": "2021-09-01T00:00:00.000",
+              "count": "2677"
+            },
+            {
+              "item": "2018-09-01T00:00:00.000",
+              "count": "2615"
+            },
+            {
+              "item": "2016-09-01T00:00:00.000",
+              "count": "1716"
+            },
+            {
+              "item": "2017-09-01T00:00:00.000",
+              "count": "1597"
+            },
+            {
+              "item": "2015-09-01T00:00:00.000",
+              "count": "1450"
+            },
+            {
+              "item": "2014-09-01T00:00:00.000",
+              "count": "888"
+            },
+            {
+              "item": "1994-09-30T00:00:00.000",
+              "count": "861"
+            },
+            {
+              "item": "2013-09-15T00:00:00.000",
+              "count": "795"
+            },
+            {
+              "item": "2012-10-01T00:00:00.000",
+              "count": "659"
+            },
+            {
+              "item": "1994-05-31T00:00:00.000",
+              "count": "558"
+            },
+            {
+              "item": "2011-10-01T00:00:00.000",
+              "count": "381"
+            },
+            {
+              "item": "2010-10-01T00:00:00.000",
+              "count": "317"
+            }
+          ],
+          "smallest": "1994-05-31T00:00:00.000",
+          "count": "203887",
+          "cardinality": "203887"
+        },
+        "format": {
+          "view": "date",
+          "align": "left"
+        }
+      }
+    ],
+    "grants": [
+      {
+        "inherited": false,
+        "type": "viewer",
+        "flags": [
+          "public"
+        ]
+      }
+    ],
+    "metadata": {
+      "rdfSubject": "0",
+      "attachments": [
+        {
+          "filename": "HPD Registration Open Data.pdf",
+          "assetId": "54b2086b-b656-49cb-8db8-14b3f1dcf05b",
+          "name": "HPD Registration Open Data.pdf"
+        }
+      ],
+      "custom_fields": {
+        "Update": {
+          "Automation": "Yes",
+          "Date Made Public": "2/14/2014",
+          "Update Frequency": "Monthly"
+        },
+        "Legislative Compliance": {
+          "Geo-coding Attached?": ""
+        },
+        "Dataset Information": {
+          "Agency": "Department of Housing Preservation and Development (HPD)"
+        }
+      },
+      "rowLabel": "Multiple Dwelling Registration",
+      "availableDisplayTypes": [
+        "table",
+        "fatrow",
+        "page"
+      ],
+      "renderTypeConfig": {
+        "visible": {
+          "table": true
+        }
+      }
+    },
+    "owner": {
+      "id": "5fuc-pqz2",
+      "displayName": "NYC OpenData",
+      "profileImageUrlLarge": "/api/users/5fuc-pqz2/profile_images/LARGE",
+      "profileImageUrlMedium": "/api/users/5fuc-pqz2/profile_images/THUMB",
+      "profileImageUrlSmall": "/api/users/5fuc-pqz2/profile_images/TINY",
+      "screenName": "NYC OpenData",
+      "type": "interactive",
+      "flags": [
+        "acceptedEula",
+        "mayBeStoriesCoOwner"
+      ]
+    },
+    "query": {},
+    "rights": [
+      "read"
+    ],
+    "tableAuthor": {
+      "id": "5fuc-pqz2",
+      "displayName": "NYC OpenData",
+      "profileImageUrlLarge": "/api/users/5fuc-pqz2/profile_images/LARGE",
+      "profileImageUrlMedium": "/api/users/5fuc-pqz2/profile_images/THUMB",
+      "profileImageUrlSmall": "/api/users/5fuc-pqz2/profile_images/TINY",
+      "screenName": "NYC OpenData",
+      "type": "interactive",
+      "flags": [
+        "acceptedEula",
+        "mayBeStoriesCoOwner"
+      ]
+    },
+    "tags": [
+      "registrations",
+      "department of housing preservation and development",
+      "hpd",
+      "housing"
+    ],
+    "flags": [
+      "default",
+      "ownerMayBeContacted",
+      "restorable",
+      "restorePossibleForType"
+    ]
+  }
+}

@@ -1,0 +1,918 @@
+{
+  "dataset_id": "24a4-muw7",
+  "host": "health.data.ny.gov",
+  "expected_before": 6244,
+  "expected_after": 6244,
+  "retrieved": 6244,
+  "unique_row_ids": 6244,
+  "pagination_completed": true,
+  "rows_updated_before": 1790100555,
+  "rows_updated_after": 1790100555,
+  "stable_complete_snapshot": true,
+  "metadata_before": {
+    "id": "24a4-muw7",
+    "name": "New York State Cooling Tower Registry Weekly Extract",
+    "assetType": "dataset",
+    "attribution": "Center for Environmental Health",
+    "attributionLink": "https://ct.doh.ny.gov/",
+    "averageRating": 0,
+    "category": "Health",
+    "createdAt": 1648643844,
+    "description": "The dataset contains the location, legionella sampling results and operational status of cooling towers operating in New York State. The data is self-reported by the cooling tower operator according to Public Health Law, Section 225(5)(a) Subpart 4-1 – Cooling Towers. This dataset is a weekly snapshot of the data collected from the NYS Cooling Tower Registry Website it does not contain historical data.",
+    "diciBackend": false,
+    "displayType": "table",
+    "downloadCount": 18728,
+    "hideFromCatalog": false,
+    "hideFromDataJson": false,
+    "locked": false,
+    "newBackend": true,
+    "numberOfComments": 0,
+    "oid": 39652589,
+    "provenance": "official",
+    "publicationAppendEnabled": false,
+    "publicationDate": 1686056642,
+    "publicationGroup": 18639531,
+    "publicationStage": "published",
+    "rowsUpdatedAt": 1790100555,
+    "rowsUpdatedBy": "a9xd-f5um",
+    "tableId": 19172970,
+    "totalTimesRated": 0,
+    "viewCount": 84123,
+    "viewLastModified": 1790100553,
+    "viewType": "tabular",
+    "approvals": [
+      {
+        "reviewedAt": 1661276738,
+        "reviewedAutomatically": true,
+        "state": "approved",
+        "submissionId": 5552009,
+        "submissionObject": "public_audience_request",
+        "submissionOutcome": "change_audience",
+        "submittedAt": 1661276738,
+        "targetAudience": "public",
+        "workflowId": 1966,
+        "submissionDetails": {
+          "permissionType": "READ"
+        },
+        "submissionOutcomeApplication": {
+          "endedAt": 1661276738,
+          "failureCount": 0,
+          "startedAt": 1661276738,
+          "status": "success"
+        },
+        "submitter": {
+          "id": "cznh-xced",
+          "displayName": "Sheldon Vosburgh"
+        }
+      }
+    ],
+    "clientContext": {
+      "clientContextVariables": [],
+      "inheritedVariables": {}
+    },
+    "columns": [
+      {
+        "id": 576567177,
+        "name": "Equipment_ID",
+        "dataTypeName": "text",
+        "description": "Cooling Tower ID number",
+        "fieldName": "equipment_id",
+        "position": 1,
+        "renderTypeName": "text",
+        "tableColumnId": 141574312,
+        "format": {}
+      },
+      {
+        "id": 576567178,
+        "name": "County",
+        "dataTypeName": "text",
+        "description": "County",
+        "fieldName": "county",
+        "position": 2,
+        "renderTypeName": "text",
+        "tableColumnId": 141570837,
+        "format": {}
+      },
+      {
+        "id": 576567179,
+        "name": "Reg_Comp",
+        "dataTypeName": "text",
+        "description": "Regulation 4-1 Compliance Status",
+        "fieldName": "reg_comp",
+        "position": 3,
+        "renderTypeName": "text",
+        "tableColumnId": 141570839,
+        "format": {}
+      },
+      {
+        "id": 576567180,
+        "name": "Last_Update_Days",
+        "dataTypeName": "text",
+        "description": "Days the operator last updated the Registry",
+        "fieldName": "lastupdate",
+        "position": 4,
+        "renderTypeName": "text",
+        "tableColumnId": 143480843,
+        "format": {}
+      },
+      {
+        "id": 576567181,
+        "name": "CT_Status",
+        "dataTypeName": "text",
+        "description": "The operational status of the cooling tower",
+        "fieldName": "ct_status",
+        "position": 5,
+        "renderTypeName": "text",
+        "tableColumnId": 141570841,
+        "format": {}
+      },
+      {
+        "id": 576567182,
+        "name": "Last_Sampled_Days",
+        "dataTypeName": "text",
+        "description": "Number of days the operator last sampled for legionella",
+        "fieldName": "last_sampled_days",
+        "position": 6,
+        "renderTypeName": "text",
+        "tableColumnId": 143480842,
+        "format": {}
+      },
+      {
+        "id": 576567183,
+        "name": "equipment_street_address",
+        "dataTypeName": "text",
+        "description": "Address of cooling tower",
+        "fieldName": "equipment_street_address",
+        "position": 7,
+        "renderTypeName": "text",
+        "tableColumnId": 141570844,
+        "format": {}
+      },
+      {
+        "id": 576567184,
+        "name": "equipment_location_city",
+        "dataTypeName": "text",
+        "description": "City",
+        "fieldName": "equipment_location_city",
+        "position": 8,
+        "renderTypeName": "text",
+        "tableColumnId": 141570845,
+        "format": {}
+      },
+      {
+        "id": 576567185,
+        "name": "equipment_location_zip",
+        "dataTypeName": "text",
+        "description": "Zip code",
+        "fieldName": "equipment_location_zip",
+        "position": 9,
+        "renderTypeName": "text",
+        "tableColumnId": 141574313,
+        "format": {}
+      },
+      {
+        "id": 576567186,
+        "name": "Equipment Last Legionellla Sample Collection Date",
+        "dataTypeName": "text",
+        "description": "Date of last legionella sample",
+        "fieldName": "equipment_last_legionellla_sample_collection_date",
+        "position": 10,
+        "renderTypeName": "text",
+        "tableColumnId": 143480841,
+        "format": {
+          "view": "date"
+        }
+      },
+      {
+        "id": 576567187,
+        "name": "Equipment Last Legionella Test Result",
+        "dataTypeName": "text",
+        "description": "Results of last legionella lab",
+        "fieldName": "equipment_last_legionella_test_result",
+        "position": 11,
+        "renderTypeName": "text",
+        "tableColumnId": 143090511,
+        "format": {}
+      },
+      {
+        "id": 576567188,
+        "name": "Equipment_Tower_Operation_Duration",
+        "dataTypeName": "text",
+        "description": "Operation of cooling tower year-round or not",
+        "fieldName": "equipment_tower_operation_duration",
+        "position": 12,
+        "renderTypeName": "text",
+        "tableColumnId": 143090509,
+        "format": {}
+      },
+      {
+        "id": 576567189,
+        "name": "Latitude",
+        "dataTypeName": "text",
+        "description": "Geographic coordinates in decimal degrees y-axis",
+        "fieldName": "latitude",
+        "position": 13,
+        "renderTypeName": "text",
+        "tableColumnId": 143480840,
+        "format": {}
+      },
+      {
+        "id": 576567190,
+        "name": "Longitude",
+        "dataTypeName": "text",
+        "description": "Geographic coordinates in decimal degrees x-axis",
+        "fieldName": "longitude",
+        "position": 14,
+        "renderTypeName": "text",
+        "tableColumnId": 143480839,
+        "format": {}
+      },
+      {
+        "id": 576567191,
+        "name": "Georeference",
+        "dataTypeName": "point",
+        "description": "",
+        "fieldName": "georeference",
+        "position": 15,
+        "renderTypeName": "point",
+        "tableColumnId": 143480844,
+        "format": {}
+      },
+      {
+        "id": 576567192,
+        "name": "Local Waterfront Revitalization Program (LWRP) Communities 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'Local Waterfront Revitalization Program (LWRP) Communities' (8ire-itmf) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_8ire_itmf",
+        "position": 25,
+        "renderTypeName": "number",
+        "tableColumnId": 143480845,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_8ire-itmf",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567193,
+        "name": "School Districts 2016.shp 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'School Districts 2016.shp' (5edz-4hdv) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_5edz_4hdv",
+        "position": 26,
+        "renderTypeName": "number",
+        "tableColumnId": 143480846,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_5edz-4hdv",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567194,
+        "name": "New York Zip Codes 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'New York Zip Codes' (43an-4dx5) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_43an_4dx5",
+        "position": 27,
+        "renderTypeName": "number",
+        "tableColumnId": 143480847,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_43an-4dx5",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567195,
+        "name": "Counties 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'Counties' (9yqb-tdyd) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_9yqb_tdyd",
+        "position": 28,
+        "renderTypeName": "number",
+        "tableColumnId": 143480848,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_9yqb-tdyd",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567196,
+        "name": "NYS Senate Districts 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'NYS Senate Districts' (assa-msit) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_assa_msit",
+        "position": 29,
+        "renderTypeName": "number",
+        "tableColumnId": 143480849,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_assa-msit",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567197,
+        "name": "NYS Tick Regions",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'NYS Tick Regions' (v9ry-wcha) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_v9ry_wcha",
+        "position": 30,
+        "renderTypeName": "number",
+        "tableColumnId": 147113189,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_v9ry-wcha",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      }
+    ],
+    "grants": [
+      {
+        "inherited": false,
+        "type": "viewer",
+        "flags": [
+          "public"
+        ]
+      }
+    ],
+    "metadata": {
+      "attachments": [
+        {
+          "filename": "NYSDOH_COOLING_TOWER_OVERVIEW.pdf",
+          "assetId": "e555307f-e787-4171-b920-39bf56985644",
+          "name": "NYSDOH_COOLING_TOWER_OVERVIEW.pdf"
+        },
+        {
+          "filename": "NYSDOH_COOLING_TOWER_DATA_DICTIONARY.pdf",
+          "assetId": "f1181d3f-673f-409d-8717-acb319abe7e3",
+          "name": "NYSDOH_COOLING_TOWER_DATA_DICTIONARY.pdf"
+        }
+      ],
+      "custom_fields": {
+        "Dataset Summary": {
+          "Posting Frequency": "Weekly",
+          "Time Period": "2022",
+          "Office/Division": "Center for Environmental Health",
+          "Coverage": "Statewide, excluding NYC",
+          "Granularity": "Street Address",
+          "Units": "Laboratory Sample Result",
+          "Dataset Owner": "Bureau of Water Supply Protection – Legionella Program"
+        },
+        "Local Data": {
+          "County_Column": "County",
+          "County Filter": "Yes"
+        },
+        "Additional Resources": {
+          "See Also": "https://www.health.ny.gov/environmental/water/drinking/legionella/cooling_towers.htm  "
+        },
+        "Disclaimers": {
+          "Limitations": "All data is input by the cooling tower operator and is not verified by the NYS DOH. "
+        },
+        "Notes": {
+          "Notes": "Researchers agree to: use the data for statistical reporting and analysis only. The author will include a disclaimer that states any analyses, interpretations or conclusions were reached by the author and not the NYSDOH."
+        },
+        "Dataset Information": {
+          "Agency": "Health, Department of"
+        }
+      },
+      "rowLabel": "Laboratory Sample Result",
+      "availableDisplayTypes": [
+        "table",
+        "fatrow",
+        "page"
+      ]
+    },
+    "owner": {
+      "id": "s9j2-nqmr",
+      "displayName": "Open Data NY - DOH",
+      "profileImageUrlLarge": "/api/users/s9j2-nqmr/profile_images/LARGE",
+      "profileImageUrlMedium": "/api/users/s9j2-nqmr/profile_images/THUMB",
+      "profileImageUrlSmall": "/api/users/s9j2-nqmr/profile_images/TINY",
+      "screenName": "Open Data NY - DOH",
+      "type": "interactive",
+      "flags": [
+        "mayBeStoriesCoOwner"
+      ]
+    },
+    "query": {},
+    "rights": [
+      "read"
+    ],
+    "tableAuthor": {
+      "id": "s9j2-nqmr",
+      "displayName": "Open Data NY - DOH",
+      "profileImageUrlLarge": "/api/users/s9j2-nqmr/profile_images/LARGE",
+      "profileImageUrlMedium": "/api/users/s9j2-nqmr/profile_images/THUMB",
+      "profileImageUrlSmall": "/api/users/s9j2-nqmr/profile_images/TINY",
+      "screenName": "Open Data NY - DOH",
+      "type": "interactive",
+      "flags": [
+        "mayBeStoriesCoOwner"
+      ]
+    },
+    "tags": [
+      "cooling tower",
+      "legionella",
+      "legionnaires",
+      "regulation 4-1"
+    ],
+    "flags": [
+      "default",
+      "ownerMayBeContacted",
+      "restorable",
+      "restorePossibleForType"
+    ]
+  },
+  "metadata_after": {
+    "id": "24a4-muw7",
+    "name": "New York State Cooling Tower Registry Weekly Extract",
+    "assetType": "dataset",
+    "attribution": "Center for Environmental Health",
+    "attributionLink": "https://ct.doh.ny.gov/",
+    "averageRating": 0,
+    "category": "Health",
+    "createdAt": 1648643844,
+    "description": "The dataset contains the location, legionella sampling results and operational status of cooling towers operating in New York State. The data is self-reported by the cooling tower operator according to Public Health Law, Section 225(5)(a) Subpart 4-1 – Cooling Towers. This dataset is a weekly snapshot of the data collected from the NYS Cooling Tower Registry Website it does not contain historical data.",
+    "diciBackend": false,
+    "displayType": "table",
+    "downloadCount": 18728,
+    "hideFromCatalog": false,
+    "hideFromDataJson": false,
+    "locked": false,
+    "newBackend": true,
+    "numberOfComments": 0,
+    "oid": 39652589,
+    "provenance": "official",
+    "publicationAppendEnabled": false,
+    "publicationDate": 1686056642,
+    "publicationGroup": 18639531,
+    "publicationStage": "published",
+    "rowsUpdatedAt": 1790100555,
+    "rowsUpdatedBy": "a9xd-f5um",
+    "tableId": 19172970,
+    "totalTimesRated": 0,
+    "viewCount": 84123,
+    "viewLastModified": 1790100553,
+    "viewType": "tabular",
+    "approvals": [
+      {
+        "reviewedAt": 1661276738,
+        "reviewedAutomatically": true,
+        "state": "approved",
+        "submissionId": 5552009,
+        "submissionObject": "public_audience_request",
+        "submissionOutcome": "change_audience",
+        "submittedAt": 1661276738,
+        "targetAudience": "public",
+        "workflowId": 1966,
+        "submissionDetails": {
+          "permissionType": "READ"
+        },
+        "submissionOutcomeApplication": {
+          "endedAt": 1661276738,
+          "failureCount": 0,
+          "startedAt": 1661276738,
+          "status": "success"
+        },
+        "submitter": {
+          "id": "cznh-xced",
+          "displayName": "Sheldon Vosburgh"
+        }
+      }
+    ],
+    "clientContext": {
+      "clientContextVariables": [],
+      "inheritedVariables": {}
+    },
+    "columns": [
+      {
+        "id": 576567177,
+        "name": "Equipment_ID",
+        "dataTypeName": "text",
+        "description": "Cooling Tower ID number",
+        "fieldName": "equipment_id",
+        "position": 1,
+        "renderTypeName": "text",
+        "tableColumnId": 141574312,
+        "format": {}
+      },
+      {
+        "id": 576567178,
+        "name": "County",
+        "dataTypeName": "text",
+        "description": "County",
+        "fieldName": "county",
+        "position": 2,
+        "renderTypeName": "text",
+        "tableColumnId": 141570837,
+        "format": {}
+      },
+      {
+        "id": 576567179,
+        "name": "Reg_Comp",
+        "dataTypeName": "text",
+        "description": "Regulation 4-1 Compliance Status",
+        "fieldName": "reg_comp",
+        "position": 3,
+        "renderTypeName": "text",
+        "tableColumnId": 141570839,
+        "format": {}
+      },
+      {
+        "id": 576567180,
+        "name": "Last_Update_Days",
+        "dataTypeName": "text",
+        "description": "Days the operator last updated the Registry",
+        "fieldName": "lastupdate",
+        "position": 4,
+        "renderTypeName": "text",
+        "tableColumnId": 143480843,
+        "format": {}
+      },
+      {
+        "id": 576567181,
+        "name": "CT_Status",
+        "dataTypeName": "text",
+        "description": "The operational status of the cooling tower",
+        "fieldName": "ct_status",
+        "position": 5,
+        "renderTypeName": "text",
+        "tableColumnId": 141570841,
+        "format": {}
+      },
+      {
+        "id": 576567182,
+        "name": "Last_Sampled_Days",
+        "dataTypeName": "text",
+        "description": "Number of days the operator last sampled for legionella",
+        "fieldName": "last_sampled_days",
+        "position": 6,
+        "renderTypeName": "text",
+        "tableColumnId": 143480842,
+        "format": {}
+      },
+      {
+        "id": 576567183,
+        "name": "equipment_street_address",
+        "dataTypeName": "text",
+        "description": "Address of cooling tower",
+        "fieldName": "equipment_street_address",
+        "position": 7,
+        "renderTypeName": "text",
+        "tableColumnId": 141570844,
+        "format": {}
+      },
+      {
+        "id": 576567184,
+        "name": "equipment_location_city",
+        "dataTypeName": "text",
+        "description": "City",
+        "fieldName": "equipment_location_city",
+        "position": 8,
+        "renderTypeName": "text",
+        "tableColumnId": 141570845,
+        "format": {}
+      },
+      {
+        "id": 576567185,
+        "name": "equipment_location_zip",
+        "dataTypeName": "text",
+        "description": "Zip code",
+        "fieldName": "equipment_location_zip",
+        "position": 9,
+        "renderTypeName": "text",
+        "tableColumnId": 141574313,
+        "format": {}
+      },
+      {
+        "id": 576567186,
+        "name": "Equipment Last Legionellla Sample Collection Date",
+        "dataTypeName": "text",
+        "description": "Date of last legionella sample",
+        "fieldName": "equipment_last_legionellla_sample_collection_date",
+        "position": 10,
+        "renderTypeName": "text",
+        "tableColumnId": 143480841,
+        "format": {
+          "view": "date"
+        }
+      },
+      {
+        "id": 576567187,
+        "name": "Equipment Last Legionella Test Result",
+        "dataTypeName": "text",
+        "description": "Results of last legionella lab",
+        "fieldName": "equipment_last_legionella_test_result",
+        "position": 11,
+        "renderTypeName": "text",
+        "tableColumnId": 143090511,
+        "format": {}
+      },
+      {
+        "id": 576567188,
+        "name": "Equipment_Tower_Operation_Duration",
+        "dataTypeName": "text",
+        "description": "Operation of cooling tower year-round or not",
+        "fieldName": "equipment_tower_operation_duration",
+        "position": 12,
+        "renderTypeName": "text",
+        "tableColumnId": 143090509,
+        "format": {}
+      },
+      {
+        "id": 576567189,
+        "name": "Latitude",
+        "dataTypeName": "text",
+        "description": "Geographic coordinates in decimal degrees y-axis",
+        "fieldName": "latitude",
+        "position": 13,
+        "renderTypeName": "text",
+        "tableColumnId": 143480840,
+        "format": {}
+      },
+      {
+        "id": 576567190,
+        "name": "Longitude",
+        "dataTypeName": "text",
+        "description": "Geographic coordinates in decimal degrees x-axis",
+        "fieldName": "longitude",
+        "position": 14,
+        "renderTypeName": "text",
+        "tableColumnId": 143480839,
+        "format": {}
+      },
+      {
+        "id": 576567191,
+        "name": "Georeference",
+        "dataTypeName": "point",
+        "description": "",
+        "fieldName": "georeference",
+        "position": 15,
+        "renderTypeName": "point",
+        "tableColumnId": 143480844,
+        "format": {}
+      },
+      {
+        "id": 576567192,
+        "name": "Local Waterfront Revitalization Program (LWRP) Communities 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'Local Waterfront Revitalization Program (LWRP) Communities' (8ire-itmf) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_8ire_itmf",
+        "position": 25,
+        "renderTypeName": "number",
+        "tableColumnId": 143480845,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_8ire-itmf",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567193,
+        "name": "School Districts 2016.shp 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'School Districts 2016.shp' (5edz-4hdv) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_5edz_4hdv",
+        "position": 26,
+        "renderTypeName": "number",
+        "tableColumnId": 143480846,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_5edz-4hdv",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567194,
+        "name": "New York Zip Codes 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'New York Zip Codes' (43an-4dx5) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_43an_4dx5",
+        "position": 27,
+        "renderTypeName": "number",
+        "tableColumnId": 143480847,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_43an-4dx5",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567195,
+        "name": "Counties 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'Counties' (9yqb-tdyd) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_9yqb_tdyd",
+        "position": 28,
+        "renderTypeName": "number",
+        "tableColumnId": 143480848,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_9yqb-tdyd",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567196,
+        "name": "NYS Senate Districts 2",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'NYS Senate Districts' (assa-msit) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_assa_msit",
+        "position": 29,
+        "renderTypeName": "number",
+        "tableColumnId": 143480849,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_assa-msit",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      },
+      {
+        "id": 576567197,
+        "name": "NYS Tick Regions",
+        "dataTypeName": "number",
+        "description": "This column was automatically created in order to record in what polygon from the dataset 'NYS Tick Regions' (v9ry-wcha) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+        "fieldName": ":@computed_region_v9ry_wcha",
+        "position": 30,
+        "renderTypeName": "number",
+        "tableColumnId": 147113189,
+        "computationStrategy": {
+          "source_columns": [
+            "georeference"
+          ],
+          "type": "georegion_match_on_point",
+          "parameters": {
+            "region": "_v9ry-wcha",
+            "primary_key": "_feature_id"
+          }
+        },
+        "format": {}
+      }
+    ],
+    "grants": [
+      {
+        "inherited": false,
+        "type": "viewer",
+        "flags": [
+          "public"
+        ]
+      }
+    ],
+    "metadata": {
+      "attachments": [
+        {
+          "filename": "NYSDOH_COOLING_TOWER_OVERVIEW.pdf",
+          "assetId": "e555307f-e787-4171-b920-39bf56985644",
+          "name": "NYSDOH_COOLING_TOWER_OVERVIEW.pdf"
+        },
+        {
+          "filename": "NYSDOH_COOLING_TOWER_DATA_DICTIONARY.pdf",
+          "assetId": "f1181d3f-673f-409d-8717-acb319abe7e3",
+          "name": "NYSDOH_COOLING_TOWER_DATA_DICTIONARY.pdf"
+        }
+      ],
+      "custom_fields": {
+        "Dataset Summary": {
+          "Posting Frequency": "Weekly",
+          "Time Period": "2022",
+          "Office/Division": "Center for Environmental Health",
+          "Coverage": "Statewide, excluding NYC",
+          "Granularity": "Street Address",
+          "Units": "Laboratory Sample Result",
+          "Dataset Owner": "Bureau of Water Supply Protection – Legionella Program"
+        },
+        "Local Data": {
+          "County_Column": "County",
+          "County Filter": "Yes"
+        },
+        "Additional Resources": {
+          "See Also": "https://www.health.ny.gov/environmental/water/drinking/legionella/cooling_towers.htm  "
+        },
+        "Disclaimers": {
+          "Limitations": "All data is input by the cooling tower operator and is not verified by the NYS DOH. "
+        },
+        "Notes": {
+          "Notes": "Researchers agree to: use the data for statistical reporting and analysis only. The author will include a disclaimer that states any analyses, interpretations or conclusions were reached by the author and not the NYSDOH."
+        },
+        "Dataset Information": {
+          "Agency": "Health, Department of"
+        }
+      },
+      "rowLabel": "Laboratory Sample Result",
+      "availableDisplayTypes": [
+        "table",
+        "fatrow",
+        "page"
+      ]
+    },
+    "owner": {
+      "id": "s9j2-nqmr",
+      "displayName": "Open Data NY - DOH",
+      "profileImageUrlLarge": "/api/users/s9j2-nqmr/profile_images/LARGE",
+      "profileImageUrlMedium": "/api/users/s9j2-nqmr/profile_images/THUMB",
+      "profileImageUrlSmall": "/api/users/s9j2-nqmr/profile_images/TINY",
+      "screenName": "Open Data NY - DOH",
+      "type": "interactive",
+      "flags": [
+        "mayBeStoriesCoOwner"
+      ]
+    },
+    "query": {},
+    "rights": [
+      "read"
+    ],
+    "tableAuthor": {
+      "id": "s9j2-nqmr",
+      "displayName": "Open Data NY - DOH",
+      "profileImageUrlLarge": "/api/users/s9j2-nqmr/profile_images/LARGE",
+      "profileImageUrlMedium": "/api/users/s9j2-nqmr/profile_images/THUMB",
+      "profileImageUrlSmall": "/api/users/s9j2-nqmr/profile_images/TINY",
+      "screenName": "Open Data NY - DOH",
+      "type": "interactive",
+      "flags": [
+        "mayBeStoriesCoOwner"
+      ]
+    },
+    "tags": [
+      "cooling tower",
+      "legionella",
+      "legionnaires",
+      "regulation 4-1"
+    ],
+    "flags": [
+      "default",
+      "ownerMayBeContacted",
+      "restorable",
+      "restorePossibleForType"
+    ]
+  }
+}
