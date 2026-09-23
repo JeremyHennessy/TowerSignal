@@ -1,0 +1,18 @@
+name: Validate NYS ABO spend and identity repair
+on:
+  push:
+    branches: [repair/abo-spend-identity-20260923]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Targeted NYS authority tests
+        run: python -m unittest tests.python.test_nys_authority_procurement -v
+      - name: Full Python suite
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
