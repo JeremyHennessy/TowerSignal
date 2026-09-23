@@ -1,0 +1,48 @@
+{
+  "reconciled_at": "2026-09-23",
+  "master_field_count": 1288,
+  "prior_counts": {
+    "USED": 158,
+    "UNUSED_POTENTIALLY_USEFUL": 7,
+    "UNRESOLVED": 1123
+  },
+  "current_counts": {
+    "USED": 184,
+    "UNUSED_POTENTIALLY_USEFUL": 121,
+    "INTENTIONALLY_EXCLUDED": 404,
+    "UNRESOLVED": 579
+  },
+  "fields_with_changed_disposition": 545,
+  "resolved_unresolved_fields": 544,
+  "reviewed_sources": {
+    "y4fw-iqfr": "NYC cooling-tower registrations",
+    "f9wb-g8mb": "NYC cooling-tower inspections",
+    "tesw-yqqr": "HPD multiple-dwelling registrations",
+    "feu5-w2e2": "HPD registration contacts",
+    "64uk-42ks": "MapPLUTO",
+    "24a4-muw7": "NYS cooling-tower registry",
+    "erm2-nwe9": "NYC 311",
+    "wvxf-dwi5": "HPD violations",
+    "w9ak-ipjd": "DOB NOW job filings",
+    "rbx6-tga4": "DOB approved permits",
+    "5zyy-y8am": "LL84 benchmarking"
+  },
+  "reconciliation_rules": [
+    "Current explicit collector/query/normalizer use is USED even when an additional downstream opportunity exists.",
+    "Fields not collected by the reviewed source families receive the reviewed stage5/stage9 opportunity or exclusion disposition.",
+    "Inspection source identity/address fields are useful only for QA/corroboration; redundant geography is excluded.",
+    "NYS Socrata georeference/computed-region fields are excluded because exact equipment ID plus source county/latitude/longitude already supply the relevant identity/geography.",
+    "A field normalized but not rendered is not automatically considered missing; retained-only downstream opportunities are recorded separately.",
+    "The permit source field applicant_middle_name is an additional identity-quality opportunity because the shared name normalizer anticipates it but the permit select contract does not currently request it."
+  ],
+  "evidence": [
+    "stage5-field-ledger/source-field-ledger-batch.json",
+    "stage5-field-ledger/core-field-review.json",
+    "stage7-retained-usage/retained-field-review.json",
+    "stage9-water-source-fields/water-signal-source-field-ledger.json",
+    "stage9-water-source-fields/water-source-field-review.json",
+    "stage8-dob-worktypes/FINDING.md",
+    "STAGE4_RESOLUTION.md"
+  ],
+  "boundary": "This updates source-field dispositions only. It does not make the remaining 579 fields resolved and does not authorize production integration of opportunity fields."
+}
