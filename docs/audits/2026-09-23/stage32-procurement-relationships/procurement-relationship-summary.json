@@ -1,0 +1,30 @@
+{
+  "artifacts": 5,
+  "system_universe": 4893,
+  "company_master_count": 1047,
+  "records_checked": 54922,
+  "source_stats": {
+    "NYC_CITY_RECORD": {
+      "rows": 97
+    },
+    "CHECKBOOK_NYC": {
+      "rows": 362
+    },
+    "NYS_AUTHORITIES": {
+      "rows": 839
+    },
+    "OPEN_BOOK_NY": {
+      "rows": 1419
+    },
+    "NYCHA": {
+      "rows": 52205
+    }
+  },
+  "procurement_role_edges_emittable": 0,
+  "unique_role_edges": 0,
+  "issue_count": 0,
+  "issue_type_counts": {},
+  "system_id_explicit_gate_valid": true,
+  "company_link_gate_valid": true,
+  "boundary": "Artifact relationship invariant audit. This proves explicit IDs/confidence are internally consistent in served artifacts; it does not independently prove how every upstream procurement facility/tower link was derived from publisher records."
+}

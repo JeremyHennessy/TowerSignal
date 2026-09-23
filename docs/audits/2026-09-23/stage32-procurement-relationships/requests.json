@@ -1,0 +1,44 @@
+[
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/systems.json",
+    "status": 200,
+    "bytes": 16359451,
+    "sha256": "9ca884e7b9283856337fc81a63d6aa790b7a13f281823deacab614bc7cd95b7e"
+  },
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/companies.json",
+    "status": 200,
+    "bytes": 9288282,
+    "sha256": "e11c571ee8c83cd334a617df356630d411fc168dd246b393a1696edbfd32f651"
+  },
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/procurement-city-record.json",
+    "status": 200,
+    "bytes": 341383,
+    "sha256": "1e64d55b86aee4fa03d80bbf33e7791db40223266bffa00ed191a5a193db2187"
+  },
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/procurement-checkbook.json",
+    "status": 200,
+    "bytes": 1093054,
+    "sha256": "021955d625f1659d8013e40c02648daf3915e163948ecd1d454318ce7ce324b3"
+  },
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/procurement-nys-authorities.json",
+    "status": 200,
+    "bytes": 1726870,
+    "sha256": "3d1f30ed41d2cf4e6913a4de8aa9689d164e5e95b1f011ef4ef7e3c074a582c9"
+  },
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/procurement-openbook-water.json",
+    "status": 200,
+    "bytes": 7600649,
+    "sha256": "4a17d06e5e9f1f6f0b66cfe2325a2882a28eb60cecd0920cfd735459cc7d8a40"
+  },
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/procurement-nycha-water.json",
+    "status": 200,
+    "bytes": 205714322,
+    "sha256": "646afe2de958b7e6de632470f05fe43f1802562c048cb47c7c47c4e302b3d555"
+  }
+]
