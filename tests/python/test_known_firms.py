@@ -14,17 +14,17 @@ class KnownFirmsTests(unittest.TestCase):
             "metadata": {"generated_at": "2026-09-09T12:00:00Z"},
             "systems": [
                 {
-                    "system_id": "sys-1", "bin": "100001", "bbl": "1000010001",
+                    "system_id": "sys-1", "bin": "1000001", "bbl": "1000010001",
                     "address": "10 Main St", "borough": "Manhattan", "zip": "10001",
                     "latitude": 40.75, "longitude": -73.99,
                 },
                 {
-                    "system_id": "sys-2", "bin": "100001", "bbl": "1000010001",
+                    "system_id": "sys-2", "bin": "1000001", "bbl": "1000010001",
                     "address": "10 Main St", "borough": "Manhattan", "zip": "10001",
                     "latitude": 40.7501, "longitude": -73.9901,
                 },
                 {
-                    "system_id": "sys-3", "bin": "200001", "bbl": "3000010001",
+                    "system_id": "sys-3", "bin": "2000001", "bbl": "3000010001",
                     "address": "20 Water St", "borough": "Brooklyn", "zip": "11201",
                     "latitude": 40.69, "longitude": -73.99,
                 },
@@ -59,25 +59,25 @@ class KnownFirmsTests(unittest.TestCase):
         domestic = {
             "tank_inspections": [
                 {
-                    "inspection_id": "i1", "building_key": "NYC-BIN-100001", "bin": "100001", "bbl": "1000010001",
+                    "inspection_id": "i1", "building_key": "NYC-BIN-1000001", "bin": "1000001", "bbl": "1000010001",
                     "address": "10 Main St", "borough": "Manhattan", "zip": "10001", "inspection_date": "2026-02-01",
                     "provider_raw": "Alpha Water, Inc.", "provider_data_quality": "VALID_NAME",
                     "lab_raw": "Alpha Water Inc", "laboratory_data_quality": "VALID_NAME",
                 },
                 {
-                    "inspection_id": "i2", "building_key": "NYC-BIN-100001", "bin": "100001", "bbl": "1000010001",
+                    "inspection_id": "i2", "building_key": "NYC-BIN-1000001", "bin": "1000001", "bbl": "1000010001",
                     "address": "10 Main St", "borough": "Manhattan", "zip": "10001", "inspection_date": "2026-07-01",
                     "provider_raw": "Alpha Water Inc", "provider_data_quality": "VALID_NAME",
                     "lab_raw": None, "laboratory_data_quality": "MISSING",
                 },
                 {
-                    "inspection_id": "i3", "building_key": "NYC-BIN-200001", "bin": "200001", "bbl": "3000010001",
+                    "inspection_id": "i3", "building_key": "NYC-BIN-2000001", "bin": "2000001", "bbl": "3000010001",
                     "address": "20 Water St", "borough": "Brooklyn", "zip": "11201", "inspection_date": "2026-06-15",
                     "provider_raw": "Beta Water LLC", "provider_data_quality": "VALID_NAME",
                     "lab_raw": None, "laboratory_data_quality": "MISSING",
                 },
                 {
-                    "inspection_id": "i4", "building_key": "NYC-BIN-200001", "bin": "200001", "bbl": "3000010001",
+                    "inspection_id": "i4", "building_key": "NYC-BIN-2000001", "bin": "2000001", "bbl": "3000010001",
                     "address": "20 Water St", "borough": "Brooklyn", "zip": "11201", "inspection_date": "2026-06-16",
                     "provider_raw": "Beta Water Inc", "provider_data_quality": "VALID_NAME",
                     "lab_raw": None, "laboratory_data_quality": "MISSING",
@@ -185,6 +185,59 @@ class KnownFirmsTests(unittest.TestCase):
         self.assertEqual(summary["unique_serviced_site_count"], 2)
         self.assertGreater(summary["firm_serviced_site_relationship_count"], summary["unique_serviced_site_count"])
         self.assertGreaterEqual(summary["firms_with_dwt_service_evidence"], 3)
+
+
+    def test_placeholder_bin_falls_back_to_valid_bbl_without_linking_unrelated_systems(self):
+        systems = {
+            "metadata": {"generated_at": "2026-09-09T12:00:00Z"},
+            "systems": [
+                {
+                    "system_id": "sys-a", "bin": None, "bbl": "1005977503",
+                    "address": "110 Charlton Street", "borough": "Manhattan", "zip": "10014",
+                    "latitude": 40.727, "longitude": -74.007,
+                },
+                {
+                    "system_id": "sys-b", "bin": None, "bbl": "1007290060",
+                    "address": "395 9th Avenue", "borough": "Manhattan", "zip": "10001",
+                    "latitude": 40.752, "longitude": -73.997,
+                },
+            ],
+        }
+        domestic = {
+            "tank_inspections": [
+                {
+                    "inspection_id": "bad-bin-a", "building_key": "NYC-BIN-1000000",
+                    "bin": "1000000", "bbl": "1005977503",
+                    "address": "110 Charlton Street", "borough": "Manhattan", "zip": "10014",
+                    "inspection_date": "2026-01-01",
+                    "provider_raw": "EMSL Analytical", "provider_data_quality": "VALID_NAME",
+                    "lab_raw": None, "laboratory_data_quality": "MISSING",
+                },
+                {
+                    "inspection_id": "bad-bin-b", "building_key": "NYC-BIN-1000000",
+                    "bin": "1000000", "bbl": "1007290060",
+                    "address": "395 9th Avenue", "borough": "Manhattan", "zip": "10001",
+                    "inspection_date": "2026-02-01",
+                    "provider_raw": "EMSL Analytical", "provider_data_quality": "VALID_NAME",
+                    "lab_raw": None, "laboratory_data_quality": "MISSING",
+                },
+            ],
+            "dec_7g_businesses": [],
+        }
+        payload, firm_details = build_known_firms(
+            systems_payload=systems,
+            companies_payload={"companies": []},
+            domestic_payload=domestic,
+            procurement_payloads=[],
+            details_by_system={},
+            generated_at="2026-09-09T12:00:00Z",
+        )
+        emsl = next(row for row in payload["firms"] if row["canonical_name"] == "EMSL Analytical")
+        sites = firm_details[emsl["firm_id"]]["site_relationships"]
+        self.assertEqual({site["site_id"] for site in sites}, {"NYC-BBL-1005977503", "NYC-BBL-1007290060"})
+        self.assertTrue(all(site["bin"] is None for site in sites))
+        self.assertEqual({site["bbl"] for site in sites}, {"1005977503", "1007290060"})
+        self.assertEqual({tuple(site["system_ids"]) for site in sites}, {("sys-a",), ("sys-b",)})
 
 
 if __name__ == "__main__":
