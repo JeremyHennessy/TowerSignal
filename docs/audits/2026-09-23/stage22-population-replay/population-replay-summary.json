@@ -25,10 +25,10 @@
       "source_rows": 24525,
       "served_rows": 62972,
       "source_bin_count": 1738,
-      "served_bin_count": 5639,
+      "served_bin_count": 1738,
       "bin_count_maps_equal": false,
       "source_only_count_delta": 2,
-      "served_only_count_delta": 38318
+      "served_only_count_delta": 0
     },
     "rytv-g5ui": {
       "retrieval": {
@@ -42,7 +42,12 @@
       "served_bin_count": 0,
       "bin_count_maps_equal": false,
       "source_only_count_delta": 8658,
-      "served_only_count_delta": 0
+      "served_only_count_delta": 0,
+      "served_detail_record_count": 8658,
+      "served_detail_bin_count": 1757,
+      "detail_bin_count_maps_equal": true,
+      "detail_source_only_count_delta": 0,
+      "detail_served_only_count_delta": 0
     },
     "xubg-57si": {
       "retrieval": {
@@ -51,9 +56,9 @@
         "partitions": 27
       },
       "source_rows": 14178,
-      "served_attachment_rows": 0,
+      "served_unique_bin_context_rows": 13865,
       "bin_count_maps_equal": false,
-      "delta_source": 14178,
+      "delta_source": 313,
       "delta_served": 0
     },
     "x748-37q7": {
@@ -63,8 +68,8 @@
         "partitions": 27
       },
       "source_rows": 8477,
-      "served_features": 0,
-      "globalid_multiset_equal": false
+      "served_unique_features": 8477,
+      "globalid_multiset_equal": true
     },
     "h8u2-6ejg": {
       "retrieval": {
@@ -85,10 +90,11 @@
         "stable": true
       },
       "source_rows": 54355,
-      "served_rows": 0,
-      "served_count_equal": false,
+      "published_raw_array_rows": 0,
+      "raw_array_published": false,
       "product_source_health_count": 54355,
-      "health_count_equal": true
+      "health_count_equal": true,
+      "population_acceptance_basis": "SOURCE_HEALTH_COUNT"
     },
     "3wxk-qa8q": {
       "retrieval": {
@@ -98,10 +104,11 @@
         "stable": true
       },
       "source_rows": 4604,
-      "served_rows": 4604,
-      "served_count_equal": true,
+      "published_raw_array_rows": 4604,
+      "raw_array_published": true,
       "product_source_health_count": 4604,
-      "health_count_equal": true
+      "health_count_equal": true,
+      "population_acceptance_basis": "RAW_ARRAY_AND_SOURCE_HEALTH"
     },
     "dg92-zbpx": {
       "retrieval": {
