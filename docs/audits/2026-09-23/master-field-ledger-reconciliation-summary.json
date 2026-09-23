@@ -7,13 +7,13 @@
     "UNRESOLVED": 1123
   },
   "current_counts": {
-    "USED": 184,
-    "UNUSED_POTENTIALLY_USEFUL": 121,
-    "INTENTIONALLY_EXCLUDED": 404,
-    "UNRESOLVED": 579
+    "USED": 324,
+    "UNUSED_POTENTIALLY_USEFUL": 229,
+    "INTENTIONALLY_EXCLUDED": 460,
+    "UNRESOLVED": 275
   },
-  "fields_with_changed_disposition": 545,
-  "resolved_unresolved_fields": 544,
+  "fields_with_changed_disposition": 849,
+  "resolved_unresolved_fields": 848,
   "reviewed_sources": {
     "y4fw-iqfr": "NYC cooling-tower registrations",
     "f9wb-g8mb": "NYC cooling-tower inspections",
@@ -42,7 +42,16 @@
     "stage9-water-source-fields/water-signal-source-field-ledger.json",
     "stage9-water-source-fields/water-source-field-review.json",
     "stage8-dob-worktypes/FINDING.md",
-    "STAGE4_RESOLUTION.md"
+    "STAGE4_RESOLUTION.md",
+    "stage10-top-five-fields/top-five-source-field-ledger.json",
+    "stage10-top-five-fields/top-five-field-review.json"
   ],
-  "boundary": "This updates source-field dispositions only. It does not make the remaining 579 fields resolved and does not authorize production integration of opportunity fields."
+  "boundary": "This updates source-field dispositions through the first 16 reviewed dataset families. The remaining 275 fields are individually retained as UNRESOLVED pending the final source-family batch; no opportunity field is production-integrated by this audit.",
+  "additional_reviewed_sources": {
+    "ic3t-wcy2": "Legacy DOB/BIS job applications",
+    "jz4z-kudi": "OATH Hearings case status",
+    "76ig-c548": "Historical NYC 311 2010-2019",
+    "gjm4-k24g": "DOHMH self-reported drinking-water tank inspections",
+    "xubg-57si": "DOB NOW facade compliance filings"
+  }
 }
