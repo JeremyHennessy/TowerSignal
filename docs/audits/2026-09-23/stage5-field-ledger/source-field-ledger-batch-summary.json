@@ -15,8 +15,8 @@
       "published_fields": 22,
       "requested_fields": 22,
       "dispositions": {
-        "RETAINED_NOT_DISPLAYED": 17,
-        "USED": 5
+        "RETAINED_NOT_DISPLAYED": 11,
+        "USED": 11
       },
       "source_updated_at": 1789398453,
       "metadata_url": "https://data.cityofnewyork.us/api/views/f9wb-g8mb.json"

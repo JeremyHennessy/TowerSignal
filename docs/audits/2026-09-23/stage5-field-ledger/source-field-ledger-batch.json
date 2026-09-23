@@ -519,9 +519,14 @@
     "requested": true,
     "retrieval_mode": "FULL_ROW_FETCH",
     "collector": "scripts/build_data_live.py -> fetch_dataset",
-    "production_references": [],
-    "disposition": "RETAINED_NOT_DISPLAYED",
-    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "dynamic_contract": "VIOLATION_FIELDS"
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
   },
   {
     "source_id": "f9wb-g8mb",
@@ -535,9 +540,14 @@
     "requested": true,
     "retrieval_mode": "FULL_ROW_FETCH",
     "collector": "scripts/build_data_live.py -> fetch_dataset",
-    "production_references": [],
-    "disposition": "RETAINED_NOT_DISPLAYED",
-    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "dynamic_contract": "VIOLATION_FIELDS"
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
   },
   {
     "source_id": "f9wb-g8mb",
@@ -551,9 +561,14 @@
     "requested": true,
     "retrieval_mode": "FULL_ROW_FETCH",
     "collector": "scripts/build_data_live.py -> fetch_dataset",
-    "production_references": [],
-    "disposition": "RETAINED_NOT_DISPLAYED",
-    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "dynamic_contract": "VIOLATION_FIELDS"
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
   },
   {
     "source_id": "f9wb-g8mb",
@@ -567,9 +582,14 @@
     "requested": true,
     "retrieval_mode": "FULL_ROW_FETCH",
     "collector": "scripts/build_data_live.py -> fetch_dataset",
-    "production_references": [],
-    "disposition": "RETAINED_NOT_DISPLAYED",
-    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "dynamic_contract": "VIOLATION_FIELDS"
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
   },
   {
     "source_id": "f9wb-g8mb",
@@ -583,9 +603,14 @@
     "requested": true,
     "retrieval_mode": "FULL_ROW_FETCH",
     "collector": "scripts/build_data_live.py -> fetch_dataset",
-    "production_references": [],
-    "disposition": "RETAINED_NOT_DISPLAYED",
-    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "dynamic_contract": "VIOLATION_FIELDS"
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
   },
   {
     "source_id": "f9wb-g8mb",
@@ -599,9 +624,14 @@
     "requested": true,
     "retrieval_mode": "FULL_ROW_FETCH",
     "collector": "scripts/build_data_live.py -> fetch_dataset",
-    "production_references": [],
-    "disposition": "RETAINED_NOT_DISPLAYED",
-    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "dynamic_contract": "VIOLATION_FIELDS"
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
   },
   {
     "source_id": "f9wb-g8mb",
