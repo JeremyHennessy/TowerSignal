@@ -1,0 +1,46 @@
+name: Validate DOB work-type population fallback
+on:
+  push:
+    branches: [fix/dob-worktype-post-hpd-20260923]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Targeted NYC water tests
+        run: python -m unittest tests.python.test_nyc_water_signals -v
+      - name: Full Python suite
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
+      - name: Reclassify the complete currently served DOB job population
+        run: |
+          python - <<'PY'
+          import json, urllib.request
+          from collections import Counter
+          import sys
+          sys.path.insert(0, 'scripts')
+          from towersignal.nyc_water_signals import classify_dob_work
+
+          url='https://jeremyhennessy.github.io/TowerSignal/data/nyc-water-signals.json'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'TowerSignal-worktype-validation'}),timeout=120) as r:
+              payload=json.load(r)
+          rows=payload.get('dob_water_job_filings') or []
+          old_generic=[row for row in rows if row.get('category')=='OTHER_WATER_MECHANICAL']
+          new=Counter()
+          still=[]
+          for row in old_generic:
+              raw=row.get('raw') if isinstance(row.get('raw'),dict) else row
+              category=classify_dob_work(raw)
+              new[category]+=1
+              if category=='OTHER_WATER_MECHANICAL':
+                  still.append(row.get('source_record_id'))
+          print(json.dumps({'rows':len(rows),'old_generic':len(old_generic),'new_categories':dict(new),'still_generic':len(still)},indent=2))
+          assert rows, 'served DOB job population is empty'
+          assert old_generic, 'expected a generic DOB population to validate'
+          assert not still, f'generic source-flagged DOB rows remain: {still[:20]}'
+          PY
