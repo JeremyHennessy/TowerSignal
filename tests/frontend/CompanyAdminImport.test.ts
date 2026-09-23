@@ -58,8 +58,18 @@ test('private import rechecks admin access and writes profiles before contacts',
   }), [firm])
 
   await expect(applyCompanyAdminImport(bundle)).resolves.toEqual({ companies:1, contacts:1 })
-  expect(client.saveCompanyAdminProfile).toHaveBeenCalledWith('known-firm-alpha', 'ALPHA WATER LLC', expect.objectContaining({ website:'https://alpha.example' }))
-  expect(client.saveCompanyAdminContact).toHaveBeenCalledWith('alpha-sales', 'known-firm-alpha', expect.objectContaining({ name:'Sales' }))
+  expect(client.saveCompanyAdminProfile).toHaveBeenCalledWith(
+    'known-firm-alpha',
+    'ALPHA WATER LLC',
+    expect.objectContaining({ website:'https://alpha.example' }),
+    expect.objectContaining({ source:'import', batchId:expect.any(String) }),
+  )
+  expect(client.saveCompanyAdminContact).toHaveBeenCalledWith(
+    'alpha-sales',
+    'known-firm-alpha',
+    expect.objectContaining({ name:'Sales' }),
+    expect.objectContaining({ source:'import', batchId:expect.any(String) }),
+  )
 })
 
 test('private import fails closed for non-admin users', async () => {
