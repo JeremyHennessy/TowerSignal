@@ -1,0 +1,112 @@
+name: DOB provenance full-population proof
+
+on:
+  push:
+    branches: [agent/audit-repair-dob-provenance-20260923]
+    paths:
+      - src/domain/accountEvidence.ts
+      - src/domain/accountEvidence.test.ts
+      - .github/workflows/audit-dob-provenance-full-population.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35866906472
+          github-token: ${{ github.token }}
+          path: .pages242
+      - name: Extract fixed account population
+        run: |
+          mkdir -p .fixed
+          tar -xf .pages242/artifact.tar -C .fixed --wildcards './data/details/*/*.json'
+          npm install --no-audit --no-fund
+      - name: Run actual selector against all 4,893 account details
+        run: |
+          mkdir -p .dob-proof
+          cat > src/domain/auditDobProvenanceFullPopulation.test.ts <<'TS'
+          import fs from 'node:fs'
+          import path from 'node:path'
+          import { describe, expect, it } from 'vitest'
+          import type { SystemDetailWithDomesticWater } from '../components/DomesticWaterSection'
+          import { collectAccountFirmRoleEvidence } from './accountEvidence'
+
+          function walk(dir: string): string[] {
+            return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+              const full=path.join(dir,entry.name)
+              return entry.isDirectory() ? walk(full) : entry.isFile() && entry.name.endsWith('.json') ? [full] : []
+            })
+          }
+          function expectedBasis(confidence: unknown): 'BIN_EXACT'|'BBL_EXACT'|null {
+            if (confidence === 'CONFIRMED_SOURCE_BIN' || confidence === 'EXACT_SINGLE_BIN') return 'BIN_EXACT'
+            if (confidence === 'CONFIRMED_SOURCE_BBL' || confidence === 'EXACT_SINGLE_BBL') return 'BBL_EXACT'
+            return null
+          }
+
+          describe('full Pages242 DOB role provenance', () => {
+            it('preserves role population and emits the actual exact source key for every DOB water role', () => {
+              const files=walk('.fixed/data/details')
+              expect(files.length).toBe(4893)
+              let allRoleRows=0
+              let waterRoleRows=0
+              let binRoleRows=0
+              let bblRoleRows=0
+              const failures: unknown[]=[]
+              for (const file of files) {
+                const detail=JSON.parse(fs.readFileSync(file,'utf8')) as SystemDetailWithDomesticWater
+                const emitted=collectAccountFirmRoleEvidence(detail)
+                allRoleRows += emitted.length
+                const sourceRows=[
+                  ...(detail.nyc_building_water_signals?.dob_water_job_filings ?? []),
+                  ...(detail.nyc_building_water_signals?.dob_water_permits ?? []),
+                ] as Record<string,unknown>[]
+                const byRecord=new Map(sourceRows.map(raw => [
+                  String(raw.source_record_id ?? raw.job_filing_number ?? raw.activity_id ?? 'record id not published'),
+                  raw,
+                ]))
+                for (const row of emitted) {
+                  if (!row.sourceReference.startsWith('Record ')) continue
+                  waterRoleRows++
+                  const record=row.sourceReference.slice('Record '.length).split(' · ')[0]
+                  const raw=byRecord.get(record)
+                  if (!raw) {
+                    failures.push({kind:'missing-raw',file,record,row})
+                    continue
+                  }
+                  const expected=expectedBasis(raw.property_link_confidence)
+                  if (expected !== row.matchBasis) failures.push({kind:'basis',file,record,confidence:raw.property_link_confidence,expected,actual:row.matchBasis})
+                  const phrase=expected==='BIN_EXACT'?'exact BIN':expected==='BBL_EXACT'?'exact BBL':null
+                  if (!phrase || !row.sourceReference.includes(phrase)) failures.push({kind:'reference',file,record,expected,sourceReference:row.sourceReference})
+                  if (expected==='BIN_EXACT') binRoleRows++
+                  if (expected==='BBL_EXACT') bblRoleRows++
+                }
+              }
+              fs.writeFileSync('.dob-proof/result.json',JSON.stringify({files:4893,allRoleRows,waterRoleRows,binRoleRows,bblRoleRows,failures},null,2))
+              expect(failures).toEqual([])
+              expect(allRoleRows).toBe(156869)
+              expect(binRoleRows).toBe(33)
+              expect(bblRoleRows).toBeGreaterThan(0)
+            })
+          })
+          TS
+          npx vitest run src/domain/auditDobProvenanceFullPopulation.test.ts
+          rm src/domain/auditDobProvenanceFullPopulation.test.ts
+      - name: Preserve proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dob-provenance-full-population-proof
+          path: .dob-proof
+          include-hidden-files: true
+          retention-days: 14
