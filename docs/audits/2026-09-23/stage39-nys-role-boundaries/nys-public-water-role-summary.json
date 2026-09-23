@@ -1,0 +1,15 @@
+{
+  "pws_sha256": "73d0f51d130e395bd4beda195ea707fb66a155411f3b3b1130ff9601c815f3ee",
+  "lsli_detail_sha256": "81f6ee586eefc31def714f105e0cdbf9ebfbb8e789511bf65e131307e18044af",
+  "pws_system_count": 8683,
+  "pws_contact_count": 10225,
+  "certified_operator_count": 5479,
+  "lsli_parsed_detail_count": 2889,
+  "lsli_form_contact_count": 2862,
+  "lsli_unavailable_count": 38,
+  "direct_tower_account_id_occurrences": 0,
+  "issue_count": 0,
+  "issue_type_counts": {},
+  "role_boundaries_clean": true,
+  "boundary": "Served semantic-boundary audit. It proves statewide PWS/operator/LSLI artifacts do not manufacture building/tower assignments or split the combined Section II owner/operator role; source-page value accuracy is a separate source-retrieval gate."
+}
