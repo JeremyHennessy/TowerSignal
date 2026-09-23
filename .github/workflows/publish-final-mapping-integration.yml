@@ -1,0 +1,55 @@
+name: Publish final mapping integration
+on:
+  push:
+    branches: [audit/mapping-fix-transfer-20260923]
+    paths: [.github/workflows/publish-final-mapping-integration.yml]
+permissions:
+  contents: write
+concurrency:
+  group: publish-final-mapping-integration
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact tested patch to inspected candidate
+        run: |
+          cp .audit-transfer/final-mapping-integration.patch "$RUNNER_TEMP/mapping-integration.patch"
+          git switch --detach 6a2fb031847321863528dc5a6ce3c8cacbe54403
+          git apply --check "$RUNNER_TEMP/mapping-integration.patch"
+          git apply "$RUNNER_TEMP/mapping-integration.patch"
+          git diff --check
+          git diff --exit-code -- src package.json package-lock.json scripts/towersignal/reviewed_priority.py scripts/towersignal/scoring.py
+      - name: Run every Python test including production-volume builder regression
+        run: |
+          set -o pipefail
+          python -m unittest discover -s tests/python -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/final-mapping-tests.log"
+      - name: Push complete candidate to staging reference
+        run: |
+          git config user.name 'TowerSignal source maintenance'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/build_acris_cache.py scripts/build_data_live.py tests/e2e/missing-sample-priority-release.spec.ts tests/e2e/nyc-all-pages-tabs.spec.ts tests/e2e/nyc-evidence-review.spec.ts tests/e2e/workflow-inspector-layout.spec.ts tests/python/test_mapping_build.py
+          test "$(git diff --cached --name-only | wc -l)" -eq 7
+          git commit -m 'Complete mapping builder integration and make hosted acceptance source-date aware'
+          git push origin HEAD:refs/heads/staging/mapping-integration-20260923
+          mkdir -p final-candidate
+          git rev-parse HEAD | tee final-candidate/candidate-sha.txt
+          git show --stat --oneline HEAD | tee final-candidate/commit.txt
+          git archive --format=tar.gz --output=final-candidate/candidate-source.tar.gz HEAD
+          cp "$RUNNER_TEMP/final-mapping-tests.log" final-candidate/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: final-mapping-integration
+          path: final-candidate
+          retention-days: 30
+          if-no-files-found: error
