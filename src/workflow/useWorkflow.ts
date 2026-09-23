@@ -19,7 +19,6 @@ import {
   setRemoteMembership,
   signInWorkflow,
   signOutWorkflow,
-  signUpWorkflow,
   workflowRuntimeEnabled,
 } from './client'
 
@@ -149,23 +148,6 @@ export function useWorkflow() {
     }
   }, [hydrateRemote])
 
-  const signUp = useCallback(async (email: string, password: string) => {
-    setBusy(true); setError(null)
-    try {
-      const sessionUser = await signUpWorkflow(email, password)
-      setUser(sessionUser)
-      try {
-        await hydrateRemote(sessionUser)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Account created, but workflow sync is unavailable in this browser session')
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to create account')
-      throw err
-    } finally {
-      setBusy(false)
-    }
-  }, [hydrateRemote])
 
   const signOut = useCallback(async () => {
     setBusy(true); setError(null)
@@ -316,7 +298,6 @@ export function useWorkflow() {
     watchedSystemIds,
     watchlistIdsBySystemId,
     signIn,
-    signUp,
     signOut,
     saveView,
     deleteView,

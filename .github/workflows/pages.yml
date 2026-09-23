@@ -356,7 +356,16 @@ jobs:
         env:
           BASE_URL: ${{ needs.deploy.outputs.page_url }}
           REQUIRE_ACRIS: ${{ inputs.require_acris }}
-        run: npm run test:e2e
+          TOWERSIGNAL_E2E_EMAIL: ${{ secrets.TOWERSIGNAL_E2E_EMAIL }}
+          TOWERSIGNAL_E2E_PASSWORD: ${{ secrets.TOWERSIGNAL_E2E_PASSWORD }}
+        run: |
+          if [ -n "${TOWERSIGNAL_E2E_EMAIL:-}" ] && [ -n "${TOWERSIGNAL_E2E_PASSWORD:-}" ]; then
+            echo "Running full authenticated hosted suite with pre-provisioned credentials"
+            npm run test:e2e
+          else
+            echo "Pre-provisioned hosted credentials are not configured; running live public auth-gate verification only"
+            npx playwright test --config=playwright.public-auth.config.ts
+          fi
       - name: Upload browser verification report
         if: always()
         uses: actions/upload-artifact@v4

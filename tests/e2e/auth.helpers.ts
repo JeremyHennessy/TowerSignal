@@ -1,7 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 import { installCandidateRoutes } from './candidate-routes'
 
-const PASSWORD = 'TowerSignal-E2E-2026!'
 const AUTH_STATE_DIR = 'test-results/.auth'
 
 function family(projectName: string): 'desktop' | 'iphone' {
@@ -12,13 +11,15 @@ export function authStatePath(projectName: string): string {
   return `${AUTH_STATE_DIR}/${family(projectName)}.json`
 }
 
-export function testCredentials(projectName: string) {
-  const runId = process.env.GITHUB_RUN_ID || 'local'
-  const attempt = process.env.GITHUB_RUN_ATTEMPT || '1'
-  const browserFamily = family(projectName)
+export function testCredentials() {
+  const email = process.env.TOWERSIGNAL_E2E_EMAIL?.trim()
+  const password = process.env.TOWERSIGNAL_E2E_PASSWORD
+  if (!email || !password) {
+    throw new Error('Hosted authentication verification requires pre-provisioned TOWERSIGNAL_E2E_EMAIL and TOWERSIGNAL_E2E_PASSWORD; tests must not create production users.')
+  }
   return {
-    email: `towersignal-e2e-${runId}-${attempt}-${browserFamily}@example.com`,
-    password: PASSWORD,
+    email,
+    password,
     name: 'E2E Verification',
   }
 }
@@ -42,7 +43,7 @@ async function gotoHosted(page: Page, targetHash: string): Promise<void> {
 }
 
 export async function submitSignIn(page: Page, projectName: string): Promise<void> {
-  const credentials = testCredentials(projectName)
+  const credentials = testCredentials()
   const loginHeading = page.getByRole('heading', { name: 'Sign in to TowerSignal', exact: true })
   const attempts = process.env.CI && family(projectName) === 'iphone' ? 2 : 1
 

@@ -286,7 +286,6 @@ export default function App() {
       authBusy={workflow.busy}
       authError={workflow.error}
       onSignIn={workflow.signIn}
-      onSignUp={workflow.signUp}
       onSignOut={workflow.signOut}
     />
 
