@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-09-23T16:00Z",
+  "served_release": {
+    "systems_sha256": "e90ad86b1e0ec033ffff1064a0152f3d619e65acef7eab3828489e5abfc26ad8",
+    "system_count": 4893,
+    "detail_count": 4893
+  },
+  "pages242_artifact": {
+    "run_id": 35866906472,
+    "artifact_id": 10759814013,
+    "artifact_sha256": "b989f5da4a4f37320a5ab026cb518391fb7556ddb8a324e928947c9e1826d66a",
+    "systems_sha256": "e90ad86b1e0ec033ffff1064a0152f3d619e65acef7eab3828489e5abfc26ad8",
+    "detail_count": 4893
+  },
+  "comparison": {
+    "systems_byte_hash_equal": true,
+    "detail_hashes_compared": 4893,
+    "missing_served_details": 0,
+    "extra_artifact_details": 0,
+    "detail_hash_mismatches": 0
+  },
+  "method": "Served hashes came from independent stage4 HTTPS fetches. Artifact hashes were recomputed by single-pass streaming of the exact downloaded Pages242 artifact tar; every data/details JSON and data/systems.json was SHA-256 compared.",
+  "conclusion": "For systems.json and all 4,893 NYC detail payloads checked, the served data bytes equal the exact Pages242 artifact bytes. This does not prove every root dataset, JS asset, browser cache state, export, or future response is identical."
+}
