@@ -1,0 +1,354 @@
+[
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/nyc-water-signals.json",
+    "attempt": 1,
+    "at": "2026-09-23T19:20:30.112525+00:00",
+    "status": 200,
+    "bytes": 872786116,
+    "sha256": "c05690718cd6facbc0821626c93248f748e6590d45630894565981338c9c2afd"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/api/views/wvxf-dwi5.json",
+    "attempt": 1,
+    "at": "2026-09-23T19:20:46.352497+00:00",
+    "status": 200,
+    "bytes": 84704,
+    "sha256": "2ae06f211f9810c2abf617a237b0ed7e60c9b2e6443b67804775c22952ca24b1"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "attempt": 1,
+    "at": "2026-09-23T19:20:46.564895+00:00",
+    "status": 200,
+    "bytes": 2462399,
+    "sha256": "12fb2e119d949be5707b928be13b8103e2d6ab6eab8669bed9bd23cb1a9c3731"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "attempt": 1,
+    "at": "2026-09-23T19:21:07.136729+00:00",
+    "status": 200,
+    "bytes": 2557257,
+    "sha256": "6c070b30fd7cf216ee7f2fc4288a3583a1e3acc30c738c4a78293c2ce8af7210"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=10000",
+    "attempt": 1,
+    "at": "2026-09-23T19:21:17.745485+00:00",
+    "status": 200,
+    "bytes": 2645149,
+    "sha256": "f930b12c7adc82dc99190064391e4b507f05830aaf9e547154563fd35616f969"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=15000",
+    "attempt": 1,
+    "at": "2026-09-23T19:21:28.556078+00:00",
+    "status": 200,
+    "bytes": 2670464,
+    "sha256": "7db9ad30da54645f35640734d5b37e8803fa42adc3e6d28c092e9ccbf205c439"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=20000",
+    "attempt": 1,
+    "at": "2026-09-23T19:21:34.696965+00:00",
+    "status": 200,
+    "bytes": 2645121,
+    "sha256": "063a14a64f5ae95eab754324115bebc3290b3f9ef2b5b87273faf695e572cfb8"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=25000",
+    "attempt": 1,
+    "at": "2026-09-23T19:21:40.278595+00:00",
+    "status": 200,
+    "bytes": 1851042,
+    "sha256": "ba815d17ec4fdc88f4659f9c3b27eb28f7a3bc45a99b48e04623f45e863d5969"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "attempt": 1,
+    "at": "2026-09-23T19:21:44.949650+00:00",
+    "status": 200,
+    "bytes": 2509825,
+    "sha256": "22a329cac9d0638cd5102475a9972acb1f013b68c76b48d27e3fec2f42d01cfa"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "attempt": 1,
+    "at": "2026-09-23T19:21:56.863667+00:00",
+    "status": 200,
+    "bytes": 2572062,
+    "sha256": "7e956ae49f68899e68e8f1f04a701e409db8543ef1140a33659f602314b56c7a"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=10000",
+    "attempt": 1,
+    "at": "2026-09-23T19:22:10.919486+00:00",
+    "status": 200,
+    "bytes": 2630348,
+    "sha256": "a439fd2057837b998ba1f1db8591d4505377292414e93d0458b249ff708a320a"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=15000",
+    "attempt": 1,
+    "at": "2026-09-23T19:22:25.072852+00:00",
+    "status": 200,
+    "bytes": 2634710,
+    "sha256": "6c90ae3b3846844a8e0613c824a6be2f65f40945e14c1cec3b4279575473b158"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=20000",
+    "attempt": 1,
+    "at": "2026-09-23T19:22:38.921911+00:00",
+    "status": 200,
+    "bytes": 2667086,
+    "sha256": "b64fd8e7f1c03fcad3f73ab88641a3b0874aa8896b8e5be681978374584e87db"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=25000",
+    "attempt": 1,
+    "at": "2026-09-23T19:22:50.535887+00:00",
+    "status": 200,
+    "bytes": 2662461,
+    "sha256": "8f7fa952fdb063c6d7777cc1f633c34994cbc0c7c85df53ec65a7ebefad29d31"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=30000",
+    "attempt": 1,
+    "at": "2026-09-23T19:23:03.328276+00:00",
+    "status": 200,
+    "bytes": 2637215,
+    "sha256": "817e02ed635307c02a634ad88889764c8b5a158a55f3a7e2212f3b188c69d23f"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=35000",
+    "attempt": 1,
+    "at": "2026-09-23T19:23:14.428280+00:00",
+    "status": 200,
+    "bytes": 2649629,
+    "sha256": "33685fd311994b6adf3d0b040e94d0bf9e16bf3367a625f7cde2238da5acfcab"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=40000",
+    "attempt": 1,
+    "at": "2026-09-23T19:23:32.896544+00:00",
+    "status": 200,
+    "bytes": 1972270,
+    "sha256": "5996482bf46b9a09eaeb2636f0ce9e937a6115c4beb91f84acd9f6455983fed0"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "attempt": 1,
+    "at": "2026-09-23T19:23:42.709838+00:00",
+    "status": 200,
+    "bytes": 2442326,
+    "sha256": "400d1086ea87e31c1859066b59e840dd32d3431c13d0ac0f9437a8e0f296aea3"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "attempt": 1,
+    "at": "2026-09-23T19:23:45.111942+00:00",
+    "status": 200,
+    "bytes": 2463840,
+    "sha256": "2b44babed3d632cf5ed45c36581495198ee3efd78b35dd26a32a3c8efc550ed1"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=10000",
+    "attempt": 1,
+    "at": "2026-09-23T19:23:48.127362+00:00",
+    "status": 200,
+    "bytes": 2413262,
+    "sha256": "9bf710b5a557b27dc291a6a0565f15458d5d998dd12edb7132eb693aef009937"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=15000",
+    "attempt": 1,
+    "at": "2026-09-23T19:23:49.797878+00:00",
+    "status": 200,
+    "bytes": 2409877,
+    "sha256": "01212a026bef66f5b123a7eee36aaeeb9b9382ea0b1e415151303c198281225c"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=20000",
+    "attempt": 1,
+    "at": "2026-09-23T19:24:22.888086+00:00",
+    "status": 200,
+    "bytes": 2530573,
+    "sha256": "49b63f74efaf97be32334d6f15e16223902a858d1dadf7348ba023fd0087d244"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=25000",
+    "attempt": 1,
+    "at": "2026-09-23T19:24:33.831746+00:00",
+    "status": 200,
+    "bytes": 2529584,
+    "sha256": "a54936b1fbdf055198d2e9ee774060ad138d1bedb8dc7abaf1262c8dacc827d6"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=30000",
+    "attempt": 1,
+    "at": "2026-09-23T19:24:49.573702+00:00",
+    "status": 200,
+    "bytes": 2566086,
+    "sha256": "17033a52f6e17a4a29668e4c79876e62d0435233ce24f49d807d3b0811291f9e"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=35000",
+    "attempt": 1,
+    "at": "2026-09-23T19:26:01.614697+00:00",
+    "status": 200,
+    "bytes": 2606073,
+    "sha256": "63115b8ee7c0f6d1392c6d8c681956c4669770d687d0f1472dbc5a7ad5bb879a"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=40000",
+    "attempt": 1,
+    "at": "2026-09-23T19:26:59.526013+00:00",
+    "status": 200,
+    "bytes": 2668447,
+    "sha256": "94b452de539cb523da90505274f59c74cd050481148173685d483ce815469fa0"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=45000",
+    "attempt": 1,
+    "at": "2026-09-23T19:27:40.892333+00:00",
+    "status": 200,
+    "bytes": 2669369,
+    "sha256": "294d95983154230b7f2a57a51dd71b4db83885bb60b4349bb43ada0d1eed3f0d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=50000",
+    "attempt": 1,
+    "at": "2026-09-23T19:27:58.261954+00:00",
+    "status": 200,
+    "bytes": 2670439,
+    "sha256": "4d88ea2ae16a5cb956c040d6418d5a30e88f1f76afb8e1ca539d94844806d1e3"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=55000",
+    "attempt": 1,
+    "at": "2026-09-23T19:28:11.892386+00:00",
+    "status": 200,
+    "bytes": 2655556,
+    "sha256": "680e8c6a6ffcc979dc14041b6a7682f3fab747cab4df32d38af55fced812a186"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=60000",
+    "attempt": 1,
+    "at": "2026-09-23T19:28:39.107214+00:00",
+    "status": 200,
+    "bytes": 2646687,
+    "sha256": "969cd94d983e4006a5645b867e1e58d14ed524fcd5c518b3d932d9417208706c"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=65000",
+    "attempt": 1,
+    "at": "2026-09-23T19:28:52.613688+00:00",
+    "status": 200,
+    "bytes": 2646760,
+    "sha256": "ecfa6a0b4c901cf83051b4bfd361f673ea1a204a6008610f6ca5c9b1d43d7e9a"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=70000",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:07.347044+00:00",
+    "status": 200,
+    "bytes": 618399,
+    "sha256": "c710a1fc8c61cf8c29ee50d4eed85d6b4c1a1c9ed0108bff557edfebc1957c51"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:19.453251+00:00",
+    "status": 200,
+    "bytes": 2463924,
+    "sha256": "cd094f2a6c9280038cb3f139705027ea2e87f6a4a4e3bbd1943cb49bb0deec03"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:21.826856+00:00",
+    "status": 200,
+    "bytes": 2510697,
+    "sha256": "0d3f9fc16eb6068c7972d0430ec2c566f8b099b757df93f1ac65fd36bd62e2de"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=10000",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:30.503274+00:00",
+    "status": 200,
+    "bytes": 2492599,
+    "sha256": "cb9ee5eeba4c54f757e5cf2dc88a308d694e76d35478fcfa9ea2e112c227b6b0"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=15000",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:36.057624+00:00",
+    "status": 200,
+    "bytes": 2532652,
+    "sha256": "edba9f9ddc733eac8721cc1a4a11cfb2f0d137731773521d62a1327ce11f2d0d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=20000",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:41.558412+00:00",
+    "status": 200,
+    "bytes": 2617463,
+    "sha256": "e5b42c6a2688bd9110219c366108b6afc693f01371a53b75e2d303e2c764ccc1"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=25000",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:45.759756+00:00",
+    "status": 200,
+    "bytes": 2654724,
+    "sha256": "9e72b19dbb26ce1a4d9d43cc69503a581627e894ccb941cc32d4f06a41414edf"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=30000",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:51.413644+00:00",
+    "status": 200,
+    "bytes": 2432406,
+    "sha256": "5b7672cbeb4200cf304e634f1c781037699318336d220228db03a1be3bbd740c"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27STATEN+ISLAND%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:56.719060+00:00",
+    "status": 200,
+    "bytes": 2551710,
+    "sha256": "679f5a2eef68f85cad96fe609fe63d5041f10450c3f7070217f058ffbb9d1cdc"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27STATEN+ISLAND%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:58.070200+00:00",
+    "status": 200,
+    "bytes": 869260,
+    "sha256": "63a55d3cf788f13fd9024bf860adbbbd5ed94a7862df78e139f33467c8a86ed3"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/api/views/wvxf-dwi5.json",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:59.422927+00:00",
+    "status": 200,
+    "bytes": 84704,
+    "sha256": "2ae06f211f9810c2abf617a237b0ed7e60c9b2e6443b67804775c22952ca24b1"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationid+in+%2810563759%2C18297635%2C18310372%2C18362159%2C18604710%2C18618203%2C18618226%2C18638038%2C18650835%2C18650862%2C19022967%2C19026472%2C19046840%2C19046845%2C19046848%2C19051323%2C19057791%2C19057793%2C19060231%2C19069302%2C19069303%2C19100607%2C19162205%2C19162207%2C19167890%2C19175486%2C19221109%2C19222934%2C19226166%2C19226167%2C19228504%2C19228600%2C19228751%2C19228948%2C19229371%2C19229443%2C19229839%2C19229922%2C19229923%2C19229927%2C19229937%2C19229938%2C19230529%2C19230530%2C19232732%2C19232781%2C19232785%2C19232796%2C19232819%2C19232825%2C19232861%2C19232896%2C19233091%2C19233254%2C19233326%2C19234739%2C19235294%2C19235304%2C19235307%2C19235337%2C19235346%2C19235647%2C19235702%2C19235726%2C19235792%2C19235793%2C19235868%2C19235874%2C19235918%2C19235958%2C19236047%2C19236049%2C19236063%2C19236112%2C19236114%2C19236179%2C19236189%2C19236195%2C19236367%2C19236395%2C19236448%2C19236449%2C19236454%2C19236457%2C19236499%2C19236529%2C19236532%2C19236555%2C19236578%2C19236598%2C19236716%2C19236717%2C19236730%2C19236817%2C19236900%2C19236926%2C19236949%2C19236953%2C19236979%2C19236986%2C19236988%2C19237065%2C19237097%2C19237104%2C19237105%2C19237185%2C19237189%2C19237191%2C19237208%2C19237229%2C19237278%2C19237324%2C19237337%2C19237509%2C19237512%2C19237536%2C19237538%2C19237550%2C19237555%2C19237565%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:59.709629+00:00",
+    "status": 200,
+    "bytes": 58703,
+    "sha256": "ac57efdcf150196d412e709d9ffa1f18212c147739db9f87ebe71a0b9a922d25"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid%2Cbbl%2Cbin%2Cboro%2Cinspectiondate%2Capproveddate%2Cnovissueddate%2Cnovdescription%2Ccurrentstatus%2Ccurrentstatusdate%2Cviolationstatus%2Crentimpairing&%24where=violationid+in+%2819237572%2C19237584%2C19237585%2C19237617%2C19237698%2C19237705%2C19237741%2C19237806%2C19240520%2C19240525%2C19240532%2C19240638%2C19240660%2C19240671%2C19240673%2C19240693%2C19240698%2C19240815%2C19240912%2C19241216%2C19241295%2C19241307%2C19241308%2C19241318%2C19241326%2C19241330%2C19241345%2C19241481%2C19241484%2C19241507%2C19241537%2C19241553%2C19241576%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "attempt": 1,
+    "at": "2026-09-23T19:29:59.905790+00:00",
+    "status": 200,
+    "bytes": 16214,
+    "sha256": "9940e734179b6b9f113fa00128443ac31923773454957d5f5d3a774bb0dc9ec4"
+  }
+]

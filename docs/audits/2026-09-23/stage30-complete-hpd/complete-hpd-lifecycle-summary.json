@@ -1,0 +1,28 @@
+{
+  "served_build_generated_at": "2026-09-23T17:16:52.510618Z",
+  "served_source_health_entries": 5,
+  "served_source_versions": [
+    "2026-09-23T14:56:59Z"
+  ],
+  "served_source_retrieved_at": [
+    "2026-09-23T17:01:42.479904Z",
+    "2026-09-23T17:05:01.310929Z",
+    "2026-09-23T17:11:04.283905Z",
+    "2026-09-23T17:12:01.037782Z",
+    "2026-09-23T17:12:28.739854Z"
+  ],
+  "current_source_version": "2026-09-23T14:56:59Z",
+  "current_rows_updated_epoch": 1790175419,
+  "publisher_version_advanced_since_served_snapshot": false,
+  "current_open_water_rows": 184645,
+  "current_unique_ids": 184645,
+  "served_open_water_rows": 184546,
+  "source_only_count": 126,
+  "served_only_count": 27,
+  "class_counts": {
+    "CURRENT_OPEN_UNEXPLAINED_VERSION_EQUAL": 126,
+    "SERVED_SNAPSHOT_NOW_CLOSED": 27
+  },
+  "identity_sets_equal": false,
+  "delta_fully_attributable_to_publisher_version_or_lifecycle": false
+}
