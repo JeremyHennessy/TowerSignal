@@ -1,4 +1,4 @@
-name: Resolve TowerSignal Neon project ID
+name: Inspect TowerSignal Neon auth inventory access
 
 on:
   push:
@@ -9,48 +9,50 @@ permissions:
   contents: read
 
 jobs:
-  resolve-project:
+  inspect-auth:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
-      TARGET_ENDPOINT_ID: ep-silent-moon-au2icaki
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+      TOWERSIGNAL_DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL }}
+      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
     steps:
-      - name: Resolve project containing production endpoint
-        shell: python
+      - name: Read auth-user counts without exposing identities
+        shell: bash
         run: |
-          import json
-          import os
-          import sys
-          import urllib.request
-          import urllib.error
-
-          key = os.environ.get("NEON_API_KEY", "")
-          target = os.environ["TARGET_ENDPOINT_ID"]
-          if not key:
-              print("NEON_API_KEY_MISSING")
-              raise SystemExit(4)
-
-          headers = {"Authorization": f"Bearer {key}", "Accept": "application/json"}
-
-          def get(url):
-              req = urllib.request.Request(url, headers=headers)
-              with urllib.request.urlopen(req, timeout=30) as response:
-                  return json.load(response)
-
-          payload = get("https://console.neon.tech/api/v2/projects?limit=100")
-          projects = payload.get("projects", [])
-          for project in projects:
-              project_id = project.get("id")
-              if not project_id:
-                  continue
-              try:
-                  endpoints = get(f"https://console.neon.tech/api/v2/projects/{project_id}/endpoints").get("endpoints", [])
-              except urllib.error.HTTPError:
-                  continue
-              if any(endpoint.get("id") == target for endpoint in endpoints):
-                  print(f"MATCHED_PROJECT_ID={project_id}")
-                  raise SystemExit(0)
-
-          print("PRODUCTION_ENDPOINT_NOT_FOUND")
-          raise SystemExit(5)
+          set -euo pipefail
+          connection=""
+          source_name=""
+          for candidate in DATABASE_URL NEON_DATABASE_URL TOWERSIGNAL_DATABASE_URL POSTGRES_URL; do
+            value="${!candidate:-}"
+            if [ -n "$value" ]; then
+              connection="$value"
+              source_name="$candidate"
+              break
+            fi
+          done
+          if [ -z "$connection" ]; then
+            echo "DATABASE_CONNECTION_SECRET_MISSING"
+            exit 6
+          fi
+          echo "DATABASE_CONNECTION_SECRET_PRESENT=$source_name"
+          if ! command -v psql >/dev/null 2>&1; then
+            echo "PSQL_NOT_AVAILABLE"
+            exit 7
+          fi
+          psql "$connection" -v ON_ERROR_STOP=1 -At <<'SQL'
+          SELECT 'TOTAL_USERS=' || count(*) FROM neon_auth."user";
+          SELECT 'GENERATED_TEST_USERS=' || count(*) FROM neon_auth."user"
+            WHERE lower(email) LIKE 'towersignal-e2e-%@example.com'
+               OR lower(email) LIKE 'towersignal-hosted-%@example.com'
+               OR lower(email) LIKE 'towersignal-workflow-%@example.com'
+               OR lower(email) LIKE 'towersignal-isolation-%@example.com';
+          SELECT 'NON_GENERATED_USERS=' || count(*) FROM neon_auth."user"
+            WHERE NOT (
+              lower(email) LIKE 'towersignal-e2e-%@example.com'
+              OR lower(email) LIKE 'towersignal-hosted-%@example.com'
+              OR lower(email) LIKE 'towersignal-workflow-%@example.com'
+              OR lower(email) LIKE 'towersignal-isolation-%@example.com'
+            );
+          SQL
