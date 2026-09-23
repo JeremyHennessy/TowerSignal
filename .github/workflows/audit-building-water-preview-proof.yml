@@ -34,11 +34,12 @@ jobs:
           npm install --no-audit --no-fund
       - name: Reconcile ordering against all 4,893 account details
         run: |
-          cat > src/components/auditBuildingWaterFullPopulation.test.ts <<'TS'
+          mkdir -p tests/frontend
+          cat > tests/frontend/auditBuildingWaterFullPopulation.test.ts <<'TS'
           import fs from 'node:fs'
           import path from 'node:path'
           import { describe, expect, it } from 'vitest'
-          import { orderedDobWaterRows } from './BuildingWaterSignalsSection'
+          import { orderedDobWaterRows } from '../../src/components/BuildingWaterSignalsSection'
 
           function walk(dir: string): string[] {
             return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>{
@@ -81,8 +82,8 @@ jobs:
             })
           })
           TS
-          npx vitest run src/components/auditBuildingWaterFullPopulation.test.ts
-          rm src/components/auditBuildingWaterFullPopulation.test.ts
+          npx vitest run tests/frontend/auditBuildingWaterFullPopulation.test.ts
+          rm tests/frontend/auditBuildingWaterFullPopulation.test.ts
       - name: Prepare actual-data visual harness
         run: |
           python - <<'PY'
