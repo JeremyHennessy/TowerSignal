@@ -76,7 +76,7 @@ field_refs=defaultdict(lambda:defaultdict(list))
 for sid,paths in family_files.items():
     for path in paths:
         text=Path(path).read_text()
-        for m in re.finditer(r"(?:row|record)\.get\(["']([^"']+)["']\)",text):
+        for m in re.finditer(r'''(?:row|record)\.get\(["']([^"']+)["']\)''', text):
             field_refs[sid][m.group(1)].append({'path':path,'offset':m.start()})
 
 rows=[]
