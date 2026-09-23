@@ -1,0 +1,47 @@
+name: Resolve TowerSignal Neon project
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/neon-project-resolution-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      TARGET_BRANCH_ID: br-orange-bar-aujld2d5
+    steps:
+      - name: Resolve project containing production branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${NEON_API_KEY:-}" ]; then
+            echo "NEON_API_KEY=MISSING"
+            exit 2
+          fi
+          echo "NEON_API_KEY=PRESENT"
+          projects_json="$(curl --fail-with-body --silent --show-error \
+            -H "Authorization: Bearer ${NEON_API_KEY}" \
+            "https://console.neon.tech/api/v2/projects?limit=100")"
+          found=""
+          while IFS= read -r project_id; do
+            [ -n "$project_id" ] || continue
+            branches_json="$(curl --fail-with-body --silent --show-error \
+              -H "Authorization: Bearer ${NEON_API_KEY}" \
+              "https://console.neon.tech/api/v2/projects/${project_id}/branches?limit=100")"
+            if printf '%s' "$branches_json" | jq -e --arg branch "$TARGET_BRANCH_ID" '.branches[]? | select(.id == $branch)' >/dev/null; then
+              found="$project_id"
+              break
+            fi
+          done < <(printf '%s' "$projects_json" | jq -r '.projects[]?.id')
+          if [ -z "$found" ]; then
+            echo "TOWERSIGNAL_NEON_PROJECT_ID=NOT_FOUND"
+            exit 3
+          fi
+          echo "TOWERSIGNAL_NEON_PROJECT_ID=$found"
