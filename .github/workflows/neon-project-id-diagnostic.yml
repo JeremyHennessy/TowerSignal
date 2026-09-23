@@ -1,0 +1,56 @@
+name: Resolve TowerSignal Neon project ID
+
+on:
+  push:
+    branches:
+      - agent/neon-auth-inventory-diagnostic-20260923
+
+permissions:
+  contents: read
+
+jobs:
+  resolve-project:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      TARGET_ENDPOINT_ID: ep-silent-moon-au2icaki
+    steps:
+      - name: Resolve project containing production endpoint
+        shell: python
+        run: |
+          import json
+          import os
+          import sys
+          import urllib.request
+          import urllib.error
+
+          key = os.environ.get("NEON_API_KEY", "")
+          target = os.environ["TARGET_ENDPOINT_ID"]
+          if not key:
+              print("NEON_API_KEY_MISSING")
+              raise SystemExit(4)
+
+          headers = {"Authorization": f"Bearer {key}", "Accept": "application/json"}
+
+          def get(url):
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  return json.load(response)
+
+          payload = get("https://console.neon.tech/api/v2/projects?limit=100")
+          projects = payload.get("projects", [])
+          for project in projects:
+              project_id = project.get("id")
+              if not project_id:
+                  continue
+              try:
+                  endpoints = get(f"https://console.neon.tech/api/v2/projects/{project_id}/endpoints").get("endpoints", [])
+              except urllib.error.HTTPError:
+                  continue
+              if any(endpoint.get("id") == target for endpoint in endpoints):
+                  print(f"MATCHED_PROJECT_ID={project_id}")
+                  raise SystemExit(0)
+
+          print("PRODUCTION_ENDPOINT_NOT_FOUND")
+          raise SystemExit(5)
