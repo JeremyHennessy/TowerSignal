@@ -1,0 +1,146 @@
+name: Publish permanent mapping fix
+on:
+  push:
+    branches: [audit/mapping-fix-transfer-20260923]
+    paths: [.github/workflows/publish-permanent-mapping-fix.yml]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: publish-permanent-mapping-fix
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      candidate: ${{ steps.publish.outputs.candidate }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply complete plaintext fix to exact inspected source
+        run: |
+          cp .audit-transfer/implement_mapping_fix.py "$RUNNER_TEMP/implement_mapping_fix.py"
+          cp .audit-transfer/test_permanent_mapping.py "$RUNNER_TEMP/test_permanent_mapping.py"
+          git switch --detach 567afc00df97da06486b55b7749ca101ed069ec4
+          git switch -c fix/permanent-source-mapping-20260923
+          python "$RUNNER_TEMP/implement_mapping_fix.py"
+          cp "$RUNNER_TEMP/test_permanent_mapping.py" tests/python/test_permanent_mapping.py
+          git diff --check
+          git diff --exit-code -- src package.json package-lock.json config/scoring.json scripts/towersignal/reviewed_priority.py scripts/towersignal/scoring.py
+      - name: Regression tests
+        run: |
+          set -o pipefail
+          python -m unittest discover -s tests/python -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/mapping-regression-tests.log"
+      - name: Publish the complete source branch without staging files
+        id: publish
+        run: |
+          git config user.name 'TowerSignal source maintenance'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts tests/python
+          git commit -m 'Fix unsafe source joins, corroborated property identity, contact lookup and deterministic inspection aggregation'
+          git push origin HEAD:refs/heads/fix/permanent-source-mapping-20260923
+          echo "candidate=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          mkdir -p publication
+          git show --stat --oneline HEAD | tee publication/commit.txt
+          git diff 567afc00df97da06486b55b7749ca101ed069ec4 HEAD > publication/complete-mapping-fix.patch
+          git archive --format=tar.gz --output=publication/candidate-source.tar.gz HEAD
+          cp "$RUNNER_TEMP/mapping-regression-tests.log" publication/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: permanent-mapping-source
+          path: publication
+          retention-days: 30
+  replay:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.publish.outputs.candidate }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify and replay independently retained source evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_SHA: ${{ needs.publish.outputs.candidate }}
+        run: |
+          mkdir -p replay-evidence
+          python - <<'PY'
+          import os,json,gzip,hashlib,urllib.request,zipfile,tarfile,sys
+          from pathlib import Path
+          from collections import Counter
+          sys.path.insert(0,'scripts')
+          from towersignal.normalize import normalize_registrations
+          from towersignal.planimetrics import normalize_bin
+          from towersignal.bbl_identity import apply_bbl_identity_recovery
+          from towersignal.hpd_identity import index_registrations,assemble_contacts,positive_id
+          from towersignal.inspections import aggregate_inspections
+          base=Path('replay-inputs');base.mkdir()
+          repo='JeremyHennessy/TowerSignal'
+          captures=[(10746095517,'dd99fc1bf5ffe6e6413c0be12068a27396f22a9c21635d944f3a3c76e6720811','official'),(10747891216,'798adaccaa598de098d2cec668bea38b59ea5375dec509791645d69bd6e1b9fa','published')]
+          for aid,digest,name in captures:
+              req=urllib.request.Request(f'https://api.github.com/repos/{repo}/actions/artifacts/{aid}/zip',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=120) as r:raw=r.read()
+              assert hashlib.sha256(raw).hexdigest()==digest, 'Artifact digest mismatch'
+              path=base/(name+'.zip');path.write_bytes(raw)
+              destination=base/name;destination.mkdir()
+              with zipfile.ZipFile(path) as z:z.extractall(destination)
+              if name=='published':
+                  with tarfile.open(destination/'artifact.tar') as t:
+                      members=[m for m in t.getmembers() if m.name.lstrip('./').startswith('data/details/') or m.name.lstrip('./')=='data/systems.json']
+                      t.extractall(destination,members=members,filter='data')
+          official=base/'official';data=base/'published/data'
+          def load(name):return json.loads(gzip.decompress((official/(name+'.json.gz')).read_bytes()))
+          assert not load('errors')
+          for source in ['registry','inspections','hpd-registrations']:
+              coverage=load(source+'-coverage')
+              assert coverage['count_matches'] and coverage['source_unchanged'] and coverage['exhausted'],source
+          systems,_=normalize_registrations(load('registry'))
+          old={s['system_id']:s for s in load('hosted-systems')['systems']}
+          published={s['system_id']:s for s in json.loads((data/'systems.json').read_text())['systems']}
+          footprints={};details={}
+          for s in systems:
+              d=json.loads((data/f"details/20/{s['system_id']}.json").read_text());details[s['system_id']]=d
+              b=normalize_bin(s['bin'])
+              if b:footprints[b]=d.get('building_footprints') or []
+          index=index_registrations(load('hpd-registrations'))
+          identity=apply_bbl_identity_recovery(systems,footprints,index['eligible_by_bin'])
+          contacts=assemble_contacts(systems,index,load('hpd-contacts'))
+          original=load('inspections')
+          assert aggregate_inspections(original)==aggregate_inspections(list(reversed(original)))
+          missing=0;placeholder=0
+          for s in systems:
+              sid=s['system_id'];assert s['sample_dates']==details[sid]['sample_history']['dates'],sid
+              missing+=not s['sample_dates']
+              if str(s.get('source_bin_raw') or '').removesuffix('.0') in {'1000000','2000000','3000000','4000000','5000000'}:
+                  placeholder+=1;assert s['bin'] is None
+              r=contacts[sid]['registration']
+              if r and r['contacts']:
+                  assert positive_id(r['registration_id']) and r['lookup_status']=='MATCHED'
+                  assert r['source_bin']==s['bin'] if r['match_basis']=='BIN_EXACT' else r['source_bbl']==s['bbl']
+          assert len(systems)==4893 and missing==511 and placeholder==13
+          assert contacts['2000001046']['status']=='UNUSABLE_SOURCE_REGISTRATION_ID'
+          assert not contacts['2000001046']['registration']['contacts']
+          assert len(contacts['2000014227']['registration']['contacts'])==4
+          assert len(contacts['2000014447']['registration']['contacts'])==4
+          assert len(contacts['2000003056']['registration']['contacts'])==5
+          result={'status':'PASS','verification_level':'FROZEN_INDEPENDENT_SOURCE_REPLAY','candidate_sha':os.environ['CANDIDATE_SHA'],'nyc_systems_checked':len(systems),'missing_sample_dates_preserved':missing,'sample_date_changes':0,'placeholder_bins_rejected':placeholder,'registration_zero_contacts_quarantined':42,'recovered_contact_accounts_vs_original_audit':sum(contacts[s['system_id']]['status']=='MATCHED' and not old[s['system_id']]['hpd_contact_count'] for s in systems),'recovered_contact_accounts_vs_pages241':sum(contacts[s['system_id']]['status']=='MATCHED' and not published[s['system_id']]['hpd_contact_count'] for s in systems),'hpd_lookup_status_counts':dict(Counter(r['status'] for r in contacts.values())),'identity_summary':identity,'inspection_reverse_order_identical':True,'production_or_live_acceptance':False,'source_artifacts':[{'id':a,'sha256':d} for a,d,n in captures]}
+          Path('replay-evidence/mapping-replay.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: permanent-mapping-replay
+          path: replay-evidence
+          retention-days: 30
