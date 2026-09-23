@@ -1,0 +1,73 @@
+{
+  "scope":"47 continuation traces; not the exhaustive or unique visible-field denominator. Combined downloadable application register contains2218 entries including2171 earlier inventory candidates.",
+  "code_sha":"f1cbdb925b704a8b7a34aaccd169be6649b80a92",
+  "artifact_scope":"Pages241 captured data and separately Pages242 artifact10759814013",
+  "authenticated_renderer_verification":"NOT_DONE; do not interpret selector execution as browser or PDF acceptance",
+  "selector":{
+    "file":"src/domain/accountEvidence.ts",
+    "function":"collectAccountFirmRoleEvidence",
+    "inputs":"domestic_water.self_report_history[];nyc_building_water_signals.dob_water_job_filings[];nyc_building_water_signals.dob_water_permits[];dob_activity_history[]",
+    "grain":"Account-firm-role-source-reference tuple",
+    "dedup":"firmKey+role+datasetId+sourceReference",
+    "name_filter":"Canonical normalized firm key must exist in collectKnownAccountFirms",
+    "date_null":"Source date may remain null; sourceReference uses explicit missing-key/year fallbacks",
+    "execution":"Mechanically type-stripped original selector bytes with local import path adaptation; no production source edits or normalizer imports",
+    "population":4893,
+    "pages241_role_rows":157210,
+    "pages242_role_rows":156869,
+    "fields":[
+      {"field":"factClass","value":"CONFIRMED_FACT","rule":"Unconditional literal after canonical name resolution","defect_scope":"548 unsafe DWT roles in Pages241;zero for the affected accounts in Pages242"},
+      {"field":"confidence","value":"CONFIRMED","rule":"Unconditional literal; does not independently validate attached identifiers"},
+      {"field":"matchBasis","rule":"DWT literal BIN_EXACT;DOB literal BBL_EXACT","remaining_defect":"33 Pages242 emitted DOB role rows across2000004045 and2000015696 use assigned BIN linkage but claim exact BBL"},
+      {"field":"sourceReference","rule":"BIN+tank+inspection date/year, or source record ID+literal exact BBL","raw_fields":"bin;tank_num;inspection_date;reporting_year;source_record_id"},
+      {"field":"name","rule":"Canonical display name selected by normalized firm key","raw_fields":"inspection_by_firm;lab_name;applicant_business_raw;applicant_business_name"},
+      {"field":"observedDate","rule":"Source-native value retained; calendar-aware ISO/US sort separate","raw_fields":"inspection_date;issued_date;approved_date;filing_date"},
+      {"field":"relationship","rule":"DWT OBSERVED_SERVICE;DOB RECORDED_ROLE","boundary":"Not current cooling-tower incumbency, responsibility or contract proof"}
+    ]
+  },
+  "building_water_component":{
+    "file":"src/components/BuildingWaterSignalsSection.tsx",
+    "routes":"AccountEvidenceWorkspace DomesticWater group;DetailPanel",
+    "inputs":"detail.nyc_building_water_signals.summary and five attached row arrays",
+    "text_null":"Em dash for null or empty",
+    "date_null":"First nonempty source date then formatDate;otherwise em dash",
+    "water_units":"Numbers formatted in kgal;non-numeric fallback remains explicit text",
+    "ordering":"Inherited group order;DOB jobs concatenated before permits",
+    "limit":"Each of four groups unconditionally slice(0,8);no show-more control in this component",
+    "pages242_preview_defect":{"all_permits_outside_preview_accounts":786,"newer_permit_than_every_shown_card_accounts":399},
+    "verification":"Exact component expressions applied to all4893 artifact details; not live screenshots",
+    "fields":[
+      ["Exact property signals","summary.record_count"],
+      ["311 building requests","summary.water_311_building_signal_count"],
+      ["Open HPD water violations","summary.hpd_open_water_violation_count"],
+      ["DOB water work records","summary.dob_water_job_filing_count+summary.dob_water_permit_count"],
+      ["LL84 water benchmarks","summary.ll84_water_benchmark_count"],
+      ["Latest observation","summary.latest_observation_date"],
+      ["Status /311","water_311_requests[].status"],
+      ["Request ID","water_311_requests[].request_id"],
+      ["BBL","water_311_requests[].bbl"],
+      ["Linkage /311","water_311_requests[].property_link_confidence"],
+      ["Class","hpd_open_water_violations[].class"],
+      ["Status /HPD","hpd_open_water_violations[].current_status"],
+      ["BBL/BIN","hpd_open_water_violations[].bbl and bin"],
+      ["Linkage /HPD","hpd_open_water_violations[].property_link_confidence"],
+      ["Record","dob_water_*.source_record_id fallback job_filing_number"],
+      ["Applicant business","dob_water_*.applicant_business_raw"],
+      ["Role evidence","dob_water_*.relationship_evidence"],
+      ["Service assignment","dob_water_*.service_assignment_confidence"],
+      ["Property ID","ll84_water_benchmarks[].property_id"],
+      ["Metered areas","ll84_water_benchmarks[].metered_areas_water"],
+      ["All water use","ll84_water_benchmarks[].water_use_all_sources_kgal"],
+      ["Municipal potable total","ll84_water_benchmarks[].municipal_potable_total_kgal"]
+    ]
+  },
+  "nys_aggregates":{
+    "path":"nys-systems.json.summary",
+    "population":6244,
+    "verification":"18 independently recomputed stored population/group/category metrics match; not current publisher-to-normalized proof or proof every metric is visible",
+    "group_key":"Trim/casefold stored address|city|ZIP; grouping is not a legal parcel or common ownership assertion",
+    "null_behavior":"Empty category values omitted from categorical counters; null dates/results remain unverified against raw source",
+    "fields":["registered_equipment","mapped_equipment","multi_equipment_properties","equipment_at_multi_equipment_properties","max_equipment_per_property","non_compliant","compliant","sample_required","update_required","missing_legionella_result","disinfection_required","decommissioned","out_of_service","published_county_counts","status_counts","compliance_counts","sample_result_counts","operation_duration_counts"]
+  },
+  "remaining":"Full original source definitions, per-route visibility, sorting/filter behavior, authenticated screenshots, client network origins, exports and approved PDF appearance remain incomplete where not individually evidenced. Do not infer absence from collapsed or preview-only content."
+}
