@@ -109,3 +109,37 @@ export interface CompanyAdminSnapshot {
   activities: CompanyAdminActivity[]
   notes: CompanyAdminNote[]
 }
+
+
+export type CompanyResearchStatus = 'unreviewed' | 'researching' | 'verified' | 'needs-review' | 'complete'
+
+export interface CompanyResearchQueueItem {
+  company_id: string
+  priority_score: number
+  priority_reason: string
+  missing_fields: string[]
+  status: CompanyResearchStatus
+  research_owner: string | null
+  last_researched_at: string | null
+  queued_at: string
+  updated_at: string
+  created_by: string | null
+  updated_by: string | null
+}
+
+export type CompanyAuditChangeSource = 'manual' | 'import' | 'system' | 'database'
+
+export interface CompanyAuditEntry {
+  change_id: number
+  company_id: string
+  entity_type: string
+  entity_id: string
+  operation: string
+  field_name: string
+  old_value: unknown
+  new_value: unknown
+  change_source: CompanyAuditChangeSource
+  import_batch_id: string | null
+  changed_at: string
+  changed_by: string | null
+}

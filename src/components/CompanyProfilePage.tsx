@@ -9,6 +9,8 @@ import { ShareButton } from './ShareButton'
 import { FirmSiteMap } from './FirmSiteMap'
 import { StatusBadge } from './StatusBadge'
 import { CompanyAdminPanel } from './CompanyAdminPanel'
+import { CompanyFamilyPanel } from './CompanyFamilyPanel'
+import { CompanyAuditHistory } from './CompanyAuditHistory'
 
 const number = new Intl.NumberFormat('en-US')
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -287,6 +289,8 @@ export function CompanyProfilePage({
     </div>
 
     <CompanyAdminPanel companyId={firm.firm_id} canonicalName={firm.canonical_name} />
+    <CompanyFamilyPanel companyId={firm.firm_id} />
+    <CompanyAuditHistory companyId={firm.firm_id} />
 
     <section className="reference-table-card firm-site-workspace">
       <div className="reference-table-heading firm-site-workspace-heading">

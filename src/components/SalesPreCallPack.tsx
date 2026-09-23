@@ -4,6 +4,7 @@ import type { SystemSummary } from '../types/data'
 import type { SystemDetailWithDomesticWater } from './DomesticWaterSection'
 import { AccountSectionNavigator } from './AccountSectionNavigator'
 import { collectKnownAccountFirms, type SalesKnownFirm } from './salesKnownFirms'
+import { AccountCompanyLinks } from './AccountCompanyLinks'
 
 type SalesTone = 'ready' | 'attention' | 'verify' | 'missing'
 
@@ -263,6 +264,7 @@ export function SalesPreCallPack({ row, detail }: { row: SystemSummary; detail: 
           {knownFirms.length > 0
             ? <div className="sales-expanded-facts">{knownFirms.map(firmCard)}</div>
             : <p className="microcopy">No source-named service, inspection, testing or relevant DOB applicant business is attached to this account through the current exact BIN/BBL evidence paths.</p>}
+          <AccountCompanyLinks firms={knownFirms} />
         </details>
         {additionalPoints.length > 0 && <details className="sales-pack-expand">
           <summary><strong>More account talking points</strong><span>{additionalPoints.length}</span></summary>
