@@ -1,0 +1,84 @@
+name: Verify seeded company RLS
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/postseed-company-rls-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Verify real seeded rows remain admin-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          DO $$
+          DECLARE
+            admin_id text;
+            nonadmin_id text;
+            admin_count integer;
+            nonadmin_count integer;
+            admin_contacts integer;
+            nonadmin_contacts integer;
+          BEGIN
+            SELECT id::text INTO admin_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin'
+            LIMIT 1;
+
+            SELECT id::text INTO nonadmin_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,'')) <> 'admin'
+            LIMIT 1;
+
+            IF admin_id IS NULL OR nonadmin_id IS NULL THEN
+              RAISE EXCEPTION 'Expected one admin and one non-admin identity';
+            END IF;
+
+            EXECUTE 'SET LOCAL ROLE authenticated';
+
+            PERFORM set_config(
+              'request.jwt.claims',
+              json_build_object('sub', nonadmin_id, 'role', 'authenticated')::text,
+              true
+            );
+            SELECT count(*) INTO nonadmin_count FROM public.company_private_profiles;
+            SELECT count(*) INTO nonadmin_contacts FROM public.company_private_contacts;
+
+            IF nonadmin_count <> 0 OR nonadmin_contacts <> 0 THEN
+              RAISE EXCEPTION 'Non-admin private visibility failed: profiles=% contacts=%',
+                nonadmin_count, nonadmin_contacts;
+            END IF;
+
+            PERFORM set_config(
+              'request.jwt.claims',
+              json_build_object('sub', admin_id, 'role', 'authenticated')::text,
+              true
+            );
+            SELECT count(*) INTO admin_count FROM public.company_private_profiles;
+            SELECT count(*) INTO admin_contacts FROM public.company_private_contacts;
+
+            IF admin_count <> 7 OR admin_contacts <> 7 THEN
+              RAISE EXCEPTION 'Admin seeded visibility failed: profiles=% contacts=%',
+                admin_count, admin_contacts;
+            END IF;
+
+            RAISE NOTICE 'SEEDED_COMPANY_RLS=PASS admin_profiles=% admin_contacts=% nonadmin_profiles=% nonadmin_contacts=%',
+              admin_count, admin_contacts, nonadmin_count, nonadmin_contacts;
+          END $$;
+
+          ROLLBACK;
+          SQL
