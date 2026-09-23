@@ -1,0 +1,26 @@
+{
+  "ic3t-wcy2": {
+    "source_snapshot_stable": true,
+    "requested_bbl_aliases": 4941,
+    "source_exact_bbl_rows": 552422,
+    "source_matched_bbls": 4517,
+    "independently_retained_rows": 4236,
+    "served_retained_rows": 4236,
+    "retained_identity_multiset_equal": true,
+    "source_only_retained_count": 0,
+    "served_only_retained_count": 0,
+    "source_only_examples": [],
+    "served_only_examples": []
+  },
+  "historical-311": {
+    "source_snapshots_stable": true,
+    "requested_bbl_aliases": 4941,
+    "source_rows": 27429,
+    "building_water_rows": 15973,
+    "independent_matched_bbls": 2917,
+    "served_matched_bbls": 2917,
+    "profile_maps_equal": true,
+    "differing_bbl_count": 0,
+    "differing_bbl_examples": []
+  }
+}
