@@ -112,7 +112,7 @@ def build(output_dir: Path) -> dict:
 
     progress(f"Fetching HPD contacts for {len(bbl_values):,} canonical BBLs")
     hpd_by_system, hpd_meta = fetch_contacts_for_systems(systems, hpd_index)
-    progress(f"Matched HPD contacts for {len(hpd_by_bbl):,} BBLs")
+    progress(f"Resolved HPD lookups for {len(hpd_by_system):,} systems")
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [
@@ -347,6 +347,8 @@ def build(output_dir: Path) -> dict:
             "system_id": system["system_id"],
             "bin": system["bin"],
             "source_bin_raw": system.get("source_bin_raw"),
+            "number": system.get("number"),
+            "street": system.get("street"),
             "bbl": system["bbl"],
             "property_bbl": system.get("property_bbl"),
             "registry_bbl": system.get("registry_bbl"),
@@ -403,6 +405,8 @@ def build(output_dir: Path) -> dict:
                 "system_id": system["system_id"],
                 "bin": system["bin"],
             "source_bin_raw": system.get("source_bin_raw"),
+            "number": system.get("number"),
+            "street": system.get("street"),
                 "bbl": system["bbl"],
                 "property_bbl": system.get("property_bbl"),
                 "registry_bbl": system.get("registry_bbl"),

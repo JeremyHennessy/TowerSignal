@@ -16,7 +16,13 @@ test('Existing Home building links reach reviewed account scoring and source-dat
   await expect(page.getByLabel('Official building health evidence')).toContainText('Order date Sep 12, 2026')
   const score = page.getByLabel('Priority score explanation')
   await expect(score).toBeVisible()
-  await expect(score).toContainText('Research priority model 1.1')
+  const releasedScoring = await page.evaluate(async () => {
+    const response = await fetch(new URL('data/details/20/2000003324.json', location.href))
+    if (!response.ok) throw new Error(`Released account HTTP ${response.status}`)
+    return (await response.json()).scoring
+  })
+  expect(releasedScoring.priority_model_version).toBeTruthy()
+  await expect(score).toContainText(`Research priority model ${releasedScoring.priority_model_version}`)
   await expect(score).toContainText('Building-level match')
   await expectContained(page)
   await page.evaluate(() => scrollTo(0, 0))

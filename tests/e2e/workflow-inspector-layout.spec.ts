@@ -120,9 +120,19 @@ test('Workflow Account Inspector stays in a dedicated sidecar through selections
 
   await page.setViewportSize({ width: 1440, height: 1000 })
   await workflow.getByRole('tab', { name: /^Changes/ }).click()
-  await expect(workflow.locator('.workflow-change-table')).toBeVisible()
-  const changeRows = workflow.locator('.workflow-change-table tbody tr')
-  if (await changeRows.count()) await changeRows.first().click()
+  const changeHeading = workflow.locator('.workflow-command-table-card .table-heading').filter({ hasText: 'source changes in the current 7-day monitor window' })
+  await expect(changeHeading).toBeVisible()
+  const advertisedChanges = Number((await changeHeading.locator('strong').first().innerText()).replaceAll(',', ''))
+  expect(Number.isFinite(advertisedChanges)).toBe(true)
+  if (advertisedChanges === 0) {
+    await expect(workflow.getByText('No recent source changes match these filters.', { exact: true })).toBeVisible()
+    await expect(workflow.locator('.workflow-change-table')).toHaveCount(0)
+  } else {
+    await expect(workflow.locator('.workflow-change-table')).toBeVisible()
+    const changeRows = workflow.locator('.workflow-change-table tbody tr')
+    await expect(changeRows.first()).toBeVisible()
+    await changeRows.first().click()
+  }
   await assertWorkspaceGeometry(page, false)
 
   await workflow.getByRole('tab', { name: /^Actions/ }).click()

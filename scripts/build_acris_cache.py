@@ -14,6 +14,7 @@ from towersignal.bbl_identity import apply_bbl_identity_recovery  # noqa: E402
 from towersignal.building_footprints import fetch_building_footprints_by_bin  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
 from towersignal.hpd_identity import fetch_registration_snapshot  # noqa: E402
+from towersignal.acris_identity_cache import property_targets as build_property_targets, graph_digest  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
 
 REGISTRATION_DATASET_ID = "y4fw-iqfr"
@@ -56,21 +57,7 @@ def reconciled_current_systems() -> list[dict[str, Any]]:
 
 
 def property_targets_from_systems(systems: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    targets: dict[str, dict[str, Any]] = {}
-    for system in systems:
-        bbl = normalize_bbl(system.get("bbl"))
-        if not bbl:
-            continue
-        targets[bbl] = {
-            "system_id": system.get("system_id"),
-            "bin": system.get("bin"),
-            "borough": system.get("borough"),
-            "number": system.get("number"),
-            "street": system.get("street"),
-            "address": system.get("address"),
-            "bbl_aliases": list(system.get("bbl_aliases") or []),
-        }
-    return targets
+    return build_property_targets(systems)
 
 
 def tower_bbls_from_current_registrations() -> set[str]:
@@ -94,6 +81,7 @@ def build(tower_snapshot: Path | None, output: Path) -> dict:
         )
         property_targets = property_targets_from_systems(systems)
     cache = build_recent_cache(bbls, property_targets=property_targets)
+    cache["mapping_property_graph_sha256"] = graph_digest(property_targets)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(cache, separators=(",", ":")), encoding="utf-8")
     result = validate_cache_file(output, require_production_volume=True)
