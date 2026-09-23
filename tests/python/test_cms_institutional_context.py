@@ -93,6 +93,7 @@ class CmsInstitutionalContextTests(unittest.TestCase):
 
         resolve_mock.side_effect = resolve
         payload = build_cms_institutional_context(["1000010001"], geosearch_workers=1)
+        self.assertEqual(payload["summary"]["requested_tower_bbl_count"], 1)
         self.assertEqual(payload["summary"]["tower_overlap_facility_count"], 1)
         self.assertEqual(payload["summary"]["resolved_non_tower_bbl_count"], 1)
         self.assertEqual(payload["by_bbl"]["1000010001"][0]["source_facility_id"], "H1")
@@ -102,7 +103,7 @@ class CmsInstitutionalContextTests(unittest.TestCase):
     def test_validator_and_attachment_preserve_exact_context(self):
         cache_payload = {
             "schema_version": "1.0", "domain": "CMS_NYC_INSTITUTIONAL_CONTEXT", "generated_at": "2026-09-07T00:00:00Z",
-            "summary": {"hospital_source_rows": 5419, "nursing_home_source_rows": 14690, "nyc_candidate_facility_count": 210, "exact_resolved_facility_count": 116, "tower_overlap_facility_count": 1, "tower_overlap_bbl_count": 1, "resolved_non_tower_bbl_count": 70},
+            "summary": {"requested_tower_bbl_count": 2, "hospital_source_rows": 5419, "nursing_home_source_rows": 14690, "nyc_candidate_facility_count": 210, "exact_resolved_facility_count": 116, "tower_overlap_facility_count": 1, "tower_overlap_bbl_count": 1, "resolved_non_tower_bbl_count": 70},
             "by_bbl": {"1011210036": [{"source_dataset_id": "xubh-q36u", "source_facility_id": "H1", "source_kind": "HOSPITAL", "facility_name": "Hospital A", "facility_type": "Acute Care", "ownership_type": "Voluntary", "chain_name": None, "bbl": "1011210036", "bin": "1079280", "property_link_confidence": "CONFIRMED_PAD_EXACT_ADDRESS_BBL"}]},
             "source": {"datasets": [], "property_resolution": "exact"},
             "evidence_boundaries": {"property_link": "Exact PAD", "facility": "Context only", "non_tower": "Not promoted", "provider": "No incumbent"},

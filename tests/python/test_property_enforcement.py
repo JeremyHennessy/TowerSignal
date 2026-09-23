@@ -1,12 +1,15 @@
 import sys
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from attach_property_enforcement import _merge_hpd_alias_contexts
+from towersignal.fetch import SourceFetchError
 from towersignal.property_enforcement import (
+    fetch_hpd_violations_by_bbl,
     fetch_official_swo_snapshot_by_bin,
     normalize_facade_filing,
     normalize_hpd_violation,
@@ -35,6 +38,26 @@ class PropertyEnforcementTests(unittest.TestCase):
         self.assertTrue(row["is_open"])
         self.assertTrue(row["rent_impairing"])
         self.assertEqual(row["match_basis"], "BBL_EXACT")
+
+    @patch("towersignal.property_enforcement.fetch_count", side_effect=SourceFetchError("count timeout"))
+    @patch("towersignal.property_enforcement.fetch_metadata", return_value={"name": "HPD", "source_last_updated_at": "2026-09-23T00:00:00Z"})
+    @patch("towersignal.property_enforcement._paged_where")
+    def test_hpd_exact_filtered_evidence_survives_global_count_telemetry_timeout(self, page_mock, _metadata_mock, _count_mock):
+        page_mock.return_value = [{
+            "violationid": "V1",
+            "bbl": "1011717513",
+            "bin": "1089723",
+            "class": "C",
+            "inspectiondate": "2026-09-20T00:00:00.000",
+            "violationstatus": "Open",
+        }]
+        by_bbl, source = fetch_hpd_violations_by_bbl(["1011717513"], chunk_size=12)
+        self.assertEqual(len(by_bbl["1011717513"]), 1)
+        self.assertIsNone(source["source_record_count"])
+        self.assertEqual(source["source_record_count_status"], "UNAVAILABLE_TELEMETRY")
+        self.assertIn("count timeout", source["source_record_count_error"])
+        self.assertEqual(source["requested_bbl_count"], 1)
+        self.assertEqual(source["matched_bbl_count"], 1)
 
     def test_swo_disposition_preserves_issue_and_rescission_semantics(self):
         issued = normalize_stop_work_order({

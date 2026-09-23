@@ -256,6 +256,8 @@ jobs:
         run: python scripts/validate_historical_311_context.py --cache public/data/historical-311-context.json --require-production-volume
       - name: Attach exact-BBL NYC historical 311 context
         run: python scripts/attach_historical_311_context.py --output public/data --cache public/data/historical-311-context.json
+      - name: Validate complete NYC mapping and downstream alias coherence
+        run: python scripts/validate_mapping_coherence.py --output public/data --require-production-volume
       - name: Build and validate source-health coverage
         run: python scripts/build_source_health.py --output public/data --previous-snapshot .history-store/data/history/latest.json
       - name: Attach domestic-water source health

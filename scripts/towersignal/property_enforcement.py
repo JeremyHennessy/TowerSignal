@@ -129,6 +129,22 @@ def _paged_where(dataset_id: str, *, where: str, order_by: str, select: str) -> 
             )
 
 
+def _source_record_count_telemetry(dataset_id: str) -> dict[str, Any]:
+    """Whole-dataset counts are telemetry only and must not invalidate exact filtered evidence."""
+    try:
+        return {
+            "source_record_count": fetch_count(dataset_id),
+            "source_record_count_status": "AVAILABLE",
+            "source_record_count_error": None,
+        }
+    except SourceFetchError as exc:
+        return {
+            "source_record_count": None,
+            "source_record_count_status": "UNAVAILABLE_TELEMETRY",
+            "source_record_count_error": str(exc),
+        }
+
+
 def normalize_hpd_violation(row: dict[str, Any]) -> dict[str, Any]:
     bbl = normalize_bbl(row.get("bbl"))
     if not bbl:
@@ -192,13 +208,14 @@ def fetch_hpd_violations_by_bbl(bbl_values: Iterable[Any], *, chunk_size: int = 
         )
     metadata = fetch_metadata(HPD_VIOLATIONS_DATASET_ID)
     records = [record for values in result.values() for record in values]
+    count_telemetry = _source_record_count_telemetry(HPD_VIOLATIONS_DATASET_ID)
     return result, {
         "dataset_id": HPD_VIOLATIONS_DATASET_ID,
         "name": metadata.get("name") or "Housing Maintenance Code Violations",
         "url": HPD_VIOLATIONS_URL,
         "retrieved_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source_last_updated_at": metadata.get("source_last_updated_at"),
-        "source_record_count": fetch_count(HPD_VIOLATIONS_DATASET_ID),
+        **count_telemetry,
         "requested_bbl_count": len(requested),
         "matched_bbl_count": len(result),
         "matched_violation_count": len(records),
@@ -386,7 +403,7 @@ def fetch_stop_work_orders_by_bin(bin_values: Iterable[Any], *, chunk_size: int 
         "methodology_url": DOB_BUILDING_PROFILES_METHOD_URL,
         "retrieved_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source_last_updated_at": metadata.get("source_last_updated_at"),
-        "source_record_count": fetch_count(DOB_COMPLAINTS_DATASET_ID),
+        **_source_record_count_telemetry(DOB_COMPLAINTS_DATASET_ID),
         "requested_bin_count": len(requested),
         "matched_bin_count": len(result),
         "matched_event_count": len(records),
@@ -465,7 +482,7 @@ def fetch_facade_filings_by_bin(bin_values: Iterable[Any], *, chunk_size: int = 
         "url": FACADE_FILINGS_URL,
         "retrieved_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source_last_updated_at": metadata.get("source_last_updated_at"),
-        "source_record_count": fetch_count(FACADE_FILINGS_DATASET_ID),
+        **_source_record_count_telemetry(FACADE_FILINGS_DATASET_ID),
         "requested_bin_count": len(requested),
         "matched_bin_count": len(result),
         "matched_filing_count": len(records),

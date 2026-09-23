@@ -23,11 +23,14 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def _source_row(source: dict[str, Any], matched_count: int) -> dict[str, Any]:
+    raw_count = source.get("source_record_count")
     return {
         "dataset_id": source.get("dataset_id"),
         "name": source.get("name"),
         "retrieved_at": source.get("retrieved_at"),
-        "source_record_count": int(source.get("source_record_count") or 0),
+        "source_record_count": int(raw_count) if raw_count not in (None, "") else None,
+        "source_record_count_status": source.get("source_record_count_status"),
+        "source_record_count_error": source.get("source_record_count_error"),
         "source_last_updated_at": source.get("source_last_updated_at"),
         "url": source.get("url"),
         "matched_record_count": matched_count,
@@ -169,6 +172,7 @@ def attach(output_dir: Path, cache_path: Path) -> dict[str, int]:
     metadata["property_enforcement_cache_available"] = True
     metadata["property_enforcement_generated_at"] = cache.get("generated_at")
     metadata["hpd_violation_match_basis"] = "BBL_ALIAS_EXACT"
+    metadata["hpd_violation_requested_bbl_count"] = int(cache_summary.get("requested_bbl_count") or 0)
     metadata["stop_work_order_match_basis"] = "BIN_EXACT"
     metadata["official_swo_snapshot_match_basis"] = "BIN_EXACT"
     metadata["official_swo_snapshot_current_status_available"] = False
