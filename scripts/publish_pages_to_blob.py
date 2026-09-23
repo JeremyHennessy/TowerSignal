@@ -248,6 +248,36 @@ def baseline_plan(store, reader):
             'baseline_manifest_sha256': BASELINE_MANIFEST, 'baseline_complete_sha256': BASELINE_COMPLETE}
 
 
+def pages_can_replace_current(reader, source, old_source):
+    """Prove a Pages release is newer than one exact cross-workflow current source.
+
+    Workflow run numbers are intentionally not compared across workflows.
+    A Pages candidate must have a later source timestamp and use the same commit
+    or a descendant commit of the data-only source. The final promotion binds
+    this prevalidation to the exact old source object and still uses pointer CAS.
+    """
+    require(source.get('workflow_id') == PAGES_WORKFLOW,
+            'Cross-workflow promotion candidate is not a trusted Pages source')
+    require(old_source.get('kind') == 'data-only' and
+            old_source.get('workflow_path') == '.github/workflows/azure-data-refresh.yml',
+            'Current cross-workflow pointer is not a recognized data-only source')
+    require(timestamp(source['created_at']) > timestamp(old_source['created_at']),
+            'Pages candidate is not newer than the current data-only source')
+    old_sha = str(old_source.get('source_sha') or '')
+    new_sha = str(source.get('source_sha') or '')
+    require(re.fullmatch(r'[0-9a-f]{40}', old_sha) and re.fullmatch(r'[0-9a-f]{40}', new_sha),
+            'Cross-workflow source SHA is invalid')
+    if old_sha == new_sha:
+        return True
+    comparison = reader.get(f'/compare/{old_sha}...{new_sha}')
+    require(comparison.get('status') == 'ahead' and
+            type(comparison.get('ahead_by')) is int and comparison['ahead_by'] > 0 and
+            comparison.get('base_commit', {}).get('sha') == old_sha and
+            comparison.get('merge_base_commit', {}).get('sha') == old_sha,
+            'Pages candidate commit is not a descendant of the current data-only source')
+    return True
+
+
 def apply(store, reader, plan, work, *, bootstrap=False):
     source = plan['source']
     actual, _ = successful_source(reader, source['run_id'])
@@ -260,7 +290,13 @@ def apply(store, reader, plan, work, *, bootstrap=False):
     require(check_history_parity(plan['runtime'], plan['history']) == plan['history_parity'],
             'Staged parity proof no longer matches the data inventory')
     old, _, _ = current_pointer(store)
-    if old and old['source']['run_id'] == source['run_id']:
+    cross_workflow_source = None
+    if old and old['source'].get('workflow_id') != source.get('workflow_id'):
+        require(not bootstrap, 'Bootstrap cannot replace an existing current pointer')
+        require(pages_can_replace_current(reader, source, old['source']),
+                'Pages release cannot safely replace current cross-workflow source')
+        cross_workflow_source = dict(old['source'])
+    if old and old['source']['run_id'] == source['run_id'] and old['source'].get('workflow_id') == source.get('workflow_id'):
         require(old['source'] == source, 'Same-run source proof differs from current release')
         for kind in ('runtime', 'history'):
             validate_descriptor(store, old[kind], kind, source)
@@ -272,8 +308,12 @@ def apply(store, reader, plan, work, *, bootstrap=False):
             verify_dataset(store, old[kind]['data_prefix'], manifest['records'])
         result = {'status': 'ALREADY_CURRENT', 'source': source, 'current': old, 'payloads_uploaded': False}
     else:
-        require(not old or (not bootstrap and source['run_number'] > old['source']['run_number']),
-                'Refusing to replace a newer current release')
+        if old and source.get('workflow_id') == old['source'].get('workflow_id'):
+            require(not bootstrap and source['run_number'] > old['source']['run_number'],
+                    'Refusing to replace a newer current Pages release')
+        elif old:
+            require(cross_workflow_source == old['source'],
+                    'Cross-workflow current source was not safely prevalidated')
         release = f"{ROOT}/releases/pages-{source['run_id']}"
         state = f"{ROOT}/state/history/pages-{source['run_id']}"
         runtime_prefix = BASELINE + '/runtime' if bootstrap else release + '/runtime'
@@ -288,7 +328,8 @@ def apply(store, reader, plan, work, *, bootstrap=False):
         if not bootstrap:
             require(reader.get('/git/ref/heads/data/towersignal-history')['object']['sha'] == source['history_sha'],
                     'GitHub history advanced before promotion')
-        result = {**promote(store, source, runtime, history, bootstrap=bootstrap),
+        result = {**promote(store, source, runtime, history, bootstrap=bootstrap,
+                            cross_workflow_source=cross_workflow_source),
                   'payloads_uploaded': not bootstrap}
     result.update({'operation': 'bootstrap' if bootstrap else 'publish',
                    'history_parity': plan['history_parity'], 'source': source,
