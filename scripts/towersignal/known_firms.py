@@ -60,8 +60,15 @@ def _safe_firm_detail_path(firm_id: str) -> str:
     return f"firm-details/{prefix}/{safe}.json"
 
 
+def _assigned_bin(value: Any) -> str | None:
+    text = normalize_space(str(value or ""))
+    if len(text) != 7 or not text.isdigit() or text[0] not in "12345" or text[1:] == "000000":
+        return None
+    return text
+
+
 def _system_site_key(row: Mapping[str, Any]) -> str:
-    bin_value = normalize_space(str(row.get("bin") or ""))
+    bin_value = _assigned_bin(row.get("bin"))
     bbl = normalize_space(str(row.get("bbl") or ""))
     system_id = normalize_space(str(row.get("system_id") or ""))
     if bin_value:
@@ -105,7 +112,7 @@ def _site_from_systems(
 ) -> dict[str, Any]:
     rows = list(systems)
     first = rows[0] if rows else {}
-    bin_value = normalize_space(str(fallback_bin or first.get("bin") or "")) or None
+    bin_value = _assigned_bin(fallback_bin or first.get("bin"))
     bbl = normalize_space(str(fallback_bbl or first.get("bbl") or "")) or None
     address = normalize_space(str(fallback_address or first.get("address") or "")) or None
     borough = normalize_space(str(fallback_borough or first.get("borough") or "")) or None
@@ -270,8 +277,8 @@ def build_known_firms(
     systems_by_bin: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     systems_by_bbl: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for row in systems:
-        if row.get("bin"):
-            systems_by_bin[str(row["bin"])].append(row)
+        if (bin_value := _assigned_bin(row.get("bin"))):
+            systems_by_bin[bin_value].append(row)
         if row.get("bbl"):
             systems_by_bbl[str(row["bbl"])].append(row)
 
@@ -364,7 +371,7 @@ def build_known_firms(
             system = systems_by_id.get(str(system_id))
             if system and system not in linked:
                 linked.append(system)
-        normalized_bin = normalize_space(str(bin_value or ""))
+        normalized_bin = _assigned_bin(bin_value)
         normalized_bbl = normalize_space(str(bbl or ""))
         if normalized_bin:
             for system in systems_by_bin.get(normalized_bin, []):
