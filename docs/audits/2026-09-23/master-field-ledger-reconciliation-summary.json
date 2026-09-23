@@ -7,13 +7,14 @@
     "UNRESOLVED": 1123
   },
   "current_counts": {
-    "USED": 324,
-    "UNUSED_POTENTIALLY_USEFUL": 229,
-    "INTENTIONALLY_EXCLUDED": 460,
-    "UNRESOLVED": 275
+    "USED": 528,
+    "RETAINED_NOT_DISPLAYED": 7,
+    "UNUSED_POTENTIALLY_USEFUL": 267,
+    "INTENTIONALLY_EXCLUDED": 486,
+    "UNRESOLVED": 0
   },
-  "fields_with_changed_disposition": 849,
-  "resolved_unresolved_fields": 848,
+  "fields_with_changed_disposition": 1123,
+  "resolved_unresolved_fields": 1123,
   "reviewed_sources": {
     "y4fw-iqfr": "NYC cooling-tower registrations",
     "f9wb-g8mb": "NYC cooling-tower inspections",
@@ -44,14 +45,24 @@
     "stage8-dob-worktypes/FINDING.md",
     "STAGE4_RESOLUTION.md",
     "stage10-top-five-fields/top-five-source-field-ledger.json",
+    "stage10-top-five-fields/top-five-field-review.json",
+    "stage11-final-sources/final-source-field-ledger.json",
+    "stage11-final-sources/final-field-review.json",
+    "stage10-top-five-fields/top-five-source-field-ledger.json",
     "stage10-top-five-fields/top-five-field-review.json"
   ],
-  "boundary": "This updates source-field dispositions through the first 16 reviewed dataset families. The remaining 275 fields are individually retained as UNRESOLVED pending the final source-family batch; no opportunity field is production-integrated by this audit.",
+  "boundary": "All 1,288 enumerated source fields now have explicit dispositions. This completes source-field classification, not the entire TowerSignal audit: application-field, relationship, source-population and current-hosted-release acceptance remain separate workstreams.",
   "additional_reviewed_sources": {
     "ic3t-wcy2": "Legacy DOB/BIS job applications",
     "jz4z-kudi": "OATH Hearings case status",
     "76ig-c548": "Historical NYC 311 2010-2019",
     "gjm4-k24g": "DOHMH self-reported drinking-water tank inspections",
     "xubg-57si": "DOB NOW facade compliance filings"
+  },
+  "final_reviewed_sources": "All 33 source datasets represented in the 1,288-field master source-field ledger",
+  "master_ledger_artifact": {
+    "json_sha256": "18880e595caf524a457ffadd8918c1bfd58a1df9cdd9e748d058c80132ccfe27",
+    "csv_sha256": "cf0bdb5d151d8305822154a5206339dffc6682b0ccd97e1f9351ec3a3275796b",
+    "zip_sha256": "d17472be93bfbeb34a77ea2d2c4dcabffc939a005d578c0998a603b9b867eb3d"
   }
 }
