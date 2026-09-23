@@ -1,0 +1,50 @@
+{
+  "audited_at": "2026-09-23T15:54:00Z",
+  "run_id": 35866906472,
+  "workflow": "Deploy GitHub Pages",
+  "application_sha": "f1cbdb925b704a8b7a34aaccd169be6649b80a92",
+  "build": {
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "deploy": {
+    "status": "completed",
+    "conclusion": "success",
+    "completed_at": "2026-09-23T15:18:54Z"
+  },
+  "verify": {
+    "job_id": 107247839941,
+    "status": "completed",
+    "conclusion": "success",
+    "hosted_browser_step_started_at": "2026-09-23T15:21:04Z",
+    "hosted_browser_step_completed_at": "2026-09-23T15:53:11Z",
+    "passed": 92,
+    "skipped": 12,
+    "failed": 0,
+    "devices": [
+      "desktop-chromium",
+      "iphone/WebKit"
+    ],
+    "notes": [
+      "Skipped cases are test-defined skips, not failures; preserve their names in the workflow log/report.",
+      "Hosted tests include approved Account PDF checks for systems 2000000407 and 2000014227.",
+      "Hosted tests include 400 West 61st missing-sample warning and priority-score semantics.",
+      "Hosted tests include NYC page/tab visual inventory, Companies/Company Profile, Source Health, Workflow and mobile layout coverage.",
+      "This manifest records canonical hosted verification. It does not supersede the independent lineage audit or eliminate separately reproduced firm-site/provenance/preview defects."
+    ]
+  },
+  "browser_report_artifact": {
+    "id": 10762656492,
+    "name": "live-browser-verification",
+    "size_bytes": 73335199,
+    "sha256": "baab998bdc1d7dee6cd4623938d97bdf378b135ceab1b479dd404d3223f1f6a8",
+    "expires_at": "2026-10-07T15:53:11Z",
+    "files": 285
+  },
+  "pages_artifact": {
+    "id": 10759814013,
+    "sha256": "b989f5da4a4f37320a5ab026cb518391fb7556ddb8a324e928947c9e1826d66a",
+    "expires_at": "2026-09-24T15:17:04Z"
+  },
+  "acceptance_boundary": "CODE PRESENT -> TESTED -> MERGED -> BUILT -> DEPLOYED -> SERVED/HOSTED-VERIFIED is established for canonical Pages #242 by the workflow. User approval and complete source-lineage correctness are separate states."
+}
