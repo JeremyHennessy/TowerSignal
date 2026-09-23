@@ -1,0 +1,14 @@
+{
+  "systems_sha256": "9ca884e7b9283856337fc81a63d6aa790b7a13f281823deacab614bc7cd95b7e",
+  "labor_cache_sha256": "cbba6b1b6af764aaa89a73ebd56b46b52bf21564c01d878527794cfe6f4db896",
+  "system_count": 4893,
+  "retained_decision_count": 10,
+  "explicit_subject_candidate_count": 0,
+  "expected_relationship_edges": 0,
+  "served_relationship_edges": 0,
+  "relationship_sets_equal": true,
+  "issue_count": 0,
+  "issue_type_counts": {},
+  "all_served_boundaries_correct": true,
+  "boundary": "Independent relationship replay from the served source-owned decision cache to the current TowerSignal registry. It proves exact normalized-address attachment and boundary flags; it does not independently re-extract decision body text from Official Reports or imply current filing/liability status."
+}
