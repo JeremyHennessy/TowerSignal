@@ -1,0 +1,486 @@
+[
+  {
+    "url": "https://data.cityofnewyork.us/api/views/wvxf-dwi5.json",
+    "status": 200,
+    "bytes": 84704,
+    "sha256": "2ae06f211f9810c2abf617a237b0ed7e60c9b2e6443b67804775c22952ca24b1"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "623043a6dd98928795f29f10be1241c60d50efafad05ae2b0b7c33ec7086a6e2"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "d463db4ae1c609600d7b088bdf4962899986a7febd68cfa5626c7b55151518af"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=10000",
+    "status": 200,
+    "bytes": 139961,
+    "sha256": "a57d0c5dc22da63cd67b7ef15639ede614bd69a23e21c383566fbf0dd04665ac"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=15000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "e99c0448bd6863d46d513886fe673dbab09885794c709f6c529906f30ebede4f"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=20000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "eb09ef50d2361d5869d0b123d1a3092d78104eeff319fb487a8233d431b23655"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=25000",
+    "status": 200,
+    "bytes": 98393,
+    "sha256": "6d539bcd90068e11ece94c9e006f179cbaf4139b61587acce2d7be9dd0f102f7"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "623043a6dd98928795f29f10be1241c60d50efafad05ae2b0b7c33ec7086a6e2"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+3058743&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "d463db4ae1c609600d7b088bdf4962899986a7febd68cfa5626c7b55151518af"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+9935043&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 139961,
+    "sha256": "a57d0c5dc22da63cd67b7ef15639ede614bd69a23e21c383566fbf0dd04665ac"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+14815595&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "e99c0448bd6863d46d513886fe673dbab09885794c709f6c529906f30ebede4f"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+17551185&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "eb09ef50d2361d5869d0b123d1a3092d78104eeff319fb487a8233d431b23655"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27MANHATTAN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+18781122&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 98393,
+    "sha256": "6d539bcd90068e11ece94c9e006f179cbaf4139b61587acce2d7be9dd0f102f7"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "status": 200,
+    "bytes": 133664,
+    "sha256": "81afc9ce76540cfef97283ea3612b42934eaeaf3267430ccff1b59e5842a56d6"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "status": 200,
+    "bytes": 137950,
+    "sha256": "ad58f7acc76762e0c888411bae2509461b1e67f166b6f3ee596ec447bfc19061"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=10000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "ee85fca721747b5bad4bc5e2190da993507844742f9fdb836174b68c40b9448b"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=15000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "3216ea0fe45800686e32e7b9128846554a8831f0d7e3e28b3bae496592392a5f"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=20000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "bc90a49a528fb7262b1a524a32b57b5494b4bd2194482a38dcbddbdae73c2a92"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=25000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "d8ab9eeb0dae152d8ab07e2dd1d67700ff9e3f60a72c2bdda59503a03f01dba3"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=30000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "af28b7d73c37208c75b5fd8f469b576051b8f631d4b015a4be732671a76232d5"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=35000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "934d108d0d934e63e0787b1d405e15f67e0cdbda055e477146811358d5b9e7f4"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=40000",
+    "status": 200,
+    "bytes": 104581,
+    "sha256": "a0d7e5a1901989d8906519ef7b72cd87819f70cbb3e41d28da47d3ccfcfdd6f6"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 133664,
+    "sha256": "81afc9ce76540cfef97283ea3612b42934eaeaf3267430ccff1b59e5842a56d6"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+8437259&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 137950,
+    "sha256": "ad58f7acc76762e0c888411bae2509461b1e67f166b6f3ee596ec447bfc19061"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+11736491&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "ee85fca721747b5bad4bc5e2190da993507844742f9fdb836174b68c40b9448b"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+14627066&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "3216ea0fe45800686e32e7b9128846554a8831f0d7e3e28b3bae496592392a5f"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+16323961&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "bc90a49a528fb7262b1a524a32b57b5494b4bd2194482a38dcbddbdae73c2a92"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+17410730&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "d8ab9eeb0dae152d8ab07e2dd1d67700ff9e3f60a72c2bdda59503a03f01dba3"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+18121459&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "af28b7d73c37208c75b5fd8f469b576051b8f631d4b015a4be732671a76232d5"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+18662438&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "934d108d0d934e63e0787b1d405e15f67e0cdbda055e477146811358d5b9e7f4"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BRONX%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+19079699&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 104581,
+    "sha256": "a0d7e5a1901989d8906519ef7b72cd87819f70cbb3e41d28da47d3ccfcfdd6f6"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "status": 200,
+    "bytes": 134477,
+    "sha256": "a4fda63bbf6cc8714b388ed24e38e90d00b7fb00d786b17e7eddd5dae703b1d9"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "5f815b301b25be319995f1d1ca3c85e9aa49a4c619d712391de1410b465e0d24"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=10000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "818bbff7eb3d1db61a8108ef4bdb8ce612406bf6fc46c1f6375eb683c351418d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=15000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "93d4fe2ee41a5c11fe245f3772469e1e05c45c300fdd3ae7f9235a3d3902610d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=20000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "05d1c2bab69a0f511f82ce03384c664875bf0c7d97d5ba721e84260d73ac8107"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=25000",
+    "status": 200,
+    "bytes": 135728,
+    "sha256": "da8e599552ae7adea81d4a3d17a561bed164728988b1102b062d08962916fca7"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=30000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "09761beedf5bfbe0e92a153dd3a2ca92f291e3a774c17caa8d7e791b2257e557"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=35000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "123bca3e02fe28178221c333d9405fb5153dfaf975da0c26238b5e1a2b77fc67"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=40000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "8a50356b6373dbdf23e3005698be061f9f65c9132519c1b3414a8f9b05240cb6"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=45000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "72964827d200a960fafdeabb2d4677d4ea52016259a5572676ca9323345f2f1a"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=50000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "89965bcd408a4ef6beee4ea08d2c8e70391e0a2437f2baa12aef333f7626616d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=55000",
+    "error": "TimeoutError"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=55000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "faea753c74e5c7cec868eabe87ce3c3fa14bb0434937238792f6d1f1b88374a0"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=60000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "6de368ab40effff70e048c052bd35fa42cee2188fd609c58cde960ab79ca142b"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=65000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "cb24be464870d9799626a08b765516f1d7a67116bf80187455abd0495ed97e83"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=70000",
+    "status": 200,
+    "bytes": 33069,
+    "sha256": "dea7e90e498cba2a6f269a87327ff94814a258cb29241ab959953ebccfae7930"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 134477,
+    "sha256": "a4fda63bbf6cc8714b388ed24e38e90d00b7fb00d786b17e7eddd5dae703b1d9"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+1731454&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "5f815b301b25be319995f1d1ca3c85e9aa49a4c619d712391de1410b465e0d24"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+4265643&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "818bbff7eb3d1db61a8108ef4bdb8ce612406bf6fc46c1f6375eb683c351418d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+5077043&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "93d4fe2ee41a5c11fe245f3772469e1e05c45c300fdd3ae7f9235a3d3902610d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+6196533&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "05d1c2bab69a0f511f82ce03384c664875bf0c7d97d5ba721e84260d73ac8107"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+8503887&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135728,
+    "sha256": "da8e599552ae7adea81d4a3d17a561bed164728988b1102b062d08962916fca7"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+10203422&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "09761beedf5bfbe0e92a153dd3a2ca92f291e3a774c17caa8d7e791b2257e557"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+11927337&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "123bca3e02fe28178221c333d9405fb5153dfaf975da0c26238b5e1a2b77fc67"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+13507495&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "8a50356b6373dbdf23e3005698be061f9f65c9132519c1b3414a8f9b05240cb6"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+14973769&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "72964827d200a960fafdeabb2d4677d4ea52016259a5572676ca9323345f2f1a"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+16175790&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "89965bcd408a4ef6beee4ea08d2c8e70391e0a2437f2baa12aef333f7626616d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+17296179&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "faea753c74e5c7cec868eabe87ce3c3fa14bb0434937238792f6d1f1b88374a0"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+18150927&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "6de368ab40effff70e048c052bd35fa42cee2188fd609c58cde960ab79ca142b"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+18770680&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "cb24be464870d9799626a08b765516f1d7a67116bf80187455abd0495ed97e83"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27BROOKLYN%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+19189763&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 33069,
+    "sha256": "dea7e90e498cba2a6f269a87327ff94814a258cb29241ab959953ebccfae7930"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "status": 200,
+    "bytes": 132967,
+    "sha256": "b8c07b3537599ae6870b87e53d047c8aeb4cb13068622089119e3b97b51f8abb"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "9dc7575cf199c0c4ddfad1cf3287160762dccf9edb23fdc93f606eee6f98d2ae"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=10000",
+    "status": 200,
+    "bytes": 135270,
+    "sha256": "461729771d418dc0672f60ec38962c8e35256a1b42de03768f9e2b134309f188"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=15000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "bb47263ec197863afb17f6c932b1872b3b0533dd263ed6de80fff9d5390d8155"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=20000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "b1b3abe2cd3b8a7bdd1f314d00f7ada3528600a220a15a780a9ecb5c4e7ed4db"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=25000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "f6be441eb97d99ea4fad49e277efd7e6dfd5326b4b7a0c51527f053810d32d84"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=30000",
+    "status": 200,
+    "bytes": 128633,
+    "sha256": "a1e6eef32c0bcf290a8876fac3e4ec12a48fe6d616dd05b800c580460cdd4199"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 132967,
+    "sha256": "b8c07b3537599ae6870b87e53d047c8aeb4cb13068622089119e3b97b51f8abb"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+4238601&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135001,
+    "sha256": "9dc7575cf199c0c4ddfad1cf3287160762dccf9edb23fdc93f606eee6f98d2ae"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+6957802&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 135270,
+    "sha256": "461729771d418dc0672f60ec38962c8e35256a1b42de03768f9e2b134309f188"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+10110674&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "bb47263ec197863afb17f6c932b1872b3b0533dd263ed6de80fff9d5390d8155"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+13050599&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "b1b3abe2cd3b8a7bdd1f314d00f7ada3528600a220a15a780a9ecb5c4e7ed4db"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+16097748&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 140001,
+    "sha256": "f6be441eb97d99ea4fad49e277efd7e6dfd5326b4b7a0c51527f053810d32d84"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27QUEENS%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+18165615&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 128633,
+    "sha256": "a1e6eef32c0bcf290a8876fac3e4ec12a48fe6d616dd05b800c580460cdd4199"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27STATEN+ISLAND%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=0",
+    "status": 200,
+    "bytes": 137482,
+    "sha256": "3a4b6b4cacf8872bd44df3a1e8113b7a52d050e061bac5ddf56a3b199423288d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27STATEN+ISLAND%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000&%24offset=5000",
+    "status": 200,
+    "bytes": 45389,
+    "sha256": "be7ecabac720ab72e275a3b2b03884fb283f404124c075281c08e1f0622b1c35"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=violationstatus%3D%27Open%27+AND+boro%3D%27STATEN+ISLAND%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 137482,
+    "sha256": "3a4b6b4cacf8872bd44df3a1e8113b7a52d050e061bac5ddf56a3b199423288d"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/resource/wvxf-dwi5.json?%24select=violationid&%24where=%28violationstatus%3D%27Open%27+AND+boro%3D%27STATEN+ISLAND%27+AND+%28novdescription+like+%27%25HOT+WATER%25%27+OR+novdescription+like+%27%25WATER+SUPPLY%25%27+OR+novdescription+like+%27%25POTABLE%25%27+OR+novdescription+like+%27%25PLUMBING%25%27+OR+novdescription+like+%27%25FAUCET%25%27+OR+novdescription+like+%27%25SINK%25%27+OR+novdescription+like+%27%25TOILET%25%27+OR+novdescription+like+%27%25SHOWER%25%27+OR+novdescription+like+%27%25BATHTUB%25%27+OR+novdescription+like+%27%25WATER+CLOSET%25%27%29%29+AND+violationid+%3E+17109887&%24order=violationid&%24limit=5000",
+    "status": 200,
+    "bytes": 45389,
+    "sha256": "be7ecabac720ab72e275a3b2b03884fb283f404124c075281c08e1f0622b1c35"
+  },
+  {
+    "url": "https://data.cityofnewyork.us/api/views/wvxf-dwi5.json",
+    "status": 200,
+    "bytes": 84704,
+    "sha256": "2ae06f211f9810c2abf617a237b0ed7e60c9b2e6443b67804775c22952ca24b1"
+  }
+]

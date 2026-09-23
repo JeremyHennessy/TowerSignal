@@ -1,0 +1,56 @@
+{
+  "rows_updated_before": 1790175419,
+  "rows_updated_after": 1790175419,
+  "source_version_stable": true,
+  "boroughs": {
+    "MANHATTAN": {
+      "offset_count": 28514,
+      "seek_count": 28514,
+      "sets_equal": true,
+      "order_unique_offset": true,
+      "order_unique_seek": true,
+      "offset_only": [],
+      "seek_only": []
+    },
+    "BRONX": {
+      "offset_count": 43735,
+      "seek_count": 43735,
+      "sets_equal": true,
+      "order_unique_offset": true,
+      "order_unique_seek": true,
+      "offset_only": [],
+      "seek_only": []
+    },
+    "BROOKLYN": {
+      "offset_count": 71181,
+      "seek_count": 71181,
+      "sets_equal": true,
+      "order_unique_offset": true,
+      "order_unique_seek": true,
+      "offset_only": [],
+      "seek_only": []
+    },
+    "QUEENS": {
+      "offset_count": 34594,
+      "seek_count": 34594,
+      "sets_equal": true,
+      "order_unique_offset": true,
+      "order_unique_seek": true,
+      "offset_only": [],
+      "seek_only": []
+    },
+    "STATEN ISLAND": {
+      "offset_count": 6621,
+      "seek_count": 6621,
+      "sets_equal": true,
+      "order_unique_offset": true,
+      "order_unique_seek": true,
+      "offset_only": [],
+      "seek_only": []
+    }
+  },
+  "all_seek_offset_sets_equal": true,
+  "offset_total": 184645,
+  "seek_total": 184645,
+  "boundary": "Direct parity test of the current production seek-pagination semantics versus independent offset pagination under the same source filter/version. Equality disproves current seek-page loss but cannot retroactively prove publisher snapshot consistency during the earlier build."
+}
