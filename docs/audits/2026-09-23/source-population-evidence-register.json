@@ -2,16 +2,15 @@
   "source_datasets": 33,
   "statuses": {
     "FULL_CURRENT_INDEPENDENT": 6,
-    "TARGET_SCOPE_CURRENT_INDEPENDENT": 10,
+    "TARGET_SCOPE_CURRENT_INDEPENDENT": 13,
     "COLLECTOR_SCOPE_CURRENT_INDEPENDENT": 8,
     "CURRENT_SCOPE_DELTA_LIFECYCLE_RECONCILIATION_IN_PROGRESS": 1,
     "FULL_CURRENT_AGENCY_SLICE_INDEPENDENT": 1,
     "SOURCE_ROW_MATCHED_DEFECT_FOUND": 2,
-    "SCHEMA_COLLECTOR_LINEAGE_VERIFIED": 3,
     "FULL_CURRENT_FILTERED_INDEPENDENT": 1,
     "FULL_CURRENT_INDEPENDENT_COUNT": 1
   },
-  "independently_current_retrieved_or_exact_source_matched": 30,
+  "independently_current_retrieved_or_exact_source_matched": 33,
   "entries": [
     {
       "dataset_id": "y4fw-iqfr",
@@ -160,20 +159,20 @@
     {
       "dataset_id": "8h5j-fqxa",
       "name": "ACRIS Real Property Legals",
-      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
-      "evidence": "Exact BBL/alias/condo roll-up identity contract and fields reviewed; current complete target ACRIS population not independently replayed by this audit."
+      "status": "TARGET_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "Independent current ACRIS target replay at served 2025-09-23 cutoff: legal rows joined by exact document ID and exact BBL/alias/condo billing identity. Across 3,804 TowerSignal BBLs, full document counts, party counts and retained top-25 document/match-basis/date tuples have zero mismatching BBLs."
     },
     {
       "dataset_id": "bnx9-e6tj",
       "name": "ACRIS Real Property Master",
-      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
-      "evidence": "Master document schema/normalization and exact document linkage reviewed; current complete target population replay remains open."
+      "status": "TARGET_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "Independent current ACRIS target replay retrieved 174,433 master rows / 174,186 unique documents at the served cutoff; source version matches served metadata and all per-property document counts/top-25 relationships reconcile exactly."
     },
     {
       "dataset_id": "636b-3b5g",
       "name": "ACRIS Real Property Parties",
-      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
-      "evidence": "Party schema and document linkage reviewed; current complete target population replay remains open."
+      "status": "TARGET_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "Independent current ACRIS target replay fetched parties for 13,168 matched documents (37,755 party rows); every TowerSignal property party count equals the served summary and the source version matches served metadata."
     },
     {
       "dataset_id": "h8u2-6ejg",
@@ -212,6 +211,6 @@
       "evidence": "8,477 current exact-BIN planimetric cooling-tower features independently replayed; GlobalID multiset exactly equals served features."
     }
   ],
-  "boundary": "Updated through stage36. All non-ACRIS source datasets now have current independent retrieval/exact-source evidence except HPD remains under lifecycle/pagination adjudication. ACRIS three-table target replay is in progress. Source population proof remains separate from relationship/UI acceptance.",
-  "updated_after_stages": "22-32"
+  "boundary": "All 33 enumerated source datasets now have independent current retrieval/exact-source evidence or source-row-matched defect evidence. HPD remains a current-population discrepancy under pagination/query-consistency adjudication; independent coverage does not mean all relationships or normalized values are defect-free.",
+  "updated_after_stages": "22-39"
 }
