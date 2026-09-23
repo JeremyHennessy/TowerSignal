@@ -53,7 +53,7 @@ test('private import rechecks admin access and writes profiles before contacts',
       company_id:'known-firm-alpha',
       canonical_name:'ALPHA WATER LLC',
       profile:{ relationship_status:'researching', website:'https://alpha.example', website_source_name:'Official site', website_source_url:'https://alpha.example' },
-      contacts:[{ contact_id:'alpha-sales', name:'Sales', email:null, title:null, phone:null, linkedin_url:null, notes:null, source_name:null, source_url:null, verified_at:null, active:true }],
+      contacts:[{ contact_id:'alpha-sales', name:'Sales', email:null, title:null, phone:null, linkedin_url:null, notes:null, source_name:'Official contact page', source_url:'https://alpha.example/contact', verified_at:'2026-09-23T19:00:00Z', active:true }],
     }],
   }), [firm])
 
