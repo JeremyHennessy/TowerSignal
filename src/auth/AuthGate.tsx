@@ -5,7 +5,7 @@ import { HomePage } from '../components/HomePage'
 import { MarketingLandingPage } from '../components/MarketingLandingPage'
 import { UserAccountPage } from '../components/UserAccountPage'
 import type { WorkflowUser } from '../types/workflow'
-import { getWorkflowSession, signInWorkflow, signOutWorkflow, signUpWorkflow } from '../workflow/client'
+import { getWorkflowSession, signInWorkflow, signOutWorkflow } from '../workflow/client'
 
 type GateRoute = 'marketing' | 'login' | 'home' | 'account' | 'app'
 
@@ -86,12 +86,6 @@ export function AuthGate() {
     return sessionUser
   }
 
-  const signUp = async (name: string, email: string, password: string) => {
-    const sessionUser = await signUpWorkflow(email, password, name)
-    completeAuthentication(sessionUser)
-    return sessionUser
-  }
-
   const signOut = async () => {
     await signOutWorkflow()
     intendedHash.current = '#/home'
@@ -102,7 +96,7 @@ export function AuthGate() {
 
   if (route === 'marketing') return <MarketingLandingPage />
   if (checking) return <main className="auth-check-page"><div className="auth-check-card"><span className="auth-brand-mark">TS</span><h1>TowerSignal</h1><p>Verifying authenticated workspace…</p></div></main>
-  if (!user) return <AuthLandingPage initialError={sessionError} onSignIn={signIn} onSignUp={signUp} />
+  if (!user) return <AuthLandingPage initialError={sessionError} onSignIn={signIn} />
   if (route === 'login' || route === 'home') return <HomePage user={user} />
   if (route === 'account') return <UserAccountPage user={user} onSignOut={signOut} />
   return <App />

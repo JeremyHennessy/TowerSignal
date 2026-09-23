@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadKnownFirms } from '../data/api'
+import { loadCompanyAdminAccess, loadCompanyAdminDirectory } from '../companyAdmin/client'
 import type { CompanyIntelligenceRecord } from '../types/company'
+import type { CompanyAdminProfile } from '../types/companyAdmin'
 import type { KnownFirmPayload, KnownFirmRole, KnownFirmSummaryRecord } from '../types/firm'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
@@ -73,10 +75,32 @@ function compareValues(left: unknown, right: unknown): number {
   return String(left ?? '').localeCompare(String(right ?? ''), undefined, { numeric: true, sensitivity: 'base' })
 }
 
+function adminRevenue(profile: CompanyAdminProfile): string {
+  if (profile.revenue_type === 'range' && profile.revenue_low != null && profile.revenue_high != null) {
+    return `${currency.format(profile.revenue_low)}–${currency.format(profile.revenue_high)}`
+  }
+  if (profile.revenue_amount != null) return currency.format(profile.revenue_amount)
+  return 'Revenue not recorded'
+}
+
+function adminLocation(profile: CompanyAdminProfile): string {
+  return [
+    profile.headquarters_city,
+    profile.headquarters_region,
+    profile.headquarters_country,
+  ].filter(Boolean).join(', ') || profile.headquarters_address || 'Address not recorded'
+}
+
+function relationshipLabel(value: string): string {
+  return value.replaceAll('-', ' ').replace(/(^|\s)\S/g, match => match.toUpperCase())
+}
+
 export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: CompanyIntelligenceRecord) => void }) {
   void onOpenCompany
   const [payload, setPayload] = useState<KnownFirmPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [adminAccess, setAdminAccess] = useState(false)
+  const [adminProfiles, setAdminProfiles] = useState<CompanyAdminProfile[]>([])
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('ALL')
   const [relationship, setRelationship] = useState('ALL')
@@ -93,6 +117,25 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
     return () => { cancelled = true }
   }, [])
 
+  useEffect(() => {
+    let cancelled = false
+    loadCompanyAdminAccess()
+      .then(async allowed => {
+        if (cancelled || !allowed) return
+        setAdminAccess(true)
+        const profiles = await loadCompanyAdminDirectory()
+        if (!cancelled) setAdminProfiles(profiles)
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAdminAccess(false)
+          setAdminProfiles([])
+        }
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  const adminByCompanyId = useMemo(() => new Map(adminProfiles.map(profile => [profile.company_id, profile])), [adminProfiles])
   const roles = useMemo(() => payload ? [...new Set(payload.firms.flatMap(firm => firm.roles))].sort() : [], [payload])
   const filtered = useMemo(() => payload ? payload.firms.filter(firm => {
     const query = search.trim().toLowerCase()
@@ -138,6 +181,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
       <div>
         <span className="page-kicker">New York · company and service-market intelligence</span>
         <h1>Known companies &amp; firms</h1>
+        {adminAccess && <span className="company-admin-directory-badge">Admin company database · private fields enabled</span>}
         <p>One normalized list of every company or firm TowerSignal can support from public evidence: service providers, laboratories, procurement vendors, DEC 7G businesses and DOB project-role firms.</p>
       </div>
     </div>
@@ -194,6 +238,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         <th scope="col" role="columnheader"><button onClick={() => changeSort('observed_customer_count')}>Buyers{sortIndicator('observed_customer_count')}</button></th>
         <th scope="col" role="columnheader"><button onClick={() => changeSort('active_qualification_count')}>7G{sortIndicator('active_qualification_count')}</button></th>
         <th scope="col" role="columnheader"><button onClick={() => changeSort('identity_confidence')}>Identity{sortIndicator('identity_confidence')}</button></th>
+        {adminAccess && <th scope="col" role="columnheader">Admin database</th>}
         <th scope="col" role="columnheader" aria-label="Open firm" />
       </tr></thead><tbody>{visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') openFirm(firm) }}>
         <td className="account-cell firm-name-cell">
@@ -209,6 +254,15 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         <td><strong>{number.format(firm.observed_customer_count)}</strong><small>{number.format(firm.repeat_buyer_count)} repeat buyer{firm.repeat_buyer_count === 1 ? '' : 's'}</small></td>
         <td><strong>{number.format(firm.active_qualification_count)}</strong><small>{number.format(firm.qualification_count)} observed registration{firm.qualification_count === 1 ? '' : 's'}</small></td>
         <td><span className={`health-badge health-${firm.identity_confidence === 'VERIFY' || firm.identity_confidence === 'UNRESOLVED' ? 'warning' : 'healthy'}`}>{firm.identity_confidence}</span><small>{label(firm.resolution_method)}</small></td>
+        {adminAccess && (() => {
+          const profile = adminByCompanyId.get(firm.firm_id)
+          return <td className="company-admin-list-cell">{profile ? <>
+            <strong>{profile.rollup_name || profile.legal_name || firm.canonical_name}</strong>
+            <span>{profile.website ? profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '') : adminLocation(profile)}</span>
+            <small>{adminRevenue(profile)}{profile.revenue_year ? ` · ${profile.revenue_year}` : ''} · {relationshipLabel(profile.relationship_status)}</small>
+            {profile.parent_company_name && <small>Parent: {profile.parent_company_name}</small>}
+          </> : <><strong>Not enriched</strong><span>Open profile to add private company data</span></>}</td>
+        })()}
         <td className="row-arrow">›</td>
       </tr>)}</tbody></table></div>}
 
