@@ -4,6 +4,17 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { CompaniesPage } from '../../src/components/CompaniesPage'
 import { CompanyProfilePage } from '../../src/components/CompanyProfilePage'
 
+vi.mock('../../src/companyAdmin/client', () => ({
+  loadCompanyAdminAccess: vi.fn(() => Promise.resolve(false)),
+  loadCompanyAdminDirectory: vi.fn(() => Promise.resolve([])),
+  loadCompanyAdminSnapshot: vi.fn(),
+  saveCompanyAdminProfile: vi.fn(),
+  addCompanyContact: vi.fn(),
+  addCompanyActivity: vi.fn(),
+  addCompanyNote: vi.fn(),
+  updateCompanyNote: vi.fn(),
+}))
+
 vi.mock('../../src/components/FirmSiteMap', () => ({
   FirmSiteMap: () => <div role="region" aria-label="Known firm site relationship map" data-testid="firm-site-map">Map</div>,
 }))
