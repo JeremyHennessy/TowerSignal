@@ -1,0 +1,162 @@
+{
+  "field_rows": 275,
+  "sources": {
+    "dg92-zbpx": {
+      "label": "NYC City Record",
+      "published_fields": 37,
+      "requested_fields": 37,
+      "dispositions": {
+        "USED": 29,
+        "RETAINED_NOT_DISPLAYED": 8
+      },
+      "source_updated_at": 1789561954
+    },
+    "ehig-g5x3": {
+      "label": "NYS ABO State Authorities procurement",
+      "published_fields": 33,
+      "requested_fields": 33,
+      "dispositions": {
+        "USED": 17,
+        "RETAINED_NOT_DISPLAYED": 16
+      },
+      "source_updated_at": 1764609495
+    },
+    "8w5p-k45m": {
+      "label": "NYS ABO Local Authorities procurement",
+      "published_fields": 20,
+      "requested_fields": 20,
+      "dispositions": {
+        "USED": 15,
+        "RETAINED_NOT_DISPLAYED": 5
+      },
+      "source_updated_at": 1764617910
+    },
+    "d84c-dk28": {
+      "label": "NYS ABO Local Development Corporations procurement",
+      "published_fields": 20,
+      "requested_fields": 20,
+      "dispositions": {
+        "USED": 15,
+        "RETAINED_NOT_DISPLAYED": 5
+      },
+      "source_updated_at": 1764617403
+    },
+    "p3p6-xqr5": {
+      "label": "NYS ABO Industrial Development Agencies procurement",
+      "published_fields": 20,
+      "requested_fields": 20,
+      "dispositions": {
+        "USED": 15,
+        "RETAINED_NOT_DISPLAYED": 5
+      },
+      "source_updated_at": 1764618345
+    },
+    "j63k-4n92": {
+      "label": "NYS lead service-line inventory",
+      "published_fields": 25,
+      "requested_fields": 20,
+      "dispositions": {
+        "USED": 20,
+        "UNRESOLVED": 5
+      },
+      "source_updated_at": 1758225781
+    },
+    "rytv-g5ui": {
+      "label": "DOHMH drinking-water tank compliance",
+      "published_fields": 22,
+      "requested_fields": 22,
+      "dispositions": {
+        "USED": 18,
+        "RETAINED_NOT_DISPLAYED": 4
+      },
+      "source_updated_at": 1789398565
+    },
+    "8h5j-fqxa": {
+      "label": "ACRIS Real Property Legals",
+      "published_fields": 14,
+      "requested_fields": 9,
+      "dispositions": {
+        "USED": 9,
+        "UNRESOLVED": 5
+      },
+      "source_updated_at": 1788895869
+    },
+    "bnx9-e6tj": {
+      "label": "ACRIS Real Property Master",
+      "published_fields": 14,
+      "requested_fields": 11,
+      "dispositions": {
+        "USED": 11,
+        "UNRESOLVED": 3
+      },
+      "source_updated_at": 1788895961
+    },
+    "636b-3b5g": {
+      "label": "ACRIS Real Property Parties",
+      "published_fields": 11,
+      "requested_fields": 11,
+      "dispositions": {
+        "USED": 11
+      },
+      "source_updated_at": 1789481033
+    },
+    "h8u2-6ejg": {
+      "label": "DEC registered pesticide businesses",
+      "published_fields": 14,
+      "requested_fields": 14,
+      "dispositions": {
+        "USED": 10,
+        "RETAINED_NOT_DISPLAYED": 4
+      },
+      "source_updated_at": 1790154597
+    },
+    "c7db-kwpj": {
+      "label": "DEC certified pesticide applicators",
+      "published_fields": 11,
+      "requested_fields": 11,
+      "dispositions": {
+        "USED": 10,
+        "RETAINED_NOT_DISPLAYED": 1
+      },
+      "source_updated_at": 1790154611
+    },
+    "k5us-nav4": {
+      "label": "Free residential lead/copper samples",
+      "published_fields": 11,
+      "requested_fields": 11,
+      "dispositions": {
+        "USED": 11
+      },
+      "source_updated_at": 1776174992
+    },
+    "3wxk-qa8q": {
+      "label": "Lead/copper compliance samples",
+      "published_fields": 7,
+      "requested_fields": 7,
+      "dispositions": {
+        "USED": 7
+      },
+      "source_updated_at": 1765898540
+    },
+    "jqfp-uff7": {
+      "label": "NYC DEP service-line locations",
+      "published_fields": 9,
+      "requested_fields": 6,
+      "dispositions": {
+        "UNRESOLVED": 3,
+        "USED": 6
+      },
+      "source_updated_at": 1769786025
+    },
+    "x748-37q7": {
+      "label": "NYC planimetric cooling towers",
+      "published_fields": 7,
+      "requested_fields": 7,
+      "dispositions": {
+        "USED": 7
+      },
+      "source_updated_at": 1764863828
+    }
+  },
+  "boundary": "Exact schema/collector literal scan. FULL_ROW means fields arrive in fetched source rows but are not called durably retained unless normalized/stored. Flexible source aliases may require manual review even when no exact literal is found."
+}
