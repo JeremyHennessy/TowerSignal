@@ -1,0 +1,107 @@
+[
+  {
+    "file": "src/App.tsx",
+    "routes": [
+      "#/"
+    ]
+  },
+  {
+    "file": "src/auth/AuthGate.tsx",
+    "routes": [
+      "#/home"
+    ]
+  },
+  {
+    "file": "src/components/ChangesView.tsx",
+    "routes": [
+      "#/account/"
+    ]
+  },
+  {
+    "file": "src/components/ClientSiteReport.tsx",
+    "routes": [
+      "#/account/"
+    ]
+  },
+  {
+    "file": "src/components/CompaniesPage.tsx",
+    "routes": [
+      "#/company/"
+    ]
+  },
+  {
+    "file": "src/components/CompanyProfilePage.tsx",
+    "routes": [
+      "#/company/",
+      "#/account/"
+    ]
+  },
+  {
+    "file": "src/components/DetailPanel.tsx",
+    "routes": [
+      "#/account/"
+    ]
+  },
+  {
+    "file": "src/components/HomePage.tsx",
+    "routes": [
+      "#/prospect",
+      "#/monitor",
+      "#/opportunities",
+      "#/companies",
+      "#/water-quality",
+      "#/map",
+      "#/workflow"
+    ]
+  },
+  {
+    "file": "src/components/LegionellaIntelligencePanel.tsx",
+    "routes": [
+      "#/account/"
+    ]
+  },
+  {
+    "file": "src/components/MarketingLandingPage.tsx",
+    "routes": [
+      "#/login"
+    ]
+  },
+  {
+    "file": "src/components/PortalNavigation.tsx",
+    "routes": [
+      "#/prospect",
+      "#/monitor",
+      "#/map",
+      "#/opportunities",
+      "#/nys",
+      "#/nys-changes",
+      "#/companies",
+      "#/water-quality",
+      "#/portfolios",
+      "#/workflow",
+      "#/source-health",
+      "#/prospect?search=",
+      "#/home",
+      "#/my-account"
+    ]
+  },
+  {
+    "file": "src/components/PortfoliosPage.tsx",
+    "routes": [
+      "#/portfolios?owner="
+    ]
+  },
+  {
+    "file": "src/components/TopNavigation.tsx",
+    "routes": [
+      "#/home",
+      "#/my-account"
+    ]
+  },
+  {
+    "file": "src/domain/accountMode.ts",
+    "routes": [
+      "#/"
+    ]
+  }
+]

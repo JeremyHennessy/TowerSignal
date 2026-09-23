@@ -1,0 +1,32 @@
+{
+  "runtime_source_files": 89,
+  "jsx_expression_fields": 3041,
+  "report_export_fields": 7,
+  "deduplicated_application_expression_records": 3021,
+  "records_with_direct_core_source_name_candidates": 330,
+  "records_without_direct_core_source_name_candidates": 2691,
+  "route_literal_files": 14,
+  "route_literals": [
+    "#/",
+    "#/account/",
+    "#/companies",
+    "#/company/",
+    "#/home",
+    "#/login",
+    "#/map",
+    "#/monitor",
+    "#/my-account",
+    "#/nys",
+    "#/nys-changes",
+    "#/opportunities",
+    "#/portfolios",
+    "#/portfolios?owner=",
+    "#/prospect",
+    "#/prospect?search=",
+    "#/source-health",
+    "#/water-quality",
+    "#/workflow"
+  ],
+  "denominator_definition": "Unique current-runtime JSX expression sites excluding event handlers plus explicit report/export object-field mappings. This is an application-expression denominator, not a claim that each expression is a distinct business concept.",
+  "verification_boundary": "Every record is individually inventoried with component/file/line/expression. Hosted state/rendering and backward source meaning require separate per-record statuses."
+}

@@ -1,0 +1,1342 @@
+[
+  {
+    "from": "src/App.tsx",
+    "module": "./data/api",
+    "names": "{ loadChanges, loadNysChanges, loadNysSystems, loadSystems }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./types/data",
+    "names": "{ SystemSummary, SystemsPayload }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./types/acris",
+    "names": "{ AcrisMetadataFields, AcrisPayloadSummaryFields }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./types/history",
+    "names": "{ ChangesPayload }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./types/nys",
+    "names": "{ NysChangesPayload, NysSystem, NysSystemsPayload }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./types/company",
+    "names": "{ CompanyIntelligenceRecord }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./domain/labels",
+    "names": "{ formatTimestamp }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./domain/prospectPreset",
+    "names": "{ normalizeProspectPreset, type ProspectPreset }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./domain/accountMode",
+    "names": "{ accountHashWithView, accountViewFromHash, normalizeAccountView, type AccountView }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/ChangesView",
+    "names": "{ ChangesView }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/DetailPanel",
+    "names": "{ DetailPanel }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/Filters",
+    "names": "{ Filters, filterSystems, initialFilters, type FilterState }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/NysChangesView",
+    "names": "{ NysChangesView }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/NysDetailPanel",
+    "names": "{ NysDetailPanel }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/NysRegistryView",
+    "names": "{ NysRegistryView }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/SystemTable",
+    "names": "{ SystemTable }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/TowerMap",
+    "names": "{ TowerMap }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/WorkflowAccountSection",
+    "names": "{ WorkflowAccountSection }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/WorkflowPanel",
+    "names": "{ WorkflowPanel }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/OpportunitiesPage",
+    "names": "{ OpportunitiesPage }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/CompaniesPage",
+    "names": "{ CompaniesPage }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/CompanyProfilePage",
+    "names": "{ CompanyProfilePage }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/PortfoliosPage",
+    "names": "{ PortfoliosPage }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/SourceHealthPage",
+    "names": "{ SourceHealthPage }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/WaterQualityPage",
+    "names": "{ WaterQualityPage }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/WorkflowWorkspacePage",
+    "names": "{ WorkflowWorkspacePage }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./components/TopNavigation",
+    "names": "{ TopNavigation, type WorkspaceMode }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./utils/export",
+    "names": "{ exportCsv }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./utils/workflowExport",
+    "names": "{ exportWorkflowCsv }"
+  },
+  {
+    "from": "src/App.tsx",
+    "module": "./workflow/useWorkflow",
+    "names": "{ useWorkflow }"
+  },
+  {
+    "from": "src/auth/AuthGate.tsx",
+    "module": "../App",
+    "names": "App"
+  },
+  {
+    "from": "src/auth/AuthGate.tsx",
+    "module": "../components/AuthLandingPage",
+    "names": "{ AuthLandingPage }"
+  },
+  {
+    "from": "src/auth/AuthGate.tsx",
+    "module": "../components/HomePage",
+    "names": "{ HomePage }"
+  },
+  {
+    "from": "src/auth/AuthGate.tsx",
+    "module": "../components/MarketingLandingPage",
+    "names": "{ MarketingLandingPage }"
+  },
+  {
+    "from": "src/auth/AuthGate.tsx",
+    "module": "../components/UserAccountPage",
+    "names": "{ UserAccountPage }"
+  },
+  {
+    "from": "src/auth/AuthGate.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowUser }"
+  },
+  {
+    "from": "src/auth/AuthGate.tsx",
+    "module": "../workflow/client",
+    "names": "{ getWorkflowSession, signInWorkflow, signOutWorkflow, signUpWorkflow }"
+  },
+  {
+    "from": "src/components/AccountDecisionSummary.tsx",
+    "module": "../types/history",
+    "names": "{ ChangeEvent }"
+  },
+  {
+    "from": "src/components/AccountDecisionSummary.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail, SystemSummary }"
+  },
+  {
+    "from": "src/components/AccountDecisionSummary.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowAccountState }"
+  },
+  {
+    "from": "src/components/AccountDecisionSummary.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, signalLabel }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "../data/api",
+    "names": "{ loadSystemDetail }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "../domain/accountEvidence",
+    "names": "{ collectAccountFirmRoleEvidence }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "../domain/procurementFirmRoles",
+    "names": "{ collectProcurementFirmRoleEvidence }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "../types/procurement",
+    "names": "{ ProcurementRecord }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "../types/enforcement",
+    "names": "{ PropertyEnforcementContext }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "./BuildingWaterSignalsSection",
+    "names": "{ BuildingWaterSignalsSection }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "./DomesticWaterSection",
+    "names": "{ DomesticWaterSection, type SystemDetailWithDomesticWater }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "./InstitutionalFacilitySection",
+    "names": "{ InstitutionalFacilitySection }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "./LeadServiceLineSection",
+    "names": "{ LeadServiceLineSection }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "./LegacyDobProjectSection",
+    "names": "{ LegacyDobProjectSection }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "./OfficialSwoSnapshotSection",
+    "names": "{ OfficialSwoSnapshotSection }"
+  },
+  {
+    "from": "src/components/AccountEvidenceWorkspace.tsx",
+    "module": "../data/accountProcurement",
+    "names": "{ loadAccountProcurementManifest, loadAccountProcurementPage, type AccountProcurementManifest }"
+  },
+  {
+    "from": "src/components/AccountModeTabs.tsx",
+    "module": "../domain/accountMode",
+    "names": "{ accountHashWithView, accountViewFromHash, type AccountView }"
+  },
+  {
+    "from": "src/components/AccountModeTabs.tsx",
+    "module": "./AccountEvidenceWorkspace",
+    "names": "{ AccountEvidenceWorkspace }"
+  },
+  {
+    "from": "src/components/AccountUnifiedTimeline.tsx",
+    "module": "../types/history",
+    "names": "{ ChangeEvent }"
+  },
+  {
+    "from": "src/components/AccountUnifiedTimeline.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/AccountUnifiedTimeline.tsx",
+    "module": "../types/acris",
+    "names": "{ AcrisPropertyActivity }"
+  },
+  {
+    "from": "src/components/AccountUnifiedTimeline.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/AcrisActivitySection.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/AcrisActivitySection.tsx",
+    "module": "../types/data",
+    "names": "{ Metadata, SystemDetail, SystemSummary }"
+  },
+  {
+    "from": "src/components/AcrisActivitySection.tsx",
+    "module": "../types/acris",
+    "names": "{ AcrisMetadataFields, AcrisPropertyActivity, AcrisSummaryFields }"
+  },
+  {
+    "from": "src/components/AuthLandingPage.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowUser }"
+  },
+  {
+    "from": "src/components/BuildingWaterSignalsSection.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/BuildingWaterSignalsSection.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/ChangesView.tsx",
+    "module": "../types/history",
+    "names": "{ ChangeEvent, ChangeEventType, ChangesPayload }"
+  },
+  {
+    "from": "src/components/ChangesView.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/ChangesView.tsx",
+    "module": "../domain/changePresentation",
+    "names": "{ compareEventDates, eventDate, evidenceLabel, inSourceRange, readableValue, recordValue, sourceLabel }"
+  },
+  {
+    "from": "src/components/ChangesView.tsx",
+    "module": "../domain/monitorFields",
+    "names": "{ monitorFields }"
+  },
+  {
+    "from": "src/components/ChangesView.tsx",
+    "module": "./StatusBadge",
+    "names": "{ StatusBadge }"
+  },
+  {
+    "from": "src/components/ClientSiteReport.tsx",
+    "module": "../types/history",
+    "names": "{ ChangeEvent }"
+  },
+  {
+    "from": "src/components/ClientSiteReport.tsx",
+    "module": "../types/data",
+    "names": "{ Metadata, SystemDetail, SystemSummary }"
+  },
+  {
+    "from": "src/components/ClientSiteReport.tsx",
+    "module": "../utils/accountReportModel",
+    "names": "{ reportDate, reportGeometry, reportModel, reportMoney, reportName, reportNumber }"
+  },
+  {
+    "from": "src/components/CompaniesPage.tsx",
+    "module": "../data/api",
+    "names": "{ loadKnownFirms }"
+  },
+  {
+    "from": "src/components/CompaniesPage.tsx",
+    "module": "../types/company",
+    "names": "{ CompanyIntelligenceRecord }"
+  },
+  {
+    "from": "src/components/CompaniesPage.tsx",
+    "module": "../types/firm",
+    "names": "{ KnownFirmPayload, KnownFirmRole, KnownFirmSummaryRecord }"
+  },
+  {
+    "from": "src/components/CompaniesPage.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/CompaniesPage.tsx",
+    "module": "./ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "../data/api",
+    "names": "{ loadKnownFirmDetail, loadProcurement, loadSystems }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "../types/company",
+    "names": "{ CompanyIntelligenceRecord }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "../types/firm",
+    "names": "{ KnownFirmDetailPayload, KnownFirmRole, KnownFirmSiteRelationship }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "../types/procurement",
+    "names": "{ ProcurementBundle, ProcurementRecord }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, signalLabel }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "./ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "./FirmSiteMap",
+    "names": "{ FirmSiteMap }"
+  },
+  {
+    "from": "src/components/CompanyProfilePage.tsx",
+    "module": "./StatusBadge",
+    "names": "{ StatusBadge }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./OfficialBuildingEvidence",
+    "names": "{ OfficialBuildingEvidence }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./OfficialSwoSnapshotSection",
+    "names": "{ OfficialSwoSnapshotSection }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./ScoreExplanation",
+    "names": "{ ScoreExplanation }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "../types/enforcement",
+    "names": "{ LegionellaBuildingLink }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "../data/api",
+    "names": "{ loadSystemDetail }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "../utils/export",
+    "names": "{ leadSummary }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "../utils/prepareAccountReport",
+    "names": "{ prepareAccountReport }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "../types/data",
+    "names": "{ Metadata, SystemDetail, SystemSummary }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "../types/history",
+    "names": "{ ChangeEvent }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowAccountState }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./StatusBadge",
+    "names": "{ StatusBadge }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./AcrisActivitySection",
+    "names": "{ AcrisActivitySection }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./PlanimetricTowerSection",
+    "names": "{ PlanimetricTowerSection }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./TechnicianFieldPack",
+    "names": "{ TechnicianFieldPack }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./BuildingWaterSignalsSection",
+    "names": "{ BuildingWaterSignalsSection }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./HistoricalWaterContextSection",
+    "names": "{ HistoricalWaterContextSection }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./InstitutionalFacilitySection",
+    "names": "{ InstitutionalFacilitySection }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./LeadServiceLineSection",
+    "names": "{ LeadServiceLineSection }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./LegacyDobProjectSection",
+    "names": "{ LegacyDobProjectSection }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./AccountDecisionSummary",
+    "names": "{ AccountDecisionSummary }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./AccountModeTabs",
+    "names": "{ AccountModeTabs }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./AccountUnifiedTimeline",
+    "names": "{ AccountUnifiedTimeline }"
+  },
+  {
+    "from": "src/components/DetailPanel.tsx",
+    "module": "./ClientSiteReport",
+    "names": "{ ClientSiteReport }"
+  },
+  {
+    "from": "src/components/DomesticWaterSection.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/Filters.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/components/Filters.tsx",
+    "module": "../types/acris",
+    "names": "{ AcrisSummaryFields }"
+  },
+  {
+    "from": "src/components/Filters.tsx",
+    "module": "../types/enforcement",
+    "names": "{ PropertyEnforcementSummaryFields }"
+  },
+  {
+    "from": "src/components/FirmSiteMap.tsx",
+    "module": "../types/firm",
+    "names": "{ KnownFirmSiteRelationship }"
+  },
+  {
+    "from": "src/components/HistoricalWaterContextSection.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/HistoricalWaterContextSection.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/HomePage.tsx",
+    "module": "../data/api",
+    "names": "{ loadChanges, loadCompanies, loadProcurement, loadSystems }"
+  },
+  {
+    "from": "src/components/HomePage.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowUser }"
+  },
+  {
+    "from": "src/components/HomePage.tsx",
+    "module": "./PortalNavigation",
+    "names": "{ PortalNavigation }"
+  },
+  {
+    "from": "src/components/HomePage.tsx",
+    "module": "./LegionellaIntelligencePanel",
+    "names": "{ LegionellaIntelligencePanel }"
+  },
+  {
+    "from": "src/components/InstitutionalFacilitySection.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/LaborLawDecisionSection.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/LaborLawDecisionSection.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/LeadServiceLineSection.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatTimestamp }"
+  },
+  {
+    "from": "src/components/LeadServiceLineSection.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/LegacyDobProjectSection.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/LegacyDobProjectSection.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/LegionellaIntelligencePanel.tsx",
+    "module": "../types/enforcement",
+    "names": "{ LegionellaAlertPayload }"
+  },
+  {
+    "from": "src/components/LegionellaIntelligencePanel.tsx",
+    "module": "../types/legionellaIntelligence",
+    "names": "{ LegionellaPropertyMatches }"
+  },
+  {
+    "from": "src/components/LegionellaIntelligencePanel.tsx",
+    "module": "../utils/legionellaIntelligence",
+    "names": "{ displayHeadline, officialDate, publicationKind, relatedEvidence, resultLabel }"
+  },
+  {
+    "from": "src/components/NysChangesView.tsx",
+    "module": "../types/nys",
+    "names": "{ NysChangeEvent, NysChangeEventType, NysChangesPayload, NysSystem }"
+  },
+  {
+    "from": "src/components/NysChangesView.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/NysDetailPanel.tsx",
+    "module": "../types/nys",
+    "names": "{ NysMetadata, NysSystem }"
+  },
+  {
+    "from": "src/components/NysDetailPanel.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/NysRegistryView.tsx",
+    "module": "../types/nys",
+    "names": "{ NysSystem, NysSystemsPayload }"
+  },
+  {
+    "from": "src/components/NysRegistryView.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatTimestamp }"
+  },
+  {
+    "from": "src/components/NysRegistryView.tsx",
+    "module": "./NysTowerMap",
+    "names": "{ NysTowerMap }"
+  },
+  {
+    "from": "src/components/NysRegistryView.tsx",
+    "module": "./NysSystemTable",
+    "names": "{ NysSystemTable }"
+  },
+  {
+    "from": "src/components/NysRegistryView.tsx",
+    "module": "./NysWaterMarketSubViews",
+    "names": "{ NysWaterMarketSubViews, type NysWaterSubview }"
+  },
+  {
+    "from": "src/components/NysSystemTable.tsx",
+    "module": "../types/nys",
+    "names": "{ NysSystem }"
+  },
+  {
+    "from": "src/components/NysSystemTable.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/NysTowerMap.tsx",
+    "module": "../types/nys",
+    "names": "{ NysSystem }"
+  },
+  {
+    "from": "src/components/NysWaterMarketSubViews.tsx",
+    "module": "../data/api",
+    "names": "{ loadNysLsliDetails, loadNysPublicWater, loadNysServiceLineSummary }"
+  },
+  {
+    "from": "src/components/NysWaterMarketSubViews.tsx",
+    "module": "../types/water",
+    "names": "{ LsliDetailRecord, NysLsliDetailPayload, NysPublicWaterPayload, NysServiceLineInventorySummaryPayload }"
+  },
+  {
+    "from": "src/components/NysWaterMarketSubViews.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatTimestamp }"
+  },
+  {
+    "from": "src/components/OfficialBuildingEvidence.tsx",
+    "module": "../types/enforcement",
+    "names": "{ LegionellaBuildingLink }"
+  },
+  {
+    "from": "src/components/OfficialBuildingEvidence.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/OfficialSwoSnapshotSection.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/OfficialSwoSnapshotSection.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/OfficialSwoSnapshotSection.tsx",
+    "module": "./LaborLawDecisionSection",
+    "names": "{ LaborLawDecisionSection }"
+  },
+  {
+    "from": "src/components/OpportunitiesPage.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary, SystemsPayload }"
+  },
+  {
+    "from": "src/components/OpportunitiesPage.tsx",
+    "module": "../types/acris",
+    "names": "{ AcrisSummaryFields }"
+  },
+  {
+    "from": "src/components/OpportunitiesPage.tsx",
+    "module": "../types/procurement",
+    "names": "{ ProcurementBundle, ProcurementRecord }"
+  },
+  {
+    "from": "src/components/OpportunitiesPage.tsx",
+    "module": "../data/api",
+    "names": "{ loadProcurement }"
+  },
+  {
+    "from": "src/components/OpportunitiesPage.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/OpportunitiesPage.tsx",
+    "module": "./ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/PlanimetricTowerSection.tsx",
+    "module": "./DomesticWaterSection",
+    "names": "{ DomesticWaterSection, type SystemDetailWithDomesticWater }"
+  },
+  {
+    "from": "src/components/PortalNavigation.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowUser }"
+  },
+  {
+    "from": "src/components/PortfoliosPage.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary, SystemsPayload }"
+  },
+  {
+    "from": "src/components/PortfoliosPage.tsx",
+    "module": "../types/acris",
+    "names": "{ AcrisSummaryFields }"
+  },
+  {
+    "from": "src/components/PortfoliosPage.tsx",
+    "module": "./ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/SalesPreCallPack.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/SalesPreCallPack.tsx",
+    "module": "../types/acris",
+    "names": "{ AcrisPropertyActivity, AcrisSummaryFields }"
+  },
+  {
+    "from": "src/components/SalesPreCallPack.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/components/SalesPreCallPack.tsx",
+    "module": "./DomesticWaterSection",
+    "names": "{ SystemDetailWithDomesticWater }"
+  },
+  {
+    "from": "src/components/SalesPreCallPack.tsx",
+    "module": "./AccountSectionNavigator",
+    "names": "{ AccountSectionNavigator }"
+  },
+  {
+    "from": "src/components/SalesPreCallPack.tsx",
+    "module": "./salesKnownFirms",
+    "names": "{ collectKnownAccountFirms, type SalesKnownFirm }"
+  },
+  {
+    "from": "src/components/ScoreExplanation.tsx",
+    "module": "../types/data",
+    "names": "{ SystemDetail }"
+  },
+  {
+    "from": "src/components/ScoreExplanation.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/SourceHealthExpansion.tsx",
+    "module": "../types/data",
+    "names": "{ SystemsPayload }"
+  },
+  {
+    "from": "src/components/SourceHealthExpansion.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatTimestamp }"
+  },
+  {
+    "from": "src/components/SourceHealthExpansion.tsx",
+    "module": "../domain/sourceHealthExpansion",
+    "names": "{ countOrNull, enforcementCoverage, legionellaChannelRows, parseLegionellaHealth, safeSourceUrl, timestampOrNull, type LegionellaHealthPayload }"
+  },
+  {
+    "from": "src/components/SourceHealthPage.tsx",
+    "module": "../types/data",
+    "names": "{ SystemsPayload }"
+  },
+  {
+    "from": "src/components/SourceHealthPage.tsx",
+    "module": "../types/procurement",
+    "names": "{ ProcurementBundle, ProcurementSourceHealth }"
+  },
+  {
+    "from": "src/components/SourceHealthPage.tsx",
+    "module": "../types/coverage",
+    "names": "{ CoverageAuditPayload }"
+  },
+  {
+    "from": "src/components/SourceHealthPage.tsx",
+    "module": "../data/api",
+    "names": "{ loadCoverageAudit, loadProcurement }"
+  },
+  {
+    "from": "src/components/SourceHealthPage.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatTimestamp }"
+  },
+  {
+    "from": "src/components/SourceHealthPage.tsx",
+    "module": "../domain/sourceHealthExpansion",
+    "names": "{ safeSourceUrl }"
+  },
+  {
+    "from": "src/components/SourceHealthPage.tsx",
+    "module": "./ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/SourceHealthPage.tsx",
+    "module": "./SourceHealthExpansion",
+    "names": "{ SourceHealthExpansion }"
+  },
+  {
+    "from": "src/components/StatusBadge.tsx",
+    "module": "../types/data",
+    "names": "{ EvidenceConfidence }"
+  },
+  {
+    "from": "src/components/SystemTable.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/components/SystemTable.tsx",
+    "module": "../data/api",
+    "names": "{ loadDomesticWaterMarket }"
+  },
+  {
+    "from": "src/components/SystemTable.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, signalLabel }"
+  },
+  {
+    "from": "src/components/SystemTable.tsx",
+    "module": "../domain/prospectPreset",
+    "names": "{ exactDomesticWaterProperty, indexDomesticWaterProperties, normalizeProspectPreset, prospectPresets, type DomesticWaterMarketWithProperties, type ProspectPreset, type ProspectSystemSummary }"
+  },
+  {
+    "from": "src/components/SystemTable.tsx",
+    "module": "./StatusBadge",
+    "names": "{ StatusBadge }"
+  },
+  {
+    "from": "src/components/TechnicianFieldPack.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/components/TechnicianFieldPack.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/components/TechnicianFieldPack.tsx",
+    "module": "../types/enforcement",
+    "names": "{ PropertyEnforcementContext }"
+  },
+  {
+    "from": "src/components/TechnicianFieldPack.tsx",
+    "module": "./DomesticWaterSection",
+    "names": "{ SystemDetailWithDomesticWater }"
+  },
+  {
+    "from": "src/components/TechnicianFieldPack.tsx",
+    "module": "./SalesPreCallPack",
+    "names": "{ SalesPreCallPack }"
+  },
+  {
+    "from": "src/components/TopNavigation.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowUser }"
+  },
+  {
+    "from": "src/components/TopNavigation.tsx",
+    "module": "./ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/TowerMap.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/components/UserAccountPage.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowUser }"
+  },
+  {
+    "from": "src/components/UserAccountPage.tsx",
+    "module": "./PortalNavigation",
+    "names": "{ PortalNavigation }"
+  },
+  {
+    "from": "src/components/WaterQualityPage.tsx",
+    "module": "../data/api",
+    "names": "{ loadNycDistributionWater, loadNysLsliDetails, loadNysPublicWater, loadNysServiceLineSummary }"
+  },
+  {
+    "from": "src/components/WaterQualityPage.tsx",
+    "module": "../types/water",
+    "names": "{ LsliDetailRecord, NysLsliDetailPayload, NysPublicWaterPayload, NysServiceLineInventorySummaryPayload, NycDistributionWaterPayload }"
+  },
+  {
+    "from": "src/components/WaterQualityPage.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/WaterQualityPage.tsx",
+    "module": "./ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/WorkflowAccountSection.tsx",
+    "module": "../types/workflow",
+    "names": "{ AccountDisposition, WorkflowAccountPatch, WorkflowAccountState, WorkflowWatchlist }"
+  },
+  {
+    "from": "src/components/WorkflowAuthPanel.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowUser }"
+  },
+  {
+    "from": "src/components/WorkflowPanel.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowUser, WorkflowWatchlist }"
+  },
+  {
+    "from": "src/components/WorkflowQuickEditor.tsx",
+    "module": "../types/workflow",
+    "names": "{ AccountDisposition, WorkflowAccountPatch, WorkflowAccountState, WorkflowWatchlist }"
+  },
+  {
+    "from": "src/components/WorkflowQuickEditor.tsx",
+    "module": "../workflow/useWorkflow",
+    "names": "{ WorkflowSaveResult }"
+  },
+  {
+    "from": "src/components/WorkflowScaleWorkspace.tsx",
+    "module": "../types/history",
+    "names": "{ ChangeEvent }"
+  },
+  {
+    "from": "src/components/WorkflowScaleWorkspace.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/components/WorkflowScaleWorkspace.tsx",
+    "module": "../types/workflow",
+    "names": "{ AccountDisposition, WorkflowAccountPatch, WorkflowAccountState, WorkflowMembership, WorkflowSavedView, WorkflowWatchlist }"
+  },
+  {
+    "from": "src/components/WorkflowScaleWorkspace.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, signalLabel }"
+  },
+  {
+    "from": "src/components/WorkflowScaleWorkspace.tsx",
+    "module": "./TowerMap",
+    "names": "{ TowerMap }"
+  },
+  {
+    "from": "src/components/WorkflowScaleWorkspace.tsx",
+    "module": "./WorkflowQuickEditor",
+    "names": "{ WorkflowQuickEditor }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "../types/acris",
+    "names": "{ AcrisSummaryFields }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "../types/history",
+    "names": "{ ChangeEvent, ChangesPayload }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "../types/workflow",
+    "names": "{ WorkflowAccountPatch, WorkflowAccountState, WorkflowMembership, WorkflowSavedView, WorkflowUser, WorkflowWatchlist }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "../workflow/useWorkflow",
+    "names": "{ WorkflowSaveResult }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "../data/api",
+    "names": "{ loadChanges }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "../domain/labels",
+    "names": "{ formatDate, formatTimestamp }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "./ShareButton",
+    "names": "{ ShareButton }"
+  },
+  {
+    "from": "src/components/WorkflowWorkspacePage.tsx",
+    "module": "./WorkflowScaleWorkspace",
+    "names": "{ WorkflowScaleWorkspace }"
+  },
+  {
+    "from": "src/components/salesKnownFirms.ts",
+    "module": "./DomesticWaterSection",
+    "names": "{ SystemDetailWithDomesticWater }"
+  },
+  {
+    "from": "src/data/accountProcurement.ts",
+    "module": "../types/procurement",
+    "names": "{ ProcurementRecord }"
+  },
+  {
+    "from": "src/data/api.ts",
+    "module": "../types/data",
+    "names": "{ SystemDetail, SystemsPayload }"
+  },
+  {
+    "from": "src/data/api.ts",
+    "module": "../types/history",
+    "names": "{ ChangesPayload }"
+  },
+  {
+    "from": "src/data/api.ts",
+    "module": "../types/nys",
+    "names": "{ NysChangesPayload, NysSystemsPayload }"
+  },
+  {
+    "from": "src/data/api.ts",
+    "module": "../types/procurement",
+    "names": "{ CheckbookProcurementPayload, CityRecordProcurementPayload, NysAuthorityProcurementPayload, NychaWaterPayload, OpenBookWaterPayload, ProcurementBundle }"
+  },
+  {
+    "from": "src/data/api.ts",
+    "module": "../types/company",
+    "names": "{ CompanyIntelligencePayload }"
+  },
+  {
+    "from": "src/data/api.ts",
+    "module": "../types/firm",
+    "names": "{ KnownFirmDetailPayload, KnownFirmPayload }"
+  },
+  {
+    "from": "src/data/api.ts",
+    "module": "../types/water",
+    "names": "{ DomesticWaterMarketPayload, ElapProbePayload, NysLsliDetailPayload, NysPublicWaterPayload, NysServiceLineInventorySummaryPayload, NycDistributionWaterPayload, NycWaterSignalsPayload, ProviderResolutionPayload }"
+  },
+  {
+    "from": "src/data/api.ts",
+    "module": "../types/coverage",
+    "names": "{ CoverageAuditPayload }"
+  },
+  {
+    "from": "src/domain/accountEvidence.ts",
+    "module": "../types/procurement",
+    "names": "{ ProcurementBundle, ProcurementRecord }"
+  },
+  {
+    "from": "src/domain/accountEvidence.ts",
+    "module": "../components/DomesticWaterSection",
+    "names": "{ SystemDetailWithDomesticWater }"
+  },
+  {
+    "from": "src/domain/accountEvidence.ts",
+    "module": "../components/salesKnownFirms",
+    "names": "{ collectKnownAccountFirms, knownFirmKey }"
+  },
+  {
+    "from": "src/domain/changePresentation.ts",
+    "module": "../types/history",
+    "names": "{ ChangeEvent }"
+  },
+  {
+    "from": "src/domain/monitorFields.ts",
+    "module": "../types/history",
+    "names": "{ ChangeEvent }"
+  },
+  {
+    "from": "src/domain/monitorFields.ts",
+    "module": "./labels",
+    "names": "{ formatDate }"
+  },
+  {
+    "from": "src/domain/monitorFields.ts",
+    "module": "./changePresentation",
+    "names": "{ readableValue, recordValue, sourceDay }"
+  },
+  {
+    "from": "src/domain/procurementFirmRoles.ts",
+    "module": "../types/procurement",
+    "names": "{ ProcurementRecord }"
+  },
+  {
+    "from": "src/domain/prospectPreset.ts",
+    "module": "../types/acris",
+    "names": "{ AcrisSummaryFields }"
+  },
+  {
+    "from": "src/domain/prospectPreset.ts",
+    "module": "../types/data",
+    "names": "{ SystemSummary }"
+  },
+  {
+    "from": "src/domain/prospectPreset.ts",
+    "module": "../types/enforcement",
+    "names": "{ PropertyEnforcementSummaryFields }"
+  },
+  {
+    "from": "src/domain/prospectPreset.ts",
+    "module": "../types/water",
+    "names": "{ DomesticWaterMarketPayload }"
+  },
+  {
+    "from": "src/domain/sourceHealthExpansion.ts",
+    "module": "../types/data",
+    "names": "{ SourceMetadata, SystemsPayload }"
+  },
+  {
+    "from": "src/domain/sourceHealthExpansion.ts",
+    "module": "../types/enforcement",
+    "names": "{ PropertyEnforcementSummaryFields }"
+  },
+  {
+    "from": "src/main.tsx",
+    "module": "./auth/AuthGate",
+    "names": "{ AuthGate }"
+  },
+  {
+    "from": "src/types/history.ts",
+    "module": "./data",
+    "names": "{ EvidenceConfidence }"
+  },
+  {
+    "from": "src/types/nys.ts",
+    "module": "./data",
+    "names": "{ CoordinateStatus, SourceHealthEntry }"
+  },
+  {
+    "from": "src/types/water.ts",
+    "module": "./procurement",
+    "names": "{ ProcurementConfidence }"
+  },
+  {
+    "from": "src/types/workflow.ts",
+    "module": "../components/Filters",
+    "names": "{ FilterState }"
+  },
+  {
+    "from": "src/utils/accountReportModel.ts",
+    "module": "../types/data",
+    "names": "{ Metadata, SystemDetail, SystemSummary, Violation, PlanimetricGeometry }"
+  },
+  {
+    "from": "src/utils/export.ts",
+    "module": "../types/data",
+    "names": "{ Metadata, SystemDetail, SystemSummary }"
+  },
+  {
+    "from": "src/utils/export.ts",
+    "module": "../types/acris",
+    "names": "{ AcrisMetadataFields, AcrisPropertyActivity, AcrisSummaryFields }"
+  },
+  {
+    "from": "src/utils/export.ts",
+    "module": "../domain/labels",
+    "names": "{ signalLabel }"
+  },
+  {
+    "from": "src/utils/legionellaIntelligence.ts",
+    "module": "../types/enforcement",
+    "names": "{ LegionellaAlertItem }"
+  },
+  {
+    "from": "src/utils/legionellaIntelligence.ts",
+    "module": "../types/legionellaIntelligence",
+    "names": "{ LegionellaPropertyMatches }"
+  },
+  {
+    "from": "src/utils/workflowExport.ts",
+    "module": "../types/data",
+    "names": "{ Metadata, SystemSummary }"
+  },
+  {
+    "from": "src/utils/workflowExport.ts",
+    "module": "../types/workflow",
+    "names": "{ WorkflowAccountState, WorkflowMembership, WorkflowWatchlist }"
+  },
+  {
+    "from": "src/workflow/client.ts",
+    "module": "../types/workflow",
+    "names": "{ WorkflowAccountPatch, WorkflowSavedView, WorkflowUser, WorkflowWatchlist }"
+  },
+  {
+    "from": "src/workflow/client.ts",
+    "module": "./remoteClient",
+    "names": "* as remote"
+  },
+  {
+    "from": "src/workflow/remoteClient.ts",
+    "module": "../types/workflow",
+    "names": "{ WorkflowAccountPatch, WorkflowAccountState, WorkflowSavedView, WorkflowSnapshot, WorkflowUser, WorkflowWatchlist, }"
+  },
+  {
+    "from": "src/workflow/useWorkflow.ts",
+    "module": "../components/Filters",
+    "names": "{ initialFilters, type FilterState }"
+  },
+  {
+    "from": "src/workflow/useWorkflow.ts",
+    "module": "../types/workflow",
+    "names": "{ WorkflowAccountPatch, WorkflowAccountState, WorkflowMembership, WorkflowSavedView, WorkflowUser, WorkflowWatchlist, }"
+  },
+  {
+    "from": "src/workflow/useWorkflow.ts",
+    "module": "./client",
+    "names": "{ createRemoteWatchlist, deleteRemoteView, deleteRemoteWatchlist, getWorkflowSession, loadWorkflowSnapshot, saveRemoteAccount, saveRemoteView, setRemoteMembership, signInWorkflow, signOutWorkflow, signUpWorkflow, workflowRuntimeEnabled, }"
+  }
+]
