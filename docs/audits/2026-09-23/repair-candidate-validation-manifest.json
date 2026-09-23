@@ -1,0 +1,72 @@
+{
+  "recorded_at": "2026-09-23T17:16:00Z",
+  "production_base": "952ac2e8c7b48d01029e279c1c5a74791623fef6",
+  "merged_or_deployed": false,
+  "candidates": [
+    {
+      "defect": "Firm-site identity accepts borough-only placeholder BINs",
+      "branch": "repair/firm-site-identity-20260923",
+      "head": "aa7368b8e925e543cc4bd7072f7297c5a3b1802d",
+      "workflow_run": 35893807985,
+      "conclusion": "success",
+      "targeted_tests": {
+        "count": 5,
+        "status": "passed"
+      },
+      "full_python_suite": {
+        "count": 518,
+        "status": "passed"
+      },
+      "changed_product_files": [
+        "scripts/towersignal/known_firms.py"
+      ],
+      "acceptance_boundary": "Logic/unit regression only. No production artifact, hosted browser, company-page visual or full generated known-firm population comparison yet."
+    },
+    {
+      "defect": "DOB water-role provenance hardcodes exact BBL for BIN-linked records",
+      "branch": "repair/dob-provenance-20260923",
+      "head": "44efca38840840162b24ecd8795848255d509755",
+      "workflow_run": 35893812425,
+      "conclusion": "success",
+      "targeted_tests": {
+        "count": 2,
+        "status": "passed"
+      },
+      "lint": "passed",
+      "typecheck": "passed",
+      "full_frontend_suite": {
+        "files": 26,
+        "tests": 112,
+        "status": "passed"
+      },
+      "changed_product_files": [
+        "src/domain/accountEvidence.ts",
+        "src/components/salesKnownFirms.ts"
+      ],
+      "acceptance_boundary": "Client logic regression only. No hosted authenticated account/firm renderer or PDF acceptance yet."
+    },
+    {
+      "defect": "DOB building-water preview orders jobs before permits then truncates at eight",
+      "branch": "repair/building-water-preview-20260923",
+      "head": "711f6717c478056b5d509b9ff595a55402d09e27",
+      "workflow_run": 35893818284,
+      "conclusion": "success",
+      "targeted_tests": {
+        "count": 1,
+        "status": "passed"
+      },
+      "lint": "passed",
+      "typecheck": "passed",
+      "full_frontend_suite": {
+        "files": 26,
+        "tests": 111,
+        "status": "passed"
+      },
+      "changed_product_files": [
+        "src/components/BuildingWaterSignalsSection.tsx"
+      ],
+      "acceptance_boundary": "Component regression only. Approved visual/PDF appearance and hosted account-state acceptance remain required."
+    }
+  ],
+  "note": "All candidates remain isolated. Green candidate tests are not authorization to merge or deploy."
+}
