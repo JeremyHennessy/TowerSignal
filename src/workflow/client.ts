@@ -22,12 +22,6 @@ export async function signInWorkflow(email: string, password: string): Promise<W
   return user
 }
 
-export async function signUpWorkflow(email: string, password: string, name?: string): Promise<WorkflowUser> {
-  const user = await remote.signUpWorkflow(email, password, name)
-  inMemorySessionUser = user
-  return user
-}
-
 export async function signOutWorkflow(): Promise<void> {
   await remote.signOutWorkflow()
   inMemorySessionUser = null
