@@ -13,6 +13,7 @@ from towersignal.acris import build_recent_cache, normalize_bbl, validate_cache_
 from towersignal.bbl_identity import apply_bbl_identity_recovery  # noqa: E402
 from towersignal.building_footprints import fetch_building_footprints_by_bin  # noqa: E402
 from towersignal.fetch import fetch_dataset  # noqa: E402
+from towersignal.hpd_identity import fetch_registration_snapshot  # noqa: E402
 from towersignal.normalize import normalize_registrations  # noqa: E402
 
 REGISTRATION_DATASET_ID = "y4fw-iqfr"
@@ -45,7 +46,8 @@ def reconciled_current_systems() -> list[dict[str, Any]]:
 
     bins = {str(system.get("bin")) for system in systems if system.get("bin")}
     footprints_by_bin, _ = fetch_building_footprints_by_bin(bins)
-    identity_meta = apply_bbl_identity_recovery(systems, footprints_by_bin)
+    hpd_index = fetch_registration_snapshot()
+    identity_meta = apply_bbl_identity_recovery(systems, footprints_by_bin, hpd_index["eligible_by_bin"])
     if identity_meta["canonical_bbl_count"] < 1000:
         raise RuntimeError(
             "Refusing to build ACRIS cache from an implausibly small reconciled property-BBL universe"
@@ -82,7 +84,8 @@ def tower_bbls_from_current_registrations() -> set[str]:
 def build(tower_snapshot: Path | None, output: Path) -> dict:
     if tower_snapshot:
         bbls = tower_bbls_from_snapshot(tower_snapshot)
-        property_targets: dict[str, dict[str, Any]] = {}
+        payload = json.loads(tower_snapshot.read_text(encoding="utf-8"))
+        property_targets = property_targets_from_systems(payload.get("systems") or payload.get("observations") or [])
     else:
         systems = reconciled_current_systems()
         bbls = _tower_bbls(

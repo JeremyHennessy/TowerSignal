@@ -35,6 +35,8 @@ class RegistryBinIdentityTests(unittest.TestCase):
     def test_bin_normalization_does_not_change_other_registry_fields(self):
         canonical, canonical_meta = normalize_registrations([self.registration("1089723")])
         decimal, decimal_meta = normalize_registrations([self.registration("1089723.0")])
+        self.assertEqual(decimal[0].pop("source_bin_raw"), "1089723.0")
+        self.assertEqual(canonical[0].pop("source_bin_raw"), "1089723")
         self.assertEqual(decimal, canonical)
         self.assertEqual(decimal_meta, canonical_meta)
 

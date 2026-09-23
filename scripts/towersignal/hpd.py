@@ -144,7 +144,7 @@ def fetch_hpd_contacts_by_bbl(bbl_values: Iterable[str], chunk_size: int = 100) 
             if existing is None or _registration_rank(row) > _registration_rank(existing):
                 latest_registration_by_bbl[bbl] = row
 
-    registration_ids = sorted({str(row["registrationid"]).strip() for row in latest_registration_by_bbl.values() if row.get("registrationid")})
+    registration_ids = sorted({str(row["registrationid"]).strip() for row in latest_registration_by_bbl.values() if str(row.get("registrationid") or "").strip().isdigit() and int(row["registrationid"]) > 0})
     contacts_by_registration: dict[str, list[dict[str, Any]]] = {}
     contact_row_count = 0
     for start in range(0, len(registration_ids), 250):

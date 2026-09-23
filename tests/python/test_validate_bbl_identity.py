@@ -21,6 +21,8 @@ class ValidateBblIdentityTests(unittest.TestCase):
         detail = {
             "identity": {
                 "system_id": row["system_id"],
+                "bin": "1089723",
+                "borough": "Manhattan",
                 "bbl": row.get("bbl"),
                 "property_bbl": row.get("property_bbl"),
                 "registry_bbl": row.get("registry_bbl"),
@@ -69,7 +71,7 @@ class ValidateBblIdentityTests(unittest.TestCase):
                 {"base_bbl": "1011710154", "mappluto_bbl": "1011717513"},
                 0,
             )
-            with self.assertRaisesRegex(RuntimeError, "ignored exact-BIN"):
+            with self.assertRaisesRegex(RuntimeError, "not supported by its exact-key sources"):
                 validate(root)
 
 

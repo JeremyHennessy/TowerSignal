@@ -110,8 +110,9 @@ def verify(systems_path: Path, details_dir: Path, output: Path, sample_size: int
         generated = detail.get("hpd_registration")
         if not generated or not generated.get("contacts"):
             raise RuntimeError(f"Summary reports HPD contacts but detail is empty for {displayed['system_id']}")
-        live_by_bbl, _ = fetch_hpd_contacts_by_bbl([bbl])
-        live = live_by_bbl.get(bbl)
+        from towersignal.hpd_identity import fetch_registration_snapshot, fetch_contacts_for_systems
+        live_results, _ = fetch_contacts_for_systems([displayed], fetch_registration_snapshot())
+        live = live_results[displayed["system_id"]]["registration"]
         checks = {
             "bbl_exact": live is not None,
             "registration_id": bool(live) and live["registration_id"] == generated["registration_id"],

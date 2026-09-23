@@ -37,9 +37,8 @@ def _normalize_bbl(value: Any) -> str | None:
 
 
 def _normalize_bin(value: Any) -> str | None:
-    digits = re.sub(r"\D", "", str(value or ""))
-    return digits if len(digits) == 7 else None
-
+    from towersignal.planimetrics import normalize_bin as assigned_bin
+    return assigned_bin(value)
 
 def _safe_detail_path(base: Path, system_id: str) -> Path:
     safe = "".join(ch for ch in system_id if ch.isalnum() or ch in ("-", "_"))

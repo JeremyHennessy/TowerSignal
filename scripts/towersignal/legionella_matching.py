@@ -34,9 +34,8 @@ def normalized_address(value: Any) -> str:
 
 
 def canonical_bin(value: Any) -> str | None:
-    text = str(value or '').strip().removesuffix('.0')
-    return text if re.fullmatch(r'[1-5]\d{6}', text) else None
-
+    from towersignal.planimetrics import normalize_bin as assigned_bin
+    return assigned_bin(value)
 
 class ListParser(HTMLParser):
     def __init__(self) -> None:

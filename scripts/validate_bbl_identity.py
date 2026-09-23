@@ -47,7 +47,8 @@ def validate(output_dir: Path, *, require_production_volume: bool = False) -> di
             if (value := _normalized_bbl(raw))
         })
         expected_aliases = sorted({value for value in (canonical, registry) if value})
-        if aliases != expected_aliases:
+        # The expected alias set is derived below from retained source evidence.
+        if canonical and canonical not in aliases:
             raise RuntimeError(
                 f"System {system_id} exact BBL alias mismatch: aliases={aliases} expected={expected_aliases}"
             )
@@ -89,6 +90,16 @@ def validate(output_dir: Path, *, require_production_volume: bool = False) -> di
             if isinstance(item, dict)
             and (value := _normalized_bbl(item.get("base_bbl")))
         }
+
+        evidence = identity.get("bbl_identity_evidence") or {}
+        from towersignal.bbl_identity import resolve_system_bbl_identity
+        from towersignal.planimetrics import normalize_bin
+        recomputed = resolve_system_bbl_identity(
+            {**identity, "bbl": registry}, footprints, evidence.get("hpd_identity_rows") or [])
+        if aliases != recomputed["bbl_aliases"] or canonical != recomputed["canonical_bbl"]:
+            raise RuntimeError(f"System {system_id} identity is not supported by its exact-key sources")
+        if identity.get("bin") and normalize_bin(identity["bin"]) is None:
+            raise RuntimeError(f"System {system_id} uses an unassigned BIN as a relationship key")
 
         strong_bridge = (
             registry is not None

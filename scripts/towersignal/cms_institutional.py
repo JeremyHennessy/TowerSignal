@@ -37,9 +37,8 @@ def normalize_bbl(value: Any) -> str | None:
 
 
 def normalize_bin(value: Any) -> str | None:
-    value_digits = digits(value)
-    return value_digits if len(value_digits) == 7 else None
-
+    from towersignal.planimetrics import normalize_bin as assigned_bin
+    return assigned_bin(value)
 
 def normalize_zip(value: Any) -> str | None:
     value_digits = digits(value)

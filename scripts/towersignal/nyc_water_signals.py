@@ -96,9 +96,8 @@ def _normalize_bbl(value: Any) -> str | None:
 
 
 def _normalize_bin(value: Any) -> str | None:
-    digits = re.sub(r"\D", "", normalize_space(value))
-    return digits if len(digits) == 7 else None
-
+    from towersignal.planimetrics import normalize_bin as assigned_bin
+    return assigned_bin(value)
 
 def _identifier_list(value: Any, digits: int) -> list[str]:
     text = normalize_space(value)

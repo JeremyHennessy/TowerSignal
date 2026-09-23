@@ -31,6 +31,8 @@ def _violation(row: dict[str, Any]) -> dict[str, Any] | None:
 
 def aggregate_inspections(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
+    observed_statuses: dict = defaultdict(set)
+    observed_equipment: dict = defaultdict(set)
     seen_violations: dict[tuple[str, str, str], set[tuple[Any, ...]]] = defaultdict(set)
 
     for row in rows:
@@ -38,6 +40,8 @@ def aggregate_inspections(rows: list[dict[str, Any]]) -> dict[str, list[dict[str
         if not system_id:
             continue
         key = _inspection_key(row)
+        observed_statuses[key].add(_clean(row.get("status")))
+        observed_equipment[key].add(_int(row.get("active_equip"), 0))
         if key not in grouped:
             grouped[key] = {
                 "system_id": system_id,
@@ -55,10 +59,17 @@ def aggregate_inspections(rows: list[dict[str, Any]]) -> dict[str, list[dict[str
                 seen_violations[key].add(identity)
 
     by_system: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for inspection in grouped.values():
+    for key, inspection in grouped.items():
+        statuses = sorted(observed_statuses[key], key=lambda v: v or "")
+        equipment = sorted(observed_equipment[key])
+        inspection["status"] = statuses[0] if len(statuses) == 1 else "SOURCE_CONFLICT"
+        inspection["active_equipment_at_publication"] = equipment[0] if len(equipment) == 1 else None
+        if len(statuses) > 1 or len(equipment) > 1:
+            inspection["source_metadata_conflicts"] = {"statuses": statuses, "active_equipment": equipment}
+        inspection["violations"].sort(key=lambda r: tuple(str(r.get(f) or "") for f in VIOLATION_FIELDS))
         inspection["violation_count"] = len(inspection["violations"])
         by_system[inspection["system_id"]].append(inspection)
 
     for inspections in by_system.values():
-        inspections.sort(key=lambda item: item.get("inspection_date") or "", reverse=True)
+        inspections.sort(key=lambda item: (item.get("inspection_date") or "", item.get("inspection_type") or ""), reverse=True)
     return dict(by_system)
