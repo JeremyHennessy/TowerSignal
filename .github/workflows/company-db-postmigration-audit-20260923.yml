@@ -1,0 +1,90 @@
+name: Audit company DB and auth cleanup
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/company-db-postmigration-audit-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Audit schema, RLS and auth counts
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          select 'USER_COUNTS' as section,
+                 count(*) as total_users,
+                 count(*) filter (where lower(email) like '%@example.com') as example_test_users,
+                 count(*) filter (where lower(email) not like '%@example.com') as real_users,
+                 count(*) filter (where lower(coalesce(role,'')) = 'admin') as admins
+          from neon_auth."user";
+
+          select 'PRIVATE_TABLE_COUNTS' as section,
+                 (select count(*) from public.company_private_profiles) as profiles,
+                 (select count(*) from public.company_private_contacts) as contacts,
+                 (select count(*) from public.company_private_activities) as activities,
+                 (select count(*) from public.company_private_notes) as notes;
+
+          select 'POLICY' as section, tablename, policyname, roles::text, cmd,
+                 coalesce(qual,'') as using_expr,
+                 coalesce(with_check,'') as check_expr
+          from pg_policies
+          where schemaname='public'
+            and tablename in ('company_private_profiles','company_private_contacts','company_private_activities','company_private_notes')
+          order by tablename, policyname;
+
+          select 'RLS' as section, relname,
+                 relrowsecurity as enabled,
+                 relforcerowsecurity as forced
+          from pg_class
+          where oid in (
+            'public.company_private_profiles'::regclass,
+            'public.company_private_contacts'::regclass,
+            'public.company_private_activities'::regclass,
+            'public.company_private_notes'::regclass
+          )
+          order by relname;
+
+          select 'ACCESS_VIEW' as section, c.relname,
+                 coalesce(array_to_string(c.reloptions,','),'') as reloptions
+          from pg_class c
+          join pg_namespace n on n.oid=c.relnamespace
+          where n.nspname='public' and c.relname='company_admin_access';
+
+          select 'FUNCTION' as section, p.proname, p.prosecdef as security_definer
+          from pg_proc p
+          join pg_namespace n on n.oid=p.pronamespace
+          where n.nspname='public' and p.proname='towersignal_is_admin';
+
+          with test_users as (
+            select id::text
+            from neon_auth."user"
+            where lower(email) like '%@example.com'
+          )
+          select 'WORKFLOW_TEST_ROWS' as section,
+                 (select count(*) from public.workflow_saved_views w join test_users t on t.id=w.user_id) as saved_views,
+                 (select count(*) from public.workflow_watchlists w join test_users t on t.id=w.user_id) as watchlists,
+                 (select count(*) from public.workflow_accounts w join test_users t on t.id=w.user_id) as accounts,
+                 (select count(*) from public.workflow_watchlist_members w join test_users t on t.id=w.user_id) as memberships;
+
+          select 'AUTH_FK' as section,
+                 conrelid::regclass::text as child_table,
+                 conname,
+                 confrelid::regclass::text as parent_table,
+                 confdeltype
+          from pg_constraint
+          where contype='f'
+            and (conrelid::regclass::text like 'neon_auth.%' or confrelid::regclass::text='neon_auth."user"')
+          order by child_table, conname;
+          SQL
