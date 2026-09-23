@@ -81,6 +81,30 @@ def source(number=1):
             'source_sha': 'a' * 40, 'created_at': '2026-09-11T01:00:00Z', 'history_sha': 'b' * 40}
 
 
+def data_source(number=1, *, sha='a' * 40, created_at='2026-09-11T00:30:00Z'):
+    return {
+        'kind': 'data-only',
+        'workflow_path': '.github/workflows/azure-data-refresh.yml',
+        'run_id': number + 900,
+        'run_number': number,
+        'run_attempt': 1,
+        'source_sha': sha,
+        'created_at': created_at,
+        'trigger': 'workflow_dispatch',
+    }
+
+
+def pointer_for_data_source(src):
+    return {
+        'schema_version': 1,
+        'domain': 'TOWERSIGNAL_BLOB_RELEASE',
+        'source': src,
+        'runtime': {'data_prefix': 'data-only-runtime'},
+        'history': {'data_prefix': 'data-only-history'},
+        'revision': {'kind': 'data-only'},
+    }
+
+
 class FakeReader:
     def __init__(self, s=None):
         s = s or source()
@@ -95,6 +119,9 @@ class FakeReader:
              'started_at': '2026-09-11T01:00:00Z', 'completed_at': '2026-09-11T02:00:00Z'}
             for n in ('build', 'deploy', 'verify', 'persist-history')]}
         self.history_sha = s['history_sha']
+        self.compare_status = 'ahead'
+        self.compare_ahead_by = 1
+        self.compare_merge_base = None
 
     def get(self, path):
         if '/jobs?' in path:
@@ -103,6 +130,17 @@ class FakeReader:
             return copy.deepcopy(self.run)
         if path == '/git/ref/heads/data/towersignal-history':
             return {'object': {'sha': self.history_sha}}
+        if path.startswith('/compare/'):
+            material = path.removeprefix('/compare/')
+            base, head = material.split('...', 1)
+            merge_base = self.compare_merge_base or base
+            return {
+                'status': self.compare_status,
+                'ahead_by': self.compare_ahead_by,
+                'base_commit': {'sha': base},
+                'merge_base_commit': {'sha': merge_base},
+                'commits': [{'sha': head}] if self.compare_ahead_by else [],
+            }
         raise AssertionError(path)
 
 
@@ -429,6 +467,61 @@ class PublisherTests(unittest.TestCase):
             p.apply(self.store, FakeReader(source(1)), plan, work)
         self.assertEqual(self.store.data[b.POINTER], before)
         self.assertEqual(self.store.writes, writes)
+
+    def test_current_pointer_accepts_recognized_data_only_source(self):
+        src = data_source()
+        self.store.seed(b.POINTER, b.encoded(pointer_for_data_source(src)))
+        current, _, raw = b.current_pointer(self.store)
+        self.assertEqual(current['source'], src)
+        self.assertEqual(raw, self.store.data[b.POINTER])
+
+    def test_pages_can_replace_older_data_only_same_sha(self):
+        reader = FakeReader(source(2))
+        old = data_source(7, sha=reader.s['source_sha'], created_at='2026-09-11T00:30:00Z')
+        self.assertTrue(p.pages_can_replace_current(reader, reader.s, old))
+
+    def test_pages_can_replace_older_data_only_ancestor_sha(self):
+        candidate = source(2)
+        candidate['source_sha'] = 'c' * 40
+        reader = FakeReader(candidate)
+        old = data_source(7, sha='a' * 40, created_at='2026-09-11T00:30:00Z')
+        self.assertTrue(p.pages_can_replace_current(reader, candidate, old))
+
+    def test_pages_cannot_replace_newer_data_only_source(self):
+        reader = FakeReader(source(2))
+        old = data_source(7, sha=reader.s['source_sha'], created_at='2026-09-11T02:30:00Z')
+        with self.assertRaisesRegex(b.PublishError, 'not newer'):
+            p.pages_can_replace_current(reader, reader.s, old)
+
+    def test_pages_cannot_replace_nonancestor_data_only_source(self):
+        candidate = source(2)
+        candidate['source_sha'] = 'c' * 40
+        reader = FakeReader(candidate)
+        reader.compare_status = 'diverged'
+        reader.compare_ahead_by = 1
+        reader.compare_merge_base = 'd' * 40
+        old = data_source(7, sha='a' * 40, created_at='2026-09-11T00:30:00Z')
+        with self.assertRaisesRegex(b.PublishError, 'not a descendant'):
+            p.pages_can_replace_current(reader, candidate, old)
+
+    def test_full_publisher_can_advance_from_older_data_only_pointer(self):
+        old = data_source(7, sha='a' * 40, created_at='2026-09-11T00:30:00Z')
+        self.store.seed(b.POINTER, b.encoded(pointer_for_data_source(old)))
+        work, plan = self.application_plan(2)
+        result = p.apply(self.store, FakeReader(source(2)), plan, work)
+        self.assertEqual(result['status'], 'CURRENT')
+        self.assertEqual(result['current']['source']['workflow_id'], p.PAGES_WORKFLOW)
+        self.assertEqual(result['current']['source']['run_id'], source(2)['run_id'])
+
+    def test_cross_workflow_prevalidation_is_bound_to_exact_current_source(self):
+        s, runtime, history = self.pair(2)
+        validated = data_source(7, created_at='2026-09-11T00:30:00Z')
+        changed = data_source(8, created_at='2026-09-11T00:45:00Z')
+        self.store.seed(b.POINTER, b.encoded(pointer_for_data_source(changed)))
+        before = self.store.data[b.POINTER]
+        with self.assertRaisesRegex(b.PublishError, 'prevalidated or changed'):
+            b.promote(self.store, s, runtime, history, cross_workflow_source=validated)
+        self.assertEqual(self.store.data[b.POINTER], before)
 
     def test_full_bootstrap_adopts_both_without_payload_writes(self):
         work,plan = self.application_plan(1)
