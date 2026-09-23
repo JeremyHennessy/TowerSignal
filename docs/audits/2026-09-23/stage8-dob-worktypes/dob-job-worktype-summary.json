@@ -1,0 +1,39 @@
+{
+  "url": "https://jeremyhennessy.github.io/TowerSignal/data/nyc-water-signals.json",
+  "cache_sha256": "33ce3b43acddc920820cb1611b4c2b0f82d725e1bbc0bc05eb63eb2d8a5a6bd8",
+  "rows": 75019,
+  "explicit_work_type_patterns": {
+    "PLUMBING": 71242,
+    "MECHANICAL": 3777
+  },
+  "generic_other_water_mechanical_rows": 1377,
+  "generic_pattern_counts": {
+    "PLUMBING": 1099,
+    "MECHANICAL": 278
+  },
+  "rows_missing_all_required_explicit_flags": 0,
+  "category_pattern_counts": {
+    "BACKFLOW_PREVENTION|MECHANICAL": 6,
+    "BACKFLOW_PREVENTION|PLUMBING": 599,
+    "BOILER_WATER_ADJACENT|MECHANICAL": 40,
+    "BOILER_WATER_ADJACENT|PLUMBING": 1370,
+    "COOLING_TOWER_ADJACENT|MECHANICAL": 123,
+    "COOLING_TOWER_ADJACENT|PLUMBING": 24,
+    "DOMESTIC_WATER_STORAGE|MECHANICAL": 49,
+    "DOMESTIC_WATER_STORAGE|PLUMBING": 498,
+    "DOMESTIC_WATER_SYSTEM|MECHANICAL": 46,
+    "DOMESTIC_WATER_SYSTEM|PLUMBING": 1209,
+    "FIRE_WATER_CONTEXT|MECHANICAL": 95,
+    "FIRE_WATER_CONTEXT|PLUMBING": 6464,
+    "HOT_WATER_SYSTEM|MECHANICAL": 527,
+    "HOT_WATER_SYSTEM|PLUMBING": 3989,
+    "OTHER_WATER_MECHANICAL|MECHANICAL": 278,
+    "OTHER_WATER_MECHANICAL|PLUMBING": 1099,
+    "PLUMBING_WATER_RELATED|MECHANICAL": 823,
+    "PLUMBING_WATER_RELATED|PLUMBING": 55505,
+    "WATER_PUMP|MECHANICAL": 1790,
+    "WATER_PUMP|PLUMBING": 485
+  },
+  "diagnosis": "The collector query requires PLUMBING/MECHANICAL/BOILER YES, but classify_dob_work uses job_description plus generic work_type; job filings do not select a generic work_type. Explicit source work-type distinctions are retained but do not influence category.",
+  "boundary": "This quantifies lost classification context. It does not assert a single correct replacement category for multi-flag records without a reviewed precedence rule."
+}
