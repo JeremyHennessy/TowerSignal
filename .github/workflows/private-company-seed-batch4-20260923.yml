@@ -1,0 +1,323 @@
+name: Load encrypted private company seed batch 4
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/private-company-seed-batch4-20260923.yml'
+      - '.ops/company-seed-batch4.enc'
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch exact production Known Firms identity map
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            https://jeremyhennessy.github.io/TowerSignal/data/known-firms.json \
+            --output /tmp/known-firms.json
+
+      - name: Decrypt and validate private seed without logging contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          test -f .ops/company-seed-batch4.enc || { echo "ENCRYPTED_SEED=MISSING"; exit 3; }
+
+          python - <<'PY'
+          import base64
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          from cryptography.hazmat.primitives import hashes
+          from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey, X25519PublicKey
+          from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+          from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+          aad = b"TowerSignal private company seed v1"
+          envelope = json.loads(Path(".ops/company-seed-batch4.enc").read_text())
+          if envelope.get("version") != 1:
+              raise SystemExit("Unsupported encrypted seed version")
+
+          private_seed = hashlib.sha256(
+              b"TowerSignal private company seed key v1\0" + os.environ["DATABASE_URL"].encode()
+          ).digest()
+          private = X25519PrivateKey.from_private_bytes(private_seed)
+          ephemeral = X25519PublicKey.from_public_bytes(base64.b64decode(envelope["ephemeral_public_key"]))
+          shared = private.exchange(ephemeral)
+          key = HKDF(algorithm=hashes.SHA256(), length=32, salt=None, info=aad).derive(shared)
+
+          plaintext = AESGCM(key).decrypt(
+              base64.b64decode(envelope["nonce"]),
+              base64.b64decode(envelope["ciphertext"]),
+              aad,
+          )
+          seed = json.loads(plaintext)
+          known = json.loads(Path("/tmp/known-firms.json").read_text())
+          known_map = {row["firm_id"]: row["canonical_name"] for row in known["firms"]}
+
+          if seed.get("schema") != "TOWERSIGNAL_PRIVATE_COMPANY_IMPORT_V1":
+              raise SystemExit("Private seed schema mismatch")
+          companies = seed.get("companies")
+          if not isinstance(companies, list) or len(companies) != 1:
+              raise SystemExit("Expected exactly one seed company")
+
+          seen_companies = set()
+          seen_contacts = set()
+          contact_count = 0
+
+          def require_https(value, context):
+              if not isinstance(value, str) or urlparse(value).scheme != "https":
+                  raise SystemExit(f"{context} must use https")
+
+          for company in companies:
+              company_id = company.get("company_id")
+              canonical_name = company.get("canonical_name")
+              if company_id in seen_companies:
+                  raise SystemExit(f"Duplicate company_id: {company_id}")
+              seen_companies.add(company_id)
+              if known_map.get(company_id) != canonical_name:
+                  raise SystemExit(f"Known Firms identity mismatch for {company_id}")
+
+              profile = company.get("profile") or {}
+              if profile.get("website"):
+                  require_https(profile.get("website"), f"{company_id} website")
+                  require_https(profile.get("website_source_url"), f"{company_id} website source")
+              if any(profile.get(key) for key in (
+                  "headquarters_address", "headquarters_city", "headquarters_region",
+                  "headquarters_postal_code", "headquarters_country",
+              )):
+                  require_https(profile.get("headquarters_source_url"), f"{company_id} HQ source")
+              if profile.get("identity_source_url"):
+                  require_https(profile.get("identity_source_url"), f"{company_id} identity source")
+              if profile.get("parent_company_id") or profile.get("parent_company_name"):
+                  parent_id = profile.get("parent_company_id")
+                  if parent_id and parent_id not in known_map:
+                      raise SystemExit(f"Unknown parent firm_id for {company_id}: {parent_id}")
+                  require_https(profile.get("parent_source_url"), f"{company_id} parent source")
+              if any(profile.get(key) is not None for key in ("revenue_amount", "revenue_low", "revenue_high")):
+                  require_https(profile.get("revenue_source_url"), f"{company_id} revenue source")
+
+              for contact in company.get("contacts") or []:
+                  contact_id = contact.get("contact_id")
+                  if not contact_id or contact_id in seen_contacts:
+                      raise SystemExit(f"Missing or duplicate contact_id: {contact_id}")
+                  seen_contacts.add(contact_id)
+                  if not contact.get("name"):
+                      raise SystemExit(f"Missing contact name: {contact_id}")
+                  require_https(contact.get("source_url"), f"{contact_id} source")
+                  contact_count += 1
+
+          if contact_count != 1:
+              raise SystemExit(f"Expected one sourced contact, got {contact_count}")
+
+          compact = json.dumps(seed, separators=(",", ":"))
+          if "$tsseed$" in compact:
+              raise SystemExit("Reserved SQL delimiter found in seed")
+          Path("/tmp/seed-payload.sql").write_text(
+              "INSERT INTO seed_doc(doc) VALUES ($tsseed$" + compact + "$tsseed$::jsonb);\n"
+          )
+          print(f"SEED_VALIDATION=PASS companies={len(companies)} contacts={contact_count}")
+          PY
+
+      - name: Load seed transactionally into private admin tables
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          DO $$
+          DECLARE
+            v_users integer;
+            v_admins integer;
+            v_profiles integer;
+            v_contacts integer;
+            v_activities integer;
+            v_notes integer;
+          BEGIN
+            SELECT count(*), count(*) FILTER (WHERE lower(coalesce(role,''))='admin')
+              INTO v_users, v_admins
+            FROM neon_auth."user";
+            SELECT count(*) INTO v_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO v_contacts FROM public.company_private_contacts;
+            SELECT count(*) INTO v_activities FROM public.company_private_activities;
+            SELECT count(*) INTO v_notes FROM public.company_private_notes;
+
+            IF v_users <> 2 OR v_admins <> 1
+              OR v_profiles <> 12 OR v_contacts <> 12 OR v_activities <> 0 OR v_notes <> 0 THEN
+              RAISE EXCEPTION 'Seed guard failed: users=% admins=% profiles=% contacts=% activities=% notes=%',
+                v_users, v_admins, v_profiles, v_contacts, v_activities, v_notes;
+            END IF;
+          END $$;
+
+          CREATE TEMP TABLE seed_doc(doc jsonb NOT NULL);
+          \i /tmp/seed-payload.sql
+
+          WITH admin_user AS (
+            SELECT id::text AS user_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin'
+            LIMIT 1
+          ),
+          companies AS (
+            SELECT item, item->'profile' AS profile
+            FROM seed_doc
+            CROSS JOIN LATERAL jsonb_array_elements(doc->'companies') AS item
+          )
+          INSERT INTO public.company_private_profiles (
+            company_id, canonical_name, legal_name,
+            rollup_name, rollup_company_id, rollup_source_name, rollup_source_url,
+            website, website_source_name, website_source_url,
+            identity_source_name, identity_source_url,
+            headquarters_address, headquarters_city, headquarters_region,
+            headquarters_postal_code, headquarters_country,
+            headquarters_source_name, headquarters_source_url,
+            parent_company_id, parent_company_name, parent_source_name, parent_source_url,
+            company_type, enrichment_checked_at,
+            revenue_amount, revenue_low, revenue_high, revenue_currency, revenue_year,
+            revenue_type, revenue_source_name, revenue_source_url, revenue_confidence,
+            relationship_status, last_contacted_at, next_action_date, account_owner, internal_summary,
+            created_by, updated_by
+          )
+          SELECT
+            item->>'company_id',
+            item->>'canonical_name',
+            NULLIF(profile->>'legal_name',''),
+            NULLIF(profile->>'rollup_name',''),
+            NULLIF(profile->>'rollup_company_id',''),
+            NULLIF(profile->>'rollup_source_name',''),
+            NULLIF(profile->>'rollup_source_url',''),
+            NULLIF(profile->>'website',''),
+            NULLIF(profile->>'website_source_name',''),
+            NULLIF(profile->>'website_source_url',''),
+            NULLIF(profile->>'identity_source_name',''),
+            NULLIF(profile->>'identity_source_url',''),
+            NULLIF(profile->>'headquarters_address',''),
+            NULLIF(profile->>'headquarters_city',''),
+            NULLIF(profile->>'headquarters_region',''),
+            NULLIF(profile->>'headquarters_postal_code',''),
+            NULLIF(profile->>'headquarters_country',''),
+            NULLIF(profile->>'headquarters_source_name',''),
+            NULLIF(profile->>'headquarters_source_url',''),
+            NULLIF(profile->>'parent_company_id',''),
+            NULLIF(profile->>'parent_company_name',''),
+            NULLIF(profile->>'parent_source_name',''),
+            NULLIF(profile->>'parent_source_url',''),
+            NULLIF(profile->>'company_type',''),
+            NULLIF(profile->>'enrichment_checked_at','')::timestamptz,
+            NULLIF(profile->>'revenue_amount','')::numeric,
+            NULLIF(profile->>'revenue_low','')::numeric,
+            NULLIF(profile->>'revenue_high','')::numeric,
+            COALESCE(NULLIF(profile->>'revenue_currency',''),'USD'),
+            NULLIF(profile->>'revenue_year','')::integer,
+            COALESCE(NULLIF(profile->>'revenue_type',''),'unknown'),
+            NULLIF(profile->>'revenue_source_name',''),
+            NULLIF(profile->>'revenue_source_url',''),
+            COALESCE(NULLIF(profile->>'revenue_confidence',''),'unknown'),
+            COALESCE(NULLIF(profile->>'relationship_status',''),'uncontacted'),
+            NULLIF(profile->>'last_contacted_at','')::timestamptz,
+            NULLIF(profile->>'next_action_date','')::date,
+            NULLIF(profile->>'account_owner',''),
+            NULLIF(profile->>'internal_summary',''),
+            admin_user.user_id,
+            admin_user.user_id
+          FROM companies
+          CROSS JOIN admin_user;
+
+          WITH admin_user AS (
+            SELECT id::text AS user_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin'
+            LIMIT 1
+          ),
+          contacts AS (
+            SELECT
+              company->>'company_id' AS company_id,
+              contact
+            FROM seed_doc
+            CROSS JOIN LATERAL jsonb_array_elements(doc->'companies') AS company
+            CROSS JOIN LATERAL jsonb_array_elements(COALESCE(company->'contacts','[]'::jsonb)) AS contact
+          )
+          INSERT INTO public.company_private_contacts (
+            contact_id, company_id, name, title, email, phone, linkedin_url, notes,
+            source_name, source_url, verified_at, active, created_by, updated_by
+          )
+          SELECT
+            contact->>'contact_id',
+            company_id,
+            contact->>'name',
+            NULLIF(contact->>'title',''),
+            NULLIF(contact->>'email',''),
+            NULLIF(contact->>'phone',''),
+            NULLIF(contact->>'linkedin_url',''),
+            NULLIF(contact->>'notes',''),
+            NULLIF(contact->>'source_name',''),
+            NULLIF(contact->>'source_url',''),
+            NULLIF(contact->>'verified_at','')::timestamptz,
+            COALESCE((contact->>'active')::boolean, true),
+            admin_user.user_id,
+            admin_user.user_id
+          FROM contacts
+          CROSS JOIN admin_user;
+
+          DO $$
+          DECLARE
+            v_profiles integer;
+            v_contacts integer;
+            v_unsourced_profiles integer;
+            v_unsourced_contacts integer;
+            v_revenue_values integer;
+            v_parent_links integer;
+          BEGIN
+            SELECT count(*) INTO v_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO v_contacts FROM public.company_private_contacts;
+            SELECT count(*) INTO v_unsourced_profiles
+            FROM public.company_private_profiles
+            WHERE website IS NOT NULL AND website_source_url IS NULL
+               OR headquarters_address IS NOT NULL AND headquarters_source_url IS NULL;
+            SELECT count(*) INTO v_unsourced_contacts
+            FROM public.company_private_contacts
+            WHERE source_url IS NULL;
+            SELECT count(*) INTO v_revenue_values
+            FROM public.company_private_profiles
+            WHERE revenue_amount IS NOT NULL OR revenue_low IS NOT NULL OR revenue_high IS NOT NULL;
+            SELECT count(*) INTO v_parent_links
+            FROM public.company_private_profiles
+            WHERE parent_company_id IS NOT NULL;
+
+            IF v_profiles <> 13 OR v_contacts <> 13
+              OR v_unsourced_profiles <> 0 OR v_unsourced_contacts <> 0
+              OR v_revenue_values <> 1 OR v_parent_links <> 2 THEN
+              RAISE EXCEPTION 'Seed postcondition failed: profiles=% contacts=% unsourced_profiles=% unsourced_contacts=% revenue_values=% parent_links=%',
+                v_profiles, v_contacts, v_unsourced_profiles, v_unsourced_contacts, v_revenue_values, v_parent_links;
+            END IF;
+          END $$;
+
+          COMMIT;
+
+          SELECT 'PRIVATE_COMPANY_SEED_BATCH4=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_profiles) AS profiles,
+                 (SELECT count(*) FROM public.company_private_contacts) AS contacts,
+                 (SELECT count(*) FROM public.company_private_profiles WHERE relationship_status='researching') AS researching,
+                 (SELECT count(*) FROM public.company_private_profiles WHERE parent_company_id IS NOT NULL) AS parent_links,
+                 (SELECT count(*) FROM public.company_private_profiles WHERE revenue_amount IS NOT NULL OR revenue_low IS NOT NULL OR revenue_high IS NOT NULL) AS revenue_values;
+          SQL
+
+      - name: Remove decrypted material from runner
+        if: always()
+        shell: bash
+        run: rm -f /tmp/seed-payload.sql /tmp/known-firms.json
