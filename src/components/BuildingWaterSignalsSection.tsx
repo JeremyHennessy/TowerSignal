@@ -30,8 +30,38 @@ function waterUse(row: Record<string, unknown>, key: string): string {
   return typeof value === 'number' ? `${number.format(value)} kgal` : text(row, key)
 }
 
+function dobObservationDate(row: Record<string, unknown>): string {
+  for (const key of ['issued_date', 'approved_date', 'filing_date']) {
+    const value = row[key]
+    if (typeof value === 'string' && value.trim()) return value
+  }
+  return ''
+}
+
+function dobRecordId(row: Record<string, unknown>): string {
+  for (const key of ['source_record_id', 'job_filing_number', 'activity_id']) {
+    const value = row[key]
+    if (value != null && String(value).trim()) return String(value)
+  }
+  return ''
+}
+
+function renderDobCard(row: Record<string, unknown>, index: number, keyPrefix: string) {
+  return <article className="signal-card" key={`${keyPrefix}-${dobRecordId(row)}-${index}`}>
+    <div className="signal-card-head"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'issued_date', 'approved_date', 'filing_date')}</span></div>
+    <p>{text(row, 'job_description')}</p>
+    <dl className="identity-grid"><div><dt>Record</dt><dd>{text(row, 'source_record_id') !== '—' ? text(row, 'source_record_id') : text(row, 'job_filing_number')}</dd></div><div><dt>Applicant business</dt><dd>{text(row, 'applicant_business_raw')}</dd></div><div><dt>Role evidence</dt><dd>{text(row, 'relationship_evidence')}</dd></div><div><dt>Service assignment</dt><dd>{text(row, 'service_assignment_confidence')}</dd></div></dl>
+  </article>
+}
+
 export function BuildingWaterSignalsSection({ detail }: { detail: SystemDetail }) {
   const context = detail.nyc_building_water_signals
+  const dobRows = context
+    ? [...context.dob_water_job_filings, ...context.dob_water_permits].sort((left, right) =>
+      dobObservationDate(right).localeCompare(dobObservationDate(left)) || dobRecordId(left).localeCompare(dobRecordId(right)))
+    : []
+  const dobPreview = dobRows.slice(0, 8)
+  const dobRemainder = dobRows.slice(8)
   return <section className="building-water-signals-section">
     <h3>NYC building-water signals</h3>
     {!context ? <>
@@ -67,13 +97,13 @@ export function BuildingWaterSignalsSection({ detail }: { detail: SystemDetail }
         </article>)}</div>
       </details>}
 
-      {(context.dob_water_job_filings.length + context.dob_water_permits.length) > 0 && <details className="domestic-water-history" open>
-        <summary>DOB water work roles · {metric(context.dob_water_job_filings.length + context.dob_water_permits.length)}</summary>
-        <div className="signal-list">{[...context.dob_water_job_filings, ...context.dob_water_permits].slice(0, 8).map((row, index) => <article className="signal-card" key={`${text(row, 'activity_id')}-${index}`}>
-          <div className="signal-card-head"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'issued_date', 'approved_date', 'filing_date')}</span></div>
-          <p>{text(row, 'job_description')}</p>
-          <dl className="identity-grid"><div><dt>Record</dt><dd>{text(row, 'source_record_id') !== '—' ? text(row, 'source_record_id') : text(row, 'job_filing_number')}</dd></div><div><dt>Applicant business</dt><dd>{text(row, 'applicant_business_raw')}</dd></div><div><dt>Role evidence</dt><dd>{text(row, 'relationship_evidence')}</dd></div><div><dt>Service assignment</dt><dd>{text(row, 'service_assignment_confidence')}</dd></div></dl>
-        </article>)}</div>
+      {dobRows.length > 0 && <details className="domestic-water-history" open>
+        <summary>DOB water work roles · {metric(dobRows.length)}</summary>
+        <div className="signal-list">{dobPreview.map((row, index) => renderDobCard(row, index, 'dob-preview'))}</div>
+        {dobRemainder.length > 0 && <details className="domestic-water-history">
+          <summary>Additional DOB water work records · {metric(dobRemainder.length)}</summary>
+          <div className="signal-list">{dobRemainder.map((row, index) => renderDobCard(row, index, 'dob-additional'))}</div>
+        </details>}
       </details>}
 
       {context.ll84_water_benchmarks.length > 0 && <details className="domestic-water-history">
