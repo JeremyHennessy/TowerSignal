@@ -1,0 +1,695 @@
+{
+  "summary": {
+    "reviewed_occurrences": 41,
+    "unresolved_occurrences": 0,
+    "status_counts": {
+      "RESOLVED_BOUNDED": 30,
+      "RESOLVED_SCHEMA_OR_LOCAL_OBJECT": 2,
+      "RESOLVED_SCHEMA_DECLARATION": 9
+    },
+    "boundary": "Dynamic contract closure enumerates allowed runtime values or identifies schema/plumbing occurrences. It does not independently validate every upstream join; join correctness remains supported by the separate population/mapping audits."
+  },
+  "records": [
+    {
+      "language": "python",
+      "file": "scripts/verify_live_planimetrics.py",
+      "line": 110,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "\"planimetric\": {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/verify_live_acris.py",
+      "line": 187,
+      "key": "match_basis",
+      "value": "VARIABLE:match_basis",
+      "source_line": "verified.append({\"bbl\": bbl, \"document_id\": document_id, \"doc_type\": cached_type, \"recorded_date\": cached_recorded, \"match_basis\": match_basis})",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BBL_EXACT_DOCUMENT_ID_EXACT",
+        "BBL_ALIAS_EXACT_DOCUMENT_ID_EXACT",
+        "CONDO_BILLING_BBL_BLOCK_ADDRESS_EXACT"
+      ],
+      "dynamic_review_reason": "ACRIS match basis is selected from reviewed exact-property/document identity paths.",
+      "boundary": "Condo roll-up requires exact block/address rules; no fuzzy address path is included."
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/oath.py",
+      "line": 93,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "SUMMONS_NUMBER_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/known_firms.py",
+      "line": 156,
+      "key": "identity_confidence",
+      "value": "VARIABLE:identity_confidence",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED",
+        "STRONG",
+        "VERIFY",
+        "UNRESOLVED",
+        "PROCUREMENT_OBSERVED_VENDOR",
+        "AMBIGUOUS_PROCUREMENT_ALIAS",
+        "STRICT_OBSERVED_NAME_SUFFIX_PRESERVED"
+      ],
+      "dynamic_review_reason": "Known-firm identity values are controlled by procurement-company evidence and strict-name resolution branches.",
+      "boundary": "This does not repair the separately confirmed placeholder-BIN firm-site identity defect."
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/known_firms.py",
+      "line": 156,
+      "key": "resolution_method",
+      "value": "VARIABLE:resolution_method",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED",
+        "STRONG",
+        "VERIFY",
+        "UNRESOLVED",
+        "PROCUREMENT_OBSERVED_VENDOR",
+        "AMBIGUOUS_PROCUREMENT_ALIAS",
+        "STRICT_OBSERVED_NAME_SUFFIX_PRESERVED"
+      ],
+      "dynamic_review_reason": "Known-firm identity values are controlled by procurement-company evidence and strict-name resolution branches.",
+      "boundary": "This does not repair the separately confirmed placeholder-BIN firm-site identity defect."
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/procurement.py",
+      "line": 257,
+      "key": "identity_confidence",
+      "value": "VARIABLE:identity_confidence",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED",
+        "STRONG",
+        "VERIFY",
+        "UNRESOLVED"
+      ],
+      "dynamic_review_reason": "Value is bounded by procurement resolver/classifier enums and explicit resolution branches.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/procurement.py",
+      "line": 283,
+      "key": "confidence",
+      "value": "VARIABLE:confidence",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED",
+        "STRONG",
+        "VERIFY",
+        "UNRESOLVED"
+      ],
+      "dynamic_review_reason": "Value is bounded by procurement resolver/classifier enums and explicit resolution branches.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/procurement.py",
+      "line": 283,
+      "key": "resolution_method",
+      "value": "VARIABLE:resolution_method",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "AUTHORITATIVE_VENDOR_ID",
+        "CONFLICTING_AUTHORITATIVE_VENDOR_ID",
+        "NORMALIZED_NAME_AND_ADDRESS",
+        "AUTHORITATIVE_ALIAS",
+        "NORMALIZED_DISTINCTIVE_NAME",
+        "AMBIGUOUS_NORMALIZED_NAME",
+        "MULTIPLE_ALIAS_CANDIDATES",
+        "CANONICAL_NAME_EXACT_NORMALIZED",
+        "MULTIPLE_CANONICAL_CANDIDATES",
+        "NO_SAFE_MATCH",
+        "MANUAL_REVIEW"
+      ],
+      "dynamic_review_reason": "Value is bounded by procurement resolver/classifier enums and explicit resolution branches.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/procurement.py",
+      "line": 413,
+      "key": "facility_match_confidence",
+      "value": "VARIABLE:facility_match_confidence",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED",
+        "STRONG",
+        "CONTEXT",
+        "UNLINKED"
+      ],
+      "dynamic_review_reason": "Value is bounded by procurement resolver/classifier enums and explicit resolution branches.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/procurement.py",
+      "line": 413,
+      "key": "tower_link_confidence",
+      "value": "VARIABLE:tower_link_confidence",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED",
+        "STRONG",
+        "CONTEXT",
+        "UNLINKED"
+      ],
+      "dynamic_review_reason": "Value is bounded by procurement resolver/classifier enums and explicit resolution branches.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/company_intelligence.py",
+      "line": 163,
+      "key": "cross_source_resolution_method",
+      "value": "VARIABLE:resolution_method",
+      "source_line": "record.update({",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "LEGAL_SUFFIX_OR_SOURCE_VARIANT_REQUIRES_REVIEW",
+        "AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL",
+        "EXACT_SOURCE_LABEL_SUFFIX_PRESERVED",
+        "EXPLICIT_SOURCE_DBA_ALIAS"
+      ],
+      "dynamic_review_reason": "Company resolution method is selected from explicit source-label/DBA review branches.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/company_intelligence.py",
+      "line": 190,
+      "key": "resolution_method",
+      "value": "VARIABLE:resolution_method",
+      "source_line": "unresolved_observations.append({",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "LEGAL_SUFFIX_OR_SOURCE_VARIANT_REQUIRES_REVIEW",
+        "AMBIGUOUS_SHORT_OR_GENERIC_VENDOR_LABEL",
+        "EXACT_SOURCE_LABEL_SUFFIX_PRESERVED",
+        "EXPLICIT_SOURCE_DBA_ALIAS"
+      ],
+      "dynamic_review_reason": "Company resolution method is selected from explicit source-label/DBA review branches.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/checkbook_nycha.py",
+      "line": 346,
+      "key": "confidence",
+      "value": "VARIABLE:confidence",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED",
+        "STRONG",
+        "VERIFY"
+      ],
+      "dynamic_review_reason": "Classifier confidence is inherited from deterministic procurement rules or explicit supplemental rule tuples.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/building_footprints.py",
+      "line": 64,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/building_footprints.py",
+      "line": 143,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "metadata = {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/openbook_water.py",
+      "line": 301,
+      "key": "confidence",
+      "value": "VARIABLE:confidence",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED",
+        "STRONG",
+        "VERIFY"
+      ],
+      "dynamic_review_reason": "Classifier confidence is inherited from deterministic procurement rules or explicit supplemental rule tuples.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/domestic_water.py",
+      "line": 180,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/domestic_water.py",
+      "line": 271,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "metadata = {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/domestic_water.py",
+      "line": 294,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/domestic_water.py",
+      "line": 319,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/domestic_water.py",
+      "line": 388,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "metadata = {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/nyc_water_signals.py",
+      "line": 216,
+      "key": "property_link_confidence",
+      "value": "VARIABLE:link",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED_SOURCE_BBL",
+        "ADDRESS_CONTEXT",
+        "CONTEXT_ONLY",
+        "EXACT_SINGLE_BBL",
+        "EXACT_SINGLE_BIN",
+        "MULTI_IDENTIFIER_CONTEXT",
+        "UNLINKED"
+      ],
+      "dynamic_review_reason": "Runtime link values come from explicit normalization branches.",
+      "boundary": "Attachment code promotes only exact BBL/BIN confidence classes; contextual values remain unlinked."
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/nyc_water_signals.py",
+      "line": 431,
+      "key": "property_link_confidence",
+      "value": "VARIABLE:link",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "CONFIRMED_SOURCE_BBL",
+        "ADDRESS_CONTEXT",
+        "CONTEXT_ONLY",
+        "EXACT_SINGLE_BBL",
+        "EXACT_SINGLE_BIN",
+        "MULTI_IDENTIFIER_CONTEXT",
+        "UNLINKED"
+      ],
+      "dynamic_review_reason": "Runtime link values come from explicit normalization branches.",
+      "boundary": "Attachment code promotes only exact BBL/BIN confidence classes; contextual values remain unlinked."
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/planimetrics.py",
+      "line": 80,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/planimetrics.py",
+      "line": 152,
+      "key": "match_basis",
+      "value": "VARIABLE:MATCH_BASIS",
+      "source_line": "metadata = {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BIN_EXACT"
+      ],
+      "dynamic_review_reason": "Module-level MATCH_BASIS constant is fixed.",
+      "boundary": ""
+    },
+    {
+      "language": "python",
+      "file": "scripts/towersignal/acris.py",
+      "line": 413,
+      "key": "match_basis",
+      "value": "VARIABLE:match_basis",
+      "source_line": "return {",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "BBL_EXACT_DOCUMENT_ID_EXACT",
+        "BBL_ALIAS_EXACT_DOCUMENT_ID_EXACT",
+        "CONDO_BILLING_BBL_BLOCK_ADDRESS_EXACT"
+      ],
+      "dynamic_review_reason": "ACRIS match basis is selected from reviewed exact-property/document identity paths.",
+      "boundary": "Condo roll-up requires exact block/address rules; no fuzzy address path is included."
+    },
+    {
+      "language": "typescript",
+      "file": "src/components/salesKnownFirms.ts",
+      "line": 19,
+      "key": "relationship",
+      "value": "DYNAMIC_EXPRESSION:SalesKnownFirm['relationship']",
+      "source_line": "relationship: SalesKnownFirm['relationship']",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "OBSERVED_SERVICE",
+        "RECORDED_ROLE"
+      ],
+      "dynamic_review_reason": "Type union explicitly restricts relationship values.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/components/salesKnownFirms.ts",
+      "line": 37,
+      "key": "relationship",
+      "value": "DYNAMIC_EXPRESSION:SalesKnownFirm['relationship']",
+      "source_line": "relationship: SalesKnownFirm['relationship']",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "OBSERVED_SERVICE",
+        "RECORDED_ROLE"
+      ],
+      "dynamic_review_reason": "Type union explicitly restricts relationship values.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/components/salesKnownFirms.ts",
+      "line": 111,
+      "key": "relationship",
+      "value": "DYNAMIC_EXPRESSION:observation.relationship",
+      "source_line": "relationship: observation.relationship,",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "OBSERVED_SERVICE",
+        "RECORDED_ROLE"
+      ],
+      "dynamic_review_reason": "Type union explicitly restricts relationship values.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/components/salesKnownFirms.ts",
+      "line": 198,
+      "key": "relationship",
+      "value": "DYNAMIC_EXPRESSION:firm.relationship",
+      "source_line": "relationship: firm.relationship,",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_BOUNDED",
+      "allowed_values": [
+        "OBSERVED_SERVICE",
+        "RECORDED_ROLE"
+      ],
+      "dynamic_review_reason": "Type union explicitly restricts relationship values.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/components/CompanyProfilePage.tsx",
+      "line": 26,
+      "key": "relationship",
+      "value": "DYNAMIC_EXPRESSION:KnownFirmSiteRelationship",
+      "source_line": "relationship: KnownFirmSiteRelationship",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_OR_LOCAL_OBJECT",
+      "allowed_values": [
+        "KnownFirmSiteRelationship object",
+        "site object"
+      ],
+      "dynamic_review_reason": "The occurrence is a TypeScript object/property plumbing site, not a new confidence assertion.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/components/CompanyProfilePage.tsx",
+      "line": 111,
+      "key": "relationship",
+      "value": "DYNAMIC_EXPRESSION:site",
+      "source_line": "relationship: site,",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_OR_LOCAL_OBJECT",
+      "allowed_values": [
+        "KnownFirmSiteRelationship object",
+        "site object"
+      ],
+      "dynamic_review_reason": "The occurrence is a TypeScript object/property plumbing site, not a new confidence assertion.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/company.ts",
+      "line": 9,
+      "key": "confidence",
+      "value": "DYNAMIC_EXPRESSION:string",
+      "source_line": "confidence: string",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/company.ts",
+      "line": 10,
+      "key": "resolution_method",
+      "value": "DYNAMIC_EXPRESSION:string",
+      "source_line": "resolution_method: string",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/company.ts",
+      "line": 50,
+      "key": "identity_confidence",
+      "value": "DYNAMIC_EXPRESSION:string",
+      "source_line": "identity_confidence: string",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/company.ts",
+      "line": 58,
+      "key": "cross_source_resolution_method",
+      "value": "DYNAMIC_EXPRESSION:string",
+      "source_line": "cross_source_resolution_method: string",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/company.ts",
+      "line": 91,
+      "key": "resolution_method",
+      "value": "DYNAMIC_EXPRESSION:string",
+      "source_line": "resolution_method: string",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/firm.ts",
+      "line": 18,
+      "key": "identity_confidence",
+      "value": "DYNAMIC_EXPRESSION:KnownFirmIdentityConfidence",
+      "source_line": "identity_confidence: KnownFirmIdentityConfidence",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/firm.ts",
+      "line": 19,
+      "key": "resolution_method",
+      "value": "DYNAMIC_EXPRESSION:string",
+      "source_line": "resolution_method: string",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/legionellaIntelligence.ts",
+      "line": 17,
+      "key": "match_basis",
+      "value": "DYNAMIC_EXPRESSION:string",
+      "source_line": "match_basis: string",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    },
+    {
+      "language": "typescript",
+      "file": "src/types/enforcement.ts",
+      "line": 129,
+      "key": "match_basis",
+      "value": "DYNAMIC_EXPRESSION:string",
+      "source_line": "match_basis: string",
+      "semantic_class": "DYNAMIC_REQUIRES_TRACE",
+      "dynamic_review_status": "RESOLVED_SCHEMA_DECLARATION",
+      "allowed_values": [
+        "schema/type declaration; runtime values constrained by producer logic where applicable"
+      ],
+      "dynamic_review_reason": "Type/interface occurrence is schema declaration, not an independent relationship decision.",
+      "boundary": ""
+    }
+  ]
+}
