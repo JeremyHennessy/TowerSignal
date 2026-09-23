@@ -1,0 +1,3635 @@
+[
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "bin",
+    "official_name": "BIN",
+    "description": "Department of Buildings (DOB) Building Identification Number",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4657
+      },
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4715
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "system_id",
+    "official_name": "system_id",
+    "description": "Unique NYC Cooling Tower System Identification Number",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 3616
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "date_registered",
+    "official_name": "Date_Registered",
+    "description": "Cooling tower system registration date",
+    "datatype": "calendar_date",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4821
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "number",
+    "official_name": "Number",
+    "description": "House number",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4399
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "street",
+    "official_name": "Street",
+    "description": "Street name",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4442
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "borough",
+    "official_name": "Borough",
+    "description": "Borough of the physical location of the cooling tower system",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4988
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "zip",
+    "official_name": "Zip_Code",
+    "description": "ZIP code of the physical location of the cooling tower system",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 5039
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "sampledates",
+    "official_name": "Sample_Dates",
+    "description": "Dates of water tests reported by the qualified person",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 3293
+      },
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4150
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "activeequipment",
+    "official_name": "Active_Equip",
+    "description": "Number of active cooling tower equipment associated with the cooling tower system at the time of publication",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 5097
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "bbl",
+    "official_name": "BBL",
+    "description": "Borough Block Lot",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4762
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "latitude",
+    "official_name": "Latitude",
+    "description": "Latitude of the location of the building having the cooling tower",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4218
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "longitude",
+    "official_name": "Longitude",
+    "description": "Longitude of the location of the building having the cooling tower",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 4239
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "community_board",
+    "official_name": "Community_Board",
+    "description": "Community Board of the location of the building having the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 5202
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "council_district",
+    "official_name": "Council_District",
+    "description": "Council District of the location of the building having the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 5274
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "census_tract",
+    "official_name": "Census_Tract",
+    "description": "The Census Tract of the location of the building having the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 5343
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "y4fw-iqfr",
+    "source_label": "NYC cooling-tower registrations",
+    "publisher_name": "NYC Cooling Tower Registrations",
+    "source_updated_at": 1790172016,
+    "official_field": "ntacode",
+    "official_name": "NTA_Code",
+    "description": "NTA (Neighborhood Tabulation Area) code of the location of the building having the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/normalize.py",
+        "offset": 5403
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "bin",
+    "official_name": "BIN",
+    "description": "Department of Buildings (DOB) Building Identification Number",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "system_id",
+    "official_name": "System_ID",
+    "description": "Unique NYC Cooling Tower System Identification Number",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 387
+      },
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 1316
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "address",
+    "official_name": "Address",
+    "description": "Street name and street number of the physical location of the cooling tower system",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "borough",
+    "official_name": "Borough",
+    "description": "Borough of the physical location of the cooling tower system",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "zip_code",
+    "official_name": "ZIP_Code",
+    "description": "ZIP code of the physical location of the cooling tower system",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "status",
+    "official_name": "Status",
+    "description": "Registration status of the cooling tower system ",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 1462
+      },
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 1779
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "active_equip",
+    "official_name": "Active_Equip",
+    "description": "Number of active cooling tower equipment associated with the cooling tower system at the time of publication",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 1523
+      },
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 1855
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "inspection_date",
+    "official_name": "Inspection_date",
+    "description": "Cooling tower system inspection date",
+    "datatype": "calendar_date",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 443
+      },
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 543
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "violation_code",
+    "official_name": "Violation_Code",
+    "description": "OATH (Office of Administrative Trials and Hearings) Code",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "law_section",
+    "official_name": "Law_Section",
+    "description": "Section/Rule of Law of Violation",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "violation_text",
+    "official_name": "Violation_Text",
+    "description": "Description of Violation",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "violation_type",
+    "official_name": "Violation_Type",
+    "description": "Health Hazard Category of Violation",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "citation_text",
+    "official_name": "Citation_Text",
+    "description": "Details of the Violation",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "summons_number",
+    "official_name": "Summons_Number",
+    "description": "Summons or Ticket Number for OATH hearing at ECB (Environmental Control Board)",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "inspection_type",
+    "official_name": "Inspection_Type",
+    "description": "Type of inspection conducted",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/inspections.py",
+        "offset": 607
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "bbl",
+    "official_name": "BBL",
+    "description": "Borough Block Lot",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "latitude",
+    "official_name": "Latitude",
+    "description": "Latitude of the location of the building having the cooling tower",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "longitude",
+    "official_name": "Longitude",
+    "description": "Longitude of the location of the building having the cooling tower",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "community_board",
+    "official_name": "Community_Board",
+    "description": "Community Board of the location of the building having the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "council_district",
+    "official_name": "Council_District",
+    "description": "Council District of the location of the building having the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "census_tract",
+    "official_name": "Census_Tract",
+    "description": "The 2020 Census Tract of the location of the building having the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "f9wb-g8mb",
+    "source_label": "NYC cooling-tower inspections",
+    "publisher_name": "NYC Cooling Tower System Inspection Results",
+    "source_updated_at": 1789398453,
+    "official_field": "nta_code",
+    "official_name": "NTA_Code",
+    "description": "NTA (Neighborhood Tabulation Area) code of the location of the building having the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/build_data_live.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "registrationid",
+    "official_name": "RegistrationID",
+    "description": "Unique identifier of Registration\n",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 1368
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 4035
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 4439
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 4864
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 5423
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 6324
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 3724
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 5286
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 5983
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "buildingid",
+    "official_name": "BuildingID",
+    "description": "Unique identifier of building being registered\n",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 1564
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 5481
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "boroid",
+    "official_name": "BoroID",
+    "description": "Unique identifier of a borough",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 913
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 4832
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "boro",
+    "official_name": "Boro",
+    "description": "Boro code (1 = Manhattan, 2 = Bronx, 3 = Brooklyn, 4 = Queens, 5 = Staten Island)\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Explicitly selected by collector but no audited row.get reference found; requires storage/consumer trace before classification"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "housenumber",
+    "official_name": "HouseNumber",
+    "description": "Address information for the building\n",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "lowhousenumber",
+    "official_name": "LowHouseNumber",
+    "description": "Address information for the building\n",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "highhousenumber",
+    "official_name": "HighHouseNumber",
+    "description": "Address information for the building\n",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "streetname",
+    "official_name": "StreetName",
+    "description": "Address information for the building\n",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "streetcode",
+    "official_name": "StreetCode",
+    "description": "Address information for the building\n",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "zip",
+    "official_name": "Zip",
+    "description": "Address information for the building\n",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "block",
+    "official_name": "Block",
+    "description": "Tax block for building\n",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 932
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 4851
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "lot",
+    "official_name": "Lot",
+    "description": "Tax lot for building\n",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 950
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 4869
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "bin",
+    "official_name": "BIN",
+    "description": "DCP Building Identification Number for building\n",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 1326
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 5559
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "communityboard",
+    "official_name": "CommunityBoard",
+    "description": "Community Board for building\n",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "lastregistrationdate",
+    "official_name": "LastRegistrationDate",
+    "description": "Date on which the registration information was processed\n",
+    "datatype": "calendar_date",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 5667
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 3674
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "tesw-yqqr",
+    "source_label": "HPD multiple-dwelling registrations",
+    "publisher_name": "Multiple Dwelling Registrations",
+    "source_updated_at": 1786546841,
+    "official_field": "registrationenddate",
+    "official_name": "RegistrationEndDate",
+    "description": "Expiration date of registration record\n",
+    "datatype": "calendar_date",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "registrationcontactid",
+    "official_name": "RegistrationContactID",
+    "description": "Unique identifier of RegistrationContact\n",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 3193
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "registrationid",
+    "official_name": "RegistrationID",
+    "description": "Unique identifier of owning Registration\n",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 1368
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 4035
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 4439
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 4864
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 5423
+      },
+      {
+        "path": "scripts/towersignal/hpd_identity.py",
+        "offset": 6324
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 3724
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 5286
+      },
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 5983
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "type",
+    "official_name": "Type",
+    "description": "\"Individual Owner\", \"Corporate Owner\", \"Managing Agent\", \"Head Officer\", \"Officer\", \"Shareholder\"\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 3250
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "contactdescription",
+    "official_name": "ContactDescription",
+    "description": "Description of contact\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 3297
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "corporationname",
+    "official_name": "CorporationName",
+    "description": "If applicable\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 3363
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "title",
+    "official_name": "Title",
+    "description": "Contact person information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 3457
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "firstname",
+    "official_name": "FirstName",
+    "description": "Contact person information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2276
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "middleinitial",
+    "official_name": "MiddleInitial",
+    "description": "Contact person information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2305
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "lastname",
+    "official_name": "LastName",
+    "description": "Contact person information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2338
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "businesshousenumber",
+    "official_name": "BusinessHouseNumber",
+    "description": "Contact address information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2541
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "businessstreetname",
+    "official_name": "BusinessStreetName",
+    "description": "Contact address information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2580
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "businessapartment",
+    "official_name": "BusinessApartment",
+    "description": "Contact address information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2643
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "businesscity",
+    "official_name": "BusinessCity",
+    "description": "Contact address information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2804
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "businessstate",
+    "official_name": "BusinessState",
+    "description": "Contact address information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2836
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "feu5-w2e2",
+    "source_label": "HPD registration contacts",
+    "publisher_name": "Registration Contacts",
+    "source_updated_at": 1786546925,
+    "official_field": "businesszip",
+    "official_name": "BusinessZip",
+    "description": "Contact address information\n",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/hpd_identity.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/hpd.py",
+        "offset": 2893
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "borough",
+    "official_name": "borough",
+    "description": "The borough in which the tax lot is located. This field contains a two-character borough code.\n\nTwo portions of the city, Marble Hill and Rikers Island, are legally located in one borough but are serviced by a different borough. The BOROUGH codes associated with these areas are the boroughs in which they are legally located. Marble Hill is serviced by the Bronx, but is legally located in Manhattan and has a BOROUGH of MN. Rikers Island is serviced by Queens, but is legally located in the Bronx and has a BOROUGH of BX.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "block",
+    "official_name": "Tax block",
+    "description": "The tax block in which the tax lot is located.\nThis field contains a one to five-digit tax block number.\nEach tax block is unique within a borough (see BOROUGH).",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "lot",
+    "official_name": "Tax lot",
+    "description": "The number of the tax lot.\n\nThis field contains a one to four-digit tax lot number.\n\nEach tax lot is unique within a tax block (see TAX BLOCK).\n\n<b>Special handling for condominiums:</b>\n\nIn a condominium complex, each condominium unit is a separate tax lot and has its own lot number. In a residential condominium, the condominium units are generally the individual apartments; in a commercial condominium, the units might be floors in an office building, individual retail shops, or blocks of office space. These unit lot numbers have values between 1001 - 6999.\n\nEach unit tax lot has an associated billing lot number, with values between 7501 - 7599. Lots in a condominium complex on the same block will have the same billing lot number. To make condominium information more compatible with parcel information, the Department of City Planning aggregates condominium unit tax lot information to the billing lot. For example, if a residential condominium building contains 20 units, the Department of Finance will assign 20 unit lot numbers and each of these lot numbers will have the same billing lot number. PLUTO will contain one record with the billing lot number and RESIDENTIAL UNITS will be set to 20.\n\nIf the Department of Finance has not yet assigned a billing lot number to the condominium complex, PLUTO uses the lowest unit lot number within the complex.\n\nNote on MapPLUTO: The Department of Finance Digital Tax Map (DTM) contains the geography of the base lot for condominiums. The base lot is also called the \"Formerly Known As\" or FKA lot. For most condominium complexes, there is one base lot per billing lot. In using the DTM to create MapPLUTO, DCP replaces the base lot number with the billing lot number. If there is more than one base lot with the same billing lot number, DCP merges the base lots to create a geography for the billing lot.\n\nUnder certain circumstances, DCP is unable to aggregate condominium unit tax lot information to the billing lot or to the lowest unit lot number. This occurs when a CONDOMINIUM NUMBER has not yet been assigned to the unit lots in PTS. In most cases, these unit lots will appear in PLUTO and in the NOT_MAPPED_LOTS table that is released with MapPLUTO. Before including these unit lots, the data is checked to verify that it pertains only to the unit lot. If unit lots have an identical address and a value for RESIDENTIAL UNITS that is greater than 1 and the same for all records, and there is no matching BBL in the DTM, they are assumed to part of the same condominium. BUILDING AREA is checked in the same way. These unit lots are removed from PLUTO and NOT_MAPPED_LOTS to avoid overcounting the number of residential units and building area.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "cd",
+    "official_name": "community board",
+    "description": "The community district (CD) or joint interest area (JIA) for the tax lot. The city is divided into 59 community districts and 12 joint interest areas, which are large parks or airports that are not considered part of any community district.\n\nThis field consists of three digits, the first of which is the borough code (see BORO CODE). The second and third digits are the community district or joint interest area number, whichever is applicable.\n\nJoint interest areas:\nBOROUGH JIA NAME\nManhattan 164 Central Park\nBronx\n226 Van Cortlandt Park\n227 Bronx Park\n228 Pelham Bay Park\nBrooklyn 355 Prospect Park\n356 Gateway National Recreation Area\nQueens\n480 LaGuardia Airport\n481 Flushing Meadow/Corona Park\n482 Forest Park\n483 JFK International Airport\n484 Gateway National Recreation Area\nStaten Island 595 Gateway National Recreation Area\n\nTwo portions of the city, Marble Hill and Rikers Island, are legally located in one borough, but serviced by a different borough. The COMMUNITY DISTRICT associated with these areas is the community district by which they are serviced.\n\nMarble Hill is legally located in Manhattan, but is serviced by the Bronx and is divided between community districts 207 and 208. Rikers Island is legally located in the Bronx, but is serviced by Queens and is part of community district 401.\n\nCOMMUNITY DISTRICT contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, COMMUNITY DISTRICT is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "ct2010",
+    "official_name": "census tract 2010",
+    "description": "The 2010 census tract in which the tax lot is located.\n\nThis field contains a one to four-digit census tract number, sometimes with a decimal point and a two-digit suffix.\n\n2010 census tracts are geographic areas defined by the U.S. Census Bureau for the\n2010 Census. Census tracts are comprised of census blocks.\n\nEach census tract is unique within a borough (see BOROUGH).\n\nExamples:\n   Census Tract 203.01\n   Census Tract 23\n\nCENSUS TRACT 2010 contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, CENSUS TRACT 2010 is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "cb2010",
+    "official_name": "cb2010",
+    "description": "The 2010 census block in which the tax lot is located.\n\nThis field contains a four-digit census block number and, when applicable, a one- character alphabetic suffix.\n\n2010 census blocks are the smallest geographic areas defined by the U.S. Census Bureau.\n\nEach census block number is unique within a census tract (see CENSUS TRACT).\n\nExamples:\n   Census Block 101A\n   Census Block 102",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "schooldist",
+    "official_name": "schooldist",
+    "description": "The school district in which the tax lot is located.\n\nThis field contains a two-digit school district number, which is preceded with a zero when the district number is one digit.\n\nThe city is divided up into 34 school districts. Those districts are then divided into smaller zones which determine the area served by local schools. Each district has its own superintendent and receives guidance from a Community District Education Council made up of parents and local representatives.\n\nSCHOOL DISTRICT contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, SCHOOL DISTRICT is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "council",
+    "official_name": "council district",
+    "description": "The city council district in which the tax lot is located.\n\nThis field contains a two-digit city council district number, which is preceded with a zero when the district number is one digit.\n\nThere are currently 51 city council districts in the City, which serve as political districts for the legislative branch of city government.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "zipcode",
+    "official_name": "postcode",
+    "description": "A ZIP code that is valid for one of the addresses assigned to the tax lot.\n\nNote that a tax lot may have multiple addresses and these addresses may not have the same ZIP code. A building with entrances on two streets may have a different ZIP code for each street address. ZIP CODE may not be valid for the street address in ADDRESS.\n\nIf a tax lot does not have an ADDRESS or the ADDRESS contains a street name without a house number, ZIP CODE will be blank.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "firecomp",
+    "official_name": "firecomp",
+    "description": "The fire company that services the tax lot.\n\nThis field consists of four characters, the first of which is an alphabetic code identifying the type of fire company, where E stands for Engine, L stands for Ladder and Q stands for Squad. The type code is followed by a one to three- digit fire company number which is preceded with leading zeros if the company number is less than three digits.\n\nFIRE COMPANY contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, FIRE COMPANY is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files. data_type: text",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "policeprct",
+    "official_name": "policeprct",
+    "description": "The police precinct in which the tax lot is located.\n\nThis field contains a three-digit police precinct number which is preceded with\nleading zeros if the precinct number has less than three digits.\n\nPOLICE PRECINCT contains the value returned by Geosupport for one of the\naddresses assigned to the lot. If Geosupport does not return a value, POLICE\nPRECINCT is calculated spatially using the tax lot's XY COORDINATES and\nDCP's Administrative District Base Map files.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "healtharea",
+    "official_name": "healtharea",
+    "description": "The health area in which the tax lot is located.\n\nHealth areas were originally created in the 1920s for the purpose of reporting and statistical analysis of public health data. They were based on census tracts and created to be areas of equal population. Health areas are contained within health center districts.\n\nThis field contains a four-digit health area number, which is preceded with leading zeros when the health area is less than four digits. There is an implied decimal point after the first two digits.\n\nHEALTH AREA contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, HEALTH AREA is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "sanitboro",
+    "official_name": "sanitboro",
+    "description": "The borough of the sanitation district that services the tax lot.\n\nSANITATION DISTRICT BORO contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, SANITATION DISTRICT BORO is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "sanitsub",
+    "official_name": "sanitsub",
+    "description": "The subsection of the sanitation district that services the tax lot.\n\nSANITATION SUBSECTION contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, SANITATION SUBSECTION is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.    data_source: |",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "address",
+    "official_name": "address",
+    "description": "An address for the tax lot.\n\nTax lots may be assigned a single house number on a street, a range of house numbers on a street, or addresses on multiple streets. ADDRESS contains the address in PTS, using the low number when there is a range of house numbers. Some tax lots, such as vacant lots or parks, have only a street name and no house number.\n\nA complete list of the addresses assigned to a tax lot is available through Geosupport or by downloading the Property Address Directory (PAD) from the BYTES of the BIG APPLETM.\n\nMost house numbers in Queens contain a hyphen.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "zonedist1",
+    "official_name": "zonedist1",
+    "description": "The zoning district classification of the tax lot. Under the Zoning Resolution, the map of New York City is generally apportioned into three basic zoning district categories: Residence (R), Commercial (C) and Manufacturing (M), which are further divided into a range of individual zoning districts, denoted by different number and letter combinations. In general, the higher the number immediately following the first letter (R, C or M), the higher the density or intensity of land use permitted.\n\nIf the tax lot is divided by a zoning boundary line, ZONING DISTRICT 1 represents the zoning district classification occupying the greatest percentage of the tax lot's area.\n\nFor example: Tax lot 98 is divided by a zoning boundary line into part A and part B. Part A, the largest portion of the lot, is in a commercial zoning district, while part B is in a residential zoning district. ZONING DISTRICT 1 will contain the commercial zoning district associated with part A.\n\nTax lots that intersect with areas designated in NYC Zoning Districts as PARK, BALL FIELD, PLAYGROUND, and PUBLIC SPACE are assigned a single value of PARK in PLUTO. The NYC Zoning Districts do not constitute a definitive list of parks in the city. Lots designated as PARK should not be used to calculate the amount of open space in an area.\n\nSee SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.\n\nAbbreviation Description\nR1-1 - R12 Residential Districts\nC1-6 - C8-4 Commercial Districts\nM1-1 - M3-2 Manufacturing Districts\nM1-1/R5 - M1-6/R10 Mixed Manufacturing & Residential Districts\nBPC Battery Park City\nPARK Areas designated as PARK, BALL FIELD,\nPLAYGROUND and PUBLIC SPACE in NYC\nZoning Districts",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "zonedist2",
+    "official_name": "zonedist2",
+    "description": "If the tax lot is divided by zoning boundary lines, ZONING DISTRICT 2 represents the zoning classification occupying the second greatest percentage of the tax lot's area. Only zoning districts that cover at least 10% of a tax lot's area are included.\n\nIf the tax lot is not divided by a zoning boundary line, the field is blank.\n\nFor example: Tax lot 98 is divided by a zoning boundary line into part A and part B. Part A, the larger portion of the lot, is in a commercial zoning district, while part B is in a residential zoning district. ZONING DISTRICT 2 will contain the residential zoning district associated with part B.\n\nSee SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "zonedist3",
+    "official_name": "zonedist3",
+    "description": "If the tax lot is divided by zoning boundary lines, ZONING DISTRICT 3 represents the zoning classification occupying the third greatest percentage of the tax lot's area. Only zoning districts that cover at least 10% of a tax lot's area are included.\n\nIf the tax lot is not split between three zoning districts, the field is blank.\n\nFor example: Tax lot 98 is divided by zoning boundary lines into three sections - part A, part B and part C. Part A represents the largest portion of the lot, part B is the second largest portion of the lot, and part C covers the smallest portion of the tax lot. ZONING DISTRICT 3 will contain the zoning associated with part C.\n\nSee SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "zonedist4",
+    "official_name": "zonedist4",
+    "description": "If the tax lot is divided by zoning boundary lines, ZONING DISTRICT 4 represents\n\nthe zoning classification occupying the fourth greatest percentage of the tax lot's area. Only zoning districts that cover at least 10% of a tax lot's area are included.\n\nIf the tax lot is not split between four zoning districts, the field is blank.\n\nFor example: Tax lot 98 is divided by zoning boundary lines into four sections - part A, part B, part C and part D. Part A represents the largest portion of the lot, part B is the second largest portion of the lot, part C represents the third largest portion of the lot, and part D covers the smallest portion of the tax lot. ZONING DISTRICT 4 will contain the zoning associated with part D.\n\nSee SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "overlay1",
+    "official_name": "overlay1",
+    "description": "The commercial overlay assigned to the tax lot. A commercial overlay is a C1 or C2 zoning district mapped within residential zoning districts to serve local retail needs (grocery stores, dry cleaners, restaurants, for example).\n\nIf more than one commercial overlay exists on the tax lot, COMMERCIAL OVERLAY 1 represents the commercial overlay occupying the greatest percentage of the lot area. The commercial overlay district must either cover at least 10% of a tax lot's area or at least 50% of the commercial overlay district must be contained within the tax lot.\n\nIf the tax lot is does not contain a commercial overlay, the field is blank.\n\nSee SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "overlay2",
+    "official_name": "overlay2",
+    "description": "A commercial overlay assigned to the tax lot.\n\nIf the tax lot has more than one commercial overlays, COMMERCIAL OVERLAY 2 represents the commercial overlay occupying the second largest percentage of the tax lot's area. The commercial overlay district must either cover at least 10% of a tax lot's area or at least 50% of the commercial overlay district must be contained within the tax lot.\n\nIf the tax lot is not divided by two commercial overlays the field is blank. See SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "spdist1",
+    "official_name": "spdist1",
+    "description": "The special purpose district assigned to the tax lot. The regulations for special purpose districts are designed to supplement and modify the underlying zoning in order to respond to distinctive neighborhoods with particular issues and goals. Only special purpose districts that cover at least 10% of a tax lot's area are included.\n\nIf the tax lot is not in a special purpose district, the field is blank.\n\nIf more than one special purpose district exists on the tax lot, SPECIAL PURPOSE DISTRICT 1 represents the special purpose district occupying the greatest percentage of the lot area. If the greatest percentage is occupied by two special purpose districts that overlap each other and cover the same percentage of the lot, SPECIAL PURPOSE DISTRICT 1 contains both special purpose districts. separated by \"/\".\n\u2022 See Appendix A for valid values.\nSee SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "spdist2",
+    "official_name": "spdist2",
+    "description": "The special purpose district assigned to the tax lot. The regulations for special purpose districts are designed to supplement and modify the underlying zoning in order to respond to distinctive neighborhoods with particular issues and goals. Only special purpose districts that cover at least 10% of a tax lot's area are included.\n\nIf the tax lot is not divided by at least two special purpose districts, the field is blank.\n\nIf more than one special purpose district exists on the tax lot, SPECIAL PURPOSE DISTRICT 2 represents the special purpose district occupying the second greatest percentage of the lot area. If the second greatest percentage is occupied by two special purpose districts that overlap each other and cover the same percentage of the lot, SPECIAL PURPOSE DISTRICT 2 contains both special purpose districts. separated by \"/\".\n\nSee Appendix A for valid values.\n\nSee SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "spdist3",
+    "official_name": "spdist3",
+    "description": "The special purpose district assigned to the tax lot. The regulations for special purpose districts are designed to supplement and modify the underlying zoning in order to respond to distinctive neighborhoods with particular issues and goals. Only special purpose districts that cover at least 10% of a tax lot's area are included.\n\nIf the tax lot is not divided by at least three special purpose districts, the field is blank.\n\nIf the tax lot has more than two special purpose districts, SPECIAL PURPOSE DISTRICT 3 represents the special purpose district occupying the smallest percentage of the lot area.\n\nSee Appendix A for valid values.\n\nSee SPLIT BOUNDARY INDICATOR to determine if the tax lot is divided.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "ltdheight",
+    "official_name": "ltdheight",
+    "description": "The limited height district assigned to the tax lot. A limited height district is superimposed on an area designated as an historic district by the Landmarks Preservation Commission.\n\nSee Appendix B for valid values.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "splitzone",
+    "official_name": "splitzone",
+    "description": "A code indicating whether the tax lot is split between multiple zoning features. The split boundary indicator is equal to \"Y\" if the tax lot has a value for ZONING DISTRICT 2, COMMERCIAL OVERLAY 2, or SPECIAL DISTRICT BOUNDARY 2.",
+    "datatype": "checkbox",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "bldgclass",
+    "official_name": "bldgclass",
+    "description": "A code describing the major use of structures on the tax lot.\n\nExcept as described below, BUILDING CLASS is taken from PTS without modification.\n\nFor condominiums, PTS contains the building class for each unit lot. When merging this data into a single record for the billing lot, DCP creates several mixed-use building classes (RC, RD, RI, RM, RX, and RZ). These are assigned as follows:\n\u2022 If all unit lots have the same building class, that building class is used for the\nbilling lot.\n\u2022 PTS building class types are grouped as follows:\n  o Commercial - R5, R7, R8, RA, RB, RH, and RK\n  o Residential - R1, R2, R3, R4, R6, and RR\n  o Mixed commercial and residential - R9\n  o Industrial/warehouse - RW\n\u2022 If the unit lots are a mixture of commercial building types, BUILDING CLASS = RC.\n\u2022 If the unit lots are a mixture of residential building types, BUILDING CLASS = RD.\n\u2022 If the unit lots are a mixture of commercial and residential building types, BUILDING CLASS = RM.\n\u2022 If the unit lots are a mixture of commercial and industrial/warehouse building types, BUILDING CLASS = RI.\n\u2022 If the unit lots are a mixture of commercial, residential, and industrial/warehouse building types, BUILDING CLASS = RX.\n\u2022 If the unit lots are a mixture of residential and industrial/warehouse building types, BUILDING CLASS = RZ.\n\u2022 When unit lots with a building class of RG (Indoor Parking), RP (Outdoor Parking), RS (Non-Business Storage Space), or RT (Terraces/Gardens/Cabanas) have the same billing lot as another building class, their building class is ignored. For example, if the billing lot has unit lots with a building class of R4 (Residential Unit in Elevator Bldg) and RG (Indoor Parking), BUILDING CLASS = R4.\n\nQ0 is assigned by DCP to tax lots with a PTS building class starting with \"V\" that are identified in the NYC GIS Zoning Database as PARK, BALL FIELD, PLAYGROUND, or PUBLIC SPACE.\n\nQG is assigned by DCP to tax lots with a PTS building class starting with \"V\" that contain community gardens from the Department of Parks and Recreation's NYC Greenthumb Community Gardens dataset. This is done to comply with Local Law 46 of 2020, which requires that such lots be given a land use category of open space, outdoor recreation, a community garden, or other similar description. Lots with a BUILDING CLASS of QG are assigned to LAND USE CATEGORY \"09\" (Open Space & Outdoor Recreation). This land use assignment is solely informational and does not confer or change a legal status for such a tax lot.\n\nPTS contains two building classes for some tax lots, with one of the building classes being Z7 (Easement). BUILDING CLASS is only set to Z7 when it is the only PTS building class for the tax lot.\n\nSee Appendix C - Building Class Codes for valid values",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2430
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "landuse",
+    "official_name": "landuse",
+    "description": "A code for the tax lot's land use category.\n\nThe Department of City Planning has created 11 land use categories and assigns each BUILDING CLASS to the most appropriate land use category.\n\nAppendix D - Land Use Categories details the relationship of building classes to land use categories.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2377
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "easements",
+    "official_name": "easements",
+    "description": "The number of unique easements on the tax lot.\n\nPTS contains a record for each easement. NUMBER OF EASEMENTS is calculated by counting the number of unique PTS easement records for the tax lot.\n\nIf the number of easements is zero, the tax lot has no easements.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "ownertype",
+    "official_name": "ownertype",
+    "description": "A code indicating type of ownership for the tax lot.\n\nOnly one data source is used per tax lot.\n\nThe COLP file, which contains more accurate and specific type of city ownership data than PTS, is used when data is available for that lot. Codes C, M, O, P are derived from COLP.\n\nIf the tax lot is not in COLP, PTS is checked to see if the lot's EXEMPT TOTAL VALUE equals its ASSESSED TOTAL VALUE. If the two values are the same, the lot is given a code of X. Otherwise the tax lot is not given any TYPE OF OWNERSHIP CODE.\n\nOWNER NAME should be referenced to verify type of ownership, particularly when it's important to distinguish between state, federal, and public authority ownership.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "ownername",
+    "official_name": "ownername",
+    "description": "The name of the owner of the tax lot.\n\nFor publicly owned tax lots, owner names have been normalized. For example, \"NYC PARKS\", \"PARKS DEPARTMENT\", and \"PARKS AND RECREATION (GENERAL)\" have been changed to \"NYC DEPARTMENT OF PARKS AND RECREATION\".\n\nIf OWNER NAME is normalized, DCPEdited is set to \"1\". (see CHANGED BY DCP).",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2195
+      },
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2266
+      },
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2328
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "lotarea",
+    "official_name": "lotarea",
+    "description": "Total area of the tax lot, expressed in square feet rounded to the nearest integer.\n\nLOT AREA contains street beds when the tax lot contains \"paper streets\" i.e., streets mapped but not built.\n\nIf the tax lot is not an irregularly shaped lot (see IRREGULAR LOT CODE) the Department of Finance calculates the LOT AREA by multiplying the LOT FRONTAGE by the LOT DEPTH. If the tax lot is irregularly shaped, DOF calculates the LOT AREA from the Digital Tax Map.\n\nIf PTS contains a zero value for LOT AREA, this field is changed to show the area of the tax lot's geometric shape in the Digital Tax Map and DCPEdited is set to \"1\". (see CHANGED BY DCP).",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2486
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "bldgarea",
+    "official_name": "bldgarea",
+    "description": "The total gross area in square feet, except for condominium measurements which come from the Condo Declaration and are net square footage not gross.\n\nTOTAL BUILDING FLOOR AREA is populated in the following order of preference:\n  1. Gross floor area from PTS\n  2. Gross floor area from CAMA\n  3. Calculated from the PTS building dimensions and number of stories for the primary building on the lot. TOTAL BUILDING FLOOR AREA calculated by this method will not include floor area for any other buildings on the lot.\n  4. TOTAL BUILDING FLOOR AREA is set to zero if the building class starts with \"V\" and the number of buildings is zero.\n\nSee TOTAL BUILDING FLOOR AREA SOURCE CODE to determine which method was used.\n\nIf TOTAL BUILDING FLOOR AREA SOURCE CODE has a value of 2 (PTS) or 7 (CAMA), the TOTAL BUILDING FLOOR AREA is based on gross building area, also known as total gross square feet. For these data sources, the TOTAL BUILDING FLOOR AREA is for all of the structures on the tax lot, including stairwells, halls, elevator shafts, attics and extensions such as attached garages. Measurements are based on exterior dimensions and take into account setbacks.\n\nIf the TOTAL BUILDING FLOOR AREA SOURCE CODE field has a value of 5, the floor area was calculated from the DOF Property Tax System (PTS) using the building dimensions and number of stories for ONLY the largest structure on the tax lot.\n\nIn all cases, this is a rough estimate of the gross building floor area and does not necessarily take into account all the criteria for calculating floor area as defined in section 12-10 of the Zoning Resolution.\n\nRoof areas used for parking/garden/playground are not included in the floor area.\n\nIf TOTAL BUILDING FLOOR AREA SOURCE CODE is 2, TOTAL BUILDING FLOOR AREA contains the common area for condominiums.\n\nIf FLOOR AREA, TOTAL BUILDING SOURCE CODE is 7, TOTAL BUILDING FLOOR AREA does not include below grade finished basements.\n\nIf the basement in a one, two or three family structure is above grade and finished, its square footage is included in TOTAL BUILDING FLOOR AREA.\n\nA TOTAL BUILDING FLOOR AREA of zero can mean it is either not available or not applicable. If NUMBER OF BUILDINGS is greater than zero, then a TOTAL BUILDING FLOOR AREA of zero means it is not available. If NUMBER OF BUILDINGS is zero, then a TOTAL BUILDING FLOOR AREA of zero means it is not applicable.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2545
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "comarea",
+    "official_name": "comarea",
+    "description": "An estimate of the exterior dimensions of the portion of the structure(s) allocated for commercial use.\n\nValue is taken from PTS, if available. When calculated from PTS data, COMMERCIAL FLOOR AREA is the sum of floor areas for office, retail, garage, storage, factory, and other uses. If these fields are not populated in PTS, the value is taken from CAMA.\n\nOriginally square footage came from sketches, but, for both new construction and alterations, it now comes from site visits. Basement square footage may be included in COMMERCIAL FLOOR AREA if the commercial buildings meets two of the three following criteria:\n\u2022 Finished\n\u2022 Active\n\u2022 Publicly accessible\nFor condominiums, COMMERCIAL FLOOR AREA is the sum of the commercial floor area for condominium lots with the same billing lot. COMMERCIAL FLOOR AREA does not contain the condominium's common area.\n\nA COMMERCIAL FLOOR AREA of zero can mean it is either not available or not applicable.\n\nAn update to the floor area is triggered by the issuance of a Department of Buildings permit, feedback from the public, or site visits by Department of Finance assessors.\n\nThe sum of the various floor area fields does not always equal TOTAL BUILDING FLOOR AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "resarea",
+    "official_name": "resarea",
+    "description": "An estimate of the exterior dimensions of the portion of the structure(s) allocated for residential use.\n\nValue is taken from PTS, if available. Otherwise it comes from CAMA.\n\nFor condominiums, RESIDENTIAL FLOOR AREA is the sum of the residential floor area for condominium lots with the same billing lot. RESIDENTIAL FLOOR AREA does not contain the condominium's common area.\n\nA RESIDENTIAL FLOOR AREA of zero can mean it is either not available or not applicable.\n\nAn update to the floor area is triggered by the issuance of a Department of Buildings permit, feedback from the public, or site visits by Department of Finance assessors.\n\nThe sum of the various floor area fields does not always equal TOTAL BUILDING FLOOR AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "officearea",
+    "official_name": "officearea",
+    "description": "An estimate of the exterior dimensions of the portion of the structure(s) allocated for office use.\n\nValue is taken from PTS, if available. Otherwise it comes from CAMA.\n\nThis information is NOT available for one, two or three family structures.\n\nAn OFFICE FLOOR AREA of zero can mean it is either not available or not applicable.\n\nAn update to the floor area is triggered by the issuance of a Department of Buildings permit, feedback from the public, or site visits by Department of Finance assessors.\n\nThe sum of the various floor area fields does not always equal TOTAL BUILDING FLOOR AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "retailarea",
+    "official_name": "retailarea",
+    "description": "An estimate of the exterior dimensions of the portion of the structure(s) allocated for retail use.\n\nValue is taken from PTS, if available. Otherwise it comes from CAMA.\n\nThis information is NOT available for one, two or three family structures.\n\nA RETAIL FLOOR AREA of zero can mean it is either not available or not applicable.\n\nAn update to the floor area is triggered by the issuance of a Department of Buildings permit, feedback from the public, or site visits by Department of Finance assessors.\n\nThe sum of the various floor area fields does not always equal TOTAL BUILDING FLOOR AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "garagearea",
+    "official_name": "garagearea",
+    "description": "An estimate of the exterior dimensions of the portion of the structure(s) allocated for\ngarage use.\n\nValue is taken from PTS, if available. Otherwise it comes from CAMA.\n\nThis information is NOT available for one, two or three family structures.\n\nA GARAGE FLOOR AREA of zero can mean it is either not available or not\napplicable.\n\nAn update to the floor area is triggered by the issuance of a Department of Buildings\npermit, feedback from the public, or site visits by Department of Finance assessors.\n\nThe sum of the various floor area fields does not always equal TOTAL BUILDING\nFLOOR AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "strgearea",
+    "official_name": "strgearea",
+    "description": "An estimate of the exterior dimensions of the portion of the structure(s) allocated for storage or loft purposes.\n\nValue is taken from PTS, if available. Otherwise it comes from CAMA.\n\nThis information is NOT available for one, two or three family structures.\n\nA STORAGE FLOOR AREA of zero can mean it is either not available or not applicable.\n\nAn update to the floor area is triggered by the issuance of a Department of Buildings permit, feedback from the public, or site visits by Department of Finance assessors.\n\nThe sum of the various floor area fields does not always equal TOTAL BUILDING FLOOR AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "factryarea",
+    "official_name": "factryarea",
+    "description": "An estimate of the exterior dimensions of the portion of the structure(s) allocated for factory, warehouse or loft use.\n\nValue is taken from PTS, if available. Otherwise it comes from CAMA.\n\nThis information is NOT available for one, two or three family structures.\n\nA FACTORY FLOOR AREA of zero can mean it is either not available or not applicable.\n\nAn update to the floor area is triggered by the issuance of a Department of Buildings permit, feedback from the public, or site visits by Department of Finance assessors.\n\nThe sum of the various floor area fields does not always equal TOTAL BUILDING FLOOR AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "otherarea",
+    "official_name": "otherarea",
+    "description": "An estimate of the exterior dimensions of the portion of the structure(s) allocated for other than commercial, residential, office, retail, garage, storage, or factory use.\n\nValue is taken from PTS, if available. Otherwise it comes from CAMA.\n\nThis information is NOT available for one, two or three family structures.\n\nAn OTHER FLOOR AREA of zero can mean it is either not available or not applicable.\n\nAn update to the floor area is triggered by the issuance of a Department of Buildings permit, feedback from the public, or site visits by Department of Finance assessors.\n\nThe sum of the various floor area fields does not always equal TOTAL BUILDING FLOOR AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "areasource",
+    "official_name": "areasource",
+    "description": "A code indicating the methodology used to determine the tax lot's TOTAL BUILDING FLOOR AREA (BldgArea)\n\nOnly one source is used per tax lot.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "numbldgs",
+    "official_name": "numbldgs",
+    "description": "The number of buildings on the tax lot.\n\nThe number of buildings on a lot is calculated by taking the Building Identification Number (BIN) for every building in DoITT's Building Footprints dataset, running Geosupport function BN to get the BBL associated with that BIN, and summing the number of buildings per tax lot.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "numfloors",
+    "official_name": "numfloors",
+    "description": "The number of full and partial floors starting from the ground floor, for the tallest building on the tax lot. A partial floor is a floor that does not span the entire building envelope. For example, if a building is 3 stories tall and 2 floors cover the entire footprint of the building and one floor covers half of the footprint, the number of floors would be 2.5.\n\nAbove ground basements are not included in the NUMBER OF FLOORS.\n\nA roof used for parking, farming, playground, etc. is not included in NUMBER OF FLOORS.\n\nIf the NUMBER OF FLOORS is null and the NUMBER OF BUILDINGS is greater than zero, then NUMBER OF FLOORS is not available for the tax lot.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2593
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "unitsres",
+    "official_name": "unitsres",
+    "description": "The sum of residential units in all buildings on the tax lot.\n\nIf there are no residential units in the tax lot, this field will be zero.\n\nHotels/motels, nursing homes and SROs do not have residential units, but boarding houses do. Basement units for building superintendents are counted as a residential unit.\n\nAn update to residential units is triggered by the issuance of a Department of Buildings permit.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2654
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "unitstotal",
+    "official_name": "unitstotal",
+    "description": "The sum of residential and non-residential (offices, retail stores, etc.) units for all buildings on the tax lot.\n\nThe count of non-residential units is sometimes not available if the building contains residential units.\n\nNon-residential units are units with a separate use.  If a building has 25 different offices it would be counted as 1 unit because they have the same use.\n\nUpdates to residential and non-residential units are triggered by the issuance of a Department of Buildings permit.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2708
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "lotfront",
+    "official_name": "lotfront",
+    "description": "The tax lot's frontage measured in feet.\n\nNOTE: It appears that if a lot fronts on more than one street, the PTS building address often determines which side of the lot used for calculating lot frontage.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "lotdepth",
+    "official_name": "lotdepth",
+    "description": "The tax lot's depth measured in feet.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "bldgfront",
+    "official_name": "bldgfront",
+    "description": "The building's frontage along the street measured in feet.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "bldgdepth",
+    "official_name": "bldgdepth",
+    "description": "The building's depth, which is the effective perpendicular distance, measured in feet.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "ext",
+    "official_name": "ext",
+    "description": "A code identifying whether there is an extension on the lot or a garage other than the primary structure.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "proxcode",
+    "official_name": "proxcode",
+    "description": "A code describing the physical relationship of the building to neighboring buildings. If there are multiple buildings on the lot, CAMA data for building number 1 is used.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "irrlotcode",
+    "official_name": "irrlotcode",
+    "description": "A code indicating whether the tax lot is irregularly shaped.",
+    "datatype": "checkbox",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "lottype",
+    "official_name": "lottype",
+    "description": "A code indicating the location of the tax lot in relationship to another tax lot and/or the water.\n\nCAMA may contain multiple lot types for a tax lot. For instance, a lot may be both a corner lot and waterfront lot. DCP assigns LOT TYPE by taking the lowest CAMA lot type for the tax lot, with the exception of LOT TYPE 5, which is only assigned if the lot has no other lot types in CAMA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "bsmtcode",
+    "official_name": "bsmtcode",
+    "description": "A code describing the building's basement.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "assessland",
+    "official_name": "assessland",
+    "description": "The assessed land value for the tax lot.\n\nThe Department of Finance calculates the assessed value by multiplying the tax lot's estimated full market land value, determined as if vacant and unimproved, by a uniform percentage for the property's tax class.\n\nAssessed and exempt values are updated twice a year. Tentative values are released in mid-January and final values are released around May 25. If the date on source file (PTS), as reported in the Readme file, is between January 15 and May 25, ASSESSED LAND VALUE is from the tentative roll for the tax year starting in July. Otherwise, ASSESSED LAND VALUE is from the final roll.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "assesstot",
+    "official_name": "assesstot",
+    "description": "The assessed total value for the tax lot.\n\nThe Department of Finance (DOF) calculates the assessed value by multiplying the tax lot's estimated full market value by a uniform percentage for the property's tax class.\n\nDOF values properties based on current and constructive use, rather than legal use. The predominant active use, which determines the classification of a property, is determined by square footage. If the second story of a three-story building is mixed-use, an interior inspection may be necessary to establish the commercial percentage of that story before reclassification. In other cases, a two-story building with retail on the first floor may have a sign identifying a second story accounting office.  If, for example, the second story is a primary residence and there is a difference in square footage from the first to second floor, the mere presence of a business sign does not confirm a predominant commercial use.\n\nAdditional research is required to ensure proper classification.  This can include an internal inspection, speaking to someone at the location or a neighbor, and researching various records (such as filed Real Property Income and Expenses statements) from DOF or other city agencies.\n\nNYC Property Tax Classes are determined by NYS and described under Real Property Tax Law (RPTL) [Article \u00a718-02](https://gcc02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.nysenate.gov%2Flegislation%2Flaws%2FRPT%2F1802&data=05%7C01%7CLSeirup%40planning.nyc.gov%7Cd62da5a4813248adc71e08dab374460e%7C32f56fc75f814e22a95b15da66513bef%7C0%7C0%7C638019609211103424%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=rr4wH48ewePfrBbuHeY18ewwelGkQVsF62Rs9tJbBj8%3D&reserved=0) which mentions primary use for real property classification.\n\nProperty value is assessed as of January 5th.  If a new building is not completed by April 14th, the assessed building value is 0 and the Building Class reverts to Vacant.\n\nAssessed and exempt values are updated twice a year. Tentative values are released in mid-January and final values are released around May 25. If the date on source file (PTS), as reported in the Readme file, is between January 15 and May 25, ASSESSED TOTAL VALUE is from the tentative roll for the tax year starting in July. Otherwise, ASSESSED TOTAL VALUE is from the final roll",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "exempttot",
+    "official_name": "exempttot",
+    "description": "The exempt total value, which is determined differently for each exemption program, is the dollar amount related to that portion of the tax lot that has received an exemption.\n\nAssessed and exempt values are updated twice a year. Tentative values are released in mid-January and final values are released around May 25. If the date on source file (PTS), as reported in the Readme file, is between January 15 and May 25, EXEMPT TOTAL VALUE is from the tentative roll for the tax year starting in July. Otherwise, EXEMPT TOTAL VALUE is from the final roll.\n\nNote that New York State typically releases STAR exempt values right after the tentative roll is released. EXEMPT TOTAL VALUE will change to reflect these values after they are received.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "yearbuilt",
+    "official_name": "yearbuilt",
+    "description": "The year construction of the building was completed.\n\nIn general, YEAR BUILT is accurate for the decade, but not necessarily for the specific year. Between 1910 and 1985, the majority of YEAR BUILT values are in years ending in 5 or 0. Many structures built between 1800s and early 1900s have a YEAR BUILT between 1899 and 1901.\n\nFor ~26,000 buildings in historic districts, YEAR BUILT has been changed to the date_high value from Landmarks Preservation Commission's [Individual Landmark and Historic District Building Database](https://data.cityofnewyork.us/Housing-Development/LPC-Individual-Landmark-and-Historic-District-Buil/7mgd-s57w). Any tax lot updated with LPC data has a value of 1 in field CHANGED BY DCP. The original YEAR BUILT value can be found in PLUTOChangeFileYYv#.#.csv, where YYv#.# is the version number.\n\nIf Year Built is null or 0, then the value is unknown.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2763
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "yearalter1",
+    "official_name": "yearalter1",
+    "description": "If a building has only been altered once, YEAR ALTERED 1 is the date that alteration began.\n\nIf a building has been altered more than once, YEAR ALTERED 1 is the year of the second most recent alteration.\n\nThe Department of Finance defines alterations as modifications to the structure that, according to the assessor, change the value of the real property.\n\nThe date comes from Department of Buildings permits and may either be the actual date or an estimate.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2821
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "yearalter2",
+    "official_name": "yearalter2",
+    "description": "If a building has only been altered once, this field is blank.\n\nIf a building has been altered more than once, YEAR ALTERED 2 is the year that the most recent alteration began.\n\nThe Department of Finance defines alterations as modifications to the structure that, according to the assessor, change the value of the real property.\n\nThe date comes from Department of Buildings permits and may either be the actual date or an estimate.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2880
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "histdist",
+    "official_name": "histdist",
+    "description": "The name of the Historic District that the tax lot is within. Historic Districts are designated by the New York City Landmarks Preservation Commission.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "landmark",
+    "official_name": "landmark",
+    "description": "This value indicates whether the lot contains an individual landmark building, an interior landmark building, or both.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "builtfar",
+    "official_name": "builtfar",
+    "description": "The BUILT FLOOR AREA RATIO is the total building floor area divided by the area of the tax lot.\n\nThis is an estimate by City Planning based on rough building area and lot area measurements provided by the Department of Finance.  BUILT FLOOR AREA RATIO is calculated using the TOTAL BUILDING FLOOR AREA and the LOT AREA.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "residfar",
+    "official_name": "residfar",
+    "description": "The maximum allowable residential floor area ratio for standard residences, based on the zoning district classification occupying the greatest percentage of the tax lot\u2019s area as reported in ZoneDist1. If the lot is assigned to more than one zoning district and ZoneDist1 does not allow residential uses, MAXIMUM ALLOWABLE RESIDENTIAL FAR is based on ZoneDist2, ZoneDist3 or ZoneDist4, in that order.\n\nThe maximum allowable residential floor area ratios are exclusive of bonuses for plazas, plaza-connected open areas, arcades, or other amenities. For the maximum allowable floor area for affordable housing, Users should consult the AffResFAR field.\n\nUsers should consult Section 23-20 of the Zoning Resolution for more information.\n\nFor properties zoned R6, R7-1, R7-2, R8 or R9, ResidFAR reflects the maximum achievable floor area under ideal conditions for sky exposure plane buildings. Users should consult Section 23-73 of the Zoning Resolution for more information.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "commfar",
+    "official_name": "commfar",
+    "description": "The maximum allowable commercial floor area ratio, based on the zoning district classification occupying the greatest percentage of the tax lot's area as reported in ZoneDist1. If the lot is assigned to more than one zoning district and ZoneDist1 does not allow commercial uses, MAXIMUM ALLOWABLE COMMERCIAL FAR is based on ZoneDist2, ZoneDist3 or ZoneDist4, in that order.\n\nThe maximum allowable commercial floor area ratios are exclusive of bonuses for plazas, plaza-connected open areas, arcades, or other amenities.\n\nUsers should consult Section 33-12 of the Zoning Resolution for more information.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "facilfar",
+    "official_name": "facilfar",
+    "description": "The maximum allowable community facility floor area ratio, based on the zoning district classification occupying the greatest percentage of the tax lot's area as reported in ZoneDist1. If the lot is assigned to more than one zoning district and ZoneDist1 does not allow community facility uses, MAXIMUM ALLOWABLE COMMUNITY FACILITY FAR is based on ZoneDist2, ZoneDist3 or ZoneDist4, in that order.\n\nThe maximum allowable community facility floor area ratios are exclusive of bonuses for plazas, plaza-connected open areas, arcades, or other amenities.\n\nUsers should consult Section 24-11, 33-12, or 43-12 of the Zoning Resolution, as applicable, for more information.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "affresfar",
+    "official_name": "affresfar",
+    "description": "The maximum allowable residential floor area ratio for affordable housing, based on the zoning district classification occupying the greatest percentage of the tax lot\u2019s area as reported in ZoneDist1. If the lot is assigned to more than one zoning district and ZoneDist1 does not allow residential uses, MAXIMUM ALLOWABLE AFFORDABLE RESIDENTIAL FAR is based on ZoneDist2, ZoneDist3 or ZoneDist4, in that order.\n\nThe maximum allowable residential floor area ratios are exclusive of bonuses for plazas, plaza-connected open areas, arcades, or other amenities.\n\nUsers should consult Section 23-20 of the Zoning Resolution for more information.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "mnffar",
+    "official_name": "mnffar",
+    "description": "The maximum allowable Manufacturing floor area ratio, based on the zoning district classification occupying the greatest percentage of the tax lot\u2019s area as reported in ZoneDist1. If the lot is assigned to more than one zoning district and ZoneDist1 does not allow manufacturing uses, MAXIMUM ALLOWABLE MANUFACTURING FAR is based on ZoneDist2, ZoneDist3 or ZoneDist4, in that order.\n\nThe maximum allowable manufacturing floor area ratios are exclusive of bonuses for plazas, plaza-connected open areas, arcades, or other amenities.\n\nUsers should consult Section 43-12 of the Zoning Resolution for more information.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "borocode",
+    "official_name": "borocode",
+    "description": "The borough in which the tax lot is located.\n\nTwo portions of the city, Marble Hill and Rikers Island, are legally located in one borough but are serviced by a different borough. The BORO CODEs associated with these areas are the boroughs in which they are legally located.\n\nMarble Hill is serviced by the Bronx, but is legally located in Manhattan and has a BORO CODE of 1. Rikers Island is serviced by Queens, but is legally located in the Bronx and has a BORO CODE of 2.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "bbl",
+    "official_name": "BBL",
+    "description": "A concatenation of the borough code, tax block and tax lot.\n\nThis field consists of the borough code followed by the tax block followed by the tax lot.  The borough code is one numeric digit.  The tax block is one to five numeric digits, preceded with leading zeros when the block is less than five digits.  The tax lot is one to four digits and is preceded with leading zeros when the lot is less than four digits.\n\nFor condominiums, the BBL is for the billing lot. See TAX LOT for more information on how condominiums are handled.\n\nExamples:\nManhattan Borough Code 1, Tax Block 16, Tax Lot 100 would be stored as 1000160100.\nBrooklyn Borough Code 3, Tax Block 15828, Tax Lot 7501 would be stored as 3158287501.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/pluto.py",
+        "offset": 2141
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "condono",
+    "official_name": "condono",
+    "description": "The condominium number assigned to the complex.\n\nCondominium numbers are unique within a borough (see BOROUGH).",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "tract2010",
+    "official_name": "tract2010",
+    "description": "The 2010 census tract in which the tax lot is located.\n\nThis field contains a one to four-digit census tract number and a two-digit suffix.  There is an implied decimal point between the census tract number and the suffix.  The census tract number is preceded with leading zeros when the tract is less than four digits.  If the tract has no suffix, CENSUS TRACT 2 contains 4 characters.\n\n2010 census tracts are geographic areas defined by the U.S. Census Bureau for the 2010 Census.\n\nExamples:\nCensus Tract 203.01 would be stored as 020301\nCensus Tract 23 would be stored as 0023",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "xcoord",
+    "official_name": "xcoord",
+    "description": "The X coordinate of the XY coordinate pair which depicts the approximate location of the lot.\n\nIf the X coordinate is not available from Geosupport, it is calculated from the centroid of the tax lot, with the constraint that the resulting point must be within the lot boundaries.\n\nThe XY coordinates are expressed in the New York-Long Island State Plane coordinate system.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "ycoord",
+    "official_name": "ycoord",
+    "description": "The Y coordinate of the XY coordinate pair which depicts the approximate location of the lot.\n\nIf the Y coordinate is not available from Geosupport, it is calculated from the centroid of the tax lot, with the constraint that the resulting point must be within the lot boundaries\n\nThe XY coordinates are expressed in the New York-Long Island State Plane coordinate system.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "latitude",
+    "official_name": "latitude",
+    "description": "The WGS 84 latitude of the latitude/longitude coordinate pair for the approximate location of the tax lot.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "longitude",
+    "official_name": "longitude",
+    "description": "The WGS 84 longitude of the latitude/longitude coordinate pair for the approximate location of the tax lot",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "zonemap",
+    "official_name": "zonemap",
+    "description": "The Department of City Planning Zoning Map Number associated with the tax lot's X and Y Coordinates. If the tax lot is on the border of two or more zoning maps, ZONING MAP \\# is the zoning map covering the greatest area.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "zmcode",
+    "official_name": "zmcode",
+    "description": "A code (Y) identifies a tax lot on the border of two or more zoning maps.",
+    "datatype": "checkbox",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "sanborn",
+    "official_name": "sanborn",
+    "description": "The Sanborn Map Company map number associated with the tax block and lot.\n\nSANBORN MAP \\# format is Borough Code/Volume Number/Page Number,\n\nwhere Borough Code is 1 (Manhattan), 2 (Bronx), 3 (Brooklyn), 4 (Queens), or 5 (Staten Island)\n\nFor example:  the SANBORN MAP \\# associated with tax block 154, tax lot 23 in Manhattan is 1/01S/020.\n\nThis field has been deprecated and will be removed at a future date. The data in the field cannot be considered reliable.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "taxmap",
+    "official_name": "taxmap",
+    "description": "The Department of Finance paper tax map volume number associated with the tax block and lot.\n\nThe first character of the Tax Map \\# is the Borough Code - 1 (Manhattan), 2 (Bronx), 3 (Brooklyn), 4 (Queens), or 5 (Staten Island). The second and third characters are the Section Number and the fourth and fifth characters are the Volume Number.\n\nNOTE: The Department of Finance no longer updates their paper tax maps.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "edesignum",
+    "official_name": "edesignum",
+    "description": "The (E) designation number assigned to the tax lot. An (E) designation provides notice of the presence of an environmental requirement pertaining to potential hazardous materials contamination, high ambient noise levels or air emission concerns on a particular tax lot.\n\nNote that a tax lot may have more than one (E) designation. See the source file for all designations on the lot.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "appbbl",
+    "official_name": "appbbl",
+    "description": "The originating BBL (borough, block and lot) from the apportionment prior to the merge, split or property's conversion to a condominium.\n\nAPPORTIONMENT BBL is only available for mergers, splits, and conversions since 1984.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "appdate",
+    "official_name": "appdate",
+    "description": "The date of the apportionment.\n\nThe data is in the format MM/DD/YYYY, where MM is a two-digit month, DD is the two-digit day, and YYYY is the four-digit year.",
+    "datatype": "calendar_date",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "plutomapid",
+    "official_name": "plutomapid",
+    "description": "A code indicating whether the tax lot is in the PLUTO file, the MapPLUTO file with water areas included, and/or the MapPLUTO file that is clipped to the shoreline.\n\nBecause the Digital Tax Map (DTM) and the Property Tax System (PTS) are not updated at the same time, they are slightly out-of-sync. There will be lots in PTS that are not in the DTM and vice versa. In addition, some lots are wholly underwater and are not included in the version of MapPLUTO that is clipped to the shoreline.\n\nThe lot geographies in MapPLUTO (with water areas included) are created from the DTM. City Planning modifies the DTM for condominium lots to show the billing tax lot in MapPLUTO, rather than the base tax lot. If there is more than one base tax lot with the same billing lot, the base tax lots are merged into a single feature and assigned to the billing lot. See LOT for more information on condominium lots.\n\nMapPLUTO (clipped to shoreline) is created by clipping the full MapPLUTO using DOF's Shoreline File.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "version",
+    "official_name": "version",
+    "description": "The version number for this release of PLUTO.\n\nThe Version Number is in the format YYv#.# where:\n  YY is the last two digits of the year;\n  v stands for version;\n  \\# is the release number for that year; and .# indicates an amendment to the original release, if applicable.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "sanitdistrict",
+    "official_name": "sanitdistrict",
+    "description": "The sanitation district that services the tax lot.\n\nSANITATION DISTRICT NUMBER contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, SANITATION DISTRICT NUMBER is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "healthcenterdistrict",
+    "official_name": "healthcenterdistrict",
+    "description": "The health center district in which the tax lot is located. Thirty health center districts were created by the City in 1930 to conduct neighborhood focused health interventions.\n\nThis field contains a two-digit health district number.\n\nHEALTH CENTER DISTRICT contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, HEALTH CENTER DISTRICT is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "firm07_flag",
+    "official_name": "firm07_flag",
+    "description": "A value of 1 means that some portion of the tax lot falls within the 1% annual chance floodplain as determined by FEMA's 2007 Flood Insurance Rate Map.\n\nNote that buildings on the tax lot may or may not be in the portion of the tax lot that is within the 1% annual chance floodplain.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "pfirm15_flag",
+    "official_name": "pfirm15_flag",
+    "description": "A value of 1 means that some portion of the tax lot falls within the 1% annual chance floodplain as determined by FEMA's 2015 Preliminary Flood Insurance Rate Map.\n\nNote that buildings on the tax lot may or may not be in the portion of the tax lot that is within the 1% annual chance floodplain.",
+    "datatype": "number",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "dcpedited",
+    "official_name": "dcpedited",
+    "description": "Flag indicating that City Planning has applied a correction to the record.\n\nFlag set to \"1\" if City Planning has made a change to any field values for this tax lot. To see which field(s) were changed, refer to the PLUTOChangeFileYYv#.#.csv, where YYv#.# is the version number. See the PLUTO change file readme document for more information.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "notes",
+    "official_name": "notes",
+    "description": "A text field containing notes of importance to one or more lots.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "bct2020",
+    "official_name": "bct2020",
+    "description": "The 2020 census tract in which the tax lot is located.\n\nThis field contains a seven-digit code representing the one-digit borough code followed by the six-digit census tract number.\n\n2020 census tracts are geographic areas defined by the U.S. Census Bureau for the 2020 Census. Census tracts are comprised of census blocks.\n\nEach census tract is unique within a borough (see BOROUGH).\n\nExamples:\nCensus Tract 4062600\nCensus Tract 4063200\n\nCENSUS TRACT 2020 contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, CENSUS TRACT 2020 is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "bctcb2020",
+    "official_name": "bctcb2020",
+    "description": "The 2020 census block in which the tax lot is located.\n\nThis field contains an eleven-digit code representing the one-digit borough code followed by the six-digit census tract number and then the four-digit census block number.\n\n2020 census blocks are the smallest geographic areas defined by the U.S. Census Bureau.\n\nEach census block number is unique within a census tract (see CENSUS TRACT).\n\nExamples:\nCensus Block 20350001000\nCensus Block 30403001002\n\nCENSUS BLOCK 2020 contains the value returned by Geosupport for one of the addresses assigned to the lot. If Geosupport does not return a value, CENSUS BLOCK 2020 is calculated spatially using the tax lot's XY COORDINATES and DCP's Administrative District Base Map files.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "mih_opt1",
+    "official_name": "mihopt1",
+    "description": "Flag set to \u201c1\u201d if MIH Option 1 applies to tax lot. Under Option 1, 25 percent of the residential floor area must be affordable to households earning an average of 60 percent of Area Median Income, of which 10 percent shall be affordable to families earning 40 percent of Area Median Income.\n\nUsers should consult Section 27-131 of the Zoning Resolution for more information.",
+    "datatype": "checkbox",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "mih_opt2",
+    "official_name": "mihopt2",
+    "description": "Flag set to \u201c1\u201d if MIH Option 2 applies to tax lot. Under Option 2, 30 percent of the residential floor area must be affordable to households earning an average of 80 percent of Area Median Income.\n\nUsers should consult Section 27-131 of the Zoning Resolution for more information.",
+    "datatype": "checkbox",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "mih_opt3",
+    "official_name": "mihopt3",
+    "description": "Flag set to \u201c1\u201d if MIH Option 3 (deep affordability) applies to tax lot. Under Option 3, 20 percent of the residential floor area must be affordable to households earning an average of 40 percent of Area Median Income.\n\nUsers should consult Section 27-131 of the Zoning Resolution for more information.",
+    "datatype": "checkbox",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "mih_opt4",
+    "official_name": "mihopt4",
+    "description": "Flag set to \u201c1\u201d if MIH Option 4 (workforce option) applies to tax lot. Under Option 4, 30 percent of the residential floor area must be affordable to families earning an average of 115 percent of Area Median Income, of which 5 percent must be affordable to families earning 90 percent of Area Median Income and another 5 percent must be affordable to families earning 70 percent of Area Median Income.\n\nUsers should consult Section 27-131 of the Zoning Resolution for more information.",
+    "datatype": "checkbox",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "transitzone",
+    "official_name": "transitzone",
+    "description": "The Transit Zone classification of the tax lot. Under the Zoning Resolution, the map of New York City is apportioned into areas that generally govern residential parking. These include the Manhattan Core, LIC Parking Area, and Inner Transit Zone, where no residential parking is required. In addition, these include the Outer Transit Zone and the area Beyond the Greater Transit Zone where residential parking is required.\n\nUsers should consult Section 13-20 of the Zoning Resolution for more information on the Manhattan Core, Section 16-20 for more information on the LIC Parking Area, and Section 25-20 for more information on the other listed Transit Zone areas.",
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "geom",
+    "official_name": "geom",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "basempdate",
+    "official_name": "basempdate",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "dcasdate",
+    "official_name": "dcasdate",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "edesigdate",
+    "official_name": "edesigdate",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "landmkdate",
+    "official_name": "landmkdate",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "masdate",
+    "official_name": "masdate",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "polidate",
+    "official_name": "polidate",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "rpaddate",
+    "official_name": "rpaddate",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "64uk-42ks",
+    "source_label": "MapPLUTO",
+    "publisher_name": "Primary Land Use Tax Lot Output (PLUTO)",
+    "source_updated_at": 1787604531,
+    "official_field": "zoningdate",
+    "official_name": "zoningdate",
+    "description": null,
+    "datatype": "text",
+    "requested": false,
+    "retrieval_mode": "EXPLICIT_SELECT",
+    "collector": "scripts/towersignal/pluto.py",
+    "production_references": [],
+    "disposition": "UNRESOLVED",
+    "disposition_reason": "Not requested by current collector; usefulness/exclusion reason requires field-level review"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "equipment_id",
+    "official_name": "Equipment_ID",
+    "description": "Cooling Tower ID number",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 2843
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "county",
+    "official_name": "County",
+    "description": "County",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 4442
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "reg_comp",
+    "official_name": "Reg_Comp",
+    "description": "Regulation 4-1 Compliance Status",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 4617
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "lastupdate",
+    "official_name": "Last_Update_Days",
+    "description": "Days the operator last updated the Registry",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 4731
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "ct_status",
+    "official_name": "CT_Status",
+    "description": "The operational status of the cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 4671
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "last_sampled_days",
+    "official_name": "Last_Sampled_Days",
+    "description": "Number of days the operator last sampled for legionella",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 4793
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "equipment_street_address",
+    "official_name": "equipment_street_address",
+    "description": "Address of cooling tower",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 3644
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "equipment_location_city",
+    "official_name": "equipment_location_city",
+    "description": "City",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 3703
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "equipment_location_zip",
+    "official_name": "equipment_location_zip",
+    "description": "Zip code",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 3765
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "equipment_last_legionellla_sample_collection_date",
+    "official_name": "Equipment Last Legionellla Sample Collection Date",
+    "description": "Date of last legionella sample",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 4864
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "equipment_last_legionella_test_result",
+    "official_name": "Equipment Last Legionella Test Result",
+    "description": "Results of last legionella lab",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 4970
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "equipment_tower_operation_duration",
+    "official_name": "Equipment_Tower_Operation_Duration",
+    "description": "Operation of cooling tower year-round or not",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 5062
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "latitude",
+    "official_name": "Latitude",
+    "description": "Geographic coordinates in decimal degrees y-axis",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 3848
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "longitude",
+    "official_name": "Longitude",
+    "description": "Geographic coordinates in decimal degrees x-axis",
+    "datatype": "text",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [
+      {
+        "path": "scripts/towersignal/nys_registry.py",
+        "offset": 3869
+      }
+    ],
+    "disposition": "USED",
+    "disposition_reason": "Explicit production normalization/identity reference"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": "georeference",
+    "official_name": "Georeference",
+    "description": "",
+    "datatype": "point",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": ":@computed_region_8ire_itmf",
+    "official_name": "Local Waterfront Revitalization Program (LWRP) Communities 2",
+    "description": "This column was automatically created in order to record in what polygon from the dataset 'Local Waterfront Revitalization Program (LWRP) Communities' (8ire-itmf) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": ":@computed_region_5edz_4hdv",
+    "official_name": "School Districts 2016.shp 2",
+    "description": "This column was automatically created in order to record in what polygon from the dataset 'School Districts 2016.shp' (5edz-4hdv) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": ":@computed_region_43an_4dx5",
+    "official_name": "New York Zip Codes 2",
+    "description": "This column was automatically created in order to record in what polygon from the dataset 'New York Zip Codes' (43an-4dx5) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": ":@computed_region_9yqb_tdyd",
+    "official_name": "Counties 2",
+    "description": "This column was automatically created in order to record in what polygon from the dataset 'Counties' (9yqb-tdyd) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": ":@computed_region_assa_msit",
+    "official_name": "NYS Senate Districts 2",
+    "description": "This column was automatically created in order to record in what polygon from the dataset 'NYS Senate Districts' (assa-msit) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  },
+  {
+    "source_id": "24a4-muw7",
+    "source_label": "NYS cooling-tower registry weekly extract",
+    "publisher_name": "New York State Cooling Tower Registry Weekly Extract",
+    "source_updated_at": 1790100555,
+    "official_field": ":@computed_region_v9ry_wcha",
+    "official_name": "NYS Tick Regions",
+    "description": "This column was automatically created in order to record in what polygon from the dataset 'NYS Tick Regions' (v9ry-wcha) the point in column 'georeference' is located.  This enables the creation of region maps (choropleths) in the visualization canvas and data lens.",
+    "datatype": "number",
+    "requested": true,
+    "retrieval_mode": "FULL_ROW_FETCH",
+    "collector": "scripts/towersignal/nys_registry.py -> fetch_dataset",
+    "production_references": [],
+    "disposition": "RETAINED_NOT_DISPLAYED",
+    "disposition_reason": "Fetched in complete source row but no explicit normalized-field reference found in audited family code; raw row is transient unless another cache retains it"
+  }
+]

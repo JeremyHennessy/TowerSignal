@@ -1,0 +1,69 @@
+{
+  "sources": {
+    "y4fw-iqfr": {
+      "label": "NYC cooling-tower registrations",
+      "published_fields": 16,
+      "requested_fields": 16,
+      "dispositions": {
+        "USED": 16
+      },
+      "source_updated_at": 1790172016,
+      "metadata_url": "https://data.cityofnewyork.us/api/views/y4fw-iqfr.json"
+    },
+    "f9wb-g8mb": {
+      "label": "NYC cooling-tower inspections",
+      "published_fields": 22,
+      "requested_fields": 22,
+      "dispositions": {
+        "RETAINED_NOT_DISPLAYED": 17,
+        "USED": 5
+      },
+      "source_updated_at": 1789398453,
+      "metadata_url": "https://data.cityofnewyork.us/api/views/f9wb-g8mb.json"
+    },
+    "tesw-yqqr": {
+      "label": "HPD multiple-dwelling registrations",
+      "published_fields": 16,
+      "requested_fields": 8,
+      "dispositions": {
+        "USED": 7,
+        "UNRESOLVED": 9
+      },
+      "source_updated_at": 1786546841,
+      "metadata_url": "https://data.cityofnewyork.us/api/views/tesw-yqqr.json"
+    },
+    "feu5-w2e2": {
+      "label": "HPD registration contacts",
+      "published_fields": 15,
+      "requested_fields": 15,
+      "dispositions": {
+        "USED": 15
+      },
+      "source_updated_at": 1786546925,
+      "metadata_url": "https://data.cityofnewyork.us/api/views/feu5-w2e2.json"
+    },
+    "64uk-42ks": {
+      "label": "MapPLUTO",
+      "published_fields": 108,
+      "requested_fields": 12,
+      "dispositions": {
+        "UNRESOLVED": 96,
+        "USED": 12
+      },
+      "source_updated_at": 1787604531,
+      "metadata_url": "https://data.cityofnewyork.us/api/views/64uk-42ks.json"
+    },
+    "24a4-muw7": {
+      "label": "NYS cooling-tower registry weekly extract",
+      "published_fields": 21,
+      "requested_fields": 21,
+      "dispositions": {
+        "USED": 14,
+        "RETAINED_NOT_DISPLAYED": 7
+      },
+      "source_updated_at": 1790100555,
+      "metadata_url": "https://health.data.ny.gov/api/views/24a4-muw7.json"
+    }
+  },
+  "field_rows": 198
+}
