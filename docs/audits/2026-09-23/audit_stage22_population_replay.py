@@ -71,7 +71,7 @@ results['rbx6-tga4']={'retrieval':permit_meta,'source_rows':len(permit_rows),'se
 
 # exact-bin DWT self reports and compliance; compare counts by valid BIN
 for id,key in [('gjm4-k24g','tank_inspections'),('rytv-g5ui','compliance_activity')]:
-    rows,meta=scoped_union('data.cityofnewyork.us',id,in_clauses('bin',bins), 'bin,*', 'bin')
+    rows,meta=scoped_union('data.cityofnewyork.us',id,in_clauses('bin',bins), '*', 'bin')
     source_counts=Counter(str(r.get('bin')) for r in rows if r.get('bin'))
     served=water.get(key) or []
     served_counts=Counter(str(r.get('bin')) for r in served if r.get('bin'))
