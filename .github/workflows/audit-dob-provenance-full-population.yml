@@ -35,12 +35,12 @@ jobs:
       - name: Run actual selector against all 4,893 account details
         run: |
           mkdir -p .dob-proof
-          cat > src/domain/auditDobProvenanceFullPopulation.test.ts <<'TS'
+          mkdir -p tests/frontend\n          cat > tests/frontend/auditDobProvenanceFullPopulation.test.ts <<'TS'
           import fs from 'node:fs'
           import path from 'node:path'
           import { describe, expect, it } from 'vitest'
-          import type { SystemDetailWithDomesticWater } from '../components/DomesticWaterSection'
-          import { collectAccountFirmRoleEvidence } from './accountEvidence'
+          import type { SystemDetailWithDomesticWater } from '../../src/components/DomesticWaterSection'
+          import { collectAccountFirmRoleEvidence } from '../../src/domain/accountEvidence'
 
           function walk(dir: string): string[] {
             return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
@@ -100,8 +100,8 @@ jobs:
             })
           })
           TS
-          npx vitest run src/domain/auditDobProvenanceFullPopulation.test.ts
-          rm src/domain/auditDobProvenanceFullPopulation.test.ts
+          npx vitest run tests/frontend/auditDobProvenanceFullPopulation.test.ts
+          rm tests/frontend/auditDobProvenanceFullPopulation.test.ts
       - name: Preserve proof
         if: always()
         uses: actions/upload-artifact@v4
