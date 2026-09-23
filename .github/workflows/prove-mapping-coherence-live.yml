@@ -1,0 +1,45 @@
+name: Prove mapping coherence gate against live hybrid
+
+on:
+  push:
+    branches: [agent/complete-mapping-propagation-20260923]
+    paths:
+      - scripts/validate_mapping_coherence.py
+      - .github/workflows/prove-mapping-coherence-live.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/complete-mapping-propagation-20260923
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download exact live production artifact
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35804994677
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .live-artifact
+      - name: Confirm the new gate rejects the known hybrid release
+        run: |
+          mkdir -p .live
+          tar -xf .live-artifact/artifact.tar -C .live
+          set +e
+          python scripts/validate_mapping_coherence.py --output .live/data --require-production-volume > gate.log 2>&1
+          status=$?
+          set -e
+          cat gate.log
+          if [ "$status" -eq 0 ]; then
+            echo "Expected live hybrid release to fail mapping coherence" >&2
+            exit 1
+          fi
+          grep -Eq "Summary/detail mapping coherence failed|current/base alias universe" gate.log
