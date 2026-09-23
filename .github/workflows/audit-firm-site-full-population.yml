@@ -1,0 +1,120 @@
+name: Firm-site identity full-population proof
+
+on:
+  push:
+    branches: [agent/audit-repair-firm-site-identity-20260923]
+    paths:
+      - scripts/towersignal/known_firms.py
+      - tests/python/test_known_firms.py
+      - .github/workflows/audit-firm-site-full-population.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35866906472
+          github-token: ${{ github.token }}
+          path: .pages242
+      - name: Extract only known-firm inputs and baseline outputs
+        run: |
+          mkdir -p .fixed
+          tar -xf .pages242/artifact.tar -C .fixed --wildcards             './data/systems.json'             './data/companies.json'             './data/domestic-water-market.json'             './data/procurement-*.json'             './data/details/*/*.json'             './data/known-firms.json'             './data/firm-details/*/*.json'
+          cp -a .fixed/data .candidate-data
+      - name: Rebuild known-firm projection using candidate identity code
+        run: python scripts/build_known_firms.py --output .candidate-data
+      - name: Reconcile full firm and site population
+        run: |
+          mkdir -p .firm-proof
+          python - <<'PY'
+          import json, re
+          from collections import defaultdict
+          from pathlib import Path
+
+          old=Path('.fixed/data'); new=Path('.candidate-data')
+          old_master=json.loads((old/'known-firms.json').read_text())
+          new_master=json.loads((new/'known-firms.json').read_text())
+          old_firms={x['firm_id']:x for x in old_master['firms']}
+          new_firms={x['firm_id']:x for x in new_master['firms']}
+          assert set(old_firms)==set(new_firms), (len(old_firms),len(new_firms))
+
+          preserved_fields=['canonical_name','strict_name','normalized_name','observation_count','role_counts','qualification_count']
+          changed=[]
+          for fid in old_firms:
+              for key in preserved_fields:
+                  if old_firms[fid].get(key)!=new_firms[fid].get(key):
+                      changed.append((fid,key,old_firms[fid].get(key),new_firms[fid].get(key)))
+          assert not changed, changed[:20]
+
+          inspections=json.loads((new/'domestic-water-market.json').read_text())['tank_inspections']
+          insp={str(x.get('inspection_id')):x for x in inspections if x.get('inspection_id')}
+
+          def details(root):
+              out={}
+              for p in (root/'firm-details').glob('*/*.json'):
+                  d=json.loads(p.read_text()); out[d['firm']['firm_id']]=d
+              return out
+          od,nd=details(old),details(new)
+          assert set(od)==set(nd)
+
+          placeholder=re.compile(r'^NYC-BIN-[1-5]000000$')
+          old_placeholder=[]; new_placeholder=[]
+          old_multi=[]; new_multi=[]
+          record_loss=[]; tower_changes=[]
+          for fid in od:
+              osites=od[fid].get('site_relationships',[]); nsites=nd[fid].get('site_relationships',[])
+              old_ids={str(x) for s in osites for x in s.get('source_record_ids',[])}
+              new_ids={str(x) for s in nsites for x in s.get('source_record_ids',[])}
+              if not old_ids.issubset(new_ids):
+                  record_loss.append((fid,sorted(old_ids-new_ids)[:20]))
+              old_towers={str(x) for s in osites for x in s.get('system_ids',[])}
+              new_towers={str(x) for s in nsites for x in s.get('system_ids',[])}
+              if old_towers!=new_towers: tower_changes.append((fid,sorted(old_towers),sorted(new_towers)))
+              for label,sites,target,mp in [('old',osites,old_placeholder,old_multi),('new',nsites,new_placeholder,new_multi)]:
+                  for site in sites:
+                      if placeholder.match(str(site.get('site_id'))): target.append((fid,site))
+                      bbls={str(insp[x].get('bbl')) for x in site.get('source_record_ids',[]) if x in insp and insp[x].get('bbl')}
+                      addresses={str(insp[x].get('address')) for x in site.get('source_record_ids',[]) if x in insp and insp[x].get('address')}
+                      if len(bbls)>1:
+                          mp.append({'firm_id':fid,'site_id':site.get('site_id'),'bbls':sorted(bbls),'addresses':sorted(addresses),'source_ids':site.get('source_record_ids',[])})
+          assert not record_loss, record_loss[:10]
+          assert not tower_changes, tower_changes[:10]
+          assert len(new_multi)==0, new_multi[:10]
+
+          report={
+            'base_run':35866906472,
+            'base_sha':'f1cbdb925b704a8b7a34aaccd169be6649b80a92',
+            'candidate_sha':'${{ github.sha }}',
+            'firms':len(new_firms),
+            'old_placeholder_site_rows':len(old_placeholder),
+            'new_placeholder_site_rows':len(new_placeholder),
+            'old_multi_bbl_sites_proven_from_retained_ids':len(old_multi),
+            'new_multi_bbl_sites_proven_from_retained_ids':len(new_multi),
+            'firm_identity_or_observation_changes':len(changed),
+            'lost_old_retained_source_ids':len(record_loss),
+            'firm_tower_account_set_changes':len(tower_changes),
+            'old_multi_examples':old_multi[:20],
+            'new_placeholder_examples':[{'firm_id':f,'site_id':s.get('site_id'),'bin':s.get('bin'),'bbl':s.get('bbl'),'address':s.get('address')} for f,s in new_placeholder[:20]],
+          }
+          Path('.firm-proof/full-population.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Preserve proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firm-site-full-population-proof
+          path: .firm-proof
+          include-hidden-files: true
+          retention-days: 14
