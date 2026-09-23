@@ -1,0 +1,73 @@
+{
+  "source_file": "TowerSignal_Demo_Deck.pdf",
+  "source_sha256": "c823956148d7706a302428960badfaa7cb6d03431ee719d37065f8c98cdcb571",
+  "source_pages": 8,
+  "extraction": "Original full-page embedded images, RGB conversion, native pixel dimensions, WebP quality 90 method 6. No regenerated content or cropping.",
+  "snapshot_notice": "September 2026 demo. Figures shown belong to the presentation, not the current live dataset.",
+  "assets": [
+    {
+      "path": "public/marketing/demo-deck-20260922/demo-cover.webp",
+      "pdf_page": 1,
+      "pixel_width": 1672,
+      "pixel_height": 941,
+      "size_bytes": 206068,
+      "sha256": "9b90cf7386a3cd88da57c451b4354a5a014415048815eddc21f95961ccbee59c"
+    },
+    {
+      "path": "public/marketing/demo-deck-20260922/demo-prospect.webp",
+      "pdf_page": 2,
+      "pixel_width": 1672,
+      "pixel_height": 941,
+      "size_bytes": 202286,
+      "sha256": "6b89cd562087cbdaecf56dd5c12c873eed3884f26d8e806a7dfa76b8a2fc9fc0"
+    },
+    {
+      "path": "public/marketing/demo-deck-20260922/demo-account-summary.webp",
+      "pdf_page": 3,
+      "pixel_width": 1672,
+      "pixel_height": 941,
+      "size_bytes": 179888,
+      "sha256": "4b2c8de7fdd7eee40c77b2f44f9f7eb1df8bfde6897ea5abdd0a0a9a37962c53"
+    },
+    {
+      "path": "public/marketing/demo-deck-20260922/demo-account-context.webp",
+      "pdf_page": 4,
+      "pixel_width": 1672,
+      "pixel_height": 941,
+      "size_bytes": 180962,
+      "sha256": "5789a1b25c8b8a75ad72521cfb6d94a4d50572ebcd98a9d34f8d513d9dacbb98"
+    },
+    {
+      "path": "public/marketing/demo-deck-20260922/demo-field.webp",
+      "pdf_page": 5,
+      "pixel_width": 1672,
+      "pixel_height": 941,
+      "size_bytes": 192096,
+      "sha256": "33067f94857052b74d31e303b395b05f145cfe23dd5f1082fc8502e69a1aaf9a"
+    },
+    {
+      "path": "public/marketing/demo-deck-20260922/demo-workflow.webp",
+      "pdf_page": 6,
+      "pixel_width": 1672,
+      "pixel_height": 941,
+      "size_bytes": 185748,
+      "sha256": "83fd47137fdc6bcdc33e30d1435b3754331cdd2319e1af9009360f5389949c66"
+    },
+    {
+      "path": "public/marketing/demo-deck-20260922/demo-source-health.webp",
+      "pdf_page": 7,
+      "pixel_width": 1672,
+      "pixel_height": 941,
+      "size_bytes": 204168,
+      "sha256": "61d17eafa6c30f2d3b453b007a4f8eead3ee568f705a5a63b94601582754cc37"
+    },
+    {
+      "path": "public/marketing/demo-deck-20260922/demo-overview.webp",
+      "pdf_page": 8,
+      "pixel_width": 1672,
+      "pixel_height": 940,
+      "size_bytes": 200022,
+      "sha256": "9a2e9525ff2b8aac028b346c978448a188d3764f772a55518cb9938a6712c6e1"
+    }
+  ]
+}
