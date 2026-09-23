@@ -24,8 +24,8 @@ test('private import accepts only exact known-firm identity matches', () => {
     companies:[{
       company_id:'known-firm-alpha',
       canonical_name:'ALPHA WATER LLC',
-      profile:{ website:'https://alpha.example', website_source_url:'https://alpha.example' },
-      contacts:[{ contact_id:'alpha-sales', name:'Sales', email:'sales@alpha.example', active:true }],
+      profile:{ website:'https://alpha.example', website_source_name:'Official site', website_source_url:'https://alpha.example' },
+      contacts:[{ contact_id:'alpha-sales', name:'Sales', email:'sales@alpha.example', source_name:'Official site', source_url:'https://alpha.example/contact', verified_at:'2026-09-23T19:00:00Z', active:true }],
     }],
   }), [firm])
   expect(parsed.companies).toHaveLength(1)
@@ -52,7 +52,7 @@ test('private import rechecks admin access and writes profiles before contacts',
     companies:[{
       company_id:'known-firm-alpha',
       canonical_name:'ALPHA WATER LLC',
-      profile:{ relationship_status:'researching', website:'https://alpha.example' },
+      profile:{ relationship_status:'researching', website:'https://alpha.example', website_source_name:'Official site', website_source_url:'https://alpha.example' },
       contacts:[{ contact_id:'alpha-sales', name:'Sales', email:null, title:null, phone:null, linkedin_url:null, notes:null, source_name:null, source_url:null, verified_at:null, active:true }],
     }],
   }), [firm])
@@ -70,4 +70,42 @@ test('private import fails closed for non-admin users', async () => {
   }), [firm])
   await expect(applyCompanyAdminImport(bundle)).rejects.toThrow(/Admin company-database access is required/)
   expect(client.saveCompanyAdminProfile).not.toHaveBeenCalled()
+})
+
+
+test('private import rejects unsourced enrichment and malformed revenue', () => {
+  expect(() => parseCompanyAdminImport(JSON.stringify({
+    schema: COMPANY_ADMIN_IMPORT_SCHEMA,
+    companies:[{
+      company_id:'known-firm-alpha',
+      canonical_name:'ALPHA WATER LLC',
+      profile:{ website:'https://alpha.example' },
+    }],
+  }), [firm])).toThrow(/website_source_name/)
+
+  expect(() => parseCompanyAdminImport(JSON.stringify({
+    schema: COMPANY_ADMIN_IMPORT_SCHEMA,
+    companies:[{
+      company_id:'known-firm-alpha',
+      canonical_name:'ALPHA WATER LLC',
+      profile:{
+        revenue_amount:1000000,
+        revenue_type:'reported',
+        revenue_source_name:'Annual report',
+        revenue_source_url:'https://alpha.example/revenue',
+      },
+    }],
+  }), [firm])).toThrow(/revenue_year is required/)
+})
+
+test('private import requires provenance for contacts', () => {
+  expect(() => parseCompanyAdminImport(JSON.stringify({
+    schema: COMPANY_ADMIN_IMPORT_SCHEMA,
+    companies:[{
+      company_id:'known-firm-alpha',
+      canonical_name:'ALPHA WATER LLC',
+      profile:{},
+      contacts:[{ contact_id:'alpha-sales', name:'Sales' }],
+    }],
+  }), [firm])).toThrow(/source_name is required/)
 })
