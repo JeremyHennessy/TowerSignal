@@ -1,0 +1,30 @@
+name: Reconcile complete HPD lifecycle delta
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/audit_stage30_complete_hpd_lifecycle.py
+      - .github/workflows/audit-stage30-complete-hpd.yml
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reconcile complete HPD source-version/lifecycle delta
+        run: python -u docs/audits/2026-09-23/audit_stage30_complete_hpd_lifecycle.py
+      - name: Persist results
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage30-complete-hpd
+          cp .audit-stage30/*.json docs/audits/2026-09-23/stage30-complete-hpd/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage30-complete-hpd
+          git commit -m "audit: persist complete HPD lifecycle reconciliation"
+          git pull --rebase origin audit/full-lineage-20260923-1350
+          git push origin HEAD:audit/full-lineage-20260923-1350
