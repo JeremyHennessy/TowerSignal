@@ -76,7 +76,7 @@ test('admin company panel exposes private enrichment without changing public evi
   expect(screen.getByDisplayValue('https://alpha.example')).toBeInTheDocument()
   expect(screen.getByDisplayValue('ALPHA WATER')).toBeInTheDocument()
   expect(screen.getByText('$12,000,000')).toBeInTheDocument()
-  expect(screen.getByText('Existing private note')).toBeInTheDocument()
+  expect(screen.getByDisplayValue('Existing private note')).toBeInTheDocument()
 
   const website = screen.getByDisplayValue('https://alpha.example')
   await user.clear(website)
