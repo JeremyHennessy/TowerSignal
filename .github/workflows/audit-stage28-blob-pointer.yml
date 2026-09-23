@@ -1,0 +1,37 @@
+name: Read-only Blob current-pointer audit
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/audit_stage28_blob_pointer.py
+      - .github/workflows/audit-stage28-blob-pointer.yml
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: azure-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install read-only Blob client
+        run: pip install --disable-pip-version-check azure-storage-blob==12.25.1
+      - name: Read current pointer only
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+        run: python -u docs/audits/2026-09-23/audit_stage28_blob_pointer.py
+      - name: Persist sanitized result
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage28-blob-pointer
+          cp .audit-stage28/blob-current-pointer-audit.json docs/audits/2026-09-23/stage28-blob-pointer/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage28-blob-pointer
+          git commit -m "audit: persist read-only Blob pointer diagnosis"
+          git pull --rebase origin audit/full-lineage-20260923-1350
+          git push origin HEAD:audit/full-lineage-20260923-1350
