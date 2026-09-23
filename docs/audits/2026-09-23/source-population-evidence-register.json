@@ -1,0 +1,213 @@
+{
+  "source_datasets": 33,
+  "statuses": {
+    "FULL_CURRENT_INDEPENDENT": 4,
+    "TARGET_SCOPE_CURRENT_INDEPENDENT": 3,
+    "COLLECTOR_SCOPE_CURRENT_INDEPENDENT": 2,
+    "ARTIFACT_AND_TRANSFORM_VERIFIED": 5,
+    "SCHEMA_COLLECTOR_LINEAGE_VERIFIED": 17,
+    "SOURCE_ROW_MATCHED_DEFECT_FOUND": 2
+  },
+  "independently_current_retrieved_or_exact_source_matched": 11,
+  "entries": [
+    {
+      "dataset_id": "y4fw-iqfr",
+      "name": "NYC cooling-tower registrations",
+      "status": "FULL_CURRENT_INDEPENDENT",
+      "evidence": "Complete publisher population retrieved with stable count/row IDs; duplicate/sample-date census independently reconciled."
+    },
+    {
+      "dataset_id": "f9wb-g8mb",
+      "name": "NYC cooling-tower inspections",
+      "status": "FULL_CURRENT_INDEPENDENT",
+      "evidence": "Complete publisher population retrieved with stable count/row IDs; inspection attachment behavior independently reconciled."
+    },
+    {
+      "dataset_id": "tesw-yqqr",
+      "name": "HPD multiple-dwelling registrations",
+      "status": "FULL_CURRENT_INDEPENDENT",
+      "evidence": "Complete current HPD registration snapshot independently retrieved and reconciled across all 4,893 hosted accounts."
+    },
+    {
+      "dataset_id": "feu5-w2e2",
+      "name": "HPD registration contacts",
+      "status": "TARGET_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "All registration IDs independently selected from the complete relevant HPD registration universe and queried in stable bounded batches; target-account scope complete, not whole-city contact dump."
+    },
+    {
+      "dataset_id": "64uk-42ks",
+      "name": "MapPLUTO",
+      "status": "TARGET_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "Exact canonical-BBL scope for current 4,893-account universe independently queried; 3,804 requested BBLs, 3,775 matched source BBLs, zero owner normalization mismatches."
+    },
+    {
+      "dataset_id": "24a4-muw7",
+      "name": "NYS cooling-tower registry weekly extract",
+      "status": "FULL_CURRENT_INDEPENDENT",
+      "evidence": "Complete current 6,244-row publisher population independently retrieved; 6,244/6,244 equipment IDs and normalized values reconciled."
+    },
+    {
+      "dataset_id": "5zhs-2jue",
+      "name": "NYC Building Footprints",
+      "status": "TARGET_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "Exact assigned-BIN target scope independently queried during identity census; used to validate registry/base-BBL alias bridges and reject placeholder BIN joins."
+    },
+    {
+      "dataset_id": "w9ak-ipjd",
+      "name": "NYC DOB NOW job application filings",
+      "status": "COLLECTOR_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "Current collector-scope source rows independently re-retrieved with source row IDs in source-row identity audit; 75,019 scoped rows examined."
+    },
+    {
+      "dataset_id": "5zyy-y8am",
+      "name": "NYC LL84 benchmarking",
+      "status": "COLLECTOR_SCOPE_CURRENT_INDEPENDENT",
+      "evidence": "Current collector-scope source rows independently re-retrieved with source row IDs; 103,259 scoped rows examined."
+    },
+    {
+      "dataset_id": "erm2-nwe9",
+      "name": "NYC 311 service requests",
+      "status": "ARTIFACT_AND_TRANSFORM_VERIFIED",
+      "evidence": "190,233 retained source-cache rows and transformations independently checked; no fresh complete current declared publisher scope in this continuation."
+    },
+    {
+      "dataset_id": "wvxf-dwi5",
+      "name": "NYC HPD violations",
+      "status": "ARTIFACT_AND_TRANSFORM_VERIFIED",
+      "evidence": "184,528 retained HPD water-violation rows checked field-by-field and cache-to-account; no fresh complete whole declared filtered population independently re-retrieved in final pass."
+    },
+    {
+      "dataset_id": "rbx6-tga4",
+      "name": "NYC DOB NOW approved permits",
+      "status": "ARTIFACT_AND_TRANSFORM_VERIFIED",
+      "evidence": "56,028 retained permit observations checked for value/multiplicity and presentation behavior; fresh current collector-scope publisher re-retrieval remains open."
+    },
+    {
+      "dataset_id": "ic3t-wcy2",
+      "name": "Legacy DOB/BIS job applications",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Official schema and exact-BBL collector/normalizer reviewed; current publisher target population not independently re-retrieved by audit."
+    },
+    {
+      "dataset_id": "jz4z-kudi",
+      "name": "OATH Hearings case status",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Exact summons match contract, fallback behavior and lifecycle schema reviewed; audit has not independently re-retrieved the entire current requested-ticket/agency population outside product build."
+    },
+    {
+      "dataset_id": "76ig-c548",
+      "name": "Historical NYC 311 2010-2019",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Historical bounded exact-BBL source contract and aggregation reviewed; full target population not independently re-retrieved in final audit."
+    },
+    {
+      "dataset_id": "gjm4-k24g",
+      "name": "DOHMH self-reported drinking-water tank inspections",
+      "status": "ARTIFACT_AND_TRANSFORM_VERIFIED",
+      "evidence": "Served normalized population and source-field semantics deeply audited, including firm-site collapse evidence; fresh complete target publisher scope not independently re-retrieved."
+    },
+    {
+      "dataset_id": "xubg-57si",
+      "name": "DOB NOW façade compliance filings",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Exact-BIN collector and field lifecycle reviewed; fresh complete target publisher scope not independently re-retrieved."
+    },
+    {
+      "dataset_id": "dg92-zbpx",
+      "name": "NYC City Record",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Official schema, bounded solicitation/award scopes, pagination contract and normalization reviewed; fresh complete scoped publisher population not independently replayed."
+    },
+    {
+      "dataset_id": "ehig-g5x3",
+      "name": "NYS ABO State Authorities procurement",
+      "status": "SOURCE_ROW_MATCHED_DEFECT_FOUND",
+      "evidence": "566 served state-authority contracts exactly source-fingerprinted in normalization-gap audit; source spend/transaction fields proven dropped. Not a full independent retrieval of all relevant current source candidates."
+    },
+    {
+      "dataset_id": "8w5p-k45m",
+      "name": "NYS ABO Local Authorities procurement",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Schema/search/normalizer contract reviewed; independent current complete relevant population replay remains open."
+    },
+    {
+      "dataset_id": "d84c-dk28",
+      "name": "NYS ABO Local Development Corporations procurement",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Schema/search/normalizer contract reviewed; independent current complete relevant population replay remains open."
+    },
+    {
+      "dataset_id": "p3p6-xqr5",
+      "name": "NYS ABO Industrial Development Agencies procurement",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Schema/search/normalizer contract reviewed; independent current complete relevant population replay remains open."
+    },
+    {
+      "dataset_id": "j63k-4n92",
+      "name": "NYS lead service-line inventory",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Published field contract reviewed; canonical main build currently regenerates related service-line artifacts, but independent current population replay is not yet accepted."
+    },
+    {
+      "dataset_id": "rytv-g5ui",
+      "name": "DOHMH drinking-water tank compliance",
+      "status": "ARTIFACT_AND_TRANSFORM_VERIFIED",
+      "evidence": "Normalized compliance rows/fields and exact-BIN attachment paths audited; fresh complete target source population not independently replayed."
+    },
+    {
+      "dataset_id": "8h5j-fqxa",
+      "name": "ACRIS Real Property Legals",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Exact BBL/alias/condo roll-up identity contract and fields reviewed; current complete target ACRIS population not independently replayed by this audit."
+    },
+    {
+      "dataset_id": "bnx9-e6tj",
+      "name": "ACRIS Real Property Master",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Master document schema/normalization and exact document linkage reviewed; current complete target population replay remains open."
+    },
+    {
+      "dataset_id": "636b-3b5g",
+      "name": "ACRIS Real Property Parties",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Party schema and document linkage reviewed; current complete target population replay remains open."
+    },
+    {
+      "dataset_id": "h8u2-6ejg",
+      "name": "DEC registered pesticide businesses",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Category 7G source/qualification semantics reviewed; current complete source population replay remains open."
+    },
+    {
+      "dataset_id": "c7db-kwpj",
+      "name": "DEC certified pesticide applicators",
+      "status": "SOURCE_ROW_MATCHED_DEFECT_FOUND",
+      "evidence": "All 1,681 served 7G applicators exactly matched to current official source rows; region normalization defect proven for all 1,681."
+    },
+    {
+      "dataset_id": "k5us-nav4",
+      "name": "Free residential lead/copper samples",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Schema/ZIP-borough-only boundary reviewed; no property linkage is inferred; full current source population not independently replayed."
+    },
+    {
+      "dataset_id": "3wxk-qa8q",
+      "name": "Lead/copper compliance samples",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Schema/ZIP-borough-only boundary reviewed; no property linkage is inferred; full current source population not independently replayed."
+    },
+    {
+      "dataset_id": "jqfp-uff7",
+      "name": "NYC DEP service-line locations",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Exact-count builder/BBL attachment contract reviewed; current main build is regenerating service-line artifacts, but independent publisher replay remains open."
+    },
+    {
+      "dataset_id": "x748-37q7",
+      "name": "NYC planimetric cooling towers",
+      "status": "SCHEMA_COLLECTOR_LINEAGE_VERIFIED",
+      "evidence": "Exact assigned-BIN feature identity and coded subfeature domain reviewed; target population not independently re-retrieved in final audit."
+    }
+  ],
+  "boundary": "This register separates source-field/schema lineage from independent current population evidence. A source can have zero unresolved fields while its current publisher population still lacks an independent full/target-scope replay. Product-build retrieval is not counted as independent audit retrieval unless separately reproduced."
+}
