@@ -1,0 +1,134 @@
+{
+  "input_records": 366,
+  "class_counts": {
+    "CALLBACK_FROM_WORKFLOW_STATE": 16,
+    "STILL_UNRESOLVED": 184,
+    "CALLBACK_FROM_LOCAL_COLLECTION_NEEDS_TRACE": 120,
+    "CALLBACK_FROM_SOURCE_OR_ARTIFACT_COLLECTION": 46
+  },
+  "resolved_source_or_workflow_callbacks": 62,
+  "still_needing_trace": 304,
+  "top_remaining_files": [
+    [
+      "src/components/SourceHealthExpansion.tsx",
+      24
+    ],
+    [
+      "src/components/ChangesView.tsx",
+      22
+    ],
+    [
+      "src/components/LegionellaIntelligencePanel.tsx",
+      22
+    ],
+    [
+      "src/components/WorkflowScaleWorkspace.tsx",
+      20
+    ],
+    [
+      "src/components/SourceHealthPage.tsx",
+      19
+    ],
+    [
+      "src/components/Filters.tsx",
+      18
+    ],
+    [
+      "src/App.tsx",
+      17
+    ],
+    [
+      "src/components/ScoreExplanation.tsx",
+      15
+    ],
+    [
+      "src/components/AcrisActivitySection.tsx",
+      14
+    ],
+    [
+      "src/components/PlanimetricTowerSection.tsx",
+      14
+    ],
+    [
+      "src/components/DetailPanel.tsx",
+      12
+    ],
+    [
+      "src/components/DomesticWaterSection.tsx",
+      11
+    ],
+    [
+      "src/components/NysRegistryView.tsx",
+      11
+    ],
+    [
+      "src/components/WorkflowQuickEditor.tsx",
+      7
+    ],
+    [
+      "src/components/WorkflowWorkspacePage.tsx",
+      7
+    ],
+    [
+      "src/components/HomePage.tsx",
+      6
+    ],
+    [
+      "src/components/WorkflowAccountSection.tsx",
+      6
+    ],
+    [
+      "src/components/AccountDecisionSummary.tsx",
+      5
+    ],
+    [
+      "src/components/AccountUnifiedTimeline.tsx",
+      5
+    ],
+    [
+      "src/components/ClientSiteReport.tsx",
+      5
+    ],
+    [
+      "src/components/NysChangesView.tsx",
+      5
+    ],
+    [
+      "src/components/PortfoliosPage.tsx",
+      5
+    ],
+    [
+      "src/components/NysWaterMarketSubViews.tsx",
+      3
+    ],
+    [
+      "src/components/PortalNavigation.tsx",
+      3
+    ],
+    [
+      "src/components/SalesPreCallPack.tsx",
+      3
+    ],
+    [
+      "src/components/TechnicianFieldPack.tsx",
+      3
+    ],
+    [
+      "src/components/TopNavigation.tsx",
+      3
+    ],
+    [
+      "src/components/WaterQualityPage.tsx",
+      3
+    ],
+    [
+      "src/components/AccountModeTabs.tsx",
+      2
+    ],
+    [
+      "src/components/AccountSectionNavigator.tsx",
+      2
+    ]
+  ],
+  "boundary": "Callback-parameter to iterated-collection static trace. Source/artifact collection classification establishes data lineage class, not source correctness or hosted rendering."
+}
