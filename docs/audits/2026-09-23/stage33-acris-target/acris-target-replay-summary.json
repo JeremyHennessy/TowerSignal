@@ -1,0 +1,27 @@
+{
+  "cutoff": "2025-09-23",
+  "served_cache_generated_at": "2026-09-23T13:47:25.635970Z",
+  "requested_tower_bbl_count": 3804,
+  "master_source_rows": 174433,
+  "master_unique_documents": 174186,
+  "legal_rows": 216210,
+  "matched_unique_documents": 13168,
+  "matched_bbl_count": 1049,
+  "party_rows": 37755,
+  "source_snapshots_stable": true,
+  "current_rows_updated": {
+    "bnx9-e6tj": 1788895961,
+    "8h5j-fqxa": 1788895869,
+    "636b-3b5g": 1789481033
+  },
+  "served_source_last_updated": {
+    "bnx9-e6tj": "2026-09-08T19:32:41Z",
+    "8h5j-fqxa": "2026-09-08T19:31:09Z",
+    "636b-3b5g": "2026-09-15T14:03:53Z"
+  },
+  "full_document_count_mismatch_bbls": 0,
+  "party_count_mismatch_bbls": 0,
+  "retained_top25_identity_mismatch_bbls": 0,
+  "all_current_target_relationships_equal": true,
+  "boundary": "Independent current replay of the served ACRIS cutoff and release property graph. Full counts compare system summary; retained browser identities compare exact top-25 document/match-basis/date tuples."
+}
