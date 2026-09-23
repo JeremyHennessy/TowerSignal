@@ -311,11 +311,14 @@ class DataRefreshTests(unittest.TestCase):
         with patch.dict(os.environ,reader.env()),self.assertRaisesRegex(b.PublishError,'Artifact digest mismatch'):
             d.stage(reader,broken)
 
-    def test_old_pages_publisher_fails_closed_after_data_authority_handoff(self):
+    def test_pages_pointer_reader_recognizes_data_authority_handoff(self):
         self.candidate();self.publish()
         before=self.store.data[b.POINTER]
-        with self.assertRaises(b.PublishError): b.current_pointer(self.store)
-        self.assertEqual(self.store.data[b.POINTER],before)
+        current, _, raw = b.current_pointer(self.store)
+        self.assertEqual(current['source']['kind'], 'data-only')
+        self.assertEqual(current['source']['workflow_path'], d.WORKFLOW)
+        self.assertEqual(raw, before)
+        self.assertEqual(self.store.data[b.POINTER], before)
 
     def test_write_boundary_cannot_touch_migration_or_cache_data(self):
         for name in [p.BASELINE+'/runtime/a',b.ROOT+'/caches/acris/x',b.ROOT+'/pointers/runtime-current.json',
