@@ -1,0 +1,30 @@
+name: Reconcile final application lineage ledger
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/build_stage20_final_application_ledger.py
+      - .github/workflows/audit-stage20-final-application-ledger.yml
+permissions:
+  contents: write
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reconcile final application ledger
+        run: python -u docs/audits/2026-09-23/build_stage20_final_application_ledger.py
+      - name: Persist results
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage20-final-application-ledger
+          cp .audit-stage20/*.json docs/audits/2026-09-23/stage20-final-application-ledger/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage20-final-application-ledger
+          git commit -m "audit: persist final application lineage ledger"
+          git pull --rebase origin audit/full-lineage-20260923-1350
+          git push origin HEAD:audit/full-lineage-20260923-1350
