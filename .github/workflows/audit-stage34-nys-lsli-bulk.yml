@@ -1,0 +1,30 @@
+name: Replay complete NYS LSLI bulk source
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/audit_stage34_nys_lsli_bulk.py
+      - .github/workflows/audit-stage34-nys-lsli-bulk.yml
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Replay complete current NYS LSLI bulk source
+        run: python -u docs/audits/2026-09-23/audit_stage34_nys_lsli_bulk.py
+      - name: Persist results
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage34-nys-lsli-bulk
+          cp .audit-stage34/*.json docs/audits/2026-09-23/stage34-nys-lsli-bulk/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage34-nys-lsli-bulk
+          git commit -m "audit: persist complete NYS LSLI source proof"
+          git pull --rebase origin audit/full-lineage-20260923-1350
+          git push origin HEAD:audit/full-lineage-20260923-1350
