@@ -1,0 +1,141 @@
+{
+  "records": 3021,
+  "class_counts": {
+    "LOCAL_DERIVED_OR_PRESENTATION": 573,
+    "ROUTING_OR_PRESENTATION_STATE": 40,
+    "DATA_PAYLOAD_FIELD_NEEDS_BACKTRACE": 716,
+    "SOURCE_HEALTH_OR_PROVENANCE": 128,
+    "WORKFLOW_OR_USER_STATE": 121,
+    "DERIVED_DATA_METRIC_NEEDS_BACKTRACE": 306,
+    "UNRESOLVED_APPLICATION_EXPRESSION": 686,
+    "PRESENTATION_OR_CONTROL": 89,
+    "DIRECT_CORE_SOURCE_LINEAGE": 330,
+    "ROUTING_OR_LINK_TARGET": 32
+  },
+  "needs_backtrace_count": 1708,
+  "files": 57,
+  "files_with_needs_backtrace": 53,
+  "top_needs_backtrace_files": [
+    [
+      "src/components/CompanyProfilePage.tsx",
+      126
+    ],
+    [
+      "src/components/DetailPanel.tsx",
+      110
+    ],
+    [
+      "src/components/SystemTable.tsx",
+      101
+    ],
+    [
+      "src/components/WorkflowScaleWorkspace.tsx",
+      101
+    ],
+    [
+      "src/components/AccountEvidenceWorkspace.tsx",
+      99
+    ],
+    [
+      "src/components/WaterQualityPage.tsx",
+      86
+    ],
+    [
+      "src/components/SourceHealthPage.tsx",
+      80
+    ],
+    [
+      "src/components/ClientSiteReport.tsx",
+      76
+    ],
+    [
+      "src/components/OpportunitiesPage.tsx",
+      68
+    ],
+    [
+      "src/App.tsx",
+      60
+    ],
+    [
+      "src/components/NysWaterMarketSubViews.tsx",
+      56
+    ],
+    [
+      "src/components/BuildingWaterSignalsSection.tsx",
+      55
+    ],
+    [
+      "src/components/DomesticWaterSection.tsx",
+      52
+    ],
+    [
+      "src/components/LegionellaIntelligencePanel.tsx",
+      49
+    ],
+    [
+      "src/components/SourceHealthExpansion.tsx",
+      46
+    ],
+    [
+      "src/components/ChangesView.tsx",
+      44
+    ],
+    [
+      "src/components/CompaniesPage.tsx",
+      40
+    ],
+    [
+      "src/components/PortfoliosPage.tsx",
+      34
+    ],
+    [
+      "src/components/AcrisActivitySection.tsx",
+      33
+    ],
+    [
+      "src/components/NysChangesView.tsx",
+      33
+    ],
+    [
+      "src/components/PlanimetricTowerSection.tsx",
+      31
+    ],
+    [
+      "src/components/SalesPreCallPack.tsx",
+      28
+    ],
+    [
+      "src/components/Filters.tsx",
+      27
+    ],
+    [
+      "src/components/TechnicianFieldPack.tsx",
+      25
+    ],
+    [
+      "src/components/NysRegistryView.tsx",
+      23
+    ],
+    [
+      "src/components/LegacyDobProjectSection.tsx",
+      21
+    ],
+    [
+      "src/components/AccountDecisionSummary.tsx",
+      20
+    ],
+    [
+      "src/components/ScoreExplanation.tsx",
+      16
+    ],
+    [
+      "src/components/WorkflowWorkspacePage.tsx",
+      15
+    ],
+    [
+      "src/components/HistoricalWaterContextSection.tsx",
+      12
+    ]
+  ],
+  "boundary": "Static application-expression classification. DIRECT_CORE_SOURCE_LINEAGE means at least one direct candidate exists, not that the visible value is fully source-verified. NEEDS_BACKTRACE expressions require explicit derivation tracing or browser/state verification."
+}
