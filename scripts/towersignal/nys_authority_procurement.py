@@ -142,13 +142,13 @@ def normalize_row(source: str, dataset_id: str, row: Mapping[str, Any], *, retri
         return None
 
     source_record_id = _source_row_fingerprint(dataset_id, row)
-    contract_number = normalize_space(str(_first(row, "procurement_number", "contract_number", "contract_id") or "")) or None
+    contract_number = normalize_space(str(_first(row, "procurement_number", "contract_number", "contract_id", "transaction_number") or "")) or None
     fiscal_year = parse_iso_date(_first(row, "fiscal_year_end_date"))
     award_date = parse_iso_date(_first(row, "award_date"))
     start_date = parse_iso_date(_first(row, "contract_begin_date", "contract_start_date", "begin_date", "start_date"))
     end_date = parse_iso_date(_first(row, "contract_end_date", "end_date"))
     amount = parse_money(_first(row, "contract_amount", "amount", "procurement_amount", "total_amount"))
-    expended = parse_money(_first(row, "amount_expended", "amount_spent", "expenditures", "spend_to_date"))
+    expended = parse_money(_first(row, "amount_expended_to_date", "amount_expended_for_fiscal_year", "amount_expended", "amount_spent", "expenditures", "spend_to_date"))
 
     return {
         "schema_version": SCHEMA_VERSION,
