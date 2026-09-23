@@ -1,0 +1,58 @@
+name: Refine company audit logging
+
+on:
+  push:
+    branches:
+      - ops/refine-company-audit-20260923
+    paths:
+      - '.github/workflows/refine-company-audit-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply audit refinement
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/004a_company_audit_refinement.sql
+      - name: Transactionally verify concise insert audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+          INSERT INTO public.company_private_profiles (
+            company_id, canonical_name, last_change_source, last_change_batch_id
+          ) VALUES (
+            '__audit_refinement_probe__', 'Audit refinement probe', 'system', 'audit-refinement-probe'
+          );
+          DO $$
+          DECLARE
+            v_rows integer;
+            v_null_rows integer;
+          BEGIN
+            SELECT count(*) INTO v_rows
+            FROM public.company_private_change_log
+            WHERE company_id='__audit_refinement_probe__';
+            SELECT count(*) INTO v_null_rows
+            FROM public.company_private_change_log
+            WHERE company_id='__audit_refinement_probe__'
+              AND new_value='null'::jsonb;
+            IF v_rows < 2 OR v_rows > 8 OR v_null_rows <> 0 THEN
+              RAISE EXCEPTION 'Audit refinement verification failed: rows=% null_rows=%', v_rows, v_null_rows;
+            END IF;
+          END $$;
+          ROLLBACK;
+          SELECT 'COMPANY_AUDIT_REFINEMENT=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_profiles) AS profiles,
+                 (SELECT count(*) FROM public.company_private_change_log) AS audit_rows;
+          SQL
