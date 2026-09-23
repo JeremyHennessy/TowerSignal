@@ -378,6 +378,40 @@ def _verify_hpd_snapshot_identity_stability(
     }
 
 
+def _fetch_stable_hpd_population(
+    *,
+    page_size: int,
+    max_attempts: int = 3,
+) -> tuple[list[SourceSnapshot], list[dict[str, Any]], int, dict[str, Any]]:
+    if max_attempts <= 0:
+        raise ValueError("max_attempts must be positive")
+    last_error: DomesticWaterSourceError | None = None
+    for attempt in range(1, max_attempts + 1):
+        print(
+            f"NYC water HPD stability attempt {attempt}/{max_attempts}: fetching primary population",
+            file=sys.stderr,
+            flush=True,
+        )
+        snapshots = _fetch_hpd_snapshots(page_size=page_size)
+        rows, duplicate_count = _dedupe_hpd_rows(snapshots)
+        try:
+            proof = _verify_hpd_snapshot_identity_stability(snapshots, page_size=page_size)
+        except DomesticWaterSourceError as exc:
+            last_error = exc
+            print(
+                f"NYC water HPD stability attempt {attempt}/{max_attempts} drifted; retrying complete HPD population",
+                file=sys.stderr,
+                flush=True,
+            )
+            continue
+        proof["attempt"] = attempt
+        proof["max_attempts"] = max_attempts
+        return snapshots, rows, duplicate_count, proof
+    raise DomesticWaterSourceError(
+        f"HPD water-violation identity set did not stabilize after {max_attempts} complete attempts: {last_error}"
+    )
+
+
 def classify_dob_work(row: Mapping[str, Any]) -> str:
     text = _lower_text(row.get("job_description"), row.get("work_type"))
     if any(term in text for term in ("sprinkler", "standpipe", "fire suppression")) and not any(term in text for term in ("domestic water", "potable", "backflow", "rpz")):
@@ -566,10 +600,10 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
     print("NYC water signals: fetching 311 DEP water/lead request partitions", file=sys.stderr, flush=True)
     requests_snapshots = _fetch_311_snapshots(page_size=page_size)
     request_rows, request_duplicate_partition_count = _dedupe_311_rows(requests_snapshots)
-    print("NYC water signals: fetching HPD water violation partitions", file=sys.stderr, flush=True)
-    hpd_snapshots = _fetch_hpd_snapshots(page_size=page_size)
-    hpd_rows, hpd_duplicate_partition_count = _dedupe_hpd_rows(hpd_snapshots)
-    hpd_identity_verification = _verify_hpd_snapshot_identity_stability(hpd_snapshots, page_size=page_size)
+    print("NYC water signals: fetching stable HPD water violation population", file=sys.stderr, flush=True)
+    hpd_snapshots, hpd_rows, hpd_duplicate_partition_count, hpd_identity_verification = _fetch_stable_hpd_population(
+        page_size=page_size
+    )
     job_snapshot = fetch_snapshot(
         DOB_JOB_FILINGS_DATASET_ID, api_root=NYC_API_ROOT, order_by="job_filing_number",
         required_fields=("job_filing_number", "filing_status", "house_no", "street_name", "borough", "bin", "bbl", "applicant_professional_title", "applicant_license", "applicant_first_name", "applicants_middle_initial", "applicant_last_name", "applicant_business_name", "owner_s_business_name", "plumbing_work_type", "boiler_equipment_work_type_", "mechanical_systems_work_type_", "filing_date", "approved_date", "signoff_date", "job_description"),
@@ -629,6 +663,8 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
             "hpd_identity_second_pass_sha256": hpd_identity_verification["second_pass_sha256"],
             "hpd_identity_second_pass_duplicate_count": hpd_identity_verification["second_pass_duplicate_count"],
             "hpd_identity_second_pass_partition_count": hpd_identity_verification["second_pass_partition_count"],
+            "hpd_identity_stability_attempt": hpd_identity_verification["attempt"],
+            "hpd_identity_stability_max_attempts": hpd_identity_verification["max_attempts"],
             "dob_water_job_filing_count": len(jobs),
             "dob_water_permit_count": len(permits),
             "dob_observed_business_count": len(dob_businesses),
