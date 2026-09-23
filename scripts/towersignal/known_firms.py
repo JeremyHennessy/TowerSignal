@@ -5,6 +5,8 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Any, Iterable, Mapping, Sequence
 
 from towersignal.company_intelligence import strict_vendor_key
+from towersignal.planimetrics import normalize_bin
+from towersignal.pluto import normalize_bbl
 from towersignal.procurement import normalize_company_name, normalize_space, stable_id
 
 SCHEMA_VERSION = "1.0"
@@ -61,8 +63,8 @@ def _safe_firm_detail_path(firm_id: str) -> str:
 
 
 def _system_site_key(row: Mapping[str, Any]) -> str:
-    bin_value = normalize_space(str(row.get("bin") or ""))
-    bbl = normalize_space(str(row.get("bbl") or ""))
+    bin_value = normalize_bin(row.get("bin"))
+    bbl = normalize_bbl(row.get("bbl"))
     system_id = normalize_space(str(row.get("system_id") or ""))
     if bin_value:
         return f"NYC-BIN-{bin_value}"
@@ -105,8 +107,8 @@ def _site_from_systems(
 ) -> dict[str, Any]:
     rows = list(systems)
     first = rows[0] if rows else {}
-    bin_value = normalize_space(str(fallback_bin or first.get("bin") or "")) or None
-    bbl = normalize_space(str(fallback_bbl or first.get("bbl") or "")) or None
+    bin_value = normalize_bin(fallback_bin if fallback_bin is not None else first.get("bin"))
+    bbl = normalize_bbl(fallback_bbl if fallback_bbl is not None else first.get("bbl"))
     address = normalize_space(str(fallback_address or first.get("address") or "")) or None
     borough = normalize_space(str(fallback_borough or first.get("borough") or "")) or None
     zip_value = normalize_space(str(fallback_zip or first.get("zip") or "")) or None
@@ -270,10 +272,10 @@ def build_known_firms(
     systems_by_bin: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     systems_by_bbl: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for row in systems:
-        if row.get("bin"):
-            systems_by_bin[str(row["bin"])].append(row)
-        if row.get("bbl"):
-            systems_by_bbl[str(row["bbl"])].append(row)
+        if bin_value := normalize_bin(row.get("bin")):
+            systems_by_bin[bin_value].append(row)
+        if bbl_value := normalize_bbl(row.get("bbl")):
+            systems_by_bbl[bbl_value].append(row)
 
     firms: dict[str, dict[str, Any]] = {}
     procurement_alias_index: dict[str, set[str]] = defaultdict(set)
@@ -364,8 +366,8 @@ def build_known_firms(
             system = systems_by_id.get(str(system_id))
             if system and system not in linked:
                 linked.append(system)
-        normalized_bin = normalize_space(str(bin_value or ""))
-        normalized_bbl = normalize_space(str(bbl or ""))
+        normalized_bin = normalize_bin(bin_value)
+        normalized_bbl = normalize_bbl(bbl)
         if normalized_bin:
             for system in systems_by_bin.get(normalized_bin, []):
                 if system not in linked:
