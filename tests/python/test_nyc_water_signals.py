@@ -89,6 +89,35 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(classify_dob_work({"job_description": "REPLACE FIRE SPRINKLER WATER PIPING", "work_type": "Plumbing"}), "FIRE_WATER_CONTEXT")
         self.assertEqual(classify_dob_work({"job_description": "REPLACE DOMESTIC WATER PIPING", "work_type": "Plumbing"}), "DOMESTIC_WATER_SYSTEM")
 
+    def test_dob_explicit_source_work_type_is_generic_fallback_only(self) -> None:
+        self.assertEqual(
+            classify_dob_work({"job_description": "REPLACE RISER", "plumbing_work_type": "YES"}),
+            "PLUMBING_WATER_RELATED",
+        )
+        self.assertEqual(
+            classify_dob_work({"job_description": "REPLACE EQUIPMENT", "mechanical_systems_work_type_": "YES"}),
+            "MECHANICAL_WATER_RELATED",
+        )
+        self.assertEqual(
+            classify_dob_work({"job_description": "REPLACE EQUIPMENT", "boiler_equipment_work_type_": "YES"}),
+            "BOILER_WATER_ADJACENT",
+        )
+        self.assertEqual(
+            classify_dob_work({
+                "job_description": "REPLACE EQUIPMENT",
+                "plumbing_work_type": "YES",
+                "mechanical_systems_work_type_": "YES",
+            }),
+            "MULTI_WATER_MECHANICAL_SOURCE_SCOPE",
+        )
+        self.assertEqual(
+            classify_dob_work({
+                "job_description": "REPLACE DOMESTIC WATER PIPING",
+                "mechanical_systems_work_type_": "YES",
+            }),
+            "DOMESTIC_WATER_SYSTEM",
+        )
+
     def test_ll84_multi_bbl_is_not_force_linked(self) -> None:
         single = normalize_ll84({"report_year": "2025", "property_id": "1", "nyc_borough_block_and_lot": "1000010001", "nyc_building_identification": "1000001", "municipally_supplied_potable_1": "1234.5"})
         self.assertEqual(single["property_link_confidence"], "EXACT_SINGLE_BBL")
