@@ -1,0 +1,35 @@
+name: Replay NYC DEP service-line target population
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/audit_stage26_nyc_service_lines.py
+      - .github/workflows/audit-stage26-nyc-service-lines.yml
+permissions:
+  contents: write
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Replay exact-BBL DEP service-line population
+        run: python -u docs/audits/2026-09-23/audit_stage26_nyc_service_lines.py
+      - name: Persist evidence
+        if: always()
+        run: |
+          if [ -d .audit-stage26 ]; then
+            mkdir -p docs/audits/2026-09-23/stage26-nyc-service-lines
+            cp .audit-stage26/*.json docs/audits/2026-09-23/stage26-nyc-service-lines/ || true
+            git config user.name "TowerSignal Audit"
+            git config user.email "actions@users.noreply.github.com"
+            git add docs/audits/2026-09-23/stage26-nyc-service-lines
+            if ! git diff --cached --quiet; then
+              git commit -m "audit: persist NYC DEP service-line population replay"
+              git pull --rebase origin audit/full-lineage-20260923-1350
+              git push origin HEAD:audit/full-lineage-20260923-1350
+            fi
+          fi
