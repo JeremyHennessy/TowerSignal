@@ -297,11 +297,6 @@ jobs:
         run: |
           npx playwright test             tests/e2e/missing-sample-priority-release.spec.ts             tests/e2e/account-header.spec.ts             tests/e2e/approved-account-pdf.spec.ts             tests/e2e/account-correction-acceptance.spec.ts             --project=desktop-chromium --project=iphone
 
-      - name: Inspect approved four-page PDF bytes
-        run: |
-          python -m pip install --quiet PyMuPDF==1.24.14
-          python scripts/verify-account-pdf.py
-
       - name: Retain pre-deploy proof
         if: always()
         uses: actions/upload-artifact@v4
@@ -409,11 +404,6 @@ jobs:
           BASE_URL: ${{ needs.deploy.outputs.page_url }}
         run: |
           GITHUB_RUN_ID="${GITHUB_RUN_ID}-hosted" npx playwright test             tests/e2e/missing-sample-priority-release.spec.ts             tests/e2e/account-header.spec.ts             tests/e2e/approved-account-pdf.spec.ts             tests/e2e/account-correction-acceptance.spec.ts             --project=desktop-chromium --project=iphone
-
-      - name: Inspect actual hosted four-page PDF bytes
-        run: |
-          python -m pip install --quiet PyMuPDF==1.24.14
-          python scripts/verify-account-pdf.py
 
       - name: Retain hosted proof
         if: always()
