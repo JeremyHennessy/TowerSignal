@@ -1,0 +1,54 @@
+name: Verify seeded company RLS batch 4
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/postseed-company-rls-batch4-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Verify current private rows remain admin-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+          DO $$
+          DECLARE
+            admin_id text; nonadmin_id text;
+            admin_profiles integer; admin_contacts integer;
+            nonadmin_profiles integer; nonadmin_contacts integer;
+          BEGIN
+            SELECT id::text INTO admin_id FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin' LIMIT 1;
+            SELECT id::text INTO nonadmin_id FROM neon_auth."user" WHERE lower(coalesce(role,''))<>'admin' LIMIT 1;
+            IF admin_id IS NULL OR nonadmin_id IS NULL THEN RAISE EXCEPTION 'Expected admin and non-admin identities'; END IF;
+
+            EXECUTE 'SET LOCAL ROLE authenticated';
+            PERFORM set_config('request.jwt.claims', json_build_object('sub', nonadmin_id, 'role', 'authenticated')::text, true);
+            SELECT count(*) INTO nonadmin_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO nonadmin_contacts FROM public.company_private_contacts;
+            IF nonadmin_profiles <> 0 OR nonadmin_contacts <> 0 THEN
+              RAISE EXCEPTION 'Non-admin visibility failed: profiles=% contacts=%', nonadmin_profiles, nonadmin_contacts;
+            END IF;
+
+            PERFORM set_config('request.jwt.claims', json_build_object('sub', admin_id, 'role', 'authenticated')::text, true);
+            SELECT count(*) INTO admin_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO admin_contacts FROM public.company_private_contacts;
+            IF admin_profiles <> 13 OR admin_contacts <> 13 THEN
+              RAISE EXCEPTION 'Admin visibility failed: profiles=% contacts=%', admin_profiles, admin_contacts;
+            END IF;
+
+            RAISE NOTICE 'SEEDED_COMPANY_RLS_BATCH4=PASS admin_profiles=% admin_contacts=% nonadmin_profiles=% nonadmin_contacts=%',
+              admin_profiles, admin_contacts, nonadmin_profiles, nonadmin_contacts;
+          END $$;
+          ROLLBACK;
+          SQL
