@@ -1,0 +1,92 @@
+name: Probe live company admin backend
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/company-admin-live-probe-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TOWERSIGNAL_E2E_EMAIL: ${{ secrets.TOWERSIGNAL_E2E_EMAIL }}
+      TOWERSIGNAL_E2E_PASSWORD: ${{ secrets.TOWERSIGNAL_E2E_PASSWORD }}
+      AUTH_URL: https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth
+      DATA_API_URL: https://ep-silent-moon-au2icaki.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Inspect production auth role and company schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${TOWERSIGNAL_E2E_EMAIL:-}" ] || [ -z "${TOWERSIGNAL_E2E_PASSWORD:-}" ]; then
+            echo "E2E_CREDENTIALS=MISSING"
+            exit 2
+          fi
+          node <<'NODE'
+          const authUrl = process.env.AUTH_URL
+          const dataApiUrl = process.env.DATA_API_URL
+          const email = process.env.TOWERSIGNAL_E2E_EMAIL
+          const password = process.env.TOWERSIGNAL_E2E_PASSWORD
+          const origin = 'https://jeremyhennessy.github.io'
+
+          function cookiesFrom(response) {
+            const values = typeof response.headers.getSetCookie === 'function'
+              ? response.headers.getSetCookie()
+              : [response.headers.get('set-cookie')].filter(Boolean)
+            return values.map(value => value.split(';', 1)[0]).join('; ')
+          }
+
+          const signIn = await fetch(`${authUrl}/sign-in/email`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', origin },
+            body: JSON.stringify({ email, password, rememberMe: false }),
+            redirect: 'manual',
+          })
+          const signInText = await signIn.text()
+          if (!signIn.ok) throw new Error(`SIGN_IN_FAILED=${signIn.status}`)
+          const cookies = cookiesFrom(signIn)
+          console.log('E2E_SIGN_IN=OK')
+
+          const session = await fetch(`${authUrl}/get-session`, { headers: { cookie: cookies, origin } })
+          const sessionText = await session.text()
+          if (!session.ok) throw new Error(`SESSION_FAILED=${session.status}`)
+          const body = sessionText ? JSON.parse(sessionText) : {}
+          const role = body?.user?.role ?? body?.user?.roles ?? null
+          console.log(`SESSION_ROLE=${Array.isArray(role) ? role.join(',') : (role ?? 'ABSENT')}`)
+          const jwt = session.headers.get('set-auth-jwt')
+          if (!jwt) throw new Error('JWT=ABSENT')
+          console.log('JWT=PRESENT')
+
+          async function probe(name, path) {
+            const response = await fetch(`${dataApiUrl}/${path}`, {
+              headers: { authorization: `Bearer ${jwt}`, accept: 'application/json' },
+            })
+            const text = await response.text()
+            console.log(`${name}_HTTP=${response.status}`)
+            if (response.ok) {
+              let value = text
+              try { value = JSON.parse(text) } catch {}
+              if (name === 'COMPANY_ADMIN_ACCESS' && Array.isArray(value)) {
+                console.log(`COMPANY_ADMIN_ACCESS_ROWS=${value.length}`)
+                if (value[0] && typeof value[0].is_admin === 'boolean') console.log(`COMPANY_ADMIN_IS_ADMIN=${value[0].is_admin}`)
+              } else if (Array.isArray(value)) {
+                console.log(`${name}_ROWS=${value.length}`)
+              }
+            } else {
+              let code = 'UNKNOWN'
+              try { code = JSON.parse(text)?.code ?? 'UNKNOWN' } catch {}
+              console.log(`${name}_ERROR_CODE=${code}`)
+            }
+          }
+
+          await probe('COMPANY_ADMIN_ACCESS', 'company_admin_access?select=is_admin&limit=1')
+          await probe('COMPANY_PRIVATE_PROFILES', 'company_private_profiles?select=company_id&limit=1')
+          NODE
