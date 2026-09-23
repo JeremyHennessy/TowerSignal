@@ -1,0 +1,40 @@
+name: Persist stage4 audit censuses
+
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - .github/workflows/persist-stage4-audit-censuses.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: audit/full-lineage-20260923-1350
+          fetch-depth: 2
+      - uses: actions/download-artifact@v4
+        with:
+          name: lineage-stage4-current-source-census
+          run-id: 35885600439
+          github-token: ${{ github.token }}
+          path: .stage4
+      - name: Copy complete derived censuses and retrieval manifests
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage4-current
+          for name in             stage4-summary.json             hosted-systems-metadata.json             hpd-registration-retrieval.json             hpd-contact-retrieval.json             hpd-current-full-account-reconciliation.json             pluto-owner-retrieval.json             pluto-owner-full-account-reconciliation.json             nys-current-retrieval.json             nys-current-full-reconciliation.json; do
+            cp ".stage4/$name" "docs/audits/2026-09-23/stage4-current/$name"
+          done
+      - name: Commit only isolated audit evidence
+        run: |
+          git config user.name "TowerSignal Audit"
+          git config user.email "audit@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage4-current
+          git diff --cached --quiet && exit 0
+          git commit -m "audit: persist stage4 current-source censuses"
+          git push origin HEAD:audit/full-lineage-20260923-1350
