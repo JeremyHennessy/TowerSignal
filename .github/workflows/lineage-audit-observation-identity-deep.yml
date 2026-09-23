@@ -1,0 +1,129 @@
+name: Deep observation identity collision audit
+
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - .github/workflows/lineage-audit-observation-identity-deep.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35866906472
+          github-token: ${{ github.token }}
+          path: .pages242
+      - name: Extract cache
+        run: |
+          mkdir -p .deep-id
+          tar -xf .pages242/artifact.tar -C .deep-id --wildcards './data/nyc-water-signals.json'
+      - name: Analyze varying normalized and raw source fields
+        run: |
+          python - <<'PY'
+          import json,itertools,hashlib
+          from collections import defaultdict,Counter
+          from pathlib import Path
+
+          payload=json.loads(Path('.deep-id/data/nyc-water-signals.json').read_text())
+          specs={'dob_water_job_filings':'activity_id','ll84_water_benchmarks':'benchmark_id'}
+          report={}
+          def scalar(v):
+              if v is None:return ''
+              if isinstance(v,(str,int,float,bool)):return str(v).strip()
+              return json.dumps(v,sort_keys=True,separators=(',',':'))
+          def digest(r):return hashlib.sha256(json.dumps(r,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          for array,idfield in specs.items():
+              rows=payload[array]
+              by=defaultdict(list)
+              for r in rows:
+                  k=scalar(r.get(idfield))
+                  if k:by[k].append(r)
+              groups=[g for g in by.values() if len(g)>1 and len({digest(r) for r in g})>1]
+              all_fields=sorted(set().union(*(r.keys() for g in groups for r in g)))
+              # Flatten raw fields as raw.<name> so source-native row keys can be evaluated.
+              raw_fields=sorted({k for g in groups for r in g for k in ((r.get('raw') or {}).keys() if isinstance(r.get('raw'),dict) else [])})
+              field_getters={}
+              for f in all_fields:
+                  if f!='raw': field_getters[f]=lambda r,f=f:scalar(r.get(f))
+              for f in raw_fields:
+                  field_getters['raw.'+f]=lambda r,f=f:scalar((r.get('raw') or {}).get(f) if isinstance(r.get('raw'),dict) else None)
+
+              varies=Counter()
+              for name,getter in field_getters.items():
+                  for g in groups:
+                      if len({getter(r) for r in g})>1:varies[name]+=1
+              ranked=[n for n,c in varies.most_common() if n!=idfield]
+              # Prefer source/document identity/date/version-like fields, then top varying fields.
+              preferred=[n for n in ranked if any(token in n.lower() for token in ['id','date','sequence','year','modified','status','filing','report','record','submission','property'])]
+              candidates=[]
+              seen=set()
+              for n in preferred+ranked:
+                  if n not in seen:
+                      seen.add(n);candidates.append(n)
+                  if len(candidates)>=25:break
+
+              def unresolved(fields):
+                  bad=0; examples=[]
+                  for g in groups:
+                      vals=[tuple([scalar(r.get(idfield))]+[field_getters[f](r) for f in fields]) for r in g]
+                      # same candidate key among non-identical rows is unresolved
+                      keyed=defaultdict(list)
+                      for key,row in zip(vals,g):keyed[key].append(row)
+                      coll=[v for v in keyed.values() if len(v)>1 and len({digest(r) for r in v})>1]
+                      if coll:
+                          bad+=1
+                          if len(examples)<8:examples.append({'current_id':scalar(g[0].get(idfield)),'collision_size':len(g)})
+                  return bad,examples
+
+              one=[]
+              for a in candidates:
+                  n,ex=unresolved([a]);one.append({'fields':[idfield,a],'unresolved_groups':n,'examples':ex})
+              pairs=[]
+              for a,b in itertools.combinations(candidates,2):
+                  n,ex=unresolved([a,b])
+                  pairs.append({'fields':[idfield,a,b],'unresolved_groups':n,'examples':ex})
+              pairs.sort(key=lambda x:(x['unresolved_groups'],x['fields']))
+              triples=[]
+              # Only search triples formed from the 12 strongest fields.
+              top=candidates[:12]
+              for a,b,c in itertools.combinations(top,3):
+                  n,ex=unresolved([a,b,c])
+                  triples.append({'fields':[idfield,a,b,c],'unresolved_groups':n,'examples':ex})
+              triples.sort(key=lambda x:(x['unresolved_groups'],x['fields']))
+
+              collision_examples=[]
+              for g in groups[:25]:
+                  varying=[n for n,getter in field_getters.items() if len({getter(r) for r in g})>1]
+                  collision_examples.append({
+                    'current_id':scalar(g[0].get(idfield)),
+                    'rows':len(g),
+                    'varying_fields':varying,
+                    'selected_values':[{n:field_getters[n](r) for n in varying[:20]} for r in g[:8]],
+                  })
+              report[array]={
+                'differing_current_id_groups':len(groups),
+                'field_variation_frequency':varies.most_common(),
+                'candidate_fields':candidates,
+                'best_single_field_extensions':sorted(one,key=lambda x:(x['unresolved_groups'],x['fields']))[:15],
+                'best_two_field_extensions':pairs[:30],
+                'best_three_field_extensions':triples[:30],
+                'collision_examples':collision_examples,
+              }
+          Path('.deep-id/deep-observation-identity-report.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps({k:{'groups':v['differing_current_id_groups'],'best1':v['best_single_field_extensions'][:5],'best2':v['best_two_field_extensions'][:5],'best3':v['best_three_field_extensions'][:5]} for k,v in report.items()},indent=2))
+          PY
+      - name: Preserve deep report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-observation-identity-audit
+          path: .deep-id/deep-observation-identity-report.json
+          retention-days: 14
