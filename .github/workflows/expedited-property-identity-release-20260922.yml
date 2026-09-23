@@ -114,7 +114,7 @@ jobs:
               'bin','bbl','registry_bbl','property_bbl','bbl_aliases',
               'bbl_identity_basis','bbl_identity_status','bbl_identity_evidence',
               'priority_score','score_components','primary_signal','signal_types',
-              'official_building_evidence_count','official_building_followup'
+              'official_building_evidence_count','official_building_followup','latest_acris_recorded_date'
           }
           def stable_system(row):
               return {
@@ -245,7 +245,7 @@ jobs:
               'bin','bbl','registry_bbl','property_bbl','bbl_aliases',
               'bbl_identity_basis','bbl_identity_status','bbl_identity_evidence',
               'priority_score','score_components','primary_signal','signal_types',
-              'official_building_evidence_count','official_building_followup'
+              'official_building_evidence_count','official_building_followup','latest_acris_recorded_date'
           }
           allowed_detail={
               'identity','building_footprints','building_context','hpd_registration',
