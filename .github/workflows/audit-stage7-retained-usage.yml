@@ -1,0 +1,29 @@
+name: Audit retained core-field downstream usage
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/build_stage7_retained_usage.py
+      - .github/workflows/audit-stage7-retained-usage.yml
+permissions:
+  contents: write
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan downstream code use
+        run: python -u docs/audits/2026-09-23/build_stage7_retained_usage.py
+      - name: Persist results
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage7-retained-usage
+          cp .audit-stage7/*.json docs/audits/2026-09-23/stage7-retained-usage/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage7-retained-usage
+          git commit -m "audit: persist retained core-field downstream usage"
+          git push origin HEAD:audit/full-lineage-20260923-1350
