@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 import { applyCompanyAdminImport, parseCompanyAdminImport, COMPANY_ADMIN_IMPORT_SCHEMA } from '../../src/companyAdmin/import'
 import * as client from '../../src/companyAdmin/client'
 import type { KnownFirmSummaryRecord } from '../../src/types/firm'
@@ -8,6 +8,10 @@ vi.mock('../../src/companyAdmin/client', () => ({
   saveCompanyAdminProfile: vi.fn(),
   saveCompanyAdminContact: vi.fn(),
 }))
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 const firm = {
   firm_id:'known-firm-alpha',
