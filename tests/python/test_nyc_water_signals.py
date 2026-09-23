@@ -556,6 +556,10 @@ class NycWaterSignalsTests(unittest.TestCase):
         cache = Path(handle.name)
         try:
             validated = validate(cache, max_age_days=1, require_production_volume=False)
+            payload["summary"]["hpd_identity_second_pass_sha256"] = "0" * 64
+            cache.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "identity stability digests"):
+                validate(cache, max_age_days=1, require_production_volume=False)
         finally:
             cache.unlink()
 
