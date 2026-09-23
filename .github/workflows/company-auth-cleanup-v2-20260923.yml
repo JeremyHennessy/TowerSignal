@@ -1,0 +1,115 @@
+name: Remove TowerSignal test accounts v2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/company-auth-cleanup-v2-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Remove CI-created test users atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || exit 2
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          DO $$
+          DECLARE
+            v_total integer;
+            v_test integer;
+            v_real integer;
+            v_unknown integer;
+          BEGIN
+            SELECT count(*),
+                   count(*) FILTER (WHERE lower(email) LIKE '%@example.com'),
+                   count(*) FILTER (WHERE lower(email) NOT LIKE '%@example.com')
+              INTO v_total, v_test, v_real
+            FROM neon_auth."user";
+
+            IF v_total <> 598 OR v_test <> 596 OR v_real <> 2 THEN
+              RAISE EXCEPTION 'Unexpected auth population: total=% test=% real=%', v_total, v_test, v_real;
+            END IF;
+
+            SELECT count(*)
+              INTO v_unknown
+            FROM information_schema.columns c
+            JOIN information_schema.tables t
+              ON t.table_schema=c.table_schema AND t.table_name=c.table_name
+            WHERE c.table_schema='public'
+              AND c.column_name='user_id'
+              AND t.table_type='BASE TABLE'
+              AND c.table_name NOT IN (
+                'workflow_saved_views',
+                'workflow_watchlists',
+                'workflow_accounts',
+                'workflow_watchlist_members'
+              );
+
+            IF v_unknown <> 0 THEN
+              RAISE EXCEPTION 'Unexpected public user-owned base tables: %', v_unknown;
+            END IF;
+          END $$;
+
+          CREATE TEMP TABLE towersignal_test_users AS
+          SELECT id::text AS user_id
+          FROM neon_auth."user"
+          WHERE lower(email) LIKE '%@example.com';
+
+          DELETE FROM public.workflow_watchlist_members
+            WHERE user_id IN (SELECT user_id FROM towersignal_test_users);
+          DELETE FROM public.workflow_accounts
+            WHERE user_id IN (SELECT user_id FROM towersignal_test_users);
+          DELETE FROM public.workflow_watchlists
+            WHERE user_id IN (SELECT user_id FROM towersignal_test_users);
+          DELETE FROM public.workflow_saved_views
+            WHERE user_id IN (SELECT user_id FROM towersignal_test_users);
+
+          DELETE FROM neon_auth."user"
+            WHERE id::text IN (SELECT user_id FROM towersignal_test_users);
+
+          DO $$
+          DECLARE
+            v_total integer;
+            v_test integer;
+            v_real integer;
+            v_orphans integer;
+          BEGIN
+            SELECT count(*),
+                   count(*) FILTER (WHERE lower(email) LIKE '%@example.com'),
+                   count(*) FILTER (WHERE lower(email) NOT LIKE '%@example.com')
+              INTO v_total, v_test, v_real
+            FROM neon_auth."user";
+
+            SELECT
+              (SELECT count(*) FROM public.workflow_saved_views w JOIN towersignal_test_users t ON t.user_id=w.user_id) +
+              (SELECT count(*) FROM public.workflow_watchlists w JOIN towersignal_test_users t ON t.user_id=w.user_id) +
+              (SELECT count(*) FROM public.workflow_accounts w JOIN towersignal_test_users t ON t.user_id=w.user_id) +
+              (SELECT count(*) FROM public.workflow_watchlist_members w JOIN towersignal_test_users t ON t.user_id=w.user_id)
+              INTO v_orphans;
+
+            IF v_total <> 2 OR v_test <> 0 OR v_real <> 2 OR v_orphans <> 0 THEN
+              RAISE EXCEPTION 'Cleanup postcondition failed: total=% test=% real=% orphans=%',
+                v_total, v_test, v_real, v_orphans;
+            END IF;
+          END $$;
+
+          COMMIT;
+
+          SELECT 'AUTH_CLEANUP=PASS',
+                 count(*),
+                 count(*) FILTER (WHERE lower(email) LIKE '%@example.com'),
+                 count(*) FILTER (WHERE lower(email) NOT LIKE '%@example.com'),
+                 count(*) FILTER (WHERE lower(coalesce(role,''))='admin')
+          FROM neon_auth."user";
+          SQL
