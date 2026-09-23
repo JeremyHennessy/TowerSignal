@@ -186,6 +186,56 @@ class KnownFirmsTests(unittest.TestCase):
         self.assertGreater(summary["firm_serviced_site_relationship_count"], summary["unique_serviced_site_count"])
         self.assertGreaterEqual(summary["firms_with_dwt_service_evidence"], 3)
 
+    def test_placeholder_bin_does_not_merge_distinct_bbl_sites(self):
+        systems = {"metadata": {"generated_at": "2026-09-23T00:00:00Z"}, "systems": []}
+        domestic = {
+            "tank_inspections": [
+                {
+                    "inspection_id": "p1",
+                    "building_key": "NYC-BIN-1000000",
+                    "bin": "1000000",
+                    "bbl": "1005977503",
+                    "address": "110 Charlton Street",
+                    "borough": "Manhattan",
+                    "zip": "10014",
+                    "inspection_date": "2026-01-10",
+                    "provider_raw": "Audit Water LLC",
+                    "provider_data_quality": "VALID_NAME",
+                    "lab_raw": None,
+                    "laboratory_data_quality": "MISSING",
+                },
+                {
+                    "inspection_id": "p2",
+                    "building_key": "NYC-BIN-1000000",
+                    "bin": "1000000",
+                    "bbl": "1007290060",
+                    "address": "395 9th Avenue",
+                    "borough": "Manhattan",
+                    "zip": "10001",
+                    "inspection_date": "2026-02-10",
+                    "provider_raw": "Audit Water LLC",
+                    "provider_data_quality": "VALID_NAME",
+                    "lab_raw": None,
+                    "laboratory_data_quality": "MISSING",
+                },
+            ],
+            "dec_7g_businesses": [],
+        }
+        payload, details = build_known_firms(
+            systems_payload=systems,
+            companies_payload={"companies": []},
+            domestic_payload=domestic,
+            procurement_payloads=[],
+            details_by_system={},
+            generated_at="2026-09-23T00:00:00Z",
+        )
+        firm = next(row for row in payload["firms"] if row["canonical_name"] == "Audit Water LLC")
+        sites = details[firm["firm_id"]]["site_relationships"]
+        self.assertEqual(len(sites), 2)
+        self.assertEqual({site["site_id"] for site in sites}, {"NYC-BBL-1005977503", "NYC-BBL-1007290060"})
+        self.assertTrue(all(site["bin"] is None for site in sites))
+        self.assertEqual({site["bbl"] for site in sites}, {"1005977503", "1007290060"})
+
 
 if __name__ == "__main__":
     unittest.main()
