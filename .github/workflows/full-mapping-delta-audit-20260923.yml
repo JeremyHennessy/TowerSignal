@@ -1,0 +1,178 @@
+name: Full mapping delta audit
+
+on:
+  push:
+    branches: [agent/full-mapping-delta-audit-20260923]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out exact current main product
+        uses: actions/checkout@v4
+        with:
+          ref: 4d2963a5b9c397d276421d0af935061bb1a73227
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download exact currently deployed Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35804994677
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .live-artifact
+
+      - name: Materialize exact live production data
+        run: |
+          mkdir -p .live
+          tar -xf .live-artifact/artifact.tar -C .live
+          test -f .live/data/systems.json
+          test -f .live/data/details/20/2000014227.json
+
+      - name: Generate fresh current mapping snapshot
+        timeout-minutes: 25
+        run: python scripts/build_data.py --output .fresh
+
+      - name: Validate fresh mapping universe
+        run: |
+          python scripts/validate_bbl_identity.py --output .fresh --require-production-volume
+          python scripts/validate_property_identity_acceptance.py --output .fresh
+
+      - name: Compare live hybrid release to fresh mapping build
+        run: |
+          mkdir -p .proof
+          PYTHONPATH=scripts python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          live_root=Path('.live/data')
+          fresh_root=Path('.fresh')
+          live=json.loads((live_root/'systems.json').read_text())
+          fresh=json.loads((fresh_root/'systems.json').read_text())
+          L={str(r['system_id']):r for r in live['systems']}
+          F={str(r['system_id']):r for r in fresh['systems']}
+          assert set(L)==set(F)
+
+          identity_fields=('bin','bbl','registry_bbl','property_bbl','bbl_aliases','bbl_identity_status','bbl_identity_basis')
+          summary_fields=(
+              'pluto_match','pluto_owner_name','pluto_building_area_sqft','hpd_contact_count',
+              'dob_activity_count','dob_recent_activity_count','dob_explicit_cooling_tower_count',
+              'dob_mechanical_or_boiler_count','latest_dob_activity_date'
+          )
+          report={
+              'system_count':len(L),
+              'reconciled_system_count':0,
+              'identity_mismatch_count':0,
+              'summary_delta_counts':Counter(),
+              'detail_delta_counts':Counter(),
+              'reconciled_dob_changed_system_count':0,
+              'reconciled_dob_added_record_count':0,
+              'reconciled_dob_removed_record_count':0,
+              'examples':{},
+          }
+          examples={k:[] for k in summary_fields}
+          dob_examples=[]
+
+          for sid in sorted(L):
+              lr=L[sid]; fr=F[sid]
+              reconciled=fr.get('bbl_identity_status')=='RECONCILED_REGISTRY_BASE_TO_MAPPLUTO_BBL'
+              if reconciled:
+                  report['reconciled_system_count']+=1
+              if any(lr.get(k)!=fr.get(k) for k in identity_fields):
+                  report['identity_mismatch_count']+=1
+
+              for k in summary_fields:
+                  if lr.get(k)!=fr.get(k):
+                      report['summary_delta_counts'][k]+=1
+                      if len(examples[k])<12:
+                          examples[k].append({
+                              'system_id':sid,'address':fr.get('address'),
+                              'status':fr.get('bbl_identity_status'),
+                              'live':lr.get(k),'fresh':fr.get(k),
+                          })
+
+              lp=live_root/'details'/sid[:2]/f'{sid}.json'
+              fp=fresh_root/'details'/sid[:2]/f'{sid}.json'
+              ld=json.loads(lp.read_text()); fd=json.loads(fp.read_text())
+
+              for key in ('identity','building_context','hpd_registration','building_footprints'):
+                  if ld.get(key)!=fd.get(key):
+                      report['detail_delta_counts'][key]+=1
+
+              if reconciled:
+                  old_ids={
+                      str(x.get('job_filing_number') or x.get('job_number') or x.get('source_row_id'))
+                      for x in (ld.get('dob_activity_history') or [])
+                  }
+                  new_ids={
+                      str(x.get('job_filing_number') or x.get('job_number') or x.get('source_row_id'))
+                      for x in (fd.get('dob_activity_history') or [])
+                  }
+                  if old_ids!=new_ids:
+                      added=sorted(new_ids-old_ids); removed=sorted(old_ids-new_ids)
+                      report['reconciled_dob_changed_system_count']+=1
+                      report['reconciled_dob_added_record_count']+=len(added)
+                      report['reconciled_dob_removed_record_count']+=len(removed)
+                      if len(dob_examples)<20:
+                          dob_examples.append({
+                              'system_id':sid,'address':fr.get('address'),
+                              'registry_bbl':fr.get('registry_bbl'),
+                              'property_bbl':fr.get('property_bbl'),
+                              'live_count':len(old_ids),'fresh_count':len(new_ids),
+                              'added':added[:20],'removed':removed[:20],
+                          })
+
+          report['summary_delta_counts']=dict(report['summary_delta_counts'])
+          report['detail_delta_counts']=dict(report['detail_delta_counts'])
+          report['examples']={k:v for k,v in examples.items() if v}
+          report['dob_examples']=dob_examples
+
+          # Explicitly compare live metadata contracts to current alias-aware universe.
+          aliases={
+              str(v)
+              for row in live['systems']
+              for v in (row.get('bbl_aliases') or [])
+              if v
+          }
+          report['unique_exact_bbl_alias_count']=len(aliases)
+          report['live_match_contracts']={
+              k:live['metadata'].get(k)
+              for k in (
+                  'hpd_violation_match_basis','legacy_dob_project_match_basis',
+                  'nyc_water_signal_match_basis','nyc_historical_311_match_basis',
+                  'cms_institutional_match_basis','nyc_lead_service_line_match_basis'
+              )
+          }
+          report['live_requested_bbl_counts']={
+              k:live['metadata'].get(k)
+              for k in (
+                  'legacy_dob_project_requested_bbl_count',
+                  'nyc_historical_311_requested_bbl_count',
+                  'nyc_lead_service_line_requested_bbl_count',
+                  'pluto_requested_bbl_count','hpd_requested_bbl_count'
+              )
+          }
+
+          Path('.proof/full-mapping-delta-audit.json').write_text(json.dumps(report,indent=2,sort_keys=True))
+          print(json.dumps({
+              k:v for k,v in report.items()
+              if k not in ('examples','dob_examples')
+          },indent=2,sort_keys=True))
+          PY
+
+      - name: Retain full mapping delta proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-mapping-delta-audit
+          path: .proof/full-mapping-delta-audit.json
+          retention-days: 30
