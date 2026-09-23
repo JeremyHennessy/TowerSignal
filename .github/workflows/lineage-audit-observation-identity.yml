@@ -1,0 +1,138 @@
+name: Read-only observation identity audit
+
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - .github/workflows/lineage-audit-observation-identity.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 35866906472
+          github-token: ${{ github.token }}
+          path: .pages242
+      - name: Extract relevant normalized source caches
+        run: |
+          mkdir -p .observation-audit
+          tar -xf .pages242/artifact.tar -C .observation-audit --wildcards './data/nyc-water-signals.json'
+      - name: Audit current IDs and candidate observation identities
+        run: |
+          python - <<'PY'
+          import json, hashlib
+          from collections import defaultdict, Counter
+          from pathlib import Path
+
+          p=Path('.observation-audit/data/nyc-water-signals.json')
+          payload=json.loads(p.read_text())
+
+          specs={
+            'dob_water_job_filings': {
+              'current':'activity_id',
+              'candidates':[
+                ['activity_id','source_record_id'],
+                ['activity_id','source_record_id','filing_date'],
+                ['source_record_id','category','filing_date','approved_date','signoff_date'],
+              ],
+            },
+            'dob_water_permits': {
+              'current':'activity_id',
+              'candidates':[
+                ['activity_id','sequence_number'],
+                ['activity_id','sequence_number','issued_date'],
+                ['source_record_id','sequence_number','issued_date','expired_date'],
+                ['job_filing_number','sequence_number','issued_date','expired_date','filing_reason'],
+              ],
+            },
+            'll84_water_benchmarks': {
+              'current':'benchmark_id',
+              'candidates':[
+                ['benchmark_id','report_year'],
+                ['benchmark_id','report_year','year_ending'],
+                ['property_id','report_year','year_ending','last_modified_date_water'],
+              ],
+            },
+          }
+
+          def clean(v):
+              return '' if v is None else str(v).strip()
+          def key(row, fields):
+              return tuple(clean(row.get(f)) for f in fields)
+          def digest(row):
+              return hashlib.sha256(json.dumps(row,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          report={'base_run':35866906472,'base_sha':'f1cbdb925b704a8b7a34aaccd169be6649b80a92','families':{}}
+          for array,spec in specs.items():
+              rows=payload.get(array) or []
+              current=defaultdict(list)
+              for i,row in enumerate(rows):
+                  current[clean(row.get(spec['current']))].append((i,row))
+              repeated={k:g for k,g in current.items() if k and len(g)>1}
+              differing={k:g for k,g in repeated.items() if len({digest(r) for _,r in g})>1}
+              exact_duplicate_groups={k:g for k,g in repeated.items() if len({digest(r) for _,r in g})==1}
+              candidates=[]
+              for fields in spec['candidates']:
+                  groups=defaultdict(list)
+                  for i,row in enumerate(rows): groups[key(row,fields)].append((i,row))
+                  collisions={k:g for k,g in groups.items() if len(g)>1}
+                  differing_collisions={k:g for k,g in collisions.items() if len({digest(r) for _,r in g})>1}
+                  candidates.append({
+                    'fields':fields,
+                    'unique_keys':len(groups),
+                    'collision_groups':len(collisions),
+                    'differing_collision_groups':len(differing_collisions),
+                    'max_group_size':max((len(g) for g in collisions.values()),default=1),
+                    'examples':[{
+                      'key':list(k),
+                      'rows':[{
+                        'index':i,
+                        **{f:r.get(f) for f in sorted(set(fields+[spec['current'],'source_record_id','job_filing_number','sequence_number','issued_date','filing_date','report_year','year_ending','last_modified_date_water','property_id']))}
+                      } for i,r in g[:6]]
+                    } for k,g in list(differing_collisions.items())[:10]]
+                  })
+              report['families'][array]={
+                'row_count':len(rows),
+                'current_id_field':spec['current'],
+                'blank_current_id_rows':sum(1 for r in rows if not clean(r.get(spec['current']))),
+                'current_unique_nonblank_ids':len([k for k in current if k]),
+                'current_repeated_id_groups':len(repeated),
+                'current_repeated_groups_with_nonidentical_rows':len(differing),
+                'exact_duplicate_current_id_groups':len(exact_duplicate_groups),
+                'max_current_id_group_size':max((len(g) for g in repeated.values()),default=1),
+                'candidate_identities':candidates,
+                'current_collision_examples':[{
+                  'current_id':k,
+                  'rows':[{
+                    'index':i,
+                    'row_sha256':digest(r),
+                    'source_record_id':r.get('source_record_id'),
+                    'job_filing_number':r.get('job_filing_number'),
+                    'sequence_number':r.get('sequence_number'),
+                    'issued_date':r.get('issued_date'),
+                    'filing_date':r.get('filing_date'),
+                    'report_year':r.get('report_year'),
+                    'year_ending':r.get('year_ending'),
+                    'last_modified_date_water':r.get('last_modified_date_water'),
+                    'property_id':r.get('property_id'),
+                  } for i,r in g[:8]]
+                } for k,g in list(differing.items())[:20]],
+              }
+          out=Path('.observation-audit/observation-identity-report.json')
+          out.write_text(json.dumps(report,indent=2))
+          print(json.dumps({k:{'rows':v['row_count'],'repeated':v['current_repeated_id_groups'],'differing':v['current_repeated_groups_with_nonidentical_rows'],'candidates':[{ 'fields':x['fields'],'different_collisions':x['differing_collision_groups']} for x in v['candidate_identities']]} for k,v in report['families'].items()},indent=2))
+          PY
+      - name: Preserve report
+        uses: actions/upload-artifact@v4
+        with:
+          name: observation-identity-audit
+          path: .observation-audit/observation-identity-report.json
+          retention-days: 14
