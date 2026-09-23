@@ -1,0 +1,223 @@
+name: Fast release company admin importer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fast-company-admin-import-release-20260923.yml'
+      - 'src/companyAdmin/client.ts'
+      - 'src/companyAdmin/import.ts'
+      - 'src/components/CompaniesPage.tsx'
+      - 'src/components/CompanyAdminImportPanel.tsx'
+      - 'src/styles/company-admin.css'
+      - 'tests/frontend/CompanyAdminImport.test.ts'
+
+permissions:
+  contents: read
+  actions: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: fast-company-admin-import-release-20260923
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prove importer-only delta against accepted provenance baseline
+        env:
+          EXPECTED_PRODUCT: c5be362316bc8294e1d0970419d70817ebdf9718
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin "$EXPECTED_PRODUCT"
+          git diff --name-only "$EXPECTED_PRODUCT" HEAD > /tmp/release-diff.txt
+          cat /tmp/release-diff.txt
+          python - <<'PY'
+          from pathlib import Path
+          allowed = {
+            '.github/workflows/fast-company-admin-import-release-20260923.yml',
+            'src/companyAdmin/client.ts',
+            'src/companyAdmin/import.ts',
+            'src/components/CompaniesPage.tsx',
+            'src/components/CompanyAdminImportPanel.tsx',
+            'src/styles/company-admin.css',
+            'tests/frontend/CompanyAdminImport.test.ts',
+          }
+          actual = {line.strip() for line in Path('/tmp/release-diff.txt').read_text().splitlines() if line.strip()}
+          assert actual == allowed, (actual, allowed)
+          PY
+
+      - name: Stop competing full-data release only after exact-diff proof
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({...context.repo,head_sha:context.sha,per_page:100})).data.workflow_runs;
+            for (const run of runs) {
+              if (run.path === '.github/workflows/pages.yml' && ['queued','in_progress','waiting','pending'].includes(run.status)) {
+                core.info(`Cancelling competing canonical Pages run ${run.id} after importer-only proof`);
+                await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:run.id}).catch(error => {
+                  if (error.status !== 409) throw error;
+                });
+              }
+            }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install exact frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Download accepted provenance site
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35908796502
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .accepted-site
+
+      - name: Freeze accepted production data byte-for-byte
+        run: |
+          set -euo pipefail
+          mkdir -p .rollback .source-data public/data
+          archive="$(find .accepted-site -type f | head -1)"
+          test -n "$archive"
+          tar -xf "$archive" -C .rollback
+          test -d .rollback/data
+          rm -rf public/data
+          cp -R .rollback/data public/data
+          cp -R public/data .source-data/data
+          python - <<'PY'
+          import hashlib, json, pathlib
+          root=pathlib.Path('.source-data/data')
+          hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert hashes
+          pathlib.Path('accepted-data-sha256.json').write_text(json.dumps(hashes,sort_keys=True))
+          print(f'Frozen {len(hashes):,} accepted data files from provenance baseline')
+          PY
+
+      - name: Verify and build importer application
+        run: |
+          set -euo pipefail
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+          grep -R -q "Import sourced company enrichment" dist/assets
+          python - <<'PY'
+          import hashlib, json, pathlib
+          expected=json.loads(pathlib.Path('accepted-data-sha256.json').read_text())
+          root=pathlib.Path('dist/data')
+          actual={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert actual == expected, 'Importer-only build changed the accepted production data snapshot'
+          print(f'All {len(actual):,} data files remain byte-for-byte identical')
+          PY
+
+      - name: Install public-auth browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify candidate public auth gate
+        env:
+          BASE_URL: http://127.0.0.1:4173/TowerSignal/
+        run: |
+          set -euo pipefail
+          npx vite preview --host 127.0.0.1 --port 4173 > /tmp/towersignal-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/TowerSignal/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/TowerSignal/ >/dev/null
+          npx playwright test --config=playwright.public-auth.config.ts
+
+      - name: Retain importer candidate proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: company-admin-importer-candidate-proof
+          path: |
+            playwright-report
+            test-results
+            accepted-data-sha256.json
+          retention-days: 30
+
+      - name: Upload importer candidate
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Stage accepted provenance site for rollback
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: company-admin-importer-rollback
+          path: .rollback
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy exact verified importer application
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install hosted acceptance dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Verify hosted public auth gate on desktop and iPhone
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: npx playwright test --config=playwright.public-auth.config.ts
+      - name: Verify hosted importer bundle marker
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          html="$(curl --fail --silent --show-error --location "$BASE_URL")"
+          asset="$(printf '%s' "$html" | grep -oE 'assets/index-[^"]+\.js' | head -1)"
+          test -n "$asset"
+          curl --fail --silent --show-error --location "${BASE_URL%/}/$asset" | grep -q "Import sourced company enrichment"
+      - name: Retain hosted importer proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: company-admin-importer-hosted-proof
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
+
+  rollback:
+    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
+    needs: [build, deploy, verify]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Restore accepted provenance site
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: company-admin-importer-rollback
