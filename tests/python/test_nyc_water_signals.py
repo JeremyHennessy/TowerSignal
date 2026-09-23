@@ -22,6 +22,7 @@ from towersignal.nyc_water_signals import (  # noqa: E402
     LL84_DATASET_ID,
     NYC_311_DATASET_ID,
     _dob_business_profiles,
+    _fetch_stable_hpd_population,
     build_payload,
     classify_311,
     classify_dob_work,
@@ -224,6 +225,45 @@ class NycWaterSignalsTests(unittest.TestCase):
             payload["summary"]["hpd_identity_second_pass_sha256"],
         )
         self.assertEqual(payload["summary"]["hpd_identity_second_pass_partition_count"], expected_hpd_partitions)
+
+    def test_hpd_population_retries_after_transient_identity_drift(self) -> None:
+        snapshot = SourceSnapshot(
+            dataset_id=HPD_VIOLATIONS_DATASET_ID,
+            name=HPD_VIOLATIONS_DATASET_ID,
+            api_root="https://data.cityofnewyork.us",
+            rows=[{"violationid": "123"}],
+            retrieved_at="2026-09-23T17:00:00Z",
+            source_record_count=1,
+            source_last_updated_at="2026-09-23T14:56:59Z",
+            source_query_scope="demo",
+            fields=("violationid",),
+        )
+        stable_proof = {
+            "status": "PASS",
+            "first_pass_record_count": 1,
+            "second_pass_record_count": 1,
+            "first_pass_sha256": "a" * 64,
+            "second_pass_sha256": "a" * 64,
+            "second_pass_duplicate_count": 0,
+            "second_pass_partition_count": len(HPD_BOROUGHS),
+            "source_last_updated_values": ["2026-09-23T14:56:59Z"],
+        }
+        with (
+            patch("towersignal.nyc_water_signals._fetch_hpd_snapshots", return_value=[snapshot]) as fetch_hpd,
+            patch(
+                "towersignal.nyc_water_signals._verify_hpd_snapshot_identity_stability",
+                side_effect=[DomesticWaterSourceError("identity drift"), stable_proof],
+            ) as verify_hpd,
+        ):
+            snapshots, rows, duplicates, proof = _fetch_stable_hpd_population(page_size=50000, max_attempts=3)
+
+        self.assertEqual(fetch_hpd.call_count, 2)
+        self.assertEqual(verify_hpd.call_count, 2)
+        self.assertEqual(snapshots, [snapshot])
+        self.assertEqual(rows, [{"violationid": "123"}])
+        self.assertEqual(duplicates, 0)
+        self.assertEqual(proof["attempt"], 2)
+        self.assertEqual(proof["max_attempts"], 3)
 
     def test_build_payload_rejects_hpd_identity_drift_between_passes(self) -> None:
         first = {
