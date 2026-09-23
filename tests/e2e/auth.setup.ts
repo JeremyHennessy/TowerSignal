@@ -12,7 +12,7 @@ setup('prove signed-out route gate and sign in with a pre-provisioned TowerSigna
   await expect(page.getByRole('tab', { name: 'Create account', exact: true })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Create account', exact: true })).toHaveCount(0)
 
-  const credentials = testCredentials(testInfo.project.name)
+  const credentials = testCredentials()
   await page.getByLabel('Email').fill(credentials.email)
   await page.getByLabel('Password', { exact: true }).fill(credentials.password)
   await page.getByRole('button', { name: 'Sign in', exact: true }).click()
