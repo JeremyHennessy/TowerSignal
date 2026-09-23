@@ -356,6 +356,8 @@ jobs:
         env:
           BASE_URL: ${{ needs.deploy.outputs.page_url }}
           REQUIRE_ACRIS: ${{ inputs.require_acris }}
+          TOWERSIGNAL_E2E_EMAIL: ${{ secrets.TOWERSIGNAL_E2E_EMAIL }}
+          TOWERSIGNAL_E2E_PASSWORD: ${{ secrets.TOWERSIGNAL_E2E_PASSWORD }}
         run: npm run test:e2e
       - name: Upload browser verification report
         if: always()
