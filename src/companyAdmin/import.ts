@@ -278,11 +278,12 @@ export async function applyCompanyAdminImport(bundle: CompanyAdminImportBundle):
   if (!await loadCompanyAdminAccess()) throw new Error('Admin company-database access is required')
 
   let contacts = 0
+  const batchId = bundle.generated_at ?? crypto.randomUUID()
   for (const company of bundle.companies) {
-    await saveCompanyAdminProfile(company.company_id, company.canonical_name, company.profile as CompanyAdminProfilePatch)
+    await saveCompanyAdminProfile(company.company_id, company.canonical_name, company.profile as CompanyAdminProfilePatch, { source: 'import', batchId })
     for (const contact of company.contacts ?? []) {
       const { contact_id, ...values } = contact
-      await saveCompanyAdminContact(contact_id, company.company_id, values)
+      await saveCompanyAdminContact(contact_id, company.company_id, values, { source: 'import', batchId })
       contacts += 1
     }
   }
