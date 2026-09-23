@@ -1,0 +1,1322 @@
+[
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/procurement-nys-authorities.json",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:08.623081+00:00",
+    "status": 200,
+    "bytes": 1726870,
+    "sha256": "15085596ccf89e480b983cd52c8f3dc913b248f8433ca02d34b1868e702181ef"
+  },
+  {
+    "url": "https://data.ny.gov/api/views/ehig-g5x3",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:09.009025+00:00",
+    "status": 200,
+    "bytes": 66352,
+    "sha256": "bfad115f9bd7395a35c6e0bfb993bbb9563609c52f80d83f506490f72f192afd"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=cooling+tower",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:09.436507+00:00",
+    "status": 200,
+    "bytes": 113222,
+    "sha256": "59e50cc18ea207787ac74fe2ea4634e00fd29375075fbd72a5a141cfc2c19431"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=water+treatment",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:09.857039+00:00",
+    "status": 200,
+    "bytes": 135291,
+    "sha256": "be2024518c18fdbcdf7660467e3946ec0d6c187c97779fac4002d1ee2f19ce0b"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=cooling+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:10.342855+00:00",
+    "status": 200,
+    "bytes": 58873,
+    "sha256": "53d2d81dbca41dc2b049888b47518924c4f33d6176a7245b86836db01a20d4ce"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=condenser+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:10.687179+00:00",
+    "status": 200,
+    "bytes": 9564,
+    "sha256": "4c4d55524d3c0bc62e1ce552150cb69e5d2c861c30f33ce79a410f3bc3f339e7"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=boiler+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:10.963086+00:00",
+    "status": 200,
+    "bytes": 16636,
+    "sha256": "b8344b2e460e6690bd8475782126423b8e07d8a1c6fc962d5373a70cc9a6ea94"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=legionella",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:11.360246+00:00",
+    "status": 200,
+    "bytes": 1065,
+    "sha256": "1230fa67e20982cb51dbac6e30cc9ae69ad1d5665decec95fca47e271d02fe56"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=disinfection",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:11.728492+00:00",
+    "status": 200,
+    "bytes": 321965,
+    "sha256": "930b9c312b0973823cbc66119ba8fd9f8544625c0d2f61dbca609e8e12a052a2"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=water+management",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:12.220662+00:00",
+    "status": 200,
+    "bytes": 45567,
+    "sha256": "83a8dd517e3f07e2a95c031143f9bf1cd4f254a41e67398f8b8fff791ad94a1d"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=water+quality",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:13.279955+00:00",
+    "status": 200,
+    "bytes": 20146,
+    "sha256": "672552f393d6f5009f86e5219755c289f90bd3b73e429868403361d8f805c382"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=biocide",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:14.155737+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=chiller",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:14.429429+00:00",
+    "status": 200,
+    "bytes": 128592,
+    "sha256": "17240b567c12fcffb02f22775ddf91da9b83bde0b451121abe801f962c25b757"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=hvac+maintenance",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:15.388878+00:00",
+    "status": 200,
+    "bytes": 117551,
+    "sha256": "90712a540ffd84601e1f33c4e1776bf636f640132d953228e029e6132831c7c6"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=mechanical+maintenance",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:15.804992+00:00",
+    "status": 200,
+    "bytes": 76459,
+    "sha256": "6e1dd04fcfdaf7c0b3219a9c115df81bc0787b8cb72f548a75c36ab8a1bd08c6"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=laboratory+testing",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:16.203911+00:00",
+    "status": 200,
+    "bytes": 201838,
+    "sha256": "287f360009483d6bc449d23ea7fd0c188e9339e155b42bdb851a7ca5fb363dae"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=chemical+treatment",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:16.682089+00:00",
+    "status": 200,
+    "bytes": 53384,
+    "sha256": "fd6c60c2b46ccb9205843ec947e6dac998adb132daf85d5778f64d6b9ac95890"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=ROCHESTER+MIDLAND+CORPORATION",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:17.670481+00:00",
+    "status": 200,
+    "bytes": 7491,
+    "sha256": "e0bfef319a38d4fa654d5525db958473a54e377d4f0aed41a68a8bcb3b450550"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=ROCHESTER+MIDLAND+CORP",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:17.988954+00:00",
+    "status": 200,
+    "bytes": 7491,
+    "sha256": "e0bfef319a38d4fa654d5525db958473a54e377d4f0aed41a68a8bcb3b450550"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=RMC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:18.279960+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=NORKEM+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:18.501300+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=JACKLYN+INDUSTRIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:18.754622+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=SOLUTIONS+WATER+MANAGEMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:19.078191+00:00",
+    "status": 200,
+    "bytes": 2771,
+    "sha256": "c871a3cf2888b0d50eee2a0df78f169cdb241f71487ff0d6138ad556aa877523"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=INDUSTRIAL+WATER+TECHNOLOGIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:19.470148+00:00",
+    "status": 200,
+    "bytes": 622,
+    "sha256": "066aecd93d062e23bfcc5a0baaad5c8228a98f733a63578585ca90acb2cddf3a"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=INDUSTRIAL+WATER+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:19.743133+00:00",
+    "status": 200,
+    "bytes": 622,
+    "sha256": "066aecd93d062e23bfcc5a0baaad5c8228a98f733a63578585ca90acb2cddf3a"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MGMT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:20.342940+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MANAGEMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:20.708446+00:00",
+    "status": 200,
+    "bytes": 1740,
+    "sha256": "4ab9ed8cd68b88f44eaadec2c4d88df61496a04eaa713254b0ad968e3a0d857d"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MGMT",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:21.455481+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=OCS+CHEMICAL+ENGINEERING",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:21.699903+00:00",
+    "status": 200,
+    "bytes": 1144,
+    "sha256": "f55dd7a9299d43dd5800b58a49d27483fe8b9fdb2ba72ffebe6ea3400977bfb2"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=OCS+CHEMICAL+ENGINEERING+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:22.048500+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=COMPREHENSIVE+CHEMICAL+AND+WATER+TREATMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:22.238715+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=COMPREHENSIVE+CHEMICAL+WATER+TREATMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:22.771462+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=DECON+WATER+TECHNOLOGIES+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:23.029686+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=DECON+WATER+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:23.684006+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=SOLID+BLEND+TECHNOLOGIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:24.181095+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=SOLID+BLEND+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:24.533881+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=TOWER+WATER",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:24.745214+00:00",
+    "status": 200,
+    "bytes": 35925,
+    "sha256": "a4295ffa827adc03349b3feb6b9b434b1d93d095099a2d6701a2fad59fda2ea2"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=TOWER+CLEANING+PLUS+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:25.047692+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=CLARITYCHEM+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:25.739316+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=CHEMASTERS+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:26.311064+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/ehig-g5x3.json?%24limit=50000&%24offset=0&%24q=CHEMATRIX+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:26.640579+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/api/views/ehig-g5x3",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:27.156220+00:00",
+    "status": 200,
+    "bytes": 66352,
+    "sha256": "bfad115f9bd7395a35c6e0bfb993bbb9563609c52f80d83f506490f72f192afd"
+  },
+  {
+    "url": "https://data.ny.gov/api/views/8w5p-k45m",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:27.494225+00:00",
+    "status": 200,
+    "bytes": 45746,
+    "sha256": "d9709256fb662e3d74dee440af9acc3c3fdd81c28a1cd1afeb528a18e0b5d7c0"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=cooling+tower",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:28.126228+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=water+treatment",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:28.401151+00:00",
+    "status": 200,
+    "bytes": 118731,
+    "sha256": "1b111ebb48c8888bcdc3aad17a17e79689d4cd41af893f1da39a7cc1969da9da"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=cooling+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:28.896901+00:00",
+    "status": 200,
+    "bytes": 14996,
+    "sha256": "09adb0234d70deee8136a96d17cbc88d664016f1fad106cac67e456ddbc94ea5"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=condenser+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:29.173465+00:00",
+    "status": 200,
+    "bytes": 1610,
+    "sha256": "d7ba3e5df801d051d380318514b280cafa108f4798dac55d9f6009afcbf01acf"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=boiler+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:29.523241+00:00",
+    "status": 200,
+    "bytes": 10957,
+    "sha256": "a43b2dd254274cc488e5f74f449fcc879f2027f9780e11178c1870c5bd3145da"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=legionella",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:29.789790+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=disinfection",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:30.006718+00:00",
+    "status": 200,
+    "bytes": 9939,
+    "sha256": "814f984eb05e73a3d11c16bc2f7b5761f01991770fa6175cbc883421f05bc798"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=water+management",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:30.274269+00:00",
+    "status": 200,
+    "bytes": 161049,
+    "sha256": "803a511d0a789ca24d8f73862d4dca6fdc3d6faaab3dafd1020acca88e7be673"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=water+quality",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:30.702156+00:00",
+    "status": 200,
+    "bytes": 27361,
+    "sha256": "3d057f8dedc4e9c68de34caac4b0b23286498eb81c88b5b5d1d44d3c2b05e240"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=biocide",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:30.969229+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=chiller",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:31.252003+00:00",
+    "status": 200,
+    "bytes": 8600,
+    "sha256": "08c5a782507947957c7729fd9364d2a5ef9adf578af0b65350f122ea6b170b07"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=hvac+maintenance",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:31.507923+00:00",
+    "status": 200,
+    "bytes": 18530,
+    "sha256": "20d0d17e42c352c208e0b1c2b7aa5879eb352589b614870963feb01ce664b393"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=mechanical+maintenance",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:31.820116+00:00",
+    "status": 200,
+    "bytes": 10232,
+    "sha256": "b632755e83f3eeb9ee075058e0e1be2c9cfe277f2c3d7c9c82d413c488cb5ef3"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=laboratory+testing",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:32.062728+00:00",
+    "status": 200,
+    "bytes": 34030,
+    "sha256": "58ceeec3c3538ac3c37ce54912c14d4d3e867316ca46b12c3c7e96cccc44e3d6"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=chemical+treatment",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:32.380245+00:00",
+    "status": 200,
+    "bytes": 14674,
+    "sha256": "d93e4e13ff0f7a51287f169f3287b4c34fe73eccb515ca9e0e66735a11fb53ca"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=ROCHESTER+MIDLAND+CORPORATION",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:32.656489+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=ROCHESTER+MIDLAND+CORP",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:32.885171+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=RMC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:33.139272+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=NORKEM+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:33.468558+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=JACKLYN+INDUSTRIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:33.753224+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=SOLUTIONS+WATER+MANAGEMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:34.044229+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=INDUSTRIAL+WATER+TECHNOLOGIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:34.391114+00:00",
+    "status": 200,
+    "bytes": 19687,
+    "sha256": "bde0814328523e73194e703d308b39d30523defa37209e9f9823fb4b70589eb6"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=INDUSTRIAL+WATER+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:34.652515+00:00",
+    "status": 200,
+    "bytes": 28483,
+    "sha256": "419e42b867caaa95beb4dd43fed8299b6adad265e1f46a143ff40ac2c84f6dc2"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MGMT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:34.935394+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MANAGEMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:35.205858+00:00",
+    "status": 200,
+    "bytes": 3341,
+    "sha256": "2a4ab9c0be6a7696aba9e58a9663fc0fd98e6e092411881eb7fb1876ea72234a"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MGMT",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:35.435636+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=OCS+CHEMICAL+ENGINEERING",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:35.750926+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=OCS+CHEMICAL+ENGINEERING+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:36.042071+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=COMPREHENSIVE+CHEMICAL+AND+WATER+TREATMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:36.617325+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=COMPREHENSIVE+CHEMICAL+WATER+TREATMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:36.916663+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=DECON+WATER+TECHNOLOGIES+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:37.527678+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=DECON+WATER+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:37.859231+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=SOLID+BLEND+TECHNOLOGIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:38.228763+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=SOLID+BLEND+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:38.430412+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=TOWER+WATER",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:38.720197+00:00",
+    "status": 200,
+    "bytes": 67469,
+    "sha256": "98533995f898813cc57f583cf92a7ff9e908ae3071974d38c37d239cbf645f2c"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=TOWER+CLEANING+PLUS+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:39.153001+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=CLARITYCHEM+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:39.664631+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=CHEMASTERS+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:39.918490+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/8w5p-k45m.json?%24limit=50000&%24offset=0&%24q=CHEMATRIX+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:40.191084+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/api/views/8w5p-k45m",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:40.586274+00:00",
+    "status": 200,
+    "bytes": 45746,
+    "sha256": "d9709256fb662e3d74dee440af9acc3c3fdd81c28a1cd1afeb528a18e0b5d7c0"
+  },
+  {
+    "url": "https://data.ny.gov/api/views/d84c-dk28",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:40.879087+00:00",
+    "status": 200,
+    "bytes": 46137,
+    "sha256": "81a1009c7afb0b0f72123f51ddf31021e80e2f69461a7b00597e433ae21c8857"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=cooling+tower",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:41.138179+00:00",
+    "status": 200,
+    "bytes": 3375,
+    "sha256": "8818bf4a7fa8c4583f45deab1c9d39021d470586d20fa8583e90c98aaae05d36"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=water+treatment",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:41.443396+00:00",
+    "status": 200,
+    "bytes": 8866,
+    "sha256": "3cc4c893f4fc7ada1bdb9d03b2e487960c3204c174a4f1ab8b1e06e18e8e48ba"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=cooling+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:41.703265+00:00",
+    "status": 200,
+    "bytes": 707,
+    "sha256": "0550189152dfa16f83dab5c16e8834cc1264bbabe7a3f36d3d17731aa47ca79b"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=condenser+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:42.219077+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=boiler+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:42.587074+00:00",
+    "status": 200,
+    "bytes": 615,
+    "sha256": "0c8c8e66767ef526c94a9a3ac23b3f259fe74516fc185b80f10c412f829f2415"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=legionella",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:42.929209+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=disinfection",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:43.233791+00:00",
+    "status": 200,
+    "bytes": 31182,
+    "sha256": "0877c4df39a13cba169234f0282316625d2116add9bdb6e855bdcc49794e5a66"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=water+management",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:43.866117+00:00",
+    "status": 200,
+    "bytes": 34097,
+    "sha256": "40896e71e3037cd55d84ecd7c0e133f8688ec11199f0a145013be87158ca20f7"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=water+quality",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:44.255267+00:00",
+    "status": 200,
+    "bytes": 859,
+    "sha256": "80a224833d16dfdc0bc22ff27ad98fb76c686152646ecbdadcd827fb5635d5ea"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=biocide",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:44.798830+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=chiller",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:45.106166+00:00",
+    "status": 200,
+    "bytes": 7404,
+    "sha256": "77e78622e2ab968e361916ceec98b6e3255e812a4ed7ea1eb773d13750f84c8a"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=hvac+maintenance",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:45.481107+00:00",
+    "status": 200,
+    "bytes": 18781,
+    "sha256": "158a081f828a36050017cd1a543ee9107bd3674b57a73d71d469a6f4436f3353"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=mechanical+maintenance",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:45.733083+00:00",
+    "status": 200,
+    "bytes": 9957,
+    "sha256": "078b3aab28b3a39b0a13709146ab161c5fe7fe20907a035966dfd1eda67a9b83"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=laboratory+testing",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:46.065501+00:00",
+    "status": 200,
+    "bytes": 8643,
+    "sha256": "e15e142509565c049490be7da972a33534579090fb0b18eda9afef2cf7802f01"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=chemical+treatment",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:46.325619+00:00",
+    "status": 200,
+    "bytes": 508,
+    "sha256": "b7226029731be3267bbc58e7d2da2585e4acff6d69b3abb33611c5976c262a79"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=ROCHESTER+MIDLAND+CORPORATION",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:46.638607+00:00",
+    "status": 200,
+    "bytes": 1633,
+    "sha256": "ec780e783939a7cc97fdf65bef7e21c83927ee6bb2fbb51876d3ec3535387c98"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=ROCHESTER+MIDLAND+CORP",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:46.943856+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=RMC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:47.160869+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=NORKEM+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:47.405504+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=JACKLYN+INDUSTRIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:47.621893+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=SOLUTIONS+WATER+MANAGEMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:47.956600+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=INDUSTRIAL+WATER+TECHNOLOGIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:48.469094+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=INDUSTRIAL+WATER+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:49.046528+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MGMT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:49.320268+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MANAGEMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:49.566666+00:00",
+    "status": 200,
+    "bytes": 692,
+    "sha256": "97fe7bd2244d1e76becc27db358a95fd2fc30a96fa85bd88c827fe8dd92468cf"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MGMT",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:49.824504+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=OCS+CHEMICAL+ENGINEERING",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:50.548786+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=OCS+CHEMICAL+ENGINEERING+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:50.796084+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=COMPREHENSIVE+CHEMICAL+AND+WATER+TREATMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:51.027732+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=COMPREHENSIVE+CHEMICAL+WATER+TREATMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:51.419678+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=DECON+WATER+TECHNOLOGIES+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:51.649858+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=DECON+WATER+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:51.900387+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=SOLID+BLEND+TECHNOLOGIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:52.122212+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=SOLID+BLEND+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:52.363783+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=TOWER+WATER",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:52.673517+00:00",
+    "status": 200,
+    "bytes": 2490,
+    "sha256": "b52b634c2c482b7dd0df598a888066b033d97fea88fbb798b1c47051c6438fa2"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=TOWER+CLEANING+PLUS+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:52.992638+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=CLARITYCHEM+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:53.368167+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=CHEMASTERS+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:53.769037+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/d84c-dk28.json?%24limit=50000&%24offset=0&%24q=CHEMATRIX+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:53.988272+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/api/views/d84c-dk28",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:54.223852+00:00",
+    "status": 200,
+    "bytes": 46137,
+    "sha256": "81a1009c7afb0b0f72123f51ddf31021e80e2f69461a7b00597e433ae21c8857"
+  },
+  {
+    "url": "https://data.ny.gov/api/views/p3p6-xqr5",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:54.499371+00:00",
+    "status": 200,
+    "bytes": 44560,
+    "sha256": "5386cc2e6bce071583c9a926921aac91313c6d25bf77fa6eed43cefcfb6f2b60"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=cooling+tower",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:54.863587+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=water+treatment",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:55.229628+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=cooling+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:55.437290+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=condenser+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:55.693653+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=boiler+water",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:57.058894+00:00",
+    "status": 200,
+    "bytes": 620,
+    "sha256": "5e306a737ae11b4e213479d7a8fc471a2971aec71c940767ebd35dde880b8457"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=legionella",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:57.269571+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=disinfection",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:57.508840+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=water+management",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:57.786097+00:00",
+    "status": 200,
+    "bytes": 1429,
+    "sha256": "1818aaacb28128acd0a7303169d324fa85ece37112309d02fcce4d1124120a31"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=water+quality",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:58.270166+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=biocide",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:58.567593+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=chiller",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:59.009151+00:00",
+    "status": 200,
+    "bytes": 1204,
+    "sha256": "9040a48e4173550976fc197940ede5ee825b903a192f02e92b4e656f23afe203"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=hvac+maintenance",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:59.231406+00:00",
+    "status": 200,
+    "bytes": 1644,
+    "sha256": "45c772772d6aeabbdb6a6f86ea87098fe93225c8940744d5dd92c6236d9d4d80"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=mechanical+maintenance",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:59.485812+00:00",
+    "status": 200,
+    "bytes": 585,
+    "sha256": "0611b9a25cee26e2a2b69031b9e7ca1e2903996cba807dc7863d2fde6e4e6904"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=laboratory+testing",
+    "attempt": 1,
+    "at": "2026-09-23T18:17:59.757728+00:00",
+    "status": 200,
+    "bytes": 538,
+    "sha256": "37e59f195abc6ce92b8f79e535ff5c7c99afb4cdfa2a360c8bdd996971986cc9"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=chemical+treatment",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:00.057488+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=ROCHESTER+MIDLAND+CORPORATION",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:00.317296+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=ROCHESTER+MIDLAND+CORP",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:00.528456+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=RMC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:00.772903+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=NORKEM+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:01.121679+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=JACKLYN+INDUSTRIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:02.441097+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=SOLUTIONS+WATER+MANAGEMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:02.859739+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=INDUSTRIAL+WATER+TECHNOLOGIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:03.148398+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=INDUSTRIAL+WATER+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:04.117093+00:00",
+    "status": 200,
+    "bytes": 1192,
+    "sha256": "6abb38aafe563b6d557cdbf96ad2af1163f323358802f3ad162c0233514c3468"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MGMT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:04.373699+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MANAGEMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:04.576231+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=BARCLAY+WATER+MGMT",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:04.819197+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=OCS+CHEMICAL+ENGINEERING",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:05.091396+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=OCS+CHEMICAL+ENGINEERING+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:05.435329+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=COMPREHENSIVE+CHEMICAL+AND+WATER+TREATMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:05.655207+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=COMPREHENSIVE+CHEMICAL+WATER+TREATMENT+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:06.059866+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=DECON+WATER+TECHNOLOGIES+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:06.329900+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=DECON+WATER+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:06.570705+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=SOLID+BLEND+TECHNOLOGIES+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:06.854988+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=SOLID+BLEND+TECHNOLOGIES",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:07.175573+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=TOWER+WATER",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:07.621231+00:00",
+    "status": 200,
+    "bytes": 810,
+    "sha256": "2ee5c254ff45180f77c0676b2c4117ddd03d96e1c0b428e913c90e33e5a55ebd"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=TOWER+CLEANING+PLUS+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:07.837795+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=CLARITYCHEM+INC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:08.089014+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=CHEMASTERS+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:08.314481+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/resource/p3p6-xqr5.json?%24limit=50000&%24offset=0&%24q=CHEMATRIX+LLC",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:08.509444+00:00",
+    "status": 200,
+    "bytes": 3,
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "url": "https://data.ny.gov/api/views/p3p6-xqr5",
+    "attempt": 1,
+    "at": "2026-09-23T18:18:09.726318+00:00",
+    "status": 200,
+    "bytes": 44560,
+    "sha256": "5386cc2e6bce071583c9a926921aac91313c6d25bf77fa6eed43cefcfb6f2b60"
+  }
+]
