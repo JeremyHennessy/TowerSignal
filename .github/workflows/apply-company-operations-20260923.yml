@@ -1,0 +1,112 @@
+name: Apply company operations migration
+
+on:
+  push:
+    branches:
+      - ops/apply-company-operations-20260923
+    paths:
+      - '.github/workflows/apply-company-operations-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify pre-migration production baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_profiles integer;
+            v_contacts integer;
+            v_users integer;
+            v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO v_contacts FROM public.company_private_contacts;
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin';
+            IF v_profiles <> 31 OR v_contacts <> 13 OR v_users <> 2 OR v_admins <> 1 THEN
+              RAISE EXCEPTION 'Company operations migration guard failed: profiles=% contacts=% users=% admins=%',
+                v_profiles, v_contacts, v_users, v_admins;
+            END IF;
+          END $$;
+          SQL
+
+      - name: Apply migration 004
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/004_company_operations.sql
+
+      - name: Verify queue audit RLS triggers and unchanged baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_rls integer;
+            v_triggers integer;
+            v_profiles integer;
+            v_contacts integer;
+            v_users integer;
+            v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_rls
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public'
+              AND c.relname IN ('company_private_research_queue','company_private_change_log')
+              AND c.relrowsecurity;
+
+            SELECT count(*) INTO v_triggers
+            FROM pg_trigger t
+            JOIN pg_class c ON c.oid=t.tgrelid
+            JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public'
+              AND NOT t.tgisinternal
+              AND t.tgname IN (
+                'company_private_profiles_audit',
+                'company_private_contacts_audit',
+                'company_private_activities_audit',
+                'company_private_notes_audit',
+                'company_private_research_audit'
+              );
+
+            SELECT count(*) INTO v_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO v_contacts FROM public.company_private_contacts;
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin';
+
+            IF to_regclass('public.company_private_research_queue') IS NULL
+               OR to_regclass('public.company_private_change_log') IS NULL
+               OR v_rls <> 2
+               OR v_triggers <> 5
+               OR v_profiles <> 31
+               OR v_contacts <> 13
+               OR v_users <> 2
+               OR v_admins <> 1 THEN
+              RAISE EXCEPTION 'Company operations verification failed: rls=% triggers=% profiles=% contacts=% users=% admins=%',
+                v_rls, v_triggers, v_profiles, v_contacts, v_users, v_admins;
+            END IF;
+          END $$;
+
+          SELECT 'COMPANY_OPERATIONS_MIGRATION=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_profiles) AS profiles,
+                 (SELECT count(*) FROM public.company_private_contacts) AS contacts,
+                 (SELECT count(*) FROM public.company_private_research_queue) AS research_queue,
+                 (SELECT count(*) FROM public.company_private_change_log) AS audit_rows,
+                 (SELECT count(*) FROM neon_auth."user") AS users,
+                 (SELECT count(*) FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin') AS admins;
+          SQL
