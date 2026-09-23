@@ -15,17 +15,29 @@ jobs:
     timeout-minutes: 5
     env:
       NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+      TOWERSIGNAL_DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL }}
       TARGET_BRANCH_ID: br-orange-bar-aujld2d5
     steps:
-      - name: Resolve project containing production branch
+      - name: Inspect available Neon control-plane credentials
         shell: bash
         run: |
           set -euo pipefail
-          if [ -z "${NEON_API_KEY:-}" ]; then
-            echo "NEON_API_KEY=MISSING"
-            exit 2
-          fi
-          echo "NEON_API_KEY=PRESENT"
+          for name in NEON_API_KEY NEON_PROJECT_ID DATABASE_URL NEON_DATABASE_URL TOWERSIGNAL_DATABASE_URL; do
+            if [ -n "${!name:-}" ]; then
+              echo "$name=PRESENT"
+            else
+              echo "$name=MISSING"
+            fi
+          done
+
+      - name: Resolve project from API key when available
+        if: ${{ env.NEON_API_KEY != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
           projects_json="$(curl --fail-with-body --silent --show-error \
             -H "Authorization: Bearer ${NEON_API_KEY}" \
             "https://console.neon.tech/api/v2/projects?limit=100")"
@@ -45,3 +57,11 @@ jobs:
             exit 3
           fi
           echo "TOWERSIGNAL_NEON_PROJECT_ID=$found"
+
+      - name: Verify direct database credential without exposing it
+        if: ${{ env.DATABASE_URL != '' || env.NEON_DATABASE_URL != '' || env.TOWERSIGNAL_DATABASE_URL != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="${TOWERSIGNAL_DATABASE_URL:-${NEON_DATABASE_URL:-${DATABASE_URL:-}}}"
+          psql "$url" -v ON_ERROR_STOP=1 -Atc "select 'DATABASE_CONNECTION=OK', current_database();" 
