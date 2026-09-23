@@ -5,23 +5,11 @@ from collections import defaultdict
 
 OUT=Path('.audit-stage6');OUT.mkdir(exist_ok=True)
 
-consumer_files=[
- 'src/components/AccountEvidenceWorkspace.tsx',
- 'src/components/ClientSiteReport.tsx',
- 'src/components/CompanyProfilePage.tsx',
- 'src/components/PortfoliosPage.tsx',
- 'src/components/AccountUnifiedTimeline.tsx',
- 'src/components/WorkflowAccountSection.tsx',
- 'src/components/WorkflowPanel.tsx',
- 'src/components/BuildingWaterSignalsSection.tsx',
- 'src/components/salesKnownFirms.ts',
- 'src/domain/accountEvidence.ts',
- 'src/utils/accountReportModel.ts',
- 'src/utils/prepareAccountReport.ts',
- 'src/utils/workflowExport.ts',
- 'src/components/UserAccountPage.tsx',
-]
-type_files=['src/types/data.ts','src/types/company.ts','src/types/history.ts','src/types/workflow.ts','src/types/procurement.ts']
+consumer_files=sorted(
+    str(p) for p in Path('src').rglob('*')
+    if p.is_file() and p.suffix in {'.ts','.tsx'} and '.test.' not in p.name
+)
+type_files=sorted(str(p) for p in Path('src/types').glob('*.ts'))
 
 def py_direct_mappings(path, functions):
     text=Path(path).read_text()
@@ -89,7 +77,7 @@ for m in mappings:
                 type_occ.append({'path':path,'line':i,'text':line.strip()})
     records.append({**m,'consumer_occurrences':occ,'consumer_count':len(occ),'type_occurrences':type_occ,
                     'consumer_disposition':'CONSUMED_IN_AUDITED_SURFACES' if occ else 'NO_REFERENCE_IN_AUDITED_SURFACES',
-                    'limits':'Static reference scan; absence is not proof of no runtime use outside the audited consumer set.'})
+                    'limits':'Static reference scan across all non-test TypeScript/TSX under src; absence is not proof of no runtime use through dynamic keys, generated code, or non-src consumers.'})
 
 # Inventory truncation/pagination/collapse mechanics in audited consumer files.
 mechanics=[]
@@ -107,7 +95,7 @@ summary={
  'consumer_files_checked':list(consumer_text),
  'type_files_checked':list(type_text),
  'presentation_mechanics_count':len(mechanics),
- 'boundary':'Static code-path trace, not authenticated browser proof. A no-reference result is scoped to listed consumers only.'
+ 'boundary':'Static code-path trace across all non-test src TypeScript/TSX, not authenticated browser proof. Dynamic-key access and non-src consumers remain separate checks.'
 }
 (OUT/'core-normalized-consumer-lineage.json').write_text(json.dumps(records,indent=2))
 (OUT/'consumer-presentation-mechanics.json').write_text(json.dumps(mechanics,indent=2))
