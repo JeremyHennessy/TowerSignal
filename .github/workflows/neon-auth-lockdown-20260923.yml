@@ -1,0 +1,88 @@
+name: Lock Neon Auth registration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/neon-auth-lockdown-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  lockdown:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+      AUTH_URL: https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth
+    steps:
+      - name: Disable self-registration and localhost auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || exit 2
+
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          DO $$
+          DECLARE
+            v_rows integer;
+            v_users integer;
+          BEGIN
+            SELECT count(*) INTO v_rows FROM neon_auth.project_config;
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            IF v_rows <> 1 OR v_users <> 2 THEN
+              RAISE EXCEPTION 'Auth lockdown guard failed: config_rows=% users=%', v_rows, v_users;
+            END IF;
+          END $$;
+
+          UPDATE neon_auth.project_config
+          SET email_and_password =
+                jsonb_set(email_and_password::jsonb, '{disableSignUp}', 'true'::jsonb, true),
+              allow_localhost = false,
+              updated_at = now();
+
+          DO $$
+          DECLARE
+            v_disabled boolean;
+            v_localhost boolean;
+          BEGIN
+            SELECT coalesce((email_and_password::jsonb->>'disableSignUp')::boolean,false),
+                   allow_localhost
+              INTO v_disabled, v_localhost
+            FROM neon_auth.project_config;
+
+            IF NOT v_disabled OR v_localhost THEN
+              RAISE EXCEPTION 'Auth lockdown postcondition failed: disableSignUp=% allow_localhost=%',
+                v_disabled, v_localhost;
+            END IF;
+          END $$;
+
+          COMMIT;
+
+          SELECT 'AUTH_CONFIG_LOCKDOWN=PASS',
+                 email_and_password::jsonb->>'disableSignUp',
+                 allow_localhost
+          FROM neon_auth.project_config;
+          SQL
+
+      - name: Prove public signup is rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          email="towersignal-lockdown-proof-${GITHUB_RUN_ID}@example.com"
+          password="Ts-Lockdown-${GITHUB_RUN_ID}-Aa9!"
+          payload="$(jq -nc --arg email "$email" --arg password "$password" --arg name "TowerSignal lockdown proof" --arg callbackURL "https://jeremyhennessy.github.io" '{email:$email,password:$password,name:$name,callbackURL:$callbackURL}')"
+
+          code="$(curl --silent --show-error --output /tmp/signup-response.txt --write-out '%{http_code}'             -X POST "${AUTH_URL}/sign-up/email"             -H 'content-type: application/json'             -H 'origin: https://jeremyhennessy.github.io'             --data "$payload")"
+
+          if [[ "$code" =~ ^2 ]]; then
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "delete from neon_auth.\"user\" where email = '$email';"
+            echo "SIGNUP_REJECTION=FAIL accepted_http_$code"
+            exit 3
+          fi
+
+          echo "SIGNUP_REJECTION=PASS http_$code"
+          test "$(psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select count(*) from neon_auth.\"user\";")" = "2"
