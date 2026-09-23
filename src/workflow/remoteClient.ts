@@ -57,18 +57,6 @@ export async function signInWorkflow(email: string, password: string): Promise<W
   return user
 }
 
-export async function signUpWorkflow(email: string, password: string, name?: string): Promise<WorkflowUser> {
-  const result = await client.auth.signUp.email({
-    email,
-    password,
-    name: name?.trim() || email.split('@')[0] || 'TowerSignal user',
-  })
-  throwIfError('Unable to create account', result.error)
-  const user = userFrom(result.data?.user)
-  if (!user) throw new Error('Unable to create account: session user was not returned')
-  return user
-}
-
 export async function signOutWorkflow(): Promise<void> {
   const result = await client.auth.signOut()
   throwIfError('Unable to sign out', result.error)
