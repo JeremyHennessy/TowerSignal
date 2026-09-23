@@ -34,56 +34,36 @@ jobs:
           npm install --no-audit --no-fund
       - name: Reconcile ordering against all 4,893 account details
         run: |
-          mkdir -p tests/frontend
-          cat > tests/frontend/auditBuildingWaterFullPopulation.test.ts <<'TS'
+          cat > audit-preview-full-population.ts <<'TS'
           import fs from 'node:fs'
           import path from 'node:path'
-          import { describe, expect, it } from 'vitest'
-          import { orderedDobWaterRows } from '../../src/components/BuildingWaterSignalsSection'
-
-          function walk(dir: string): string[] {
-            return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>{
-              const p=path.join(dir,e.name)
-              return e.isDirectory()?walk(p):e.isFile()&&e.name.endsWith('.json')?[p]:[]
-            })
+          import { orderedDobWaterRows } from './src/components/BuildingWaterSignalsSection'
+          function walk(dir:string):string[]{return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>{const p=path.join(dir,e.name);return e.isDirectory()?walk(p):e.isFile()&&e.name.endsWith('.json')?[p]:[]})}
+          function date(row:Record<string,unknown>):string{for(const k of ['issued_date','approved_date','filing_date']){const v=row[k];if(typeof v==='string'&&/^\\d{4}-\\d{2}-\\d{2}/.test(v))return v.slice(0,10)}return ''}
+          const files=walk('.fixed/data/details')
+          if(files.length!==4893) throw new Error(`detail population ${files.length}`)
+          let accountsWithDob=0,totalRows=0,remainingRows=0,newerHidden=0,noPermitInPreview=0
+          const failures:any[]=[]
+          for(const file of files){
+            const d=JSON.parse(fs.readFileSync(file,'utf8'));const ctx=d.nyc_building_water_signals;if(!ctx)continue
+            const jobs=ctx.dob_water_job_filings??[], permits=ctx.dob_water_permits??[]
+            if(!jobs.length&&!permits.length)continue
+            accountsWithDob++
+            const ordered=orderedDobWaterRows(jobs,permits);totalRows+=ordered.length;remainingRows+=Math.max(0,ordered.length-8)
+            if(ordered.length!==jobs.length+permits.length)failures.push({file,kind:'loss'})
+            const preview=ordered.slice(0,8),hidden=ordered.slice(8)
+            const oldestShown=preview.map(date).filter(Boolean).sort()[0]??''
+            if(hidden.some((row:any)=>date(row)>oldestShown)){newerHidden++;failures.push({file,kind:'newer-hidden',oldestShown})}
+            if(permits.length&&!preview.some((row:any)=>permits.includes(row)))noPermitInPreview++
           }
-          function date(row: Record<string,unknown>): string {
-            for(const k of ['issued_date','approved_date','filing_date']){
-              const v=row[k]; if(typeof v==='string' && /^\\d{4}-\\d{2}-\\d{2}/.test(v)) return v.slice(0,10)
-            }
-            return ''
-          }
-          describe('full Pages242 DOB preview population',()=>{
-            it('preserves all rows and never hides a newer record behind an older preview card',()=>{
-              const files=walk('.fixed/data/details')
-              expect(files.length).toBe(4893)
-              let accountsWithDob=0, totalRows=0, remainingRows=0, newerHidden=0, noPermitInPreview=0
-              const failures:unknown[]=[]
-              for(const file of files){
-                const d=JSON.parse(fs.readFileSync(file,'utf8'))
-                const c=d.nyc_building_water_signals
-                if(!c) continue
-                const jobs=(c.dob_water_job_filings??[]) as Record<string,unknown>[]
-                const permits=(c.dob_water_permits??[]) as Record<string,unknown>[]
-                if(!jobs.length && !permits.length) continue
-                accountsWithDob++
-                const ordered=orderedDobWaterRows(jobs,permits)
-                totalRows+=ordered.length
-                remainingRows+=Math.max(0,ordered.length-8)
-                if(ordered.length!==jobs.length+permits.length) failures.push({file,kind:'loss'})
-                const preview=ordered.slice(0,8), hidden=ordered.slice(8)
-                const oldestShown=preview.map(date).filter(Boolean).sort()[0]??''
-                if(hidden.some(row=>date(row)>oldestShown)){ newerHidden++; failures.push({file,kind:'newer-hidden',oldestShown}) }
-                if(permits.length && !preview.some(row=>permits.includes(row))) noPermitInPreview++
-              }
-              fs.writeFileSync('.preview-proof/full-population.json',JSON.stringify({files:4893,accountsWithDob,totalRows,remainingRows,newerHidden,noPermitInPreview,failures},null,2))
-              expect(failures).toEqual([])
-              expect(newerHidden).toBe(0)
-            })
-          })
+          const result={files:files.length,accountsWithDob,totalRows,remainingRows,newerHidden,noPermitInPreview,failures}
+          fs.writeFileSync('.preview-proof/full-population.json',JSON.stringify(result,null,2))
+          console.log(JSON.stringify({...result,failures:failures.slice(0,20)},null,2))
+          if(failures.length)throw new Error(`${failures.length} ordering failures`)
+          if(newerHidden!==0)throw new Error(`${newerHidden} newer hidden records`)
           TS
-          npx vitest run tests/frontend/auditBuildingWaterFullPopulation.test.ts
-          rm tests/frontend/auditBuildingWaterFullPopulation.test.ts
+          npx vite-node audit-preview-full-population.ts
+          rm audit-preview-full-population.ts
       - name: Prepare actual-data visual harness
         run: |
           python - <<'PY'
