@@ -1,0 +1,114 @@
+{
+  "input_records": 172,
+  "class_counts": {
+    "TYPE_CANDIDATES_AMBIGUOUS": 56,
+    "NO_TYPE_FIELD_TRACE": 8,
+    "NO_TYPE_FIELD_TRACE_IN_DATA_COMPONENT": 33,
+    "TYPE_BACKTRACED_DATA_FIELD": 75
+  },
+  "type_backtraced": 75,
+  "remaining_manual": 97,
+  "remaining_by_file": [
+    [
+      "src/App.tsx",
+      17
+    ],
+    [
+      "src/components/DomesticWaterSection.tsx",
+      11
+    ],
+    [
+      "src/components/ChangesView.tsx",
+      10
+    ],
+    [
+      "src/components/DetailPanel.tsx",
+      6
+    ],
+    [
+      "src/components/HomePage.tsx",
+      6
+    ],
+    [
+      "src/components/LegionellaIntelligencePanel.tsx",
+      5
+    ],
+    [
+      "src/components/PortfoliosPage.tsx",
+      5
+    ],
+    [
+      "src/components/SourceHealthExpansion.tsx",
+      5
+    ],
+    [
+      "src/components/NysRegistryView.tsx",
+      4
+    ],
+    [
+      "src/components/AccountDecisionSummary.tsx",
+      3
+    ],
+    [
+      "src/components/AccountUnifiedTimeline.tsx",
+      3
+    ],
+    [
+      "src/components/NysChangesView.tsx",
+      3
+    ],
+    [
+      "src/components/NysWaterMarketSubViews.tsx",
+      3
+    ],
+    [
+      "src/components/SalesPreCallPack.tsx",
+      3
+    ],
+    [
+      "src/components/WaterQualityPage.tsx",
+      3
+    ],
+    [
+      "src/components/ClientSiteReport.tsx",
+      2
+    ],
+    [
+      "src/components/MarketingLandingPage.tsx",
+      2
+    ],
+    [
+      "src/components/SystemTable.tsx",
+      2
+    ],
+    [
+      "src/components/AccountEvidenceWorkspace.tsx",
+      1
+    ],
+    [
+      "src/components/InstitutionalFacilitySection.tsx",
+      1
+    ],
+    [
+      "src/components/OpportunitiesPage.tsx",
+      1
+    ],
+    [
+      "src/components/StatusBadge.tsx",
+      1
+    ]
+  ],
+  "chosen_domain_counts": {
+    "SYSTEM_ACCOUNT": 3,
+    "ACRIS": 5,
+    "HISTORY_CHANGE": 9,
+    "OATH": 6,
+    "COMPANY_FIRM": 1,
+    "LEGIONELLA": 11,
+    "NYS": 6,
+    "PLANIMETRIC": 14,
+    "MULTI:SYSTEM_ACCOUNT,WORKFLOW": 1,
+    "SOURCE_HEALTH": 19
+  },
+  "boundary": "Property-name to declared TypeScript model trace. A typed domain identifies the application model lineage, not the original publisher field unless separately linked through source/normalizer ledgers."
+}
