@@ -1,0 +1,35 @@
+name: Recover mapping transfer
+on:
+  push:
+    branches: [audit/mapping-fix-transfer-20260923]
+    paths: [.github/workflows/recover-mapping-transfer.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover available patch and live provenance
+        run: |
+          mkdir -p recovery
+          python - <<'PY'
+          import base64,zlib,json,urllib.request,hashlib
+          from pathlib import Path
+          text=''.join(p.read_text().strip() for p in sorted(Path('.audit-transfer').glob('mapping-patch-*.b64')))
+          text=text[:len(text)//4*4]
+          decoder=zlib.decompressobj(31)
+          data=decoder.decompress(base64.b64decode(text))
+          Path('recovery/partial-patch').write_bytes(data)
+          Path('recovery/recovery.json').write_text(json.dumps({'gzip_complete':decoder.eof,'recovered_bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}))
+          for name in ['systems.json','details/20/2000014227.json','details/20/2000011002.json','metadata.json','changes.json']:
+            with urllib.request.urlopen('https://jeremyhennessy.github.io/TowerSignal/data/'+name,timeout=90) as r: raw=r.read()
+            Path('recovery/'+name.replace('/','_')).write_bytes(raw)
+          print('Partial bytes:',len(data),'complete:',decoder.eof)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mapping-transfer-recovery
+          path: recovery
+          retention-days: 14
