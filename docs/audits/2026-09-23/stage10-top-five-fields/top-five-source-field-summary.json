@@ -1,0 +1,61 @@
+{
+  "field_rows": 304,
+  "sources": {
+    "ic3t-wcy2": {
+      "label": "Legacy DOB/BIS job applications",
+      "published_fields": 95,
+      "requested_fields": 28,
+      "semantic_used_fields": 28,
+      "dispositions": {
+        "USED": 28,
+        "UNRESOLVED": 67
+      },
+      "source_updated_at": 1790115878
+    },
+    "jz4z-kudi": {
+      "label": "OATH Hearings case status",
+      "published_fields": 74,
+      "requested_fields": 62,
+      "semantic_used_fields": 62,
+      "dispositions": {
+        "USED": 62,
+        "UNRESOLVED": 12
+      },
+      "source_updated_at": 1790137934
+    },
+    "76ig-c548": {
+      "label": "Historical NYC 311 2010-2019",
+      "published_fields": 48,
+      "requested_fields": 10,
+      "semantic_used_fields": 10,
+      "dispositions": {
+        "USED": 10,
+        "UNRESOLVED": 38
+      },
+      "source_updated_at": 1766600348
+    },
+    "gjm4-k24g": {
+      "label": "DOHMH self-reported drinking-water tank inspections",
+      "published_fields": 47,
+      "requested_fields": 47,
+      "semantic_used_fields": 25,
+      "dispositions": {
+        "USED": 25,
+        "RETAINED_NOT_DISPLAYED": 22
+      },
+      "source_updated_at": 1790180657
+    },
+    "xubg-57si": {
+      "label": "DOB NOW fa\u00e7ade compliance filings",
+      "published_fields": 40,
+      "requested_fields": 15,
+      "semantic_used_fields": 15,
+      "dispositions": {
+        "USED": 15,
+        "UNRESOLVED": 25
+      },
+      "source_updated_at": 1790184750
+    }
+  },
+  "boundary": "Source-schema/collector audit only. FULL_ROW_EXACT_BIN means fields arrive in source responses; fields not semantically normalized are not assumed durably retained. UNRESOLVED is not a missing-data finding."
+}
