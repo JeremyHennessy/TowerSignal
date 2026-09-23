@@ -450,7 +450,7 @@ def normalize_dec_business(row: Mapping[str, Any]) -> dict[str, Any]:
         "city": normalize_space(row.get("city")) or None,
         "state": normalize_space(row.get("state")) or None,
         "zip": normalize_space(row.get("zip_code")) or None,
-        "dec_region": normalize_space(row.get("dec_region")) or None,
+        "dec_region": normalize_space(row.get("region")) or None,
         "registration_effective_date": parse_source_date(row.get("registration_effective_date")),
         "registration_expiration_date": parse_source_date(row.get("registration_expiration_date")),
         "category": normalize_space(row.get("pesticide_category_code")) or None,
