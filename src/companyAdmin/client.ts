@@ -186,16 +186,33 @@ export async function saveCompanyAdminProfile(
   return profileFrom(created)
 }
 
-export async function addCompanyContact(companyId: string, values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'created_at' | 'updated_at'>): Promise<CompanyAdminContact> {
-  const result = await client.from('company_private_contacts').insert({
-    contact_id: crypto.randomUUID(),
+export async function saveCompanyAdminContact(
+  contactId: string,
+  companyId: string,
+  values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'created_at' | 'updated_at'>,
+): Promise<CompanyAdminContact> {
+  const update = await client.from('company_private_contacts')
+    .update({ ...values, updated_at: new Date().toISOString() })
+    .eq('contact_id', contactId)
+    .eq('company_id', companyId)
+    .select('*')
+  throwIfError('Unable to update company contact', update.error)
+  const updated = ((update.data ?? []) as Array<Record<string, unknown>>)[0]
+  if (updated) return contactFrom(updated)
+
+  const insert = await client.from('company_private_contacts').insert({
+    contact_id: contactId,
     company_id: companyId,
     ...values,
   }).select('*')
-  throwIfError('Unable to add company contact', result.error)
-  const row = ((result.data ?? []) as Array<Record<string, unknown>>)[0]
+  throwIfError('Unable to add company contact', insert.error)
+  const row = ((insert.data ?? []) as Array<Record<string, unknown>>)[0]
   if (!row) throw new Error('Unable to add company contact: inserted row was not returned')
   return contactFrom(row)
+}
+
+export async function addCompanyContact(companyId: string, values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'created_at' | 'updated_at'>): Promise<CompanyAdminContact> {
+  return saveCompanyAdminContact(crypto.randomUUID(), companyId, values)
 }
 
 export async function addCompanyActivity(companyId: string, values: Omit<CompanyAdminActivity, 'activity_id' | 'company_id' | 'created_at' | 'created_by'>): Promise<CompanyAdminActivity> {
