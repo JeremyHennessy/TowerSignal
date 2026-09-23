@@ -1,0 +1,188 @@
+name: Read-only lineage audit 20260923
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths: [.github/workflows/lineage-audit-20260923.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  evidence:
+    if: github.ref == 'refs/heads/audit/full-lineage-20260923-1350'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preserve pinned source and independently collect read-only evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .audit-evidence
+          git archive f1cbdb925b704a8b7a34aaccd169be6649b80a92 -o .audit-evidence/repository.tar
+          python -u - <<'PY'
+          import concurrent.futures as cf, datetime as dt, gzip, hashlib, io, json, os, re, tarfile, urllib.request as ur, urllib.parse as up, zipfile
+          from pathlib import Path
+          E=Path('.audit-evidence'); API='https://api.github.com/repos/JeremyHennessy/TowerSignal'; LIVE='https://jeremyhennessy.github.io/TowerSignal/'
+          records=[]
+          def save(path,obj):
+              p=E/path; p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(obj,ensure_ascii=False,indent=2,default=str))
+          def get(url,timeout=50,raw=False):
+              started=dt.datetime.now(dt.timezone.utc).isoformat(); headers={'User-Agent':'TowerSignal-read-only-lineage-audit/20260923'}
+              if url.startswith('https://api.github.com/'):
+                  headers['Authorization']='Bearer '+os.environ['GH_TOKEN']; headers['Accept']='application/vnd.github+json'
+              rec={'url':url,'requested_at':started}
+              try:
+                  with ur.urlopen(ur.Request(url,headers=headers),timeout=timeout) as r:
+                      b=r.read(); rec.update(status=r.status,bytes=len(b),sha256=hashlib.sha256(b).hexdigest(),headers={k:v for k,v in r.headers.items() if k.lower() in ('date','etag','last-modified','content-type','x-github-request-id')})
+                  records.append(rec)
+                  return b if raw else json.loads(b)
+              except Exception as ex:
+                  rec.update(error=str(ex),status=getattr(ex,'code',None)); records.append(rec)
+                  return {'_audit_error':str(ex),'url':url}
+          baseline={'audit_start':dt.datetime.now(dt.timezone.utc).isoformat(),'inspected_code_sha':'f1cbdb925b704a8b7a34aaccd169be6649b80a92','audit_sha':os.getenv('GITHUB_SHA'),'audit_run':os.getenv('GITHUB_RUN_ID'),'permissions':'READ_ONLY; no deploy, no cache writes, no workflow cancellation'}
+          for name,path in [('main','/branches/main'),('open_prs','/pulls?state=open&per_page=100'),('active_runs','/actions/runs?status=in_progress&per_page=100'),('queued_runs','/actions/runs?status=queued&per_page=100'),('pages_runs','/actions/workflows/pages.yml/runs?per_page=8'),('branches','/branches?per_page=100'),('deployments','/deployments?per_page=6')]:
+              baseline[name]=get(API+path); save('baseline/'+name+'.json',baseline[name])
+          print('BASELINE',json.dumps({k:baseline[k] for k in ['audit_start','inspected_code_sha','audit_sha','audit_run']}),flush=True)
+          successes=get(API+'/actions/workflows/pages.yml/runs?status=success&per_page=3')
+          runs=successes.get('workflow_runs',[]) if isinstance(successes,dict) else []
+          save('baseline/successful-pages.json',successes)
+          if runs:
+              run=runs[0]; baseline['selected_successful_pages_run']=run
+              arts=get(API+f"/actions/runs/{run['id']}/artifacts?per_page=100"); save('baseline/selected-artifacts.json',arts)
+              save('baseline/selected-jobs.json',get(API+f"/actions/runs/{run['id']}/jobs?per_page=100"))
+              candidates=[a for a in arts.get('artifacts',[]) if not a.get('expired') and a.get('name')=='github-pages']
+              if candidates:
+                  a=candidates[0]; baseline['selected_artifact']=a; print('Downloading accepted-run artifact',a['id'],a['size_in_bytes'],flush=True)
+                  b=get(API+f"/actions/artifacts/{a['id']}/zip",timeout=180,raw=True)
+                  if isinstance(b,bytes):
+                      baseline['downloaded_artifact_sha256']=hashlib.sha256(b).hexdigest()
+                      with zipfile.ZipFile(io.BytesIO(b)) as z:
+                          for name in z.namelist():
+                              if name.endswith('.tar'):
+                                  with tarfile.open(fileobj=io.BytesIO(z.read(name))) as t:
+                                      for m in t.getmembers():
+                                          rel=Path(m.name.lstrip('./'))
+                                          if not m.isfile() or '..' in rel.parts: continue
+                                          if rel.suffix.lower() not in ('.json','.gz','.ndjson','.html','.js','.css','.txt','.csv','.map'): continue
+                                          p=E/'artifact-site'/rel; p.parent.mkdir(parents=True,exist_ok=True); p.write_bytes(t.extractfile(m).read())
+                      print('Extracted artifact text/data files',sum(1 for p in (E/'artifact-site').rglob('*') if p.is_file()),flush=True)
+          root=get(LIVE,raw=True)
+          if isinstance(root,bytes): (E/'hosted-index.html').write_bytes(root)
+          site=E/'artifact-site'
+          hosted_candidates=set()
+          if site.exists():
+              for p in site.rglob('*.json'):
+                  rel=p.relative_to(site)
+                  if len(rel.parts)<=2: hosted_candidates.add(str(rel))
+                  if p.stem in {'2000014227','2000001474','2000001046','2000003056','2000015473','2000011125','2000014447'}: hosted_candidates.add(str(rel))
+          hosted_candidates.update(['data/systems.json','data/accounts.json','release.json'])
+          def hosted(rel):
+              b=get(LIVE+rel,raw=True)
+              if isinstance(b,bytes):
+                  p=E/'hosted'/rel; p.parent.mkdir(parents=True,exist_ok=True); p.write_bytes(b)
+                  q=site/rel
+                  return {'path':rel,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest(),'artifact_equal':q.exists() and q.read_bytes()==b}
+              return {'path':rel,'error':b}
+          with cf.ThreadPoolExecutor(max_workers=4) as pool: baseline['hosted_comparisons']=list(pool.map(hosted,sorted(hosted_candidates)))
+          print('HOSTED',json.dumps(baseline['hosted_comparisons']),flush=True)
+          hits={}; url_hits=[]; source_files=[]
+          for folder in ['scripts','src','config','data','docs','.github']:
+              for p in Path(folder).rglob('*'):
+                  if not p.is_file() or p.suffix not in ('.py','.ts','.tsx','.json','.md','.yml','.yaml','.mjs'): continue
+                  try: text=p.read_text()
+                  except Exception: continue
+                  source_files.append({'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+                  for i,line in enumerate(text.splitlines(),1):
+                      for u in re.findall(r'https?://[^\s<>\"\'`\\)]+',line): url_hits.append({'path':str(p),'line':i,'url_literal':u})
+                      for ident in re.findall(r'(?<![a-z0-9])[a-z0-9]{4}-[a-z0-9]{4}(?![a-z0-9])',line):
+                          if not any(c.isdigit() for c in ident): continue
+                          hits.setdefault(ident,[]).append({'path':str(p),'line':i,'text':line.strip()[:700],'nys_hint':'data.ny.gov' in text})
+          save('discovery/source-files.json',source_files); save('discovery/url-occurrences.json',url_hits); save('discovery/dataset-candidates.json',hits)
+          def schema(item):
+              ident,occ=item; domains=['data.ny.gov','data.cityofnewyork.us'] if any(o['nys_hint'] for o in occ) else ['data.cityofnewyork.us','data.ny.gov']
+              for domain in domains:
+                  d=get(f'https://{domain}/api/views/{ident}.json',timeout=20)
+                  if isinstance(d,dict) and isinstance(d.get('columns'),list):
+                      save(f'official-schemas/{domain}__{ident}.json',d)
+                      return {'dataset_id':ident,'domain':domain,'name':d.get('name'),'columns':len(d['columns']),'rows_updated_at':d.get('rowsUpdatedAt'),'metadata_checked':True,'occurrences':occ}
+              return {'dataset_id':ident,'metadata_checked':False,'status':'UNRESOLVED_CANDIDATE_NOT_CONFIRMED_SOURCE','occurrences':occ}
+          with cf.ThreadPoolExecutor(max_workers=6) as pool: inventory=list(pool.map(schema,hits.items()))
+          save('source-inventory.json',inventory); print('SCHEMAS',len(inventory),'candidates;',sum(x.get('metadata_checked',False) for x in inventory),'confirmed',flush=True)
+          for ident in ['y4fw-iqfr','f9wb-g8mb']:
+              base=f'https://data.cityofnewyork.us/resource/{ident}.json'; q=lambda p:base+'?'+up.urlencode(p)
+              before=get(q({'$select':'count(*) as n'})); rows=[]; offset=0; ok=True
+              while True:
+                  page=get(q({'$select':'*,:id as audit_row_id','$order':':id','$limit':10000,'$offset':offset}),timeout=90)
+                  if not isinstance(page,list): ok=False; break
+                  rows.extend(page)
+                  if len(page)<10000: break
+                  offset+=10000
+              after=get(q({'$select':'count(*) as n'})); meta=get(f'https://data.cityofnewyork.us/api/views/{ident}.json')
+              with gzip.open(E/f'{ident}-independent-raw.json.gz','wt') as f: json.dump(rows,f)
+              save(f'{ident}-retrieval.json',{'before':before,'after':after,'retrieved':len(rows),'pagination_completed':ok,'ordering':':id','selected':'*,:id as audit_row_id','source_rows_updated_at':meta.get('rowsUpdatedAt'),'source_metadata_after':meta})
+              print('PRIMARY_SOURCE',ident,len(rows),'rows',before,after,'pagination_completed',ok,flush=True)
+          baseline['audit_snapshot_end']=dt.datetime.now(dt.timezone.utc).isoformat(); save('baseline.json',baseline); save('requests.json',records)
+          print('Evidence collection completed; no production state changed.',flush=True)
+          PY
+      - name: Install pinned browser tooling
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Read-only hosted desktop and iPhone network/renderer evidence
+        run: |
+          cat > audit-hosted-readonly.mjs <<'JS'
+          import { chromium, webkit, devices } from '@playwright/test';
+          import fs from 'node:fs/promises';
+          import path from 'node:path';
+          const out='.audit-evidence/browser'; await fs.mkdir(out,{recursive:true});
+          const base='https://jeremyhennessy.github.io/TowerSignal/';
+          const ids=['2000014227','2000001474','2000001046','2000003056','2000015473','2000011125','2000014447'];
+          const results=[];
+          for (const [name,type,opts] of [['desktop',chromium,{viewport:{width:1440,height:1000}}],['iphone',webkit,devices['iPhone 13']]]) {
+            const browser=await type.launch(); const context=await browser.newContext(opts);
+            await context.route('**/*',r=>['GET','HEAD','OPTIONS'].includes(r.request().method())?r.continue():r.abort('blockedbyclient'));
+            const page=await context.newPage(); const network=[],errors=[];
+            page.on('response',r=>network.push({url:r.url(),status:r.status(),method:r.request().method()}));
+            page.on('requestfailed',r=>network.push({url:r.url(),failure:r.failure(),method:r.method()}));
+            page.on('pageerror',e=>errors.push(String(e))); page.on('console',m=>{if(m.type()==='error') errors.push(m.text())});
+            try {
+              await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000}); await page.waitForTimeout(3000);
+              const nav=await page.locator('a[href*="#/"]').evaluateAll(es=>es.map(e=>e.getAttribute('href')).filter(Boolean));
+              const routes=[...new Set(['#/',...nav.filter(x=>x.startsWith('#/')),...ids.map(x=>'#/account/'+x)])];
+              for (let i=0;i<routes.length;i++) {
+                const route=routes[i]; const start=network.length; const errstart=errors.length;
+                const key=name+'-'+String(i).padStart(2,'0');
+                try {
+                  await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:60000});
+                  await page.waitForTimeout(1700);
+                  await page.screenshot({path:path.join(out,key+'.png'),fullPage:false});
+                  await fs.writeFile(path.join(out,key+'.txt'),await page.locator('body').innerText());
+                  const controls=await page.locator('a,button,input,select,[role="tab"],th').evaluateAll(es=>es.map(e=>({tag:e.tagName,role:e.getAttribute('role'),text:(e.innerText||e.getAttribute('aria-label')||'').trim(),href:e.getAttribute('href'),type:e.getAttribute('type')})));
+                  results.push({device:name,route,key,controls,network:network.slice(start),errors:errors.slice(errstart),url:page.url(),horizontalOverflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)});
+                } catch(e){results.push({device:name,route,key,error:String(e),network:network.slice(start),errors:errors.slice(errstart)});}
+              }
+            } catch(e){results.push({device:name,error:String(e)});}
+            await fs.writeFile(path.join(out,name+'-network.json'),JSON.stringify(network,null,2));
+            await browser.close();
+          }
+          await fs.writeFile(path.join(out,'results.json'),JSON.stringify(results,null,2));
+          console.log('HOSTED_BROWSER',JSON.stringify(results.map(({device,route,key,error,errors,horizontalOverflow})=>({device,route,key,error,errors,horizontalOverflow}))));
+          JS
+          node audit-hosted-readonly.mjs
+      - name: Upload audit evidence, not a release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: readonly-lineage-audit-evidence-20260923
+          path: .audit-evidence
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
