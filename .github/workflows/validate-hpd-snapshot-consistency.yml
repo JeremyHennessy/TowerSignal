@@ -1,0 +1,19 @@
+name: Validate HPD snapshot consistency repair
+on:
+  push:
+    branches: [fix/hpd-snapshot-consistency-20260923]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Targeted NYC water signal tests
+        run: python -m unittest tests.python.test_nyc_water_signals -v
+      - name: Full Python suite
+        run: python -m unittest discover -s tests/python -p 'test_*.py' -v
