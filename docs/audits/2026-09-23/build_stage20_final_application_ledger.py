@@ -87,7 +87,7 @@ summary={
  'resolution_stage_counts':dict(stages),
  'manual_domain_counts':dict(domains),
  'route_literals':json.loads((B/'stage13-application-register/application-field-summary.json').read_text()).get('route_literals',[]),
- 'denominator_definition':'The same 3,021 deduplicated runtime JSX/report-export expression records established in stage13.',
+ 'denominator_definition':f"The same {len(final):,} deduplicated runtime JSX/report-export expression records established in the current stage13 run.",
  'acceptance_boundary':'Application expression lineage is classified for every denominator record. This does not mean every visible state was exercised in a browser, nor that every source-derived value is correct; source-field correctness, relationship joins, hosted state coverage and PDF/visual acceptance remain separate gates.'
 }
 (OUT/'final-application-lineage-register.json').write_text(json.dumps(final,indent=2))
