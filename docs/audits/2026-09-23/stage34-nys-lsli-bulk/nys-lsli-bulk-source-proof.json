@@ -1,0 +1,23 @@
+{
+  "dataset_id": "j63k-4n92",
+  "served_generated_at": "2026-09-23T18:16:19.455532Z",
+  "served_source_record_count": 4618115,
+  "served_bulk_export_sha256": "64a399f87a22f45ce7cc525e0f8f40809af2526a01d559c61124cd80858f6b1b",
+  "served_bulk_export_byte_count": 944424962,
+  "current_count_before": 4618115,
+  "current_count_after": 4618115,
+  "downloaded_rows": 4618115,
+  "downloaded_bytes": 944424962,
+  "downloaded_sha256": "64a399f87a22f45ce7cc525e0f8f40809af2526a01d559c61124cd80858f6b1b",
+  "rows_updated_before": 1758225781,
+  "rows_updated_after": 1758225781,
+  "data_updated_before": null,
+  "data_updated_after": null,
+  "snapshot_stable": true,
+  "record_count_equal_served": true,
+  "bulk_sha256_equal_served": true,
+  "bulk_byte_count_equal_served": true,
+  "exact_current_bulk_snapshot_equal_served": true,
+  "source_fields_equal": true,
+  "boundary": "Independent complete current bulk export using the same authoritative 20-field schema. Exact SHA/byte equality proves the served source snapshot bytes when equal; it does not by itself re-prove every normalized row field."
+}

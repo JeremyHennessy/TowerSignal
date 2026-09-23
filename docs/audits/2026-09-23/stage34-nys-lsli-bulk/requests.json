@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://jeremyhennessy.github.io/TowerSignal/data/nys-service-line-inventory-summary.json",
+    "status": 200,
+    "bytes": 89288,
+    "sha256": "1b10fa07829217ee5889378d761fc1f76d482100b86b33f9da43822c9d9310b8"
+  },
+  {
+    "url": "https://health.data.ny.gov/api/views/j63k-4n92",
+    "status": 200,
+    "bytes": 48073,
+    "sha256": "e20af4dd6329955ed1f262f1e77b1bb29b21d3e931fc693a483b790003bac193"
+  },
+  {
+    "url": "https://health.data.ny.gov/resource/j63k-4n92.json?%24select=count%28%2A%29+as+count",
+    "status": 200,
+    "bytes": 22,
+    "sha256": "1f254ea28f8e5e9916d7b6eedb2e611c058acfeb8c9dcfe196348c0d1579d950"
+  },
+  {
+    "url": "https://health.data.ny.gov/api/views/j63k-4n92",
+    "status": 200,
+    "bytes": 48073,
+    "sha256": "e20af4dd6329955ed1f262f1e77b1bb29b21d3e931fc693a483b790003bac193"
+  },
+  {
+    "url": "https://health.data.ny.gov/resource/j63k-4n92.json?%24select=count%28%2A%29+as+count",
+    "status": 200,
+    "bytes": 22,
+    "sha256": "1f254ea28f8e5e9916d7b6eedb2e611c058acfeb8c9dcfe196348c0d1579d950"
+  }
+]
