@@ -1,0 +1,170 @@
+name: Deploy auth-lock application-only release
+
+on:
+  push:
+    branches:
+      - agent/auth-lock-application-release-20260923
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: auth-lock-application-release-20260923
+  cancel-in-progress: true
+
+env:
+  VITE_REPORT_APPLICATION_SHA: 952ac2e8c7b48d01029e279c1c5a74791623fef6
+  EXPECTED_REPORT_SHA: 952ac2e8c7b48d01029e279c1c5a74791623fef6
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Download last fully successful production Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35866906472
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .verified-pages
+
+      - name: Freeze production data byte-for-byte
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .rollback public/data
+          archive="$(find .verified-pages -type f | head -1)"
+          test -n "$archive"
+          tar -xf "$archive" -C .rollback
+          test -f .rollback/data/systems.json
+          rm -rf public/data
+          cp -R .rollback/data public/data
+          python - <<'PY'
+          import hashlib, json, pathlib
+          root=pathlib.Path('public/data')
+          hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          pathlib.Path('verified-data-sha256.json').write_text(json.dumps(hashes,sort_keys=True))
+          print(f'Frozen {len(hashes):,} production data files from Pages run 35866906472')
+          PY
+
+      - name: Verify exact application
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Prove application build did not change production data
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib
+          expected=json.loads(pathlib.Path('verified-data-sha256.json').read_text())
+          root=pathlib.Path('dist/data')
+          actual={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert actual == expected, 'Application-only auth release changed the frozen production data snapshot'
+          print(f'All {len(actual):,} data files are byte-for-byte unchanged')
+          PY
+
+      - name: Install verification browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify locked auth gate before deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx vite preview --host 127.0.0.1 --port 4173 > /tmp/towersignal-auth-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/TowerSignal/ >/dev/null; then break; fi
+            sleep 1
+          done
+          BASE_URL=http://127.0.0.1:4173/TowerSignal/ npx playwright test --config=playwright.public-auth.config.ts
+
+      - name: Retain pre-deploy auth proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-lock-candidate-proof
+          path: |
+            playwright-report
+            test-results
+            verified-data-sha256.json
+          retention-days: 14
+
+      - name: Upload auth-lock application candidate
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Stage exact prior site for rollback
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: auth-lock-rollback
+          path: .rollback
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy verified auth-lock application
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install hosted verification dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium webkit
+      - name: Verify hosted desktop and iPhone auth gate
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: npx playwright test --config=playwright.public-auth.config.ts
+      - name: Retain hosted auth proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-lock-hosted-proof
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
+
+  rollback:
+    if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
+    needs: [build, deploy, verify]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Restore exact prior production site
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: auth-lock-rollback
