@@ -88,6 +88,21 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
     if int(summary.get("hpd_source_partition_record_count") or -1) != hpd_partition_records:
         raise RuntimeError("HPD source partition record count mismatch")
     hpd_unique = int(summary.get("hpd_open_water_violation_count") or 0)
+    if summary.get("hpd_identity_verification_status") != "PASS":
+        raise RuntimeError("HPD identity stability proof is missing or did not pass")
+    first_identity_count = int(summary.get("hpd_identity_first_pass_record_count") or -1)
+    second_identity_count = int(summary.get("hpd_identity_second_pass_record_count") or -1)
+    first_identity_sha = str(summary.get("hpd_identity_first_pass_sha256") or "")
+    second_identity_sha = str(summary.get("hpd_identity_second_pass_sha256") or "")
+    if first_identity_count != hpd_unique or second_identity_count != hpd_unique:
+        raise RuntimeError("HPD identity stability counts do not match the published violation population")
+    if (
+        len(first_identity_sha) != 64
+        or len(second_identity_sha) != 64
+        or any(ch not in "0123456789abcdef" for ch in first_identity_sha + second_identity_sha)
+        or first_identity_sha != second_identity_sha
+    ):
+        raise RuntimeError("HPD identity stability digests do not match")
     hpd_duplicate_raw = summary.get("hpd_duplicate_partition_violation_count")
     hpd_duplicates = -1 if hpd_duplicate_raw is None else int(hpd_duplicate_raw)
     if hpd_fetch_strategy == "OPEN_VIOLATIONS_LOCAL_TERM_FILTER":
@@ -98,6 +113,8 @@ def validate(path: Path, *, max_age_days: int, require_production_volume: bool) 
             raise RuntimeError("HPD borough partition metadata is missing")
         if hpd_partition_count != len(expected_boroughs):
             raise RuntimeError("HPD borough partition count mismatch")
+        if int(summary.get("hpd_identity_second_pass_partition_count") or -1) != len(expected_boroughs):
+            raise RuntimeError("HPD identity verification partition count mismatch")
         if hpd_duplicates < 0 or hpd_partition_records - hpd_duplicates != hpd_unique:
             raise RuntimeError("HPD borough partition de-duplication counts do not reconcile")
     elif hpd_fetch_strategy in {"KEYWORD_PARTITIONS", "UPPERCASE_KEYWORD_PARTITIONS"}:
