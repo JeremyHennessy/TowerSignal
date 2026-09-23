@@ -1,0 +1,16 @@
+{
+  "dataset_id": "jqfp-uff7",
+  "source_snapshot_stable": true,
+  "publisher_full_record_count": 856912,
+  "requested_bbl_aliases": 4941,
+  "source_target_rows": 3779,
+  "source_target_unique_records": 3779,
+  "served_unique_records": 3779,
+  "served_identity_set_equal": true,
+  "source_only_count": 0,
+  "served_only_count": 0,
+  "source_only_examples": [],
+  "served_only_examples": [],
+  "attachment_rows": 4818,
+  "boundary": "Exact source-reported BBL/alias target population; record identity is objectid + source BBL. Attachment multiplicity across systems is not compared to publisher row count."
+}
