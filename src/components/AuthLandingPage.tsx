@@ -1,56 +1,31 @@
 import { useState, type FormEvent } from 'react'
 import type { WorkflowUser } from '../types/workflow'
 
-type AuthMode = 'sign-in' | 'sign-up'
-
 const logoAsset = `${import.meta.env.BASE_URL}marketing/towersignal-logo.webp`
 
 export function AuthLandingPage({
   initialError,
   onSignIn,
-  onSignUp,
 }: {
   initialError?: string | null
   onSignIn: (email: string, password: string) => Promise<WorkflowUser>
-  onSignUp: (name: string, email: string, password: string) => Promise<WorkflowUser>
 }) {
-  const [mode, setMode] = useState<AuthMode>('sign-in')
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(initialError ?? null)
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
-    const normalizedEmail = email.trim()
-    const normalizedName = name.trim()
-    if (mode === 'sign-up' && password !== confirmPassword) {
-      setError('Passwords do not match.')
-      return
-    }
-    if (mode === 'sign-up' && normalizedName.length < 2) {
-      setError('Enter your name to create the account.')
-      return
-    }
     setBusy(true)
     setError(null)
     try {
-      if (mode === 'sign-up') await onSignUp(normalizedName, normalizedEmail, password)
-      else await onSignIn(normalizedEmail, password)
+      await onSignIn(email.trim(), password)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed.')
     } finally {
       setBusy(false)
     }
-  }
-
-  const switchMode = (next: AuthMode) => {
-    setMode(next)
-    setError(null)
-    setPassword('')
-    setConfirmPassword('')
   }
 
   return <main className="auth-gate-page auth-themed-page">
@@ -80,22 +55,16 @@ export function AuthLandingPage({
       <div className="auth-form-card">
         <div className="auth-form-heading">
           <span className="eyebrow">TowerSignal workspace</span>
-          <h2>{mode === 'sign-up' ? 'Create your TowerSignal account' : 'Sign in to TowerSignal'}</h2>
-          <p>{mode === 'sign-up' ? 'Create a private workspace login to access the application.' : 'Welcome back. Sign in to continue to your TowerSignal workspace.'}</p>
-        </div>
-        <div className="auth-mode-tabs" role="tablist" aria-label="Authentication mode">
-          <button type="button" role="tab" aria-selected={mode === 'sign-in'} className={mode === 'sign-in' ? 'active' : ''} onClick={() => switchMode('sign-in')}>Sign in</button>
-          <button type="button" role="tab" aria-selected={mode === 'sign-up'} className={mode === 'sign-up' ? 'active' : ''} onClick={() => switchMode('sign-up')}>Create account</button>
+          <h2>Sign in to TowerSignal</h2>
+          <p>Access is limited to administrator-provisioned accounts.</p>
         </div>
         <form className="auth-form" onSubmit={event => void submit(event)}>
-          {mode === 'sign-up' && <label>Full name<input aria-label="Full name" type="text" autoComplete="name" value={name} onChange={event => setName(event.target.value)} minLength={2} required /></label>}
           <label>Email<input aria-label="Email" type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required /></label>
-          <label>Password<input aria-label="Password" type="password" autoComplete={mode === 'sign-up' ? 'new-password' : 'current-password'} value={password} onChange={event => setPassword(event.target.value)} minLength={8} required /></label>
-          {mode === 'sign-up' && <label>Confirm password<input aria-label="Confirm password" type="password" autoComplete="new-password" value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} minLength={8} required /></label>}
+          <label>Password<input aria-label="Password" type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} minLength={8} required /></label>
           {error && <div className="auth-form-error" role="alert">{error}</div>}
-          <button className="auth-submit" type="submit" disabled={busy || !email.trim() || password.length < 8 || (mode === 'sign-up' && (!name.trim() || confirmPassword.length < 8))}>{busy ? 'Working…' : mode === 'sign-up' ? 'Create account' : 'Sign in'} <span aria-hidden="true">→</span></button>
+          <button className="auth-submit" type="submit" disabled={busy || !email.trim() || password.length < 8}>{busy ? 'Working…' : 'Sign in'} <span aria-hidden="true">→</span></button>
         </form>
-        <div className="auth-security-note"><strong>Authenticated application access</strong><span>Your private workflow state is tied to your account. TowerSignal's underlying public-source datasets remain public-source evidence.</span></div>
+        <div className="auth-security-note"><strong>Private access only</strong><span>New accounts cannot be created from TowerSignal. Access is provisioned by an administrator.</span></div>
       </div>
     </section>
   </main>
