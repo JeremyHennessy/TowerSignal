@@ -1,0 +1,14 @@
+{
+  "companies_sha256": "e11c571ee8c83cd334a617df356630d411fc168dd246b393a1696edbfd32f651",
+  "company_count": 1047,
+  "procurement_observation_ids": 54916,
+  "verify_company_count": 111,
+  "unresolved_observation_count": 6638,
+  "explicit_dba_alias_count": 28,
+  "confirmed_alias_count": 28,
+  "base_names_with_multiple_strict_companies": 31,
+  "issue_count": 0,
+  "issue_type_counts": {},
+  "identity_invariants_clean": true,
+  "boundary": "Served company-identity invariant audit. It proves the generated company graph obeys conservative strict-label/DBA rules; it does not independently verify corporate parentage or external company-master enrichment."
+}
