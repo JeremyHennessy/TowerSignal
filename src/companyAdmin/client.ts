@@ -6,6 +6,9 @@ import type {
   CompanyAdminProfile,
   CompanyAdminProfilePatch,
   CompanyAdminSnapshot,
+  CompanyAuditEntry,
+  CompanyResearchQueueItem,
+  CompanyResearchStatus,
 } from '../types/companyAdmin'
 
 const DEFAULT_AUTH_URL = 'https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth'
@@ -168,13 +171,25 @@ export async function loadCompanyAdminSnapshot(companyId: string): Promise<Compa
   }
 }
 
+export type CompanyChangeContext = {
+  source?: 'manual' | 'import' | 'system'
+  batchId?: string | null
+}
+
 export async function saveCompanyAdminProfile(
   companyId: string,
   canonicalName: string,
-  patch: CompanyAdminProfilePatch,
+  patch: Partial<CompanyAdminProfilePatch>,
+  context: CompanyChangeContext = {},
 ): Promise<CompanyAdminProfile> {
   const now = new Date().toISOString()
-  const values = { ...patch, canonical_name: canonicalName, updated_at: now }
+  const values = {
+    ...patch,
+    canonical_name: canonicalName,
+    updated_at: now,
+    last_change_source: context.source ?? 'manual',
+    last_change_batch_id: context.batchId ?? null,
+  }
   const update = await client.from('company_private_profiles').update(values).eq('company_id', companyId).select('*')
   throwIfError('Unable to update private company profile', update.error)
   const updated = ((update.data ?? []) as Array<Record<string, unknown>>)[0]
@@ -190,9 +205,16 @@ export async function saveCompanyAdminContact(
   contactId: string,
   companyId: string,
   values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'created_at' | 'updated_at'>,
+  context: CompanyChangeContext = {},
 ): Promise<CompanyAdminContact> {
+  const change = {
+    ...values,
+    updated_at: new Date().toISOString(),
+    last_change_source: context.source ?? 'manual',
+    last_change_batch_id: context.batchId ?? null,
+  }
   const update = await client.from('company_private_contacts')
-    .update({ ...values, updated_at: new Date().toISOString() })
+    .update(change)
     .eq('contact_id', contactId)
     .eq('company_id', companyId)
     .select('*')
@@ -203,7 +225,7 @@ export async function saveCompanyAdminContact(
   const insert = await client.from('company_private_contacts').insert({
     contact_id: contactId,
     company_id: companyId,
-    ...values,
+    ...change,
   }).select('*')
   throwIfError('Unable to add company contact', insert.error)
   const row = ((insert.data ?? []) as Array<Record<string, unknown>>)[0]
@@ -220,6 +242,8 @@ export async function addCompanyActivity(companyId: string, values: Omit<Company
     activity_id: crypto.randomUUID(),
     company_id: companyId,
     ...values,
+    last_change_source: 'manual',
+    last_change_batch_id: null,
   }).select('*')
   throwIfError('Unable to add company activity', result.error)
   const row = ((result.data ?? []) as Array<Record<string, unknown>>)[0]
@@ -232,6 +256,8 @@ export async function addCompanyNote(companyId: string, note: string): Promise<C
     note_id: crypto.randomUUID(),
     company_id: companyId,
     note,
+    last_change_source: 'manual',
+    last_change_batch_id: null,
   }).select('*')
   throwIfError('Unable to add company note', result.error)
   const row = ((result.data ?? []) as Array<Record<string, unknown>>)[0]
@@ -241,11 +267,126 @@ export async function addCompanyNote(companyId: string, note: string): Promise<C
 
 export async function updateCompanyNote(noteId: string, note: string): Promise<CompanyAdminNote> {
   const result = await client.from('company_private_notes')
-    .update({ note, updated_at: new Date().toISOString() })
+    .update({
+      note,
+      updated_at: new Date().toISOString(),
+      last_change_source: 'manual',
+      last_change_batch_id: null,
+    })
     .eq('note_id', noteId)
     .select('*')
   throwIfError('Unable to update company note', result.error)
   const row = ((result.data ?? []) as Array<Record<string, unknown>>)[0]
   if (!row) throw new Error('Unable to update company note: row was not returned')
   return noteFrom(row)
+}
+
+
+function researchFrom(row: Record<string, unknown>): CompanyResearchQueueItem {
+  return {
+    company_id: String(row.company_id),
+    priority_score: Number(row.priority_score ?? 0),
+    priority_reason: String(row.priority_reason ?? ''),
+    missing_fields: Array.isArray(row.missing_fields) ? row.missing_fields.map(String) : [],
+    status: String(row.status ?? 'unreviewed') as CompanyResearchStatus,
+    research_owner: nullableString(row.research_owner),
+    last_researched_at: nullableString(row.last_researched_at),
+    queued_at: String(row.queued_at ?? ''),
+    updated_at: String(row.updated_at ?? ''),
+    created_by: nullableString(row.created_by),
+    updated_by: nullableString(row.updated_by),
+  }
+}
+
+function auditFrom(row: Record<string, unknown>): CompanyAuditEntry {
+  return {
+    change_id: Number(row.change_id ?? 0),
+    company_id: String(row.company_id ?? ''),
+    entity_type: String(row.entity_type ?? ''),
+    entity_id: String(row.entity_id ?? ''),
+    operation: String(row.operation ?? ''),
+    field_name: String(row.field_name ?? ''),
+    old_value: row.old_value,
+    new_value: row.new_value,
+    change_source: String(row.change_source ?? 'database') as CompanyAuditEntry['change_source'],
+    import_batch_id: nullableString(row.import_batch_id),
+    changed_at: String(row.changed_at ?? ''),
+    changed_by: nullableString(row.changed_by),
+  }
+}
+
+export async function loadAllCompanyContacts(): Promise<CompanyAdminContact[]> {
+  const result = await client.from('company_private_contacts').select('*').order('updated_at', { ascending: false })
+  throwIfError('Unable to load private company contacts', result.error)
+  return ((result.data ?? []) as Array<Record<string, unknown>>).map(contactFrom)
+}
+
+export async function loadAllCompanyActivities(): Promise<CompanyAdminActivity[]> {
+  const result = await client.from('company_private_activities').select('*').order('occurred_at', { ascending: false })
+  throwIfError('Unable to load private company activities', result.error)
+  return ((result.data ?? []) as Array<Record<string, unknown>>).map(activityFrom)
+}
+
+export async function loadCompanyResearchQueue(): Promise<CompanyResearchQueueItem[]> {
+  const result = await client.from('company_private_research_queue').select('*').order('priority_score', { ascending: false })
+  throwIfError('Unable to load company research queue', result.error)
+  return ((result.data ?? []) as Array<Record<string, unknown>>).map(researchFrom)
+}
+
+export async function saveCompanyResearchQueueItem(
+  item: Pick<CompanyResearchQueueItem, 'company_id' | 'priority_score' | 'priority_reason' | 'missing_fields' | 'status' | 'research_owner' | 'last_researched_at'>,
+  context: CompanyChangeContext = { source: 'system' },
+): Promise<CompanyResearchQueueItem> {
+  const values = {
+    priority_score: item.priority_score,
+    priority_reason: item.priority_reason,
+    missing_fields: item.missing_fields,
+    status: item.status,
+    research_owner: item.research_owner,
+    last_researched_at: item.last_researched_at,
+    updated_at: new Date().toISOString(),
+    last_change_source: context.source ?? 'system',
+    last_change_batch_id: context.batchId ?? null,
+  }
+  const update = await client.from('company_private_research_queue').update(values).eq('company_id', item.company_id).select('*')
+  throwIfError('Unable to update company research queue', update.error)
+  const updated = ((update.data ?? []) as Array<Record<string, unknown>>)[0]
+  if (updated) return researchFrom(updated)
+
+  const insert = await client.from('company_private_research_queue').insert({ company_id: item.company_id, ...values }).select('*')
+  throwIfError('Unable to add company research queue item', insert.error)
+  const created = ((insert.data ?? []) as Array<Record<string, unknown>>)[0]
+  if (!created) throw new Error('Unable to add company research queue item: row was not returned')
+  return researchFrom(created)
+}
+
+export async function syncCompanyResearchQueue(candidates: Array<{
+  company_id: string
+  canonical_name: string
+  priority_score: number
+  priority_reason: string
+  missing_fields: string[]
+}>): Promise<void> {
+  for (let index = 0; index < candidates.length; index += 5) {
+    const chunk = candidates.slice(index, index + 5)
+    await Promise.all(chunk.map(async candidate => {
+      await saveCompanyAdminProfile(candidate.company_id, candidate.canonical_name, {}, { source: 'system', batchId: 'research-queue-sync' })
+      await saveCompanyResearchQueueItem({
+        company_id: candidate.company_id,
+        priority_score: candidate.priority_score,
+        priority_reason: candidate.priority_reason,
+        missing_fields: candidate.missing_fields,
+        status: 'unreviewed',
+        research_owner: null,
+        last_researched_at: null,
+      }, { source: 'system', batchId: 'research-queue-sync' })
+    }))
+  }
+}
+
+export async function loadCompanyAuditLog(companyId: string, limit = 80): Promise<CompanyAuditEntry[]> {
+  const result = await client.from('company_private_change_log').select('*')
+    .eq('company_id', companyId).order('changed_at', { ascending: false }).limit(limit)
+  throwIfError('Unable to load company change history', result.error)
+  return ((result.data ?? []) as Array<Record<string, unknown>>).map(auditFrom)
 }
