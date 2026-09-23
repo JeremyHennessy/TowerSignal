@@ -371,13 +371,15 @@ def build_known_firms(
             system = systems_by_id.get(str(system_id))
             if system and system not in linked:
                 linked.append(system)
+        source_bin_text = normalize_space(str(bin_value or ""))
         normalized_bin = _assigned_bin(bin_value)
         normalized_bbl = normalize_space(str(bbl or ""))
+        invalid_source_bin = bool(source_bin_text) and normalized_bin is None
         if normalized_bin:
             for system in systems_by_bin.get(normalized_bin, []):
                 if system not in linked:
                     linked.append(system)
-        elif normalized_bbl:
+        elif normalized_bbl and not invalid_source_bin:
             for system in systems_by_bbl.get(normalized_bbl, []):
                 if system not in linked:
                     linked.append(system)
