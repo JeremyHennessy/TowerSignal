@@ -1,0 +1,30 @@
+name: Backtrace unresolved application expressions
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/build_stage16_application_backtrace.py
+      - .github/workflows/audit-stage16-application-backtrace.yml
+permissions:
+  contents: write
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Backtrace application expressions
+        run: python -u docs/audits/2026-09-23/build_stage16_application_backtrace.py
+      - name: Persist results
+        run: |
+          mkdir -p docs/audits/2026-09-23/stage16-application-backtrace
+          cp .audit-stage16/*.json docs/audits/2026-09-23/stage16-application-backtrace/
+          git config user.name "TowerSignal Audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/audits/2026-09-23/stage16-application-backtrace
+          git commit -m "audit: persist recursive application backtrace"
+          git pull --rebase origin audit/full-lineage-20260923-1350
+          git push origin HEAD:audit/full-lineage-20260923-1350
