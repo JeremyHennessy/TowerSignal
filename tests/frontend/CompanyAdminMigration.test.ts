@@ -19,3 +19,28 @@ test('company database migration enforces admin-only RLS for every private table
   expect((sql.match(/USING \(public\.towersignal_is_admin\(\)\)/g) ?? []).length).toBe(4)
   expect((sql.match(/WITH CHECK \(public\.towersignal_is_admin\(\)\)/g) ?? []).length).toBe(4)
 })
+
+
+const provenanceSql = readFileSync('database/migrations/003_company_provenance.sql', 'utf8')
+
+test('company provenance migration adds source fields without weakening RLS', () => {
+  for (const column of [
+    'identity_source_name',
+    'identity_source_url',
+    'website_source_name',
+    'website_source_url',
+    'rollup_source_name',
+    'rollup_source_url',
+    'headquarters_source_name',
+    'headquarters_source_url',
+    'parent_source_name',
+    'parent_source_url',
+    'enrichment_checked_at',
+  ]) {
+    expect(provenanceSql).toContain(column)
+  }
+  for (const column of ['source_name', 'source_url', 'verified_at']) {
+    expect(provenanceSql).toContain(column)
+  }
+  expect(provenanceSql).not.toContain('DISABLE ROW LEVEL SECURITY')
+})

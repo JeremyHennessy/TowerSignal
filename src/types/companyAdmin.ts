@@ -17,15 +17,26 @@ export interface CompanyAdminProfile {
   legal_name: string | null
   rollup_name: string | null
   rollup_company_id: string | null
+  rollup_source_name: string | null
+  rollup_source_url: string | null
   website: string | null
+  website_source_name: string | null
+  website_source_url: string | null
+  identity_source_name: string | null
+  identity_source_url: string | null
   headquarters_address: string | null
   headquarters_city: string | null
   headquarters_region: string | null
   headquarters_postal_code: string | null
   headquarters_country: string | null
+  headquarters_source_name: string | null
+  headquarters_source_url: string | null
   parent_company_id: string | null
   parent_company_name: string | null
+  parent_source_name: string | null
+  parent_source_url: string | null
   company_type: string | null
+  enrichment_checked_at: string | null
   revenue_amount: number | null
   revenue_low: number | null
   revenue_high: number | null
@@ -60,6 +71,9 @@ export interface CompanyAdminContact {
   phone: string | null
   linkedin_url: string | null
   notes: string | null
+  source_name: string | null
+  source_url: string | null
+  verified_at: string | null
   active: boolean
   created_at?: string
   updated_at?: string
