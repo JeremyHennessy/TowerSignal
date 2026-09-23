@@ -280,6 +280,7 @@ def build_cms_institutional_context(tower_bbls: Sequence[str], *, geosearch_work
         "domain": "CMS_NYC_INSTITUTIONAL_CONTEXT",
         "generated_at": utc_now(),
         "summary": {
+            "requested_tower_bbl_count": len(tower_set),
             "hospital_source_rows": hospital_count,
             "nursing_home_source_rows": nursing_count,
             "nyc_candidate_facility_count": len(facilities),
