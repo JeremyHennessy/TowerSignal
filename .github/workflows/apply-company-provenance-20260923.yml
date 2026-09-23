@@ -1,0 +1,90 @@
+name: Apply company provenance migration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-company-provenance-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply migration 003
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/003_company_provenance.sql
+
+      - name: Verify provenance columns and RLS
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            profile_columns integer;
+            contact_columns integer;
+            rls_tables integer;
+            admin_policies integer;
+          BEGIN
+            SELECT count(*) INTO profile_columns
+            FROM information_schema.columns
+            WHERE table_schema='public'
+              AND table_name='company_private_profiles'
+              AND column_name IN (
+                'identity_source_name','identity_source_url',
+                'website_source_name','website_source_url',
+                'rollup_source_name','rollup_source_url',
+                'headquarters_source_name','headquarters_source_url',
+                'parent_source_name','parent_source_url',
+                'enrichment_checked_at'
+              );
+
+            SELECT count(*) INTO contact_columns
+            FROM information_schema.columns
+            WHERE table_schema='public'
+              AND table_name='company_private_contacts'
+              AND column_name IN ('source_name','source_url','verified_at');
+
+            SELECT count(*) INTO rls_tables
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public'
+              AND c.relname IN (
+                'company_private_profiles','company_private_contacts',
+                'company_private_activities','company_private_notes'
+              )
+              AND c.relrowsecurity;
+
+            SELECT count(*) INTO admin_policies
+            FROM pg_policies
+            WHERE schemaname='public'
+              AND tablename IN (
+                'company_private_profiles','company_private_contacts',
+                'company_private_activities','company_private_notes'
+              )
+              AND qual='towersignal_is_admin()'
+              AND with_check='towersignal_is_admin()';
+
+            IF profile_columns <> 11 OR contact_columns <> 3 OR rls_tables <> 4 OR admin_policies <> 4 THEN
+              RAISE EXCEPTION 'Provenance migration verification failed: profile_columns=% contact_columns=% rls_tables=% admin_policies=%',
+                profile_columns, contact_columns, rls_tables, admin_policies;
+            END IF;
+          END $$;
+
+          SELECT 'COMPANY_PROVENANCE_MIGRATION=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_profiles) AS profiles,
+                 (SELECT count(*) FROM public.company_private_contacts) AS contacts,
+                 (SELECT count(*) FROM neon_auth."user") AS users,
+                 (SELECT count(*) FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin') AS admins;
+          SQL
