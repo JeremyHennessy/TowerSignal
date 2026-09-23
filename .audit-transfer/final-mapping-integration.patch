@@ -1,0 +1,225 @@
+diff --git a/scripts/build_acris_cache.py b/scripts/build_acris_cache.py
+index 3f6526e..8330aae 100644
+--- a/scripts/build_acris_cache.py
++++ b/scripts/build_acris_cache.py
+@@ -14,6 +14,7 @@ from towersignal.bbl_identity import apply_bbl_identity_recovery  # noqa: E402
+ from towersignal.building_footprints import fetch_building_footprints_by_bin  # noqa: E402
+ from towersignal.fetch import fetch_dataset  # noqa: E402
+ from towersignal.hpd_identity import fetch_registration_snapshot  # noqa: E402
++from towersignal.acris_identity_cache import property_targets as build_property_targets, graph_digest  # noqa: E402
+ from towersignal.normalize import normalize_registrations  # noqa: E402
+ 
+ REGISTRATION_DATASET_ID = "y4fw-iqfr"
+@@ -56,21 +57,7 @@ def reconciled_current_systems() -> list[dict[str, Any]]:
+ 
+ 
+ def property_targets_from_systems(systems: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+-    targets: dict[str, dict[str, Any]] = {}
+-    for system in systems:
+-        bbl = normalize_bbl(system.get("bbl"))
+-        if not bbl:
+-            continue
+-        targets[bbl] = {
+-            "system_id": system.get("system_id"),
+-            "bin": system.get("bin"),
+-            "borough": system.get("borough"),
+-            "number": system.get("number"),
+-            "street": system.get("street"),
+-            "address": system.get("address"),
+-            "bbl_aliases": list(system.get("bbl_aliases") or []),
+-        }
+-    return targets
++    return build_property_targets(systems)
+ 
+ 
+ def tower_bbls_from_current_registrations() -> set[str]:
+@@ -94,6 +81,7 @@ def build(tower_snapshot: Path | None, output: Path) -> dict:
+         )
+         property_targets = property_targets_from_systems(systems)
+     cache = build_recent_cache(bbls, property_targets=property_targets)
++    cache["mapping_property_graph_sha256"] = graph_digest(property_targets)
+     output.parent.mkdir(parents=True, exist_ok=True)
+     output.write_text(json.dumps(cache, separators=(",", ":")), encoding="utf-8")
+     result = validate_cache_file(output, require_production_volume=True)
+diff --git a/scripts/build_data_live.py b/scripts/build_data_live.py
+index bfbd41e..e078f93 100644
+--- a/scripts/build_data_live.py
++++ b/scripts/build_data_live.py
+@@ -112,7 +112,7 @@ def build(output_dir: Path) -> dict:
+ 
+     progress(f"Fetching HPD contacts for {len(bbl_values):,} canonical BBLs")
+     hpd_by_system, hpd_meta = fetch_contacts_for_systems(systems, hpd_index)
+-    progress(f"Matched HPD contacts for {len(hpd_by_bbl):,} BBLs")
++    progress(f"Resolved HPD lookups for {len(hpd_by_system):,} systems")
+ 
+     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+     sources = [
+@@ -347,6 +347,8 @@ def build(output_dir: Path) -> dict:
+             "system_id": system["system_id"],
+             "bin": system["bin"],
+             "source_bin_raw": system.get("source_bin_raw"),
++            "number": system.get("number"),
++            "street": system.get("street"),
+             "bbl": system["bbl"],
+             "property_bbl": system.get("property_bbl"),
+             "registry_bbl": system.get("registry_bbl"),
+@@ -403,6 +405,8 @@ def build(output_dir: Path) -> dict:
+                 "system_id": system["system_id"],
+                 "bin": system["bin"],
+             "source_bin_raw": system.get("source_bin_raw"),
++            "number": system.get("number"),
++            "street": system.get("street"),
+                 "bbl": system["bbl"],
+                 "property_bbl": system.get("property_bbl"),
+                 "registry_bbl": system.get("registry_bbl"),
+diff --git a/tests/e2e/missing-sample-priority-release.spec.ts b/tests/e2e/missing-sample-priority-release.spec.ts
+index d1a6002..08fba3a 100644
+--- a/tests/e2e/missing-sample-priority-release.spec.ts
++++ b/tests/e2e/missing-sample-priority-release.spec.ts
+@@ -53,6 +53,16 @@ test('400 West 61st scores missing public sampling at 30 while remaining VERIFY'
+ test('225 Broadway score remains unchanged by the missing-sample rule', async ({ page }, testInfo) => {
+   await signInForProject(page, testInfo.project.name, '#/account/2000011002')
+   await expectAccountDetailHydrated(page)
+-  await expect(page.locator('.account-decision-summary .account-decision-score strong')).toHaveText('86')
++  const released = await page.evaluate(async () => {
++    const response = await fetch(new URL('data/details/20/2000011002.json', location.href))
++    if (!response.ok) throw new Error(`Released account HTTP ${response.status}`)
++    return response.json()
++  })
++  // Live findings age across the model's recency boundaries. The independent
++  // generated-score gate validates the rules; this checks the displayed payload
++  // and proves the missing-date rule is not applied to an account with dates.
++  expect(released.sample_history.dates.length).toBeGreaterThan(0)
++  expect(released.scoring.components.some((c: { reason: string }) => /No usable public sample date/i.test(c.reason))).toBe(false)
++  await expect(page.locator('.account-decision-summary .account-decision-score strong')).toHaveText(String(released.scoring.score))
+   await expectContained(page)
+ })
+diff --git a/tests/e2e/nyc-all-pages-tabs.spec.ts b/tests/e2e/nyc-all-pages-tabs.spec.ts
+index a831cca..6eaa88b 100644
+--- a/tests/e2e/nyc-all-pages-tabs.spec.ts
++++ b/tests/e2e/nyc-all-pages-tabs.spec.ts
+@@ -92,10 +92,11 @@ test('NYC application page and tab visual inventory', async ({ page, browser },
+   // authenticated desktop project state (confirmed in the retained failed trace).
+   const publicContext=await browser.newContext({...(testInfo.project.name==='iphone'?devices['iPhone 13']: {viewport:{width:1440,height:1000}}),baseURL:String(testInfo.project.use.baseURL),storageState:{cookies:[],origins:[]}})
+   const publicPage=await publicContext.newPage()
++  await publicPage.bringToFront()
+   await installCandidateRoutes(publicPage)
+-  await publicPage.goto('./',{waitUntil:'domcontentloaded'})
++  await publicPage.goto('./',{waitUntil:'networkidle'})
+   await publicPage.screenshot({path:`${folder}/public-marketing.png`,scale:'css',fullPage:true})
+-  await publicPage.goto('./#/companies',{waitUntil:'domcontentloaded'})
++  await publicPage.goto('./#/companies',{waitUntil:'networkidle'})
+   await expect(publicPage.getByRole('heading',{name:'Sign in to TowerSignal',exact:true})).toBeVisible()
+   await publicPage.screenshot({path:`${folder}/public-login.png`,scale:'css',fullPage:true})
+   await publicPage.getByRole('tab',{name:'Create account',exact:true}).click()
+diff --git a/tests/e2e/nyc-evidence-review.spec.ts b/tests/e2e/nyc-evidence-review.spec.ts
+index 95414fc..b8f7633 100644
+--- a/tests/e2e/nyc-evidence-review.spec.ts
++++ b/tests/e2e/nyc-evidence-review.spec.ts
+@@ -16,7 +16,13 @@ test('Existing Home building links reach reviewed account scoring and source-dat
+   await expect(page.getByLabel('Official building health evidence')).toContainText('Order date Sep 12, 2026')
+   const score = page.getByLabel('Priority score explanation')
+   await expect(score).toBeVisible()
+-  await expect(score).toContainText('Research priority model 1.1')
++  const releasedScoring = await page.evaluate(async () => {
++    const response = await fetch(new URL('data/details/20/2000003324.json', location.href))
++    if (!response.ok) throw new Error(`Released account HTTP ${response.status}`)
++    return (await response.json()).scoring
++  })
++  expect(releasedScoring.priority_model_version).toBeTruthy()
++  await expect(score).toContainText(`Research priority model ${releasedScoring.priority_model_version}`)
+   await expect(score).toContainText('Building-level match')
+   await expectContained(page)
+   await page.evaluate(() => scrollTo(0, 0))
+diff --git a/tests/e2e/workflow-inspector-layout.spec.ts b/tests/e2e/workflow-inspector-layout.spec.ts
+index 29b340c..046e3bc 100644
+--- a/tests/e2e/workflow-inspector-layout.spec.ts
++++ b/tests/e2e/workflow-inspector-layout.spec.ts
+@@ -120,9 +120,19 @@ test('Workflow Account Inspector stays in a dedicated sidecar through selections
+ 
+   await page.setViewportSize({ width: 1440, height: 1000 })
+   await workflow.getByRole('tab', { name: /^Changes/ }).click()
+-  await expect(workflow.locator('.workflow-change-table')).toBeVisible()
+-  const changeRows = workflow.locator('.workflow-change-table tbody tr')
+-  if (await changeRows.count()) await changeRows.first().click()
++  const changeHeading = workflow.locator('.workflow-command-table-card .table-heading').filter({ hasText: 'source changes in the current 7-day monitor window' })
++  await expect(changeHeading).toBeVisible()
++  const advertisedChanges = Number((await changeHeading.locator('strong').first().innerText()).replaceAll(',', ''))
++  expect(Number.isFinite(advertisedChanges)).toBe(true)
++  if (advertisedChanges === 0) {
++    await expect(workflow.getByText('No recent source changes match these filters.', { exact: true })).toBeVisible()
++    await expect(workflow.locator('.workflow-change-table')).toHaveCount(0)
++  } else {
++    await expect(workflow.locator('.workflow-change-table')).toBeVisible()
++    const changeRows = workflow.locator('.workflow-change-table tbody tr')
++    await expect(changeRows.first()).toBeVisible()
++    await changeRows.first().click()
++  }
+   await assertWorkspaceGeometry(page, false)
+ 
+   await workflow.getByRole('tab', { name: /^Actions/ }).click()
+diff --git a/tests/python/test_mapping_build.py b/tests/python/test_mapping_build.py
+new file mode 100644
+index 0000000..b709246
+--- /dev/null
++++ b/tests/python/test_mapping_build.py
+@@ -0,0 +1,59 @@
++import json
++import tempfile
++import unittest
++from collections import defaultdict
++from contextlib import ExitStack
++from pathlib import Path
++from types import SimpleNamespace
++from unittest.mock import patch
++from scripts import build_data_live as pipeline
++from scripts.towersignal.hpd_identity import assemble_contacts, index_registrations
++from scripts.towersignal.acris_identity_cache import property_targets
++from scripts.towersignal.acris import _condo_target_index
++from scripts.validate_bbl_identity import validate as validate_identity
++
++
++class MappingBuildTests(unittest.TestCase):
++    def test_complete_core_build_preserves_contacts_sampling_and_source_address_parts(self):
++        # Production-volume synthetic fixtures exercise the complete builder and
++        # its real validators. Only external collection is replaced.
++        base = {"bin": "1089723.0", "bbl": "1011710154", "date_registered": "2020-01-01", "number": "400", "street": "WEST 61ST STREET", "borough": "MANHATTAN", "zip": "10023", "sampledates": "", "activeequipment": "1"}
++        registrations = [{**base, "system_id": str(2000100000 + i)} for i in range(3500)]
++        registrations[0]["system_id"] = "2000014227"
++        inspection = {key: "" for key in pipeline.validate_sources.__globals__["EXPECTED_INSPECTION_FIELDS"]}
++        inspection.update(system_id="2000014227", inspection_date="2020-01-01", inspection_type="ROUTINE", active_equip="1")
++        inspections = [inspection] * 50000
++        def snapshot(dataset, rows):
++            return SimpleNamespace(dataset_id=dataset, name="Synthetic source fixture", rows=rows, retrieved_at="2020-01-01T00:00:00Z", source_record_count=len(rows), source_last_updated_at="2020-01-01T00:00:00Z")
++        def meta(**values):
++            return defaultdict(int, {"dataset_id": "fixture", "name": "Synthetic fixture", "retrieved_at": "2020-01-01T00:00:00Z", "url": "https://example.invalid/fixture", "source_query_scope": "synthetic exact-key fixture", "source_last_updated_at": "2020-01-01T00:00:00Z", **values})
++        registration = {"registrationid": "123", "buildingid": "456", "bin": "1089723", "boroid": "1", "block": "1171", "lot": "154", "lastregistrationdate": "2020-01-01"}
++        index = index_registrations([registration])
++        hpd_meta = meta(registration_dataset_id="tesw-yqqr", contacts_dataset_id="feu5-w2e2", matched_registration_bbl_count=1, matched_contact_bbl_count=1)
++        with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
++            stack.enter_context(patch.object(pipeline, "fetch_dataset", side_effect=[snapshot("y4fw-iqfr", registrations), snapshot("f9wb-g8mb", inspections)]))
++            stack.enter_context(patch.object(pipeline, "fetch_oath_cases", return_value=({}, meta())))
++            stack.enter_context(patch.object(pipeline, "fetch_planimetric_towers_by_bin", return_value=({}, meta())))
++            stack.enter_context(patch.object(pipeline, "fetch_building_footprints_by_bin", return_value=({"1089723": [{"bin": "1089723", "base_bbl": "1011710154", "mappluto_bbl": "1011717513"}]}, meta())))
++            stack.enter_context(patch.object(pipeline, "fetch_registration_snapshot", return_value=index))
++            stack.enter_context(patch.object(pipeline, "fetch_pluto_by_bbl", return_value=({"1011717513": {"bbl": "1011717513", "owner_name": "Synthetic Owner"}}, meta())))
++            stack.enter_context(patch.object(pipeline, "fetch_dob_activity_by_bbl", return_value=({}, meta())))
++            stack.enter_context(patch.object(pipeline, "fetch_contacts_for_systems", side_effect=lambda systems, idx: (assemble_contacts(systems, idx, [{"registrationid": "123", "firstname": "Synthetic", "lastname": "Agent"}]), hpd_meta)))
++            output = Path(tmp)
++            payload = pipeline.build(output)
++            validate_identity(output, require_production_volume=True)
++            row = next(s for s in payload["systems"] if s["system_id"] == "2000014227")
++            detail = json.loads((output / "details/20/2000014227.json").read_text())
++            self.assertEqual(row["hpd_contact_count"], len(detail["hpd_registration"]["contacts"]))
++            self.assertEqual(row["hpd_contact_count"], 1)
++            self.assertEqual(detail["sample_history"]["dates"], [])
++            self.assertEqual(row["number"], "400")
++            self.assertEqual(detail["identity"]["street"], "WEST 61ST STREET")
++            self.assertEqual(row["source_bin_raw"], "1089723.0")
++            self.assertEqual(row["bin"], "1089723")
++            self.assertEqual(row["bbl"], "1011717513")
++            self.assertTrue(_condo_target_index(property_targets([row])))
++
++
++if __name__ == "__main__":
++    unittest.main()
