@@ -1,0 +1,24 @@
+name: Inspect Neon Auth email password config
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/neon-auth-email-config-audit-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Read non-secret email/password auth settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || exit 2
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select email_and_password::text, allow_localhost from neon_auth.project_config;"
