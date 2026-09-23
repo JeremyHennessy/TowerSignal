@@ -1,0 +1,16 @@
+name: Validate DOB work-type fallback
+on:
+  push:
+    branches: [fix/dob-worktype-fallback-20260923]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest tests.python.test_nyc_water_signals -v
+      - run: python -m unittest discover -s tests/python -p 'test_*.py' -v
