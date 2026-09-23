@@ -14,24 +14,29 @@ afterEach(() => {
   window.history.replaceState(null, '', window.location.pathname)
 })
 
-test('existing TowerSignal login page remains the authentication surface', () => {
-  render(<AuthLandingPage onSignIn={vi.fn().mockResolvedValue(user)} onSignUp={vi.fn().mockResolvedValue(user)} />)
+test('TowerSignal login is sign-in only', () => {
+  render(<AuthLandingPage onSignIn={vi.fn().mockResolvedValue(user)} />)
 
   expect(screen.getByRole('heading', { name: 'Sign in to TowerSignal' })).toBeVisible()
   expect(screen.getByLabelText('Email')).toBeVisible()
   expect(screen.getByLabelText('Password', { selector: 'input' })).toBeVisible()
-  expect(screen.getByRole('tab', { name: 'Create account' })).toBeVisible()
+  expect(screen.getByText('Access is limited to administrator-provisioned accounts.')).toBeVisible()
+  expect(screen.queryByRole('tab', { name: 'Create account' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Create account' })).toBeNull()
+  expect(screen.queryByLabelText('Full name')).toBeNull()
+  expect(screen.queryByLabelText('Confirm password')).toBeNull()
 })
 
-test('existing account-creation mode is preserved on the login page', async () => {
+test('existing users can still submit the sign-in form', async () => {
+  const onSignIn = vi.fn().mockResolvedValue(user)
   const events = userEvent.setup()
-  render(<AuthLandingPage onSignIn={vi.fn().mockResolvedValue(user)} onSignUp={vi.fn().mockResolvedValue(user)} />)
+  render(<AuthLandingPage onSignIn={onSignIn} />)
 
-  await events.click(screen.getByRole('tab', { name: 'Create account' }))
+  await events.type(screen.getByLabelText('Email'), 'user@example.com')
+  await events.type(screen.getByLabelText('Password', { selector: 'input' }), 'password123')
+  await events.click(screen.getByRole('button', { name: 'Sign in' }))
 
-  expect(screen.getByRole('heading', { name: 'Create your TowerSignal account' })).toBeVisible()
-  expect(screen.getByLabelText('Full name')).toBeVisible()
-  expect(screen.getByLabelText('Confirm password')).toBeVisible()
+  expect(onSignIn).toHaveBeenCalledWith('user@example.com', 'password123')
 })
 
 test('public marketing page uses the TowerSignal product positioning and a dedicated login route', () => {
