@@ -472,7 +472,7 @@ def normalize_dec_applicator(row: Mapping[str, Any]) -> dict[str, Any]:
         "qualification_id": stable_id("dec-7g-applicator", cert_number, name),
         "cert_number": cert_number or None,
         "name": name or None,
-        "dec_region": normalize_space(row.get("dec_region")) or None,
+        "dec_region": normalize_space(row.get("region")) or None,
         "renewal_date": parse_source_date(row.get("renewal_date")),
         "expiration_date": parse_source_date(row.get("expiration_date")),
         "applicator_type": normalize_space(row.get("applicator_type")) or None,
