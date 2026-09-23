@@ -1,0 +1,74 @@
+name: Assign TowerSignal administrator
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/company-admin-role-20260923.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Promote unique project-owner account
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || exit 2
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          DO $$
+          DECLARE
+            v_total integer;
+            v_owner_matches integer;
+            v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_total FROM neon_auth."user";
+            SELECT count(*) INTO v_owner_matches
+            FROM neon_auth."user"
+            WHERE lower(coalesce(name,'')) LIKE 'jeremy%';
+
+            SELECT count(*) INTO v_admins
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin';
+
+            IF v_total <> 2 OR v_owner_matches <> 1 OR v_admins <> 0 THEN
+              RAISE EXCEPTION 'Admin promotion guard failed: users=% owner_matches=% admins=%',
+                v_total, v_owner_matches, v_admins;
+            END IF;
+          END $$;
+
+          UPDATE neon_auth."user"
+          SET role='admin', "updatedAt"=now()
+          WHERE lower(coalesce(name,'')) LIKE 'jeremy%';
+
+          DO $$
+          DECLARE
+            v_admins integer;
+            v_nonadmins integer;
+          BEGIN
+            SELECT count(*) FILTER (WHERE lower(coalesce(role,''))='admin'),
+                   count(*) FILTER (WHERE lower(coalesce(role,''))<>'admin')
+              INTO v_admins, v_nonadmins
+            FROM neon_auth."user";
+
+            IF v_admins <> 1 OR v_nonadmins <> 1 THEN
+              RAISE EXCEPTION 'Admin promotion postcondition failed: admins=% nonadmins=%',
+                v_admins, v_nonadmins;
+            END IF;
+          END $$;
+
+          COMMIT;
+
+          SELECT 'ADMIN_PROMOTION=PASS',
+                 count(*) FILTER (WHERE lower(coalesce(role,''))='admin') AS admins,
+                 count(*) FILTER (WHERE lower(coalesce(role,''))<>'admin') AS nonadmins
+          FROM neon_auth."user";
+          SQL
