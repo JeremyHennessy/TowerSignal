@@ -1,0 +1,35 @@
+name: Replay NYS ABO retrieval populations independently
+on:
+  push:
+    branches: [audit/full-lineage-20260923-1350]
+    paths:
+      - docs/audits/2026-09-23/audit_stage25_abo_populations.py
+      - .github/workflows/audit-stage25-abo-populations.yml
+permissions:
+  contents: write
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Replay NYS ABO candidate populations
+        run: python -u docs/audits/2026-09-23/audit_stage25_abo_populations.py
+      - name: Persist evidence
+        if: always()
+        run: |
+          if [ -d .audit-stage25 ]; then
+            mkdir -p docs/audits/2026-09-23/stage25-abo-populations
+            cp .audit-stage25/*.json docs/audits/2026-09-23/stage25-abo-populations/ || true
+            git config user.name "TowerSignal Audit"
+            git config user.email "actions@users.noreply.github.com"
+            git add docs/audits/2026-09-23/stage25-abo-populations
+            if ! git diff --cached --quiet; then
+              git commit -m "audit: persist NYS ABO population replay"
+              git pull --rebase origin audit/full-lineage-20260923-1350
+              git push origin HEAD:audit/full-lineage-20260923-1350
+            fi
+          fi
