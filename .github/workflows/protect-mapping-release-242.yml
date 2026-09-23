@@ -1,0 +1,32 @@
+name: Protect active mapping release
+on:
+  push:
+    branches: [audit/mapping-fix-transfer-20260923]
+    paths: [.github/workflows/protect-mapping-release-242.yml]
+permissions:
+  actions: write
+  contents: read
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Cancel only the duplicate restart producer while exact Pages release is active
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          repository="$GITHUB_REPOSITORY"
+          expected=f1cbdb925b704a8b7a34aaccd169be6649b80a92
+          pages=$(gh api "repos/$repository/actions/runs/35866906472")
+          cache=$(gh api "repos/$repository/actions/runs/35866906506")
+          test "$(jq -r .head_sha <<< "$pages")" = "$expected"
+          test "$(jq -r .head_sha <<< "$cache")" = "$expected"
+          test "$(jq -r .name <<< "$pages")" = 'Deploy GitHub Pages'
+          test "$(jq -r .name <<< "$cache")" = 'Refresh verified ACRIS cache'
+          if [ "$(jq -r .status <<< "$pages")" = in_progress ] && [ "$(jq -r .status <<< "$cache")" != completed ]; then
+            gh api --method POST "repos/$repository/actions/runs/35866906506/cancel"
+            echo 'Cancelled duplicate ACRIS workflow only. Pages #242 remains active and rebuilds any mismatched ACRIS graph before validation and attachment.'
+          else
+            echo 'No cancellation: exact Pages release is no longer active or duplicate already completed.'
+          fi
