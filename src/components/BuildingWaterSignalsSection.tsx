@@ -30,8 +30,40 @@ function waterUse(row: Record<string, unknown>, key: string): string {
   return typeof value === 'number' ? `${number.format(value)} kgal` : text(row, key)
 }
 
+function dobObservationSortKey(row: Record<string, unknown>): string {
+  for (const key of ['issued_date', 'approved_date', 'filing_date']) {
+    const value = row[key]
+    if (typeof value === 'string' && /^\\d{4}-\\d{2}-\\d{2}/.test(value)) return value.slice(0, 10)
+  }
+  return ''
+}
+
+export function orderedDobWaterRows(
+  jobFilings: Record<string, unknown>[],
+  permits: Record<string, unknown>[],
+): Record<string, unknown>[] {
+  return [...jobFilings, ...permits].sort((left, right) => {
+    const dateOrder = dobObservationSortKey(right).localeCompare(dobObservationSortKey(left))
+    if (dateOrder) return dateOrder
+    const leftId = String(left.source_record_id ?? left.job_filing_number ?? left.activity_id ?? '')
+    const rightId = String(right.source_record_id ?? right.job_filing_number ?? right.activity_id ?? '')
+    return rightId.localeCompare(leftId)
+  })
+}
+
+function dobWaterCard(row: Record<string, unknown>, index: number, keyPrefix: string) {
+  return <article className="signal-card" key={`${keyPrefix}-${text(row, 'activity_id')}-${text(row, 'source_record_id')}-${index}`}>
+    <div className="signal-card-head"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'issued_date', 'approved_date', 'filing_date')}</span></div>
+    <p>{text(row, 'job_description')}</p>
+    <dl className="identity-grid"><div><dt>Record</dt><dd>{text(row, 'source_record_id') !== '—' ? text(row, 'source_record_id') : text(row, 'job_filing_number')}</dd></div><div><dt>Applicant business</dt><dd>{text(row, 'applicant_business_raw')}</dd></div><div><dt>Role evidence</dt><dd>{text(row, 'relationship_evidence')}</dd></div><div><dt>Service assignment</dt><dd>{text(row, 'service_assignment_confidence')}</dd></div></dl>
+  </article>
+}
+
 export function BuildingWaterSignalsSection({ detail }: { detail: SystemDetail }) {
   const context = detail.nyc_building_water_signals
+  const dobWaterRows = context ? orderedDobWaterRows(context.dob_water_job_filings, context.dob_water_permits) : []
+  const dobWaterPreview = dobWaterRows.slice(0, 8)
+  const dobWaterRemaining = dobWaterRows.slice(8)
   return <section className="building-water-signals-section">
     <h3>NYC building-water signals</h3>
     {!context ? <>
@@ -69,11 +101,11 @@ export function BuildingWaterSignalsSection({ detail }: { detail: SystemDetail }
 
       {(context.dob_water_job_filings.length + context.dob_water_permits.length) > 0 && <details className="domestic-water-history" open>
         <summary>DOB water work roles · {metric(context.dob_water_job_filings.length + context.dob_water_permits.length)}</summary>
-        <div className="signal-list">{[...context.dob_water_job_filings, ...context.dob_water_permits].slice(0, 8).map((row, index) => <article className="signal-card" key={`${text(row, 'activity_id')}-${index}`}>
-          <div className="signal-card-head"><strong>{text(row, 'category')}</strong><span>{dateText(row, 'issued_date', 'approved_date', 'filing_date')}</span></div>
-          <p>{text(row, 'job_description')}</p>
-          <dl className="identity-grid"><div><dt>Record</dt><dd>{text(row, 'source_record_id') !== '—' ? text(row, 'source_record_id') : text(row, 'job_filing_number')}</dd></div><div><dt>Applicant business</dt><dd>{text(row, 'applicant_business_raw')}</dd></div><div><dt>Role evidence</dt><dd>{text(row, 'relationship_evidence')}</dd></div><div><dt>Service assignment</dt><dd>{text(row, 'service_assignment_confidence')}</dd></div></dl>
-        </article>)}</div>
+        <div className="signal-list">{dobWaterPreview.map((row, index) => dobWaterCard(row, index, 'preview'))}</div>
+        {dobWaterRemaining.length > 0 && <details className="domestic-water-history">
+          <summary>View remaining DOB water work records · {metric(dobWaterRemaining.length)}</summary>
+          <div className="signal-list">{dobWaterRemaining.map((row, index) => dobWaterCard(row, index, 'remaining'))}</div>
+        </details>}
       </details>}
 
       {context.ll84_water_benchmarks.length > 0 && <details className="domestic-water-history">
