@@ -25,7 +25,7 @@
 .admin-pipeline-grid strong{font-size:1.15rem}
 .admin-family-directory{margin-top:.1rem}
 .admin-family-directory .admin-company-card-heading{align-items:end}
-.admin-family-filters{display:grid;grid-template-columns:minmax(18rem,2fr) minmax(11rem,1fr) minmax(12rem,1fr);gap:.55rem;min-width:min(100%,740px)}
+.admin-family-filters{display:grid;grid-template-columns:minmax(18rem,2fr) repeat(3,minmax(11rem,1fr));gap:.55rem;min-width:min(100%,940px)}
 .admin-family-filters input,.admin-family-filters select{height:38px;border:1px solid #d5dfe2;border-radius:8px;background:#fff;padding:0 10px;color:inherit;font:inherit;font-size:.8rem;min-width:0}
 .admin-family-table{min-width:1620px}
 .admin-family-table tbody tr,.admin-family-member-table tbody tr{cursor:pointer}
