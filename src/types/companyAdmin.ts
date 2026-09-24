@@ -65,6 +65,7 @@ export type CompanyAdminProfilePatch = Omit<
 export interface CompanyAdminContact {
   contact_id: string
   company_id: string
+  sales_account_id: string | null
   name: string
   title: string | null
   email: string | null
@@ -84,6 +85,7 @@ export interface CompanyAdminContact {
 export interface CompanyAdminActivity {
   activity_id: string
   company_id: string
+  sales_account_id: string | null
   activity_type: string
   occurred_at: string
   contact_id: string | null
@@ -98,6 +100,7 @@ export interface CompanyAdminActivity {
 export interface CompanyAdminNote {
   note_id: string
   company_id: string
+  sales_account_id: string | null
   note: string
   created_at?: string
   updated_at?: string
@@ -117,6 +120,7 @@ export type CompanyResearchStatus = 'unreviewed' | 'researching' | 'verified' | 
 
 export interface CompanyResearchQueueItem {
   company_id: string
+  sales_account_id: string | null
   priority_score: number
   priority_reason: string
   missing_fields: string[]
@@ -161,6 +165,7 @@ export type CompanyOpportunityStage =
 export interface CompanySalesOpportunity {
   opportunity_id: string
   company_id: string
+  sales_account_id: string | null
   name: string
   stage: CompanyOpportunityStage
   product_scope: string[]
@@ -189,6 +194,7 @@ export type CompanyTaskStatus = 'open' | 'completed' | 'cancelled'
 export interface CompanySalesTask {
   task_id: string
   company_id: string
+  sales_account_id: string | null
   opportunity_id: string | null
   contact_id: string | null
   title: string
