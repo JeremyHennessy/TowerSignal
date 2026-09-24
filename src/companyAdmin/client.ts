@@ -283,11 +283,13 @@ export async function saveCompanyAdminProfile(
 export async function saveCompanyAdminContact(
   contactId: string,
   companyId: string,
-  values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'created_at' | 'updated_at'>,
+  values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'sales_account_id' | 'created_at' | 'updated_at'>,
   context: CompanyChangeContext = {},
 ): Promise<CompanyAdminContact> {
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
   const change = {
     ...values,
+    sales_account_id:resolvedSalesAccountId,
     updated_at: new Date().toISOString(),
     last_change_source: context.source ?? 'manual',
     last_change_batch_id: context.batchId ?? null,
@@ -295,7 +297,7 @@ export async function saveCompanyAdminContact(
   if (values.primary_contact) {
     const clearPrimary = await client.from('company_private_contacts')
       .update({ primary_contact:false, updated_at:new Date().toISOString(), last_change_source:context.source ?? 'manual', last_change_batch_id:context.batchId ?? null })
-      .eq('company_id', companyId)
+      .eq('sales_account_id', resolvedSalesAccountId)
       .eq('primary_contact', true)
     throwIfError('Unable to clear prior primary company contact', clearPrimary.error)
   }
@@ -319,14 +321,16 @@ export async function saveCompanyAdminContact(
   return contactFrom(row)
 }
 
-export async function addCompanyContact(companyId: string, values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'created_at' | 'updated_at'>): Promise<CompanyAdminContact> {
+export async function addCompanyContact(companyId: string, values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'sales_account_id' | 'created_at' | 'updated_at'>): Promise<CompanyAdminContact> {
   return saveCompanyAdminContact(crypto.randomUUID(), companyId, values)
 }
 
-export async function addCompanyActivity(companyId: string, values: Omit<CompanyAdminActivity, 'activity_id' | 'company_id' | 'created_at' | 'created_by'>): Promise<CompanyAdminActivity> {
+export async function addCompanyActivity(companyId: string, values: Omit<CompanyAdminActivity, 'activity_id' | 'company_id' | 'sales_account_id' | 'created_at' | 'created_by'>): Promise<CompanyAdminActivity> {
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
   const result = await client.from('company_private_activities').insert({
     activity_id: crypto.randomUUID(),
     company_id: companyId,
+    sales_account_id:resolvedSalesAccountId,
     ...values,
     last_change_source: 'manual',
     last_change_batch_id: null,
@@ -338,9 +342,11 @@ export async function addCompanyActivity(companyId: string, values: Omit<Company
 }
 
 export async function addCompanyNote(companyId: string, note: string): Promise<CompanyAdminNote> {
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
   const result = await client.from('company_private_notes').insert({
     note_id: crypto.randomUUID(),
     company_id: companyId,
+    sales_account_id:resolvedSalesAccountId,
     note,
     last_change_source: 'manual',
     last_change_batch_id: null,
@@ -424,7 +430,9 @@ export async function saveCompanyResearchQueueItem(
   item: Pick<CompanyResearchQueueItem, 'company_id' | 'priority_score' | 'priority_reason' | 'missing_fields' | 'status' | 'research_owner' | 'last_researched_at'>,
   context: CompanyChangeContext = { source: 'system' },
 ): Promise<CompanyResearchQueueItem> {
+  const resolvedSalesAccountId=await salesAccountIdForCompany(item.company_id)
   const values = {
+    sales_account_id:resolvedSalesAccountId,
     priority_score: item.priority_score,
     priority_reason: item.priority_reason,
     missing_fields: item.missing_fields,
@@ -559,10 +567,11 @@ export async function loadCompanySalesOpportunities(companyId: string): Promise<
 export async function saveCompanySalesOpportunity(
   opportunityId: string,
   companyId: string,
-  values: Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'created_at'|'updated_at'>,
+  values: Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
 ): Promise<CompanySalesOpportunity> {
   const now=new Date().toISOString()
-  const change={...values,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
+  const change={...values,sales_account_id:resolvedSalesAccountId,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
   const update=await client.from('company_private_opportunities').update(change).eq('opportunity_id',opportunityId).eq('company_id',companyId).select('*')
   throwIfError('Unable to update TowerSignal sales opportunity', update.error)
   const updated=((update.data ?? []) as Array<Record<string,unknown>>)[0]
@@ -576,7 +585,7 @@ export async function saveCompanySalesOpportunity(
 
 export async function addCompanySalesOpportunity(
   companyId:string,
-  values:Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'created_at'|'updated_at'>,
+  values:Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
 ):Promise<CompanySalesOpportunity>{
   return saveCompanySalesOpportunity(crypto.randomUUID(),companyId,values)
 }
@@ -596,10 +605,11 @@ export async function loadCompanySalesTasks(companyId:string): Promise<CompanySa
 export async function saveCompanySalesTask(
   taskId:string,
   companyId:string,
-  values:Omit<CompanySalesTask,'task_id'|'company_id'|'created_at'|'updated_at'>,
+  values:Omit<CompanySalesTask,'task_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
 ):Promise<CompanySalesTask>{
   const now=new Date().toISOString()
-  const change={...values,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
+  const change={...values,sales_account_id:resolvedSalesAccountId,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
   const update=await client.from('company_private_tasks').update(change).eq('task_id',taskId).eq('company_id',companyId).select('*')
   throwIfError('Unable to update TowerSignal sales task',update.error)
   const updated=((update.data ?? []) as Array<Record<string,unknown>>)[0]
@@ -613,7 +623,7 @@ export async function saveCompanySalesTask(
 
 export async function addCompanySalesTask(
   companyId:string,
-  values:Omit<CompanySalesTask,'task_id'|'company_id'|'created_at'|'updated_at'>,
+  values:Omit<CompanySalesTask,'task_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
 ):Promise<CompanySalesTask>{
   return saveCompanySalesTask(crypto.randomUUID(),companyId,values)
 }
