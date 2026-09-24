@@ -1,4 +1,4 @@
-name: Inventory available secret names safely
+name: Inspect production Neon Auth schema safely
 
 on:
   push:
@@ -11,20 +11,25 @@ permissions:
   contents: read
 
 jobs:
-  inventory:
+  inspect-auth:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
-      ALL_VARS_JSON: ${{ toJSON(vars) }}
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
     steps:
-      - name: Print names only
+      - name: Require production database credential
         shell: bash
         run: |
-          python - <<'PY'
-          import json, os
-          secrets = json.loads(os.environ.get("ALL_SECRETS_JSON") or "{}")
-          variables = json.loads(os.environ.get("ALL_VARS_JSON") or "{}")
-          print("SECRET_NAMES=" + ",".join(sorted(secrets)))
-          print("VARIABLE_NAMES=" + ",".join(sorted(variables)))
-          PY
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "TOWERSIGNAL_DATABASE_URL_UNPOOLED is unavailable"; exit 1; }
+      - name: Inspect Neon Auth table and column names
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "
+            select table_name || ':' || string_agg(column_name, ',' order by ordinal_position)
+            from information_schema.columns
+            where table_schema='neon_auth'
+            group by table_name
+            order by table_name;
+          "
