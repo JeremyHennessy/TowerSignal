@@ -73,7 +73,7 @@ export function CompanyFamilyPanel({ companyId }: { companyId: string }) {
     <div className="company-family-members">
       {model.members.map(profile => {
         const firm = model.firmById.get(profile.company_id)
-        return <a key={profile.company_id} href={`#/company/${encodeURIComponent(profile.company_id)}`}>
+        return <a key={profile.company_id} href={`#/admin-company/${encodeURIComponent(profile.company_id)}`}>
           <strong>{profile.canonical_name}</strong>
           <span>{profile.company_id === model.masterId ? 'Master company' : 'Reviewed source-label rollup'}</span>
           <small>{firm ? `${firm.serviced_site_count.toLocaleString()} serviced · ${firm.tower_account_count.toLocaleString()} tower accounts` : 'Private-only company identity'}</small>
@@ -83,7 +83,7 @@ export function CompanyFamilyPanel({ companyId }: { companyId: string }) {
     {(model.master?.parent_company_id || model.master?.parent_company_name) && <div className="company-family-parent">
       <small>Parent / ownership</small>
       {model.master.parent_company_id
-        ? <a href={`#/company/${encodeURIComponent(model.master.parent_company_id)}`}>{model.master.parent_company_name || model.master.parent_company_id}</a>
+        ? <a href={`#/admin-company/${encodeURIComponent(model.master.parent_company_id)}`}>{model.master.parent_company_name || model.master.parent_company_id}</a>
         : <strong>{model.master.parent_company_name}</strong>}
       {model.master.parent_source_url && <a href={model.master.parent_source_url} target="_blank" rel="noreferrer">Ownership source ↗</a>}
     </div>}
