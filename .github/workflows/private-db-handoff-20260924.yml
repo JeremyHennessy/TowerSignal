@@ -1,0 +1,47 @@
+name: Private DB handoff 20260924
+
+on:
+  push:
+    branches:
+      - ops/private-db-handoff-20260924
+    paths:
+      - '.github/workflows/private-db-handoff-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  handoff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Encrypt direct database URL for one-time handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          cat >/tmp/ts-pub.pem <<'PEM'
+          -----BEGIN PUBLIC KEY-----
+          MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA5TFl5aHhihbUkRTj5Z39
+          PfHpY5icznmLGcYgOVL4wKa//Ti2cKeOAYLnTcEH99MYeqQaGTdG2Qg8Jfcz0wxx
+          Azg4EFdINBx7FW3aUpqJ6u0SeVP6VahUP9e8QLx4v6N0E1nT8XNdRiTv2e7rO8W+
+          u9Zzce+BYyM/isPH3lcaKf/7N9UxvnduJaSVmLJtXCLY9b4I0MmyT5TQTjCleNnG
+          mBJu002XppZMiUpb9sQieSIi826ovKg9Ey0W8bTPzj27CQuggAfI8ciGqh5lKbc0
+          tNFeTQ0jeGQOJyI/K0NGPuNwOM3P5tFq5RI8Glo6DO1jBTGvOnT72M9NZQx75G/n
+          3V8ZY4oztoj2RFufnV1U+4aKVjeT65oQBxoVFZqtuKA8VyrY61GEIR25FKc60y6o
+          Q5M2RBvLXUcoZ37eIOC8Wkl9y2hRhCIAThwk4cu0zUntb+3Nf026LPZgIU7/6JHi
+          oW+NBJwNPGgQtfE1q2tGr17dMoDgGiefMFJOwbaV/PzXqT7hsiWPDYjg5Oo04ErR
+          xbWK9RwsXIgA8MN5NQPr43qavT422+XsH6m5q7cDc8ZPwU9VugsgpUfb4p9nodyj
+          RBileCGQgRJ0saZV427ymlOrVOX2XVjx+B/0IXdFbx4MW2c84iVQnr+Xm37FB7Md
+          u3ccsYkfCGgLvsIx+knzdwcCAwEAAQ==
+          -----END PUBLIC KEY-----
+          PEM
+          printf '%s' "$DATABASE_URL" \
+            | openssl pkeyutl -encrypt -pubin -inkey /tmp/ts-pub.pem \
+                -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 \
+            | base64 -w0 > /tmp/db-url.enc.b64
+          printf 'DB_URL_CIPHERTEXT='
+          cat /tmp/db-url.enc.b64
+          printf '\n'
