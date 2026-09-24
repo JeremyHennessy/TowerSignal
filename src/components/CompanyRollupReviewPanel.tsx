@@ -58,7 +58,6 @@ export function CompanyRollupReviewPanel({
     return()=>{cancelled=true}
   },[accounts,members,profiles,contacts,firms])
 
-  const accountById=useMemo(()=>new Map(accounts.map(account=>[account.sales_account_id,account])),[accounts])
   const profileById=useMemo(()=>new Map(profiles.map(profile=>[profile.company_id,profile])),[profiles])
   const accountNameById=useMemo(()=>{
     const labels=new Map(accounts.map(account=>[account.sales_account_id,account.display_name]))
