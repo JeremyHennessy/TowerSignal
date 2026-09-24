@@ -26,6 +26,7 @@ import type {
 import type { KnownFirmPayload, KnownFirmSummaryRecord } from '../types/firm'
 import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
 import { CompanyAdminWorkspace } from './CompanyAdminWorkspace'
+import { CompanyRollupReviewPanel } from './CompanyRollupReviewPanel'
 
 const number = new Intl.NumberFormat('en-US')
 const statuses: CompanyRelationshipStatus[] = [
@@ -497,6 +498,15 @@ export function AdminCompaniesPage() {
         </tr>)}
       </tbody></table></div>
     </section>
+
+    <CompanyRollupReviewPanel
+      accounts={salesAccounts}
+      members={salesAccountMembers}
+      profiles={profiles}
+      contacts={contacts}
+      firms={payload.firms}
+      onChanged={reloadPrivate}
+    />
 
     <details className="admin-company-operations-panel">
       <summary><div><strong>Research queue &amp; follow-up operations</strong><span>Ranking, workflow state and queue synchronization</span></div><span>Open operations</span></summary>

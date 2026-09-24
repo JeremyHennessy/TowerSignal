@@ -159,3 +159,22 @@
 .company-sales-account-actions button{border:0;border-radius:8px;padding:.6rem .8rem;background:#174852;color:#fff;font-weight:760;cursor:pointer}
 @media(max-width:900px){.company-sales-account-form{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.company-sales-account-form{grid-template-columns:1fr}.company-sales-account-form label.wide{grid-column:auto}}
+
+.company-rollup-review-actions{display:flex;gap:.45rem;align-items:center}
+.company-rollup-review-actions select,.company-rollup-review-actions button{height:34px;border:1px solid #d5dfe2;border-radius:8px;background:#fff;padding:0 .65rem;font:inherit;font-size:.74rem}
+.company-rollup-review-actions button{background:#174852;color:#fff;border-color:#174852;font-weight:760;cursor:pointer}
+.company-rollup-review-list{display:grid}
+.company-rollup-review-list>article{display:grid;gap:.55rem;padding:.85rem .95rem;border-top:1px solid var(--border)}
+.company-rollup-review-list>article:first-child{border-top:0}
+.company-rollup-review-main{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;gap:.65rem;align-items:center}
+.company-rollup-review-main>div:not(.company-rollup-score){display:grid;gap:.15rem}
+.company-rollup-review-main small{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em}
+.company-rollup-score{display:grid;justify-items:center;min-width:58px;padding:.45rem;border-radius:10px;background:#f1f6f5}
+.company-rollup-score strong{font-size:1.05rem}
+.company-rollup-evidence{display:flex;gap:.4rem;flex-wrap:wrap}
+.company-rollup-evidence span{font-size:.7rem;border-radius:999px;background:#eef3f4;color:#39525d;padding:.28rem .5rem}
+.company-rollup-buttons{display:flex;gap:.45rem;flex-wrap:wrap}
+.company-rollup-buttons button{border:1px solid #d2dde0;border-radius:8px;background:#fff;padding:.5rem .65rem;font-weight:720;cursor:pointer}
+.company-rollup-buttons button.primary{background:#174852;color:#fff;border-color:#174852}
+.company-rollup-reviewed{color:var(--muted)}
+@media(max-width:700px){.company-rollup-review-main{grid-template-columns:1fr}.company-rollup-review-main>span{display:none}.company-rollup-score{justify-self:start}.company-rollup-review-actions{align-items:stretch;flex-direction:column}}
