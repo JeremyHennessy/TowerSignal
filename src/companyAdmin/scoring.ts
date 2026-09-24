@@ -48,11 +48,21 @@ export function scoreCompanySalesAccount({
   const readinessReasons:string[]=[]
 
   const roles=new Set(publicFirms.flatMap(firm=>firm.roles))
-  const roleScore=Math.min(42,[...roles].reduce((sum,role)=>sum+(rolePoints[role]??0),0))
+  const ownerRoles=new Set(['DOB_NOW_OWNER_BUSINESS','LEGACY_DOB_OWNER_BUSINESS'])
+  const commercialCorroborationRoles=new Set(['DWT_LABORATORY','DEC_7G_REGISTERED_BUSINESS','PROCUREMENT_VENDOR'])
+  const suppressInspectionProvider=
+    roles.has('DWT_INSPECTION_PROVIDER') &&
+    [...ownerRoles].some(role=>roles.has(role)) &&
+    ![...commercialCorroborationRoles].some(role=>roles.has(role))
+  const scoredRoles=[...roles].filter(role=>!(suppressInspectionProvider&&role==='DWT_INSPECTION_PROVIDER'))
+  const roleScore=Math.min(42,scoredRoles.reduce((sum,role)=>sum+(rolePoints[role]??0),0))
   let fit=roleScore
   if(roleScore){
-    const named=[...roles].filter(role=>rolePoints[role]).map(role=>role.replaceAll('_',' ').toLowerCase())
+    const named=scoredRoles.filter(role=>rolePoints[role]).map(role=>role.replaceAll('_',' ').toLowerCase())
     fitReasons.push(`Relevant public roles: ${named.join(', ')} (+${roleScore})`)
+  }
+  if(suppressInspectionProvider){
+    fitReasons.push('Owner/self-inspection pattern: DWT inspection activity is not treated as third-party provider evidence (+0)')
   }
 
   const categories=new Set(publicFirms.flatMap(firm=>firm.service_categories).map(value=>value.toLowerCase()))
@@ -63,7 +73,8 @@ export function scoreCompanySalesAccount({
   }
 
   const serviceRoles=new Set(['DWT_INSPECTION_PROVIDER','DWT_LABORATORY','DEC_7G_REGISTERED_BUSINESS'])
-  const serviceFirms=publicFirms.filter(firm=>firm.roles.some(role=>serviceRoles.has(role)))
+  const countsAsServiceRole=(role:string)=>serviceRoles.has(role)&&!(suppressInspectionProvider&&role==='DWT_INSPECTION_PROVIDER')
+  const serviceFirms=publicFirms.filter(firm=>firm.roles.some(countsAsServiceRole))
   const procurementFirms=publicFirms.filter(firm=>firm.roles.includes('PROCUREMENT_VENDOR'))
 
   const serviced=serviceFirms.reduce((sum,firm)=>sum+firm.serviced_site_count,0)
@@ -86,7 +97,7 @@ export function scoreCompanySalesAccount({
   fit+=customerPoints
   if(customerPoints) fitReasons.push(`${customers.toLocaleString()} observed public buyers (+${customerPoints})`)
 
-  const commercialFirms=publicFirms.filter(firm=>firm.roles.some(role=>serviceRoles.has(role)||role==='PROCUREMENT_VENDOR'))
+  const commercialFirms=publicFirms.filter(firm=>firm.roles.some(role=>countsAsServiceRole(role)||role==='PROCUREMENT_VENDOR'))
   if(commercialFirms.some(firm=>firm.active_last_12m)){
     fit+=5
     fitReasons.push('Recent provider/lab/vendor activity in the last 12 months (+5)')
