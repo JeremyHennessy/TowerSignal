@@ -16,6 +16,7 @@ on:
       - 'src/companyAdmin/client.ts'
       - 'src/companyAdmin/import.ts'
       - 'src/companyAdmin/rollupSuggestions.ts'
+      - 'src/companyAdmin/scoring.ts'
       - 'src/components/CompaniesPage.tsx'
       - 'src/components/AdminCompaniesPage.tsx'
       - 'src/components/AdminSalesTodayPanel.tsx'
@@ -47,6 +48,7 @@ on:
       - 'tests/frontend/AdminSalesToday.test.ts'
       - 'tests/frontend/MasterSalesAccounts.test.ts'
       - 'tests/frontend/RollupSuggestions.test.ts'
+      - 'tests/frontend/SalesScoring.test.ts'
       - 'tests/frontend/RollupReviewQueue.test.ts'
       - 'tests/frontend/CompanyAdminDirectoryFilters.test.ts'
       - 'tests/frontend/UserAccountAdminAccess.test.tsx'
@@ -99,6 +101,7 @@ jobs:
             'src/companyAdmin/client.ts',
             'src/companyAdmin/import.ts',
             'src/companyAdmin/rollupSuggestions.ts',
+            'src/companyAdmin/scoring.ts',
             'src/components/AdminCompaniesPage.tsx',
             'src/components/AdminCompanyProfilePage.tsx',
             'src/components/AdminSalesTodayPanel.tsx',
@@ -132,6 +135,7 @@ jobs:
             'tests/frontend/MasterSalesAccounts.test.ts',
             'tests/frontend/RollupReviewQueue.test.ts',
             'tests/frontend/RollupSuggestions.test.ts',
+            'tests/frontend/SalesScoring.test.ts',
             'tests/frontend/SeparateCompanyAdmin.test.ts',
             'tests/frontend/ServiceOperationsPage.test.tsx',
             'tests/frontend/ServiceReportingMigration.test.ts',
@@ -216,6 +220,7 @@ jobs:
           grep -R -Fq "Roll-up review queue" dist/assets
           grep -R -Fq "Account classification" dist/assets
           grep -R -Fq "Sales Today" dist/assets
+          grep -R -Fq "Target accounts" dist/assets
           grep -R -Fq "Company master & relationship record" dist/assets
           python - <<'PY'
           import hashlib, json, pathlib
@@ -316,6 +321,7 @@ jobs:
           grep -Fq "Roll-up review queue" /tmp/towersignal-index.js
           grep -Fq "Account classification" /tmp/towersignal-index.js
           grep -Fq "Sales Today" /tmp/towersignal-index.js
+          grep -Fq "Target accounts" /tmp/towersignal-index.js
           grep -Fq "Company master & relationship record" /tmp/towersignal-index.js
 
   rollback:
