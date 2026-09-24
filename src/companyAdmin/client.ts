@@ -217,6 +217,13 @@ export async function saveCompanyAdminContact(
     last_change_source: context.source ?? 'manual',
     last_change_batch_id: context.batchId ?? null,
   }
+  if (values.primary_contact) {
+    const clearPrimary = await client.from('company_private_contacts')
+      .update({ primary_contact:false, updated_at:new Date().toISOString(), last_change_source:context.source ?? 'manual', last_change_batch_id:context.batchId ?? null })
+      .eq('company_id', companyId)
+      .eq('primary_contact', true)
+    throwIfError('Unable to clear prior primary company contact', clearPrimary.error)
+  }
   const update = await client.from('company_private_contacts')
     .update(change)
     .eq('contact_id', contactId)
