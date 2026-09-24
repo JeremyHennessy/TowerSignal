@@ -6,6 +6,8 @@ import type {
   CompanySalesTask,
   CompanySalesDemo,
   CompanySalesProposal,
+  CompanySalesSubscription,
+  CompanySalesRenewal,
 } from '../types/companyAdmin'
 
 const activeStages=new Set(['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation'])
@@ -15,7 +17,7 @@ function human(value:string){return value.replaceAll('-',' ').replaceAll('_',' '
 function dateOnly(value:string|null|undefined){return value?.slice(0,10)??null}
 
 export function AdminSalesTodayPanel({
-  accounts,opportunities,tasks,activities,demos,proposals,
+  accounts,opportunities,tasks,activities,demos,proposals,subscriptions,renewals,
 }:{
   accounts:CompanySalesAccount[]
   opportunities:CompanySalesOpportunity[]
@@ -23,10 +25,14 @@ export function AdminSalesTodayPanel({
   activities:CompanyAdminActivity[]
   demos:CompanySalesDemo[]
   proposals:CompanySalesProposal[]
+  subscriptions:CompanySalesSubscription[]
+  renewals:CompanySalesRenewal[]
 }) {
   const accountById=useMemo(()=>new Map(accounts.map(account=>[account.sales_account_id,account])),[accounts])
+  const subscriptionById=useMemo(()=>new Map(subscriptions.map(subscription=>[subscription.subscription_id,subscription])),[subscriptions])
   const today=new Date().toISOString().slice(0,10)
   const nextWeek=new Date(Date.now()+7*86400000).toISOString().slice(0,10)
+  const next90Days=new Date(Date.now()+90*86400000).toISOString().slice(0,10)
   const staleCutoff=new Date(Date.now()-14*86400000).toISOString()
 
   const openTasks=tasks.filter(task=>task.status==='open')
@@ -41,6 +47,15 @@ export function AdminSalesTodayPanel({
     return demo.status==='scheduled'&&date!=null&&date>=today&&date<=nextWeek
   })
   const openProposals=proposals.filter(proposal=>['sent','revising'].includes(proposal.status))
+  const openRenewals=renewals.filter(renewal=>['upcoming','contacted','negotiating'].includes(renewal.status))
+  const renewalAttention=openRenewals.filter(renewal=>renewal.renewal_date<=next90Days)
+  const trackedRenewalSubscriptions=new Set(openRenewals.map(renewal=>renewal.subscription_id))
+  const untrackedRenewalSubscriptions=subscriptions.filter(subscription=>
+    ['onboarding','active','paused'].includes(subscription.status)&&
+    subscription.renewal_date!=null&&subscription.renewal_date<=next90Days&&
+    !trackedRenewalSubscriptions.has(subscription.subscription_id)
+  )
+  const overdueRenewals=renewalAttention.filter(renewal=>renewal.renewal_date<today)
   const noNextStep=opportunities.filter(opportunity=>activeStages.has(opportunity.stage)&&!opportunity.next_step?.trim())
   const stale=opportunities.filter(opportunity=>activeStages.has(opportunity.stage)&&opportunity.updated_at&&opportunity.updated_at<staleCutoff)
   const recentActivities=activities.slice(0,10)
@@ -52,7 +67,7 @@ export function AdminSalesTodayPanel({
 
   return <section className="admin-sales-today">
     <div className="admin-sales-today-heading">
-      <div><span className="page-kicker">Internal sales · today</span><h2>Sales Today</h2><p>Tasks, demos and deals that need attention before research work.</p></div>
+      <div><span className="page-kicker">Internal sales · today</span><h2>Sales Today</h2><p>Tasks, demos, deals and customer renewals that need attention before research work.</p></div>
       <div className="admin-sales-today-metrics">
         <article><small>Overdue</small><strong>{number.format(overdue.length)}</strong><span>open sales tasks</span></article>
         <article><small>Due today</small><strong>{number.format(dueToday.length)}</strong><span>sales tasks</span></article>
@@ -60,6 +75,8 @@ export function AdminSalesTodayPanel({
         <article><small>Demos</small><strong>{number.format(upcomingDemos.length)}</strong><span>through next 7 days</span></article>
         <article><small>Open proposals</small><strong>{number.format(openProposals.length)}</strong><span>sent or revising</span></article>
         <article><small>No next step</small><strong>{number.format(noNextStep.length)}</strong><span>active opportunities</span></article>
+        <article><small>Renewal attention</small><strong>{number.format(renewalAttention.length+untrackedRenewalSubscriptions.length)}</strong><span>due within 90 days</span></article>
+        <article><small>Renewal overdue</small><strong>{number.format(overdueRenewals.length)}</strong><span>open renewal records</span></article>
       </div>
     </div>
 
@@ -79,7 +96,7 @@ export function AdminSalesTodayPanel({
       </section>
 
       <section className="admin-company-card">
-        <div className="admin-company-card-heading"><div><strong>Deal attention</strong><span>Demos, proposals, missing next steps and stale active deals</span></div><small>{number.format(upcomingDemos.length+openProposals.length+noNextStep.length+stale.length)} signals</small></div>
+        <div className="admin-company-card-heading"><div><strong>Deal &amp; renewal attention</strong><span>Demos, proposals, renewals, missing next steps and stale active deals</span></div><small>{number.format(upcomingDemos.length+openProposals.length+renewalAttention.length+untrackedRenewalSubscriptions.length+noNextStep.length+stale.length)} signals</small></div>
         <div className="admin-sales-deal-list">
           {upcomingDemos.slice(0,6).map(demo=>{
             const account=rowAccount(demo.sales_account_id)
@@ -91,6 +108,19 @@ export function AdminSalesTodayPanel({
             const account=rowAccount(proposal.sales_account_id)
             return <a key={`proposal-${proposal.proposal_id}`} href={account?`#/admin-company/${encodeURIComponent(account.sales_account_id)}`:'#/admin-companies'}>
               <strong>{account?.display_name??proposal.sales_account_id}</strong><span>{human(proposal.status)} proposal · {proposal.proposed_arr==null?'ARR not set':proposal.proposed_arr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})+' ARR'}</span><small>{proposal.next_step||proposal.package_name||'Proposal decision pending'}</small>
+            </a>
+          })}
+          {renewalAttention.slice(0,6).map(renewal=>{
+            const account=rowAccount(renewal.sales_account_id)
+            const subscription=subscriptionById.get(renewal.subscription_id)
+            return <a key={`renewal-${renewal.renewal_id}`} href={account?`#/admin-company/${encodeURIComponent(account.sales_account_id)}`:'#/admin-companies'} className={renewal.renewal_date<today?'overdue':''}>
+              <strong>{account?.display_name??renewal.sales_account_id}</strong><span>{human(renewal.status)} renewal · {renewal.renewal_date}</span><small>{renewal.next_step||subscription?.plan_name||'Renewal follow-up required'}</small>
+            </a>
+          })}
+          {untrackedRenewalSubscriptions.slice(0,6).map(subscription=>{
+            const account=rowAccount(subscription.sales_account_id)
+            return <a key={`subscription-renewal-${subscription.subscription_id}`} href={account?`#/admin-company/${encodeURIComponent(account.sales_account_id)}`:'#/admin-companies'}>
+              <strong>{account?.display_name??subscription.sales_account_id}</strong><span>Renewal workflow missing · {subscription.renewal_date}</span><small>{subscription.plan_name} · create a renewal record and next step</small>
             </a>
           })}
           {noNextStep.slice(0,6).map(opportunity=>{
@@ -105,7 +135,7 @@ export function AdminSalesTodayPanel({
               <strong>{account?.display_name??opportunity.name}</strong><span>{human(opportunity.stage)} · untouched 14+ days</span><small>{opportunity.updated_at?new Date(opportunity.updated_at).toLocaleDateString():'No update timestamp'}</small>
             </a>
           })}
-          {!upcomingDemos.length&&!openProposals.length&&!noNextStep.length&&!stale.length&&<span className="company-admin-empty">No active deals currently need exception handling.</span>}
+          {!upcomingDemos.length&&!openProposals.length&&!renewalAttention.length&&!untrackedRenewalSubscriptions.length&&!noNextStep.length&&!stale.length&&<span className="company-admin-empty">No active deals or renewals currently need exception handling.</span>}
         </div>
       </section>
 
