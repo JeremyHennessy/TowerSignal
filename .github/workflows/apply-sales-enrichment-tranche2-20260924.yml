@@ -1,0 +1,24 @@
+name: Apply sales enrichment tranche 2
+
+on:
+  push:
+    branches:
+      - ops/sales-enrichment-tranche2-20260924
+    paths:
+      - 'database/ops/sales_enrichment_tranche2_20260924.sql'
+      - '.github/workflows/apply-sales-enrichment-tranche2-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply guarded source-backed sales enrichment
+        shell: bash
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f database/ops/sales_enrichment_tranche2_20260924.sql
