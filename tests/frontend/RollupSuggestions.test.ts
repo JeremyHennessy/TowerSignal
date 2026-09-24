@@ -63,6 +63,8 @@ test('roll-up generator surfaces conservative spelling and abbreviation variants
     ['a8','p8','Pheonix Environmental Labs'],
     ['a9','p9','Environmental Building Solutions'],
     ['a10','p10','Environmental Bldg Solutions LLC'],
+    ['a11','p11','OLA Consulting Engineers'],
+    ['a12','p12','AMA Consulting Engineers'],
   ] as const
   const profiles=names.map(([,id,name])=>profile(id,name,null,null))
   const accounts=names.map(([id,primary,name])=>account(id,primary,name))
@@ -79,5 +81,6 @@ test('roll-up generator surfaces conservative spelling and abbreviation variants
   expect(hasPair('a5','a6')).toBe(true)
   expect(hasPair('a7','a8')).toBe(true)
   expect(hasPair('a9','a10')).toBe(true)
+  expect(hasPair('a11','a12')).toBe(false)
   expect(suggestions.filter(row=>row.evidence.some(item=>item.includes('Near-exact normalized company-name spelling'))).length).toBeGreaterThanOrEqual(4)
 })
