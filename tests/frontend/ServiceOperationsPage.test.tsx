@@ -64,8 +64,8 @@ test('service operations renders private portfolio metrics and account drill-thr
 
   expect(await screen.findByRole('heading',{name:'Service operations'})).toBeInTheDocument()
   expect(screen.getAllByText('400 West 61st Street').length).toBeGreaterThanOrEqual(2)
-  expect(screen.getByText('Example Client')).toBeInTheDocument()
-  expect(screen.getByText('NYC Portfolio')).toBeInTheDocument()
+  expect(screen.getAllByText('Example Client').length).toBeGreaterThanOrEqual(2)
+  expect(screen.getAllByText('NYC Portfolio').length).toBeGreaterThanOrEqual(2)
   expect(screen.getByText('Correct chemical feed')).toBeInTheDocument()
   const link=screen.getByRole('link',{name:'Open account 2000014227'})
   expect(link).toHaveAttribute('href','#/account/2000014227')
