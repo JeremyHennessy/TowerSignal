@@ -7,6 +7,8 @@ import {
   loadCompanyResearchQueue,
   loadAllCompanySalesOpportunities,
   loadAllCompanySalesTasks,
+  loadAllCompanySalesDemos,
+  loadAllCompanySalesProposals,
   loadCompanySalesAccounts,
   loadCompanySalesAccountMembers,
 } from '../companyAdmin/client'
@@ -18,6 +20,8 @@ import type {
   CompanyResearchQueueItem,
   CompanySalesOpportunity,
   CompanySalesTask,
+  CompanySalesDemo,
+  CompanySalesProposal,
   CompanyOpportunityStage,
   CompanySalesAccount,
   CompanySalesAccountMember,
@@ -108,6 +112,8 @@ export function AdminCompaniesPage() {
   const [queue, setQueue] = useState<CompanyResearchQueueItem[]>([])
   const [opportunities, setOpportunities] = useState<CompanySalesOpportunity[]>([])
   const [salesTasks, setSalesTasks] = useState<CompanySalesTask[]>([])
+  const [salesDemos, setSalesDemos] = useState<CompanySalesDemo[]>([])
+  const [salesProposals, setSalesProposals] = useState<CompanySalesProposal[]>([])
   const [salesAccounts, setSalesAccounts] = useState<CompanySalesAccount[]>([])
   const [salesAccountMembers, setSalesAccountMembers] = useState<CompanySalesAccountMember[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -118,13 +124,15 @@ export function AdminCompaniesPage() {
   const [gap, setGap] = useState('ALL')
 
   const reloadPrivate = async () => {
-    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
+    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesDemos, nextSalesProposals, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
       loadCompanyAdminDirectory(),
       loadAllCompanyContacts(),
       loadAllCompanyActivities(),
       loadCompanyResearchQueue(),
       loadAllCompanySalesOpportunities(),
       loadAllCompanySalesTasks(),
+      loadAllCompanySalesDemos(),
+      loadAllCompanySalesProposals(),
       loadCompanySalesAccounts(),
       loadCompanySalesAccountMembers(),
     ])
@@ -134,6 +142,8 @@ export function AdminCompaniesPage() {
     setQueue(nextQueue)
     setOpportunities(nextOpportunities)
     setSalesTasks(nextSalesTasks)
+    setSalesDemos(nextSalesDemos)
+    setSalesProposals(nextSalesProposals)
     setSalesAccounts(nextSalesAccounts)
     setSalesAccountMembers(nextSalesAccountMembers)
   }
@@ -144,7 +154,7 @@ export function AdminCompaniesPage() {
       if (cancelled) return
       setAllowed(isAdmin)
       if (!isAdmin) return
-      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
+      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesDemos, nextSalesProposals, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
         loadKnownFirms(),
         loadCompanyAdminDirectory(),
         loadAllCompanyContacts(),
@@ -152,6 +162,8 @@ export function AdminCompaniesPage() {
         loadCompanyResearchQueue(),
         loadAllCompanySalesOpportunities(),
         loadAllCompanySalesTasks(),
+        loadAllCompanySalesDemos(),
+        loadAllCompanySalesProposals(),
         loadCompanySalesAccounts(),
         loadCompanySalesAccountMembers(),
       ])
@@ -163,6 +175,8 @@ export function AdminCompaniesPage() {
       setQueue(nextQueue)
       setOpportunities(nextOpportunities)
       setSalesTasks(nextSalesTasks)
+      setSalesDemos(nextSalesDemos)
+      setSalesProposals(nextSalesProposals)
       setSalesAccounts(nextSalesAccounts)
       setSalesAccountMembers(nextSalesAccountMembers)
     }).catch(err => {
@@ -312,8 +326,8 @@ export function AdminCompaniesPage() {
   const wonArr = opportunities.filter(opportunity => opportunity.stage === 'closed-won').reduce((sum, opportunity) => sum + (opportunity.estimated_arr ?? 0), 0)
   const nowIso = new Date().toISOString()
   const overdueSalesTasks = salesTasks.filter(task => task.status === 'open' && task.due_at && task.due_at < nowIso)
-  const upcomingDemos = opportunities.filter(opportunity => opportunity.demo_scheduled_at && opportunity.demo_scheduled_at >= nowIso && activeOpportunityStages.has(opportunity.stage))
-  const proposalsOut = opportunities.filter(opportunity => opportunity.stage === 'proposal' || opportunity.stage === 'negotiation')
+  const upcomingDemos = salesDemos.filter(demo => demo.status === 'scheduled' && demo.scheduled_at && demo.scheduled_at >= nowIso)
+  const proposalsOut = salesProposals.filter(proposal => proposal.status === 'sent' || proposal.status === 'revising')
   const opportunityByStage = useMemo(() => new Map(opportunityStages.map(stage => [
     stage,
     opportunities.filter(opportunity => opportunity.stage === stage),
@@ -375,7 +389,7 @@ export function AdminCompaniesPage() {
 
     {error && <div className="company-admin-error"><strong>Company administration error.</strong><span>{error}</span></div>}
 
-    <AdminSalesTodayPanel accounts={salesAccounts} opportunities={opportunities} tasks={salesTasks} activities={activities} />
+    <AdminSalesTodayPanel accounts={salesAccounts} opportunities={opportunities} tasks={salesTasks} activities={activities} demos={salesDemos} proposals={salesProposals} />
 
     <div className="admin-sales-metrics">
       <article><small>Open TowerSignal deals</small><strong>{number.format(activeSalesOpportunities.length)}</strong><span>{number.format(opportunities.length)} total opportunities</span></article>
