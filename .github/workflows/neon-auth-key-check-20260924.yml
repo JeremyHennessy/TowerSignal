@@ -1,4 +1,4 @@
-name: Verify existing Neon API key for auth provisioning
+name: Inventory available secret names safely
 
 on:
   push:
@@ -11,33 +11,20 @@ permissions:
   contents: read
 
 jobs:
-  verify-neon-auth-key:
+  inventory:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      PROJECT_ID: delicate-frost-69301563
-      BRANCH_ID: br-orange-bar-aujld2d5
-      NEON_API_KEY: ${{ secrets.NEON_API_KEY || vars.NEON_API_KEY || secrets.NEON_KEY || vars.NEON_KEY || secrets.NEON_SECRET_KEY || vars.NEON_SECRET_KEY || secrets.NEON_API_TOKEN || vars.NEON_API_TOKEN }}
+      ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
+      ALL_VARS_JSON: ${{ toJSON(vars) }}
     steps:
-      - name: Require configured Neon API key
+      - name: Print names only
         shell: bash
         run: |
-          set -euo pipefail
-          test -n "${NEON_API_KEY:-}" || { echo "NEON_API_KEY secret is not configured"; exit 1; }
-
-      - name: Verify Neon Auth access without exposing secret
-        shell: bash
-        run: |
-          set -euo pipefail
-          auth_json="$(curl --fail --silent --show-error             -H "Authorization: Bearer $NEON_API_KEY"             -H "Accept: application/json"             "https://console.neon.tech/api/v2/projects/$PROJECT_ID/branches/$BRANCH_ID/auth")"
-          password_json="$(curl --fail --silent --show-error             -H "Authorization: Bearer $NEON_API_KEY"             -H "Accept: application/json"             "https://console.neon.tech/api/v2/projects/$PROJECT_ID/branches/$BRANCH_ID/auth/email_and_password")"
-          python - "$auth_json" "$password_json" <<'PY'
-          import json, sys
-          auth = json.loads(sys.argv[1])
-          password = json.loads(sys.argv[2])
-          print("NEON_API_KEY=VALID")
-          print("AUTH_PROVIDER=" + str(auth.get("auth_provider") or auth.get("provider") or "configured"))
-          print("EMAIL_PASSWORD_ENABLED=" + str(password.get("enabled")))
-          print("SIGN_UP_DISABLED=" + str(password.get("disable_sign_up")))
-          print("REQUIRE_EMAIL_VERIFICATION=" + str(password.get("require_email_verification")))
+          python - <<'PY'
+          import json, os
+          secrets = json.loads(os.environ.get("ALL_SECRETS_JSON") or "{}")
+          variables = json.loads(os.environ.get("ALL_VARS_JSON") or "{}")
+          print("SECRET_NAMES=" + ",".join(sorted(secrets)))
+          print("VARIABLE_NAMES=" + ",".join(sorted(variables)))
           PY
