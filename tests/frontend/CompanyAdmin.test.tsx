@@ -8,6 +8,7 @@ vi.mock('../../src/companyAdmin/client', () => ({
   loadCompanyAdminAccess: vi.fn(),
   loadCompanyAdminSnapshot: vi.fn(),
   saveCompanyAdminProfile: vi.fn(),
+  saveCompanyAdminContact: vi.fn(),
   addCompanyContact: vi.fn(),
   addCompanyActivity: vi.fn(),
   addCompanyNote: vi.fn(),
@@ -65,7 +66,13 @@ beforeEach(() => {
   vi.mocked(adminClient.loadCompanyAdminAccess).mockResolvedValue(true)
   vi.mocked(adminClient.loadCompanyAdminSnapshot).mockResolvedValue({
     profile:{ ...profile },
-    contacts:[],
+    contacts:[{
+      contact_id:'c1', company_id:'observed-company-alpha', name:'Alex Buyer', title:'Facilities Manager',
+      email:'alex@example.test', phone:'212-555-0100', linkedin_url:'https://linkedin.example/alex',
+      notes:null, source_name:'Official staff page', source_url:'https://alpha.example/team',
+      verified_at:'2026-09-23T18:00:00Z', active:true,
+      created_at:'2026-09-20T00:00:00Z', updated_at:'2026-09-20T00:00:00Z',
+    }],
     activities:[],
     notes:[{ note_id:'n1', company_id:'observed-company-alpha', note:'Existing private note', updated_at:'2026-09-20T00:00:00Z' }],
   })
@@ -74,6 +81,13 @@ beforeEach(() => {
     ...patch,
     company_id:companyId,
     canonical_name:canonicalName,
+  }))
+  vi.mocked(adminClient.saveCompanyAdminContact).mockImplementation(async (contactId, companyId, values) => ({
+    contact_id:contactId, company_id:companyId, ...values,
+    created_at:'2026-09-20T00:00:00Z', updated_at:'2026-09-24T00:00:00Z',
+  }))
+  vi.mocked(adminClient.addCompanyActivity).mockImplementation(async (companyId, values) => ({
+    activity_id:'a1', company_id:companyId, ...values, created_at:'2026-09-24T00:00:00Z', created_by:'u1',
   }))
   vi.mocked(adminClient.addCompanyNote).mockResolvedValue({ note_id:'n2', company_id:'observed-company-alpha', note:'New note' })
   vi.mocked(adminClient.updateCompanyNote).mockResolvedValue({ note_id:'n1', company_id:'observed-company-alpha', note:'Updated note' })
@@ -106,4 +120,32 @@ test('non-admin user never receives the private editor', async () => {
   await vi.waitFor(() => expect(adminClient.loadCompanyAdminAccess).toHaveBeenCalled())
   expect(screen.queryByRole('region', { name:'Admin company database' })).not.toBeInTheDocument()
   expect(adminClient.loadCompanyAdminSnapshot).not.toHaveBeenCalled()
+})
+
+
+test('admin can edit a contact and associate outreach with that contact', async () => {
+  const user = userEvent.setup()
+  render(<CompanyAdminPanel companyId="observed-company-alpha" canonicalName="ALPHA WATER SERVICES LLC" />)
+
+  expect(await screen.findByText('Alex Buyer')).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name:'Edit contact' }))
+
+  const title = screen.getByLabelText('Edit contact title')
+  await user.clear(title)
+  await user.type(title, 'Director of Facilities')
+  await user.click(screen.getByRole('button', { name:'Save contact' }))
+
+  expect(adminClient.saveCompanyAdminContact).toHaveBeenCalled()
+  expect(vi.mocked(adminClient.saveCompanyAdminContact).mock.calls.at(-1)?.[0]).toBe('c1')
+  expect(vi.mocked(adminClient.saveCompanyAdminContact).mock.calls.at(-1)?.[2].title).toBe('Director of Facilities')
+
+  await user.selectOptions(screen.getByLabelText('Activity contact'), 'c1')
+  await user.type(screen.getByLabelText('Activity subject'), 'Quarterly service follow-up')
+  await user.type(screen.getByLabelText('Activity outcome'), 'Requested proposal')
+  await user.click(screen.getByRole('button', { name:'Log interaction' }))
+
+  const activity = vi.mocked(adminClient.addCompanyActivity).mock.calls.at(-1)?.[1]
+  expect(activity?.contact_id).toBe('c1')
+  expect(activity?.subject).toBe('Quarterly service follow-up')
+  expect(activity?.outcome).toBe('Requested proposal')
 })
