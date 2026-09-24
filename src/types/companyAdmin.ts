@@ -242,3 +242,22 @@ export interface CompanySalesAccountMember {
   relationship_source_url: string | null
   created_at?: string
 }
+
+
+export type CompanyRollupSuggestionStatus = 'pending' | 'accepted' | 'rejected' | 'not-same' | 'superseded'
+export type CompanyRollupSuggestionConfidence = 'high' | 'medium' | 'low'
+
+export interface CompanyRollupSuggestion {
+  suggestion_id: string
+  candidate_sales_account_id: string
+  suggested_sales_account_id: string
+  score: number
+  confidence: CompanyRollupSuggestionConfidence
+  evidence: string[]
+  status: CompanyRollupSuggestionStatus
+  generated_at: string
+  updated_at: string
+  reviewed_at: string | null
+  reviewed_by: string | null
+  review_note: string | null
+}
