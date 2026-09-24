@@ -13,6 +13,7 @@ on:
       - 'database/migrations/008_rollup_review_queue.sql'
       - 'database/migrations/009_authoritative_sales_workflow.sql'
       - 'database/migrations/010_demo_proposal_workflow.sql'
+      - 'database/migrations/011_customer_lifecycle.sql'
       - 'src/App.tsx'
       - 'src/companyAdmin/client.ts'
       - 'src/companyAdmin/import.ts'
@@ -26,6 +27,7 @@ on:
       - 'src/components/CompanyAdminPanel.tsx'
       - 'src/components/CompanySalesCrmPanel.tsx'
       - 'src/components/CompanyDemoProposalPanel.tsx'
+      - 'src/components/CompanyCustomerLifecyclePanel.tsx'
       - 'src/components/CompanySalesAccountPanel.tsx'
       - 'src/components/CompanyRollupReviewPanel.tsx'
       - 'src/components/CompanyAdminWorkspace.tsx'
@@ -48,6 +50,7 @@ on:
       - 'tests/frontend/InternalSalesCrm.test.ts'
       - 'tests/frontend/AuthoritativeSalesWorkflow.test.ts'
       - 'tests/frontend/DemoProposalWorkflow.test.ts'
+      - 'tests/frontend/CustomerLifecycle.test.ts'
       - 'tests/frontend/AdminSalesToday.test.ts'
       - 'tests/frontend/MasterSalesAccounts.test.ts'
       - 'tests/frontend/RollupSuggestions.test.ts'
@@ -102,6 +105,7 @@ jobs:
             'database/migrations/008_rollup_review_queue.sql',
             'database/migrations/009_authoritative_sales_workflow.sql',
             'database/migrations/010_demo_proposal_workflow.sql',
+            'database/migrations/011_customer_lifecycle.sql',
             'src/App.tsx',
             'src/companyAdmin/client.ts',
             'src/companyAdmin/import.ts',
@@ -119,6 +123,7 @@ jobs:
             'src/components/CompanySalesAccountPanel.tsx',
             'src/components/CompanySalesCrmPanel.tsx',
             'src/components/CompanyDemoProposalPanel.tsx',
+            'src/components/CompanyCustomerLifecyclePanel.tsx',
             'src/components/DetailPanel.tsx',
             'src/components/ServiceOperationsPage.tsx',
             'src/components/ServiceReportingPanel.tsx',
@@ -135,6 +140,7 @@ jobs:
             'tests/frontend/AdminSalesToday.test.ts',
             'tests/frontend/AuthoritativeSalesWorkflow.test.ts',
             'tests/frontend/DemoProposalWorkflow.test.ts',
+            'tests/frontend/CustomerLifecycle.test.ts',
             'tests/frontend/CompanyAdmin.test.tsx',
             'tests/frontend/CompanyAdminDirectoryFilters.test.ts',
             'tests/frontend/CompanyAdminImport.test.ts',
@@ -225,6 +231,7 @@ jobs:
           grep -R -Fq "TowerSignal sales pipeline" dist/assets
           grep -R -Fq "Sales pipeline & follow-up" dist/assets
           grep -R -Fq "Demos & proposals" dist/assets
+          grep -R -Fq "Customer lifecycle" dist/assets
           grep -R -Fq "Master sales account" dist/assets
           grep -R -Fq "Roll-up review queue" dist/assets
           grep -R -Fq "Account classification" dist/assets
@@ -327,6 +334,7 @@ jobs:
           grep -Fq "TowerSignal sales pipeline" /tmp/towersignal-index.js
           grep -Fq "Sales pipeline & follow-up" /tmp/towersignal-index.js
           grep -Fq "Demos & proposals" /tmp/towersignal-index.js
+          grep -Fq "Customer lifecycle" /tmp/towersignal-index.js
           grep -Fq "Master sales account" /tmp/towersignal-index.js
           grep -Fq "Roll-up review queue" /tmp/towersignal-index.js
           grep -Fq "Account classification" /tmp/towersignal-index.js
