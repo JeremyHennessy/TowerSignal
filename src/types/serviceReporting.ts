@@ -175,3 +175,17 @@ export interface ServiceWorkspace {
   reports: ServiceReport[]
   documents: ServiceDocument[]
 }
+
+
+export interface ServiceOperationsOverview {
+  clients: ServiceClient[]
+  portfolios: ServicePortfolio[]
+  sites: ServiceSite[]
+  assets: ServiceAsset[]
+  agreements: ServiceAgreement[]
+  visits: ServiceVisit[]
+  measurements: ServiceMeasurement[]
+  actions: ServiceAction[]
+  reports: ServiceReport[]
+  documents: ServiceDocument[]
+}
