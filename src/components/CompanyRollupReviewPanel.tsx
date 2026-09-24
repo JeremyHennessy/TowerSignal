@@ -58,7 +58,25 @@ export function CompanyRollupReviewPanel({
     return()=>{cancelled=true}
   },[accounts,members,profiles,contacts,firms])
 
-  const accountById=useMemo(()=>new Map(accounts.map(account=>[account.sales_account_id,account])),[accounts])
+  const profileById=useMemo(()=>new Map(profiles.map(profile=>[profile.company_id,profile])),[profiles])
+  const accountNameById=useMemo(()=>{
+    const labels=new Map(accounts.map(account=>[account.sales_account_id,account.display_name]))
+    const grouped=new Map<string,CompanySalesAccountMember[]>()
+    members.forEach(member=>{
+      const current=grouped.get(member.sales_account_id) ?? []
+      current.push(member)
+      grouped.set(member.sales_account_id,current)
+    })
+    grouped.forEach((accountMembers,salesAccountId)=>{
+      if(labels.has(salesAccountId)) return
+      const preferred=accountMembers.find(member=>member.is_primary) ?? accountMembers[0]
+      const profile=preferred ? profileById.get(preferred.company_id) : null
+      const label=profile?.rollup_name ?? profile?.legal_name ?? profile?.canonical_name
+      if(label) labels.set(salesAccountId,label)
+    })
+    return labels
+  },[accounts,members,profileById])
+  const accountName=(salesAccountId:string)=>accountNameById.get(salesAccountId) ?? 'Account name unavailable'
   const visible=rows.filter(row=>row.status===status)
 
   const refresh=async()=>{
@@ -72,8 +90,8 @@ export function CompanyRollupReviewPanel({
   }
 
   const review=async(row:CompanyRollupSuggestion,next:'accepted'|'rejected'|'not-same')=>{
-    const candidate=accountById.get(row.candidate_sales_account_id)?.display_name ?? row.candidate_sales_account_id
-    const target=accountById.get(row.suggested_sales_account_id)?.display_name ?? row.suggested_sales_account_id
+    const candidate=accountName(row.candidate_sales_account_id)
+    const target=accountName(row.suggested_sales_account_id)
     if(next==='accepted' && !window.confirm(`Merge "${candidate}" into "${target}"? This changes the private master sales-account roll-up while retaining every source identity.`)) return
     setBusy(true);setError(null)
     try{
@@ -94,13 +112,13 @@ export function CompanyRollupReviewPanel({
     {error&&<div className="company-admin-error"><strong>Roll-up review error.</strong><span>{error}</span></div>}
     <div className="company-rollup-review-list">
       {visible.length ? visible.map(row=>{
-        const candidate=accountById.get(row.candidate_sales_account_id)
-        const target=accountById.get(row.suggested_sales_account_id)
+        const candidateName=accountName(row.candidate_sales_account_id)
+        const targetName=accountName(row.suggested_sales_account_id)
         return <article key={row.suggestion_id}>
           <div className="company-rollup-review-main">
-            <div><small>Candidate</small><strong>{candidate?.display_name ?? row.candidate_sales_account_id}</strong></div>
+            <div><small>Candidate</small><strong>{candidateName}</strong></div>
             <span aria-hidden="true">→</span>
-            <div><small>Suggested master</small><strong>{target?.display_name ?? row.suggested_sales_account_id}</strong></div>
+            <div><small>Suggested master</small><strong>{targetName}</strong></div>
             <div className="company-rollup-score"><strong>{row.score}</strong><small>{human(row.confidence)}</small></div>
           </div>
           <div className="company-rollup-evidence">{row.evidence.map(item=><span key={item}>{item}</span>)}</div>
