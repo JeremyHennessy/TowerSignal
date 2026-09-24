@@ -193,6 +193,32 @@ jobs:
                     'buyers': f.get('observed_customer_count',0) if f else 0,
                     'observations': f.get('observation_count',0) if f else 0,
                   },sort_keys=True))
+
+          for inspect_id in [
+              'sales-account-0ae5d1d45fa2c7408a2b',
+              'sales-account-7dcd01199284dc727abd',
+              'sales-account-e570c5e2bd2cf6a56765',
+              'sales-account-7ad47acd1e4cb84f0173',
+              'sales-account-9ee6fe90f7e2f96b24b2',
+              'sales-account-5080cac75506426a5a2e',
+          ]:
+              acct=next((a for a in private['accounts'] if a['sales_account_id']==inspect_id),None)
+              if not acct: continue
+              master=profiles.get(acct['primary_company_id'],{})
+              print('ENRICHMENT_TARGET',inspect_id,acct['display_name'],acct['primary_company_id'],json.dumps({
+                  'canonical_name':master.get('canonical_name'),
+                  'legal_name':master.get('legal_name'),
+                  'website':master.get('website'),
+                  'headquarters_address':master.get('headquarters_address'),
+                  'headquarters_city':master.get('headquarters_city'),
+                  'headquarters_region':master.get('headquarters_region'),
+                  'headquarters_postal_code':master.get('headquarters_postal_code'),
+                  'company_type':master.get('company_type'),
+                  'parent_company_name':master.get('parent_company_name'),
+                  'identity_source_url':master.get('identity_source_url'),
+                  'enrichment_checked_at':master.get('enrichment_checked_at'),
+                  'contacts':contacts.get(inspect_id,[]),
+              },sort_keys=True))
           PY
 
       - name: Upload ranked enrichment targets
