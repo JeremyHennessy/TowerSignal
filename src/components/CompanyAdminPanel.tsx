@@ -118,6 +118,15 @@ function normalizeProfilePatch(value: CompanyAdminProfilePatch): CompanyAdminPro
   }
 }
 
+function enrichmentOnlyPatch(value: CompanyAdminProfilePatch): Partial<CompanyAdminProfilePatch> {
+  const patch: Partial<CompanyAdminProfilePatch> = { ...normalizeProfilePatch(value) }
+  delete patch.relationship_status
+  delete patch.last_contacted_at
+  delete patch.next_action_date
+  delete patch.account_owner
+  return patch
+}
+
 function localDateTime(value: string | null): string {
   if (!value) return ''
   const date = new Date(value)
@@ -212,15 +221,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      const normalized = normalizeProfilePatch(profile)
-      const {
-        relationship_status: _relationshipStatus,
-        last_contacted_at: _lastContactedAt,
-        next_action_date: _nextActionDate,
-        account_owner: _accountOwner,
-        ...enrichment
-      } = normalized
-      const saved = await saveCompanyAdminProfile(companyId, canonicalName, enrichment)
+      const saved = await saveCompanyAdminProfile(companyId, canonicalName, enrichmentOnlyPatch(profile))
       setProfile(patchFrom(saved))
       setSavedAt(new Date().toISOString())
     } catch (err) {
