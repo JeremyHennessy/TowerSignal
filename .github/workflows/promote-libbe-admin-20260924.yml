@@ -1,0 +1,35 @@
+name: Promote existing TowerSignal user to admin
+
+on:
+  push:
+    branches:
+      - ops/promote-libbe-admin-20260924
+    paths:
+      - '.github/workflows/promote-libbe-admin-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Verify existing user and promote
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "Production database credential unavailable"; exit 1; }
+
+          existing="$(psql "$DATABASE_URL" -Atv ON_ERROR_STOP=1 -c "select count(*) from neon_auth.\"user\" where lower(email)=lower('libbe@pharm3r.com');")"
+          test "$existing" = "1" || { echo "Expected exactly one existing libbe@pharm3r.com user, found $existing"; exit 1; }
+
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "update neon_auth.\"user\" set role='admin', \"updatedAt\"=now() where lower(email)=lower('libbe@pharm3r.com');"
+
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "select id, email, role, banned from neon_auth.\"user\" where lower(email)=lower('libbe@pharm3r.com');"
+
+          role="$(psql "$DATABASE_URL" -Atv ON_ERROR_STOP=1 -c "select lower(coalesce(role,'')) from neon_auth.\"user\" where lower(email)=lower('libbe@pharm3r.com');")"
+          test "$role" = "admin" || { echo "Admin role verification failed"; exit 1; }
+          echo "ADMIN_PROMOTION=PASS"
