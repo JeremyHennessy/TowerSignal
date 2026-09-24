@@ -15,13 +15,13 @@ import type {
   CompanyAdminActivity,
   CompanyAdminContact,
   CompanyAdminProfile,
-  CompanyRelationshipStatus,
   CompanyResearchQueueItem,
   CompanySalesOpportunity,
   CompanySalesTask,
   CompanyOpportunityStage,
   CompanySalesAccount,
   CompanySalesAccountMember,
+  CompanySalesAccountClassification,
 } from '../types/companyAdmin'
 import type { KnownFirmPayload, KnownFirmSummaryRecord } from '../types/firm'
 import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
@@ -29,34 +29,15 @@ import { CompanyAdminWorkspace } from './CompanyAdminWorkspace'
 import { CompanyRollupReviewPanel } from './CompanyRollupReviewPanel'
 
 const number = new Intl.NumberFormat('en-US')
-const statuses: CompanyRelationshipStatus[] = [
-  'uncontacted','researching','outreach-planned','contacted','engaged','opportunity','customer','not-pursuing',
+const accountClassifications: CompanySalesAccountClassification[] = [
+  'target','active-prospect','customer','former-customer','partner','competitor','do-not-pursue',
 ]
-const pipelineStatuses = new Set<CompanyRelationshipStatus>(['contacted','engaged','opportunity','customer'])
 const opportunityStages: CompanyOpportunityStage[] = ['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation','closed-won','closed-lost','nurture']
 const activeOpportunityStages = new Set<CompanyOpportunityStage>(['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation'])
 const opportunityRank: Record<CompanyOpportunityStage,number> = {
   'lead':0,'qualified':1,'demo-scheduled':2,'demo-complete':3,'proposal':4,'negotiation':5,
   'closed-won':6,'nurture':-1,'closed-lost':-2,
 }
-const relationshipRank: Record<CompanyRelationshipStatus, number> = {
-  'uncontacted':0,
-  'researching':1,
-  'outreach-planned':2,
-  'contacted':3,
-  'engaged':4,
-  'opportunity':5,
-  'customer':6,
-  'not-pursuing':-1,
-}
-
-function familyRelationshipStatus(members: CompanyAdminProfile[]): CompanyRelationshipStatus {
-  const active = members.filter(member => member.relationship_status !== 'not-pursuing')
-  if (!active.length) return 'not-pursuing'
-  return [...active].sort((a,b) => relationshipRank[b.relationship_status] - relationshipRank[a.relationship_status])[0].relationship_status
-}
-
-
 function human(value: string): string {
   return value.replaceAll('_',' ').replaceAll('-',' ').replace(/(^|\s)\S/g, match => match.toUpperCase())
 }
@@ -101,7 +82,7 @@ type FamilyRow = {
   publicContracts: number
   contacts: number
   activities: number
-  relationshipStatus: CompanyRelationshipStatus
+  accountClassification: CompanySalesAccountClassification
   nextActionDate: string | null
   research: CompanyResearchQueueItem | null
   openOpportunities: number
@@ -125,7 +106,7 @@ export function AdminCompaniesPage() {
   const [salesAccountMembers, setSalesAccountMembers] = useState<CompanySalesAccountMember[]>([])
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [relationship, setRelationship] = useState('ALL')
+  const [classification, setClassification] = useState('ALL')
   const [salesStageFilter, setSalesStageFilter] = useState('ALL')
   const [gap, setGap] = useState('ALL')
 
@@ -235,7 +216,6 @@ export function AdminCompaniesPage() {
     )
     const mostAdvancedOpportunity=[...familyOpportunities].sort((a,b)=>opportunityRank[b.stage]-opportunityRank[a.stage] || String(b.updated_at??'').localeCompare(String(a.updated_at??'')))[0] ?? null
     const salesDates=[
-      ...members.map(member=>member.next_action_date),
       ...activeFamilyOpportunities.map(opportunity=>opportunity.next_action_date),
       ...familyTasks.map(task=>task.due_at?.slice(0,10)??null),
     ].filter((value): value is string=>Boolean(value)).sort()
@@ -255,7 +235,7 @@ export function AdminCompaniesPage() {
       publicContracts:publicRows.reduce((sum,firm)=>sum+firm.observed_contract_count,0),
       contacts:familyContacts,
       activities:familyActivities,
-      relationshipStatus:familyRelationshipStatus(members),
+      accountClassification:account.account_classification,
       research:queue.find(item=>item.sales_account_id===account.sales_account_id) ?? queueById.get(account.primary_company_id) ?? null,
       openOpportunities:activeFamilyOpportunities.length,
       pipelineArr:activeFamilyOpportunities.reduce((sum,opportunity)=>sum+(opportunity.estimated_arr??0),0),
@@ -272,7 +252,7 @@ export function AdminCompaniesPage() {
   const filteredFamilies = useMemo(() => {
     const needle = search.trim().toLowerCase()
     return families.filter(family => {
-      if (relationship !== 'ALL' && family.relationshipStatus !== relationship) return false
+      if (classification !== 'ALL' && family.accountClassification !== classification) return false
       if (salesStageFilter !== 'ALL' && family.salesStage !== salesStageFilter) return false
       if (gap !== 'ALL' && !family.missing.some(value => value.toLowerCase() === gap.toLowerCase())) return false
       if (!needle) return true
@@ -284,19 +264,19 @@ export function AdminCompaniesPage() {
         family.master.headquarters_address,
         family.master.headquarters_city,
         family.master.company_type,
-        family.master.account_owner,
+        salesAccounts.find(account => account.sales_account_id===family.salesAccountId)?.account_owner,
         family.master.internal_summary,
         ...family.memberIds.map(id => profileById.get(id)?.canonical_name),
       ].filter(Boolean).join(' ').toLowerCase()
       return haystack.includes(needle)
     })
-  }, [families, relationship, salesStageFilter, gap, search, profileById])
+  }, [families, classification, salesStageFilter, gap, search, profileById])
 
   const today = new Date().toISOString().slice(0,10)
   const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().slice(0,10)
-  const overdue = families.filter(family => family.nextActionDate && family.nextActionDate < today && !['customer','not-pursuing'].includes(family.relationshipStatus))
+  const overdue = families.filter(family => family.nextActionDate && family.nextActionDate < today && !['customer','do-not-pursue'].includes(family.accountClassification))
   const upcoming = families.filter(family => family.nextActionDate && family.nextActionDate >= today && family.nextActionDate <= nextWeek)
-  const pipeline = families.filter(family => pipelineStatuses.has(family.relationshipStatus))
+  const pipeline = families.filter(family => family.openOpportunities > 0)
   const explicitAliases = profiles.filter(profile => profile.rollup_company_id).length
   const parentsRecorded = families.filter(family => family.parentName).length
   const fullyEnriched = families.filter(family => family.missing.length === 0).length
@@ -311,9 +291,9 @@ export function AdminCompaniesPage() {
     ['Active contact', families.filter(family => family.contacts > 0).length],
   ] as const, [families])
 
-  const pipelineCounts = useMemo(() => statuses.map(status => [
-    status,
-    families.filter(family => family.relationshipStatus === status).length,
+  const accountClassificationCounts = useMemo(() => accountClassifications.map(value => [
+    value,
+    families.filter(family => family.accountClassification === value).length,
   ] as const), [families])
 
   const familyByMemberId = useMemo(() => {
@@ -444,8 +424,8 @@ export function AdminCompaniesPage() {
       </section>
 
       <section className="admin-company-card">
-        <div className="admin-company-card-heading"><div><strong>CRM pipeline</strong><span>Current master-family relationship state</span></div></div>
-        <div className="admin-pipeline-grid">{pipelineCounts.map(([status,count]) => <article key={status}><small>{human(status)}</small><strong>{number.format(count)}</strong></article>)}</div>
+        <div className="admin-company-card-heading"><div><strong>Account classification</strong><span>Authoritative master sales-account state</span></div></div>
+        <div className="admin-pipeline-grid">{accountClassificationCounts.map(([value,count]) => <article key={value}><small>{human(value)}</small><strong>{number.format(count)}</strong></article>)}</div>
       </section>
     </div>
 
@@ -455,7 +435,7 @@ export function AdminCompaniesPage() {
         <div className="admin-company-activity-list">
           {attentionFamilies.length ? attentionFamilies.map(family => <a key={family.salesAccountId} href={`#/admin-company/${encodeURIComponent(family.salesAccountId)}`}>
             <strong>{family.name}</strong>
-            <span>{family.nextActionDate || 'No date'} · {human(family.relationshipStatus)}</span>
+            <span>{family.nextActionDate || 'No date'} · {human(family.accountClassification)}</span>
             <small>{family.contacts} active contact{family.contacts===1?'':'s'} · {family.activities} interaction{family.activities===1?'':'s'}</small>
           </a>) : <span className="company-admin-empty">No company follow-ups are due in the next seven days.</span>}
         </div>
@@ -478,7 +458,7 @@ export function AdminCompaniesPage() {
         <div><strong>Company family directory</strong><span>{number.format(filteredFamilies.length)} of {number.format(families.length)} reviewed master families</span></div>
         <div className="admin-family-filters">
           <input aria-label="Admin company search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search family, parent, website, owner or notes…" />
-          <select aria-label="Admin relationship filter" value={relationship} onChange={event => setRelationship(event.target.value)}><option value="ALL">All account statuses</option>{statuses.map(status => <option key={status} value={status}>{human(status)}</option>)}</select>
+          <select aria-label="Admin account classification filter" value={classification} onChange={event => setClassification(event.target.value)}><option value="ALL">All account classifications</option>{accountClassifications.map(value => <option key={value} value={value}>{human(value)}</option>)}</select>
           <select aria-label="Admin deal stage filter" value={salesStageFilter} onChange={event => setSalesStageFilter(event.target.value)}><option value="ALL">All deal stages</option>{opportunityStages.map(stage => <option key={stage} value={stage}>{human(stage)}</option>)}</select>
           <select aria-label="Admin enrichment gap filter" value={gap} onChange={event => setGap(event.target.value)}><option value="ALL">All enrichment states</option><option value="website">Missing website</option><option value="HQ">Missing HQ</option><option value="company type">Missing company type</option><option value="ownership">Missing ownership</option><option value="revenue">Missing revenue</option><option value="identity source">Missing identity source</option><option value="contact">Missing contact</option></select>
         </div>
@@ -490,7 +470,7 @@ export function AdminCompaniesPage() {
           <td><strong>{number.format(family.memberCount)}</strong><small>{number.format(family.publicIdentityCount)} in public Known Firms</small></td>
           <td><strong>{number.format(family.publicObservations)} observations</strong><small>{number.format(family.servicedRelationships)} serviced relationships · {number.format(family.towerAccountLinks)} tower links · {number.format(family.publicContracts)} contracts</small></td>
           <td><strong>{number.format(family.contacts)} contacts</strong><small>{number.format(family.activities)} logged interactions</small></td>
-          <td><span className="admin-status-chip">{family.salesStage ? human(family.salesStage) : human(family.relationshipStatus)}</span><small>{family.openOpportunities} open deal{family.openOpportunities===1?'':'s'} · {family.pipelineArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})} ARR</small><small>{family.salesOpenTasks} open task{family.salesOpenTasks===1?'':'s'}{family.salesNextStep ? ` · ${family.salesNextStep}` : ''}</small></td>
+          <td><span className="admin-status-chip">{family.salesStage ? human(family.salesStage) : human(family.accountClassification)}</span><small>{family.openOpportunities} open deal{family.openOpportunities===1?'':'s'} · {family.pipelineArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})} ARR</small><small>{family.salesOpenTasks} open task{family.salesOpenTasks===1?'':'s'}{family.salesNextStep ? ` · ${family.salesNextStep}` : ''}</small></td>
           <td><strong>{family.research ? `${family.research.priority_score} priority` : 'Not queued'}</strong><small>{family.research ? human(family.research.status) : '—'}</small></td>
           <td>{family.missing.length ? <><strong>{family.missing.length}</strong><small>{family.missing.join(' · ')}</small></> : <span className="health-badge health-healthy">COMPLETE</span>}</td>
           <td><strong>{family.nextActionDate || '—'}</strong></td>
