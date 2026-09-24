@@ -1,0 +1,83 @@
+name: Apply demo and proposal CRM schema
+
+on:
+  push:
+    branches:
+      - ops/apply-demo-proposal-schema-20260924
+    paths:
+      - 'database/migrations/010_demo_proposal_workflow.sql'
+      - '.github/workflows/apply-demo-proposal-schema-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guard current CRM schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_accounts integer;
+          BEGIN
+            SELECT count(*) INTO v_accounts FROM public.company_sales_accounts WHERE record_status='active';
+            IF v_accounts<>90 THEN
+              RAISE EXCEPTION 'Expected 90 active reviewed master accounts, found %',v_accounts;
+            END IF;
+            IF to_regclass('public.company_sales_demos') IS NOT NULL
+              OR to_regclass('public.company_sales_proposals') IS NOT NULL THEN
+              RAISE EXCEPTION 'Demo/proposal schema already exists; stop for review';
+            END IF;
+          END $$;
+          SELECT 'DEMO_PROPOSAL_SCHEMA_PRECHECK=PASS' AS result;
+          SQL
+      - name: Apply schema
+        shell: bash
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f database/migrations/010_demo_proposal_workflow.sql
+      - name: Verify schema acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_demo_cols integer;
+            v_proposal_cols integer;
+            v_policies integer;
+            v_triggers integer;
+            v_view_rows integer;
+          BEGIN
+            SELECT count(*) INTO v_demo_cols
+            FROM information_schema.columns
+            WHERE table_schema='public' AND table_name='company_sales_demos';
+            SELECT count(*) INTO v_proposal_cols
+            FROM information_schema.columns
+            WHERE table_schema='public' AND table_name='company_sales_proposals';
+            SELECT count(*) INTO v_policies
+            FROM pg_policies
+            WHERE schemaname='public'
+              AND tablename IN ('company_sales_demos','company_sales_proposals');
+            SELECT count(*) INTO v_triggers
+            FROM information_schema.triggers
+            WHERE event_object_schema='public'
+              AND event_object_table IN ('company_sales_demos','company_sales_proposals')
+              AND trigger_name IN ('company_sales_demos_audit','company_sales_proposals_audit');
+            SELECT count(*) INTO v_view_rows FROM public.company_sales_demo_proposal_state;
+
+            IF v_demo_cols<20 OR v_proposal_cols<25 OR v_policies<>2 OR v_triggers<>2 OR v_view_rows<>90 THEN
+              RAISE EXCEPTION 'Schema acceptance failed demo_cols=% proposal_cols=% policies=% triggers=% view_rows=%',
+                v_demo_cols,v_proposal_cols,v_policies,v_triggers,v_view_rows;
+            END IF;
+          END $$;
+          SELECT 'DEMO_PROPOSAL_SCHEMA=PASS' AS result,
+                 (SELECT count(*) FROM public.company_sales_demos) AS demos,
+                 (SELECT count(*) FROM public.company_sales_proposals) AS proposals,
+                 (SELECT count(*) FROM public.company_sales_demo_proposal_state) AS active_accounts;
+          SQL
