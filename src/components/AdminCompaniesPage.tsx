@@ -211,11 +211,11 @@ export function AdminCompaniesPage() {
     return map
   },[salesAccountMembers])
 
-  const families = useMemo<FamilyRow[]>(() => salesAccounts.map(account => {
+  const families = useMemo<FamilyRow[]>(() => salesAccounts.flatMap(account => {
     const memberLinks=membersBySalesAccount.get(account.sales_account_id) ?? []
     const members=memberLinks.map(member=>profileById.get(member.company_id)).filter((profile): profile is CompanyAdminProfile => Boolean(profile))
     const master=profileById.get(account.primary_company_id) ?? members[0]
-    if(!master) return null
+    if(!master) return []
     const publicRows=members.map(member=>firmById.get(member.company_id)).filter((firm): firm is KnownFirmSummaryRecord => Boolean(firm))
     const memberIds=memberLinks.map(member=>member.company_id)
     const memberIdSet=new Set(memberIds)
@@ -238,7 +238,7 @@ export function AdminCompaniesPage() {
       ...activeFamilyOpportunities.map(opportunity=>opportunity.next_action_date),
       ...familyTasks.map(task=>task.due_at?.slice(0,10)??null),
     ].filter((value): value is string=>Boolean(value)).sort()
-    return {
+    const family:FamilyRow={
       salesAccountId:account.sales_account_id,
       masterId:account.primary_company_id,
       name:account.display_name,
@@ -263,9 +263,9 @@ export function AdminCompaniesPage() {
       salesOpenTasks:familyTasks.length,
       nextActionDate:salesDates[0] ?? null,
       missing:missingFields(master,familyContacts),
-    } satisfies FamilyRow
-  }).filter((family): family is FamilyRow=>Boolean(family))
-    .sort((a,b)=>b.publicObservations-a.publicObservations || a.name.localeCompare(b.name)),
+    }
+    return [family]
+  }).sort((a,b)=>b.publicObservations-a.publicObservations || a.name.localeCompare(b.name)),
   [salesAccounts,membersBySalesAccount,profileById,firmById,contactsByCompany,activitiesByCompany,opportunities,salesTasks,queue,queueById])
 
   const filteredFamilies = useMemo(() => {
