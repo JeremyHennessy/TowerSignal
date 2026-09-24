@@ -292,7 +292,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      const normalizedProfile = normalizeProfilePatch(profile)\n      await saveCompanyAdminProfile(companyId, canonicalName, normalizedProfile)
+      const normalizedProfile = normalizeProfilePatch(profile)
+      await saveCompanyAdminProfile(companyId, canonicalName, normalizedProfile)
       const occurredAt = new Date(activityDate).toISOString()
       await addCompanyActivity(companyId, {
         activity_type: activityType,
