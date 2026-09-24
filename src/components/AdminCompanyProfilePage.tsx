@@ -83,7 +83,7 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
     const familyActivities=activities.filter(activity=>memberIds.has(activity.company_id))
     const research=queue.find(item=>item.company_id===masterId)||null
     return {
-      profileById,firmById,selected,masterId,master,members,publicRows,familyContacts,familyActivities,research,
+      profileById,firmById,selected,masterId,master,members,memberIds:[...memberIds],publicRows,familyContacts,familyActivities,research,
       publicObservations:publicRows.reduce((sum,firm)=>sum+firm.observation_count,0),
       servicedRelationships:publicRows.reduce((sum,firm)=>sum+firm.serviced_site_count,0),
       towerAccountLinks:publicRows.reduce((sum,firm)=>sum+firm.tower_account_count,0),
@@ -158,7 +158,7 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
       </section>
     </div>
 
-    <CompanySalesCrmPanel companyId={model.masterId} companyIds={model.members.map(member => member.company_id)} companyName={model.master.rollup_name || model.master.legal_name || model.master.canonical_name} />
+    <CompanySalesCrmPanel companyId={model.masterId} companyIds={model.memberIds} companyName={model.master.rollup_name || model.master.legal_name || model.master.canonical_name} />
     <CompanyAdminPanel companyId={model.selected.company_id} canonicalName={model.selected.canonical_name} />
     <CompanyFamilyPanel companyId={model.selected.company_id} />
     <CompanyAuditHistory companyId={model.selected.company_id} />
