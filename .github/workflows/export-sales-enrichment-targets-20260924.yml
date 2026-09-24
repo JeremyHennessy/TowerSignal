@@ -177,6 +177,22 @@ jobs:
           print('SALES_ENRICHMENT_TARGETS=PASS eligible=',len(eligible),'top=',len(output['targets']))
           for r in output['targets'][:100]:
               print(r['sales_account_id'],r['fit_score'],r['readiness_score'],r['enrichment_priority'],r['display_name'],','.join(r['missing_fields']))
+          for inspect_id in ['sales-account-514566217eb977e25173','sales-account-bdfd5db8edcf63c3621b']:
+              acct=next((a for a in private['accounts'] if a['sales_account_id']==inspect_id),None)
+              if not acct: continue
+              print('ACCOUNT_DIAGNOSTIC',inspect_id,acct['display_name'])
+              for m in members.get(inspect_id,[]):
+                  f=firms.get(m['company_id'])
+                  print('MEMBER',m['company_id'],'PUBLIC' if f else 'PRIVATE_ONLY',json.dumps({
+                    'name': f.get('display_name') if f else profiles.get(m['company_id'],{}).get('canonical_name'),
+                    'roles': f.get('roles',[]) if f else [],
+                    'categories': f.get('service_categories',[]) if f else [],
+                    'serviced': f.get('serviced_site_count',0) if f else 0,
+                    'towers': f.get('tower_account_count',0) if f else 0,
+                    'contracts': f.get('observed_contract_count',0) if f else 0,
+                    'buyers': f.get('observed_customer_count',0) if f else 0,
+                    'observations': f.get('observation_count',0) if f else 0,
+                  },sort_keys=True))
           PY
 
       - name: Upload ranked enrichment targets
