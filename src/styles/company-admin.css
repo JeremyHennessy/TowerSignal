@@ -200,11 +200,23 @@
 }
 
 .company-admin-inline-form.activity-form {
-  grid-template-columns: 0.7fr 1.2fr 1fr 0.9fr;
+  grid-template-columns: 0.7fr 1.1fr 1fr 1.15fr 1fr 0.9fr;
 }
 
 .company-admin-inline-form.activity-form textarea {
-  grid-column: 1 / 4;
+  grid-column: 1 / 6;
+}
+
+.company-admin-contact-editor {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(23, 72, 82, 0.1);
+}
+
+.company-admin-list > div > button {
+  margin-top: 7px;
 }
 
 .company-admin-list,
