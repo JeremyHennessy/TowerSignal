@@ -12,6 +12,7 @@ import { CompanyAdminWorkspace } from './CompanyAdminWorkspace'
 const number = new Intl.NumberFormat('en-US')
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 const PAGE_SIZE = 50
+const crmStatuses = ['uncontacted','researching','outreach-planned','contacted','engaged','opportunity','customer','not-pursuing'] as const
 
 type SortKey =
   | 'canonical_name'
@@ -108,6 +109,8 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
   const [relationship, setRelationship] = useState('ALL')
   const [confidence, setConfidence] = useState('ALL')
   const [activity, setActivity] = useState('ALL')
+  const [crmStatus, setCrmStatus] = useState('ALL')
+  const [adminGap, setAdminGap] = useState('ALL')
   const [sort, setSort] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'serviced_site_count', direction: 'desc' })
   const [page, setPage] = useState(0)
 
@@ -141,13 +144,28 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
   const roles = useMemo(() => payload ? [...new Set(payload.firms.flatMap(firm => firm.roles))].sort() : [], [payload])
   const filtered = useMemo(() => payload ? payload.firms.filter(firm => {
     const query = search.trim().toLowerCase()
+    const profile = adminByCompanyId.get(firm.firm_id)
+    const privateSearch = adminAccess && profile ? [
+      profile.legal_name,
+      profile.rollup_name,
+      profile.website,
+      profile.parent_company_name,
+      profile.headquarters_address,
+      profile.headquarters_city,
+      profile.headquarters_region,
+      profile.headquarters_country,
+      profile.company_type,
+      profile.account_owner,
+      profile.internal_summary,
+    ] : []
     const haystack = [
       firm.canonical_name,
       firm.normalized_name,
       ...firm.roles,
       ...firm.source_classes,
       ...firm.service_categories,
-    ].join(' ').toLowerCase()
+      ...privateSearch,
+    ].filter(Boolean).join(' ').toLowerCase()
     if (query && !haystack.includes(query)) return false
     if (role !== 'ALL' && !firm.roles.includes(role)) return false
     if (relationship === 'SERVICED' && firm.serviced_site_count === 0) return false
@@ -156,15 +174,24 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
     if (relationship === 'RELATED' && firm.observed_site_count === 0) return false
     if (confidence !== 'ALL' && firm.identity_confidence !== confidence) return false
     if (activity === 'RECENT' && !firm.active_last_12m) return false
+    if (adminAccess && crmStatus !== 'ALL' && profile?.relationship_status !== crmStatus) return false
+    if (adminAccess && adminGap === 'WEBSITE' && profile?.website) return false
+    if (adminAccess && adminGap === 'HQ' && profile?.headquarters_address) return false
+    if (adminAccess && adminGap === 'REVENUE' && (profile?.revenue_amount != null || profile?.revenue_low != null || profile?.revenue_high != null)) return false
+    if (adminAccess && adminGap === 'PARENT' && (profile?.parent_company_id || profile?.parent_company_name)) return false
+    if (adminAccess && adminGap === 'FOLLOWUP') {
+      const needsFollowup = profile && ['contacted','engaged','opportunity'].includes(profile.relationship_status) && !profile.next_action_date
+      if (!needsFollowup) return false
+    }
     return true
-  }) : [], [payload, search, role, relationship, confidence, activity])
+  }) : [], [payload, search, role, relationship, confidence, activity, adminAccess, adminByCompanyId, crmStatus, adminGap])
 
   const sorted = useMemo(() => [...filtered].sort((a, b) => {
     const result = compareValues(a[sort.key], b[sort.key]) || a.canonical_name.localeCompare(b.canonical_name)
     return sort.direction === 'asc' ? result : -result
   }), [filtered, sort])
 
-  useEffect(() => { setPage(0) }, [search, role, relationship, confidence, activity, sort])
+  useEffect(() => { setPage(0) }, [search, role, relationship, confidence, activity, crmStatus, adminGap, sort])
   const maxPage = Math.max(0, Math.ceil(sorted.length / PAGE_SIZE) - 1)
   const activePage = Math.min(page, maxPage)
   const visible = useMemo(
@@ -186,6 +213,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         {adminAccess && <span className="company-admin-directory-badge">Admin company database · private fields enabled</span>}
         <p>One normalized list of every company or firm TowerSignal can support from public evidence: service providers, laboratories, procurement vendors, DEC 7G businesses and DOB project-role firms.</p>
       </div>
+      {adminAccess && <div className="page-actions"><a className="secondary-link-button" href="#/service">Service operations</a></div>}
     </div>
 
     {error && <div className="reference-empty-state"><strong>Known-company intelligence is unavailable.</strong><span>{error}</span><span>TowerSignal will not substitute disconnected provider or vendor lists when the normalized dataset is missing.</span></div>}
@@ -239,6 +267,18 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
           <option value="VERIFY">Verify</option>
           <option value="UNRESOLVED">Unresolved</option>
         </select>
+        {adminAccess && <select aria-label="CRM relationship status" value={crmStatus} onChange={event => setCrmStatus(event.target.value)}>
+          <option value="ALL">All CRM statuses</option>
+          {crmStatuses.map(value => <option key={value} value={value}>{relationshipLabel(value)}</option>)}
+        </select>}
+        {adminAccess && <select aria-label="Private enrichment gap" value={adminGap} onChange={event => setAdminGap(event.target.value)}>
+          <option value="ALL">All enrichment states</option>
+          <option value="WEBSITE">Website not recorded</option>
+          <option value="HQ">HQ address not recorded</option>
+          <option value="REVENUE">Revenue not recorded</option>
+          <option value="PARENT">Parent not recorded</option>
+          <option value="FOLLOWUP">Contacted · no next action</option>
+        </select>}
       </div>
 
       {sorted.length === 0 ? <div className="empty-state"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className="table-scroll"><table className="account-table known-firms-master-table"><thead><tr>
