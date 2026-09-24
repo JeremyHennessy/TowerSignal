@@ -558,8 +558,10 @@ export async function loadAllCompanySalesOpportunities(): Promise<CompanySalesOp
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(opportunityFrom)
 }
 
-export async function loadCompanySalesOpportunities(companyId: string): Promise<CompanySalesOpportunity[]> {
-  const result = await client.from('company_private_opportunities').select('*').eq('company_id',companyId).order('updated_at',{ascending:false})
+export async function loadCompanySalesOpportunities(companyId: string, salesAccountId?: string | null): Promise<CompanySalesOpportunity[]> {
+  let query=client.from('company_private_opportunities').select('*')
+  query=salesAccountId ? query.eq('sales_account_id',salesAccountId) : query.eq('company_id',companyId)
+  const result=await query.order('updated_at',{ascending:false})
   throwIfError('Unable to load company sales opportunities', result.error)
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(opportunityFrom)
 }
@@ -568,9 +570,10 @@ export async function saveCompanySalesOpportunity(
   opportunityId: string,
   companyId: string,
   values: Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
+  salesAccountId?: string | null,
 ): Promise<CompanySalesOpportunity> {
   const now=new Date().toISOString()
-  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
+  const resolvedSalesAccountId=salesAccountId ?? await salesAccountIdForCompany(companyId)
   const change={...values,sales_account_id:resolvedSalesAccountId,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
   const update=await client.from('company_private_opportunities').update(change).eq('opportunity_id',opportunityId).eq('company_id',companyId).select('*')
   throwIfError('Unable to update TowerSignal sales opportunity', update.error)
@@ -586,8 +589,9 @@ export async function saveCompanySalesOpportunity(
 export async function addCompanySalesOpportunity(
   companyId:string,
   values:Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
+  salesAccountId?:string|null,
 ):Promise<CompanySalesOpportunity>{
-  return saveCompanySalesOpportunity(crypto.randomUUID(),companyId,values)
+  return saveCompanySalesOpportunity(crypto.randomUUID(),companyId,values,salesAccountId)
 }
 
 export async function loadAllCompanySalesTasks(): Promise<CompanySalesTask[]> {
@@ -596,8 +600,10 @@ export async function loadAllCompanySalesTasks(): Promise<CompanySalesTask[]> {
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(taskFrom)
 }
 
-export async function loadCompanySalesTasks(companyId:string): Promise<CompanySalesTask[]> {
-  const result=await client.from('company_private_tasks').select('*').eq('company_id',companyId).order('due_at',{ascending:true})
+export async function loadCompanySalesTasks(companyId:string,salesAccountId?:string|null): Promise<CompanySalesTask[]> {
+  let query=client.from('company_private_tasks').select('*')
+  query=salesAccountId ? query.eq('sales_account_id',salesAccountId) : query.eq('company_id',companyId)
+  const result=await query.order('due_at',{ascending:true})
   throwIfError('Unable to load company sales tasks',result.error)
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(taskFrom)
 }
@@ -606,9 +612,10 @@ export async function saveCompanySalesTask(
   taskId:string,
   companyId:string,
   values:Omit<CompanySalesTask,'task_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
+  salesAccountId?:string|null,
 ):Promise<CompanySalesTask>{
   const now=new Date().toISOString()
-  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
+  const resolvedSalesAccountId=salesAccountId ?? await salesAccountIdForCompany(companyId)
   const change={...values,sales_account_id:resolvedSalesAccountId,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
   const update=await client.from('company_private_tasks').update(change).eq('task_id',taskId).eq('company_id',companyId).select('*')
   throwIfError('Unable to update TowerSignal sales task',update.error)
@@ -624,6 +631,7 @@ export async function saveCompanySalesTask(
 export async function addCompanySalesTask(
   companyId:string,
   values:Omit<CompanySalesTask,'task_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
+  salesAccountId?:string|null,
 ):Promise<CompanySalesTask>{
-  return saveCompanySalesTask(crypto.randomUUID(),companyId,values)
+  return saveCompanySalesTask(crypto.randomUUID(),companyId,values,salesAccountId)
 }
