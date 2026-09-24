@@ -8,9 +8,6 @@ import { formatDate, signalLabel } from '../domain/labels'
 import { ShareButton } from './ShareButton'
 import { FirmSiteMap } from './FirmSiteMap'
 import { StatusBadge } from './StatusBadge'
-import { CompanyAdminPanel } from './CompanyAdminPanel'
-import { CompanyFamilyPanel } from './CompanyFamilyPanel'
-import { CompanyAuditHistory } from './CompanyAuditHistory'
 
 const number = new Intl.NumberFormat('en-US')
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -287,10 +284,6 @@ export function CompanyProfilePage({
       <article><span className="reference-metric-icon warning">$</span><div><small>Observed public value</small><strong>{firm.observed_contract_value ? currency.format(firm.observed_contract_value) : '—'}</strong><span>Source-reported values · not revenue</span></div></article>
       <article><span className="reference-metric-icon">7G</span><div><small>Active 7G registrations</small><strong>{number.format(firm.active_qualification_count)}</strong><span>{number.format(firm.qualification_count)} observed registrations</span></div></article>
     </div>
-
-    <CompanyAdminPanel companyId={firm.firm_id} canonicalName={firm.canonical_name} />
-    <CompanyFamilyPanel companyId={firm.firm_id} />
-    <CompanyAuditHistory companyId={firm.firm_id} />
 
     <section className="reference-table-card firm-site-workspace">
       <div className="reference-table-heading firm-site-workspace-heading">
