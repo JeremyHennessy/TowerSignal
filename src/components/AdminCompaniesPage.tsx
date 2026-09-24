@@ -271,7 +271,7 @@ export function AdminCompaniesPage() {
       ].filter(Boolean).join(' ').toLowerCase()
       return haystack.includes(needle)
     })
-  }, [families, classification, salesStageFilter, gap, search, profileById])
+  }, [families, classification, salesStageFilter, gap, search, profileById, salesAccounts])
 
   const explicitAliases = profiles.filter(profile => profile.rollup_company_id).length
   const parentsRecorded = families.filter(family => family.parentName).length
