@@ -12,6 +12,8 @@ import type {
   CompanySalesTask,
   CompanySalesAccount,
   CompanySalesAccountMember,
+  CompanyRollupSuggestion,
+  CompanyRollupSuggestionStatus,
   CompanyResearchStatus,
 } from '../types/companyAdmin'
 
@@ -634,4 +636,81 @@ export async function addCompanySalesTask(
   salesAccountId?:string|null,
 ):Promise<CompanySalesTask>{
   return saveCompanySalesTask(crypto.randomUUID(),companyId,values,salesAccountId)
+}
+
+
+function rollupSuggestionFrom(row:Record<string,unknown>):CompanyRollupSuggestion{
+  return {
+    suggestion_id:String(row.suggestion_id),
+    candidate_sales_account_id:String(row.candidate_sales_account_id),
+    suggested_sales_account_id:String(row.suggested_sales_account_id),
+    score:Number(row.score ?? 0),
+    confidence:String(row.confidence ?? 'low') as CompanyRollupSuggestion['confidence'],
+    evidence:Array.isArray(row.evidence)?row.evidence.map(String):[],
+    status:String(row.status ?? 'pending') as CompanyRollupSuggestion['status'],
+    generated_at:String(row.generated_at ?? ''),
+    updated_at:String(row.updated_at ?? ''),
+    reviewed_at:nullableString(row.reviewed_at),
+    reviewed_by:nullableString(row.reviewed_by),
+    review_note:nullableString(row.review_note),
+  }
+}
+
+export async function loadCompanyRollupSuggestions(status?:CompanyRollupSuggestionStatus):Promise<CompanyRollupSuggestion[]>{
+  let query=client.from('company_rollup_suggestions').select('*')
+  if(status) query=query.eq('status',status)
+  const result=await query.order('score',{ascending:false}).order('generated_at',{ascending:false})
+  throwIfError('Unable to load roll-up review queue',result.error)
+  return ((result.data ?? []) as Array<Record<string,unknown>>).map(rollupSuggestionFrom)
+}
+
+export async function syncCompanyRollupSuggestions(candidates:Array<Pick<
+  CompanyRollupSuggestion,
+  'suggestion_id'|'candidate_sales_account_id'|'suggested_sales_account_id'|'score'|'confidence'|'evidence'
+>>):Promise<void>{
+  const existing=await loadCompanyRollupSuggestions()
+  const existingByPair=new Map(existing.map(item=>[
+    `${item.candidate_sales_account_id}::${item.suggested_sales_account_id}`,
+    item,
+  ]))
+  for(const candidate of candidates){
+    const key=`${candidate.candidate_sales_account_id}::${candidate.suggested_sales_account_id}`
+    const current=existingByPair.get(key)
+    if(current && current.status!=='pending') continue
+    if(current){
+      const update=await client.from('company_rollup_suggestions').update({
+        score:candidate.score,
+        confidence:candidate.confidence,
+        evidence:candidate.evidence,
+        generated_at:new Date().toISOString(),
+        updated_at:new Date().toISOString(),
+      }).eq('suggestion_id',current.suggestion_id).select('suggestion_id')
+      throwIfError('Unable to refresh roll-up suggestion',update.error)
+      continue
+    }
+    const insert=await client.from('company_rollup_suggestions').insert({
+      ...candidate,
+      status:'pending',
+      generated_at:new Date().toISOString(),
+      updated_at:new Date().toISOString(),
+    }).select('suggestion_id')
+    throwIfError('Unable to add roll-up suggestion',insert.error)
+  }
+}
+
+export async function reviewCompanyRollupSuggestion(
+  suggestionId:string,
+  status:Extract<CompanyRollupSuggestionStatus,'accepted'|'rejected'|'not-same'>,
+  reviewNote?:string|null,
+):Promise<CompanyRollupSuggestion>{
+  const result=await client.from('company_rollup_suggestions').update({
+    status,
+    review_note:reviewNote?.trim()||null,
+    reviewed_at:new Date().toISOString(),
+    updated_at:new Date().toISOString(),
+  }).eq('suggestion_id',suggestionId).eq('status','pending').select('*')
+  throwIfError('Unable to review roll-up suggestion',result.error)
+  const row=((result.data ?? []) as Array<Record<string,unknown>>)[0]
+  if(!row) throw new Error('Unable to review roll-up suggestion: pending row was not returned')
+  return rollupSuggestionFrom(row)
 }
