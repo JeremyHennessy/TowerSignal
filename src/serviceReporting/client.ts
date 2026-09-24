@@ -14,6 +14,7 @@ import type {
   ServiceSite,
   ServiceVisit,
   ServiceWorkspace,
+  ServiceOperationsOverview,
 } from '../types/serviceReporting'
 
 const DEFAULT_AUTH_URL = 'https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth'
@@ -269,4 +270,34 @@ export async function ensureServiceReport(serviceSiteId: string, visitId: string
   const created = rows<ServiceReport>(result.data)[0]
   if (!created) throw new Error('Unable to create service report: row was not returned')
   return created
+}
+
+
+export async function loadServiceOperationsOverview(): Promise<ServiceOperationsOverview> {
+  const results = await Promise.all([
+    client.from('service_clients').select('*').order('name', { ascending:true }),
+    client.from('service_portfolios').select('*').order('name', { ascending:true }),
+    client.from('service_sites').select('*').order('updated_at', { ascending:false }),
+    client.from('service_assets').select('*').order('updated_at', { ascending:false }),
+    client.from('service_agreements').select('*').order('updated_at', { ascending:false }),
+    client.from('service_visits').select('*').order('scheduled_for', { ascending:false }),
+    client.from('service_measurements').select('*').order('measured_at', { ascending:false }),
+    client.from('service_actions').select('*').order('created_at', { ascending:false }),
+    client.from('service_reports').select('*').order('created_at', { ascending:false }),
+    client.from('service_documents').select('*').order('created_at', { ascending:false }),
+  ])
+  const labels = ['clients','portfolios','sites','assets','agreements','visits','measurements','actions','reports','documents']
+  results.forEach((result,index)=>throwIfError(`Unable to load service ${labels[index]}`, result.error))
+  return {
+    clients:rows<ServiceClient>(results[0].data),
+    portfolios:rows<ServicePortfolio>(results[1].data),
+    sites:rows<ServiceSite>(results[2].data),
+    assets:rows<ServiceAsset>(results[3].data),
+    agreements:rows<ServiceAgreement>(results[4].data),
+    visits:rows<ServiceVisit>(results[5].data),
+    measurements:rows<ServiceMeasurement>(results[6].data),
+    actions:rows<ServiceAction>(results[7].data),
+    reports:rows<ServiceReport>(results[8].data),
+    documents:rows<ServiceDocument>(results[9].data),
+  }
 }
