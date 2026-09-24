@@ -107,7 +107,24 @@ class KnownFirmsTests(unittest.TestCase):
         details = {
             "sys-1": {"dob_activity_history": [shared_dob], "legacy_dob_project_context": None},
             "sys-2": {"dob_activity_history": [shared_dob], "legacy_dob_project_context": None},
-            "sys-3": {"dob_activity_history": [], "legacy_dob_project_context": None},
+            "sys-3": {
+                "dob_activity_history": [],
+                "legacy_dob_project_context": None,
+                "nyc_building_water_signals": {
+                    "dob_water_permits": [
+                        {
+                            "activity_id": "water-permit-1",
+                            "source_record_id": "DOB-WATER-1",
+                            "job_filing_number": "B001",
+                            "issued_date": "2026-04-15",
+                            "approved_date": "2026-04-01",
+                            "bbl": "3000010001",
+                            "bin": "2000001",
+                            "applicant_business_raw": "G.C. Environmental, Inc",
+                        }
+                    ]
+                },
+            },
         }
         return systems, companies, domestic, procurement, details
 
@@ -153,6 +170,28 @@ class KnownFirmsTests(unittest.TestCase):
         self.assertEqual(len(detail["site_relationships"]), 1)
         self.assertFalse(detail["site_relationships"][0]["serviced"])
         self.assertTrue(detail["site_relationships"][0]["project_role"])
+
+    def test_attached_building_water_permit_applicant_is_included_as_project_role(self):
+        systems, companies, domestic, procurement, details = self.fixtures()
+        payload, firm_details = build_known_firms(
+            systems_payload=systems,
+            companies_payload=companies,
+            domestic_payload=domestic,
+            procurement_payloads=[procurement],
+            details_by_system=details,
+            generated_at="2026-09-09T12:00:00Z",
+        )
+        gce = next(row for row in payload["firms"] if row["canonical_name"] == "G.C. Environmental, Inc")
+        self.assertEqual(gce["serviced_site_count"], 0)
+        self.assertEqual(gce["project_site_count"], 1)
+        self.assertEqual(gce["role_counts"]["DOB_NOW_APPLICANT_BUSINESS"], 1)
+        self.assertIn("NYC_DOB_NOW_WATER_PERMITS", gce["source_classes"])
+        site = firm_details[gce["firm_id"]]["site_relationships"][0]
+        self.assertEqual(site["site_id"], "NYC-BIN-2000001")
+        self.assertTrue(site["project_role"])
+        self.assertFalse(site["serviced"])
+        self.assertIn("DOB_NOW_APPLICANT_BUSINESS_BBL_EXACT", site["evidence_classes"])
+
 
     def test_legal_suffix_variants_remain_separate_known_firms(self):
         systems, companies, domestic, procurement, details = self.fixtures()
