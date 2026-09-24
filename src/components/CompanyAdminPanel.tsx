@@ -156,6 +156,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
   const [contactEmail, setContactEmail] = useState('')
   const [contactPhone, setContactPhone] = useState('')
   const [contactLinkedin, setContactLinkedin] = useState('')
+  const [contactRole, setContactRole] = useState<CompanyAdminContact['contact_role']>(null)
+  const [contactPrimary, setContactPrimary] = useState(false)
   const [contactSourceName, setContactSourceName] = useState('')
   const [editingContact, setEditingContact] = useState<CompanyAdminContact | null>(null)
   const [contactSourceUrl, setContactSourceUrl] = useState('')
@@ -240,6 +242,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
         phone: text(contactPhone),
         linkedin_url: text(contactLinkedin),
         notes: null,
+        contact_role: contactRole,
+        primary_contact: contactPrimary,
         source_name: text(contactSourceName),
         source_url: text(contactSourceUrl),
         verified_at: contactVerifiedAt ? new Date(contactVerifiedAt).toISOString() : null,
@@ -250,6 +254,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
       setContactEmail('')
       setContactPhone('')
       setContactLinkedin('')
+      setContactRole(null)
+      setContactPrimary(false)
       setContactSourceName('')
       setContactSourceUrl('')
       setContactVerifiedAt('')
@@ -273,6 +279,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
         phone: text(editingContact.phone ?? ''),
         linkedin_url: text(editingContact.linkedin_url ?? ''),
         notes: text(editingContact.notes ?? ''),
+        contact_role: editingContact.contact_role,
+        primary_contact: editingContact.primary_contact,
         source_name: text(editingContact.source_name ?? ''),
         source_url: text(editingContact.source_url ?? ''),
         verified_at: editingContact.verified_at,
@@ -451,6 +459,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
           <input aria-label="Contact email" type="email" value={contactEmail} onChange={event => setContactEmail(event.target.value)} placeholder="Email" />
           <input aria-label="Contact phone" value={contactPhone} onChange={event => setContactPhone(event.target.value)} placeholder="Phone" />
           <input aria-label="Contact LinkedIn" type="url" value={contactLinkedin} onChange={event => setContactLinkedin(event.target.value)} placeholder="LinkedIn URL" />
+          <select aria-label="Contact role" value={contactRole ?? ''} onChange={event => setContactRole((event.target.value || null) as CompanyAdminContact['contact_role'])}><option value="">Buying role</option><option value="decision-maker">Decision maker</option><option value="champion">Champion</option><option value="executive">Executive</option><option value="technical">Technical</option><option value="procurement">Procurement</option><option value="finance">Finance</option><option value="other">Other</option></select>
+          <label><input aria-label="Primary contact" type="checkbox" checked={contactPrimary} onChange={event => setContactPrimary(event.target.checked)} /> Primary</label>
           <button onClick={addContact} disabled={busy || !contactName.trim()}>Add contact</button>
         </div>
         <div className="company-admin-inline-form">
@@ -458,7 +468,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
           <input aria-label="Contact source URL" type="url" value={contactSourceUrl} onChange={event => setContactSourceUrl(event.target.value)} placeholder="Source URL" />
           <input aria-label="Contact verified at" type="datetime-local" value={contactVerifiedAt} onChange={event => setContactVerifiedAt(event.target.value)} />
         </div>
-        <div className="company-admin-list">{contacts.length ? contacts.map(contact => <div key={contact.contact_id}><strong>{contact.name}</strong><span>{[contact.title, contact.email, contact.phone].filter(Boolean).join(' · ') || 'No contact detail'}</span>{contact.linkedin_url && <a href={contact.linkedin_url} target="_blank" rel="noreferrer">LinkedIn ↗</a>}{contact.source_name && <small>{contact.source_name}{contact.verified_at ? ' · verified ' + new Date(contact.verified_at).toLocaleDateString() : ''}</small>}<button type="button" onClick={() => setEditingContact({ ...contact })}>Edit contact</button></div>) : <span className="company-admin-empty">No private contacts recorded.</span>}</div>
+        <div className="company-admin-list">{contacts.length ? contacts.map(contact => <div key={contact.contact_id}><strong>{contact.name}{contact.primary_contact ? ' · Primary' : ''}</strong><span>{[contact.title, contact.contact_role ? relationshipLabel(contact.contact_role) : null, contact.email, contact.phone].filter(Boolean).join(' · ') || 'No contact detail'}</span>{contact.linkedin_url && <a href={contact.linkedin_url} target="_blank" rel="noreferrer">LinkedIn ↗</a>}{contact.source_name && <small>{contact.source_name}{contact.verified_at ? ' · verified ' + new Date(contact.verified_at).toLocaleDateString() : ''}</small>}<button type="button" onClick={() => setEditingContact({ ...contact })}>Edit contact</button></div>) : <span className="company-admin-empty">No private contacts recorded.</span>}</div>
         {editingContact && <div className="company-admin-contact-editor">
           <div className="company-admin-card-heading"><strong>Edit contact</strong><span>{editingContact.name}</span></div>
           <div className="company-admin-inline-form">
@@ -467,6 +477,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
             <input aria-label="Edit contact email" type="email" value={editingContact.email ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, email:event.target.value }) : value)} placeholder="Email" />
             <input aria-label="Edit contact phone" value={editingContact.phone ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, phone:event.target.value }) : value)} placeholder="Phone" />
             <input aria-label="Edit contact LinkedIn" type="url" value={editingContact.linkedin_url ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, linkedin_url:event.target.value }) : value)} placeholder="LinkedIn URL" />
+            <select aria-label="Edit contact role" value={editingContact.contact_role ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, contact_role:(event.target.value || null) as CompanyAdminContact['contact_role'] }) : value)}><option value="">Buying role</option><option value="decision-maker">Decision maker</option><option value="champion">Champion</option><option value="executive">Executive</option><option value="technical">Technical</option><option value="procurement">Procurement</option><option value="finance">Finance</option><option value="other">Other</option></select>
+            <label><input aria-label="Edit primary contact" type="checkbox" checked={editingContact.primary_contact} onChange={event => setEditingContact(value => value ? ({ ...value, primary_contact:event.target.checked }) : value)} /> Primary</label>
           </div>
           <div className="company-admin-inline-form">
             <input aria-label="Edit contact source name" value={editingContact.source_name ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, source_name:event.target.value }) : value)} placeholder="Source name" />
