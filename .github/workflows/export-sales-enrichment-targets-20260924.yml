@@ -93,16 +93,23 @@ jobs:
               master=profiles[a['primary_company_id']]
               cs=contacts.get(a['sales_account_id'],[])
               roles={r for f in public for r in f.get('roles',[])}
-              fit=min(42,sum(role_points.get(r,0) for r in roles))
+              owner_roles={'DOB_NOW_OWNER_BUSINESS','LEGACY_DOB_OWNER_BUSINESS'}
+              commercial_corroboration={'DWT_LABORATORY','DEC_7G_REGISTERED_BUSINESS','PROCUREMENT_VENDOR'}
+              suppress_inspection=('DWT_INSPECTION_PROVIDER' in roles and bool(roles & owner_roles) and not bool(roles & commercial_corroboration))
+              scored_roles={r for r in roles if not (suppress_inspection and r=='DWT_INSPECTION_PROVIDER')}
+              fit=min(42,sum(role_points.get(r,0) for r in scored_roles))
               reasons=[]
               if fit: reasons.append('public roles')
+              if suppress_inspection: reasons.append('owner/self-inspection')
               cats=' '.join({c.lower() for f in public for c in f.get('service_categories',[])})
               if re.search(r'water treatment|cooling tower|legionella|water management|water quality',cats):
                   fit+=8; reasons.append('water/cooling-tower services')
               service_roles={'DWT_INSPECTION_PROVIDER','DWT_LABORATORY','DEC_7G_REGISTERED_BUSINESS'}
-              service_public=[f for f in public if any(r in service_roles for r in f.get('roles',[]))]
+              def counts_as_service(r):
+                  return r in service_roles and not (suppress_inspection and r=='DWT_INSPECTION_PROVIDER')
+              service_public=[f for f in public if any(counts_as_service(r) for r in f.get('roles',[]))]
               procurement_public=[f for f in public if 'PROCUREMENT_VENDOR' in f.get('roles',[])]
-              commercial_public=[f for f in public if any(r in service_roles or r=='PROCUREMENT_VENDOR' for r in f.get('roles',[]))]
+              commercial_public=[f for f in public if any(counts_as_service(r) or r=='PROCUREMENT_VENDOR' for r in f.get('roles',[]))]
               serviced=sum(f.get('serviced_site_count',0) for f in service_public)
               towers=sum(f.get('tower_account_count',0) for f in service_public)
               contracts=sum(f.get('observed_contract_count',0) for f in procurement_public)
