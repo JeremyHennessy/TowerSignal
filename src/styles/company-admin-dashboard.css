@@ -166,7 +166,7 @@
 .company-rollup-review-list{display:grid}
 .company-rollup-review-list>article{display:grid;gap:.55rem;padding:.85rem .95rem;border-top:1px solid var(--border)}
 .company-rollup-review-list>article:first-child{border-top:0}
-.company-rollup-review-main{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;gap:.65rem;align-items:center}
+.company-rollup-review-main{display:grid;grid-template-columns:minmax(240px,360px) auto minmax(240px,360px) auto;gap:.65rem;align-items:center;justify-content:start}
 .company-rollup-review-main>div:not(.company-rollup-score){display:grid;gap:.15rem}
 .company-rollup-review-main small{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em}
 .company-rollup-score{display:grid;justify-items:center;min-width:58px;padding:.45rem;border-radius:10px;background:#f1f6f5}
