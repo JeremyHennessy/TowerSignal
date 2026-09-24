@@ -1,0 +1,47 @@
+name: Export pending company roll-up review
+
+on:
+  push:
+    branches:
+      - ops/export-rollup-review-20260924
+    paths:
+      - '.github/workflows/export-rollup-review-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Export pending roll-up suggestions
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          SELECT
+            s.score,
+            s.confidence,
+            c.sales_account_id AS candidate_id,
+            c.display_name AS candidate_name,
+            t.sales_account_id AS target_id,
+            t.display_name AS target_name,
+            array_to_string(ARRAY(SELECT jsonb_array_elements_text(s.evidence)), ' | ') AS evidence
+          FROM public.company_rollup_suggestions s
+          JOIN public.company_sales_accounts c ON c.sales_account_id=s.candidate_sales_account_id
+          JOIN public.company_sales_accounts t ON t.sales_account_id=s.suggested_sales_account_id
+          WHERE s.status='pending'
+          ORDER BY s.score DESC, c.display_name, t.display_name;
+
+          SELECT
+            'ROLLUP_QUEUE_COUNTS' AS marker,
+            count(*) FILTER (WHERE status='pending') AS pending,
+            count(*) FILTER (WHERE status='accepted') AS accepted,
+            count(*) FILTER (WHERE status='not-same') AS not_same,
+            count(*) FILTER (WHERE status='rejected') AS rejected,
+            count(*) FILTER (WHERE status='superseded') AS superseded
+          FROM public.company_rollup_suggestions;
+          SQL
