@@ -202,6 +202,11 @@ jobs:
               'sales-account-7ad47acd1e4cb84f0173',
               'sales-account-9ee6fe90f7e2f96b24b2',
               'sales-account-5080cac75506426a5a2e',
+              'sales-account-4cb3500432e523a83e91',
+              'sales-account-64654024bc1a016fcfb6',
+              'sales-account-6a1295cdab60abf62952',
+              'sales-account-5dbbe58abd75da64cb84',
+              'sales-account-bdfd5db8edcf63c3621b',
           ]:
               acct=next((a for a in private['accounts'] if a['sales_account_id']==inspect_id),None)
               if not acct: continue
