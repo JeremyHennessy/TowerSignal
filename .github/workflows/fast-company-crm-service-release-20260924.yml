@@ -175,7 +175,7 @@ jobs:
           npm run build
           grep -R -Fq "Service operations" dist/assets
           grep -R -Fq "Company command center" dist/assets
-grep -R -Fq "Parent company summary" dist/assets
+          grep -R -Fq "Parent company summary" dist/assets
           grep -R -Fq "Company master & relationship record" dist/assets
           python - <<'PY'
           import hashlib, json, pathlib
@@ -269,7 +269,7 @@ grep -R -Fq "Parent company summary" dist/assets
           curl --fail --silent --show-error --location "${BASE_URL%/}/$asset" --output /tmp/towersignal-index.js
           grep -Fq "Service operations" /tmp/towersignal-index.js
           grep -Fq "Company command center" /tmp/towersignal-index.js
-grep -Fq "Parent company summary" /tmp/towersignal-index.js
+          grep -Fq "Parent company summary" /tmp/towersignal-index.js
           grep -Fq "Company master & relationship record" /tmp/towersignal-index.js
 
   rollback:
