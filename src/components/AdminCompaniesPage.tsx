@@ -246,6 +246,21 @@ export function AdminCompaniesPage() {
     families.filter(family => family.relationshipStatus === status).length,
   ] as const), [families])
 
+  const familyByMemberId = useMemo(() => {
+    const map = new Map<string, FamilyRow>()
+    families.forEach(family => family.memberIds.forEach(id => map.set(id, family)))
+    return map
+  }, [families])
+
+  const recentActivities = useMemo(() => activities
+    .map(activity => ({ activity, family: familyByMemberId.get(activity.company_id) }))
+    .filter((row): row is { activity: CompanyAdminActivity; family: FamilyRow } => Boolean(row.family))
+    .slice(0, 12), [activities, familyByMemberId])
+
+  const attentionFamilies = useMemo(() => [...overdue, ...upcoming]
+    .sort((a,b) => (a.nextActionDate || '').localeCompare(b.nextActionDate || ''))
+    .slice(0, 12), [overdue, upcoming])
+
   const parentRows = useMemo(() => {
     const map = new Map<string, {
       name: string
@@ -316,6 +331,30 @@ export function AdminCompaniesPage() {
       <section className="admin-company-card">
         <div className="admin-company-card-heading"><div><strong>CRM pipeline</strong><span>Current master-family relationship state</span></div></div>
         <div className="admin-pipeline-grid">{pipelineCounts.map(([status,count]) => <article key={status}><small>{human(status)}</small><strong>{number.format(count)}</strong></article>)}</div>
+      </section>
+    </div>
+
+    <div className="admin-company-attention-grid">
+      <section className="admin-company-card">
+        <div className="admin-company-card-heading"><div><strong>Follow-up attention</strong><span>Overdue and next-seven-day company actions</span></div><small>{number.format(overdue.length + upcoming.length)} due</small></div>
+        <div className="admin-company-activity-list">
+          {attentionFamilies.length ? attentionFamilies.map(family => <a key={family.masterId} href={`#/admin-company/${encodeURIComponent(family.masterId)}`}>
+            <strong>{family.name}</strong>
+            <span>{family.nextActionDate || 'No date'} · {human(family.relationshipStatus)}</span>
+            <small>{family.contacts} active contact{family.contacts===1?'':'s'} · {family.activities} interaction{family.activities===1?'':'s'}</small>
+          </a>) : <span className="company-admin-empty">No company follow-ups are due in the next seven days.</span>}
+        </div>
+      </section>
+
+      <section className="admin-company-card">
+        <div className="admin-company-card-heading"><div><strong>Recent CRM activity</strong><span>Latest private outreach and interaction records</span></div><small>{number.format(activities.length)} total</small></div>
+        <div className="admin-company-activity-list">
+          {recentActivities.length ? recentActivities.map(({activity,family}) => <a key={activity.activity_id} href={`#/admin-company/${encodeURIComponent(family.masterId)}`}>
+            <strong>{family.name}</strong>
+            <span>{new Date(activity.occurred_at).toLocaleString()} · {human(activity.activity_type)}</span>
+            <small>{activity.subject || activity.outcome || activity.details || 'Interaction logged'}{activity.next_action_date ? ` · next ${activity.next_action_date}` : ''}</small>
+          </a>) : <span className="company-admin-empty">No company interactions have been logged yet.</span>}
+        </div>
       </section>
     </div>
 
