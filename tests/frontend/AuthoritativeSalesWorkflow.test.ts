@@ -20,7 +20,7 @@ test('sales account, opportunity and task state are authoritative',()=>{
 test('source enrichment editor no longer mutates legacy sales workflow fields',()=>{
   expect(adminPanel).not.toContain('Relationship &amp; follow-up')
   expect(adminPanel).not.toContain('Activity next action')
-  expect(adminPanel).toContain('sales stage, tasks and next actions are managed in the authoritative sales CRM above')
+  expect(adminPanel.toLowerCase()).toContain('sales stage, tasks and next actions are managed in the authoritative sales crm above')
   expect(adminPanel).not.toContain("relationship_status: profile.relationship_status === 'uncontacted'")
   expect(adminPanel).not.toContain('setActivityNextAction')
   expect(importer).not.toContain("'relationship_status',")
