@@ -28,6 +28,7 @@ import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
 import { CompanyAdminWorkspace } from './CompanyAdminWorkspace'
 import { CompanyRollupReviewPanel } from './CompanyRollupReviewPanel'
 import { AdminSalesTodayPanel } from './AdminSalesTodayPanel'
+import { scoreCompanySalesAccount } from '../companyAdmin/scoring'
 
 const number = new Intl.NumberFormat('en-US')
 const accountClassifications: CompanySalesAccountClassification[] = [
@@ -91,6 +92,10 @@ type FamilyRow = {
   salesStage: CompanyOpportunityStage | null
   salesNextStep: string | null
   salesOpenTasks: number
+  fitScore: number
+  readinessScore: number
+  fitReasons: string[]
+  readinessReasons: string[]
   missing: string[]
 }
 
@@ -109,6 +114,7 @@ export function AdminCompaniesPage() {
   const [search, setSearch] = useState('')
   const [classification, setClassification] = useState('ALL')
   const [salesStageFilter, setSalesStageFilter] = useState('ALL')
+  const [scoreFilter, setScoreFilter] = useState('ALL')
   const [gap, setGap] = useState('ALL')
 
   const reloadPrivate = async () => {
@@ -202,7 +208,8 @@ export function AdminCompaniesPage() {
     const publicRows=members.map(member=>firmById.get(member.company_id)).filter((firm): firm is KnownFirmSummaryRecord => Boolean(firm))
     const memberIds=memberLinks.map(member=>member.company_id)
     const memberIdSet=new Set(memberIds)
-    const familyContacts=memberIds.reduce((sum,id)=>sum+(contactsByCompany.get(id)??0),0)
+    const familyContactRows=contacts.filter(contact=>memberIdSet.has(contact.company_id)&&contact.active)
+    const familyContacts=familyContactRows.length
     const familyActivities=memberIds.reduce((sum,id)=>sum+(activitiesByCompany.get(id)??0),0)
     const familyOpportunities=opportunities.filter(opportunity =>
       opportunity.sales_account_id===account.sales_account_id ||
@@ -220,6 +227,7 @@ export function AdminCompaniesPage() {
       ...activeFamilyOpportunities.map(opportunity=>opportunity.next_action_date),
       ...familyTasks.map(task=>task.due_at?.slice(0,10)??null),
     ].filter((value): value is string=>Boolean(value)).sort()
+    const scores=scoreCompanySalesAccount({publicFirms:publicRows,masterProfile:master,contacts:familyContactRows})
     const family:FamilyRow={
       salesAccountId:account.sales_account_id,
       masterId:account.primary_company_id,
@@ -243,6 +251,10 @@ export function AdminCompaniesPage() {
       salesStage:mostAdvancedOpportunity?.stage ?? null,
       salesNextStep:mostAdvancedOpportunity?.next_step ?? null,
       salesOpenTasks:familyTasks.length,
+      fitScore:scores.fitScore,
+      readinessScore:scores.readinessScore,
+      fitReasons:scores.fitReasons,
+      readinessReasons:scores.readinessReasons,
       nextActionDate:salesDates[0] ?? null,
       missing:missingFields(master,familyContacts),
     }
@@ -255,6 +267,9 @@ export function AdminCompaniesPage() {
     return families.filter(family => {
       if (classification !== 'ALL' && family.accountClassification !== classification) return false
       if (salesStageFilter !== 'ALL' && family.salesStage !== salesStageFilter) return false
+      if (scoreFilter === 'HIGH_FIT' && family.fitScore < 70) return false
+      if (scoreFilter === 'READY' && family.readinessScore < 70) return false
+      if (scoreFilter === 'HIGH_FIT_READY' && (family.fitScore < 70 || family.readinessScore < 70)) return false
       if (gap !== 'ALL' && !family.missing.some(value => value.toLowerCase() === gap.toLowerCase())) return false
       if (!needle) return true
       const haystack = [
@@ -271,7 +286,7 @@ export function AdminCompaniesPage() {
       ].filter(Boolean).join(' ').toLowerCase()
       return haystack.includes(needle)
     })
-  }, [families, classification, salesStageFilter, gap, search, profileById, salesAccounts])
+  }, [families, classification, salesStageFilter, scoreFilter, gap, search, profileById, salesAccounts])
 
   const explicitAliases = profiles.filter(profile => profile.rollup_company_id).length
   const parentsRecorded = families.filter(family => family.parentName).length
@@ -309,6 +324,15 @@ export function AdminCompaniesPage() {
     stage,
     opportunities.filter(opportunity => opportunity.stage === stage),
   ])), [opportunities])
+
+  const topTargets = useMemo(() => families
+    .filter(family => !['customer','former-customer','partner','competitor','do-not-pursue'].includes(family.accountClassification))
+    .sort((a,b) => b.fitScore-a.fitScore || b.readinessScore-a.readinessScore || b.publicObservations-a.publicObservations)
+    .slice(0,12), [families])
+
+  const highFitCount=families.filter(family=>family.fitScore>=70&&!['customer','do-not-pursue'].includes(family.accountClassification)).length
+  const readyCount=families.filter(family=>family.readinessScore>=70&&!['customer','do-not-pursue'].includes(family.accountClassification)).length
+  const highFitReadyCount=families.filter(family=>family.fitScore>=70&&family.readinessScore>=70&&!['customer','do-not-pursue'].includes(family.accountClassification)).length
 
   const parentRows = useMemo(() => {
     const map = new Map<string, {
@@ -388,6 +412,22 @@ export function AdminCompaniesPage() {
       </div>
     </section>
 
+    <section className="admin-company-card admin-target-accounts">
+      <div className="admin-company-card-heading"><div><strong>Target accounts</strong><span>Fit measures TowerSignal customer potential; readiness measures whether we know enough to sell now</span></div><small>{number.format(highFitReadyCount)} high fit + ready</small></div>
+      <div className="admin-target-summary">
+        <article><small>High fit ≥70</small><strong>{number.format(highFitCount)}</strong></article>
+        <article><small>Ready ≥70</small><strong>{number.format(readyCount)}</strong></article>
+        <article><small>High fit + ready</small><strong>{number.format(highFitReadyCount)}</strong></article>
+      </div>
+      <div className="admin-target-list">
+        {topTargets.map(family => <a key={family.salesAccountId} href={`#/admin-company/${encodeURIComponent(family.salesAccountId)}`}>
+          <div><strong>{family.name}</strong><span>{family.parentName||'No parent recorded'}</span></div>
+          <div className="admin-target-scores"><span><b>{family.fitScore}</b> Fit</span><span><b>{family.readinessScore}</b> Ready</span></div>
+          <small>{family.fitReasons[0]||'Limited public fit evidence'} · {family.readinessReasons[0]||'Needs enrichment'}</small>
+        </a>)}
+      </div>
+    </section>
+
     <section className="admin-company-card admin-family-directory">
       <div className="admin-company-card-heading">
         <div><strong>Company family directory</strong><span>{number.format(filteredFamilies.length)} of {number.format(families.length)} reviewed master families</span></div>
@@ -395,12 +435,14 @@ export function AdminCompaniesPage() {
           <input aria-label="Admin company search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search family, parent, website, owner or notes…" />
           <select aria-label="Admin account classification filter" value={classification} onChange={event => setClassification(event.target.value)}><option value="ALL">All account classifications</option>{accountClassifications.map(value => <option key={value} value={value}>{human(value)}</option>)}</select>
           <select aria-label="Admin deal stage filter" value={salesStageFilter} onChange={event => setSalesStageFilter(event.target.value)}><option value="ALL">All deal stages</option>{opportunityStages.map(stage => <option key={stage} value={stage}>{human(stage)}</option>)}</select>
+          <select aria-label="Admin sales score filter" value={scoreFilter} onChange={event => setScoreFilter(event.target.value)}><option value="ALL">All fit/readiness</option><option value="HIGH_FIT">High fit ≥70</option><option value="READY">Sales ready ≥70</option><option value="HIGH_FIT_READY">High fit + ready</option></select>
           <select aria-label="Admin enrichment gap filter" value={gap} onChange={event => setGap(event.target.value)}><option value="ALL">All enrichment states</option><option value="website">Missing website</option><option value="HQ">Missing HQ</option><option value="company type">Missing company type</option><option value="ownership">Missing ownership</option><option value="revenue">Missing revenue</option><option value="identity source">Missing identity source</option><option value="contact">Missing contact</option></select>
         </div>
       </div>
-      <div className="table-scroll"><table className="account-table admin-family-table"><thead><tr><th>Master family</th><th>Parent / ownership</th><th>Source identities</th><th>Public evidence</th><th>Contacts / activity</th><th>TowerSignal sales</th><th>Research</th><th>Enrichment gaps</th><th>Next action</th><th></th></tr></thead><tbody>
+      <div className="table-scroll"><table className="account-table admin-family-table"><thead><tr><th>Master family</th><th>Fit / readiness</th><th>Parent / ownership</th><th>Source identities</th><th>Public evidence</th><th>Contacts / activity</th><th>TowerSignal sales</th><th>Research</th><th>Enrichment gaps</th><th>Next action</th><th></th></tr></thead><tbody>
         {filteredFamilies.map(family => <tr key={family.salesAccountId} onClick={() => { window.location.hash = `#/admin-company/${encodeURIComponent(family.salesAccountId)}` }} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') window.location.hash = `#/admin-company/${encodeURIComponent(family.salesAccountId)}` }}>
           <td><strong>{family.name}</strong><small>{family.master.legal_name || family.master.canonical_name}</small>{family.master.website && <small>{family.master.website.replace(/^https?:\/\//,'').replace(/\/$/,'')}</small>}</td>
+          <td><div className="admin-table-scores"><span><b>{family.fitScore}</b> Fit</span><span><b>{family.readinessScore}</b> Ready</span></div><small>{family.fitScore>=70?'High-fit target':'Develop fit case'} · {family.readinessScore>=70?'Ready to approach':'Needs enrichment'}</small></td>
           <td><strong>{family.parentName || 'Not recorded'}</strong><small>{ownershipKnown(family.master) ? 'Ownership reviewed' : 'Needs ownership research'}</small></td>
           <td><strong>{number.format(family.memberCount)}</strong><small>{number.format(family.publicIdentityCount)} in public Known Firms</small></td>
           <td><strong>{number.format(family.publicObservations)} observations</strong><small>{number.format(family.servicedRelationships)} serviced relationships · {number.format(family.towerAccountLinks)} tower links · {number.format(family.publicContracts)} contracts</small></td>
