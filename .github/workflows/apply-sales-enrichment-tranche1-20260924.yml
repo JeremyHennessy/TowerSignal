@@ -1,0 +1,377 @@
+name: Apply top sales-account enrichment tranche 1
+
+on:
+  push:
+    branches:
+      - ops/sales-enrichment-tranche1-20260924
+    paths:
+      - '.github/workflows/apply-sales-enrichment-tranche1-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Guard target sales accounts and existing CRM state
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_accounts integer; v_users integer; v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_accounts
+            FROM public.company_sales_accounts
+            WHERE sales_account_id IN (
+              'sales-account-23384e4c27d8d4c717bd',
+              'sales-account-414c1fd143a3f77e9309',
+              'sales-account-32209d8221aab24730e0',
+              'sales-account-9af56529abd9946c378f',
+              'sales-account-b1bbc3219867e8d1c0ba',
+              'sales-account-454f9e82f6552a974d1b',
+              'sales-account-b5adc85c07b325599f45',
+              'sales-account-be31e5f5fd42d12a6cc6',
+              'sales-account-545269f3100ddda7327c',
+              'sales-account-fd51dd8485f84b0cbd0a',
+              'sales-account-42494fec2d9099ba11b5'
+            ) AND record_status='active';
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin';
+            IF v_accounts <> 11 OR v_users <> 2 OR v_admins <> 2 THEN
+              RAISE EXCEPTION 'Enrichment guard failed accounts=% users=% admins=%',v_accounts,v_users,v_admins;
+            END IF;
+          END $$;
+          SELECT 'SALES_ENRICHMENT_PRECHECK=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_contacts) AS contacts;
+          SQL
+
+      - name: Apply official-source contacts and freshness atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          -- Clear primary flags only on accounts for which this tranche establishes a stronger,
+          -- explicit primary outreach route.
+          UPDATE public.company_private_contacts
+          SET primary_contact=false,
+              updated_at=now(),
+              last_change_source='import',
+              last_change_batch_id='sales-enrichment-tranche1-20260924'
+          WHERE sales_account_id IN (
+            'sales-account-23384e4c27d8d4c717bd',
+            'sales-account-414c1fd143a3f77e9309',
+            'sales-account-32209d8221aab24730e0',
+            'sales-account-9af56529abd9946c378f',
+            'sales-account-b1bbc3219867e8d1c0ba',
+            'sales-account-454f9e82f6552a974d1b',
+            'sales-account-b5adc85c07b325599f45',
+            'sales-account-545269f3100ddda7327c',
+            'sales-account-fd51dd8485f84b0cbd0a',
+            'sales-account-42494fec2d9099ba11b5'
+          ) AND primary_contact;
+
+          INSERT INTO public.company_private_contacts (
+            contact_id,company_id,sales_account_id,name,title,email,phone,linkedin_url,notes,
+            contact_role,primary_contact,source_name,source_url,verified_at,active,
+            last_change_source,last_change_batch_id,created_at,updated_at
+          ) VALUES
+          (
+            'metro-sales',
+            'observed-company-9a049993a3ba62961d8f',
+            'sales-account-23384e4c27d8d4c717bd',
+            'The Metro Group Sales','Sales / new business','sales@metrogroupinc.com','800-925-4948',NULL,
+            'Official sales route published by The Metro Group','other',true,
+            'The Metro Group official website',
+            'https://www.metrogroupinc.com/brown-drinking-water-causing-you-stress-heres-what-you-can-do/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'metro-john-caloritis',
+            'observed-company-9a049993a3ba62961d8f',
+            'sales-account-23384e4c27d8d4c717bd',
+            'John Caloritis, CWT','National Technical Director',NULL,NULL,NULL,
+            'Official Metro Group technical leadership; current source also identifies AWT leadership','technical',false,
+            'The Metro Group official website',
+            'https://www.metrogroupinc.com/longtime-metro-group-leader-john-caloritis-named-president-of-the-association-of-water-technologies/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'emsl-northeast-sales',
+            'observed-company-173726c34e2635b73352',
+            'sales-account-414c1fd143a3f77e9309',
+            'EMSL Northeast Sales','Northeast Sales','northeastsalesteam@emsl.com','1-800-220-3675',NULL,
+            'Official Northeast sales channel','other',true,
+            'EMSL official contact page','https://www.emsl.com/ContactUs.aspx',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'emsl-ron-smith',
+            'observed-company-173726c34e2635b73352',
+            'sales-account-414c1fd143a3f77e9309',
+            'Ron Smith','Senior Vice President, Sales',NULL,NULL,NULL,
+            'Named on EMSL official leadership page','executive',false,
+            'EMSL official About page','https://www.emsl.com/Page.aspx?MenuText=About+EMSL&bcl=2',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'emsl-peter-frasca',
+            'observed-company-173726c34e2635b73352',
+            'sales-account-414c1fd143a3f77e9309',
+            'Peter Frasca, Ph.D.','President',NULL,NULL,NULL,
+            'Named on EMSL official leadership page','executive',false,
+            'EMSL official About page','https://www.emsl.com/Page.aspx?MenuText=About+EMSL&bcl=2',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'nalco-nicholas-alfano',
+            'observed-company-f914504c7de8f74d88ad',
+            'sales-account-32209d8221aab24730e0',
+            'Nicholas Alfano','Executive Vice President & President, Global Water',NULL,NULL,NULL,
+            'Current Nalco Water / Ecolab business leadership','executive',true,
+            'Nalco Water official leadership page',
+            'https://en-ca.ecolab.com/nalco-water/about/leadership',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'nalco-joshua-magnuson',
+            'observed-company-f914504c7de8f74d88ad',
+            'sales-account-32209d8221aab24730e0',
+            'Joshua Magnuson','Executive Vice President and General Manager, Global Water Solutions',NULL,NULL,NULL,
+            'Current Nalco Water / Ecolab business leadership','executive',false,
+            'Nalco Water official leadership page',
+            'https://en-ca.ecolab.com/nalco-water/about/leadership',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'american-pipe-richard-silver',
+            'observed-company-39105f0bf6c208878fc4',
+            'sales-account-9af56529abd9946c378f',
+            'Richard Silver','Company leader',NULL,NULL,NULL,
+            'Official About page states American Pipe & Tank is led by Richard Silver','executive',true,
+            'American Pipe & Tank official About page',
+            'https://www.americanpipeandtank.com/about-us/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'american-pipe-helen-silver',
+            'observed-company-39105f0bf6c208878fc4',
+            'sales-account-9af56529abd9946c378f',
+            'Helen Rolnik Silver','Internal operations and client relations',NULL,NULL,NULL,
+            'Official About page states she oversees internal operations and manages client relations','champion',false,
+            'American Pipe & Tank official About page',
+            'https://www.americanpipeandtank.com/about-us/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'rosenwach-main-office',
+            'observed-company-fa031414cf0b56a27aa6',
+            'sales-account-b1bbc3219867e8d1c0ba',
+            'Rosenwach Main Office','Main office',NULL,'718-729-4900',NULL,
+            'Official Rosenwach contact route','other',true,
+            'Rosenwach official website','https://www.rosenwachtank.com/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'rosenwach-andrew-rosenwach',
+            'observed-company-fa031414cf0b56a27aa6',
+            'sales-account-b1bbc3219867e8d1c0ba',
+            'Andrew Rosenwach','Licensed Master Plumber #949 / Fire Suppression Contractor #276B',NULL,NULL,NULL,
+            'Named on official Rosenwach product/services page','technical',false,
+            'Rosenwach official products page','https://www.rosenwachtank.com/products.php',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'atlantank-atlantic-general',
+            'known-firm-a7f10c34b147fea6227e',
+            'sales-account-454f9e82f6552a974d1b',
+            'Atlantic Cooling / AtlanTANK General Inquiries','General inquiries','info@atlanticcooling.com','201-939-0900',NULL,
+            'Official Atlantic Cooling contact route for the organization that identifies AtlanTANK as its separate tank company','other',true,
+            'Atlantic Cooling official contact page','https://www.atlanticcooling.com/contact-us',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'isseks-general-inquiries',
+            'known-firm-809b6b7911aa65e98654',
+            'sales-account-b5adc85c07b325599f45',
+            'Isseks General Inquiries','General inquiries','info@isseks.com','1-212-267-2688',NULL,
+            'Official Isseks contact route','other',true,
+            'Isseks official About page','https://www.isseks.com/about-us/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'isseks-david-hochhauser',
+            'known-firm-809b6b7911aa65e98654',
+            'sales-account-b5adc85c07b325599f45',
+            'David Hochhauser','Leadership',NULL,NULL,NULL,
+            'Official About page identifies David and Scott Hochhauser as company leadership','executive',false,
+            'Isseks official About page','https://www.isseks.com/about-us/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'isseks-scott-hochhauser',
+            'known-firm-809b6b7911aa65e98654',
+            'sales-account-b5adc85c07b325599f45',
+            'Scott Hochhauser','Leadership',NULL,NULL,NULL,
+            'Official About page identifies David and Scott Hochhauser as company leadership','executive',false,
+            'Isseks official About page','https://www.isseks.com/about-us/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'ambient-main-office',
+            'known-firm-6b56cafe734ffee630a0',
+            'sales-account-545269f3100ddda7327c',
+            'Ambient Group Main Office','Main office',NULL,NULL,NULL,
+            'Official Ambient Group inquiry route','other',true,
+            'Ambient Group official website','https://www.ambientgroup.com/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'ambient-william-esposito',
+            'known-firm-6b56cafe734ffee630a0',
+            'sales-account-545269f3100ddda7327c',
+            'Dr. William A. Esposito','Founder',NULL,NULL,NULL,
+            'Official About page identifies Dr. William A. Esposito as founder in 1986','other',false,
+            'Ambient Group official About page','https://www.ambientgroup.com/about-ambient',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'spl-janet-stout',
+            'observed-company-4d4ccb2349b7714cbfe5',
+            'sales-account-fd51dd8485f84b0cbd0a',
+            'Janet E. Stout, PhD','President and Director',NULL,'412-281-5335',NULL,
+            'Official Special Pathogens Laboratory account packet identifies President and Director','executive',true,
+            'Special Pathogens Laboratory official account packet',
+            'https://specialpathogenslab.com/wp-content/uploads/2017/05/new-account-application-feb-2017.pdf',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'spl-jackie-lesjak',
+            'observed-company-4d4ccb2349b7714cbfe5',
+            'sales-account-fd51dd8485f84b0cbd0a',
+            'Jackie Lesjak','Chief Operating Officer',NULL,'877-775-7284',NULL,
+            'Official Special Pathogens Laboratory account packet identifies COO as pricing/lab-services contact','executive',false,
+            'Special Pathogens Laboratory official account packet',
+            'https://specialpathogenslab.com/wp-content/uploads/2017/05/new-account-application-feb-2017.pdf',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          ),
+          (
+            'ebs-codegreen-general',
+            'known-firm-0d605706e6abe584a1b8',
+            'sales-account-42494fec2d9099ba11b5',
+            'CodeGreen / EBS General Inquiries','General inquiries','info@codegreen.com',NULL,NULL,
+            'Existing sourced general outreach channel retained as primary until a decision maker is verified','other',true,
+            'CodeGreen official website','https://codegreen.com/',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          )
+          ON CONFLICT (contact_id) DO UPDATE SET
+            company_id=EXCLUDED.company_id,
+            sales_account_id=EXCLUDED.sales_account_id,
+            name=EXCLUDED.name,
+            title=EXCLUDED.title,
+            email=EXCLUDED.email,
+            phone=EXCLUDED.phone,
+            linkedin_url=EXCLUDED.linkedin_url,
+            notes=EXCLUDED.notes,
+            contact_role=EXCLUDED.contact_role,
+            primary_contact=EXCLUDED.primary_contact,
+            source_name=EXCLUDED.source_name,
+            source_url=EXCLUDED.source_url,
+            verified_at=EXCLUDED.verified_at,
+            active=EXCLUDED.active,
+            updated_at=now(),
+            last_change_source='import',
+            last_change_batch_id='sales-enrichment-tranche1-20260924';
+
+          -- Parent-company executive relevant to Barclay after Ecolab acquisition.
+          INSERT INTO public.company_private_contacts (
+            contact_id,company_id,sales_account_id,name,title,email,phone,linkedin_url,notes,
+            contact_role,primary_contact,source_name,source_url,verified_at,active,
+            last_change_source,last_change_batch_id,created_at,updated_at
+          ) VALUES (
+            'barclay-ecolab-joshua-magnuson',
+            'observed-company-65f2b666fe7b7b6e3dc3',
+            'sales-account-be31e5f5fd42d12a6cc6',
+            'Joshua Magnuson','Executive Vice President and General Manager, Global Water Solutions (Ecolab)',NULL,NULL,NULL,
+            'Ecolab executive associated with the water business; Ecolab acquired Barclay Water Management in 2024',
+            'executive',false,
+            'Ecolab official Nalco Water leadership page',
+            'https://en-ca.ecolab.com/nalco-water/about/leadership',
+            now(),true,'import','sales-enrichment-tranche1-20260924',now(),now()
+          )
+          ON CONFLICT (contact_id) DO UPDATE SET
+            title=EXCLUDED.title,
+            notes=EXCLUDED.notes,
+            contact_role=EXCLUDED.contact_role,
+            source_name=EXCLUDED.source_name,
+            source_url=EXCLUDED.source_url,
+            verified_at=EXCLUDED.verified_at,
+            active=true,
+            sales_account_id=EXCLUDED.sales_account_id,
+            company_id=EXCLUDED.company_id,
+            updated_at=now(),
+            last_change_source='import',
+            last_change_batch_id='sales-enrichment-tranche1-20260924';
+
+          UPDATE public.company_private_profiles
+          SET enrichment_checked_at=now(),
+              updated_at=now(),
+              last_change_source='import',
+              last_change_batch_id='sales-enrichment-tranche1-20260924'
+          WHERE company_id IN (
+            'observed-company-9a049993a3ba62961d8f',
+            'observed-company-173726c34e2635b73352',
+            'observed-company-f914504c7de8f74d88ad',
+            'observed-company-39105f0bf6c208878fc4',
+            'observed-company-fa031414cf0b56a27aa6',
+            'known-firm-a7f10c34b147fea6227e',
+            'known-firm-809b6b7911aa65e98654',
+            'known-firm-6b56cafe734ffee630a0',
+            'observed-company-4d4ccb2349b7714cbfe5',
+            'known-firm-0d605706e6abe584a1b8',
+            'observed-company-65f2b666fe7b7b6e3dc3'
+          );
+
+          COMMIT;
+          SQL
+
+      - name: Verify enrichment acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_batch integer; v_primary_conflicts integer; v_mapped integer;
+          BEGIN
+            SELECT count(*) INTO v_batch
+            FROM public.company_private_contacts
+            WHERE last_change_batch_id='sales-enrichment-tranche1-20260924';
+            SELECT count(*) INTO v_primary_conflicts
+            FROM (
+              SELECT sales_account_id
+              FROM public.company_private_contacts
+              WHERE active AND primary_contact AND sales_account_id IS NOT NULL
+              GROUP BY sales_account_id
+              HAVING count(*)>1
+            ) x;
+            SELECT count(*) INTO v_mapped
+            FROM public.company_private_contacts
+            WHERE last_change_batch_id='sales-enrichment-tranche1-20260924'
+              AND sales_account_id IS NOT NULL;
+            IF v_batch < 20 OR v_primary_conflicts <> 0 OR v_mapped <> v_batch THEN
+              RAISE EXCEPTION 'Enrichment acceptance failed batch=% conflicts=% mapped=%',v_batch,v_primary_conflicts,v_mapped;
+            END IF;
+          END $$;
+
+          SELECT 'SALES_ENRICHMENT_TRANCHE1=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_contacts) AS total_contacts,
+                 (SELECT count(*) FROM public.company_private_contacts WHERE last_change_batch_id='sales-enrichment-tranche1-20260924') AS tranche_contacts,
+                 (SELECT count(*) FROM public.company_private_contacts WHERE active AND primary_contact) AS primary_contacts,
+                 (SELECT count(*) FROM public.company_private_contacts WHERE active AND contact_role IN ('decision-maker','executive','champion')) AS buying_contacts;
+          SQL
