@@ -59,10 +59,6 @@ const profileKeys = new Set<keyof CompanyAdminProfilePatch>([
   'revenue_source_name',
   'revenue_source_url',
   'revenue_confidence',
-  'relationship_status',
-  'last_contacted_at',
-  'next_action_date',
-  'account_owner',
   'internal_summary',
 ])
 
@@ -99,10 +95,6 @@ function checkAllowedKeys(value: Record<string, unknown>, allowed: Set<string>, 
 
 const revenueTypes = new Set(['reported', 'estimated', 'range', 'unknown'])
 const revenueConfidences = new Set(['confirmed', 'strong', 'verify', 'unknown'])
-const relationshipStatuses = new Set([
-  'uncontacted', 'researching', 'outreach-planned', 'contacted',
-  'engaged', 'opportunity', 'customer', 'not-pursuing',
-])
 const contactRoles = new Set([
   'decision-maker','champion','technical','procurement','finance','executive','other',
 ])
@@ -197,16 +189,7 @@ function validateProfile(profile: Record<string, unknown>, known: Map<string, st
   const currency = optionalText(profile.revenue_currency, `${context}.revenue_currency`)
   if (currency && !/^[A-Z]{3}$/.test(currency)) throw new Error(`${context}.revenue_currency must be a three-letter uppercase code`)
 
-  const relationship = profile.relationship_status == null
-    ? 'uncontacted'
-    : optionalText(profile.relationship_status, `${context}.relationship_status`) ?? 'uncontacted'
-  if (!relationshipStatuses.has(relationship)) throw new Error(`${context}.relationship_status is invalid`)
-
   validateDate(profile.enrichment_checked_at, `${context}.enrichment_checked_at`)
-  validateDate(profile.last_contacted_at, `${context}.last_contacted_at`)
-  if (profile.next_action_date != null && !/^\d{4}-\d{2}-\d{2}$/.test(String(profile.next_action_date))) {
-    throw new Error(`${context}.next_action_date must be YYYY-MM-DD`)
-  }
 }
 
 export function parseCompanyAdminImport(text: string, knownFirms: KnownFirmSummaryRecord[]): CompanyAdminImportBundle {
