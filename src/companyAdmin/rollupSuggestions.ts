@@ -8,12 +8,55 @@ import type {
 import type { KnownFirmSummaryRecord } from '../types/firm'
 
 const legalSuffixes=new Set(['INC','INCORPORATED','LLC','LTD','LIMITED','LLP','LP','CORP','CORPORATION','CO','COMPANY','PLC','PC'])
+const nameTokenAliases=new Map([
+  ['BLDG','BUILDING'],
+  ['MGMT','MANAGEMENT'],
+  ['SVCS','SERVICES'],
+  ['SVC','SERVICE'],
+  ['LAB','LABORATORY'],
+  ['LABS','LABORATORIES'],
+])
 const publicMailDomains=new Set(['gmail.com','outlook.com','hotmail.com','yahoo.com','icloud.com','aol.com'])
 
 function normalizeName(value:string|null|undefined):string{
   const tokens=(value??'').toUpperCase().replaceAll('&',' AND ').replace(/[^A-Z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean)
   while(tokens.length && legalSuffixes.has(tokens[tokens.length-1])) tokens.pop()
-  return tokens.join(' ')
+  return tokens.map(token=>nameTokenAliases.get(token)??token).join(' ')
+}
+
+function damerauLevenshtein(left:string,right:string):number{
+  const rows=left.length+1
+  const cols=right.length+1
+  const distance=Array.from({length:rows},()=>Array<number>(cols).fill(0))
+  for(let i=0;i<rows;i++)distance[i][0]=i
+  for(let j=0;j<cols;j++)distance[0][j]=j
+  for(let i=1;i<rows;i++){
+    for(let j=1;j<cols;j++){
+      const cost=left[i-1]===right[j-1]?0:1
+      distance[i][j]=Math.min(
+        distance[i-1][j]+1,
+        distance[i][j-1]+1,
+        distance[i-1][j-1]+cost,
+      )
+      if(i>1&&j>1&&left[i-1]===right[j-2]&&left[i-2]===right[j-1]){
+        distance[i][j]=Math.min(distance[i][j],distance[i-2][j-2]+1)
+      }
+    }
+  }
+  return distance[left.length][right.length]
+}
+
+function nearExactName(left:string,right:string):{distance:number;similarity:number}|null{
+  const a=normalizeName(left).replaceAll(' ','')
+  const b=normalizeName(right).replaceAll(' ','')
+  if(!a||!b)return null
+  const maxLength=Math.max(a.length,b.length)
+  const minLength=Math.min(a.length,b.length)
+  if(minLength<4)return null
+  const distance=damerauLevenshtein(a,b)
+  const similarity=1-distance/maxLength
+  const singleEdit=distance===1
+  return singleEdit?{distance,similarity}:null
 }
 
 function normalizedAddress(profile:CompanyAdminProfile):string{
@@ -133,9 +176,23 @@ export function generateCompanyRollupSuggestions({
       const exactName=left.names.some(a=>right.names.some(b=>normalizeName(a)&&normalizeName(a)===normalizeName(b)))
       if(exactName){score+=55;evidence.push('Exact normalized company-name match')}
 
+      let bestNearExact:{distance:number;similarity:number}|null=null
+      if(!exactName){
+        for(const a of left.names){
+          for(const b of right.names){
+            const candidate=nearExactName(a,b)
+            if(candidate&&(!bestNearExact||candidate.similarity>bestNearExact.similarity))bestNearExact=candidate
+          }
+        }
+        if(bestNearExact){
+          score+=55
+          evidence.push(`Near-exact normalized company-name spelling (${bestNearExact.distance} edit${bestNearExact.distance===1?'':'s'})`)
+        }
+      }
+
       let bestSimilarity=0
       for(const a of left.names) for(const b of right.names) bestSimilarity=Math.max(bestSimilarity,tokenSimilarity(a,b))
-      if(!exactName){
+      if(!exactName&&!bestNearExact){
         if(bestSimilarity>=0.85){score+=30;evidence.push(`Very strong name-token similarity (${Math.round(bestSimilarity*100)}%)`)}
         else if(bestSimilarity>=0.70){score+=20;evidence.push(`Strong name-token similarity (${Math.round(bestSimilarity*100)}%)`)}
         else if(bestSimilarity>=0.60){score+=10;evidence.push(`Moderate name-token similarity (${Math.round(bestSimilarity*100)}%)`)}
