@@ -571,6 +571,44 @@ def build_known_firms(
                     project_role=True,
                 )
 
+        building_water = detail.get("nyc_building_water_signals")
+        if isinstance(building_water, Mapping):
+            for permit in building_water.get("dob_water_permits") or []:
+                if not isinstance(permit, Mapping) or not permit.get("applicant_business_raw"):
+                    continue
+                raw_name = permit.get("applicant_business_raw")
+                firm = resolve_named_firm(raw_name)
+                if not firm:
+                    continue
+                source_id = str(
+                    permit.get("source_record_id")
+                    or permit.get("activity_id")
+                    or permit.get("job_filing_number")
+                    or stable_id("dob-water-permit", permit.get("bbl"), permit.get("bin"), permit.get("issued_date"), raw_name)
+                )
+                dedupe = (firm["firm_id"], "DOB_NOW_APPLICANT_BUSINESS", source_id, str(site["site_id"]))
+                if dedupe in seen_project_observations:
+                    continue
+                seen_project_observations.add(dedupe)
+                activity_date = permit.get("issued_date") or permit.get("approved_date")
+                _observe(
+                    firm,
+                    role="DOB_NOW_APPLICANT_BUSINESS",
+                    source_class="NYC_DOB_NOW_WATER_PERMITS",
+                    date_value=activity_date,
+                    alias=str(raw_name),
+                )
+                _upsert_site(
+                    firm,
+                    site,
+                    role="DOB_NOW_APPLICANT_BUSINESS",
+                    relationship_class="PROJECT_ROLE",
+                    evidence_class="DOB_NOW_APPLICANT_BUSINESS_BBL_EXACT",
+                    date_value=activity_date,
+                    source_record_id=source_id,
+                    project_role=True,
+                )
+
         legacy_context = detail.get("legacy_dob_project_context")
         if isinstance(legacy_context, Mapping):
             for activity in legacy_context.get("records") or []:
