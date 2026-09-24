@@ -1,0 +1,81 @@
+name: Apply roll-up review queue schema
+
+on:
+  push:
+    branches:
+      - ops/apply-rollup-review-queue-20260924
+    paths:
+      - '.github/workflows/apply-rollup-review-queue-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard production baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_accounts integer; v_members integer; v_profiles integer;
+          BEGIN
+            SELECT count(*) INTO v_accounts FROM public.company_sales_accounts WHERE record_status='active';
+            SELECT count(*) INTO v_members FROM public.company_sales_account_members;
+            SELECT count(*) INTO v_profiles FROM public.company_private_profiles;
+            IF v_accounts <> 101 OR v_members <> 340 OR v_profiles <> 340 THEN
+              RAISE EXCEPTION 'Master sales-account baseline mismatch accounts=% members=% profiles=%',v_accounts,v_members,v_profiles;
+            END IF;
+          END $$;
+          SELECT 'ROLLUP_QUEUE_PRECHECK=PASS' AS result;
+          SQL
+
+      - name: Validate migration with rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          source=Path('database/migrations/008_rollup_review_queue.sql').read_text()
+          pos=source.rfind('COMMIT;')
+          assert pos >= 0
+          Path('/tmp/008_validation.sql').write_text(source[:pos]+'ROLLBACK;\n')
+          PY
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f /tmp/008_validation.sql
+          echo "ROLLUP_QUEUE_VALIDATION=PASS"
+
+      - name: Apply roll-up review queue schema
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f database/migrations/008_rollup_review_queue.sql
+
+      - name: Verify queue schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_queue regclass;
+            v_trigger integer;
+          BEGIN
+            SELECT to_regclass('public.company_rollup_suggestions') INTO v_queue;
+            SELECT count(*) INTO v_trigger
+            FROM pg_trigger
+            WHERE tgrelid='public.company_rollup_suggestions'::regclass
+              AND tgname='company_rollup_suggestion_apply'
+              AND NOT tgisinternal;
+            IF v_queue IS NULL OR v_trigger <> 1 THEN
+              RAISE EXCEPTION 'Roll-up queue schema acceptance failed queue=% trigger=%',v_queue,v_trigger;
+            END IF;
+          END $$;
+          SELECT 'ROLLUP_QUEUE_ACCEPTANCE=PASS' AS result,
+                 (SELECT count(*) FROM public.company_rollup_suggestions) AS suggestions,
+                 (SELECT count(*) FROM public.company_sales_accounts WHERE record_status='active') AS active_sales_accounts;
+          SQL
