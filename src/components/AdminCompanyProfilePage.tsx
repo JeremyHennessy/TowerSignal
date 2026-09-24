@@ -20,7 +20,6 @@ import type {
 import type { KnownFirmPayload, KnownFirmSummaryRecord } from '../types/firm'
 import { CompanyAdminPanel } from './CompanyAdminPanel'
 import { CompanyAuditHistory } from './CompanyAuditHistory'
-import { CompanyFamilyPanel } from './CompanyFamilyPanel'
 import { CompanySalesCrmPanel } from './CompanySalesCrmPanel'
 
 const number = new Intl.NumberFormat('en-US')
@@ -177,7 +176,6 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
 
     <CompanySalesCrmPanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} companyIds={model.memberIds} companyName={model.account.display_name} />
     <CompanyAdminPanel companyId={model.selected.company_id} canonicalName={model.selected.canonical_name} />
-    <CompanyFamilyPanel companyId={model.selected.company_id} />
     <CompanyAuditHistory companyId={model.selected.company_id} />
   </section>
 }
