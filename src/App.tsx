@@ -284,7 +284,7 @@ export default function App() {
 
   return <main className={`app-shell saas-shell reference-shell mode-${mode}`}>
     <TopNavigation
-      mode={mode === 'nys-account' ? 'nys' : ['company','service','admin-companies','admin-company'].includes(mode) ? 'companies' : mode}
+      mode={mode === 'nys-account' ? 'nys' : mode === 'company' || mode === 'service' || mode === 'admin-companies' || mode === 'admin-company' ? 'companies' : mode}
       onNavigate={next => navigate(next)}
       search={globalSearch}
       onSearchChange={setGlobalSearch}
