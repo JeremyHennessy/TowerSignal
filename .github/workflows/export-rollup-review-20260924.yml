@@ -45,6 +45,28 @@ jobs:
             count(*) FILTER (WHERE status='rejected') AS rejected,
             count(*) FILTER (WHERE status='superseded') AS superseded
           FROM public.company_rollup_suggestions;
+
+          SELECT
+            s.suggestion_id,
+            c.display_name AS candidate_account,
+            cp.company_id AS candidate_company_id,
+            cp.canonical_name AS candidate_canonical,
+            cp.legal_name AS candidate_legal,
+            cp.website AS candidate_website,
+            cp.headquarters_address AS candidate_hq,
+            t.display_name AS target_account,
+            tp.company_id AS target_company_id,
+            tp.canonical_name AS target_canonical,
+            tp.legal_name AS target_legal,
+            tp.website AS target_website,
+            tp.headquarters_address AS target_hq
+          FROM public.company_rollup_suggestions s
+          JOIN public.company_sales_accounts c ON c.sales_account_id=s.candidate_sales_account_id
+          JOIN public.company_private_profiles cp ON cp.company_id=c.primary_company_id
+          JOIN public.company_sales_accounts t ON t.sales_account_id=s.suggested_sales_account_id
+          JOIN public.company_private_profiles tp ON tp.company_id=t.primary_company_id
+          WHERE s.status='pending'
+          ORDER BY s.score DESC,c.display_name,t.display_name;
           SQL
 
       - name: Generate current roll-up candidates read-only
