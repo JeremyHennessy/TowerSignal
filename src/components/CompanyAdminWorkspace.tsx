@@ -165,7 +165,7 @@ export function CompanyAdminWorkspace({
             return <article key={item.company_id}>
               <div className="company-research-score"><strong>{item.priority_score}</strong><span>priority</span></div>
               <div className="company-research-body">
-                <a href={`#/company/${encodeURIComponent(item.company_id)}`}>{name}</a>
+                <a href={`#/admin-company/${encodeURIComponent(item.company_id)}`}>{name}</a>
                 <span>{item.priority_reason}</span>
                 <small>{missing.length ? `Missing: ${missing.join(' · ')}` : 'Core enrichment complete'}</small>
               </div>
@@ -181,7 +181,7 @@ export function CompanyAdminWorkspace({
         <div className="company-ops-card-heading"><div><strong>Follow-up queue</strong><span>Next actions from private CRM state</span></div></div>
         <div className="company-followup-list">
           {[...overdue, ...upcoming].slice(0, 20).map(profile => <article key={profile.company_id}>
-            <a href={`#/company/${encodeURIComponent(profile.company_id)}`}>{profile.rollup_name || profile.legal_name || profile.canonical_name}</a>
+            <a href={`#/admin-company/${encodeURIComponent(profile.company_id)}`}>{profile.rollup_name || profile.legal_name || profile.canonical_name}</a>
             <strong>{profile.next_action_date}</strong>
             <span>{profile.relationship_status.replaceAll('-', ' ')}</span>
           </article>)}
