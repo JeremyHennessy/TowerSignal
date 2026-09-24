@@ -82,7 +82,7 @@ function emptyTask():Omit<CompanySalesTask,'task_id'|'company_id'|'created_at'|'
   }
 }
 
-export function CompanySalesCrmPanel({companyId,companyName}:{companyId:string;companyName:string}) {
+export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyId]}:{companyId:string;companyName:string;companyIds?:string[]}) {
   const [opportunities,setOpportunities]=useState<CompanySalesOpportunity[]>([])
   const [tasks,setTasks]=useState<CompanySalesTask[]>([])
   const [contacts,setContacts]=useState<CompanyAdminContact[]>([])
@@ -93,14 +93,14 @@ export function CompanySalesCrmPanel({companyId,companyName}:{companyId:string;c
   const [error,setError]=useState<string|null>(null)
 
   const reload=async()=>{
-    const [nextOpportunities,nextTasks,snapshot]=await Promise.all([
+    const [nextOpportunities,nextTasks,snapshots]=await Promise.all([
       loadCompanySalesOpportunities(companyId),
       loadCompanySalesTasks(companyId),
-      loadCompanyAdminSnapshot(companyId),
+      Promise.all(companyIds.map(id=>loadCompanyAdminSnapshot(id))),
     ])
     setOpportunities(nextOpportunities)
     setTasks(nextTasks)
-    setContacts(snapshot.contacts)
+    setContacts(snapshots.flatMap(snapshot=>snapshot.contacts))
   }
 
   useEffect(()=>{
@@ -108,17 +108,17 @@ export function CompanySalesCrmPanel({companyId,companyName}:{companyId:string;c
     Promise.all([
       loadCompanySalesOpportunities(companyId),
       loadCompanySalesTasks(companyId),
-      loadCompanyAdminSnapshot(companyId),
-    ]).then(([nextOpportunities,nextTasks,snapshot])=>{
+      Promise.all(companyIds.map(id=>loadCompanyAdminSnapshot(id))),
+    ]).then(([nextOpportunities,nextTasks,snapshots])=>{
       if(cancelled) return
       setOpportunities(nextOpportunities)
       setTasks(nextTasks)
-      setContacts(snapshot.contacts)
+      setContacts(snapshots.flatMap(snapshot=>snapshot.contacts))
       setNewOpportunity(emptyOpportunity(companyName))
       setNewTask(emptyTask())
     }).catch(err=>{if(!cancelled)setError(err instanceof Error?err.message:'Unable to load TowerSignal sales CRM')})
     return()=>{cancelled=true}
-  },[companyId,companyName])
+  },[companyId,companyName,companyIds.join('|')])
 
   const contactById=useMemo(()=>new Map(contacts.map(contact=>[contact.contact_id,contact])),[contacts])
   const openTasks=tasks.filter(task=>task.status==='open')
