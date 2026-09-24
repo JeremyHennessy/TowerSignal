@@ -108,7 +108,7 @@ export function ServiceOperationsPage(){
         <h1>Service operations</h1>
         <p>Portfolio-scale scheduling, corrective actions and reporting layered onto exact TowerSignal system IDs.</p>
       </div>
-      <div className="page-actions"><a className="secondary-link-button" href="#/companies">Company CRM</a><a className="secondary-link-button" href="#/portfolios">Public portfolios</a></div>
+      <div className="page-actions"><a className="secondary-link-button" href="#/admin-companies">Company CRM</a><a className="secondary-link-button" href="#/portfolios">Public portfolios</a></div>
     </div>
 
     <div className="service-ops-metrics">

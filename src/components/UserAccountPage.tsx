@@ -63,7 +63,7 @@ export function UserAccountPage({ user, onSignOut }: { user: WorkflowUser; onSig
 
       {adminAccess && <section className="account-card account-admin-access-card">
         <div><span className="eyebrow">Administrator</span><h2>Private operations access</h2><p>Company database, CRM, research queue and service operations are enabled for this account.</p></div>
-        <div className="account-admin-actions"><a className="secondary-link-button" href="#/companies">Company database</a><a className="secondary-link-button" href="#/service">Service operations</a></div>
+        <div className="account-admin-actions"><a className="secondary-link-button" href="#/admin-companies">Company database</a><a className="secondary-link-button" href="#/service">Service operations</a></div>
       </section>}
 
       <section className="account-card account-security-card">

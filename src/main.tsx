@@ -35,6 +35,7 @@ import './styles/client-site-report.css'
 import './styles/account-header.css'
 import './styles/company-admin.css'
 import './styles/company-operations.css'
+import './styles/company-admin-dashboard.css'
 import './styles/service-reporting.css'
 import './styles/service-operations.css'
 

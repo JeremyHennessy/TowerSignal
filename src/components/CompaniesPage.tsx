@@ -1,18 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadKnownFirms } from '../data/api'
-import { loadCompanyAdminAccess, loadCompanyAdminDirectory } from '../companyAdmin/client'
 import type { CompanyIntelligenceRecord } from '../types/company'
-import type { CompanyAdminProfile } from '../types/companyAdmin'
 import type { KnownFirmPayload, KnownFirmRole, KnownFirmSummaryRecord } from '../types/firm'
 import { formatDate, formatTimestamp } from '../domain/labels'
 import { ShareButton } from './ShareButton'
-import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
-import { CompanyAdminWorkspace } from './CompanyAdminWorkspace'
 
 const number = new Intl.NumberFormat('en-US')
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 const PAGE_SIZE = 50
-const crmStatuses = ['uncontacted','researching','outreach-planned','contacted','engaged','opportunity','customer','not-pursuing'] as const
 
 type SortKey =
   | 'canonical_name'
@@ -78,39 +73,15 @@ function compareValues(left: unknown, right: unknown): number {
   return String(left ?? '').localeCompare(String(right ?? ''), undefined, { numeric: true, sensitivity: 'base' })
 }
 
-function adminRevenue(profile: CompanyAdminProfile): string {
-  if (profile.revenue_type === 'range' && profile.revenue_low != null && profile.revenue_high != null) {
-    return `${currency.format(profile.revenue_low)}–${currency.format(profile.revenue_high)}`
-  }
-  if (profile.revenue_amount != null) return currency.format(profile.revenue_amount)
-  return 'Revenue not recorded'
-}
-
-function adminLocation(profile: CompanyAdminProfile): string {
-  return [
-    profile.headquarters_city,
-    profile.headquarters_region,
-    profile.headquarters_country,
-  ].filter(Boolean).join(', ') || profile.headquarters_address || 'Address not recorded'
-}
-
-function relationshipLabel(value: string): string {
-  return value.replaceAll('-', ' ').replace(/(^|\s)\S/g, match => match.toUpperCase())
-}
-
 export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: CompanyIntelligenceRecord) => void }) {
   void onOpenCompany
   const [payload, setPayload] = useState<KnownFirmPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [adminAccess, setAdminAccess] = useState(false)
-  const [adminProfiles, setAdminProfiles] = useState<CompanyAdminProfile[]>([])
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('ALL')
   const [relationship, setRelationship] = useState('ALL')
   const [confidence, setConfidence] = useState('ALL')
   const [activity, setActivity] = useState('ALL')
-  const [crmStatus, setCrmStatus] = useState('ALL')
-  const [adminGap, setAdminGap] = useState('ALL')
   const [sort, setSort] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'serviced_site_count', direction: 'desc' })
   const [page, setPage] = useState(0)
 
@@ -122,50 +93,16 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
     return () => { cancelled = true }
   }, [])
 
-  useEffect(() => {
-    let cancelled = false
-    loadCompanyAdminAccess()
-      .then(async allowed => {
-        if (cancelled || !allowed) return
-        setAdminAccess(true)
-        const profiles = await loadCompanyAdminDirectory()
-        if (!cancelled) setAdminProfiles(profiles)
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setAdminAccess(false)
-          setAdminProfiles([])
-        }
-      })
-    return () => { cancelled = true }
-  }, [])
-
-  const adminByCompanyId = useMemo(() => new Map(adminProfiles.map(profile => [profile.company_id, profile])), [adminProfiles])
   const roles = useMemo(() => payload ? [...new Set(payload.firms.flatMap(firm => firm.roles))].sort() : [], [payload])
   const filtered = useMemo(() => payload ? payload.firms.filter(firm => {
     const query = search.trim().toLowerCase()
-    const profile = adminByCompanyId.get(firm.firm_id)
-    const privateSearch = adminAccess && profile ? [
-      profile.legal_name,
-      profile.rollup_name,
-      profile.website,
-      profile.parent_company_name,
-      profile.headquarters_address,
-      profile.headquarters_city,
-      profile.headquarters_region,
-      profile.headquarters_country,
-      profile.company_type,
-      profile.account_owner,
-      profile.internal_summary,
-    ] : []
     const haystack = [
       firm.canonical_name,
       firm.normalized_name,
       ...firm.roles,
       ...firm.source_classes,
       ...firm.service_categories,
-      ...privateSearch,
-    ].filter(Boolean).join(' ').toLowerCase()
+    ].join(' ').toLowerCase()
     if (query && !haystack.includes(query)) return false
     if (role !== 'ALL' && !firm.roles.includes(role)) return false
     if (relationship === 'SERVICED' && firm.serviced_site_count === 0) return false
@@ -174,24 +111,15 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
     if (relationship === 'RELATED' && firm.observed_site_count === 0) return false
     if (confidence !== 'ALL' && firm.identity_confidence !== confidence) return false
     if (activity === 'RECENT' && !firm.active_last_12m) return false
-    if (adminAccess && crmStatus !== 'ALL' && profile?.relationship_status !== crmStatus) return false
-    if (adminAccess && adminGap === 'WEBSITE' && profile?.website) return false
-    if (adminAccess && adminGap === 'HQ' && profile?.headquarters_address) return false
-    if (adminAccess && adminGap === 'REVENUE' && (profile?.revenue_amount != null || profile?.revenue_low != null || profile?.revenue_high != null)) return false
-    if (adminAccess && adminGap === 'PARENT' && (profile?.parent_company_id || profile?.parent_company_name)) return false
-    if (adminAccess && adminGap === 'FOLLOWUP') {
-      const needsFollowup = profile && ['contacted','engaged','opportunity'].includes(profile.relationship_status) && !profile.next_action_date
-      if (!needsFollowup) return false
-    }
     return true
-  }) : [], [payload, search, role, relationship, confidence, activity, adminAccess, adminByCompanyId, crmStatus, adminGap])
+  }) : [], [payload, search, role, relationship, confidence, activity])
 
   const sorted = useMemo(() => [...filtered].sort((a, b) => {
     const result = compareValues(a[sort.key], b[sort.key]) || a.canonical_name.localeCompare(b.canonical_name)
     return sort.direction === 'asc' ? result : -result
   }), [filtered, sort])
 
-  useEffect(() => { setPage(0) }, [search, role, relationship, confidence, activity, crmStatus, adminGap, sort])
+  useEffect(() => { setPage(0) }, [search, role, relationship, confidence, activity, sort])
   const maxPage = Math.max(0, Math.ceil(sorted.length / PAGE_SIZE) - 1)
   const activePage = Math.min(page, maxPage)
   const visible = useMemo(
@@ -210,10 +138,8 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
       <div>
         <span className="page-kicker">New York · company and service-market intelligence</span>
         <h1>Known companies &amp; firms</h1>
-        {adminAccess && <span className="company-admin-directory-badge">Admin company database · private fields enabled</span>}
         <p>One normalized list of every company or firm TowerSignal can support from public evidence: service providers, laboratories, procurement vendors, DEC 7G businesses and DOB project-role firms.</p>
       </div>
-      {adminAccess && <div className="page-actions company-admin-page-actions"><a className="secondary-link-button" href="#/service">Service operations</a><a className="secondary-link-button" href="#company-admin-tools">Research &amp; import</a></div>}
     </div>
 
     {error && <div className="reference-empty-state"><strong>Known-company intelligence is unavailable.</strong><span>{error}</span><span>TowerSignal will not substitute disconnected provider or vendor lists when the normalized dataset is missing.</span></div>}
@@ -232,7 +158,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         </div>
       </div>
 
-      <div className={`firm-master-filters${adminAccess ? ' admin-filters' : ''}`} aria-label="Known company filters">
+      <div className="firm-master-filters" aria-label="Known company filters">
         <input aria-label="Known firm search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search company, role, service or source…" />
         <select aria-label="Known firm role" value={role} onChange={event => setRole(event.target.value)}>
           <option value="ALL">All roles</option>
@@ -256,21 +182,9 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
           <option value="VERIFY">Verify</option>
           <option value="UNRESOLVED">Unresolved</option>
         </select>
-        {adminAccess && <select aria-label="CRM relationship status" value={crmStatus} onChange={event => setCrmStatus(event.target.value)}>
-          <option value="ALL">All CRM statuses</option>
-          {crmStatuses.map(value => <option key={value} value={value}>{relationshipLabel(value)}</option>)}
-        </select>}
-        {adminAccess && <select aria-label="Private enrichment gap" value={adminGap} onChange={event => setAdminGap(event.target.value)}>
-          <option value="ALL">All enrichment states</option>
-          <option value="WEBSITE">Website not recorded</option>
-          <option value="HQ">HQ address not recorded</option>
-          <option value="REVENUE">Revenue not recorded</option>
-          <option value="PARENT">Parent not recorded</option>
-          <option value="FOLLOWUP">Contacted · no next action</option>
-        </select>}
       </div>
 
-      {sorted.length === 0 ? <div className="empty-state"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className="table-scroll"><table className={`account-table known-firms-master-table${adminAccess ? ' admin-company-table' : ''}`}><thead><tr>
+      {sorted.length === 0 ? <div className="empty-state"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className="table-scroll"><table className="account-table known-firms-master-table"><thead><tr>
         <th scope="col" role="columnheader"><button onClick={() => changeSort('canonical_name')}>Company / firm{sortIndicator('canonical_name')}</button></th>
         <th scope="col" role="columnheader">Role</th>
         <th scope="col" role="columnheader"><button onClick={() => changeSort('serviced_site_count')}>Service footprint{sortIndicator('serviced_site_count')}</button></th>
@@ -280,7 +194,6 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         <th scope="col" role="columnheader"><button onClick={() => changeSort('observed_customer_count')}>Buyers{sortIndicator('observed_customer_count')}</button></th>
         <th scope="col" role="columnheader"><button onClick={() => changeSort('active_qualification_count')}>7G{sortIndicator('active_qualification_count')}</button></th>
         <th scope="col" role="columnheader"><button onClick={() => changeSort('identity_confidence')}>Identity{sortIndicator('identity_confidence')}</button></th>
-        {adminAccess && <th scope="col" role="columnheader">Admin database</th>}
         <th scope="col" role="columnheader" aria-label="Open firm" />
       </tr></thead><tbody>{visible.map(firm => <tr key={firm.firm_id} onClick={() => openFirm(firm)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') openFirm(firm) }}>
         <td className="account-cell firm-name-cell">
@@ -296,15 +209,6 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         <td><strong>{number.format(firm.observed_customer_count)}</strong><small>{number.format(firm.repeat_buyer_count)} repeat buyer{firm.repeat_buyer_count === 1 ? '' : 's'}</small></td>
         <td><strong>{number.format(firm.active_qualification_count)}</strong><small>{number.format(firm.qualification_count)} observed registration{firm.qualification_count === 1 ? '' : 's'}</small></td>
         <td><span className={`health-badge health-${firm.identity_confidence === 'VERIFY' || firm.identity_confidence === 'UNRESOLVED' ? 'warning' : 'healthy'}`}>{firm.identity_confidence}</span><small>{label(firm.resolution_method)}</small></td>
-        {adminAccess && (() => {
-          const profile = adminByCompanyId.get(firm.firm_id)
-          return <td className="company-admin-list-cell">{profile ? <>
-            <strong>{profile.rollup_name || profile.legal_name || firm.canonical_name}</strong>
-            <span>{profile.website ? profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '') : adminLocation(profile)}</span>
-            <small>{adminRevenue(profile)}{profile.revenue_year ? ` · ${profile.revenue_year}` : ''} · {relationshipLabel(profile.relationship_status)}</small>
-            {profile.parent_company_name && <small>Parent: {profile.parent_company_name}</small>}
-          </> : <><strong>Not enriched</strong><span>Open profile to add private company data</span></>}</td>
-        })()}
         <td className="row-arrow">›</td>
       </tr>)}</tbody></table></div>}
 
@@ -317,26 +221,5 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         </div>
       </div>
     </div>}
-
-    {payload && adminAccess && <details id="company-admin-tools" className="company-admin-tools">
-      <summary>
-        <div>
-          <span className="page-kicker">Admin only · secondary tools</span>
-          <strong>Research queue, follow-up pipeline &amp; sourced import</strong>
-        </div>
-        <span>Open admin tools</span>
-      </summary>
-      <div className="company-admin-tools-body">
-        <CompanyAdminWorkspace
-          firms={payload.firms}
-          profiles={adminProfiles}
-          onProfilesChanged={async () => { setAdminProfiles(await loadCompanyAdminDirectory()) }}
-        />
-        <CompanyAdminImportPanel
-          firms={payload.firms}
-          onImported={async () => { setAdminProfiles(await loadCompanyAdminDirectory()) }}
-        />
-      </div>
-    </details>}
   </section>
 }
