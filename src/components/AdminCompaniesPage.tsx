@@ -23,6 +23,26 @@ const statuses: CompanyRelationshipStatus[] = [
   'uncontacted','researching','outreach-planned','contacted','engaged','opportunity','customer','not-pursuing',
 ]
 const pipelineStatuses = new Set<CompanyRelationshipStatus>(['contacted','engaged','opportunity','customer'])
+const relationshipRank: Record<CompanyRelationshipStatus, number> = {
+  'uncontacted':0,
+  'researching':1,
+  'outreach-planned':2,
+  'contacted':3,
+  'engaged':4,
+  'opportunity':5,
+  'customer':6,
+  'not-pursuing':-1,
+}
+
+function familyRelationshipStatus(members: CompanyAdminProfile[]): CompanyRelationshipStatus {
+  const active = members.filter(member => member.relationship_status !== 'not-pursuing')
+  if (!active.length) return 'not-pursuing'
+  return [...active].sort((a,b) => relationshipRank[b.relationship_status] - relationshipRank[a.relationship_status])[0].relationship_status
+}
+
+function familyNextActionDate(members: CompanyAdminProfile[]): string | null {
+  return members.map(member => member.next_action_date).filter((value): value is string => Boolean(value)).sort()[0] ?? null
+}
 
 function human(value: string): string {
   return value.replaceAll('_',' ').replaceAll('-',' ').replace(/(^|\s)\S/g, match => match.toUpperCase())
@@ -172,8 +192,8 @@ export function AdminCompaniesPage() {
         publicContracts: publicRows.reduce((sum, firm) => sum + firm.observed_contract_count, 0),
         contacts: familyContacts,
         activities: familyActivities,
-        relationshipStatus: master.relationship_status,
-        nextActionDate: master.next_action_date,
+        relationshipStatus: familyRelationshipStatus(members),
+        nextActionDate: familyNextActionDate(members),
         research: queueById.get(masterId) ?? null,
         missing: missingFields(master, familyContacts),
       }
