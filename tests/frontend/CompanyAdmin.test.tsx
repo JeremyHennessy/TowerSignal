@@ -107,11 +107,15 @@ test('admin company panel exposes private enrichment without changing public evi
   const website = screen.getAllByDisplayValue('https://alpha.example')[0]
   await user.clear(website)
   await user.type(website, 'https://alpha-water.example')
+  const legalName = screen.getByDisplayValue('Alpha Water Services LLC')
+  await user.clear(legalName)
+  await user.type(legalName, 'Alpha Water Group LLC')
   await user.click(screen.getByRole('button', { name:'Save company' }))
 
   expect(adminClient.saveCompanyAdminProfile).toHaveBeenCalled()
   const savedPatch = vi.mocked(adminClient.saveCompanyAdminProfile).mock.calls.at(-1)?.[2]
   expect(savedPatch?.website).toBe('https://alpha-water.example')
+  expect(savedPatch?.legal_name).toBe('Alpha Water Group LLC')
 })
 
 test('non-admin user never receives the private editor', async () => {
