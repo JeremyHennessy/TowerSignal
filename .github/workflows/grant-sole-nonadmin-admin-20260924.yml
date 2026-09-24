@@ -1,0 +1,77 @@
+name: Grant sole non-admin TowerSignal admin access
+
+on:
+  push:
+    branches:
+      - ops/grant-sole-nonadmin-admin-20260924
+    paths:
+      - '.github/workflows/grant-sole-nonadmin-admin-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  grant:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Promote sole non-admin only if production auth invariant matches
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          DO $$
+          DECLARE
+            v_users integer;
+            v_admins integer;
+            v_nonadmins integer;
+            v_updated integer;
+          BEGIN
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin';
+            SELECT count(*) INTO v_nonadmins
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,'')) <> 'admin';
+
+            IF v_users <> 2 OR v_admins <> 1 OR v_nonadmins <> 1 THEN
+              RAISE EXCEPTION 'Auth guard failed: users=% admins=% nonadmins=%', v_users, v_admins, v_nonadmins;
+            END IF;
+
+            UPDATE neon_auth."user"
+            SET role='admin'
+            WHERE lower(coalesce(role,'')) <> 'admin';
+
+            GET DIAGNOSTICS v_updated = ROW_COUNT;
+            IF v_updated <> 1 THEN
+              RAISE EXCEPTION 'Expected exactly one promoted user, updated=%', v_updated;
+            END IF;
+          END $$;
+
+          COMMIT;
+
+          DO $$
+          DECLARE
+            v_users integer;
+            v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin';
+
+            IF v_users <> 2 OR v_admins <> 2 THEN
+              RAISE EXCEPTION 'Postcondition failed: users=% admins=%', v_users, v_admins;
+            END IF;
+          END $$;
+
+          SELECT 'ADMIN_PROMOTION=PASS' AS result,
+                 (SELECT count(*) FROM neon_auth."user") AS users,
+                 (SELECT count(*) FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin') AS admins;
+          SQL
