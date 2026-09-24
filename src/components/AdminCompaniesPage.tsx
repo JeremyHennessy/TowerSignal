@@ -270,7 +270,7 @@ export function AdminCompaniesPage() {
       ].filter(Boolean).join(' ').toLowerCase()
       return haystack.includes(needle)
     })
-  }, [families, classification, salesStageFilter, gap, search, profileById])
+  }, [families, classification, salesStageFilter, gap, search, profileById, salesAccounts])
 
   const today = new Date().toISOString().slice(0,10)
   const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().slice(0,10)
