@@ -1,0 +1,71 @@
+name: Apply authoritative sales workflow schema
+
+on:
+  push:
+    branches:
+      - ops/apply-authoritative-sales-workflow-20260924
+    paths:
+      - '.github/workflows/apply-authoritative-sales-workflow-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guard CRM baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_accounts integer; v_members integer;
+          BEGIN
+            SELECT count(*) INTO v_accounts FROM public.company_sales_accounts WHERE record_status='active';
+            SELECT count(*) INTO v_members FROM public.company_sales_account_members;
+            IF v_accounts <> 101 OR v_members <> 340 THEN
+              RAISE EXCEPTION 'Sales baseline mismatch accounts=% members=%',v_accounts,v_members;
+            END IF;
+          END $$;
+          SELECT 'AUTHORITATIVE_SALES_PRECHECK=PASS' AS result;
+          SQL
+      - name: Validate migration with rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          source=Path('database/migrations/009_authoritative_sales_workflow.sql').read_text()
+          pos=source.rfind('COMMIT;')
+          assert pos >= 0
+          Path('/tmp/009_validation.sql').write_text(source[:pos]+'ROLLBACK;\n')
+          PY
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f /tmp/009_validation.sql
+          echo "AUTHORITATIVE_SALES_VALIDATION=PASS"
+      - name: Apply authoritative sales migration
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f database/migrations/009_authoritative_sales_workflow.sql
+      - name: Verify pipeline view
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_view regclass; v_rows integer;
+          BEGIN
+            SELECT to_regclass('public.company_sales_pipeline_state') INTO v_view;
+            SELECT count(*) INTO v_rows FROM public.company_sales_pipeline_state;
+            IF v_view IS NULL OR v_rows <> 101 THEN
+              RAISE EXCEPTION 'Authoritative sales acceptance failed view=% rows=%',v_view,v_rows;
+            END IF;
+          END $$;
+          SELECT 'AUTHORITATIVE_SALES_ACCEPTANCE=PASS' AS result,
+                 count(*) AS active_sales_accounts,
+                 sum(open_opportunity_count) AS open_opportunities,
+                 sum(open_task_count) AS open_tasks
+          FROM public.company_sales_pipeline_state;
+          SQL
