@@ -62,35 +62,40 @@ export function scoreCompanySalesAccount({
     fitReasons.push('Relevant water/cooling-tower service category (+8)')
   }
 
-  const serviced=publicFirms.reduce((sum,firm)=>sum+firm.serviced_site_count,0)
+  const serviceRoles=new Set(['DWT_INSPECTION_PROVIDER','DWT_LABORATORY','DEC_7G_REGISTERED_BUSINESS'])
+  const serviceFirms=publicFirms.filter(firm=>firm.roles.some(role=>serviceRoles.has(role)))
+  const procurementFirms=publicFirms.filter(firm=>firm.roles.includes('PROCUREMENT_VENDOR'))
+
+  const serviced=serviceFirms.reduce((sum,firm)=>sum+firm.serviced_site_count,0)
   const servicedPoints=cappedLog(serviced,250,15)
   fit+=servicedPoints
-  if(servicedPoints) fitReasons.push(`${serviced.toLocaleString()} serviced-site relationships (+${servicedPoints})`)
+  if(servicedPoints) fitReasons.push(`${serviced.toLocaleString()} service-provider site relationships (+${servicedPoints})`)
 
-  const towerAccounts=publicFirms.reduce((sum,firm)=>sum+firm.tower_account_count,0)
+  const towerAccounts=serviceFirms.reduce((sum,firm)=>sum+firm.tower_account_count,0)
   const towerPoints=cappedLog(towerAccounts,150,12)
   fit+=towerPoints
-  if(towerPoints) fitReasons.push(`${towerAccounts.toLocaleString()} tower-account links (+${towerPoints})`)
+  if(towerPoints) fitReasons.push(`${towerAccounts.toLocaleString()} service-provider tower-account links (+${towerPoints})`)
 
-  const contracts=publicFirms.reduce((sum,firm)=>sum+firm.observed_contract_count,0)
+  const contracts=procurementFirms.reduce((sum,firm)=>sum+firm.observed_contract_count,0)
   const contractPoints=cappedLog(contracts,25,7)
   fit+=contractPoints
-  if(contractPoints) fitReasons.push(`${contracts.toLocaleString()} observed public contracts (+${contractPoints})`)
+  if(contractPoints) fitReasons.push(`${contracts.toLocaleString()} observed public vendor contracts (+${contractPoints})`)
 
-  const customers=publicFirms.reduce((sum,firm)=>sum+firm.observed_customer_count,0)
+  const customers=procurementFirms.reduce((sum,firm)=>sum+firm.observed_customer_count,0)
   const customerPoints=Math.min(5,customers)
   fit+=customerPoints
   if(customerPoints) fitReasons.push(`${customers.toLocaleString()} observed public buyers (+${customerPoints})`)
 
-  if(publicFirms.some(firm=>firm.active_last_12m)){
+  const commercialFirms=publicFirms.filter(firm=>firm.roles.some(role=>serviceRoles.has(role)||role==='PROCUREMENT_VENDOR'))
+  if(commercialFirms.some(firm=>firm.active_last_12m)){
     fit+=5
-    fitReasons.push('Observed public activity in the last 12 months (+5)')
+    fitReasons.push('Recent provider/lab/vendor activity in the last 12 months (+5)')
   }
 
-  const observations=publicFirms.reduce((sum,firm)=>sum+firm.observation_count,0)
+  const observations=commercialFirms.reduce((sum,firm)=>sum+firm.observation_count,0)
   const observationPoints=cappedLog(observations,500,6)
   fit+=observationPoints
-  if(observationPoints) fitReasons.push(`${observations.toLocaleString()} public observations (+${observationPoints})`)
+  if(observationPoints) fitReasons.push(`${observations.toLocaleString()} relevant commercial observations (+${observationPoints})`)
 
   fit=Math.min(100,fit)
 
