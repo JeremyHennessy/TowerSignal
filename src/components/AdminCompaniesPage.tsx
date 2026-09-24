@@ -174,6 +174,8 @@ export function AdminCompaniesPage() {
         loadAllCompanySalesTasks(),
         loadAllCompanySalesDemos(),
         loadAllCompanySalesProposals(),
+        loadAllCompanySalesSubscriptions(),
+        loadAllCompanySalesRenewals(),
         loadCompanySalesAccounts(),
         loadCompanySalesAccountMembers(),
       ])
