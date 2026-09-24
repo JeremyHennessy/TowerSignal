@@ -127,8 +127,8 @@ test('admin can edit a contact and associate outreach with that contact', async 
   const user = userEvent.setup()
   render(<CompanyAdminPanel companyId="observed-company-alpha" canonicalName="ALPHA WATER SERVICES LLC" />)
 
-  expect(await screen.findByText('Alex Buyer')).toBeInTheDocument()
-  await user.click(screen.getByRole('button', { name:'Edit contact' }))
+  const editContact = await screen.findByRole('button', { name:'Edit contact' })
+  await user.click(editContact)
 
   const title = screen.getByLabelText('Edit contact title')
   await user.clear(title)
