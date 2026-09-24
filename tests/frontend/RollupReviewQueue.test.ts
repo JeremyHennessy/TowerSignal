@@ -34,3 +34,12 @@ test('roll-up queue auto-syncs evidence suggestions without auto-accepting merge
   expect(panel).toContain('await syncCompanyRollupSuggestions(candidates)')
   expect(panel).toContain("if(next==='accepted' && !window.confirm")
 })
+
+
+test('roll-up queue resolves readable company names instead of exposing sales-account ids',()=>{
+  expect(panel).toContain('const accountNameById=useMemo')
+  expect(panel).toContain('profile?.rollup_name ?? profile?.legal_name ?? profile?.canonical_name')
+  expect(panel).toContain("const accountName=(salesAccountId:string)=>accountNameById.get(salesAccountId) ?? 'Account name unavailable'")
+  expect(panel).not.toContain('candidate?.display_name ?? row.candidate_sales_account_id')
+  expect(panel).not.toContain('target?.display_name ?? row.suggested_sales_account_id')
+})
