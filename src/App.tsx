@@ -26,15 +26,17 @@ import { SourceHealthPage } from './components/SourceHealthPage'
 import { WaterQualityPage } from './components/WaterQualityPage'
 import { WorkflowWorkspacePage } from './components/WorkflowWorkspacePage'
 import { ServiceOperationsPage } from './components/ServiceOperationsPage'
+import { AdminCompaniesPage } from './components/AdminCompaniesPage'
+import { AdminCompanyProfilePage } from './components/AdminCompanyProfilePage'
 import { ShareButton } from './components/ShareButton'
 import { TopNavigation, type WorkspaceMode } from './components/TopNavigation'
 import { exportCsv } from './utils/export'
 import { exportWorkflowCsv } from './utils/workflowExport'
 import { useWorkflow } from './workflow/useWorkflow'
 
-type ProductMode = WorkspaceMode | 'nys-account' | 'company' | 'service'
+type ProductMode = WorkspaceMode | 'nys-account' | 'company' | 'service' | 'admin-companies' | 'admin-company'
 
-const validModes = new Set<ProductMode>(['prospect','monitor','map','nys','nys-changes','opportunities','companies','company','service','water-quality','portfolios','workflow','source-health','account','nys-account'])
+const validModes = new Set<ProductMode>(['prospect','monitor','map','nys','nys-changes','opportunities','companies','company','service','admin-companies','admin-company','water-quality','portfolios','workflow','source-health','account','nys-account'])
 const filterKeys = Object.keys(initialFilters) as Array<keyof FilterState>
 const ACCOUNT_RETURN_KEY = 'towersignal.account-return.v1'
 
@@ -97,6 +99,7 @@ export default function App() {
   const [selected, setSelected] = useState<SystemSummary | null>(null)
   const [selectedNys, setSelectedNys] = useState<NysSystem | null>(null)
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(initialRoute.mode === 'company' ? initialRoute.id : null)
+  const [selectedAdminCompanyId, setSelectedAdminCompanyId] = useState<string | null>(initialRoute.mode === 'admin-company' ? initialRoute.id : null)
   const [mode, setMode] = useState<ProductMode>(initialRoute.mode)
   const [returnMode, setReturnMode] = useState<ProductMode>(() => initialRoute.mode === 'account' ? (readAccountReturn()?.mode ?? 'prospect') : 'prospect')
   const [viewName, setViewName] = useState('')
@@ -146,6 +149,11 @@ export default function App() {
       } else if (route.mode !== 'company') {
         setSelectedCompanyId(null)
       }
+      if (route.mode === 'admin-company' && route.id) {
+        setSelectedAdminCompanyId(route.id)
+      } else if (route.mode !== 'admin-company') {
+        setSelectedAdminCompanyId(null)
+      }
     }
     apply()
     window.addEventListener('hashchange', apply)
@@ -163,12 +171,13 @@ export default function App() {
   }, [changes, watchedOnly, workflow.user, workflow.watchedSystemIds])
 
   const navigate = useCallback((next: ProductMode) => {
-    if (next === 'account' || next === 'nys-account' || next === 'company') return
+    if (next === 'account' || next === 'nys-account' || next === 'company' || next === 'admin-company') return
     const returnState = next === 'workflow' ? readAccountReturn() : null
     setMode(next)
     setSelected(null)
     setSelectedNys(null)
     setSelectedCompanyId(null)
+    setSelectedAdminCompanyId(null)
     const normalizedFilters = { ...filters, preset: normalizeProspectPreset(filters.preset) }
     window.location.hash = next === 'prospect' || next === 'map' ? routeHash(next, null, normalizedFilters) : routeHash(next)
     if (next === 'workflow' && returnState?.mode === 'workflow') {
@@ -275,7 +284,7 @@ export default function App() {
 
   return <main className={`app-shell saas-shell reference-shell mode-${mode}`}>
     <TopNavigation
-      mode={mode === 'nys-account' ? 'nys' : mode === 'company' || mode === 'service' ? 'companies' : mode}
+      mode={mode === 'nys-account' ? 'nys' : ['company','service','admin-companies','admin-company'].includes(mode) ? 'companies' : mode}
       onNavigate={next => navigate(next)}
       search={globalSearch}
       onSearchChange={setGlobalSearch}
@@ -291,7 +300,7 @@ export default function App() {
     />
 
     <div className="main-stage">
-      {!['opportunities','companies','company','service','water-quality','portfolios','workflow','source-health','account','nys-account'].includes(mode) && <header className="utility-bar reference-utility-bar">
+      {!['opportunities','companies','company','service','admin-companies','admin-company','water-quality','portfolios','workflow','source-health','account','nys-account'].includes(mode) && <header className="utility-bar reference-utility-bar">
         <div><span className="utility-kicker">{nysMode ? 'New York State' : 'New York City'}</span><strong>{mode === 'prospect' ? 'Prospect workspace' : mode === 'monitor' ? 'Monitor workspace' : mode === 'map' ? 'Map workspace' : mode === 'nys' ? 'NYS Market' : 'NYS Changes'}</strong></div>
         <div className="utility-actions"><ShareButton url={currentShareUrl} label="Share view" /><span className="coverage-chip">Data refreshed {formatTimestamp(nysMode ? nysPayload.metadata.generated_at : payload.metadata.generated_at)}</span>{!nysMode && acrisAvailable && acrisMetadata.acris_cache_generated_at && <span className="coverage-chip">ACRIS verified {formatTimestamp(acrisMetadata.acris_cache_generated_at)}</span>}{!nysMode && <button className="primary" onClick={() => exportCsv(filtered, payload.metadata)}>Export {filtered.length.toLocaleString()} accounts</button>}</div>
       </header>}
@@ -327,6 +336,9 @@ export default function App() {
       {mode === 'companies' && <CompaniesPage onOpenCompany={openCompany} />}
       {mode === 'company' && selectedCompanyId && <CompanyProfilePage companyId={selectedCompanyId} onBack={() => navigate('companies')} onOpenCompany={openCompany} />}
       {mode === 'company' && !selectedCompanyId && <section className="product-page company-profile-page"><div className="reference-empty-state"><strong>Company ID is missing from this share link.</strong><button onClick={() => navigate('companies')}>Return to Companies</button></div></section>}
+      {mode === 'admin-companies' && <AdminCompaniesPage />}
+      {mode === 'admin-company' && selectedAdminCompanyId && <AdminCompanyProfilePage companyId={selectedAdminCompanyId} />}
+      {mode === 'admin-company' && !selectedAdminCompanyId && <section className="product-page admin-company-page"><div className="reference-empty-state"><strong>Private company ID is missing from this link.</strong><a className="secondary-link-button" href="#/admin-companies">Return to company command center</a></div></section>}
       {mode === 'service' && <ServiceOperationsPage />}
       {mode === 'water-quality' && <WaterQualityPage />}
       {mode === 'portfolios' && <PortfoliosPage payload={payload} watchedSystemIds={workflow.watchedSystemIds} onOpenAccount={openAccount} />}
