@@ -26,6 +26,7 @@ test('service reporting migration creates normalized admin-only operational mode
   expect(sql).toContain('service_visits_agreement_site_fk')
   expect(sql).toContain('service_measurements_visit_site_fk')
   expect(sql).toContain('service_documents_asset_site_fk')
+  expect(sql).toContain('ON DELETE NO ACTION')
   expect(sql).toContain('ENABLE ROW LEVEL SECURITY')
   expect(sql).toContain('towersignal_is_admin()')
   expect(sql).not.toContain('DISABLE ROW LEVEL SECURITY')
@@ -37,4 +38,21 @@ test('repository records the applied concise company-audit refinement', () => {
   expect(refinement).toContain("TG_OP = 'INSERT'")
   expect(refinement).toContain("new_value = 'null'::jsonb")
   expect(refinement).toContain('company_private_change_log')
+})
+
+
+const repairSql = readFileSync('database/migrations/005a_service_fk_delete_fix.sql', 'utf8')
+
+test('service FK repair preserves site identity when optional parents are deleted', () => {
+  for (const constraint of [
+    'service_sites_portfolio_client_fk',
+    'service_visits_agreement_site_fk',
+    'service_measurements_asset_site_fk',
+    'service_actions_visit_site_fk',
+    'service_actions_asset_site_fk',
+    'service_documents_visit_site_fk',
+    'service_documents_asset_site_fk',
+  ]) expect(repairSql).toContain(constraint)
+  expect(repairSql).not.toContain('ON DELETE SET NULL')
+  expect(repairSql).toContain('ON DELETE NO ACTION')
 })
