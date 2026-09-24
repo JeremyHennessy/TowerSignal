@@ -74,3 +74,12 @@
 @media(max-width:460px){
   .admin-company-metrics,.admin-company-profile-metrics{grid-template-columns:1fr}
 }
+
+.admin-company-attention-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.admin-company-activity-list{display:grid}
+.admin-company-activity-list>a{display:grid;gap:.12rem;padding:.7rem .85rem;border-top:1px solid var(--border);text-decoration:none;color:inherit}
+.admin-company-activity-list>a:first-child{border-top:0}
+.admin-company-activity-list>a:hover{background:#f8fafb}
+.admin-company-activity-list>a span,.admin-company-activity-list>a small{color:var(--muted);font-size:.76rem}
+.admin-company-activity-list>.company-admin-empty{padding:.85rem}
+@media(max-width:900px){.admin-company-attention-grid{grid-template-columns:1fr}}
