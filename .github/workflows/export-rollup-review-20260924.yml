@@ -45,3 +45,105 @@ jobs:
             count(*) FILTER (WHERE status='superseded') AS superseded
           FROM public.company_rollup_suggestions;
           SQL
+
+      - name: Generate current roll-up candidates read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -At -c "
+          SELECT jsonb_build_object(
+            'accounts',(SELECT coalesce(jsonb_agg(to_jsonb(a)),'[]'::jsonb) FROM public.company_sales_accounts a),
+            'members',(SELECT coalesce(jsonb_agg(to_jsonb(m)),'[]'::jsonb) FROM public.company_sales_account_members m),
+            'profiles',(SELECT coalesce(jsonb_agg(to_jsonb(p)),'[]'::jsonb) FROM public.company_private_profiles p),
+            'contacts',(SELECT coalesce(jsonb_agg(to_jsonb(c)),'[]'::jsonb) FROM public.company_private_contacts c)
+          )" > /tmp/rollup-input.json
+          curl --fail --silent --show-error --location https://jeremyhennessy.github.io/TowerSignal/data/known-firms.json -o /tmp/known-firms.json
+          python - <<'PY'
+          import json, math, re
+          from urllib.parse import urlparse
+
+          private=json.load(open('/tmp/rollup-input.json'))
+          known=json.load(open('/tmp/known-firms.json'))
+          firms={f['firm_id']:f for f in known['firms']}
+          profiles={p['company_id']:p for p in private['profiles']}
+          legal={'INC','INCORPORATED','LLC','LTD','LIMITED','LLP','LP','CORP','CORPORATION','CO','COMPANY','PLC','PC'}
+          public_mail={'gmail.com','outlook.com','hotmail.com','yahoo.com','icloud.com','aol.com'}
+
+          def normalize(value):
+              tokens=re.sub(r'[^A-Z0-9]+',' ',(value or '').upper().replace('&',' AND ')).strip().split()
+              while tokens and tokens[-1] in legal: tokens.pop()
+              return ' '.join(tokens)
+          def address(p):
+              return re.sub(r'[^A-Z0-9]+',' ',' '.join(str(p.get(k) or '') for k in ('headquarters_address','headquarters_city','headquarters_region','headquarters_postal_code')).upper()).strip()
+          def domain(value):
+              if not value: return None
+              try:
+                  host=(urlparse(value).hostname or '').lower()
+                  return re.sub(r'^www\.','',host) or None
+              except Exception: return None
+          def email_domain(value):
+              if not value or '@' not in value: return None
+              d=value.rsplit('@',1)[1].strip().lower()
+              return d if d and d not in public_mail else None
+          def similarity(a,b):
+              aa=set(normalize(a).split()); bb=set(normalize(b).split())
+              return len(aa&bb)/len(aa|bb) if aa and bb else 0
+          def completeness(p):
+              if not p: return 0
+              vals=[p.get('legal_name'),p.get('website'),p.get('headquarters_address') or p.get('headquarters_city'),p.get('company_type'),p.get('parent_company_name'),p.get('identity_source_url')]
+              return sum(bool(x) for x in vals)
+
+          contexts=[]
+          for a in private['accounts']:
+              if a.get('record_status')!='active': continue
+              links=[m for m in private['members'] if m['sales_account_id']==a['sales_account_id']]
+              rows=[profiles[m['company_id']] for m in links if m['company_id'] in profiles]
+              names={a['display_name']}
+              websites=set(); addresses=set()
+              for p in rows:
+                  for k in ('canonical_name','legal_name','rollup_name'):
+                      if p.get(k): names.add(str(p[k]))
+                  d=domain(p.get('website'))
+                  if d: websites.add(d)
+                  ad=address(p)
+                  if ad: addresses.add(ad)
+              member_ids={m['company_id'] for m in links}
+              contact_rows=[c for c in private['contacts'] if c.get('company_id') in member_ids and c.get('active')]
+              emails={d for d in (email_domain(c.get('email')) for c in contact_rows) if d}
+              observations=sum((firms.get(m['company_id']) or {}).get('observation_count',0) or 0 for m in links)
+              primary=profiles.get(a['primary_company_id'])
+              strength=len(links)*4+min(30,math.log1p(observations)*5)+completeness(primary)*5+min(15,len(contact_rows)*5)
+              contexts.append(dict(account=a,names=names,websites=websites,emails=emails,addresses=addresses,strength=strength))
+
+          suggestions=[]
+          for i,left in enumerate(contexts):
+              for right in contexts[i+1:]:
+                  ln=normalize(left['account'].get('display_name')); rn=normalize(right['account'].get('display_name'))
+                  if normalize(left['account'].get('parent_name'))==rn or normalize(right['account'].get('parent_name'))==ln: continue
+                  score=0; evidence=[]
+                  exact=any(normalize(a) and normalize(a)==normalize(b) for a in left['names'] for b in right['names'])
+                  if exact:
+                      score+=55; evidence.append('Exact normalized company-name match')
+                  best=max((similarity(a,b) for a in left['names'] for b in right['names']),default=0)
+                  if not exact:
+                      if best>=.85: score+=30; evidence.append(f'Very strong name-token similarity ({round(best*100)}%)')
+                      elif best>=.70: score+=20; evidence.append(f'Strong name-token similarity ({round(best*100)}%)')
+                      elif best>=.60: score+=10; evidence.append(f'Moderate name-token similarity ({round(best*100)}%)')
+                  common=left['websites']&right['websites']
+                  if common:
+                      value=sorted(common)[0]; score+=35; evidence.append(f'Same website domain: {value}')
+                  common=left['emails']&right['emails']
+                  if common:
+                      value=sorted(common)[0]; score+=30; evidence.append(f'Same non-public email domain: {value}')
+                  if left['addresses']&right['addresses']:
+                      score+=20; evidence.append('Same recorded headquarters address')
+                  if score<55: continue
+                  score=min(100,score)
+                  target=left if left['strength']>=right['strength'] else right
+                  candidate=right if target is left else left
+                  suggestions.append((score,'high' if score>=80 else 'medium' if score>=65 else 'low',candidate['account']['sales_account_id'],candidate['account']['display_name'],target['account']['sales_account_id'],target['account']['display_name'],' | '.join(evidence)))
+          suggestions.sort(key=lambda x:(-x[0],x[2],x[4]))
+          print('GENERATED_ROLLUP_SUGGESTIONS',len(suggestions))
+          for row in suggestions:
+              print('ROLLUP_CANDIDATE',*row,sep='\t')
+          PY
