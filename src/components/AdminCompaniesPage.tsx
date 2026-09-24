@@ -269,18 +269,6 @@ export function AdminCompaniesPage() {
     return map
   }, [families])
 
-  const opportunitiesByFamily = useMemo(() => {
-    const map = new Map<string, CompanySalesOpportunity[]>()
-    opportunities.forEach(opportunity => {
-      const family = familyByMemberId.get(opportunity.company_id)
-      const masterId = family?.masterId ?? opportunity.company_id
-      const rows = map.get(masterId) ?? []
-      rows.push(opportunity)
-      map.set(masterId, rows)
-    })
-    return map
-  }, [opportunities, familyByMemberId])
-
   const activeSalesOpportunities = opportunities.filter(opportunity => activeOpportunityStages.has(opportunity.stage))
   const openPipelineArr = activeSalesOpportunities.reduce((sum, opportunity) => sum + (opportunity.estimated_arr ?? 0), 0)
   const wonArr = opportunities.filter(opportunity => opportunity.stage === 'closed-won').reduce((sum, opportunity) => sum + (opportunity.estimated_arr ?? 0), 0)
