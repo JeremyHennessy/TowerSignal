@@ -67,12 +67,31 @@ jobs:
           firms={f['firm_id']:f for f in known['firms']}
           profiles={p['company_id']:p for p in private['profiles']}
           legal={'INC','INCORPORATED','LLC','LTD','LIMITED','LLP','LP','CORP','CORPORATION','CO','COMPANY','PLC','PC'}
+          aliases={'BLDG':'BUILDING','MGMT':'MANAGEMENT','SVCS':'SERVICES','SVC':'SERVICE','LAB':'LABORATORY','LABS':'LABORATORIES'}
           public_mail={'gmail.com','outlook.com','hotmail.com','yahoo.com','icloud.com','aol.com'}
 
           def normalize(value):
               tokens=re.sub(r'[^A-Z0-9]+',' ',(value or '').upper().replace('&',' AND ')).strip().split()
               while tokens and tokens[-1] in legal: tokens.pop()
-              return ' '.join(tokens)
+              return ' '.join(aliases.get(token,token) for token in tokens)
+          def damerau(a,b):
+              rows=len(a)+1; cols=len(b)+1
+              d=[[0]*cols for _ in range(rows)]
+              for i in range(rows): d[i][0]=i
+              for j in range(cols): d[0][j]=j
+              for i in range(1,rows):
+                  for j in range(1,cols):
+                      cost=0 if a[i-1]==b[j-1] else 1
+                      d[i][j]=min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+cost)
+                      if i>1 and j>1 and a[i-1]==b[j-2] and a[i-2]==b[j-1]:
+                          d[i][j]=min(d[i][j],d[i-2][j-2]+1)
+              return d[-1][-1]
+          def near_exact(left,right):
+              a=normalize(left).replace(' ',''); b=normalize(right).replace(' ','')
+              if not a or not b or min(len(a),len(b))<4: return None
+              dist=damerau(a,b); mx=max(len(a),len(b)); sim=1-dist/mx
+              ok=(mx<=5 and dist==1) or (mx>=8 and dist==1) or (mx>=12 and dist==2 and sim>=.88)
+              return (dist,sim) if ok else None
           def address(p):
               return re.sub(r'[^A-Z0-9]+',' ',' '.join(str(p.get(k) or '') for k in ('headquarters_address','headquarters_city','headquarters_region','headquarters_postal_code')).upper()).strip()
           def domain(value):
@@ -124,8 +143,16 @@ jobs:
                   exact=any(normalize(a) and normalize(a)==normalize(b) for a in left['names'] for b in right['names'])
                   if exact:
                       score+=55; evidence.append('Exact normalized company-name match')
-                  best=max((similarity(a,b) for a in left['names'] for b in right['names']),default=0)
+                  best_near=None
                   if not exact:
+                      for a_name in left['names']:
+                          for b_name in right['names']:
+                              candidate=near_exact(a_name,b_name)
+                              if candidate and (best_near is None or candidate[1]>best_near[1]): best_near=candidate
+                      if best_near:
+                          score+=55; evidence.append(f"Near-exact normalized company-name spelling ({best_near[0]} edit{'s' if best_near[0]!=1 else ''})")
+                  best=max((similarity(a,b) for a in left['names'] for b in right['names']),default=0)
+                  if not exact and not best_near:
                       if best>=.85: score+=30; evidence.append(f'Very strong name-token similarity ({round(best*100)}%)')
                       elif best>=.70: score+=20; evidence.append(f'Strong name-token similarity ({round(best*100)}%)')
                       elif best>=.60: score+=10; evidence.append(f'Moderate name-token similarity ({round(best*100)}%)')
