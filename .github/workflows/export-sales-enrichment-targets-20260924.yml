@@ -1,0 +1,183 @@
+name: Export ranked sales enrichment targets
+
+on:
+  push:
+    branches:
+      - ops/export-sales-enrichment-targets-20260924
+    paths:
+      - '.github/workflows/export-sales-enrichment-targets-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export private sales-account baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -At <<'SQL' > /tmp/private-sales.json
+          SELECT jsonb_build_object(
+            'accounts',(SELECT coalesce(jsonb_agg(to_jsonb(a) ORDER BY a.display_name),'[]'::jsonb) FROM public.company_sales_accounts a WHERE a.record_status='active'),
+            'members',(SELECT coalesce(jsonb_agg(to_jsonb(m)),'[]'::jsonb) FROM public.company_sales_account_members m),
+            'profiles',(SELECT coalesce(jsonb_agg(to_jsonb(p)),'[]'::jsonb) FROM public.company_private_profiles p),
+            'contacts',(SELECT coalesce(jsonb_agg(to_jsonb(c)),'[]'::jsonb) FROM public.company_private_contacts c WHERE c.active)
+          );
+          SQL
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/private-sales.json'))
+          assert len(p['accounts']) == 101
+          assert len(p['members']) == 340
+          print('PRIVATE_SALES_EXPORT=PASS',len(p['accounts']),len(p['members']),len(p['contacts']))
+          PY
+
+      - name: Download current public Known Firms
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location https://jeremyhennessy.github.io/TowerSignal/data/known-firms.json -o /tmp/known-firms.json
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/known-firms.json'))
+          assert p.get('domain')=='TOWERSIGNAL_KNOWN_FIRMS'
+          print('KNOWN_FIRMS_DOWNLOAD=PASS',len(p['firms']))
+          PY
+
+      - name: Rank master sales accounts for enrichment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, math, re
+          private=json.load(open('/tmp/private-sales.json'))
+          known=json.load(open('/tmp/known-firms.json'))
+          firms={f['firm_id']:f for f in known['firms']}
+          profiles={p['company_id']:p for p in private['profiles']}
+          members={}
+          for m in private['members']:
+              members.setdefault(m['sales_account_id'],[]).append(m)
+          contacts={}
+          for c in private['contacts']:
+              contacts.setdefault(c.get('sales_account_id') or '',[]).append(c)
+
+          role_points={
+            'DWT_INSPECTION_PROVIDER':30,
+            'DWT_LABORATORY':25,
+            'DEC_7G_REGISTERED_BUSINESS':22,
+            'PROCUREMENT_VENDOR':8,
+            'DOB_NOW_APPLICANT_BUSINESS':3,
+            'DOB_NOW_OWNER_BUSINESS':1,
+            'LEGACY_DOB_OWNER_BUSINESS':1,
+          }
+          def clog(value,cap,points):
+              if not value: return 0
+              return round(points*min(1,math.log1p(value)/math.log1p(cap)))
+          def ownership(p):
+              return bool(p.get('parent_company_id') or p.get('parent_company_name') or re.search(r'independent(ly)? owned|independent company|privately held',p.get('internal_summary') or '',re.I))
+          def revenue(p):
+              return any(p.get(k) is not None for k in ('revenue_amount','revenue_low','revenue_high'))
+
+          rows=[]
+          for a in private['accounts']:
+              links=members.get(a['sales_account_id'],[])
+              public=[firms[m['company_id']] for m in links if m['company_id'] in firms]
+              master=profiles[a['primary_company_id']]
+              cs=contacts.get(a['sales_account_id'],[])
+              roles={r for f in public for r in f.get('roles',[])}
+              fit=min(42,sum(role_points.get(r,0) for r in roles))
+              reasons=[]
+              if fit: reasons.append('public roles')
+              cats=' '.join({c.lower() for f in public for c in f.get('service_categories',[])})
+              if re.search(r'water treatment|cooling tower|legionella|water management|water quality',cats):
+                  fit+=8; reasons.append('water/cooling-tower services')
+              serviced=sum(f.get('serviced_site_count',0) for f in public)
+              towers=sum(f.get('tower_account_count',0) for f in public)
+              contracts=sum(f.get('observed_contract_count',0) for f in public)
+              buyers=sum(f.get('observed_customer_count',0) for f in public)
+              observations=sum(f.get('observation_count',0) for f in public)
+              fit+=clog(serviced,250,15)+clog(towers,150,12)+clog(contracts,25,7)+min(5,buyers)+clog(observations,500,6)
+              if any(f.get('active_last_12m') for f in public): fit+=5
+              fit=min(100,fit)
+
+              ready=0
+              missing=[]
+              if master.get('website'): ready+=12
+              else: missing.append('website')
+              if master.get('headquarters_address') or master.get('headquarters_city'): ready+=10
+              else: missing.append('headquarters')
+              if master.get('company_type'): ready+=8
+              else: missing.append('company type')
+              if ownership(master): ready+=8
+              else: missing.append('ownership')
+              if master.get('identity_source_url'): ready+=7
+              else: missing.append('identity source')
+              if revenue(master): ready+=5
+              else: missing.append('revenue')
+              if master.get('enrichment_checked_at'): ready+=5
+              else: missing.append('freshness')
+              if cs: ready+=10
+              else: missing.append('contact')
+              if any(c.get('primary_contact') for c in cs): ready+=10
+              else: missing.append('primary contact')
+              if any(c.get('contact_role') in ('decision-maker','executive','champion') for c in cs): ready+=15
+              else: missing.append('decision maker')
+              if any(c.get('email') for c in cs): ready+=5
+              else: missing.append('email')
+              if any(c.get('phone') for c in cs): ready+=3
+              if any(c.get('linkedin_url') for c in cs): ready+=2
+              ready=min(100,ready)
+
+              rows.append({
+                'sales_account_id':a['sales_account_id'],
+                'display_name':a['display_name'],
+                'account_classification':a['account_classification'],
+                'primary_company_id':a['primary_company_id'],
+                'parent_name':a.get('parent_name'),
+                'fit_score':fit,
+                'readiness_score':ready,
+                'gap_score':100-ready,
+                'member_count':len(links),
+                'public_identity_count':len(public),
+                'serviced_site_count':serviced,
+                'tower_account_count':towers,
+                'observed_contract_count':contracts,
+                'observed_customer_count':buyers,
+                'observation_count':observations,
+                'website':master.get('website'),
+                'company_type':master.get('company_type'),
+                'headquarters_address':master.get('headquarters_address'),
+                'headquarters_city':master.get('headquarters_city'),
+                'headquarters_region':master.get('headquarters_region'),
+                'contacts':cs,
+                'missing_fields':missing,
+                'enrichment_priority':round(fit*0.7+(100-ready)*0.3),
+              })
+
+          eligible=[r for r in rows if r['account_classification'] not in ('customer','former-customer','partner','competitor','do-not-pursue')]
+          eligible.sort(key=lambda r:(-r['enrichment_priority'],-r['fit_score'],r['readiness_score'],r['display_name']))
+          output={
+            'schema':'TOWERSIGNAL_SALES_ENRICHMENT_TARGETS_V1',
+            'generated_at':'2026-09-24',
+            'account_count':len(rows),
+            'eligible_count':len(eligible),
+            'targets':eligible[:100],
+          }
+          json.dump(output,open('/tmp/sales-enrichment-targets.json','w'),indent=2)
+          print('SALES_ENRICHMENT_TARGETS=PASS eligible=',len(eligible),'top=',len(output['targets']))
+          for r in output['targets'][:20]:
+              print(r['fit_score'],r['readiness_score'],r['enrichment_priority'],r['display_name'],','.join(r['missing_fields']))
+          PY
+
+      - name: Upload ranked enrichment targets
+        uses: actions/upload-artifact@v4
+        with:
+          name: sales-enrichment-targets
+          path: /tmp/sales-enrichment-targets.json
+          retention-days: 1
