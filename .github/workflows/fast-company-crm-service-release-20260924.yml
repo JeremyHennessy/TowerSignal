@@ -11,15 +11,20 @@ on:
       - 'src/App.tsx'
       - 'src/companyAdmin/client.ts'
       - 'src/components/CompaniesPage.tsx'
+      - 'src/components/AdminCompaniesPage.tsx'
+      - 'src/components/AdminCompanyProfilePage.tsx'
       - 'src/components/UserAccountPage.tsx'
       - 'src/components/CompanyAdminPanel.tsx'
       - 'src/components/CompanyAdminWorkspace.tsx'
+      - 'src/components/CompanyFamilyPanel.tsx'
+      - 'src/components/CompanyProfilePage.tsx'
       - 'src/components/DetailPanel.tsx'
       - 'src/components/ServiceOperationsPage.tsx'
       - 'src/components/ServiceReportingPanel.tsx'
       - 'src/main.tsx'
       - 'src/serviceReporting/client.ts'
       - 'src/styles/company-admin.css'
+      - 'src/styles/company-admin-dashboard.css'
       - 'src/styles/known-firms.css'
       - 'src/styles/auth-gate.css'
       - 'src/styles/service-operations.css'
@@ -29,6 +34,7 @@ on:
       - 'tests/frontend/CompanyAdminDirectoryFilters.test.ts'
       - 'tests/frontend/UserAccountAdminAccess.test.tsx'
       - 'tests/frontend/CompanyResearchQueueSync.test.ts'
+      - 'tests/frontend/SeparateCompanyAdmin.test.ts'
       - 'tests/frontend/ServiceOperationsPage.test.tsx'
       - 'tests/frontend/ServiceReportingMigration.test.ts'
 
@@ -70,27 +76,32 @@ jobs:
             'database/migrations/005a_service_fk_delete_fix.sql',
             'src/App.tsx',
             'src/companyAdmin/client.ts',
+            'src/components/AdminCompaniesPage.tsx',
+            'src/components/AdminCompanyProfilePage.tsx',
             'src/components/CompaniesPage.tsx',
-            'src/components/UserAccountPage.tsx',
             'src/components/CompanyAdminPanel.tsx',
             'src/components/CompanyAdminWorkspace.tsx',
+            'src/components/CompanyFamilyPanel.tsx',
+            'src/components/CompanyProfilePage.tsx',
             'src/components/DetailPanel.tsx',
             'src/components/ServiceOperationsPage.tsx',
             'src/components/ServiceReportingPanel.tsx',
+            'src/components/UserAccountPage.tsx',
             'src/main.tsx',
             'src/serviceReporting/client.ts',
-            'src/styles/company-admin.css',
-            'src/styles/known-firms.css',
             'src/styles/auth-gate.css',
+            'src/styles/company-admin-dashboard.css',
+            'src/styles/company-admin.css',
             'src/styles/service-operations.css',
             'src/styles/service-reporting.css',
             'src/types/serviceReporting.ts',
             'tests/frontend/CompanyAdmin.test.tsx',
             'tests/frontend/CompanyAdminDirectoryFilters.test.ts',
-            'tests/frontend/UserAccountAdminAccess.test.tsx',
             'tests/frontend/CompanyResearchQueueSync.test.ts',
+            'tests/frontend/SeparateCompanyAdmin.test.ts',
             'tests/frontend/ServiceOperationsPage.test.tsx',
             'tests/frontend/ServiceReportingMigration.test.ts',
+            'tests/frontend/UserAccountAdminAccess.test.tsx',
           }
           actual = {line.strip() for line in Path('/tmp/release-diff.txt').read_text().splitlines() if line.strip()}
           assert actual == allowed, (actual, allowed)
@@ -163,7 +174,8 @@ jobs:
           npm test
           npm run build
           grep -R -Fq "Service operations" dist/assets
-          grep -R -Fq "CRM relationship status" dist/assets
+          grep -R -Fq "Company command center" dist/assets
+grep -R -Fq "Parent company summary" dist/assets
           grep -R -Fq "Company master & relationship record" dist/assets
           python - <<'PY'
           import hashlib, json, pathlib
@@ -256,7 +268,8 @@ jobs:
           test -n "$asset"
           curl --fail --silent --show-error --location "${BASE_URL%/}/$asset" --output /tmp/towersignal-index.js
           grep -Fq "Service operations" /tmp/towersignal-index.js
-          grep -Fq "CRM relationship status" /tmp/towersignal-index.js
+          grep -Fq "Company command center" /tmp/towersignal-index.js
+grep -Fq "Parent company summary" /tmp/towersignal-index.js
           grep -Fq "Company master & relationship record" /tmp/towersignal-index.js
 
   rollback:
