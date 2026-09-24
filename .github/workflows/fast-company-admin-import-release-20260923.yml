@@ -1,16 +1,9 @@
 name: Fast release company admin importer
 
+# Superseded by fast-company-crm-service-release-20260924.yml.
+# Retained for historical/manual proof only; do not auto-run against modern main.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/fast-company-admin-import-release-20260923.yml'
-      - 'src/companyAdmin/client.ts'
-      - 'src/companyAdmin/import.ts'
-      - 'src/components/CompaniesPage.tsx'
-      - 'src/components/CompanyAdminImportPanel.tsx'
-      - 'src/styles/company-admin.css'
-      - 'tests/frontend/CompanyAdminImport.test.ts'
+  workflow_dispatch:
 
 permissions:
   contents: read
