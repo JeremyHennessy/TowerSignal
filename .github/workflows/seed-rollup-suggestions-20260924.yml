@@ -1,0 +1,113 @@
+name: Seed reviewed company roll-up candidates
+
+on:
+  push:
+    branches:
+      - ops/seed-rollup-suggestions-20260924
+    paths:
+      - '.github/workflows/seed-rollup-suggestions-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Insert pending suggestions only
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          CREATE TEMP TABLE rollup_seed(
+            suggestion_id text PRIMARY KEY,
+            candidate_sales_account_id text NOT NULL,
+            suggested_sales_account_id text NOT NULL,
+            score integer NOT NULL,
+            confidence text NOT NULL,
+            evidence text NOT NULL
+          );
+
+          INSERT INTO rollup_seed VALUES
+          ('rollup::sales-account-07eca94e79ce53957d31::sales-account-10e01676af8a4fb18898','sales-account-07eca94e79ce53957d31','sales-account-10e01676af8a4fb18898',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-128f9e12238a5e16596a::sales-account-9af56529abd9946c378f','sales-account-128f9e12238a5e16596a','sales-account-9af56529abd9946c378f',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-1bcf3d9cf7df12f53549::sales-account-128f9e12238a5e16596a','sales-account-1bcf3d9cf7df12f53549','sales-account-128f9e12238a5e16596a',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-1bcf3d9cf7df12f53549::sales-account-28f65fea1fad6935e56c','sales-account-1bcf3d9cf7df12f53549','sales-account-28f65fea1fad6935e56c',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-1bcf3d9cf7df12f53549::sales-account-9af56529abd9946c378f','sales-account-1bcf3d9cf7df12f53549','sales-account-9af56529abd9946c378f',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-1bcf3d9cf7df12f53549::sales-account-fe36d183459b721caffc','sales-account-1bcf3d9cf7df12f53549','sales-account-fe36d183459b721caffc',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-28f65fea1fad6935e56c::sales-account-128f9e12238a5e16596a','sales-account-28f65fea1fad6935e56c','sales-account-128f9e12238a5e16596a',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-28f65fea1fad6935e56c::sales-account-9af56529abd9946c378f','sales-account-28f65fea1fad6935e56c','sales-account-9af56529abd9946c378f',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-6d07da09133302cafc80::sales-account-42494fec2d9099ba11b5','sales-account-6d07da09133302cafc80','sales-account-42494fec2d9099ba11b5',55,'low','Exact normalized company-name match'),
+          ('rollup::sales-account-6d07da09133302cafc80::sales-account-d262334c358cb15791cf','sales-account-6d07da09133302cafc80','sales-account-d262334c358cb15791cf',55,'low','Exact normalized company-name match'),
+          ('rollup::sales-account-6eb601c1cab9c1f1cb81::sales-account-454f9e82f6552a974d1b','sales-account-6eb601c1cab9c1f1cb81','sales-account-454f9e82f6552a974d1b',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-7ac035eeb39c59d537af::sales-account-414c1fd143a3f77e9309','sales-account-7ac035eeb39c59d537af','sales-account-414c1fd143a3f77e9309',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-7e13c4a3fda45638eef0::sales-account-454f9e82f6552a974d1b','sales-account-7e13c4a3fda45638eef0','sales-account-454f9e82f6552a974d1b',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-9399b6ccde5fcd663f48::sales-account-8da218e08bf548da9160','sales-account-9399b6ccde5fcd663f48','sales-account-8da218e08bf548da9160',55,'low','Exact normalized company-name match'),
+          ('rollup::sales-account-a20303976c88a4b0a81b::sales-account-e4965f2f8550ece768e6','sales-account-a20303976c88a4b0a81b','sales-account-e4965f2f8550ece768e6',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-d262334c358cb15791cf::sales-account-42494fec2d9099ba11b5','sales-account-d262334c358cb15791cf','sales-account-42494fec2d9099ba11b5',55,'low','Exact normalized company-name match'),
+          ('rollup::sales-account-ee7ad21688f813c9c0cf::sales-account-a15ec96e7686b1a216a2','sales-account-ee7ad21688f813c9c0cf','sales-account-a15ec96e7686b1a216a2',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-f7674368b06d45bc5f9d::sales-account-9ee6fe90f7e2f96b24b2','sales-account-f7674368b06d45bc5f9d','sales-account-9ee6fe90f7e2f96b24b2',55,'low','Near-exact normalized company-name spelling (1 edit)'),
+          ('rollup::sales-account-fe36d183459b721caffc::sales-account-9af56529abd9946c378f','sales-account-fe36d183459b721caffc','sales-account-9af56529abd9946c378f',55,'low','Near-exact normalized company-name spelling (1 edit)');
+
+          DO $$
+          BEGIN
+            IF EXISTS(
+              SELECT 1
+              FROM rollup_seed s
+              LEFT JOIN public.company_sales_accounts c ON c.sales_account_id=s.candidate_sales_account_id
+              LEFT JOIN public.company_sales_accounts t ON t.sales_account_id=s.suggested_sales_account_id
+              WHERE c.sales_account_id IS NULL OR t.sales_account_id IS NULL
+                 OR c.record_status<>'active' OR t.record_status<>'active'
+            ) THEN
+              RAISE EXCEPTION 'Roll-up seed guard failed: missing or inactive account';
+            END IF;
+          END $$;
+
+          INSERT INTO public.company_rollup_suggestions AS existing(
+            suggestion_id,candidate_sales_account_id,suggested_sales_account_id,
+            score,confidence,evidence,status,generated_at,updated_at
+          )
+          SELECT
+            suggestion_id,candidate_sales_account_id,suggested_sales_account_id,
+            score,confidence,jsonb_build_array(evidence),'pending',now(),now()
+          FROM rollup_seed
+          ON CONFLICT (candidate_sales_account_id,suggested_sales_account_id) DO UPDATE SET
+            score=EXCLUDED.score,
+            confidence=EXCLUDED.confidence,
+            evidence=EXCLUDED.evidence,
+            generated_at=EXCLUDED.generated_at,
+            updated_at=EXCLUDED.updated_at
+          WHERE existing.status='pending';
+
+          DO $$
+          DECLARE v_present integer; v_pending integer;
+          BEGIN
+            SELECT count(*) INTO v_present
+            FROM rollup_seed s
+            JOIN public.company_rollup_suggestions q
+              ON q.candidate_sales_account_id=s.candidate_sales_account_id
+             AND q.suggested_sales_account_id=s.suggested_sales_account_id;
+            SELECT count(*) INTO v_pending
+            FROM rollup_seed s
+            JOIN public.company_rollup_suggestions q
+              ON q.candidate_sales_account_id=s.candidate_sales_account_id
+             AND q.suggested_sales_account_id=s.suggested_sales_account_id
+            WHERE q.status='pending';
+            IF v_present<>19 THEN
+              RAISE EXCEPTION 'Roll-up seed acceptance failed: present=%',v_present;
+            END IF;
+            RAISE NOTICE 'ROLLUP_SEED=PASS present=% pending=%',v_present,v_pending;
+          END $$;
+
+          COMMIT;
+
+          SELECT status,count(*) AS count
+          FROM public.company_rollup_suggestions
+          GROUP BY status
+          ORDER BY status;
+          SQL
