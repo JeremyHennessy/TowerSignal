@@ -284,7 +284,7 @@ export function AdminCompaniesPage() {
       <section className="admin-company-card admin-parent-summary">
         <div className="admin-company-card-heading"><div><strong>Parent company summary</strong><span>Private ownership rollup across reviewed master families</span></div><small>{number.format(parentRows.length)} parent states</small></div>
         <div className="table-scroll"><table className="account-table admin-parent-table"><thead><tr><th>Parent / owner</th><th>Families</th><th>Source identities</th><th>Public observations</th><th>Contacts</th><th>Pipeline families</th><th>Ownership evidence</th></tr></thead><tbody>
-          {parentRows.slice(0,20).map(parent => <tr key={parent.name}><td><strong>{parent.name}</strong></td><td>{number.format(parent.familyCount)}</td><td>{number.format(parent.identityCount)}</td><td>{number.format(parent.observations)}</td><td>{number.format(parent.contacts)}</td><td>{number.format(parent.pipeline)}</td><td>{parent.sourceUrl ? <a className="table-link" href={parent.sourceUrl} target="_blank" rel="noreferrer">Open source ↗</a> : 'Not recorded'}</td></tr>)}
+          {parentRows.map(parent => <tr key={parent.name}><td><strong>{parent.name}</strong></td><td>{number.format(parent.familyCount)}</td><td>{number.format(parent.identityCount)}</td><td>{number.format(parent.observations)}</td><td>{number.format(parent.contacts)}</td><td>{number.format(parent.pipeline)}</td><td>{parent.sourceUrl ? <a className="table-link" href={parent.sourceUrl} target="_blank" rel="noreferrer">Open source ↗</a> : 'Not recorded'}</td></tr>)}
         </tbody></table></div>
       </section>
 
