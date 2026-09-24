@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS public.service_portfolios (
   updated_at timestamptz DEFAULT now() NOT NULL,
   created_by text DEFAULT auth.user_id(),
   updated_by text DEFAULT auth.user_id(),
-  CONSTRAINT service_portfolios_status_check CHECK (status IN ('active','inactive'))
+  CONSTRAINT service_portfolios_status_check CHECK (status IN ('active','inactive')),
+  CONSTRAINT service_portfolios_id_client_unique UNIQUE (portfolio_id, client_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.service_sites (
@@ -42,7 +43,11 @@ CREATE TABLE IF NOT EXISTS public.service_sites (
   updated_at timestamptz DEFAULT now() NOT NULL,
   created_by text DEFAULT auth.user_id(),
   updated_by text DEFAULT auth.user_id(),
-  CONSTRAINT service_sites_status_check CHECK (status IN ('active','inactive','prospect'))
+  CONSTRAINT service_sites_status_check CHECK (status IN ('active','inactive','prospect')),
+  CONSTRAINT service_sites_portfolio_client_fk
+    FOREIGN KEY (portfolio_id, client_id)
+    REFERENCES public.service_portfolios(portfolio_id, client_id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.service_assets (
@@ -64,7 +69,8 @@ CREATE TABLE IF NOT EXISTS public.service_assets (
   CONSTRAINT service_assets_type_check CHECK (asset_type IN (
     'cooling_tower','controller','pump','chemical_feed','heat_exchanger',
     'domestic_water_tank','sensor','other'
-  ))
+  )),
+  CONSTRAINT service_assets_id_site_unique UNIQUE (asset_id, service_site_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.service_agreements (
@@ -84,7 +90,8 @@ CREATE TABLE IF NOT EXISTS public.service_agreements (
   updated_by text DEFAULT auth.user_id(),
   CONSTRAINT service_agreements_status_check CHECK (status IN ('draft','active','expired','cancelled')),
   CONSTRAINT service_agreements_interval_check CHECK (service_interval_days IS NULL OR service_interval_days > 0),
-  CONSTRAINT service_agreements_date_check CHECK (end_date IS NULL OR start_date IS NULL OR end_date >= start_date)
+  CONSTRAINT service_agreements_date_check CHECK (end_date IS NULL OR start_date IS NULL OR end_date >= start_date),
+  CONSTRAINT service_agreements_id_site_unique UNIQUE (agreement_id, service_site_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.service_visits (
@@ -105,7 +112,12 @@ CREATE TABLE IF NOT EXISTS public.service_visits (
   created_by text DEFAULT auth.user_id(),
   updated_by text DEFAULT auth.user_id(),
   CONSTRAINT service_visits_status_check CHECK (status IN ('scheduled','in-progress','completed','cancelled')),
-  CONSTRAINT service_visits_report_status_check CHECK (report_status IN ('draft','ready','finalized'))
+  CONSTRAINT service_visits_report_status_check CHECK (report_status IN ('draft','ready','finalized')),
+  CONSTRAINT service_visits_id_site_unique UNIQUE (visit_id, service_site_id),
+  CONSTRAINT service_visits_agreement_site_fk
+    FOREIGN KEY (agreement_id, service_site_id)
+    REFERENCES public.service_agreements(agreement_id, service_site_id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.service_measurements (
@@ -125,7 +137,16 @@ CREATE TABLE IF NOT EXISTS public.service_measurements (
   created_at timestamptz DEFAULT now() NOT NULL,
   created_by text DEFAULT auth.user_id(),
   CONSTRAINT service_measurements_result_check CHECK (result_status IN ('normal','attention','action')),
-  CONSTRAINT service_measurements_value_check CHECK (value_numeric IS NOT NULL OR nullif(trim(value_text),'') IS NOT NULL)
+  CONSTRAINT service_measurements_value_check CHECK (value_numeric IS NOT NULL OR nullif(trim(value_text),'') IS NOT NULL),
+  CONSTRAINT service_measurements_range_check CHECK (target_min IS NULL OR target_max IS NULL OR target_min <= target_max),
+  CONSTRAINT service_measurements_visit_site_fk
+    FOREIGN KEY (visit_id, service_site_id)
+    REFERENCES public.service_visits(visit_id, service_site_id)
+    ON DELETE CASCADE,
+  CONSTRAINT service_measurements_asset_site_fk
+    FOREIGN KEY (asset_id, service_site_id)
+    REFERENCES public.service_assets(asset_id, service_site_id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.service_actions (
@@ -145,7 +166,15 @@ CREATE TABLE IF NOT EXISTS public.service_actions (
   created_by text DEFAULT auth.user_id(),
   updated_by text DEFAULT auth.user_id(),
   CONSTRAINT service_actions_severity_check CHECK (severity IN ('low','medium','high','critical')),
-  CONSTRAINT service_actions_status_check CHECK (status IN ('open','in-progress','completed','dismissed'))
+  CONSTRAINT service_actions_status_check CHECK (status IN ('open','in-progress','completed','dismissed')),
+  CONSTRAINT service_actions_visit_site_fk
+    FOREIGN KEY (visit_id, service_site_id)
+    REFERENCES public.service_visits(visit_id, service_site_id)
+    ON DELETE SET NULL,
+  CONSTRAINT service_actions_asset_site_fk
+    FOREIGN KEY (asset_id, service_site_id)
+    REFERENCES public.service_assets(asset_id, service_site_id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.service_reports (
@@ -164,7 +193,11 @@ CREATE TABLE IF NOT EXISTS public.service_reports (
   updated_at timestamptz DEFAULT now() NOT NULL,
   created_by text DEFAULT auth.user_id(),
   updated_by text DEFAULT auth.user_id(),
-  CONSTRAINT service_reports_status_check CHECK (status IN ('draft','ready','finalized'))
+  CONSTRAINT service_reports_status_check CHECK (status IN ('draft','ready','finalized')),
+  CONSTRAINT service_reports_visit_site_fk
+    FOREIGN KEY (visit_id, service_site_id)
+    REFERENCES public.service_visits(visit_id, service_site_id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS public.service_documents (
@@ -190,7 +223,15 @@ CREATE TABLE IF NOT EXISTS public.service_documents (
     'visit-report','photo','lab-result','water-management-plan','contract',
     'schematic','sds','invoice','other'
   )),
-  CONSTRAINT service_documents_extraction_check CHECK (extraction_status IN ('not-requested','pending','complete','failed'))
+  CONSTRAINT service_documents_extraction_check CHECK (extraction_status IN ('not-requested','pending','complete','failed')),
+  CONSTRAINT service_documents_visit_site_fk
+    FOREIGN KEY (visit_id, service_site_id)
+    REFERENCES public.service_visits(visit_id, service_site_id)
+    ON DELETE SET NULL,
+  CONSTRAINT service_documents_asset_site_fk
+    FOREIGN KEY (asset_id, service_site_id)
+    REFERENCES public.service_assets(asset_id, service_site_id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.service_change_log (
