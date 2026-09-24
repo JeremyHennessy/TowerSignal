@@ -27,6 +27,7 @@ import type { KnownFirmPayload, KnownFirmSummaryRecord } from '../types/firm'
 import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
 import { CompanyAdminWorkspace } from './CompanyAdminWorkspace'
 import { CompanyRollupReviewPanel } from './CompanyRollupReviewPanel'
+import { AdminSalesTodayPanel } from './AdminSalesTodayPanel'
 
 const number = new Intl.NumberFormat('en-US')
 const accountClassifications: CompanySalesAccountClassification[] = [
@@ -272,11 +273,6 @@ export function AdminCompaniesPage() {
     })
   }, [families, classification, salesStageFilter, gap, search, profileById, salesAccounts])
 
-  const today = new Date().toISOString().slice(0,10)
-  const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().slice(0,10)
-  const overdue = families.filter(family => family.nextActionDate && family.nextActionDate < today && !['customer','do-not-pursue'].includes(family.accountClassification))
-  const upcoming = families.filter(family => family.nextActionDate && family.nextActionDate >= today && family.nextActionDate <= nextWeek)
-  const pipeline = families.filter(family => family.openOpportunities > 0)
   const explicitAliases = profiles.filter(profile => profile.rollup_company_id).length
   const parentsRecorded = families.filter(family => family.parentName).length
   const fullyEnriched = families.filter(family => family.missing.length === 0).length
@@ -313,15 +309,6 @@ export function AdminCompaniesPage() {
     stage,
     opportunities.filter(opportunity => opportunity.stage === stage),
   ])), [opportunities])
-
-  const recentActivities = useMemo(() => activities
-    .map(activity => ({ activity, family: familyByMemberId.get(activity.company_id) }))
-    .filter((row): row is { activity: CompanyAdminActivity; family: FamilyRow } => Boolean(row.family))
-    .slice(0, 12), [activities, familyByMemberId])
-
-  const attentionFamilies = useMemo(() => [...overdue, ...upcoming]
-    .sort((a,b) => (a.nextActionDate || '').localeCompare(b.nextActionDate || ''))
-    .slice(0, 12), [overdue, upcoming])
 
   const parentRows = useMemo(() => {
     const map = new Map<string, {
@@ -370,6 +357,8 @@ export function AdminCompaniesPage() {
 
     {error && <div className="company-admin-error"><strong>Company administration error.</strong><span>{error}</span></div>}
 
+    <AdminSalesTodayPanel accounts={salesAccounts} opportunities={opportunities} tasks={salesTasks} activities={activities} />
+
     <div className="admin-sales-metrics">
       <article><small>Open TowerSignal deals</small><strong>{number.format(activeSalesOpportunities.length)}</strong><span>{number.format(opportunities.length)} total opportunities</span></article>
       <article><small>Open pipeline ARR</small><strong>{openPipelineArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})}</strong><span>Estimated recurring value</span></article>
@@ -377,17 +366,6 @@ export function AdminCompaniesPage() {
       <article><small>Proposals / negotiation</small><strong>{number.format(proposalsOut.length)}</strong><span>Commercially active deals</span></article>
       <article><small>Overdue sales tasks</small><strong>{number.format(overdueSalesTasks.length)}</strong><span>{number.format(salesTasks.filter(task=>task.status==='open').length)} open tasks</span></article>
       <article><small>Won ARR</small><strong>{wonArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})}</strong><span>{number.format(opportunities.filter(opportunity=>opportunity.stage==='closed-won').length)} won deal(s)</span></article>
-    </div>
-
-    <div className="admin-company-metrics">
-      <article><small>Master families</small><strong>{number.format(families.length)}</strong><span>{number.format(explicitAliases)} rolled-up source identities</span></article>
-      <article><small>Private profiles</small><strong>{number.format(profiles.length)}</strong><span>{number.format(payload.summary.known_firm_count)} public Known Firms</span></article>
-      <article><small>Parents recorded</small><strong>{number.format(parentsRecorded)}</strong><span>{families.length ? Math.round(parentsRecorded / families.length * 100) : 0}% of master families</span></article>
-      <article><small>Active contacts</small><strong>{number.format(contacts.filter(contact => contact.active).length)}</strong><span>{number.format(families.filter(family => family.contacts > 0).length)} families with contacts</span></article>
-      <article><small>Pipeline</small><strong>{number.format(pipeline.length)}</strong><span>Contacted → customer</span></article>
-      <article><small>Follow-up</small><strong>{number.format(overdue.length)}</strong><span>overdue · {number.format(upcoming.length)} due in 7 days</span></article>
-      <article><small>Research queue</small><strong>{number.format(queue.length)}</strong><span>{number.format(queue.filter(item => item.status === 'complete').length)} complete</span></article>
-      <article><small>Fully enriched</small><strong>{number.format(fullyEnriched)}</strong><span>All tracked admin fields populated</span></article>
     </div>
 
     <section className="admin-sales-pipeline-card">
@@ -398,7 +376,7 @@ export function AdminCompaniesPage() {
           <div className="admin-sales-stage-list">
             {(opportunityByStage.get(stage) ?? []).map(opportunity => {
               const family = familyByMemberId.get(opportunity.company_id)
-              return <a key={opportunity.opportunity_id} href={`#/admin-company/${encodeURIComponent(family?.masterId ?? opportunity.company_id)}`}>
+              return <a key={opportunity.opportunity_id} href={`#/admin-company/${encodeURIComponent(family?.salesAccountId ?? opportunity.sales_account_id ?? opportunity.company_id)}`}>
                 <strong>{family?.name ?? opportunity.name}</strong>
                 <span>{opportunity.estimated_arr == null ? 'ARR not set' : opportunity.estimated_arr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})+' ARR'}{opportunity.probability_percent == null ? '' : ` · ${opportunity.probability_percent}%`}</span>
                 <small>{opportunity.next_step || (opportunity.demo_scheduled_at ? 'Demo '+new Date(opportunity.demo_scheduled_at).toLocaleString() : 'No next step')}</small>
@@ -409,49 +387,6 @@ export function AdminCompaniesPage() {
         </div>)}
       </div>
     </section>
-
-    <div className="admin-company-dashboard-grid">
-      <section className="admin-company-card admin-parent-summary">
-        <div className="admin-company-card-heading"><div><strong>Parent company summary</strong><span>Private ownership rollup across reviewed master families</span></div><small>{number.format(parentRows.length)} parent states</small></div>
-        <div className="table-scroll"><table className="account-table admin-parent-table"><thead><tr><th>Parent / owner</th><th>Families</th><th>Source identities</th><th>Public observations</th><th>Contacts</th><th>Pipeline families</th><th>Open deals</th><th>Pipeline ARR</th><th>Ownership evidence</th></tr></thead><tbody>
-          {parentRows.map(parent => <tr key={parent.name}><td><strong>{parent.name}</strong></td><td>{number.format(parent.familyCount)}</td><td>{number.format(parent.identityCount)}</td><td>{number.format(parent.observations)}</td><td>{number.format(parent.contacts)}</td><td>{number.format(parent.pipeline)}</td><td>{number.format(parent.openDeals)}</td><td>{parent.pipelineArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})}</td><td>{parent.sourceUrl ? <a className="table-link" href={parent.sourceUrl} target="_blank" rel="noreferrer">Open source ↗</a> : 'Not recorded'}</td></tr>)}
-        </tbody></table></div>
-      </section>
-
-      <section className="admin-company-card">
-        <div className="admin-company-card-heading"><div><strong>Enrichment coverage</strong><span>Master-family private fields</span></div></div>
-        <div className="admin-coverage-list">{coverage.map(([label,count]) => <div key={label}><div><strong>{label}</strong><span>{number.format(count)} / {number.format(families.length)}</span></div><progress max={Math.max(1,families.length)} value={count} /><small>{families.length ? Math.round(count / families.length * 100) : 0}% covered</small></div>)}</div>
-      </section>
-
-      <section className="admin-company-card">
-        <div className="admin-company-card-heading"><div><strong>Account classification</strong><span>Authoritative master sales-account state</span></div></div>
-        <div className="admin-pipeline-grid">{accountClassificationCounts.map(([value,count]) => <article key={value}><small>{human(value)}</small><strong>{number.format(count)}</strong></article>)}</div>
-      </section>
-    </div>
-
-    <div className="admin-company-attention-grid">
-      <section className="admin-company-card">
-        <div className="admin-company-card-heading"><div><strong>Follow-up attention</strong><span>Overdue and next-seven-day company actions</span></div><small>{number.format(overdue.length + upcoming.length)} due</small></div>
-        <div className="admin-company-activity-list">
-          {attentionFamilies.length ? attentionFamilies.map(family => <a key={family.salesAccountId} href={`#/admin-company/${encodeURIComponent(family.salesAccountId)}`}>
-            <strong>{family.name}</strong>
-            <span>{family.nextActionDate || 'No date'} · {human(family.accountClassification)}</span>
-            <small>{family.contacts} active contact{family.contacts===1?'':'s'} · {family.activities} interaction{family.activities===1?'':'s'}</small>
-          </a>) : <span className="company-admin-empty">No company follow-ups are due in the next seven days.</span>}
-        </div>
-      </section>
-
-      <section className="admin-company-card">
-        <div className="admin-company-card-heading"><div><strong>Recent CRM activity</strong><span>Latest private outreach and interaction records</span></div><small>{number.format(activities.length)} total</small></div>
-        <div className="admin-company-activity-list">
-          {recentActivities.length ? recentActivities.map(({activity,family}) => <a key={activity.activity_id} href={`#/admin-company/${encodeURIComponent(family.masterId)}`}>
-            <strong>{family.name}</strong>
-            <span>{new Date(activity.occurred_at).toLocaleString()} · {human(activity.activity_type)}</span>
-            <small>{activity.subject || activity.outcome || activity.details || 'Interaction logged'}{activity.next_action_date ? ` · next ${activity.next_action_date}` : ''}</small>
-          </a>) : <span className="company-admin-empty">No company interactions have been logged yet.</span>}
-        </div>
-      </section>
-    </div>
 
     <section className="admin-company-card admin-family-directory">
       <div className="admin-company-card-heading">
@@ -478,6 +413,40 @@ export function AdminCompaniesPage() {
         </tr>)}
       </tbody></table></div>
     </section>
+
+    <details className="admin-company-secondary-panel">
+      <summary><div><span className="page-kicker">Secondary</span><strong>Research, enrichment &amp; account intelligence</strong><small>Company coverage and parent structure</small></div><span>Open research dashboard</span></summary>
+      <div className="admin-company-secondary-body">
+    <div className="admin-company-metrics">
+      <article><small>Master families</small><strong>{number.format(families.length)}</strong><span>{number.format(explicitAliases)} rolled-up source identities</span></article>
+      <article><small>Private profiles</small><strong>{number.format(profiles.length)}</strong><span>{number.format(payload.summary.known_firm_count)} public Known Firms</span></article>
+      <article><small>Parents recorded</small><strong>{number.format(parentsRecorded)}</strong><span>{families.length ? Math.round(parentsRecorded / families.length * 100) : 0}% of master families</span></article>
+      <article><small>Active contacts</small><strong>{number.format(contacts.filter(contact => contact.active).length)}</strong><span>{number.format(families.filter(family => family.contacts > 0).length)} families with contacts</span></article>
+      <article><small>Research queue</small><strong>{number.format(queue.length)}</strong><span>{number.format(queue.filter(item => item.status === 'complete').length)} complete</span></article>
+      <article><small>Fully enriched</small><strong>{number.format(fullyEnriched)}</strong><span>All tracked admin fields populated</span></article>
+    </div>
+
+    <div className="admin-company-dashboard-grid">
+      <section className="admin-company-card admin-parent-summary">
+        <div className="admin-company-card-heading"><div><strong>Parent company summary</strong><span>Private ownership rollup across reviewed master families</span></div><small>{number.format(parentRows.length)} parent states</small></div>
+        <div className="table-scroll"><table className="account-table admin-parent-table"><thead><tr><th>Parent / owner</th><th>Families</th><th>Source identities</th><th>Public observations</th><th>Contacts</th><th>Pipeline families</th><th>Open deals</th><th>Pipeline ARR</th><th>Ownership evidence</th></tr></thead><tbody>
+          {parentRows.map(parent => <tr key={parent.name}><td><strong>{parent.name}</strong></td><td>{number.format(parent.familyCount)}</td><td>{number.format(parent.identityCount)}</td><td>{number.format(parent.observations)}</td><td>{number.format(parent.contacts)}</td><td>{number.format(parent.pipeline)}</td><td>{number.format(parent.openDeals)}</td><td>{parent.pipelineArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})}</td><td>{parent.sourceUrl ? <a className="table-link" href={parent.sourceUrl} target="_blank" rel="noreferrer">Open source ↗</a> : 'Not recorded'}</td></tr>)}
+        </tbody></table></div>
+      </section>
+
+      <section className="admin-company-card">
+        <div className="admin-company-card-heading"><div><strong>Enrichment coverage</strong><span>Master-family private fields</span></div></div>
+        <div className="admin-coverage-list">{coverage.map(([label,count]) => <div key={label}><div><strong>{label}</strong><span>{number.format(count)} / {number.format(families.length)}</span></div><progress max={Math.max(1,families.length)} value={count} /><small>{families.length ? Math.round(count / families.length * 100) : 0}% covered</small></div>)}</div>
+      </section>
+
+      <section className="admin-company-card">
+        <div className="admin-company-card-heading"><div><strong>Account classification</strong><span>Authoritative master sales-account state</span></div></div>
+        <div className="admin-pipeline-grid">{accountClassificationCounts.map(([value,count]) => <article key={value}><small>{human(value)}</small><strong>{number.format(count)}</strong></article>)}</div>
+      </section>
+    </div>
+
+      </div>
+    </details>
 
     <CompanyRollupReviewPanel
       accounts={salesAccounts}
