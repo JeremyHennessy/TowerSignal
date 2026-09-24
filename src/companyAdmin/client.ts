@@ -360,6 +360,11 @@ export async function saveCompanyResearchQueueItem(
   return researchFrom(created)
 }
 
+export async function deleteCompanyResearchQueueItem(companyId: string): Promise<void> {
+  const result = await client.from('company_private_research_queue').delete().eq('company_id', companyId)
+  throwIfError('Unable to remove stale company research queue item', result.error)
+}
+
 export async function syncCompanyResearchQueue(candidates: Array<{
   company_id: string
   canonical_name: string
@@ -367,20 +372,34 @@ export async function syncCompanyResearchQueue(candidates: Array<{
   priority_reason: string
   missing_fields: string[]
 }>): Promise<void> {
+  if (candidates.length !== 100) {
+    throw new Error(`Research queue sync requires exactly 100 ranked master companies; received ${candidates.length}`)
+  }
+
+  const current = await loadCompanyResearchQueue()
+  const currentById = new Map(current.map(item => [item.company_id, item]))
+  const desiredIds = new Set(candidates.map(candidate => candidate.company_id))
+
   for (let index = 0; index < candidates.length; index += 5) {
     const chunk = candidates.slice(index, index + 5)
     await Promise.all(chunk.map(async candidate => {
+      const existing = currentById.get(candidate.company_id)
       await saveCompanyAdminProfile(candidate.company_id, candidate.canonical_name, {}, { source: 'system', batchId: 'research-queue-sync' })
       await saveCompanyResearchQueueItem({
         company_id: candidate.company_id,
         priority_score: candidate.priority_score,
         priority_reason: candidate.priority_reason,
         missing_fields: candidate.missing_fields,
-        status: 'unreviewed',
-        research_owner: null,
-        last_researched_at: null,
+        status: existing?.status ?? 'unreviewed',
+        research_owner: existing?.research_owner ?? null,
+        last_researched_at: existing?.last_researched_at ?? null,
       }, { source: 'system', batchId: 'research-queue-sync' })
     }))
+  }
+
+  const stale = current.filter(item => !desiredIds.has(item.company_id))
+  for (let index = 0; index < stale.length; index += 10) {
+    await Promise.all(stale.slice(index, index + 10).map(item => deleteCompanyResearchQueueItem(item.company_id)))
   }
 }
 
