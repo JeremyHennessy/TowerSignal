@@ -15,14 +15,9 @@ import type {
   CompanyAdminNote,
   CompanyAdminProfile,
   CompanyAdminProfilePatch,
-  CompanyRelationshipStatus,
 } from '../types/companyAdmin'
 
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
-
-const relationshipStatuses: CompanyRelationshipStatus[] = [
-  'uncontacted', 'researching', 'outreach-planned', 'contacted', 'engaged', 'opportunity', 'customer', 'not-pursuing',
-]
 
 function emptyProfile(): CompanyAdminProfilePatch {
   return {
@@ -168,7 +163,6 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
   const [activitySubject, setActivitySubject] = useState('')
   const [activityOutcome, setActivityOutcome] = useState('')
   const [activityDetails, setActivityDetails] = useState('')
-  const [activityNextAction, setActivityNextAction] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [savedAt, setSavedAt] = useState<string | null>(null)
@@ -218,7 +212,15 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      const saved = await saveCompanyAdminProfile(companyId, canonicalName, normalizeProfilePatch(profile))
+      const normalized = normalizeProfilePatch(profile)
+      const {
+        relationship_status: _relationshipStatus,
+        last_contacted_at: _lastContactedAt,
+        next_action_date: _nextActionDate,
+        account_owner: _accountOwner,
+        ...enrichment
+      } = normalized
+      const saved = await saveCompanyAdminProfile(companyId, canonicalName, enrichment)
       setProfile(patchFrom(saved))
       setSavedAt(new Date().toISOString())
     } catch (err) {
@@ -300,8 +302,6 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      const normalizedProfile = normalizeProfilePatch(profile)
-      await saveCompanyAdminProfile(companyId, canonicalName, normalizedProfile)
       const occurredAt = new Date(activityDate).toISOString()
       await addCompanyActivity(companyId, {
         activity_type: activityType,
@@ -310,20 +310,11 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
         subject: text(activitySubject),
         details: text(activityDetails),
         outcome: text(activityOutcome),
-        next_action_date: text(activityNextAction),
+        next_action_date: null,
       })
-      const nextProfile = {
-        ...normalizedProfile,
-        relationship_status: profile.relationship_status === 'uncontacted' ? 'contacted' as const : profile.relationship_status,
-        last_contacted_at: occurredAt,
-        next_action_date: text(activityNextAction) ?? profile.next_action_date,
-      }
-      await saveCompanyAdminProfile(companyId, canonicalName, nextProfile)
-      setProfile(nextProfile)
       setActivitySubject('')
       setActivityOutcome('')
       setActivityDetails('')
-      setActivityNextAction('')
       setActivityDate(localDateTime(new Date().toISOString()))
       await reload()
     } catch (err) {
@@ -372,10 +363,10 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
       <div>
         <span className="page-kicker">Admin only · private company database</span>
         <h2>Company master &amp; relationship record</h2>
-        <p>Private enrichment and CRM data. Source-backed TowerSignal evidence below remains unchanged.</p>
+        <p>Private company enrichment and evidence. Sales stage, tasks and next actions are managed in the authoritative sales CRM above.</p>
       </div>
       <div className="company-admin-save-state">
-        <span>{relationshipLabel(profile.relationship_status)}</span>
+        <span>Enrichment record</span>
         {savedAt && <small>Saved {new Date(savedAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })}</small>}
         <button onClick={saveProfile} disabled={busy}>{busy ? 'Saving…' : 'Save company'}</button>
       </div>
@@ -441,13 +432,9 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
       </section>
 
       <section className="company-admin-card">
-        <div className="company-admin-card-heading"><strong>Relationship &amp; follow-up</strong><span>Internal CRM state</span></div>
+        <div className="company-admin-card-heading"><strong>Research summary</strong><span>Company intelligence only · sales state is managed above</span></div>
         <div className="company-admin-form-grid">
-          <label><span>Status</span><select value={profile.relationship_status} onChange={event => setProfile(value => ({ ...value, relationship_status:event.target.value as CompanyRelationshipStatus }))}>{relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)}</select></label>
-          <label><span>Account owner</span><input value={profile.account_owner ?? ''} onChange={event => setProfile(value => ({ ...value, account_owner:event.target.value }))} /></label>
-          <label><span>Last contacted</span><input type="datetime-local" value={localDateTime(profile.last_contacted_at)} onChange={event => setProfile(value => ({ ...value, last_contacted_at:event.target.value ? new Date(event.target.value).toISOString() : null }))} /></label>
-          <label><span>Next action</span><input type="date" value={profile.next_action_date ?? ''} onChange={event => setProfile(value => ({ ...value, next_action_date:event.target.value }))} /></label>
-          <label className="wide"><span>Internal summary</span><textarea rows={4} value={profile.internal_summary ?? ''} onChange={event => setProfile(value => ({ ...value, internal_summary:event.target.value }))} /></label>
+          <label className="wide"><span>Internal research summary</span><textarea rows={4} value={profile.internal_summary ?? ''} onChange={event => setProfile(value => ({ ...value, internal_summary:event.target.value }))} placeholder="Ownership, market position, product fit or research context…" /></label>
         </div>
       </section>
 
@@ -499,11 +486,10 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
           <select aria-label="Activity contact" value={activityContactId} onChange={event => setActivityContactId(event.target.value)}><option value="">No specific contact</option>{contacts.filter(contact => contact.active).map(contact => <option key={contact.contact_id} value={contact.contact_id}>{contact.name}</option>)}</select>
           <input aria-label="Activity subject" value={activitySubject} onChange={event => setActivitySubject(event.target.value)} placeholder="Subject / purpose" />
           <input aria-label="Activity outcome" value={activityOutcome} onChange={event => setActivityOutcome(event.target.value)} placeholder="Outcome" />
-          <input aria-label="Activity next action" type="date" value={activityNextAction} onChange={event => setActivityNextAction(event.target.value)} />
           <textarea aria-label="Activity details" rows={2} value={activityDetails} onChange={event => setActivityDetails(event.target.value)} placeholder="What happened?" />
           <button onClick={addActivity} disabled={busy || !activityDate}>Log interaction</button>
         </div>
-        <div className="company-admin-timeline">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.contact_id && <span>Contact: {contactById.get(activity.contact_id)?.name ?? activity.contact_id}</span>}{activity.subject && <span>{activity.subject}</span>}{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className="company-admin-empty">No outreach or interaction history recorded.</span>}</div>
+        <div className="company-admin-timeline">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.contact_id && <span>Contact: {contactById.get(activity.contact_id)?.name ?? activity.contact_id}</span>}{activity.subject && <span>{activity.subject}</span>}{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}</article>) : <span className="company-admin-empty">No outreach or interaction history recorded.</span>}</div>
       </section>
 
       <section className="company-admin-card company-admin-notes-card">
