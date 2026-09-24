@@ -97,13 +97,17 @@ jobs:
               cats=' '.join({c.lower() for f in public for c in f.get('service_categories',[])})
               if re.search(r'water treatment|cooling tower|legionella|water management|water quality',cats):
                   fit+=8; reasons.append('water/cooling-tower services')
-              serviced=sum(f.get('serviced_site_count',0) for f in public)
-              towers=sum(f.get('tower_account_count',0) for f in public)
-              contracts=sum(f.get('observed_contract_count',0) for f in public)
-              buyers=sum(f.get('observed_customer_count',0) for f in public)
-              observations=sum(f.get('observation_count',0) for f in public)
+              service_roles={'DWT_INSPECTION_PROVIDER','DWT_LABORATORY','DEC_7G_REGISTERED_BUSINESS'}
+              service_public=[f for f in public if any(r in service_roles for r in f.get('roles',[]))]
+              procurement_public=[f for f in public if 'PROCUREMENT_VENDOR' in f.get('roles',[])]
+              commercial_public=[f for f in public if any(r in service_roles or r=='PROCUREMENT_VENDOR' for r in f.get('roles',[]))]
+              serviced=sum(f.get('serviced_site_count',0) for f in service_public)
+              towers=sum(f.get('tower_account_count',0) for f in service_public)
+              contracts=sum(f.get('observed_contract_count',0) for f in procurement_public)
+              buyers=sum(f.get('observed_customer_count',0) for f in procurement_public)
+              observations=sum(f.get('observation_count',0) for f in commercial_public)
               fit+=clog(serviced,250,15)+clog(towers,150,12)+clog(contracts,25,7)+min(5,buyers)+clog(observations,500,6)
-              if any(f.get('active_last_12m') for f in public): fit+=5
+              if any(f.get('active_last_12m') for f in commercial_public): fit+=5
               fit=min(100,fit)
 
               ready=0
