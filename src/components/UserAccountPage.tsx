@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { WorkflowUser } from '../types/workflow'
+import { loadCompanyAdminAccess } from '../companyAdmin/client'
 import { PortalNavigation } from './PortalNavigation'
 
 function initials(user: WorkflowUser): string {
@@ -10,9 +11,18 @@ function initials(user: WorkflowUser): string {
 
 export function UserAccountPage({ user, onSignOut }: { user: WorkflowUser; onSignOut: () => Promise<void> }) {
   const [busy, setBusy] = useState(false)
+  const [adminAccess, setAdminAccess] = useState<boolean | null>(null)
   const [error, setError] = useState<string | null>(null)
   const avatar = useMemo(() => initials(user), [user])
   const name = user.name?.trim() || user.email.split('@')[0] || 'TowerSignal user'
+
+  useEffect(() => {
+    let cancelled = false
+    loadCompanyAdminAccess()
+      .then(value => { if (!cancelled) setAdminAccess(value) })
+      .catch(() => { if (!cancelled) setAdminAccess(false) })
+    return () => { cancelled = true }
+  }, [])
 
   const signOut = async () => {
     setBusy(true)
@@ -46,9 +56,15 @@ export function UserAccountPage({ user, onSignOut }: { user: WorkflowUser; onSig
             <div><dt>Session</dt><dd><span className="account-status active">Authenticated</span></dd></div>
             <div><dt>Application pages</dt><dd>Login required</dd></div>
             <div><dt>Private workflow</dt><dd>Synced to this account</dd></div>
+            <div><dt>Role</dt><dd>{adminAccess === null ? 'Checking access…' : adminAccess ? <span className="account-status administrator">Administrator</span> : 'Authenticated user'}</dd></div>
           </dl>
         </section>
       </div>
+
+      {adminAccess && <section className="account-card account-admin-access-card">
+        <div><span className="eyebrow">Administrator</span><h2>Private operations access</h2><p>Company database, CRM, research queue and service operations are enabled for this account.</p></div>
+        <div className="account-admin-actions"><a className="secondary-link-button" href="#/companies">Company database</a><a className="secondary-link-button" href="#/service">Service operations</a></div>
+      </section>}
 
       <section className="account-card account-security-card">
         <div><span className="eyebrow">Security boundary</span><h2>Authenticated application, public-source evidence</h2><p>The TowerSignal interface and workspace routes require a valid login. Because the current deployment is static GitHub Pages, published public-source JSON assets are not made private by the client-side route gate.</p></div>
