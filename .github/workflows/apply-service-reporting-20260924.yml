@@ -1,0 +1,199 @@
+name: Apply service reporting migration
+
+on:
+  push:
+    branches:
+      - ops/apply-service-reporting-20260924
+    paths:
+      - '.github/workflows/apply-service-reporting-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard current production baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_profiles integer;
+            v_queue integer;
+            v_contacts integer;
+            v_users integer;
+            v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO v_queue FROM public.company_private_research_queue;
+            SELECT count(*) INTO v_contacts FROM public.company_private_contacts;
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin';
+
+            IF v_profiles <> 118 OR v_queue <> 100 OR v_contacts <> 13 OR v_users <> 2 OR v_admins <> 1
+               OR to_regclass('public.service_sites') IS NOT NULL THEN
+              RAISE EXCEPTION 'Service migration guard failed: profiles=% queue=% contacts=% users=% admins=% service_sites=%',
+                v_profiles, v_queue, v_contacts, v_users, v_admins, to_regclass('public.service_sites');
+            END IF;
+          END $$;
+          SQL
+
+      - name: Reapply recorded audit refinement
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/004a_company_audit_refinement.sql
+
+      - name: Apply migration 005
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/005_service_reporting_foundation.sql
+
+      - name: Verify schema RLS triggers and empty service baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_tables integer;
+            v_rls integer;
+            v_triggers integer;
+            v_rows integer;
+          BEGIN
+            SELECT count(*) INTO v_tables
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public'
+              AND c.relkind='r'
+              AND c.relname IN (
+                'service_clients','service_portfolios','service_sites','service_assets',
+                'service_agreements','service_visits','service_measurements','service_actions',
+                'service_reports','service_documents','service_change_log'
+              );
+
+            SELECT count(*) INTO v_rls
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public'
+              AND c.relrowsecurity
+              AND c.relname IN (
+                'service_clients','service_portfolios','service_sites','service_assets',
+                'service_agreements','service_visits','service_measurements','service_actions',
+                'service_reports','service_documents','service_change_log'
+              );
+
+            SELECT count(*) INTO v_triggers
+            FROM pg_trigger t
+            JOIN pg_class c ON c.oid=t.tgrelid
+            JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public'
+              AND NOT t.tgisinternal
+              AND t.tgname IN (
+                'service_clients_audit','service_portfolios_audit','service_sites_audit',
+                'service_assets_audit','service_agreements_audit','service_visits_audit',
+                'service_measurements_audit','service_actions_audit','service_reports_audit',
+                'service_documents_audit'
+              );
+
+            SELECT
+              (SELECT count(*) FROM public.service_clients) +
+              (SELECT count(*) FROM public.service_portfolios) +
+              (SELECT count(*) FROM public.service_sites) +
+              (SELECT count(*) FROM public.service_assets) +
+              (SELECT count(*) FROM public.service_agreements) +
+              (SELECT count(*) FROM public.service_visits) +
+              (SELECT count(*) FROM public.service_measurements) +
+              (SELECT count(*) FROM public.service_actions) +
+              (SELECT count(*) FROM public.service_reports) +
+              (SELECT count(*) FROM public.service_documents) +
+              (SELECT count(*) FROM public.service_change_log)
+              INTO v_rows;
+
+            IF v_tables <> 11 OR v_rls <> 11 OR v_triggers <> 10 OR v_rows <> 0 THEN
+              RAISE EXCEPTION 'Service schema verification failed: tables=% rls=% triggers=% rows=%',
+                v_tables, v_rls, v_triggers, v_rows;
+            END IF;
+          END $$;
+          SQL
+
+      - name: Verify admin non-admin service RLS isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+          DO $$
+          DECLARE
+            admin_id text;
+            nonadmin_id text;
+            visible_count integer;
+          BEGIN
+            SELECT id::text INTO admin_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin'
+            ORDER BY "createdAt"
+            LIMIT 1;
+
+            SELECT id::text INTO nonadmin_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,'')) <> 'admin'
+            ORDER BY "createdAt"
+            LIMIT 1;
+
+            IF admin_id IS NULL OR nonadmin_id IS NULL THEN
+              RAISE EXCEPTION 'Service RLS probe requires one admin and one non-admin';
+            END IF;
+
+            EXECUTE 'SET LOCAL ROLE authenticated';
+            PERFORM set_config('request.jwt.claims', json_build_object('sub',admin_id,'role','authenticated')::text, true);
+
+            INSERT INTO public.service_sites (
+              service_site_id, system_id, display_name, status
+            ) VALUES (
+              '__service_rls_probe__', '__service_rls_probe_system__', 'RLS probe', 'active'
+            );
+
+            SELECT count(*) INTO visible_count
+            FROM public.service_sites
+            WHERE service_site_id='__service_rls_probe__';
+            IF visible_count <> 1 THEN RAISE EXCEPTION 'Admin cannot read service probe row'; END IF;
+
+            PERFORM set_config('request.jwt.claims', json_build_object('sub',nonadmin_id,'role','authenticated')::text, true);
+
+            SELECT count(*) INTO visible_count
+            FROM public.service_sites
+            WHERE service_site_id='__service_rls_probe__';
+            IF visible_count <> 0 THEN RAISE EXCEPTION 'Non-admin can read private service row'; END IF;
+
+            BEGIN
+              INSERT INTO public.service_sites (
+                service_site_id, system_id, display_name, status
+              ) VALUES (
+                '__service_nonadmin_fail__', '__service_nonadmin_fail_system__', 'Must fail', 'active'
+              );
+              RAISE EXCEPTION 'Non-admin service insert unexpectedly succeeded';
+            EXCEPTION
+              WHEN insufficient_privilege THEN NULL;
+              WHEN check_violation THEN NULL;
+            END;
+          END $$;
+          ROLLBACK;
+
+          SELECT 'SERVICE_REPORTING_MIGRATION=PASS' AS result,
+                 (SELECT count(*) FROM public.service_sites) AS sites,
+                 (SELECT count(*) FROM public.service_visits) AS visits,
+                 (SELECT count(*) FROM public.service_documents) AS documents,
+                 (SELECT count(*) FROM neon_auth."user") AS users,
+                 (SELECT count(*) FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin') AS admins;
+          SQL
