@@ -234,3 +234,28 @@
 .admin-family-filters{grid-template-columns:minmax(18rem,2fr) repeat(4,minmax(10rem,1fr))}
 .admin-family-table{min-width:1780px}
 @media(max-width:900px){.admin-target-summary{grid-template-columns:1fr}.admin-target-list>a{grid-template-columns:1fr}.admin-target-list>a>small{grid-column:auto}.admin-target-scores{justify-content:flex-start}}
+
+
+.company-commercial-tracking-panel{margin:0;border:1px solid var(--border);border-radius:16px;background:var(--surface);overflow:hidden}
+.company-commercial-metrics{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:.5rem;min-width:min(100%,440px)}
+.company-commercial-metrics article{display:grid;gap:.12rem;padding:.65rem .7rem;border:1px solid var(--border);border-radius:10px;background:#fff}
+.company-commercial-metrics small{color:var(--muted);font-size:.7rem}
+.company-commercial-metrics strong{font-size:1.05rem}
+.company-commercial-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;padding:.85rem}
+.company-commercial-create,.company-commercial-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;margin-bottom:.8rem}
+.company-commercial-create input,.company-commercial-create select,.company-commercial-editor-grid input,.company-commercial-editor-grid select,.company-commercial-editor-grid textarea{width:100%;box-sizing:border-box;border:1px solid #d5dfe2;border-radius:8px;background:#fff;padding:.55rem .65rem;color:inherit;font:inherit;font-size:.78rem;min-width:0}
+.company-commercial-create button,.company-commercial-actions button,.company-commercial-editor .company-admin-card-heading button{border:0;border-radius:8px;padding:.55rem .7rem;background:#174852;color:#fff;font-weight:750;cursor:pointer}
+.company-commercial-create button{grid-column:1/-1;justify-self:start}
+.company-commercial-list{display:grid;gap:.5rem}
+.company-commercial-list>article{display:grid;gap:.35rem;border:1px solid var(--border);border-radius:10px;padding:.65rem .7rem;background:#fbfcfc}
+.company-commercial-row-heading{display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+.company-commercial-facts{display:flex;gap:.55rem;flex-wrap:wrap}
+.company-commercial-facts span,.company-commercial-list p,.company-commercial-list small{color:var(--muted);font-size:.72rem}
+.company-commercial-list p{margin:0}
+.company-commercial-actions{display:flex;gap:.45rem;align-items:center;justify-content:flex-end}
+.company-commercial-actions a{font-size:.74rem;font-weight:700;color:#174852}
+.company-commercial-editor{margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--border)}
+.company-commercial-editor-grid textarea{min-height:76px;resize:vertical}
+.company-commercial-editor .company-admin-card-heading button{padding:.42rem .6rem;background:#eef3f4;color:#23424b}
+@media(max-width:900px){.company-commercial-grid{grid-template-columns:1fr}.company-commercial-metrics{width:100%;min-width:0}}
+@media(max-width:600px){.company-commercial-metrics,.company-commercial-create,.company-commercial-editor-grid{grid-template-columns:1fr}.company-commercial-create button{grid-column:auto}}

@@ -4,6 +4,8 @@ import type {
   CompanySalesAccount,
   CompanySalesOpportunity,
   CompanySalesTask,
+  CompanySalesDemo,
+  CompanySalesProposal,
 } from '../types/companyAdmin'
 
 const activeStages=new Set(['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation'])
@@ -13,12 +15,14 @@ function human(value:string){return value.replaceAll('-',' ').replaceAll('_',' '
 function dateOnly(value:string|null|undefined){return value?.slice(0,10)??null}
 
 export function AdminSalesTodayPanel({
-  accounts,opportunities,tasks,activities,
+  accounts,opportunities,tasks,activities,demos,proposals,
 }:{
   accounts:CompanySalesAccount[]
   opportunities:CompanySalesOpportunity[]
   tasks:CompanySalesTask[]
   activities:CompanyAdminActivity[]
+  demos:CompanySalesDemo[]
+  proposals:CompanySalesProposal[]
 }) {
   const accountById=useMemo(()=>new Map(accounts.map(account=>[account.sales_account_id,account])),[accounts])
   const today=new Date().toISOString().slice(0,10)
@@ -32,11 +36,11 @@ export function AdminSalesTodayPanel({
     const date=dateOnly(task.due_at)
     return date!=null&&date>today&&date<=nextWeek
   })
-  const demos=opportunities.filter(opportunity=>{
-    const date=dateOnly(opportunity.demo_scheduled_at)
-    return date!=null&&date>=today&&date<=nextWeek&&activeStages.has(opportunity.stage)
+  const upcomingDemos=demos.filter(demo=>{
+    const date=dateOnly(demo.scheduled_at)
+    return demo.status==='scheduled'&&date!=null&&date>=today&&date<=nextWeek
   })
-  const proposals=opportunities.filter(opportunity=>['proposal','negotiation'].includes(opportunity.stage))
+  const openProposals=proposals.filter(proposal=>['sent','revising'].includes(proposal.status))
   const noNextStep=opportunities.filter(opportunity=>activeStages.has(opportunity.stage)&&!opportunity.next_step?.trim())
   const stale=opportunities.filter(opportunity=>activeStages.has(opportunity.stage)&&opportunity.updated_at&&opportunity.updated_at<staleCutoff)
   const recentActivities=activities.slice(0,10)
@@ -53,8 +57,8 @@ export function AdminSalesTodayPanel({
         <article><small>Overdue</small><strong>{number.format(overdue.length)}</strong><span>open sales tasks</span></article>
         <article><small>Due today</small><strong>{number.format(dueToday.length)}</strong><span>sales tasks</span></article>
         <article><small>Next 7 days</small><strong>{number.format(nextSeven.length)}</strong><span>scheduled tasks</span></article>
-        <article><small>Demos</small><strong>{number.format(demos.length)}</strong><span>through next 7 days</span></article>
-        <article><small>Proposal / negotiation</small><strong>{number.format(proposals.length)}</strong><span>active decisions</span></article>
+        <article><small>Demos</small><strong>{number.format(upcomingDemos.length)}</strong><span>through next 7 days</span></article>
+        <article><small>Open proposals</small><strong>{number.format(openProposals.length)}</strong><span>sent or revising</span></article>
         <article><small>No next step</small><strong>{number.format(noNextStep.length)}</strong><span>active opportunities</span></article>
       </div>
     </div>
@@ -75,12 +79,18 @@ export function AdminSalesTodayPanel({
       </section>
 
       <section className="admin-company-card">
-        <div className="admin-company-card-heading"><div><strong>Deal attention</strong><span>Demos, missing next steps and stale active deals</span></div><small>{number.format(demos.length+noNextStep.length+stale.length)} signals</small></div>
+        <div className="admin-company-card-heading"><div><strong>Deal attention</strong><span>Demos, proposals, missing next steps and stale active deals</span></div><small>{number.format(upcomingDemos.length+openProposals.length+noNextStep.length+stale.length)} signals</small></div>
         <div className="admin-sales-deal-list">
-          {demos.slice(0,6).map(opportunity=>{
-            const account=rowAccount(opportunity.sales_account_id,opportunity.company_id)
-            return <a key={`demo-${opportunity.opportunity_id}`} href={account?`#/admin-company/${encodeURIComponent(account.sales_account_id)}`:'#/admin-companies'}>
-              <strong>{account?.display_name??opportunity.name}</strong><span>Demo · {opportunity.demo_scheduled_at?new Date(opportunity.demo_scheduled_at).toLocaleString():'scheduled'}</span><small>{opportunity.next_step||opportunity.name}</small>
+          {upcomingDemos.slice(0,6).map(demo=>{
+            const account=rowAccount(demo.sales_account_id)
+            return <a key={`demo-${demo.demo_id}`} href={account?`#/admin-company/${encodeURIComponent(account.sales_account_id)}`:'#/admin-companies'}>
+              <strong>{account?.display_name??demo.sales_account_id}</strong><span>Demo · {demo.scheduled_at?new Date(demo.scheduled_at).toLocaleString():'scheduled'}</span><small>{demo.next_step||demo.demo_scope||'Demo scheduled'}</small>
+            </a>
+          })}
+          {openProposals.slice(0,6).map(proposal=>{
+            const account=rowAccount(proposal.sales_account_id)
+            return <a key={`proposal-${proposal.proposal_id}`} href={account?`#/admin-company/${encodeURIComponent(account.sales_account_id)}`:'#/admin-companies'}>
+              <strong>{account?.display_name??proposal.sales_account_id}</strong><span>{human(proposal.status)} proposal · {proposal.proposed_arr==null?'ARR not set':proposal.proposed_arr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})+' ARR'}</span><small>{proposal.next_step||proposal.package_name||'Proposal decision pending'}</small>
             </a>
           })}
           {noNextStep.slice(0,6).map(opportunity=>{
@@ -95,7 +105,7 @@ export function AdminSalesTodayPanel({
               <strong>{account?.display_name??opportunity.name}</strong><span>{human(opportunity.stage)} · untouched 14+ days</span><small>{opportunity.updated_at?new Date(opportunity.updated_at).toLocaleDateString():'No update timestamp'}</small>
             </a>
           })}
-          {!demos.length&&!noNextStep.length&&!stale.length&&<span className="company-admin-empty">No active deals currently need exception handling.</span>}
+          {!upcomingDemos.length&&!openProposals.length&&!noNextStep.length&&!stale.length&&<span className="company-admin-empty">No active deals currently need exception handling.</span>}
         </div>
       </section>
 

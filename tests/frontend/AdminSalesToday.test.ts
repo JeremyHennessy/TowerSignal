@@ -20,7 +20,7 @@ test('Sales Today surfaces actionable commercial exceptions',()=>{
   expect(today).toContain('Due today')
   expect(today).toContain('Next 7 days')
   expect(today).toContain('Demos')
-  expect(today).toContain('Proposal / negotiation')
+  expect(today).toContain('Open proposals')
   expect(today).toContain('No next step')
   expect(today).toContain('untouched 14+ days')
   expect(today).toContain('Recent sales activity')

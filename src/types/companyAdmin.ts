@@ -261,3 +261,52 @@ export interface CompanyRollupSuggestion {
   reviewed_by: string | null
   review_note: string | null
 }
+
+
+export type CompanySalesDemoStatus = 'scheduled' | 'completed' | 'cancelled' | 'no-show'
+export interface CompanySalesDemo {
+  demo_id:string
+  sales_account_id:string
+  opportunity_id:string|null
+  primary_contact_id:string|null
+  status:CompanySalesDemoStatus
+  scheduled_at:string|null
+  completed_at:string|null
+  meeting_url:string|null
+  attendees:string[]
+  demo_scope:string|null
+  demo_accounts:string|null
+  objections:string|null
+  outcome:string|null
+  next_step:string|null
+  notes:string|null
+  created_at?:string
+  updated_at?:string
+}
+
+export type CompanySalesProposalStatus = 'draft' | 'sent' | 'revising' | 'accepted' | 'rejected' | 'expired'
+export interface CompanySalesProposal {
+  proposal_id:string
+  sales_account_id:string
+  opportunity_id:string|null
+  decision_maker_contact_id:string|null
+  status:CompanySalesProposalStatus
+  package_name:string|null
+  proposed_arr:number|null
+  one_time_value:number|null
+  seats:number|null
+  term_months:number|null
+  sent_at:string|null
+  valid_until:string|null
+  expected_decision_date:string|null
+  proposal_url:string|null
+  procurement_blockers:string|null
+  objections:string|null
+  next_step:string|null
+  notes:string|null
+  accepted_at:string|null
+  rejected_at:string|null
+  rejection_reason:string|null
+  created_at?:string
+  updated_at?:string
+}
