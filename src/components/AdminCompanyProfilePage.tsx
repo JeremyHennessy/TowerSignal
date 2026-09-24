@@ -21,6 +21,7 @@ import type { KnownFirmPayload, KnownFirmSummaryRecord } from '../types/firm'
 import { CompanyAdminPanel } from './CompanyAdminPanel'
 import { CompanyAuditHistory } from './CompanyAuditHistory'
 import { CompanySalesCrmPanel } from './CompanySalesCrmPanel'
+import { CompanySalesAccountPanel } from './CompanySalesAccountPanel'
 
 const number = new Intl.NumberFormat('en-US')
 
@@ -174,6 +175,7 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
       </section>
     </div>
 
+    <CompanySalesAccountPanel salesAccountId={model.account.sales_account_id} />
     <CompanySalesCrmPanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} companyIds={model.memberIds} companyName={model.account.display_name} />
     <CompanyAdminPanel companyId={model.selected.company_id} canonicalName={model.selected.canonical_name} />
     <CompanyAuditHistory companyId={model.selected.company_id} />
