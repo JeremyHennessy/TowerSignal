@@ -178,12 +178,6 @@ export function AdminCompaniesPage() {
   const firmById = useMemo(() => new Map((payload?.firms ?? []).map(firm => [firm.firm_id, firm])), [payload?.firms])
   const queueById = useMemo(() => new Map(queue.map(item => [item.company_id, item])), [queue])
 
-  const contactsByCompany = useMemo(() => {
-    const map = new Map<string, number>()
-    contacts.filter(contact => contact.active).forEach(contact => map.set(contact.company_id, (map.get(contact.company_id) ?? 0) + 1))
-    return map
-  }, [contacts])
-
   const activitiesByCompany = useMemo(() => {
     const map = new Map<string, number>()
     activities.forEach(activity => map.set(activity.company_id, (map.get(activity.company_id) ?? 0) + 1))
