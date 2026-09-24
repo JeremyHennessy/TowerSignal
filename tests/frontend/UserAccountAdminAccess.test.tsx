@@ -21,7 +21,7 @@ beforeEach(() => {
 test('my account shows administrator access and private workspace shortcuts', async () => {
   render(<UserAccountPage user={user} onSignOut={vi.fn(async () => {})} />)
 
-  expect(await screen.findByText('Administrator')).toBeInTheDocument()
+  expect((await screen.findAllByText('Administrator')).length).toBeGreaterThanOrEqual(2)
   expect(screen.getByRole('link', { name:'Company database' })).toHaveAttribute('href', '#/companies')
   expect(screen.getByRole('link', { name:'Service operations' })).toHaveAttribute('href', '#/service')
 })
