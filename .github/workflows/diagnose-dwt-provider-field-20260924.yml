@@ -1,0 +1,29 @@
+name: Diagnose DWT provider field semantics
+
+on:
+  push:
+    branches:
+      - diagnostic/dwt-provider-field-20260924
+    paths:
+      - '.github/workflows/diagnose-dwt-provider-field-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect live DWT source fields
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '=== DCAS rows where inspection_by_firm contains DCAS ==='
+          curl --fail --silent --show-error --get 'https://data.cityofnewyork.us/resource/gjm4-k24g.json'             --data-urlencode '$select=inspection_by_firm,inspection_performed,inspection_date,bin,house_num,street_name'             --data-urlencode "$where=upper(inspection_by_firm) like '%DCAS%'"             --data-urlencode '$limit=25' | python -m json.tool
+
+          echo '=== Rows where inspection_performed contains DCAS ==='
+          curl --fail --silent --show-error --get 'https://data.cityofnewyork.us/resource/gjm4-k24g.json'             --data-urlencode '$select=inspection_by_firm,inspection_performed,inspection_date,bin,house_num,street_name'             --data-urlencode "$where=upper(inspection_performed) like '%DCAS%'"             --data-urlencode '$limit=25' | python -m json.tool
+
+          echo '=== Representative paired field values ==='
+          curl --fail --silent --show-error --get 'https://data.cityofnewyork.us/resource/gjm4-k24g.json'             --data-urlencode '$select=inspection_by_firm,inspection_performed,count(*) as n'             --data-urlencode '$group=inspection_by_firm,inspection_performed'             --data-urlencode '$order=n DESC'             --data-urlencode '$limit=40' | python -m json.tool
