@@ -61,3 +61,20 @@ test('sourced buying contacts and enrichment increase readiness independently of
   expect(score.readinessScore).toBeGreaterThanOrEqual(90)
   expect(score.fitScore).toBeLessThan(30)
 })
+
+
+test('owner-only tower volume does not masquerade as TowerSignal customer fit',()=>{
+  const score=scoreCompanySalesAccount({
+    masterProfile:profile(),
+    contacts:[],
+    publicFirms:[firm({
+      roles:['DOB_NOW_OWNER_BUSINESS','LEGACY_DOB_OWNER_BUSINESS'],
+      serviced_site_count:0,
+      tower_account_count:1000,
+      observed_site_count:1000,
+      observation_count:5000,
+      active_last_12m:true,
+    })],
+  })
+  expect(score.fitScore).toBeLessThan(20)
+})
