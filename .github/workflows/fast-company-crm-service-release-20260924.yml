@@ -127,6 +127,7 @@ jobs:
             'tests/frontend/AuthoritativeSalesWorkflow.test.ts',
             'tests/frontend/CompanyAdmin.test.tsx',
             'tests/frontend/CompanyAdminDirectoryFilters.test.ts',
+            'tests/frontend/CompanyAdminImport.test.ts',
             'tests/frontend/CompanyResearchQueueSync.test.ts',
             'tests/frontend/InternalSalesCrm.test.ts',
             'tests/frontend/MasterSalesAccounts.test.ts',
