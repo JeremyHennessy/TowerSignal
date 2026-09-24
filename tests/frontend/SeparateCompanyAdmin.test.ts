@@ -39,7 +39,7 @@ test('private company administration has dedicated routes and dashboard surfaces
   expect(admin).toContain('Company command center')
   expect(admin).toContain('Parent company summary')
   expect(admin).toContain('Enrichment coverage')
-  expect(admin).toContain('CRM pipeline')
+  expect(admin).toContain('Account classification')
   expect(admin).toContain('Company family directory')
   expect(admin).toContain('Research queue &amp; follow-up operations')
   expect(adminDetail).toContain('Master company summary')
