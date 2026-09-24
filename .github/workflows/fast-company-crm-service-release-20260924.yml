@@ -93,6 +93,7 @@ jobs:
           from pathlib import Path
           allowed = {
             '.github/workflows/fast-company-crm-service-release-20260924.yml',
+            '.github/workflows/fast-company-admin-import-release-20260923.yml',
             'database/migrations/004a_company_audit_refinement.sql',
             'database/migrations/005_service_reporting_foundation.sql',
             'database/migrations/005a_service_fk_delete_fix.sql',
