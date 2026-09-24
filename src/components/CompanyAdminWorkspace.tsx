@@ -134,7 +134,10 @@ export function CompanyAdminWorkspace({
         <h2>Research queue &amp; pipeline</h2>
         <p>Private prospecting state layered over source-backed Known Firms. Public firm identity and evidence remain unchanged.</p>
       </div>
-      <button onClick={() => void syncTop100()} disabled={busy || candidates.length === 0}>{busy ? 'Updating…' : 'Sync top 100 research queue'}</button>
+      <div className="company-ops-heading-actions">
+        <a className="secondary-link-button" href="#/service">Service operations</a>
+        <button onClick={() => void syncTop100()} disabled={busy || candidates.length === 0}>{busy ? 'Updating…' : 'Sync top 100 research queue'}</button>
+      </div>
     </div>
 
     {error && <div className="company-admin-error"><strong>Company operations error.</strong><span>{error}</span></div>}
