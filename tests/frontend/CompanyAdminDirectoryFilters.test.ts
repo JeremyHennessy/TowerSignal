@@ -10,11 +10,11 @@ test('private company command center searches CRM fields and exposes operational
     'family.master.website',
     'family.parentName',
     'family.master.headquarters_address',
-    'family.master.account_owner',
+    'salesAccounts.find(account => account.sales_account_id===family.salesAccountId)?.account_owner',
     'family.master.internal_summary',
   ]) expect(source).toContain(field)
 
-  expect(source).toContain('Admin relationship filter')
+  expect(source).toContain('Admin account classification filter')
   expect(source).toContain('Admin enrichment gap filter')
   expect(source).toContain('Parent company summary')
   expect(source).toContain('Company family directory')
