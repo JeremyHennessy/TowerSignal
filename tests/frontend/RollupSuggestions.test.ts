@@ -49,3 +49,35 @@ test('roll-up generator surfaces evidence-backed aliases and not parent/subsidia
   expect(tower?.evidence).toContain('Same website domain: towerwater.com')
   expect(suggestions.some(row=>new Set([row.candidate_sales_account_id,row.suggested_sales_account_id]).has('a3')&&new Set([row.candidate_sales_account_id,row.suggested_sales_account_id]).has('a4'))).toBe(false)
 })
+
+
+test('roll-up generator surfaces conservative spelling and abbreviation variants for review',()=>{
+  const names=[
+    ['a1','p1','AtlanTANK'],
+    ['a2','p2','ATLANKTANK LLC'],
+    ['a3','p3','American Pipe & Tank'],
+    ['a4','p4','AMERICAN PIP & TANK'],
+    ['a5','p5','EMSL'],
+    ['a6','p6','ESML'],
+    ['a7','p7','Phoenix Environmental Laboratories'],
+    ['a8','p8','Pheonix Environmental Labs'],
+    ['a9','p9','Environmental Building Solutions'],
+    ['a10','p10','Environmental Bldg Solutions LLC'],
+  ] as const
+  const profiles=names.map(([,id,name])=>profile(id,name,null,null))
+  const accounts=names.map(([id,primary,name])=>account(id,primary,name))
+  const members=accounts.map((row,index)=>member(row.sales_account_id,profiles[index].company_id))
+  const suggestions=generateCompanyRollupSuggestions({
+    accounts,members,profiles,contacts:[] as CompanyAdminContact[],firms:[] as KnownFirmSummaryRecord[],
+  })
+  const hasPair=(left:string,right:string)=>suggestions.some(row=>{
+    const pair=new Set([row.candidate_sales_account_id,row.suggested_sales_account_id])
+    return pair.has(left)&&pair.has(right)
+  })
+  expect(hasPair('a1','a2')).toBe(true)
+  expect(hasPair('a3','a4')).toBe(true)
+  expect(hasPair('a5','a6')).toBe(true)
+  expect(hasPair('a7','a8')).toBe(true)
+  expect(hasPair('a9','a10')).toBe(true)
+  expect(suggestions.filter(row=>row.evidence.some(item=>item.includes('Near-exact normalized company-name spelling'))).length).toBeGreaterThanOrEqual(4)
+})
