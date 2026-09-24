@@ -201,58 +201,72 @@ export function AdminCompaniesPage() {
     return map
   }, [activities])
 
-  const families = useMemo<FamilyRow[]>(() => {
-    const grouped = new Map<string, CompanyAdminProfile[]>()
-    profiles.forEach(profile => {
-      const masterId = profile.rollup_company_id || profile.company_id
-      const rows = grouped.get(masterId) ?? []
-      rows.push(profile)
-      grouped.set(masterId, rows)
+  const membersBySalesAccount = useMemo(() => {
+    const map = new Map<string, CompanySalesAccountMember[]>()
+    salesAccountMembers.forEach(member => {
+      const rows=map.get(member.sales_account_id) ?? []
+      rows.push(member)
+      map.set(member.sales_account_id,rows)
     })
+    return map
+  },[salesAccountMembers])
 
-    return [...grouped.entries()].map(([masterId, members]) => {
-      const master = profileById.get(masterId) ?? members.find(member => member.company_id === masterId) ?? members[0]
-      const publicRows = members.map(member => firmById.get(member.company_id)).filter((firm): firm is KnownFirmSummaryRecord => Boolean(firm))
-      const memberIds = members.map(member => member.company_id)
-      const familyContacts = memberIds.reduce((sum, id) => sum + (contactsByCompany.get(id) ?? 0), 0)
-      const familyActivities = memberIds.reduce((sum, id) => sum + (activitiesByCompany.get(id) ?? 0), 0)
-      const memberIdSet = new Set(memberIds)
-      const familyOpportunities = opportunities.filter(opportunity => memberIdSet.has(opportunity.company_id))
-      const activeFamilyOpportunities = familyOpportunities.filter(opportunity => activeOpportunityStages.has(opportunity.stage))
-      const familyTasks = salesTasks.filter(task => memberIdSet.has(task.company_id) && task.status === 'open')
-      const mostAdvancedOpportunity = [...familyOpportunities].sort((a,b) => opportunityRank[b.stage] - opportunityRank[a.stage] || String(b.updated_at ?? '').localeCompare(String(a.updated_at ?? '')))[0] ?? null
-      const salesDates = [
-        ...members.map(member => member.next_action_date),
-        ...activeFamilyOpportunities.map(opportunity => opportunity.next_action_date),
-        ...familyTasks.map(task => task.due_at?.slice(0,10) ?? null),
-      ].filter((value): value is string => Boolean(value)).sort()
-      return {
-        masterId,
-        name: master.rollup_name || master.legal_name || master.canonical_name,
-        parentName: master.parent_company_name,
-        parentSourceUrl: master.parent_source_url,
-        master,
-        memberIds,
-        memberCount: members.length,
-        publicIdentityCount: publicRows.length,
-        publicObservations: publicRows.reduce((sum, firm) => sum + firm.observation_count, 0),
-        servicedRelationships: publicRows.reduce((sum, firm) => sum + firm.serviced_site_count, 0),
-        towerAccountLinks: publicRows.reduce((sum, firm) => sum + firm.tower_account_count, 0),
-        publicContracts: publicRows.reduce((sum, firm) => sum + firm.observed_contract_count, 0),
-        contacts: familyContacts,
-        activities: familyActivities,
-        relationshipStatus: familyRelationshipStatus(members),
-        research: queueById.get(masterId) ?? null,
-        openOpportunities: activeFamilyOpportunities.length,
-        pipelineArr: activeFamilyOpportunities.reduce((sum,opportunity)=>sum+(opportunity.estimated_arr??0),0),
-        salesStage: mostAdvancedOpportunity?.stage ?? null,
-        salesNextStep: mostAdvancedOpportunity?.next_step ?? null,
-        salesOpenTasks: familyTasks.length,
-        nextActionDate: salesDates[0] ?? null,
-        missing: missingFields(master, familyContacts),
-      }
-    }).sort((a,b) => b.publicObservations - a.publicObservations || a.name.localeCompare(b.name))
-  }, [profiles, profileById, firmById, contactsByCompany, activitiesByCompany, queueById, opportunities, salesTasks])
+  const families = useMemo<FamilyRow[]>(() => salesAccounts.map(account => {
+    const memberLinks=membersBySalesAccount.get(account.sales_account_id) ?? []
+    const members=memberLinks.map(member=>profileById.get(member.company_id)).filter((profile): profile is CompanyAdminProfile => Boolean(profile))
+    const master=profileById.get(account.primary_company_id) ?? members[0]
+    if(!master) return null
+    const publicRows=members.map(member=>firmById.get(member.company_id)).filter((firm): firm is KnownFirmSummaryRecord => Boolean(firm))
+    const memberIds=memberLinks.map(member=>member.company_id)
+    const memberIdSet=new Set(memberIds)
+    const familyContacts=memberIds.reduce((sum,id)=>sum+(contactsByCompany.get(id)??0),0)
+    const familyActivities=memberIds.reduce((sum,id)=>sum+(activitiesByCompany.get(id)??0),0)
+    const familyOpportunities=opportunities.filter(opportunity =>
+      opportunity.sales_account_id===account.sales_account_id ||
+      (!opportunity.sales_account_id && memberIdSet.has(opportunity.company_id))
+    )
+    const activeFamilyOpportunities=familyOpportunities.filter(opportunity=>activeOpportunityStages.has(opportunity.stage))
+    const familyTasks=salesTasks.filter(task =>
+      task.status==='open' && (
+        task.sales_account_id===account.sales_account_id ||
+        (!task.sales_account_id && memberIdSet.has(task.company_id))
+      )
+    )
+    const mostAdvancedOpportunity=[...familyOpportunities].sort((a,b)=>opportunityRank[b.stage]-opportunityRank[a.stage] || String(b.updated_at??'').localeCompare(String(a.updated_at??'')))[0] ?? null
+    const salesDates=[
+      ...members.map(member=>member.next_action_date),
+      ...activeFamilyOpportunities.map(opportunity=>opportunity.next_action_date),
+      ...familyTasks.map(task=>task.due_at?.slice(0,10)??null),
+    ].filter((value): value is string=>Boolean(value)).sort()
+    return {
+      salesAccountId:account.sales_account_id,
+      masterId:account.primary_company_id,
+      name:account.display_name,
+      parentName:account.parent_name ?? master.parent_company_name,
+      parentSourceUrl:account.parent_source_url ?? master.parent_source_url,
+      master,
+      memberIds,
+      memberCount:memberLinks.length,
+      publicIdentityCount:publicRows.length,
+      publicObservations:publicRows.reduce((sum,firm)=>sum+firm.observation_count,0),
+      servicedRelationships:publicRows.reduce((sum,firm)=>sum+firm.serviced_site_count,0),
+      towerAccountLinks:publicRows.reduce((sum,firm)=>sum+firm.tower_account_count,0),
+      publicContracts:publicRows.reduce((sum,firm)=>sum+firm.observed_contract_count,0),
+      contacts:familyContacts,
+      activities:familyActivities,
+      relationshipStatus:familyRelationshipStatus(members),
+      research:queue.find(item=>item.sales_account_id===account.sales_account_id) ?? queueById.get(account.primary_company_id) ?? null,
+      openOpportunities:activeFamilyOpportunities.length,
+      pipelineArr:activeFamilyOpportunities.reduce((sum,opportunity)=>sum+(opportunity.estimated_arr??0),0),
+      salesStage:mostAdvancedOpportunity?.stage ?? null,
+      salesNextStep:mostAdvancedOpportunity?.next_step ?? null,
+      salesOpenTasks:familyTasks.length,
+      nextActionDate:salesDates[0] ?? null,
+      missing:missingFields(master,familyContacts),
+    } satisfies FamilyRow
+  }).filter((family): family is FamilyRow=>Boolean(family))
+    .sort((a,b)=>b.publicObservations-a.publicObservations || a.name.localeCompare(b.name)),
+  [salesAccounts,membersBySalesAccount,profileById,firmById,contactsByCompany,activitiesByCompany,opportunities,salesTasks,queue,queueById])
 
   const filteredFamilies = useMemo(() => {
     const needle = search.trim().toLowerCase()
