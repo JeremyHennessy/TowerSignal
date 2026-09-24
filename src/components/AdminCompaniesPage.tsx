@@ -344,7 +344,7 @@ export function AdminCompaniesPage() {
       row.contacts += family.contacts
       row.openDeals += family.openOpportunities
       row.pipelineArr += family.pipelineArr
-      if (pipelineStatuses.has(family.relationshipStatus) || family.openOpportunities > 0) row.pipeline += 1
+      if (family.openOpportunities > 0 || family.accountClassification === 'active-prospect' || family.accountClassification === 'customer') row.pipeline += 1
       if (!row.sourceUrl && family.parentSourceUrl) row.sourceUrl = family.parentSourceUrl
       map.set(key,row)
     })
