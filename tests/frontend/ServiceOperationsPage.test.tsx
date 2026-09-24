@@ -63,7 +63,7 @@ test('service operations renders private portfolio metrics and account drill-thr
   render(<ServiceOperationsPage />)
 
   expect(await screen.findByRole('heading',{name:'Service operations'})).toBeInTheDocument()
-  expect(screen.getByText('400 West 61st Street')).toBeInTheDocument()
+  expect(screen.getAllByText('400 West 61st Street').length).toBeGreaterThanOrEqual(2)
   expect(screen.getByText('Example Client')).toBeInTheDocument()
   expect(screen.getByText('NYC Portfolio')).toBeInTheDocument()
   expect(screen.getByText('Correct chemical feed')).toBeInTheDocument()
