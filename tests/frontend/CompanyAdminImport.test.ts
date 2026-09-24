@@ -52,7 +52,7 @@ test('private import rechecks admin access and writes profiles before contacts',
     companies:[{
       company_id:'known-firm-alpha',
       canonical_name:'ALPHA WATER LLC',
-      profile:{ relationship_status:'researching', website:'https://alpha.example', website_source_name:'Official site', website_source_url:'https://alpha.example' },
+      profile:{ website:'https://alpha.example', website_source_name:'Official site', website_source_url:'https://alpha.example' },
       contacts:[{ contact_id:'alpha-sales', name:'Sales', email:null, title:null, phone:null, linkedin_url:null, notes:null, source_name:'Official contact page', source_url:'https://alpha.example/contact', verified_at:'2026-09-23T19:00:00Z', active:true }],
     }],
   }), [firm])
@@ -118,4 +118,16 @@ test('private import requires provenance for contacts', () => {
       contacts:[{ contact_id:'alpha-sales', name:'Sales' }],
     }],
   }), [firm])).toThrow(/source_name is required/)
+})
+
+
+test('private enrichment import rejects deprecated sales workflow fields', () => {
+  expect(() => parseCompanyAdminImport(JSON.stringify({
+    schema: COMPANY_ADMIN_IMPORT_SCHEMA,
+    companies:[{
+      company_id:'known-firm-alpha',
+      canonical_name:'ALPHA WATER LLC',
+      profile:{ relationship_status:'opportunity' },
+    }],
+  }), [firm])).toThrow(/unsupported fields/)
 })
