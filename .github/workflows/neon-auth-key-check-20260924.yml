@@ -13,6 +13,7 @@ permissions:
 jobs:
   verify-neon-auth-key:
     runs-on: ubuntu-latest
+    environment: github-pages
     timeout-minutes: 5
     env:
       PROJECT_ID: delicate-frost-69301563
