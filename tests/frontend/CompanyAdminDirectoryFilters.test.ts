@@ -19,3 +19,18 @@ test('admin company directory searches private CRM fields and exposes operationa
   expect(source).toContain('Contacted · no next action')
   expect(source).toContain('href="#/service"')
 })
+
+
+const css = readFileSync('src/styles/known-firms.css', 'utf8')
+
+test('company directory stays primary and admin controls do not distort the master table layout', () => {
+  const tableIndex = source.indexOf('known-firms-master-card')
+  const adminToolsIndex = source.indexOf('<details id="company-admin-tools"')
+  expect(tableIndex).toBeGreaterThan(-1)
+  expect(adminToolsIndex).toBeGreaterThan(tableIndex)
+  expect(source).toContain("admin-filters")
+  expect(source).toContain("admin-company-table")
+  expect(css).toContain('.known-firms-master-table.admin-company-table{min-width:1580px}')
+  expect(css).toContain('.firm-master-filters input{grid-column:1/-1;grid-row:auto}')
+  expect(css).not.toContain('.firm-master-filters input{grid-row:span 2}')
+})

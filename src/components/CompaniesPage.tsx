@@ -213,22 +213,11 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         {adminAccess && <span className="company-admin-directory-badge">Admin company database · private fields enabled</span>}
         <p>One normalized list of every company or firm TowerSignal can support from public evidence: service providers, laboratories, procurement vendors, DEC 7G businesses and DOB project-role firms.</p>
       </div>
-      {adminAccess && <div className="page-actions"><a className="secondary-link-button" href="#/service">Service operations</a></div>}
+      {adminAccess && <div className="page-actions company-admin-page-actions"><a className="secondary-link-button" href="#/service">Service operations</a><a className="secondary-link-button" href="#company-admin-tools">Research &amp; import</a></div>}
     </div>
 
     {error && <div className="reference-empty-state"><strong>Known-company intelligence is unavailable.</strong><span>{error}</span><span>TowerSignal will not substitute disconnected provider or vendor lists when the normalized dataset is missing.</span></div>}
     {!payload && !error && <div className="reference-empty-state"><strong>Loading normalized company intelligence…</strong></div>}
-
-    {payload && adminAccess && <CompanyAdminWorkspace
-      firms={payload.firms}
-      profiles={adminProfiles}
-      onProfilesChanged={async () => { setAdminProfiles(await loadCompanyAdminDirectory()) }}
-    />}
-
-    {payload && adminAccess && <CompanyAdminImportPanel
-      firms={payload.firms}
-      onImported={async () => { setAdminProfiles(await loadCompanyAdminDirectory()) }}
-    />}
 
     {payload && <div className="table-card account-table-card known-firms-master-card">
       <div className="firm-master-toolbar">
@@ -243,7 +232,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         </div>
       </div>
 
-      <div className="firm-master-filters" aria-label="Known company filters">
+      <div className={`firm-master-filters${adminAccess ? ' admin-filters' : ''}`} aria-label="Known company filters">
         <input aria-label="Known firm search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search company, role, service or source…" />
         <select aria-label="Known firm role" value={role} onChange={event => setRole(event.target.value)}>
           <option value="ALL">All roles</option>
@@ -281,7 +270,7 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         </select>}
       </div>
 
-      {sorted.length === 0 ? <div className="empty-state"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className="table-scroll"><table className="account-table known-firms-master-table"><thead><tr>
+      {sorted.length === 0 ? <div className="empty-state"><strong>No companies match these filters.</strong><span>Widen the role, relationship, activity or identity criteria.</span></div> : <div className="table-scroll"><table className={`account-table known-firms-master-table${adminAccess ? ' admin-company-table' : ''}`}><thead><tr>
         <th scope="col" role="columnheader"><button onClick={() => changeSort('canonical_name')}>Company / firm{sortIndicator('canonical_name')}</button></th>
         <th scope="col" role="columnheader">Role</th>
         <th scope="col" role="columnheader"><button onClick={() => changeSort('serviced_site_count')}>Service footprint{sortIndicator('serviced_site_count')}</button></th>
@@ -328,5 +317,26 @@ export function CompaniesPage({ onOpenCompany }: { onOpenCompany: (company: Comp
         </div>
       </div>
     </div>}
+
+    {payload && adminAccess && <details id="company-admin-tools" className="company-admin-tools">
+      <summary>
+        <div>
+          <span className="page-kicker">Admin only · secondary tools</span>
+          <strong>Research queue, follow-up pipeline &amp; sourced import</strong>
+        </div>
+        <span>Open admin tools</span>
+      </summary>
+      <div className="company-admin-tools-body">
+        <CompanyAdminWorkspace
+          firms={payload.firms}
+          profiles={adminProfiles}
+          onProfilesChanged={async () => { setAdminProfiles(await loadCompanyAdminDirectory()) }}
+        />
+        <CompanyAdminImportPanel
+          firms={payload.firms}
+          onImported={async () => { setAdminProfiles(await loadCompanyAdminDirectory()) }}
+        />
+      </div>
+    </details>}
   </section>
 }
