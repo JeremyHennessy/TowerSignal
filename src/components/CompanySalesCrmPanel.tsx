@@ -118,7 +118,7 @@ export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyI
       setNewTask(emptyTask())
     }).catch(err=>{if(!cancelled)setError(err instanceof Error?err.message:'Unable to load TowerSignal sales CRM')})
     return()=>{cancelled=true}
-  },[companyId,companyName,companyIds.join('|')])
+  },[companyId,companyName,companyIds])
 
   const contactById=useMemo(()=>new Map(contacts.map(contact=>[contact.contact_id,contact])),[contacts])
   const openTasks=tasks.filter(task=>task.status==='open')
