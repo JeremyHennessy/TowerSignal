@@ -1,0 +1,24 @@
+name: Apply obvious reviewed company roll-ups
+
+on:
+  push:
+    branches:
+      - ops/accept-obvious-rollups-20260924
+    paths:
+      - 'database/ops/accept_obvious_rollups_20260924.sql'
+      - '.github/workflows/accept-obvious-rollups-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply guarded reviewed roll-ups
+        shell: bash
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f database/ops/accept_obvious_rollups_20260924.sql
