@@ -1,0 +1,155 @@
+name: Validate service reporting RLS
+
+on:
+  push:
+    branches:
+      - ops/service-rls-acceptance-20260924
+    paths:
+      - '.github/workflows/service-rls-acceptance-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Verify admin service workflow non-admin isolation and site integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          DO $$
+          DECLARE
+            admin_id text;
+            nonadmin_id text;
+            visible_count integer;
+          BEGIN
+            SELECT id::text INTO admin_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,''))='admin'
+            ORDER BY "createdAt"
+            LIMIT 1;
+
+            SELECT id::text INTO nonadmin_id
+            FROM neon_auth."user"
+            WHERE lower(coalesce(role,'')) <> 'admin'
+            ORDER BY "createdAt"
+            LIMIT 1;
+
+            IF admin_id IS NULL OR nonadmin_id IS NULL THEN
+              RAISE EXCEPTION 'Service RLS acceptance requires one admin and one non-admin';
+            END IF;
+
+            EXECUTE 'SET LOCAL ROLE authenticated';
+            PERFORM set_config('request.jwt.claims', json_build_object('sub', admin_id, 'role', 'authenticated')::text, true);
+
+            INSERT INTO public.service_clients (client_id,name,status)
+              VALUES ('__svc_client__','Service acceptance client','active');
+            INSERT INTO public.service_portfolios (portfolio_id,client_id,name,status)
+              VALUES ('__svc_portfolio__','__svc_client__','Acceptance portfolio','active');
+            INSERT INTO public.service_sites (
+              service_site_id,system_id,client_id,portfolio_id,display_name,address,status
+            ) VALUES (
+              '__svc_site__','__svc_system__','__svc_client__','__svc_portfolio__',
+              'Acceptance site','Acceptance address','active'
+            );
+            INSERT INTO public.service_assets (
+              asset_id,service_site_id,asset_type,asset_label,active
+            ) VALUES (
+              '__svc_asset__','__svc_site__','cooling_tower','Tower 1',true
+            );
+            INSERT INTO public.service_agreements (
+              agreement_id,service_site_id,agreement_name,status,service_interval_days
+            ) VALUES (
+              '__svc_agreement__','__svc_site__','Monthly service','active',30
+            );
+            INSERT INTO public.service_visits (
+              visit_id,service_site_id,agreement_id,status,visit_type,scheduled_for,report_status
+            ) VALUES (
+              '__svc_visit__','__svc_site__','__svc_agreement__','scheduled','routine',now(),'draft'
+            );
+            INSERT INTO public.service_measurements (
+              measurement_id,service_site_id,visit_id,asset_id,parameter,value_numeric,unit,result_status
+            ) VALUES (
+              '__svc_measurement__','__svc_site__','__svc_visit__','__svc_asset__','pH',7.4,'pH','normal'
+            );
+            INSERT INTO public.service_actions (
+              action_id,service_site_id,visit_id,asset_id,title,severity,status
+            ) VALUES (
+              '__svc_action__','__svc_site__','__svc_visit__','__svc_asset__','Acceptance action','medium','open'
+            );
+            INSERT INTO public.service_reports (
+              report_id,service_site_id,visit_id,title,status
+            ) VALUES (
+              '__svc_report__','__svc_site__','__svc_visit__','Acceptance report','draft'
+            );
+            INSERT INTO public.service_documents (
+              document_id,service_site_id,visit_id,report_id,asset_id,document_type,file_name,extraction_status
+            ) VALUES (
+              '__svc_document__','__svc_site__','__svc_visit__','__svc_report__','__svc_asset__',
+              'photo','acceptance.jpg','not-requested'
+            );
+
+            SELECT count(*) INTO visible_count
+            FROM public.service_sites
+            WHERE service_site_id='__svc_site__';
+            IF visible_count <> 1 THEN
+              RAISE EXCEPTION 'Admin cannot read inserted service site';
+            END IF;
+
+            INSERT INTO public.service_sites (
+              service_site_id,system_id,display_name,status
+            ) VALUES (
+              '__svc_other_site__','__svc_other_system__','Other site','active'
+            );
+
+            BEGIN
+              INSERT INTO public.service_measurements (
+                measurement_id,service_site_id,visit_id,asset_id,parameter,value_numeric,result_status
+              ) VALUES (
+                '__svc_bad_measurement__','__svc_other_site__','__svc_visit__',NULL,'pH',7.0,'normal'
+              );
+              RAISE EXCEPTION 'Cross-site measurement unexpectedly succeeded';
+            EXCEPTION
+              WHEN foreign_key_violation THEN NULL;
+            END;
+
+            PERFORM set_config('request.jwt.claims', json_build_object('sub', nonadmin_id, 'role', 'authenticated')::text, true);
+
+            SELECT count(*) INTO visible_count
+            FROM public.service_sites
+            WHERE service_site_id='__svc_site__';
+            IF visible_count <> 0 THEN
+              RAISE EXCEPTION 'Non-admin could read private service site';
+            END IF;
+
+            BEGIN
+              INSERT INTO public.service_sites (
+                service_site_id,system_id,display_name,status
+              ) VALUES (
+                '__svc_nonadmin__','__svc_nonadmin_system__','Non-admin probe','active'
+              );
+              RAISE EXCEPTION 'Non-admin service insert unexpectedly succeeded';
+            EXCEPTION
+              WHEN insufficient_privilege THEN NULL;
+              WHEN check_violation THEN NULL;
+            END;
+          END $$;
+
+          ROLLBACK;
+
+          SELECT 'SERVICE_RLS_ACCEPTANCE=PASS' AS result,
+                 (SELECT count(*) FROM public.service_sites) AS service_sites,
+                 (SELECT count(*) FROM public.service_visits) AS service_visits,
+                 (SELECT count(*) FROM public.service_documents) AS service_documents,
+                 (SELECT count(*) FROM neon_auth."user") AS users,
+                 (SELECT count(*) FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin') AS admins;
+          SQL
