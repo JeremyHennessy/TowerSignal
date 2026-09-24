@@ -310,3 +310,50 @@ export interface CompanySalesProposal {
   created_at?:string
   updated_at?:string
 }
+
+
+export type CompanySalesSubscriptionStatus = 'onboarding' | 'active' | 'paused' | 'cancelled' | 'expired'
+export type CompanySalesBillingCadence = 'monthly' | 'quarterly' | 'annual' | 'multi-year' | 'other'
+export interface CompanySalesSubscription {
+  subscription_id:string
+  sales_account_id:string
+  opportunity_id:string|null
+  proposal_id:string|null
+  primary_contact_id:string|null
+  status:CompanySalesSubscriptionStatus
+  plan_name:string
+  arr:number|null
+  seats:number|null
+  start_date:string|null
+  renewal_date:string|null
+  term_months:number|null
+  billing_cadence:CompanySalesBillingCadence
+  auto_renew:boolean
+  contract_url:string|null
+  customer_success_owner:string|null
+  notes:string|null
+  ended_at:string|null
+  end_reason:string|null
+  created_at?:string
+  updated_at?:string
+}
+
+export type CompanySalesRenewalStatus = 'upcoming' | 'contacted' | 'negotiating' | 'renewed' | 'churned' | 'cancelled'
+export interface CompanySalesRenewal {
+  renewal_id:string
+  subscription_id:string
+  sales_account_id:string
+  primary_contact_id:string|null
+  status:CompanySalesRenewalStatus
+  renewal_date:string
+  current_arr:number|null
+  proposed_arr:number|null
+  renewed_arr:number|null
+  expected_decision_date:string|null
+  next_step:string|null
+  notes:string|null
+  completed_at:string|null
+  churn_reason:string|null
+  created_at?:string
+  updated_at?:string
+}
