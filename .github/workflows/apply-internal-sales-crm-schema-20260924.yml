@@ -1,0 +1,90 @@
+name: Apply internal sales CRM schema
+
+on:
+  push:
+    branches:
+      - ops/apply-internal-sales-crm-schema-20260924
+    paths:
+      - '.github/workflows/apply-internal-sales-crm-schema-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guard production database
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_users integer; v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin';
+            IF v_users <> 2 OR v_admins <> 2 THEN
+              RAISE EXCEPTION 'Auth invariant failed before CRM schema: users=% admins=%', v_users, v_admins;
+            END IF;
+          END $$;
+          SELECT 'CRM_SCHEMA_PRECHECK=PASS' AS result;
+          SQL
+
+      - name: Validate migration with rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s database/migrations/006_internal_sales_crm.sql
+          python - <<'PY'
+          from pathlib import Path
+          source=Path('database/migrations/006_internal_sales_crm.sql').read_text()
+          marker='COMMIT;'
+          pos=source.rfind(marker)
+          assert pos >= 0
+          Path('/tmp/006_internal_sales_crm_validation.sql').write_text(source[:pos]+'ROLLBACK;\n')
+          PY
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f /tmp/006_internal_sales_crm_validation.sql
+          echo "CRM_SCHEMA_VALIDATION=PASS"
+
+      - name: Apply CRM migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f database/migrations/006_internal_sales_crm.sql
+
+      - name: Verify production CRM schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_opp regclass;
+            v_tasks regclass;
+            v_role_col integer;
+            v_primary_col integer;
+          BEGIN
+            SELECT to_regclass('public.company_private_opportunities') INTO v_opp;
+            SELECT to_regclass('public.company_private_tasks') INTO v_tasks;
+            SELECT count(*) INTO v_role_col
+              FROM information_schema.columns
+              WHERE table_schema='public' AND table_name='company_private_contacts' AND column_name='contact_role';
+            SELECT count(*) INTO v_primary_col
+              FROM information_schema.columns
+              WHERE table_schema='public' AND table_name='company_private_contacts' AND column_name='primary_contact';
+            IF v_opp IS NULL OR v_tasks IS NULL OR v_role_col <> 1 OR v_primary_col <> 1 THEN
+              RAISE EXCEPTION 'CRM schema postcondition failed: opp=% tasks=% role_col=% primary_col=%',
+                v_opp, v_tasks, v_role_col, v_primary_col;
+            END IF;
+          END $$;
+          SELECT 'CRM_SCHEMA_ACCEPTANCE=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_opportunities) AS opportunities,
+                 (SELECT count(*) FROM public.company_private_tasks) AS tasks,
+                 (SELECT count(*) FROM public.company_private_contacts WHERE primary_contact) AS primary_contacts;
+          SQL
