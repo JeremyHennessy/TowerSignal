@@ -201,3 +201,38 @@ export interface CompanySalesTask {
   created_at?: string
   updated_at?: string
 }
+
+
+export type CompanySalesAccountClassification =
+  | 'target'
+  | 'active-prospect'
+  | 'customer'
+  | 'former-customer'
+  | 'partner'
+  | 'competitor'
+  | 'do-not-pursue'
+
+export interface CompanySalesAccount {
+  sales_account_id: string
+  primary_company_id: string
+  display_name: string
+  account_classification: CompanySalesAccountClassification
+  record_status: 'active' | 'merged'
+  merged_into_sales_account_id: string | null
+  parent_name: string | null
+  parent_source_url: string | null
+  account_owner: string | null
+  sales_notes: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CompanySalesAccountMember {
+  sales_account_id: string
+  company_id: string
+  member_type: 'primary-source' | 'source-identity' | 'brand' | 'subsidiary' | 'legal-entity'
+  is_primary: boolean
+  relationship_source_name: string | null
+  relationship_source_url: string | null
+  created_at?: string
+}
