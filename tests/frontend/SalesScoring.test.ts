@@ -78,3 +78,20 @@ test('owner-only tower volume does not masquerade as TowerSignal customer fit',(
   })
   expect(score.fitScore).toBeLessThan(20)
 })
+
+
+test('owner self-inspection does not masquerade as a third-party TowerSignal provider',()=>{
+  const score=scoreCompanySalesAccount({
+    masterProfile:profile(),
+    contacts:[],
+    publicFirms:[firm({
+      roles:['DWT_INSPECTION_PROVIDER','DOB_NOW_APPLICANT_BUSINESS','DOB_NOW_OWNER_BUSINESS','LEGACY_DOB_OWNER_BUSINESS'],
+      serviced_site_count:21,
+      tower_account_count:47,
+      observation_count:789,
+      active_last_12m:true,
+    })],
+  })
+  expect(score.fitScore).toBeLessThan(20)
+  expect(score.fitReasons.join(' ')).toContain('Owner/self-inspection pattern')
+})
