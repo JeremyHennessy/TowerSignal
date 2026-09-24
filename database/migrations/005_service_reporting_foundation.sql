@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS public.service_sites (
   CONSTRAINT service_sites_portfolio_client_fk
     FOREIGN KEY (portfolio_id, client_id)
     REFERENCES public.service_portfolios(portfolio_id, client_id)
-    ON DELETE SET NULL
+    ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS public.service_assets (
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS public.service_visits (
   CONSTRAINT service_visits_agreement_site_fk
     FOREIGN KEY (agreement_id, service_site_id)
     REFERENCES public.service_agreements(agreement_id, service_site_id)
-    ON DELETE SET NULL
+    ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS public.service_measurements (
@@ -146,7 +146,7 @@ CREATE TABLE IF NOT EXISTS public.service_measurements (
   CONSTRAINT service_measurements_asset_site_fk
     FOREIGN KEY (asset_id, service_site_id)
     REFERENCES public.service_assets(asset_id, service_site_id)
-    ON DELETE SET NULL
+    ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS public.service_actions (
@@ -170,11 +170,11 @@ CREATE TABLE IF NOT EXISTS public.service_actions (
   CONSTRAINT service_actions_visit_site_fk
     FOREIGN KEY (visit_id, service_site_id)
     REFERENCES public.service_visits(visit_id, service_site_id)
-    ON DELETE SET NULL,
+    ON DELETE NO ACTION,
   CONSTRAINT service_actions_asset_site_fk
     FOREIGN KEY (asset_id, service_site_id)
     REFERENCES public.service_assets(asset_id, service_site_id)
-    ON DELETE SET NULL
+    ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS public.service_reports (
@@ -227,11 +227,11 @@ CREATE TABLE IF NOT EXISTS public.service_documents (
   CONSTRAINT service_documents_visit_site_fk
     FOREIGN KEY (visit_id, service_site_id)
     REFERENCES public.service_visits(visit_id, service_site_id)
-    ON DELETE SET NULL,
+    ON DELETE NO ACTION,
   CONSTRAINT service_documents_asset_site_fk
     FOREIGN KEY (asset_id, service_site_id)
     REFERENCES public.service_assets(asset_id, service_site_id)
-    ON DELETE SET NULL
+    ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS public.service_change_log (
