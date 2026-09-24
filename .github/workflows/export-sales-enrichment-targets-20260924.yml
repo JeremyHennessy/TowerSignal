@@ -1,3 +1,4 @@
+# refresh after rollups
 name: Export ranked sales enrichment targets
 
 on:
