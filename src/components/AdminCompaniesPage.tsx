@@ -260,7 +260,7 @@ export function AdminCompaniesPage() {
     }
     return [family]
   }).sort((a,b)=>b.publicObservations-a.publicObservations || a.name.localeCompare(b.name)),
-  [salesAccounts,membersBySalesAccount,profileById,firmById,contacts,contactsByCompany,activitiesByCompany,opportunities,salesTasks,queue,queueById])
+  [salesAccounts,membersBySalesAccount,profileById,firmById,contacts,activitiesByCompany,opportunities,salesTasks,queue,queueById])
 
   const filteredFamilies = useMemo(() => {
     const needle = search.trim().toLowerCase()
