@@ -10,6 +10,8 @@ import type {
   CompanyResearchQueueItem,
   CompanySalesOpportunity,
   CompanySalesTask,
+  CompanySalesAccount,
+  CompanySalesAccountMember,
   CompanyResearchStatus,
 } from '../types/companyAdmin'
 
@@ -42,6 +44,41 @@ function nullableNumber(value: unknown): number | null {
   if (value == null || value === '') return null
   const number = Number(value)
   return Number.isFinite(number) ? number : null
+}
+
+function salesAccountFrom(row: Record<string, unknown>): CompanySalesAccount {
+  return {
+    sales_account_id:String(row.sales_account_id),
+    primary_company_id:String(row.primary_company_id),
+    display_name:String(row.display_name ?? ''),
+    account_classification:String(row.account_classification ?? 'target') as CompanySalesAccount['account_classification'],
+    record_status:String(row.record_status ?? 'active') as CompanySalesAccount['record_status'],
+    merged_into_sales_account_id:nullableString(row.merged_into_sales_account_id),
+    parent_name:nullableString(row.parent_name),
+    parent_source_url:nullableString(row.parent_source_url),
+    account_owner:nullableString(row.account_owner),
+    sales_notes:nullableString(row.sales_notes),
+    created_at:nullableString(row.created_at) ?? undefined,
+    updated_at:nullableString(row.updated_at) ?? undefined,
+  }
+}
+
+function salesAccountMemberFrom(row: Record<string, unknown>): CompanySalesAccountMember {
+  return {
+    sales_account_id:String(row.sales_account_id),
+    company_id:String(row.company_id),
+    member_type:String(row.member_type ?? 'source-identity') as CompanySalesAccountMember['member_type'],
+    is_primary:row.is_primary === true,
+    relationship_source_name:nullableString(row.relationship_source_name),
+    relationship_source_url:nullableString(row.relationship_source_url),
+    created_at:nullableString(row.created_at) ?? undefined,
+  }
+}
+
+async function salesAccountIdForCompany(companyId:string):Promise<string|null>{
+  const result=await client.from('company_sales_account_members').select('sales_account_id').eq('company_id',companyId).limit(1)
+  throwIfError('Unable to resolve master sales account',result.error)
+  return nullableString(((result.data ?? []) as Array<Record<string,unknown>>)[0]?.sales_account_id)
 }
 
 function profileFrom(row: Record<string, unknown>): CompanyAdminProfile {
@@ -96,6 +133,7 @@ function contactFrom(row: Record<string, unknown>): CompanyAdminContact {
   return {
     contact_id: String(row.contact_id),
     company_id: String(row.company_id),
+    sales_account_id: nullableString(row.sales_account_id),
     name: String(row.name ?? ''),
     title: nullableString(row.title),
     email: nullableString(row.email),
@@ -117,6 +155,7 @@ function activityFrom(row: Record<string, unknown>): CompanyAdminActivity {
   return {
     activity_id: String(row.activity_id),
     company_id: String(row.company_id),
+    sales_account_id: nullableString(row.sales_account_id),
     activity_type: String(row.activity_type ?? 'other'),
     occurred_at: String(row.occurred_at ?? ''),
     contact_id: nullableString(row.contact_id),
@@ -133,6 +172,7 @@ function noteFrom(row: Record<string, unknown>): CompanyAdminNote {
   return {
     note_id: String(row.note_id),
     company_id: String(row.company_id),
+    sales_account_id: nullableString(row.sales_account_id),
     note: String(row.note ?? ''),
     created_at: nullableString(row.created_at) ?? undefined,
     updated_at: nullableString(row.updated_at) ?? undefined,
@@ -147,6 +187,41 @@ export async function loadCompanyAdminAccess(): Promise<boolean> {
   throwIfError('Unable to verify company-database access', result.error)
   const row = ((result.data ?? []) as Array<Record<string, unknown>>)[0]
   return row?.is_admin === true
+}
+
+export async function loadCompanySalesAccounts(): Promise<CompanySalesAccount[]> {
+  const result=await client.from('company_sales_accounts').select('*').eq('record_status','active').order('display_name',{ascending:true})
+  throwIfError('Unable to load master sales accounts',result.error)
+  return ((result.data ?? []) as Array<Record<string,unknown>>).map(salesAccountFrom)
+}
+
+export async function loadCompanySalesAccountMembers(): Promise<CompanySalesAccountMember[]> {
+  const result=await client.from('company_sales_account_members').select('*').order('is_primary',{ascending:false})
+  throwIfError('Unable to load master sales-account membership',result.error)
+  return ((result.data ?? []) as Array<Record<string,unknown>>).map(salesAccountMemberFrom)
+}
+
+export async function loadCompanySalesAccount(salesAccountId:string): Promise<CompanySalesAccount|null> {
+  const result=await client.from('company_sales_accounts').select('*').eq('sales_account_id',salesAccountId).limit(1)
+  throwIfError('Unable to load master sales account',result.error)
+  const row=((result.data ?? []) as Array<Record<string,unknown>>)[0]
+  return row ? salesAccountFrom(row) : null
+}
+
+export async function saveCompanySalesAccount(
+  salesAccountId:string,
+  values:Pick<CompanySalesAccount,'display_name'|'account_classification'|'parent_name'|'parent_source_url'|'account_owner'|'sales_notes'>,
+):Promise<CompanySalesAccount>{
+  const result=await client.from('company_sales_accounts').update({
+    ...values,
+    updated_at:new Date().toISOString(),
+    last_change_source:'manual',
+    last_change_batch_id:null,
+  }).eq('sales_account_id',salesAccountId).select('*')
+  throwIfError('Unable to update master sales account',result.error)
+  const row=((result.data ?? []) as Array<Record<string,unknown>>)[0]
+  if(!row) throw new Error('Unable to update master sales account: row was not returned')
+  return salesAccountFrom(row)
 }
 
 export async function loadCompanyAdminDirectory(): Promise<CompanyAdminProfile[]> {
@@ -208,11 +283,13 @@ export async function saveCompanyAdminProfile(
 export async function saveCompanyAdminContact(
   contactId: string,
   companyId: string,
-  values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'created_at' | 'updated_at'>,
+  values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'sales_account_id' | 'created_at' | 'updated_at'>,
   context: CompanyChangeContext = {},
 ): Promise<CompanyAdminContact> {
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
   const change = {
     ...values,
+    sales_account_id:resolvedSalesAccountId,
     updated_at: new Date().toISOString(),
     last_change_source: context.source ?? 'manual',
     last_change_batch_id: context.batchId ?? null,
@@ -220,7 +297,7 @@ export async function saveCompanyAdminContact(
   if (values.primary_contact) {
     const clearPrimary = await client.from('company_private_contacts')
       .update({ primary_contact:false, updated_at:new Date().toISOString(), last_change_source:context.source ?? 'manual', last_change_batch_id:context.batchId ?? null })
-      .eq('company_id', companyId)
+      .eq('sales_account_id', resolvedSalesAccountId)
       .eq('primary_contact', true)
     throwIfError('Unable to clear prior primary company contact', clearPrimary.error)
   }
@@ -244,14 +321,16 @@ export async function saveCompanyAdminContact(
   return contactFrom(row)
 }
 
-export async function addCompanyContact(companyId: string, values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'created_at' | 'updated_at'>): Promise<CompanyAdminContact> {
+export async function addCompanyContact(companyId: string, values: Omit<CompanyAdminContact, 'contact_id' | 'company_id' | 'sales_account_id' | 'created_at' | 'updated_at'>): Promise<CompanyAdminContact> {
   return saveCompanyAdminContact(crypto.randomUUID(), companyId, values)
 }
 
-export async function addCompanyActivity(companyId: string, values: Omit<CompanyAdminActivity, 'activity_id' | 'company_id' | 'created_at' | 'created_by'>): Promise<CompanyAdminActivity> {
+export async function addCompanyActivity(companyId: string, values: Omit<CompanyAdminActivity, 'activity_id' | 'company_id' | 'sales_account_id' | 'created_at' | 'created_by'>): Promise<CompanyAdminActivity> {
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
   const result = await client.from('company_private_activities').insert({
     activity_id: crypto.randomUUID(),
     company_id: companyId,
+    sales_account_id:resolvedSalesAccountId,
     ...values,
     last_change_source: 'manual',
     last_change_batch_id: null,
@@ -263,9 +342,11 @@ export async function addCompanyActivity(companyId: string, values: Omit<Company
 }
 
 export async function addCompanyNote(companyId: string, note: string): Promise<CompanyAdminNote> {
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
   const result = await client.from('company_private_notes').insert({
     note_id: crypto.randomUUID(),
     company_id: companyId,
+    sales_account_id:resolvedSalesAccountId,
     note,
     last_change_source: 'manual',
     last_change_batch_id: null,
@@ -296,6 +377,7 @@ export async function updateCompanyNote(noteId: string, note: string): Promise<C
 function researchFrom(row: Record<string, unknown>): CompanyResearchQueueItem {
   return {
     company_id: String(row.company_id),
+    sales_account_id: nullableString(row.sales_account_id),
     priority_score: Number(row.priority_score ?? 0),
     priority_reason: String(row.priority_reason ?? ''),
     missing_fields: Array.isArray(row.missing_fields) ? row.missing_fields.map(String) : [],
@@ -348,7 +430,9 @@ export async function saveCompanyResearchQueueItem(
   item: Pick<CompanyResearchQueueItem, 'company_id' | 'priority_score' | 'priority_reason' | 'missing_fields' | 'status' | 'research_owner' | 'last_researched_at'>,
   context: CompanyChangeContext = { source: 'system' },
 ): Promise<CompanyResearchQueueItem> {
+  const resolvedSalesAccountId=await salesAccountIdForCompany(item.company_id)
   const values = {
+    sales_account_id:resolvedSalesAccountId,
     priority_score: item.priority_score,
     priority_reason: item.priority_reason,
     missing_fields: item.missing_fields,
@@ -426,6 +510,7 @@ function opportunityFrom(row: Record<string, unknown>): CompanySalesOpportunity 
   return {
     opportunity_id:String(row.opportunity_id),
     company_id:String(row.company_id),
+    sales_account_id:nullableString(row.sales_account_id),
     name:String(row.name ?? ''),
     stage:String(row.stage ?? 'lead') as CompanySalesOpportunity['stage'],
     product_scope:Array.isArray(row.product_scope) ? row.product_scope.map(String) : [],
@@ -452,6 +537,7 @@ function taskFrom(row: Record<string, unknown>): CompanySalesTask {
   return {
     task_id:String(row.task_id),
     company_id:String(row.company_id),
+    sales_account_id:nullableString(row.sales_account_id),
     opportunity_id:nullableString(row.opportunity_id),
     contact_id:nullableString(row.contact_id),
     title:String(row.title ?? ''),
@@ -472,8 +558,10 @@ export async function loadAllCompanySalesOpportunities(): Promise<CompanySalesOp
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(opportunityFrom)
 }
 
-export async function loadCompanySalesOpportunities(companyId: string): Promise<CompanySalesOpportunity[]> {
-  const result = await client.from('company_private_opportunities').select('*').eq('company_id',companyId).order('updated_at',{ascending:false})
+export async function loadCompanySalesOpportunities(companyId: string, salesAccountId?: string | null): Promise<CompanySalesOpportunity[]> {
+  let query=client.from('company_private_opportunities').select('*')
+  query=salesAccountId ? query.eq('sales_account_id',salesAccountId) : query.eq('company_id',companyId)
+  const result=await query.order('updated_at',{ascending:false})
   throwIfError('Unable to load company sales opportunities', result.error)
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(opportunityFrom)
 }
@@ -481,10 +569,12 @@ export async function loadCompanySalesOpportunities(companyId: string): Promise<
 export async function saveCompanySalesOpportunity(
   opportunityId: string,
   companyId: string,
-  values: Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'created_at'|'updated_at'>,
+  values: Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
+  salesAccountId?: string | null,
 ): Promise<CompanySalesOpportunity> {
   const now=new Date().toISOString()
-  const change={...values,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
+  const resolvedSalesAccountId=salesAccountId ?? await salesAccountIdForCompany(companyId)
+  const change={...values,sales_account_id:resolvedSalesAccountId,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
   const update=await client.from('company_private_opportunities').update(change).eq('opportunity_id',opportunityId).eq('company_id',companyId).select('*')
   throwIfError('Unable to update TowerSignal sales opportunity', update.error)
   const updated=((update.data ?? []) as Array<Record<string,unknown>>)[0]
@@ -498,9 +588,10 @@ export async function saveCompanySalesOpportunity(
 
 export async function addCompanySalesOpportunity(
   companyId:string,
-  values:Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'created_at'|'updated_at'>,
+  values:Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
+  salesAccountId?:string|null,
 ):Promise<CompanySalesOpportunity>{
-  return saveCompanySalesOpportunity(crypto.randomUUID(),companyId,values)
+  return saveCompanySalesOpportunity(crypto.randomUUID(),companyId,values,salesAccountId)
 }
 
 export async function loadAllCompanySalesTasks(): Promise<CompanySalesTask[]> {
@@ -509,8 +600,10 @@ export async function loadAllCompanySalesTasks(): Promise<CompanySalesTask[]> {
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(taskFrom)
 }
 
-export async function loadCompanySalesTasks(companyId:string): Promise<CompanySalesTask[]> {
-  const result=await client.from('company_private_tasks').select('*').eq('company_id',companyId).order('due_at',{ascending:true})
+export async function loadCompanySalesTasks(companyId:string,salesAccountId?:string|null): Promise<CompanySalesTask[]> {
+  let query=client.from('company_private_tasks').select('*')
+  query=salesAccountId ? query.eq('sales_account_id',salesAccountId) : query.eq('company_id',companyId)
+  const result=await query.order('due_at',{ascending:true})
   throwIfError('Unable to load company sales tasks',result.error)
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(taskFrom)
 }
@@ -518,10 +611,12 @@ export async function loadCompanySalesTasks(companyId:string): Promise<CompanySa
 export async function saveCompanySalesTask(
   taskId:string,
   companyId:string,
-  values:Omit<CompanySalesTask,'task_id'|'company_id'|'created_at'|'updated_at'>,
+  values:Omit<CompanySalesTask,'task_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
+  salesAccountId?:string|null,
 ):Promise<CompanySalesTask>{
   const now=new Date().toISOString()
-  const change={...values,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
+  const resolvedSalesAccountId=salesAccountId ?? await salesAccountIdForCompany(companyId)
+  const change={...values,sales_account_id:resolvedSalesAccountId,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
   const update=await client.from('company_private_tasks').update(change).eq('task_id',taskId).eq('company_id',companyId).select('*')
   throwIfError('Unable to update TowerSignal sales task',update.error)
   const updated=((update.data ?? []) as Array<Record<string,unknown>>)[0]
@@ -535,7 +630,8 @@ export async function saveCompanySalesTask(
 
 export async function addCompanySalesTask(
   companyId:string,
-  values:Omit<CompanySalesTask,'task_id'|'company_id'|'created_at'|'updated_at'>,
+  values:Omit<CompanySalesTask,'task_id'|'company_id'|'sales_account_id'|'created_at'|'updated_at'>,
+  salesAccountId?:string|null,
 ):Promise<CompanySalesTask>{
-  return saveCompanySalesTask(crypto.randomUUID(),companyId,values)
+  return saveCompanySalesTask(crypto.randomUUID(),companyId,values,salesAccountId)
 }

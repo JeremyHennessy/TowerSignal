@@ -82,7 +82,7 @@ function emptyTask():Omit<CompanySalesTask,'task_id'|'company_id'|'created_at'|'
   }
 }
 
-export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyId]}:{companyId:string;companyName:string;companyIds?:string[]}) {
+export function CompanySalesCrmPanel({salesAccountId,companyId,companyName,companyIds=[companyId]}:{salesAccountId:string;companyId:string;companyName:string;companyIds?:string[]}) {
   const [opportunities,setOpportunities]=useState<CompanySalesOpportunity[]>([])
   const [tasks,setTasks]=useState<CompanySalesTask[]>([])
   const [contacts,setContacts]=useState<CompanyAdminContact[]>([])
@@ -94,8 +94,8 @@ export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyI
 
   const reload=async()=>{
     const [nextOpportunities,nextTasks,snapshots]=await Promise.all([
-      loadCompanySalesOpportunities(companyId),
-      loadCompanySalesTasks(companyId),
+      loadCompanySalesOpportunities(companyId,salesAccountId),
+      loadCompanySalesTasks(companyId,salesAccountId),
       Promise.all(companyIds.map(id=>loadCompanyAdminSnapshot(id))),
     ])
     setOpportunities(nextOpportunities)
@@ -106,8 +106,8 @@ export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyI
   useEffect(()=>{
     let cancelled=false
     Promise.all([
-      loadCompanySalesOpportunities(companyId),
-      loadCompanySalesTasks(companyId),
+      loadCompanySalesOpportunities(companyId,salesAccountId),
+      loadCompanySalesTasks(companyId,salesAccountId),
       Promise.all(companyIds.map(id=>loadCompanyAdminSnapshot(id))),
     ]).then(([nextOpportunities,nextTasks,snapshots])=>{
       if(cancelled) return
@@ -118,7 +118,7 @@ export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyI
       setNewTask(emptyTask())
     }).catch(err=>{if(!cancelled)setError(err instanceof Error?err.message:'Unable to load TowerSignal sales CRM')})
     return()=>{cancelled=true}
-  },[companyId,companyName,companyIds])
+  },[salesAccountId,companyId,companyName,companyIds])
 
   const contactById=useMemo(()=>new Map(contacts.map(contact=>[contact.contact_id,contact])),[contacts])
   const openTasks=tasks.filter(task=>task.status==='open')
@@ -137,7 +137,7 @@ export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyI
         next_step:text(newOpportunity.next_step??''),
         notes:text(newOpportunity.notes??''),
         lost_reason:text(newOpportunity.lost_reason??''),
-      })
+      },salesAccountId)
       setNewOpportunity(emptyOpportunity(companyName))
       await reload()
     }catch(err){setError(err instanceof Error?err.message:'Unable to add opportunity')}
@@ -168,7 +168,7 @@ export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyI
         lost_at:stage==='closed-lost' ? (editingOpportunity.lost_at??now) : null,
         lost_reason:text(editingOpportunity.lost_reason??''),
         notes:text(editingOpportunity.notes??''),
-      })
+      },salesAccountId)
       setEditingOpportunity(null)
       await reload()
     }catch(err){setError(err instanceof Error?err.message:'Unable to update opportunity')}
@@ -179,7 +179,7 @@ export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyI
     if(!newTask.title.trim()) return
     setBusy(true);setError(null)
     try{
-      await addCompanySalesTask(companyId,{...newTask,title:newTask.title.trim(),notes:text(newTask.notes??'')})
+      await addCompanySalesTask(companyId,{...newTask,title:newTask.title.trim(),notes:text(newTask.notes??'')},salesAccountId)
       setNewTask(emptyTask())
       await reload()
     }catch(err){setError(err instanceof Error?err.message:'Unable to add sales task')}
@@ -189,7 +189,7 @@ export function CompanySalesCrmPanel({companyId,companyName,companyIds=[companyI
   const completeTask=async(task:CompanySalesTask)=>{
     setBusy(true);setError(null)
     try{
-      await saveCompanySalesTask(task.task_id,companyId,{...task,status:'completed',completed_at:new Date().toISOString()})
+      await saveCompanySalesTask(task.task_id,companyId,{...task,status:'completed',completed_at:new Date().toISOString()},salesAccountId)
       await reload()
     }catch(err){setError(err instanceof Error?err.message:'Unable to complete sales task')}
     finally{setBusy(false)}

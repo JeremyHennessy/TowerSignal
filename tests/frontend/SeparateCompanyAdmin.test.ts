@@ -45,6 +45,6 @@ test('private company administration has dedicated routes and dashboard surfaces
   expect(adminDetail).toContain('Master company summary')
   expect(adminDetail).toContain('Family identities')
   expect(adminDetail).toContain('CompanyAdminPanel')
-  expect(adminDetail).toContain('CompanyFamilyPanel')
+  expect(adminDetail).toContain('CompanySalesAccountPanel')
   expect(adminDetail).toContain('CompanyAuditHistory')
 })

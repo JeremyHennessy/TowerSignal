@@ -7,6 +7,8 @@ import {
   loadCompanyResearchQueue,
   loadAllCompanySalesOpportunities,
   loadAllCompanySalesTasks,
+  loadCompanySalesAccounts,
+  loadCompanySalesAccountMembers,
 } from '../companyAdmin/client'
 import { loadKnownFirms } from '../data/api'
 import type {
@@ -18,6 +20,8 @@ import type {
   CompanySalesOpportunity,
   CompanySalesTask,
   CompanyOpportunityStage,
+  CompanySalesAccount,
+  CompanySalesAccountMember,
 } from '../types/companyAdmin'
 import type { KnownFirmPayload, KnownFirmSummaryRecord } from '../types/firm'
 import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
@@ -81,6 +85,7 @@ function missingFields(profile: CompanyAdminProfile, contactCount: number): stri
 }
 
 type FamilyRow = {
+  salesAccountId: string
   masterId: string
   name: string
   parentName: string | null
@@ -115,6 +120,8 @@ export function AdminCompaniesPage() {
   const [queue, setQueue] = useState<CompanyResearchQueueItem[]>([])
   const [opportunities, setOpportunities] = useState<CompanySalesOpportunity[]>([])
   const [salesTasks, setSalesTasks] = useState<CompanySalesTask[]>([])
+  const [salesAccounts, setSalesAccounts] = useState<CompanySalesAccount[]>([])
+  const [salesAccountMembers, setSalesAccountMembers] = useState<CompanySalesAccountMember[]>([])
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [relationship, setRelationship] = useState('ALL')
@@ -122,13 +129,15 @@ export function AdminCompaniesPage() {
   const [gap, setGap] = useState('ALL')
 
   const reloadPrivate = async () => {
-    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks] = await Promise.all([
+    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
       loadCompanyAdminDirectory(),
       loadAllCompanyContacts(),
       loadAllCompanyActivities(),
       loadCompanyResearchQueue(),
       loadAllCompanySalesOpportunities(),
       loadAllCompanySalesTasks(),
+      loadCompanySalesAccounts(),
+      loadCompanySalesAccountMembers(),
     ])
     setProfiles(nextProfiles)
     setContacts(nextContacts)
@@ -136,6 +145,8 @@ export function AdminCompaniesPage() {
     setQueue(nextQueue)
     setOpportunities(nextOpportunities)
     setSalesTasks(nextSalesTasks)
+    setSalesAccounts(nextSalesAccounts)
+    setSalesAccountMembers(nextSalesAccountMembers)
   }
 
   useEffect(() => {
@@ -144,7 +155,7 @@ export function AdminCompaniesPage() {
       if (cancelled) return
       setAllowed(isAdmin)
       if (!isAdmin) return
-      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks] = await Promise.all([
+      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
         loadKnownFirms(),
         loadCompanyAdminDirectory(),
         loadAllCompanyContacts(),
@@ -152,6 +163,8 @@ export function AdminCompaniesPage() {
         loadCompanyResearchQueue(),
         loadAllCompanySalesOpportunities(),
         loadAllCompanySalesTasks(),
+        loadCompanySalesAccounts(),
+        loadCompanySalesAccountMembers(),
       ])
       if (cancelled) return
       setPayload(known)
@@ -161,6 +174,8 @@ export function AdminCompaniesPage() {
       setQueue(nextQueue)
       setOpportunities(nextOpportunities)
       setSalesTasks(nextSalesTasks)
+      setSalesAccounts(nextSalesAccounts)
+      setSalesAccountMembers(nextSalesAccountMembers)
     }).catch(err => {
       if (!cancelled) {
         setAllowed(false)
@@ -186,58 +201,72 @@ export function AdminCompaniesPage() {
     return map
   }, [activities])
 
-  const families = useMemo<FamilyRow[]>(() => {
-    const grouped = new Map<string, CompanyAdminProfile[]>()
-    profiles.forEach(profile => {
-      const masterId = profile.rollup_company_id || profile.company_id
-      const rows = grouped.get(masterId) ?? []
-      rows.push(profile)
-      grouped.set(masterId, rows)
+  const membersBySalesAccount = useMemo(() => {
+    const map = new Map<string, CompanySalesAccountMember[]>()
+    salesAccountMembers.forEach(member => {
+      const rows=map.get(member.sales_account_id) ?? []
+      rows.push(member)
+      map.set(member.sales_account_id,rows)
     })
+    return map
+  },[salesAccountMembers])
 
-    return [...grouped.entries()].map(([masterId, members]) => {
-      const master = profileById.get(masterId) ?? members.find(member => member.company_id === masterId) ?? members[0]
-      const publicRows = members.map(member => firmById.get(member.company_id)).filter((firm): firm is KnownFirmSummaryRecord => Boolean(firm))
-      const memberIds = members.map(member => member.company_id)
-      const familyContacts = memberIds.reduce((sum, id) => sum + (contactsByCompany.get(id) ?? 0), 0)
-      const familyActivities = memberIds.reduce((sum, id) => sum + (activitiesByCompany.get(id) ?? 0), 0)
-      const memberIdSet = new Set(memberIds)
-      const familyOpportunities = opportunities.filter(opportunity => memberIdSet.has(opportunity.company_id))
-      const activeFamilyOpportunities = familyOpportunities.filter(opportunity => activeOpportunityStages.has(opportunity.stage))
-      const familyTasks = salesTasks.filter(task => memberIdSet.has(task.company_id) && task.status === 'open')
-      const mostAdvancedOpportunity = [...familyOpportunities].sort((a,b) => opportunityRank[b.stage] - opportunityRank[a.stage] || String(b.updated_at ?? '').localeCompare(String(a.updated_at ?? '')))[0] ?? null
-      const salesDates = [
-        ...members.map(member => member.next_action_date),
-        ...activeFamilyOpportunities.map(opportunity => opportunity.next_action_date),
-        ...familyTasks.map(task => task.due_at?.slice(0,10) ?? null),
-      ].filter((value): value is string => Boolean(value)).sort()
-      return {
-        masterId,
-        name: master.rollup_name || master.legal_name || master.canonical_name,
-        parentName: master.parent_company_name,
-        parentSourceUrl: master.parent_source_url,
-        master,
-        memberIds,
-        memberCount: members.length,
-        publicIdentityCount: publicRows.length,
-        publicObservations: publicRows.reduce((sum, firm) => sum + firm.observation_count, 0),
-        servicedRelationships: publicRows.reduce((sum, firm) => sum + firm.serviced_site_count, 0),
-        towerAccountLinks: publicRows.reduce((sum, firm) => sum + firm.tower_account_count, 0),
-        publicContracts: publicRows.reduce((sum, firm) => sum + firm.observed_contract_count, 0),
-        contacts: familyContacts,
-        activities: familyActivities,
-        relationshipStatus: familyRelationshipStatus(members),
-        research: queueById.get(masterId) ?? null,
-        openOpportunities: activeFamilyOpportunities.length,
-        pipelineArr: activeFamilyOpportunities.reduce((sum,opportunity)=>sum+(opportunity.estimated_arr??0),0),
-        salesStage: mostAdvancedOpportunity?.stage ?? null,
-        salesNextStep: mostAdvancedOpportunity?.next_step ?? null,
-        salesOpenTasks: familyTasks.length,
-        nextActionDate: salesDates[0] ?? null,
-        missing: missingFields(master, familyContacts),
-      }
-    }).sort((a,b) => b.publicObservations - a.publicObservations || a.name.localeCompare(b.name))
-  }, [profiles, profileById, firmById, contactsByCompany, activitiesByCompany, queueById, opportunities, salesTasks])
+  const families = useMemo<FamilyRow[]>(() => salesAccounts.flatMap(account => {
+    const memberLinks=membersBySalesAccount.get(account.sales_account_id) ?? []
+    const members=memberLinks.map(member=>profileById.get(member.company_id)).filter((profile): profile is CompanyAdminProfile => Boolean(profile))
+    const master=profileById.get(account.primary_company_id) ?? members[0]
+    if(!master) return []
+    const publicRows=members.map(member=>firmById.get(member.company_id)).filter((firm): firm is KnownFirmSummaryRecord => Boolean(firm))
+    const memberIds=memberLinks.map(member=>member.company_id)
+    const memberIdSet=new Set(memberIds)
+    const familyContacts=memberIds.reduce((sum,id)=>sum+(contactsByCompany.get(id)??0),0)
+    const familyActivities=memberIds.reduce((sum,id)=>sum+(activitiesByCompany.get(id)??0),0)
+    const familyOpportunities=opportunities.filter(opportunity =>
+      opportunity.sales_account_id===account.sales_account_id ||
+      (!opportunity.sales_account_id && memberIdSet.has(opportunity.company_id))
+    )
+    const activeFamilyOpportunities=familyOpportunities.filter(opportunity=>activeOpportunityStages.has(opportunity.stage))
+    const familyTasks=salesTasks.filter(task =>
+      task.status==='open' && (
+        task.sales_account_id===account.sales_account_id ||
+        (!task.sales_account_id && memberIdSet.has(task.company_id))
+      )
+    )
+    const mostAdvancedOpportunity=[...familyOpportunities].sort((a,b)=>opportunityRank[b.stage]-opportunityRank[a.stage] || String(b.updated_at??'').localeCompare(String(a.updated_at??'')))[0] ?? null
+    const salesDates=[
+      ...members.map(member=>member.next_action_date),
+      ...activeFamilyOpportunities.map(opportunity=>opportunity.next_action_date),
+      ...familyTasks.map(task=>task.due_at?.slice(0,10)??null),
+    ].filter((value): value is string=>Boolean(value)).sort()
+    const family:FamilyRow={
+      salesAccountId:account.sales_account_id,
+      masterId:account.primary_company_id,
+      name:account.display_name,
+      parentName:account.parent_name ?? master.parent_company_name,
+      parentSourceUrl:account.parent_source_url ?? master.parent_source_url,
+      master,
+      memberIds,
+      memberCount:memberLinks.length,
+      publicIdentityCount:publicRows.length,
+      publicObservations:publicRows.reduce((sum,firm)=>sum+firm.observation_count,0),
+      servicedRelationships:publicRows.reduce((sum,firm)=>sum+firm.serviced_site_count,0),
+      towerAccountLinks:publicRows.reduce((sum,firm)=>sum+firm.tower_account_count,0),
+      publicContracts:publicRows.reduce((sum,firm)=>sum+firm.observed_contract_count,0),
+      contacts:familyContacts,
+      activities:familyActivities,
+      relationshipStatus:familyRelationshipStatus(members),
+      research:queue.find(item=>item.sales_account_id===account.sales_account_id) ?? queueById.get(account.primary_company_id) ?? null,
+      openOpportunities:activeFamilyOpportunities.length,
+      pipelineArr:activeFamilyOpportunities.reduce((sum,opportunity)=>sum+(opportunity.estimated_arr??0),0),
+      salesStage:mostAdvancedOpportunity?.stage ?? null,
+      salesNextStep:mostAdvancedOpportunity?.next_step ?? null,
+      salesOpenTasks:familyTasks.length,
+      nextActionDate:salesDates[0] ?? null,
+      missing:missingFields(master,familyContacts),
+    }
+    return [family]
+  }).sort((a,b)=>b.publicObservations-a.publicObservations || a.name.localeCompare(b.name)),
+  [salesAccounts,membersBySalesAccount,profileById,firmById,contactsByCompany,activitiesByCompany,opportunities,salesTasks,queue,queueById])
 
   const filteredFamilies = useMemo(() => {
     const needle = search.trim().toLowerCase()
@@ -423,7 +452,7 @@ export function AdminCompaniesPage() {
       <section className="admin-company-card">
         <div className="admin-company-card-heading"><div><strong>Follow-up attention</strong><span>Overdue and next-seven-day company actions</span></div><small>{number.format(overdue.length + upcoming.length)} due</small></div>
         <div className="admin-company-activity-list">
-          {attentionFamilies.length ? attentionFamilies.map(family => <a key={family.masterId} href={`#/admin-company/${encodeURIComponent(family.masterId)}`}>
+          {attentionFamilies.length ? attentionFamilies.map(family => <a key={family.salesAccountId} href={`#/admin-company/${encodeURIComponent(family.salesAccountId)}`}>
             <strong>{family.name}</strong>
             <span>{family.nextActionDate || 'No date'} · {human(family.relationshipStatus)}</span>
             <small>{family.contacts} active contact{family.contacts===1?'':'s'} · {family.activities} interaction{family.activities===1?'':'s'}</small>
@@ -454,7 +483,7 @@ export function AdminCompaniesPage() {
         </div>
       </div>
       <div className="table-scroll"><table className="account-table admin-family-table"><thead><tr><th>Master family</th><th>Parent / ownership</th><th>Source identities</th><th>Public evidence</th><th>Contacts / activity</th><th>TowerSignal sales</th><th>Research</th><th>Enrichment gaps</th><th>Next action</th><th></th></tr></thead><tbody>
-        {filteredFamilies.map(family => <tr key={family.masterId} onClick={() => { window.location.hash = `#/admin-company/${encodeURIComponent(family.masterId)}` }} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') window.location.hash = `#/admin-company/${encodeURIComponent(family.masterId)}` }}>
+        {filteredFamilies.map(family => <tr key={family.salesAccountId} onClick={() => { window.location.hash = `#/admin-company/${encodeURIComponent(family.salesAccountId)}` }} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') window.location.hash = `#/admin-company/${encodeURIComponent(family.salesAccountId)}` }}>
           <td><strong>{family.name}</strong><small>{family.master.legal_name || family.master.canonical_name}</small>{family.master.website && <small>{family.master.website.replace(/^https?:\/\//,'').replace(/\/$/,'')}</small>}</td>
           <td><strong>{family.parentName || 'Not recorded'}</strong><small>{ownershipKnown(family.master) ? 'Ownership reviewed' : 'Needs ownership research'}</small></td>
           <td><strong>{number.format(family.memberCount)}</strong><small>{number.format(family.publicIdentityCount)} in public Known Firms</small></td>

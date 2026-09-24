@@ -148,3 +148,14 @@
 @media(max-width:460px){
   .admin-sales-metrics,.company-sales-crm-metrics{grid-template-columns:1fr}
 }
+
+.company-sales-account-panel{border:1px solid var(--border);border-radius:16px;background:#fff;overflow:hidden}
+.company-sales-account-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;padding:.9rem}
+.company-sales-account-form label{display:grid;gap:.28rem;min-width:0}
+.company-sales-account-form label>span{font-size:.72rem;font-weight:760;color:var(--muted)}
+.company-sales-account-form input,.company-sales-account-form select,.company-sales-account-form textarea{width:100%;box-sizing:border-box;border:1px solid #d5dfe2;border-radius:8px;background:#fff;padding:.55rem .65rem;color:inherit;font:inherit;font-size:.8rem;min-width:0}
+.company-sales-account-form label.wide{grid-column:1/-1}
+.company-sales-account-actions{display:flex;justify-content:flex-end;padding:0 .9rem .9rem}
+.company-sales-account-actions button{border:0;border-radius:8px;padding:.6rem .8rem;background:#174852;color:#fff;font-weight:760;cursor:pointer}
+@media(max-width:900px){.company-sales-account-form{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.company-sales-account-form{grid-template-columns:1fr}.company-sales-account-form label.wide{grid-column:auto}}

@@ -65,6 +65,7 @@ export type CompanyAdminProfilePatch = Omit<
 export interface CompanyAdminContact {
   contact_id: string
   company_id: string
+  sales_account_id?: string | null
   name: string
   title: string | null
   email: string | null
@@ -84,6 +85,7 @@ export interface CompanyAdminContact {
 export interface CompanyAdminActivity {
   activity_id: string
   company_id: string
+  sales_account_id?: string | null
   activity_type: string
   occurred_at: string
   contact_id: string | null
@@ -98,6 +100,7 @@ export interface CompanyAdminActivity {
 export interface CompanyAdminNote {
   note_id: string
   company_id: string
+  sales_account_id?: string | null
   note: string
   created_at?: string
   updated_at?: string
@@ -117,6 +120,7 @@ export type CompanyResearchStatus = 'unreviewed' | 'researching' | 'verified' | 
 
 export interface CompanyResearchQueueItem {
   company_id: string
+  sales_account_id?: string | null
   priority_score: number
   priority_reason: string
   missing_fields: string[]
@@ -161,6 +165,7 @@ export type CompanyOpportunityStage =
 export interface CompanySalesOpportunity {
   opportunity_id: string
   company_id: string
+  sales_account_id?: string | null
   name: string
   stage: CompanyOpportunityStage
   product_scope: string[]
@@ -189,6 +194,7 @@ export type CompanyTaskStatus = 'open' | 'completed' | 'cancelled'
 export interface CompanySalesTask {
   task_id: string
   company_id: string
+  sales_account_id?: string | null
   opportunity_id: string | null
   contact_id: string | null
   title: string
@@ -200,4 +206,39 @@ export interface CompanySalesTask {
   notes: string | null
   created_at?: string
   updated_at?: string
+}
+
+
+export type CompanySalesAccountClassification =
+  | 'target'
+  | 'active-prospect'
+  | 'customer'
+  | 'former-customer'
+  | 'partner'
+  | 'competitor'
+  | 'do-not-pursue'
+
+export interface CompanySalesAccount {
+  sales_account_id: string
+  primary_company_id: string
+  display_name: string
+  account_classification: CompanySalesAccountClassification
+  record_status: 'active' | 'merged'
+  merged_into_sales_account_id?: string | null
+  parent_name: string | null
+  parent_source_url: string | null
+  account_owner: string | null
+  sales_notes: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CompanySalesAccountMember {
+  sales_account_id: string
+  company_id: string
+  member_type: 'primary-source' | 'source-identity' | 'brand' | 'subsidiary' | 'legal-entity'
+  is_primary: boolean
+  relationship_source_name: string | null
+  relationship_source_url: string | null
+  created_at?: string
 }
