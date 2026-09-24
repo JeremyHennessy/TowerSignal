@@ -90,8 +90,7 @@ jobs:
               a=normalize(left).replace(' ',''); b=normalize(right).replace(' ','')
               if not a or not b or min(len(a),len(b))<4: return None
               dist=damerau(a,b); mx=max(len(a),len(b)); sim=1-dist/mx
-              ok=(mx<=5 and dist==1) or (mx>=8 and dist==1) or (mx>=12 and dist==2 and sim>=.88)
-              return (dist,sim) if ok else None
+              return (dist,sim) if dist==1 else None
           def address(p):
               return re.sub(r'[^A-Z0-9]+',' ',' '.join(str(p.get(k) or '') for k in ('headquarters_address','headquarters_city','headquarters_region','headquarters_postal_code')).upper()).strip()
           def domain(value):
