@@ -1,0 +1,92 @@
+name: Export private company enrichment baseline
+
+on:
+  push:
+    branches:
+      - ops/export-company-baseline-20260924
+    paths:
+      - '.github/workflows/export-company-baseline-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Export non-CRM company enrichment baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -At -F $'\t' <<'SQL' > /tmp/company-baseline.tsv
+          SELECT
+            company_id,
+            canonical_name,
+            coalesce(legal_name,''),
+            coalesce(rollup_name,''),
+            coalesce(rollup_company_id,''),
+            coalesce(website,''),
+            coalesce(headquarters_address,''),
+            coalesce(headquarters_city,''),
+            coalesce(headquarters_region,''),
+            coalesce(headquarters_postal_code,''),
+            coalesce(headquarters_country,''),
+            coalesce(parent_company_id,''),
+            coalesce(parent_company_name,''),
+            coalesce(company_type,''),
+            coalesce(revenue_amount::text,''),
+            coalesce(revenue_low::text,''),
+            coalesce(revenue_high::text,''),
+            coalesce(revenue_currency,''),
+            coalesce(revenue_year::text,''),
+            coalesce(revenue_type,''),
+            coalesce(revenue_source_name,''),
+            coalesce(revenue_source_url,''),
+            coalesce(revenue_confidence,''),
+            coalesce(identity_source_name,''),
+            coalesce(identity_source_url,''),
+            coalesce(website_source_name,''),
+            coalesce(website_source_url,''),
+            coalesce(rollup_source_name,''),
+            coalesce(rollup_source_url,''),
+            coalesce(headquarters_source_name,''),
+            coalesce(headquarters_source_url,''),
+            coalesce(parent_source_name,''),
+            coalesce(parent_source_url,''),
+            coalesce(enrichment_checked_at::text,'')
+          FROM public.company_private_profiles
+          ORDER BY canonical_name, company_id;
+          SQL
+
+          python - <<'PY'
+          import csv, json
+          cols = [
+            'company_id','canonical_name','legal_name','rollup_name','rollup_company_id','website',
+            'headquarters_address','headquarters_city','headquarters_region','headquarters_postal_code','headquarters_country',
+            'parent_company_id','parent_company_name','company_type','revenue_amount','revenue_low','revenue_high',
+            'revenue_currency','revenue_year','revenue_type','revenue_source_name','revenue_source_url','revenue_confidence',
+            'identity_source_name','identity_source_url','website_source_name','website_source_url',
+            'rollup_source_name','rollup_source_url','headquarters_source_name','headquarters_source_url',
+            'parent_source_name','parent_source_url','enrichment_checked_at'
+          ]
+          rows=[]
+          with open('/tmp/company-baseline.tsv',encoding='utf-8') as fh:
+              for row in csv.reader(fh,delimiter='\t'):
+                  assert len(row)==len(cols), (len(row),len(cols),row)
+                  rows.append(dict(zip(cols,row)))
+          assert rows
+          json.dump({'schema':'TOWERSIGNAL_PRIVATE_COMPANY_BASELINE_V1','count':len(rows),'companies':rows},
+                    open('/tmp/company-baseline.json','w',encoding='utf-8'),indent=2)
+          print(f'COMPANY_BASELINE_EXPORT=PASS count={len(rows)}')
+          PY
+
+      - name: Upload company enrichment baseline
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-company-enrichment-baseline
+          path: /tmp/company-baseline.json
+          retention-days: 1
