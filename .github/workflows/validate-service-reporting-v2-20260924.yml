@@ -5,7 +5,7 @@ on:
     branches:
       - ops/validate-service-reporting-v2-20260924
     paths:
-      - '.github/workflows/validate-service-reporting-20260924.yml'
+      - '.github/workflows/validate-service-reporting-v2-20260924.yml'
 
 permissions:
   contents: read
