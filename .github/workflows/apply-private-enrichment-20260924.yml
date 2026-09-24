@@ -1,0 +1,523 @@
+name: Apply sourced private company enrichment
+
+on:
+  push:
+    branches:
+      - ops/apply-private-enrichment-20260924
+    paths:
+      - '.github/workflows/apply-private-enrichment-20260924.yml'
+      - '.ops/private-enrichment-20260924.enc.b64'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard private production baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_profiles integer;
+            v_queue integer;
+            v_contacts integer;
+            v_rollups integer;
+            v_users integer;
+            v_admins integer;
+            v_service_sites integer;
+          BEGIN
+            SELECT count(*) INTO v_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO v_queue FROM public.company_private_research_queue;
+            SELECT count(*) INTO v_contacts FROM public.company_private_contacts;
+            SELECT count(*) INTO v_rollups FROM public.company_private_profiles WHERE rollup_company_id IS NOT NULL;
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin';
+            SELECT count(*) INTO v_service_sites FROM public.service_sites;
+
+            IF v_profiles <> 118 OR v_queue <> 100 OR v_contacts <> 13 OR v_rollups <> 18
+               OR v_users <> 2 OR v_admins <> 1 OR v_service_sites <> 0 THEN
+              RAISE EXCEPTION 'Private enrichment guard failed: profiles=% queue=% contacts=% rollups=% users=% admins=% service_sites=%',
+                v_profiles, v_queue, v_contacts, v_rollups, v_users, v_admins, v_service_sites;
+            END IF;
+          END $$;
+          SQL
+
+      - name: Download accepted production company dataset
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: 35908796502
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .accepted-site
+
+      - name: Extract accepted Known Firms and decrypt private batch
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$(find .accepted-site -type f | head -1)"
+          test -n "$archive"
+          mkdir -p /tmp/accepted
+          tar -xf "$archive" -C /tmp/accepted ./data/known-firms.json
+          test -s /tmp/accepted/data/known-firms.json
+
+          base64 -d .ops/private-enrichment-20260924.enc.b64 > /tmp/private-enrichment.enc
+          printf '%s' "$DATABASE_URL" > /tmp/db.pass
+          chmod 600 /tmp/db.pass
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 250000 \
+            -pass file:/tmp/db.pass \
+            -in /tmp/private-enrichment.enc \
+            -out /tmp/private-enrichment.json.gz
+          gzip -dc /tmp/private-enrichment.json.gz > /tmp/private-enrichment.json
+          rm -f /tmp/db.pass /tmp/private-enrichment.enc /tmp/private-enrichment.json.gz
+
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/private-enrichment.json',encoding='utf-8'))
+          assert p.get('schema') == 'TOWERSIGNAL_PRIVATE_ENRICHMENT_BATCH_V2'
+          assert p.get('batch_id') == 'sourced-enrichment-2026-09-24-a'
+          assert len(p.get('masters') or []) == 5
+          assert len(p.get('aliases') or []) == 10
+          assert len(p.get('contacts') or []) == 4
+          for master in p['masters']:
+              assert master['company_id'] and master['canonical_name']
+              profile=master['profile']
+              assert profile.get('identity_source_url','').startswith('https://')
+              assert profile.get('website_source_url','').startswith('https://')
+          for alias in p['aliases']:
+              assert alias['source_url'].startswith('https://')
+          for contact in p['contacts']:
+              assert contact['source_url'].startswith('https://')
+          print('PRIVATE_ENRICHMENT_PAYLOAD=VALID masters=5 aliases=10 contacts=4')
+          PY
+
+      - name: Build current research candidate stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, math
+          source=json.load(open('/tmp/accepted/data/known-firms.json',encoding='utf-8'))
+          role_weights={
+            'DWT_INSPECTION_PROVIDER':15,
+            'DWT_LABORATORY':15,
+            'DEC_7G_REGISTERED_BUSINESS':12,
+            'PROCUREMENT_VENDOR':10,
+            'DOB_NOW_APPLICANT_BUSINESS':4,
+            'DOB_NOW_OWNER_BUSINESS':0,
+            'LEGACY_DOB_OWNER_BUSINESS':0,
+          }
+          def slog(v,cap):
+              return min(1, math.log1p(max(0,float(v or 0)))/math.log1p(cap))
+          def score(f):
+              role=max([0]+[role_weights.get(v,2) for v in f.get('roles',[])])
+              result=(
+                25*slog(f.get('serviced_site_count',0),500)
+                +20*slog(f.get('tower_account_count',0),250)
+                +10*slog(f.get('observed_site_count',0),500)
+                +10*slog(f.get('observed_contract_count',0),50)
+                +5*slog(max(0,f.get('observed_contract_value',0) or 0),10_000_000)
+                +5*min(1,(f.get('observed_customer_count',0) or 0)/5)
+                +5*min(1,(f.get('active_qualification_count',0) or 0))
+                +(5 if f.get('active_last_12m') else 0)
+                +role
+              )
+              return max(0,min(100,round(result)))
+          def reason(f):
+              parts=[]
+              if f.get('serviced_site_count'): parts.append(f"{f['serviced_site_count']:,} serviced sites")
+              if f.get('tower_account_count'): parts.append(f"{f['tower_account_count']:,} tower accounts")
+              if f.get('observed_contract_count'): parts.append(f"{f['observed_contract_count']:,} public contracts")
+              if f.get('observed_customer_count'): parts.append(f"{f['observed_customer_count']:,} public buyers")
+              if f.get('active_qualification_count'):
+                  n=f['active_qualification_count']
+                  parts.append(f"{n:,} active 7G registration{'s' if n != 1 else ''}")
+              if f.get('active_last_12m'): parts.append('observed in last 12 months')
+              return ' · '.join(parts[:4]) or 'TowerSignal public-record company evidence'
+
+          rows=[]
+          for f in source['firms']:
+              name=(f.get('canonical_name') or '').strip()
+              if not name or name.upper() in {'N/A','NA','NONE','UNKNOWN'}:
+                  continue
+              rows.append({
+                'firm_id':f['firm_id'],
+                'canonical_name':name,
+                'priority_score':score(f),
+                'priority_reason':reason(f),
+              })
+          rows.sort(key=lambda row:(-row['priority_score'],row['canonical_name']))
+          rows=rows[:180]
+          assert len(rows)==180
+          json.dump(rows,open('/tmp/research-candidates.json','w',encoding='utf-8'))
+          print('PUBLIC_RESEARCH_CANDIDATES=180')
+          PY
+
+      - name: Build private enrichment and queue SQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+
+          private=json.load(open('/tmp/private-enrichment.json',encoding='utf-8'))
+          candidates=json.load(open('/tmp/research-candidates.json',encoding='utf-8'))
+          batch=private['batch_id']
+
+          def lit(value):
+              if value is None:
+                  return 'NULL'
+              if isinstance(value,bool):
+                  return 'true' if value else 'false'
+              return "'" + str(value).replace("'","''") + "'"
+
+          profile_cols=[
+            'legal_name','rollup_name','website','website_source_name','website_source_url',
+            'identity_source_name','identity_source_url',
+            'headquarters_address','headquarters_city','headquarters_region','headquarters_postal_code','headquarters_country',
+            'headquarters_source_name','headquarters_source_url',
+            'parent_company_name','parent_source_name','parent_source_url',
+            'company_type','enrichment_checked_at','relationship_status','internal_summary'
+          ]
+
+          master_values=[]
+          for item in private['masters']:
+              p=item['profile']
+              values=[item['company_id'],item['canonical_name']]+[p.get(col) for col in profile_cols]
+              master_values.append('(' + ','.join(lit(v) for v in values) + ')')
+
+          alias_values=[]
+          for item in private['aliases']:
+              alias_values.append('(' + ','.join(lit(item[k]) for k in [
+                'company_id','canonical_name','rollup_name','master_id','source_name','source_url'
+              ]) + ')')
+
+          contact_values=[]
+          for item in private['contacts']:
+              values=[
+                item['contact_id'],item['company_id'],item['name'],item.get('title'),item.get('email'),item.get('phone'),
+                item['source_name'],item['source_url'],item['verified_at']
+              ]
+              contact_values.append('(' + ','.join(lit(v) for v in values) + ')')
+
+          candidate_values=[]
+          for row in candidates:
+              candidate_values.append('(' + ','.join([
+                lit(row['firm_id']),lit(row['canonical_name']),str(int(row['priority_score'])),lit(row['priority_reason'])
+              ]) + ')')
+
+          cols_sql=', '.join(profile_cols)
+          update_cols=[
+            col for col in profile_cols
+            if col != 'relationship_status'
+          ]
+          update_sql=',\n            '.join(
+            f"{col}=COALESCE(EXCLUDED.{col}, public.company_private_profiles.{col})"
+            for col in update_cols
+          )
+
+          sql=f"""
+          BEGIN;
+
+          CREATE TEMP TABLE ts_enrichment_master (
+            company_id text PRIMARY KEY,
+            canonical_name text NOT NULL,
+            legal_name text,
+            rollup_name text,
+            website text,
+            website_source_name text,
+            website_source_url text,
+            identity_source_name text,
+            identity_source_url text,
+            headquarters_address text,
+            headquarters_city text,
+            headquarters_region text,
+            headquarters_postal_code text,
+            headquarters_country text,
+            headquarters_source_name text,
+            headquarters_source_url text,
+            parent_company_name text,
+            parent_source_name text,
+            parent_source_url text,
+            company_type text,
+            enrichment_checked_at timestamptz,
+            relationship_status text,
+            internal_summary text
+          ) ON COMMIT DROP;
+
+          INSERT INTO ts_enrichment_master VALUES
+          {','.join(master_values)};
+
+          CREATE TEMP TABLE ts_enrichment_alias (
+            company_id text PRIMARY KEY,
+            canonical_name text NOT NULL,
+            rollup_name text NOT NULL,
+            master_id text NOT NULL,
+            source_name text NOT NULL,
+            source_url text NOT NULL
+          ) ON COMMIT DROP;
+
+          INSERT INTO ts_enrichment_alias VALUES
+          {','.join(alias_values)};
+
+          CREATE TEMP TABLE ts_enrichment_contact (
+            contact_id text PRIMARY KEY,
+            company_id text NOT NULL,
+            name text NOT NULL,
+            title text,
+            email text,
+            phone text,
+            source_name text NOT NULL,
+            source_url text NOT NULL,
+            verified_at timestamptz NOT NULL
+          ) ON COMMIT DROP;
+
+          INSERT INTO ts_enrichment_contact VALUES
+          {','.join(contact_values)};
+
+          INSERT INTO public.company_private_profiles (
+            company_id, canonical_name, {cols_sql},
+            updated_at, last_change_source, last_change_batch_id
+          )
+          SELECT
+            company_id, canonical_name, {cols_sql},
+            now(), 'import', {lit(batch)}
+          FROM ts_enrichment_master
+          ON CONFLICT (company_id) DO UPDATE SET
+            canonical_name=EXCLUDED.canonical_name,
+            {update_sql},
+            relationship_status=CASE
+              WHEN public.company_private_profiles.relationship_status IN ('uncontacted','researching')
+                THEN EXCLUDED.relationship_status
+              ELSE public.company_private_profiles.relationship_status
+            END,
+            updated_at=now(),
+            last_change_source='import',
+            last_change_batch_id={lit(batch)};
+
+          INSERT INTO public.company_private_profiles (
+            company_id, canonical_name, rollup_name, rollup_company_id,
+            rollup_source_name, rollup_source_url, enrichment_checked_at,
+            updated_at, last_change_source, last_change_batch_id
+          )
+          SELECT
+            company_id, canonical_name, rollup_name, master_id,
+            source_name, source_url, {lit(private['generated_at'])}::timestamptz,
+            now(), 'import', {lit(batch)}
+          FROM ts_enrichment_alias
+          ON CONFLICT (company_id) DO UPDATE SET
+            canonical_name=EXCLUDED.canonical_name,
+            rollup_name=EXCLUDED.rollup_name,
+            rollup_company_id=EXCLUDED.rollup_company_id,
+            rollup_source_name=EXCLUDED.rollup_source_name,
+            rollup_source_url=EXCLUDED.rollup_source_url,
+            enrichment_checked_at=EXCLUDED.enrichment_checked_at,
+            updated_at=now(),
+            last_change_source='import',
+            last_change_batch_id={lit(batch)};
+
+          INSERT INTO public.company_private_contacts (
+            contact_id, company_id, name, title, email, phone,
+            source_name, source_url, verified_at, active,
+            updated_at, last_change_source, last_change_batch_id
+          )
+          SELECT
+            contact_id, company_id, name, title, email, phone,
+            source_name, source_url, verified_at, true,
+            now(), 'import', {lit(batch)}
+          FROM ts_enrichment_contact
+          ON CONFLICT (contact_id) DO UPDATE SET
+            company_id=EXCLUDED.company_id,
+            name=EXCLUDED.name,
+            title=EXCLUDED.title,
+            email=EXCLUDED.email,
+            phone=EXCLUDED.phone,
+            source_name=EXCLUDED.source_name,
+            source_url=EXCLUDED.source_url,
+            verified_at=EXCLUDED.verified_at,
+            active=true,
+            updated_at=now(),
+            last_change_source='import',
+            last_change_batch_id={lit(batch)};
+
+          CREATE TEMP TABLE ts_raw_company_research (
+            firm_id text PRIMARY KEY,
+            canonical_name text NOT NULL,
+            priority_score integer NOT NULL,
+            priority_reason text NOT NULL
+          ) ON COMMIT DROP;
+
+          INSERT INTO ts_raw_company_research VALUES
+          {','.join(candidate_values)};
+
+          CREATE TEMP TABLE ts_company_research_selected ON COMMIT DROP AS
+          WITH mapped AS (
+            SELECT
+              r.*,
+              COALESCE(p.rollup_company_id, r.firm_id) AS master_id
+            FROM ts_raw_company_research r
+            LEFT JOIN public.company_private_profiles p ON p.company_id=r.firm_id
+          ),
+          best AS (
+            SELECT DISTINCT ON (master_id)
+              master_id,
+              canonical_name AS candidate_name,
+              priority_score AS base_priority_score,
+              priority_reason
+            FROM mapped
+            ORDER BY master_id, priority_score DESC, canonical_name
+          ),
+          family AS (
+            SELECT
+              b.*,
+              COALESCE(master.canonical_name, b.candidate_name) AS master_name,
+              GREATEST(
+                1,
+                (SELECT count(*)
+                 FROM public.company_private_profiles fp
+                 WHERE fp.company_id=b.master_id OR fp.rollup_company_id=b.master_id)
+              ) AS family_size
+            FROM best b
+            LEFT JOIN public.company_private_profiles master ON master.company_id=b.master_id
+          )
+          SELECT
+            master_id AS company_id,
+            master_name AS canonical_name,
+            LEAST(100, base_priority_score + LEAST(5, GREATEST(0, family_size-1)))::integer AS priority_score,
+            priority_reason ||
+              CASE WHEN family_size > 1
+                THEN ' · ' || family_size::text || ' reviewed source identities in private family'
+                ELSE ''
+              END AS priority_reason
+          FROM family
+          ORDER BY priority_score DESC, canonical_name
+          LIMIT 100;
+
+          INSERT INTO public.company_private_profiles (
+            company_id, canonical_name, last_change_source, last_change_batch_id
+          )
+          SELECT company_id, canonical_name, 'system', 'research-queue-sync-20260924'
+          FROM ts_company_research_selected
+          ON CONFLICT (company_id) DO NOTHING;
+
+          INSERT INTO public.company_private_research_queue (
+            company_id, priority_score, priority_reason, missing_fields,
+            status, research_owner, last_researched_at, updated_at,
+            last_change_source, last_change_batch_id
+          )
+          SELECT
+            s.company_id,
+            s.priority_score,
+            s.priority_reason,
+            to_jsonb(array_remove(ARRAY[
+              CASE WHEN p.website IS NULL THEN 'website' END,
+              CASE WHEN p.headquarters_address IS NULL AND p.headquarters_city IS NULL THEN 'headquarters' END,
+              CASE WHEN p.company_type IS NULL THEN 'company type' END,
+              CASE WHEN p.parent_company_id IS NULL AND p.parent_company_name IS NULL
+                   AND position('independently owned' in lower(coalesce(p.internal_summary,''))) = 0
+                   THEN 'parent / ownership' END,
+              CASE WHEN p.revenue_amount IS NULL AND p.revenue_low IS NULL AND p.revenue_high IS NULL THEN 'revenue' END,
+              CASE WHEN NOT EXISTS (
+                SELECT 1 FROM public.company_private_contacts c
+                WHERE c.company_id=s.company_id AND c.active
+              ) THEN 'contact' END
+            ]::text[], NULL)),
+            COALESCE(existing.status,'unreviewed'),
+            existing.research_owner,
+            existing.last_researched_at,
+            now(),
+            'system',
+            'research-queue-sync-20260924'
+          FROM ts_company_research_selected s
+          JOIN public.company_private_profiles p ON p.company_id=s.company_id
+          LEFT JOIN public.company_private_research_queue existing ON existing.company_id=s.company_id
+          ON CONFLICT (company_id) DO UPDATE SET
+            priority_score=EXCLUDED.priority_score,
+            priority_reason=EXCLUDED.priority_reason,
+            missing_fields=EXCLUDED.missing_fields,
+            status=public.company_private_research_queue.status,
+            research_owner=public.company_private_research_queue.research_owner,
+            last_researched_at=public.company_private_research_queue.last_researched_at,
+            updated_at=now(),
+            last_change_source='system',
+            last_change_batch_id='research-queue-sync-20260924';
+
+          DELETE FROM public.company_private_research_queue q
+          WHERE NOT EXISTS (
+            SELECT 1 FROM ts_company_research_selected s WHERE s.company_id=q.company_id
+          );
+
+          UPDATE public.company_private_research_queue q
+          SET
+            status=CASE WHEN q.status='unreviewed' THEN 'researching' ELSE q.status END,
+            last_researched_at=COALESCE(q.last_researched_at,{lit(private['generated_at'])}::timestamptz),
+            updated_at=now(),
+            last_change_source='import',
+            last_change_batch_id={lit(batch)}
+          FROM ts_enrichment_master m
+          WHERE q.company_id=m.company_id;
+
+          DO $$
+          DECLARE
+            v_rollups integer;
+            v_contacts integer;
+            v_queue integer;
+            v_alias_queue integer;
+            v_masters integer;
+            v_users integer;
+            v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_rollups
+              FROM public.company_private_profiles WHERE rollup_company_id IS NOT NULL;
+            SELECT count(*) INTO v_contacts FROM public.company_private_contacts;
+            SELECT count(*) INTO v_queue FROM public.company_private_research_queue;
+            SELECT count(*) INTO v_alias_queue
+              FROM public.company_private_research_queue q
+              JOIN ts_enrichment_alias a ON a.company_id=q.company_id;
+            SELECT count(*) INTO v_masters
+              FROM public.company_private_profiles p
+              JOIN ts_enrichment_master m ON m.company_id=p.company_id
+              WHERE p.identity_source_url IS NOT NULL
+                AND p.website_source_url IS NOT NULL
+                AND p.enrichment_checked_at IS NOT NULL;
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user"
+              WHERE lower(coalesce(role,''))='admin';
+
+            IF v_rollups <> 28 OR v_contacts <> 17 OR v_queue <> 100
+               OR v_alias_queue <> 0 OR v_masters <> 5
+               OR v_users <> 2 OR v_admins <> 1 THEN
+              RAISE EXCEPTION 'Private enrichment postcondition failed: rollups=% contacts=% queue=% alias_queue=% masters=% users=% admins=%',
+                v_rollups, v_contacts, v_queue, v_alias_queue, v_masters, v_users, v_admins;
+            END IF;
+          END $$;
+
+          SELECT 'PRIVATE_ENRICHMENT_APPLY=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_profiles) AS profiles,
+                 (SELECT count(*) FROM public.company_private_research_queue) AS research_queue,
+                 (SELECT count(*) FROM public.company_private_profiles WHERE rollup_company_id IS NOT NULL) AS rollups,
+                 (SELECT count(*) FROM public.company_private_contacts) AS contacts,
+                 (SELECT count(*) FROM public.company_private_change_log) AS audit_rows;
+
+          COMMIT;
+          """
+          open('/tmp/apply-private-enrichment.sql','w',encoding='utf-8').write(sql)
+          PY
+
+      - name: Apply sourced private enrichment atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f /tmp/apply-private-enrichment.sql
+          rm -f /tmp/private-enrichment.json /tmp/research-candidates.json /tmp/apply-private-enrichment.sql
