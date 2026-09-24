@@ -55,10 +55,8 @@ function nearExactName(left:string,right:string):{distance:number;similarity:num
   if(minLength<4)return null
   const distance=damerauLevenshtein(a,b)
   const similarity=1-distance/maxLength
-  const shortAcronym=maxLength<=5&&distance===1
-  const longSingleEdit=maxLength>=8&&distance===1
-  const longDoubleEdit=maxLength>=12&&distance===2&&similarity>=0.88
-  return shortAcronym||longSingleEdit||longDoubleEdit?{distance,similarity}:null
+  const singleEdit=distance===1
+  return singleEdit?{distance,similarity}:null
 }
 
 function normalizedAddress(profile:CompanyAdminProfile):string{
