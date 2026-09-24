@@ -1,4 +1,4 @@
-name: Inspect production Neon Auth schema safely
+name: Inspect production Neon Auth config safely
 
 on:
   push:
@@ -17,19 +17,24 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
     steps:
-      - name: Require production database credential
+      - name: Inspect config and user baseline
         shell: bash
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}" || { echo "TOWERSIGNAL_DATABASE_URL_UNPOOLED is unavailable"; exit 1; }
-      - name: Inspect Neon Auth table and column names
-        shell: bash
-        run: |
-          set -euo pipefail
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "
-            select table_name || ':' || string_agg(column_name, ',' order by ordinal_position)
-            from information_schema.columns
-            where table_schema='neon_auth'
-            group by table_name
-            order by table_name;
+          test -n "${DATABASE_URL:-}"
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select id, email_and_password, allow_localhost
+            from neon_auth.project_config;
+          "
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select email, role, banned, "emailVerified"
+            from neon_auth."user"
+            order by lower(email);
+          "
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select u.email, a."providerId", length(a.password) as password_length,
+                   case when a.password like '%:%' then 2 else 1 end as password_parts
+            from neon_auth."user" u
+            left join neon_auth.account a on a."userId"=u.id
+            order by lower(u.email), a."providerId";
           "
