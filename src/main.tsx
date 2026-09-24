@@ -36,5 +36,6 @@ import './styles/account-header.css'
 import './styles/company-admin.css'
 import './styles/company-operations.css'
 import './styles/service-reporting.css'
+import './styles/service-operations.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AuthGate /></React.StrictMode>)
