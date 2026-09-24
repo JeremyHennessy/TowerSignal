@@ -16,6 +16,8 @@ import type {
   CompanyRollupSuggestionStatus,
   CompanySalesDemo,
   CompanySalesProposal,
+  CompanySalesSubscription,
+  CompanySalesRenewal,
   CompanyResearchStatus,
 } from '../types/companyAdmin'
 
@@ -797,4 +799,99 @@ export async function saveCompanySalesProposal(proposalId:string,salesAccountId:
 }
 export async function addCompanySalesProposal(salesAccountId:string,values:Omit<CompanySalesProposal,'proposal_id'|'sales_account_id'|'created_at'|'updated_at'>):Promise<CompanySalesProposal>{
   return saveCompanySalesProposal(crypto.randomUUID(),salesAccountId,values)
+}
+
+
+function salesSubscriptionFrom(row:Record<string,unknown>):CompanySalesSubscription{
+  return {
+    subscription_id:String(row.subscription_id),sales_account_id:String(row.sales_account_id),
+    opportunity_id:nullableString(row.opportunity_id),proposal_id:nullableString(row.proposal_id),
+    primary_contact_id:nullableString(row.primary_contact_id),
+    status:String(row.status??'onboarding') as CompanySalesSubscription['status'],
+    plan_name:String(row.plan_name??''),arr:nullableNumber(row.arr),seats:nullableNumber(row.seats),
+    start_date:nullableString(row.start_date),renewal_date:nullableString(row.renewal_date),
+    term_months:nullableNumber(row.term_months),
+    billing_cadence:String(row.billing_cadence??'annual') as CompanySalesSubscription['billing_cadence'],
+    auto_renew:row.auto_renew===true,contract_url:nullableString(row.contract_url),
+    customer_success_owner:nullableString(row.customer_success_owner),notes:nullableString(row.notes),
+    ended_at:nullableString(row.ended_at),end_reason:nullableString(row.end_reason),
+    created_at:nullableString(row.created_at)??undefined,updated_at:nullableString(row.updated_at)??undefined,
+  }
+}
+function salesRenewalFrom(row:Record<string,unknown>):CompanySalesRenewal{
+  return {
+    renewal_id:String(row.renewal_id),subscription_id:String(row.subscription_id),sales_account_id:String(row.sales_account_id),
+    primary_contact_id:nullableString(row.primary_contact_id),
+    status:String(row.status??'upcoming') as CompanySalesRenewal['status'],renewal_date:String(row.renewal_date??''),
+    current_arr:nullableNumber(row.current_arr),proposed_arr:nullableNumber(row.proposed_arr),renewed_arr:nullableNumber(row.renewed_arr),
+    expected_decision_date:nullableString(row.expected_decision_date),next_step:nullableString(row.next_step),
+    notes:nullableString(row.notes),completed_at:nullableString(row.completed_at),churn_reason:nullableString(row.churn_reason),
+    created_at:nullableString(row.created_at)??undefined,updated_at:nullableString(row.updated_at)??undefined,
+  }
+}
+
+export async function loadAllCompanySalesSubscriptions():Promise<CompanySalesSubscription[]>{
+  const result=await client.from('company_sales_subscriptions').select('*').order('renewal_date',{ascending:true})
+  throwIfError('Unable to load customer subscriptions',result.error)
+  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesSubscriptionFrom)
+}
+export async function loadCompanySalesSubscriptions(salesAccountId:string):Promise<CompanySalesSubscription[]>{
+  const result=await client.from('company_sales_subscriptions').select('*').eq('sales_account_id',salesAccountId).order('renewal_date',{ascending:true})
+  throwIfError('Unable to load company subscriptions',result.error)
+  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesSubscriptionFrom)
+}
+export async function saveCompanySalesSubscription(
+  subscriptionId:string,
+  salesAccountId:string,
+  values:Omit<CompanySalesSubscription,'subscription_id'|'sales_account_id'|'created_at'|'updated_at'>,
+):Promise<CompanySalesSubscription>{
+  const change={...values,updated_at:new Date().toISOString(),last_change_source:'manual',last_change_batch_id:null}
+  const update=await client.from('company_sales_subscriptions').update(change).eq('subscription_id',subscriptionId).eq('sales_account_id',salesAccountId).select('*')
+  throwIfError('Unable to update customer subscription',update.error)
+  const updated=((update.data??[]) as Array<Record<string,unknown>>)[0]
+  if(updated)return salesSubscriptionFrom(updated)
+  const insert=await client.from('company_sales_subscriptions').insert({subscription_id:subscriptionId,sales_account_id:salesAccountId,...change}).select('*')
+  throwIfError('Unable to create customer subscription',insert.error)
+  const created=((insert.data??[]) as Array<Record<string,unknown>>)[0]
+  if(!created)throw new Error('Unable to create customer subscription: row was not returned')
+  return salesSubscriptionFrom(created)
+}
+export async function addCompanySalesSubscription(
+  salesAccountId:string,
+  values:Omit<CompanySalesSubscription,'subscription_id'|'sales_account_id'|'created_at'|'updated_at'>,
+):Promise<CompanySalesSubscription>{
+  return saveCompanySalesSubscription(crypto.randomUUID(),salesAccountId,values)
+}
+
+export async function loadAllCompanySalesRenewals():Promise<CompanySalesRenewal[]>{
+  const result=await client.from('company_sales_renewals').select('*').order('renewal_date',{ascending:true})
+  throwIfError('Unable to load customer renewals',result.error)
+  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesRenewalFrom)
+}
+export async function loadCompanySalesRenewals(salesAccountId:string):Promise<CompanySalesRenewal[]>{
+  const result=await client.from('company_sales_renewals').select('*').eq('sales_account_id',salesAccountId).order('renewal_date',{ascending:true})
+  throwIfError('Unable to load company renewals',result.error)
+  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesRenewalFrom)
+}
+export async function saveCompanySalesRenewal(
+  renewalId:string,
+  salesAccountId:string,
+  values:Omit<CompanySalesRenewal,'renewal_id'|'sales_account_id'|'created_at'|'updated_at'>,
+):Promise<CompanySalesRenewal>{
+  const change={...values,updated_at:new Date().toISOString(),last_change_source:'manual',last_change_batch_id:null}
+  const update=await client.from('company_sales_renewals').update(change).eq('renewal_id',renewalId).eq('sales_account_id',salesAccountId).select('*')
+  throwIfError('Unable to update customer renewal',update.error)
+  const updated=((update.data??[]) as Array<Record<string,unknown>>)[0]
+  if(updated)return salesRenewalFrom(updated)
+  const insert=await client.from('company_sales_renewals').insert({renewal_id:renewalId,sales_account_id:salesAccountId,...change}).select('*')
+  throwIfError('Unable to create customer renewal',insert.error)
+  const created=((insert.data??[]) as Array<Record<string,unknown>>)[0]
+  if(!created)throw new Error('Unable to create customer renewal: row was not returned')
+  return salesRenewalFrom(created)
+}
+export async function addCompanySalesRenewal(
+  salesAccountId:string,
+  values:Omit<CompanySalesRenewal,'renewal_id'|'sales_account_id'|'created_at'|'updated_at'>,
+):Promise<CompanySalesRenewal>{
+  return saveCompanySalesRenewal(crypto.randomUUID(),salesAccountId,values)
 }
