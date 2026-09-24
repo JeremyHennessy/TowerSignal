@@ -5,6 +5,8 @@ import {
   loadCompanyAdminAccess,
   loadCompanyAdminDirectory,
   loadCompanyResearchQueue,
+  loadAllCompanySalesOpportunities,
+  loadAllCompanySalesTasks,
 } from '../companyAdmin/client'
 import { loadKnownFirms } from '../data/api'
 import type {
@@ -13,6 +15,9 @@ import type {
   CompanyAdminProfile,
   CompanyRelationshipStatus,
   CompanyResearchQueueItem,
+  CompanySalesOpportunity,
+  CompanySalesTask,
+  CompanyOpportunityStage,
 } from '../types/companyAdmin'
 import type { KnownFirmPayload, KnownFirmSummaryRecord } from '../types/firm'
 import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
@@ -23,6 +28,8 @@ const statuses: CompanyRelationshipStatus[] = [
   'uncontacted','researching','outreach-planned','contacted','engaged','opportunity','customer','not-pursuing',
 ]
 const pipelineStatuses = new Set<CompanyRelationshipStatus>(['contacted','engaged','opportunity','customer'])
+const opportunityStages: CompanyOpportunityStage[] = ['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation','closed-won','closed-lost','nurture']
+const activeOpportunityStages = new Set<CompanyOpportunityStage>(['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation'])
 const relationshipRank: Record<CompanyRelationshipStatus, number> = {
   'uncontacted':0,
   'researching':1,
@@ -100,22 +107,28 @@ export function AdminCompaniesPage() {
   const [contacts, setContacts] = useState<CompanyAdminContact[]>([])
   const [activities, setActivities] = useState<CompanyAdminActivity[]>([])
   const [queue, setQueue] = useState<CompanyResearchQueueItem[]>([])
+  const [opportunities, setOpportunities] = useState<CompanySalesOpportunity[]>([])
+  const [salesTasks, setSalesTasks] = useState<CompanySalesTask[]>([])
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [relationship, setRelationship] = useState('ALL')
   const [gap, setGap] = useState('ALL')
 
   const reloadPrivate = async () => {
-    const [nextProfiles, nextContacts, nextActivities, nextQueue] = await Promise.all([
+    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks] = await Promise.all([
       loadCompanyAdminDirectory(),
       loadAllCompanyContacts(),
       loadAllCompanyActivities(),
       loadCompanyResearchQueue(),
+      loadAllCompanySalesOpportunities(),
+      loadAllCompanySalesTasks(),
     ])
     setProfiles(nextProfiles)
     setContacts(nextContacts)
     setActivities(nextActivities)
     setQueue(nextQueue)
+    setOpportunities(nextOpportunities)
+    setSalesTasks(nextSalesTasks)
   }
 
   useEffect(() => {
@@ -124,12 +137,14 @@ export function AdminCompaniesPage() {
       if (cancelled) return
       setAllowed(isAdmin)
       if (!isAdmin) return
-      const [known, nextProfiles, nextContacts, nextActivities, nextQueue] = await Promise.all([
+      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks] = await Promise.all([
         loadKnownFirms(),
         loadCompanyAdminDirectory(),
         loadAllCompanyContacts(),
         loadAllCompanyActivities(),
         loadCompanyResearchQueue(),
+        loadAllCompanySalesOpportunities(),
+        loadAllCompanySalesTasks(),
       ])
       if (cancelled) return
       setPayload(known)
@@ -137,6 +152,8 @@ export function AdminCompaniesPage() {
       setContacts(nextContacts)
       setActivities(nextActivities)
       setQueue(nextQueue)
+      setOpportunities(nextOpportunities)
+      setSalesTasks(nextSalesTasks)
     }).catch(err => {
       if (!cancelled) {
         setAllowed(false)
@@ -252,6 +269,30 @@ export function AdminCompaniesPage() {
     return map
   }, [families])
 
+  const opportunitiesByFamily = useMemo(() => {
+    const map = new Map<string, CompanySalesOpportunity[]>()
+    opportunities.forEach(opportunity => {
+      const family = familyByMemberId.get(opportunity.company_id)
+      const masterId = family?.masterId ?? opportunity.company_id
+      const rows = map.get(masterId) ?? []
+      rows.push(opportunity)
+      map.set(masterId, rows)
+    })
+    return map
+  }, [opportunities, familyByMemberId])
+
+  const activeSalesOpportunities = opportunities.filter(opportunity => activeOpportunityStages.has(opportunity.stage))
+  const openPipelineArr = activeSalesOpportunities.reduce((sum, opportunity) => sum + (opportunity.estimated_arr ?? 0), 0)
+  const wonArr = opportunities.filter(opportunity => opportunity.stage === 'closed-won').reduce((sum, opportunity) => sum + (opportunity.estimated_arr ?? 0), 0)
+  const nowIso = new Date().toISOString()
+  const overdueSalesTasks = salesTasks.filter(task => task.status === 'open' && task.due_at && task.due_at < nowIso)
+  const upcomingDemos = opportunities.filter(opportunity => opportunity.demo_scheduled_at && opportunity.demo_scheduled_at >= nowIso && activeOpportunityStages.has(opportunity.stage))
+  const proposalsOut = opportunities.filter(opportunity => opportunity.stage === 'proposal' || opportunity.stage === 'negotiation')
+  const opportunityByStage = useMemo(() => new Map(opportunityStages.map(stage => [
+    stage,
+    opportunities.filter(opportunity => opportunity.stage === stage),
+  ])), [opportunities])
+
   const recentActivities = useMemo(() => activities
     .map(activity => ({ activity, family: familyByMemberId.get(activity.company_id) }))
     .filter((row): row is { activity: CompanyAdminActivity; family: FamilyRow } => Boolean(row.family))
@@ -294,7 +335,7 @@ export function AdminCompaniesPage() {
       <div>
         <span className="page-kicker">Admin only · private company intelligence &amp; CRM</span>
         <h1>Company command center</h1>
-        <p>Reviewed corporate families, ownership, enrichment coverage, contacts, research state and commercial follow-up. Public Known Firms remains a separate source-backed workspace.</p>
+        <p>Your private TowerSignal sales CRM: reviewed company families, contacts, deals, demos, proposals, follow-ups and research. Public Known Firms remains a separate source-backed workspace.</p>
       </div>
       <div className="page-actions">
         <a className="secondary-link-button" href="#/companies">Known Firms</a>
@@ -303,6 +344,15 @@ export function AdminCompaniesPage() {
     </div>
 
     {error && <div className="company-admin-error"><strong>Company administration error.</strong><span>{error}</span></div>}
+
+    <div className="admin-sales-metrics">
+      <article><small>Open TowerSignal deals</small><strong>{number.format(activeSalesOpportunities.length)}</strong><span>{number.format(opportunities.length)} total opportunities</span></article>
+      <article><small>Open pipeline ARR</small><strong>{openPipelineArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})}</strong><span>Estimated recurring value</span></article>
+      <article><small>Demos scheduled</small><strong>{number.format(upcomingDemos.length)}</strong><span>Upcoming demo meetings</span></article>
+      <article><small>Proposals / negotiation</small><strong>{number.format(proposalsOut.length)}</strong><span>Commercially active deals</span></article>
+      <article><small>Overdue sales tasks</small><strong>{number.format(overdueSalesTasks.length)}</strong><span>{number.format(salesTasks.filter(task=>task.status==='open').length)} open tasks</span></article>
+      <article><small>Won ARR</small><strong>{wonArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})}</strong><span>{number.format(opportunities.filter(opportunity=>opportunity.stage==='closed-won').length)} won deal(s)</span></article>
+    </div>
 
     <div className="admin-company-metrics">
       <article><small>Master families</small><strong>{number.format(families.length)}</strong><span>{number.format(explicitAliases)} rolled-up source identities</span></article>
@@ -314,6 +364,26 @@ export function AdminCompaniesPage() {
       <article><small>Research queue</small><strong>{number.format(queue.length)}</strong><span>{number.format(queue.filter(item => item.status === 'complete').length)} complete</span></article>
       <article><small>Fully enriched</small><strong>{number.format(fullyEnriched)}</strong><span>All tracked admin fields populated</span></article>
     </div>
+
+    <section className="admin-sales-pipeline-card">
+      <div className="admin-company-card-heading"><div><strong>TowerSignal sales pipeline</strong><span>Personal deal board across reviewed master companies</span></div><small>{number.format(activeSalesOpportunities.length)} active</small></div>
+      <div className="admin-sales-pipeline-board">
+        {opportunityStages.map(stage => <div key={stage} className="admin-sales-stage">
+          <div className="admin-sales-stage-heading"><strong>{human(stage)}</strong><span>{number.format(opportunityByStage.get(stage)?.length ?? 0)}</span></div>
+          <div className="admin-sales-stage-list">
+            {(opportunityByStage.get(stage) ?? []).map(opportunity => {
+              const family = familyByMemberId.get(opportunity.company_id)
+              return <a key={opportunity.opportunity_id} href={`#/admin-company/${encodeURIComponent(family?.masterId ?? opportunity.company_id)}`}>
+                <strong>{family?.name ?? opportunity.name}</strong>
+                <span>{opportunity.estimated_arr == null ? 'ARR not set' : opportunity.estimated_arr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})+' ARR'}{opportunity.probability_percent == null ? '' : ` · ${opportunity.probability_percent}%`}</span>
+                <small>{opportunity.next_step || (opportunity.demo_scheduled_at ? 'Demo '+new Date(opportunity.demo_scheduled_at).toLocaleString() : 'No next step')}</small>
+              </a>
+            })}
+            {!(opportunityByStage.get(stage)?.length) && <span className="company-admin-empty">No deals</span>}
+          </div>
+        </div>)}
+      </div>
+    </section>
 
     <div className="admin-company-dashboard-grid">
       <section className="admin-company-card admin-parent-summary">
