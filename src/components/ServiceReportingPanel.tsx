@@ -141,7 +141,10 @@ export function ServiceReportingPanel({
         <h3>Service operations</h3>
         <p>Private operational records for System {systemId}. Public TowerSignal evidence remains read-only and separately sourced.</p>
       </div>
-      <span className="service-site-status">{human(site.status)}</span>
+      <div className="service-reporting-heading-actions">
+        <a className="secondary-link-button" href="#/service">Portfolio dashboard</a>
+        <span className="service-site-status">{human(site.status)}</span>
+      </div>
     </div>
     {error && <div className="company-admin-error">{error}</div>}
 
