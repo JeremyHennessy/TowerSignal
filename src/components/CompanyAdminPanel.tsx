@@ -89,6 +89,40 @@ function numberValue(value: string): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+function normalizeProfilePatch(value: CompanyAdminProfilePatch): CompanyAdminProfilePatch {
+  return {
+    ...value,
+    legal_name: text(value.legal_name ?? ''),
+    rollup_name: text(value.rollup_name ?? ''),
+    rollup_company_id: text(value.rollup_company_id ?? ''),
+    rollup_source_name: text(value.rollup_source_name ?? ''),
+    rollup_source_url: text(value.rollup_source_url ?? ''),
+    website: text(value.website ?? ''),
+    website_source_name: text(value.website_source_name ?? ''),
+    website_source_url: text(value.website_source_url ?? ''),
+    identity_source_name: text(value.identity_source_name ?? ''),
+    identity_source_url: text(value.identity_source_url ?? ''),
+    headquarters_address: text(value.headquarters_address ?? ''),
+    headquarters_city: text(value.headquarters_city ?? ''),
+    headquarters_region: text(value.headquarters_region ?? ''),
+    headquarters_postal_code: text(value.headquarters_postal_code ?? ''),
+    headquarters_country: text(value.headquarters_country ?? ''),
+    headquarters_source_name: text(value.headquarters_source_name ?? ''),
+    headquarters_source_url: text(value.headquarters_source_url ?? ''),
+    parent_company_id: text(value.parent_company_id ?? ''),
+    parent_company_name: text(value.parent_company_name ?? ''),
+    parent_source_name: text(value.parent_source_name ?? ''),
+    parent_source_url: text(value.parent_source_url ?? ''),
+    company_type: text(value.company_type ?? ''),
+    revenue_currency: value.revenue_currency.trim().toUpperCase().slice(0, 3) || 'USD',
+    revenue_source_name: text(value.revenue_source_name ?? ''),
+    revenue_source_url: text(value.revenue_source_url ?? ''),
+    next_action_date: text(value.next_action_date ?? ''),
+    account_owner: text(value.account_owner ?? ''),
+    internal_summary: text(value.internal_summary ?? ''),
+  }
+}
+
 function localDateTime(value: string | null): string {
   if (!value) return ''
   const date = new Date(value)
@@ -182,7 +216,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      const saved = await saveCompanyAdminProfile(companyId, canonicalName, profile)
+      const saved = await saveCompanyAdminProfile(companyId, canonicalName, normalizeProfilePatch(profile))
       setProfile(patchFrom(saved))
       setSavedAt(new Date().toISOString())
     } catch (err) {
@@ -197,7 +231,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      const savedProfile = await saveCompanyAdminProfile(companyId, canonicalName, profile)
+      const savedProfile = await saveCompanyAdminProfile(companyId, canonicalName, normalizeProfilePatch(profile))
       setProfile(patchFrom(savedProfile))
       await addCompanyContact(companyId, {
         name: contactName.trim(),
@@ -258,7 +292,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      await saveCompanyAdminProfile(companyId, canonicalName, profile)
+      const normalizedProfile = normalizeProfilePatch(profile)\n      await saveCompanyAdminProfile(companyId, canonicalName, normalizedProfile)
       const occurredAt = new Date(activityDate).toISOString()
       await addCompanyActivity(companyId, {
         activity_type: activityType,
@@ -270,7 +304,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
         next_action_date: text(activityNextAction),
       })
       const nextProfile = {
-        ...profile,
+        ...normalizedProfile,
         relationship_status: profile.relationship_status === 'uncontacted' ? 'contacted' as const : profile.relationship_status,
         last_contacted_at: occurredAt,
         next_action_date: text(activityNextAction) ?? profile.next_action_date,
@@ -295,7 +329,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      const savedProfile = await saveCompanyAdminProfile(companyId, canonicalName, profile)
+      const savedProfile = await saveCompanyAdminProfile(companyId, canonicalName, normalizeProfilePatch(profile))
       setProfile(patchFrom(savedProfile))
       await addCompanyNote(companyId, newNote.trim())
       setNewNote('')
@@ -351,33 +385,33 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
       <section className="company-admin-card">
         <div className="company-admin-card-heading"><strong>Company identity &amp; structure</strong><span>Editable private enrichment</span></div>
         <div className="company-admin-form-grid">
-          <label><span>Legal name</span><input value={profile.legal_name ?? ''} onChange={event => setProfile(value => ({ ...value, legal_name:text(event.target.value) }))} /></label>
-          <label><span>Rolled-up normalized name</span><input value={profile.rollup_name ?? ''} onChange={event => setProfile(value => ({ ...value, rollup_name:text(event.target.value) }))} /></label>
-          <label><span>Rollup company ID</span><input value={profile.rollup_company_id ?? ''} onChange={event => setProfile(value => ({ ...value, rollup_company_id:text(event.target.value) }))} placeholder="Explicit only; never inferred" /></label>
-          <label><span>Website</span><input type="url" value={profile.website ?? ''} onChange={event => setProfile(value => ({ ...value, website:text(event.target.value) }))} placeholder="https://…" /></label>
-          <label><span>Company type</span><input value={profile.company_type ?? ''} onChange={event => setProfile(value => ({ ...value, company_type:text(event.target.value) }))} /></label>
-          <label><span>Parent company</span><input value={profile.parent_company_name ?? ''} onChange={event => setProfile(value => ({ ...value, parent_company_name:text(event.target.value) }))} /></label>
-          <label><span>Parent company ID</span><input value={profile.parent_company_id ?? ''} onChange={event => setProfile(value => ({ ...value, parent_company_id:text(event.target.value) }))} /></label>
+          <label><span>Legal name</span><input value={profile.legal_name ?? ''} onChange={event => setProfile(value => ({ ...value, legal_name:event.target.value }))} /></label>
+          <label><span>Rolled-up normalized name</span><input value={profile.rollup_name ?? ''} onChange={event => setProfile(value => ({ ...value, rollup_name:event.target.value }))} /></label>
+          <label><span>Rollup company ID</span><input value={profile.rollup_company_id ?? ''} onChange={event => setProfile(value => ({ ...value, rollup_company_id:event.target.value }))} placeholder="Explicit only; never inferred" /></label>
+          <label><span>Website</span><input type="url" value={profile.website ?? ''} onChange={event => setProfile(value => ({ ...value, website:event.target.value }))} placeholder="https://…" /></label>
+          <label><span>Company type</span><input value={profile.company_type ?? ''} onChange={event => setProfile(value => ({ ...value, company_type:event.target.value }))} /></label>
+          <label><span>Parent company</span><input value={profile.parent_company_name ?? ''} onChange={event => setProfile(value => ({ ...value, parent_company_name:event.target.value }))} /></label>
+          <label><span>Parent company ID</span><input value={profile.parent_company_id ?? ''} onChange={event => setProfile(value => ({ ...value, parent_company_id:event.target.value }))} /></label>
         </div>
         <div className="company-admin-form-grid address-grid">
-          <label className="wide"><span>HQ street address</span><input value={profile.headquarters_address ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_address:text(event.target.value) }))} /></label>
-          <label><span>City</span><input value={profile.headquarters_city ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_city:text(event.target.value) }))} /></label>
-          <label><span>State / region</span><input value={profile.headquarters_region ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_region:text(event.target.value) }))} /></label>
-          <label><span>Postal code</span><input value={profile.headquarters_postal_code ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_postal_code:text(event.target.value) }))} /></label>
-          <label><span>Country</span><input value={profile.headquarters_country ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_country:text(event.target.value) }))} /></label>
+          <label className="wide"><span>HQ street address</span><input value={profile.headquarters_address ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_address:event.target.value }))} /></label>
+          <label><span>City</span><input value={profile.headquarters_city ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_city:event.target.value }))} /></label>
+          <label><span>State / region</span><input value={profile.headquarters_region ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_region:event.target.value }))} /></label>
+          <label><span>Postal code</span><input value={profile.headquarters_postal_code ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_postal_code:event.target.value }))} /></label>
+          <label><span>Country</span><input value={profile.headquarters_country ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_country:event.target.value }))} /></label>
         </div>
         <div className="company-admin-card-heading"><strong>Profile provenance</strong><span>Record the evidence used for every private enrichment decision</span></div>
         <div className="company-admin-form-grid">
-          <label><span>Identity source</span><input value={profile.identity_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, identity_source_name:text(event.target.value) }))} placeholder="Official company site, filing…" /></label>
-          <label className="wide"><span>Identity source URL</span><input type="url" value={profile.identity_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, identity_source_url:text(event.target.value) }))} /></label>
-          <label><span>Website source</span><input value={profile.website_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, website_source_name:text(event.target.value) }))} /></label>
-          <label className="wide"><span>Website source URL</span><input type="url" value={profile.website_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, website_source_url:text(event.target.value) }))} /></label>
-          <label><span>Rollup source</span><input value={profile.rollup_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, rollup_source_name:text(event.target.value) }))} /></label>
-          <label className="wide"><span>Rollup source URL</span><input type="url" value={profile.rollup_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, rollup_source_url:text(event.target.value) }))} placeholder="Evidence for explicit private rollup" /></label>
-          <label><span>HQ source</span><input value={profile.headquarters_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_source_name:text(event.target.value) }))} /></label>
-          <label className="wide"><span>HQ source URL</span><input type="url" value={profile.headquarters_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_source_url:text(event.target.value) }))} /></label>
-          <label><span>Parent source</span><input value={profile.parent_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, parent_source_name:text(event.target.value) }))} /></label>
-          <label className="wide"><span>Parent source URL</span><input type="url" value={profile.parent_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, parent_source_url:text(event.target.value) }))} /></label>
+          <label><span>Identity source</span><input value={profile.identity_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, identity_source_name:event.target.value }))} placeholder="Official company site, filing…" /></label>
+          <label className="wide"><span>Identity source URL</span><input type="url" value={profile.identity_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, identity_source_url:event.target.value }))} /></label>
+          <label><span>Website source</span><input value={profile.website_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, website_source_name:event.target.value }))} /></label>
+          <label className="wide"><span>Website source URL</span><input type="url" value={profile.website_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, website_source_url:event.target.value }))} /></label>
+          <label><span>Rollup source</span><input value={profile.rollup_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, rollup_source_name:event.target.value }))} /></label>
+          <label className="wide"><span>Rollup source URL</span><input type="url" value={profile.rollup_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, rollup_source_url:event.target.value }))} placeholder="Evidence for explicit private rollup" /></label>
+          <label><span>HQ source</span><input value={profile.headquarters_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_source_name:event.target.value }))} /></label>
+          <label className="wide"><span>HQ source URL</span><input type="url" value={profile.headquarters_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, headquarters_source_url:event.target.value }))} /></label>
+          <label><span>Parent source</span><input value={profile.parent_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, parent_source_name:event.target.value }))} /></label>
+          <label className="wide"><span>Parent source URL</span><input type="url" value={profile.parent_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, parent_source_url:event.target.value }))} /></label>
           <label><span>Enrichment checked</span><input type="datetime-local" value={localDateTime(profile.enrichment_checked_at)} onChange={event => setProfile(value => ({ ...value, enrichment_checked_at:event.target.value ? new Date(event.target.value).toISOString() : null }))} /></label>
         </div>
       </section>
@@ -392,8 +426,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
           <label><span>Currency</span><input value={profile.revenue_currency} onChange={event => setProfile(value => ({ ...value, revenue_currency:event.target.value.toUpperCase().slice(0, 3) }))} /></label>
           <label><span>Year</span><input type="number" min="1900" max="2100" value={profile.revenue_year ?? ''} onChange={event => setProfile(value => ({ ...value, revenue_year:numberValue(event.target.value) }))} /></label>
           <label><span>Confidence</span><select value={profile.revenue_confidence} onChange={event => setProfile(value => ({ ...value, revenue_confidence:event.target.value as CompanyAdminProfilePatch['revenue_confidence'] }))}><option value="unknown">Unknown</option><option value="confirmed">Confirmed</option><option value="strong">Strong</option><option value="verify">Verify</option></select></label>
-          <label><span>Source</span><input value={profile.revenue_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, revenue_source_name:text(event.target.value) }))} /></label>
-          <label className="wide"><span>Source URL</span><input type="url" value={profile.revenue_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, revenue_source_url:text(event.target.value) }))} /></label>
+          <label><span>Source</span><input value={profile.revenue_source_name ?? ''} onChange={event => setProfile(value => ({ ...value, revenue_source_name:event.target.value }))} /></label>
+          <label className="wide"><span>Source URL</span><input type="url" value={profile.revenue_source_url ?? ''} onChange={event => setProfile(value => ({ ...value, revenue_source_url:event.target.value }))} /></label>
         </div>
       </section>
 
@@ -401,10 +435,10 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
         <div className="company-admin-card-heading"><strong>Relationship &amp; follow-up</strong><span>Internal CRM state</span></div>
         <div className="company-admin-form-grid">
           <label><span>Status</span><select value={profile.relationship_status} onChange={event => setProfile(value => ({ ...value, relationship_status:event.target.value as CompanyRelationshipStatus }))}>{relationshipStatuses.map(status => <option key={status} value={status}>{relationshipLabel(status)}</option>)}</select></label>
-          <label><span>Account owner</span><input value={profile.account_owner ?? ''} onChange={event => setProfile(value => ({ ...value, account_owner:text(event.target.value) }))} /></label>
+          <label><span>Account owner</span><input value={profile.account_owner ?? ''} onChange={event => setProfile(value => ({ ...value, account_owner:event.target.value }))} /></label>
           <label><span>Last contacted</span><input type="datetime-local" value={localDateTime(profile.last_contacted_at)} onChange={event => setProfile(value => ({ ...value, last_contacted_at:event.target.value ? new Date(event.target.value).toISOString() : null }))} /></label>
-          <label><span>Next action</span><input type="date" value={profile.next_action_date ?? ''} onChange={event => setProfile(value => ({ ...value, next_action_date:text(event.target.value) }))} /></label>
-          <label className="wide"><span>Internal summary</span><textarea rows={4} value={profile.internal_summary ?? ''} onChange={event => setProfile(value => ({ ...value, internal_summary:text(event.target.value) }))} /></label>
+          <label><span>Next action</span><input type="date" value={profile.next_action_date ?? ''} onChange={event => setProfile(value => ({ ...value, next_action_date:event.target.value }))} /></label>
+          <label className="wide"><span>Internal summary</span><textarea rows={4} value={profile.internal_summary ?? ''} onChange={event => setProfile(value => ({ ...value, internal_summary:event.target.value }))} /></label>
         </div>
       </section>
 
@@ -428,14 +462,14 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
           <div className="company-admin-card-heading"><strong>Edit contact</strong><span>{editingContact.name}</span></div>
           <div className="company-admin-inline-form">
             <input aria-label="Edit contact name" value={editingContact.name} onChange={event => setEditingContact(value => value ? ({ ...value, name:event.target.value }) : value)} placeholder="Name" />
-            <input aria-label="Edit contact title" value={editingContact.title ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, title:text(event.target.value) }) : value)} placeholder="Title" />
-            <input aria-label="Edit contact email" type="email" value={editingContact.email ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, email:text(event.target.value) }) : value)} placeholder="Email" />
-            <input aria-label="Edit contact phone" value={editingContact.phone ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, phone:text(event.target.value) }) : value)} placeholder="Phone" />
-            <input aria-label="Edit contact LinkedIn" type="url" value={editingContact.linkedin_url ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, linkedin_url:text(event.target.value) }) : value)} placeholder="LinkedIn URL" />
+            <input aria-label="Edit contact title" value={editingContact.title ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, title:event.target.value }) : value)} placeholder="Title" />
+            <input aria-label="Edit contact email" type="email" value={editingContact.email ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, email:event.target.value }) : value)} placeholder="Email" />
+            <input aria-label="Edit contact phone" value={editingContact.phone ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, phone:event.target.value }) : value)} placeholder="Phone" />
+            <input aria-label="Edit contact LinkedIn" type="url" value={editingContact.linkedin_url ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, linkedin_url:event.target.value }) : value)} placeholder="LinkedIn URL" />
           </div>
           <div className="company-admin-inline-form">
-            <input aria-label="Edit contact source name" value={editingContact.source_name ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, source_name:text(event.target.value) }) : value)} placeholder="Source name" />
-            <input aria-label="Edit contact source URL" type="url" value={editingContact.source_url ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, source_url:text(event.target.value) }) : value)} placeholder="Source URL" />
+            <input aria-label="Edit contact source name" value={editingContact.source_name ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, source_name:event.target.value }) : value)} placeholder="Source name" />
+            <input aria-label="Edit contact source URL" type="url" value={editingContact.source_url ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, source_url:event.target.value }) : value)} placeholder="Source URL" />
             <input aria-label="Edit contact verified at" type="datetime-local" value={localDateTime(editingContact.verified_at)} onChange={event => setEditingContact(value => value ? ({ ...value, verified_at:event.target.value ? new Date(event.target.value).toISOString() : null }) : value)} />
             <label><input aria-label="Contact active" type="checkbox" checked={editingContact.active} onChange={event => setEditingContact(value => value ? ({ ...value, active:event.target.checked }) : value)} /> Active</label>
             <button type="button" onClick={() => void saveContact()} disabled={busy || !editingContact.name.trim()}>Save contact</button>
