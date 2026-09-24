@@ -1,3 +1,4 @@
+# Recheck after roll-up auto-sync + typo matching
 name: Export pending company roll-up review
 
 on:
