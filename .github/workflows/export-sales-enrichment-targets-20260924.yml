@@ -161,11 +161,11 @@ jobs:
                 'headquarters_region':master.get('headquarters_region'),
                 'contacts':cs,
                 'missing_fields':missing,
-                'enrichment_priority':round(fit*0.7+(100-ready)*0.3),
+                'enrichment_priority':round(fit*0.85+(100-ready)*0.15),
               })
 
           eligible=[r for r in rows if r['account_classification'] not in ('customer','former-customer','partner','competitor','do-not-pursue')]
-          eligible.sort(key=lambda r:(-r['enrichment_priority'],-r['fit_score'],r['readiness_score'],r['display_name']))
+          eligible.sort(key=lambda r:(-(r['fit_score']>=70),-r['enrichment_priority'],-r['fit_score'],r['readiness_score'],r['display_name']))
           output={
             'schema':'TOWERSIGNAL_SALES_ENRICHMENT_TARGETS_V1',
             'generated_at':'2026-09-24',
