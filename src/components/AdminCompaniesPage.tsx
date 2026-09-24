@@ -319,16 +319,20 @@ export function AdminCompaniesPage() {
       observations: number
       contacts: number
       pipeline: number
+      openDeals: number
+      pipelineArr: number
       sourceUrl: string | null
     }>()
     families.forEach(family => {
       const key = family.parentName || 'No parent company recorded'
-      const row = map.get(key) ?? { name:key, familyCount:0, identityCount:0, observations:0, contacts:0, pipeline:0, sourceUrl:null }
+      const row = map.get(key) ?? { name:key, familyCount:0, identityCount:0, observations:0, contacts:0, pipeline:0, openDeals:0, pipelineArr:0, sourceUrl:null }
       row.familyCount += 1
       row.identityCount += family.memberCount
       row.observations += family.publicObservations
       row.contacts += family.contacts
-      if (pipelineStatuses.has(family.relationshipStatus)) row.pipeline += 1
+      row.openDeals += family.openOpportunities
+      row.pipelineArr += family.pipelineArr
+      if (pipelineStatuses.has(family.relationshipStatus) || family.openOpportunities > 0) row.pipeline += 1
       if (!row.sourceUrl && family.parentSourceUrl) row.sourceUrl = family.parentSourceUrl
       map.set(key,row)
     })
@@ -397,8 +401,8 @@ export function AdminCompaniesPage() {
     <div className="admin-company-dashboard-grid">
       <section className="admin-company-card admin-parent-summary">
         <div className="admin-company-card-heading"><div><strong>Parent company summary</strong><span>Private ownership rollup across reviewed master families</span></div><small>{number.format(parentRows.length)} parent states</small></div>
-        <div className="table-scroll"><table className="account-table admin-parent-table"><thead><tr><th>Parent / owner</th><th>Families</th><th>Source identities</th><th>Public observations</th><th>Contacts</th><th>Pipeline families</th><th>Ownership evidence</th></tr></thead><tbody>
-          {parentRows.map(parent => <tr key={parent.name}><td><strong>{parent.name}</strong></td><td>{number.format(parent.familyCount)}</td><td>{number.format(parent.identityCount)}</td><td>{number.format(parent.observations)}</td><td>{number.format(parent.contacts)}</td><td>{number.format(parent.pipeline)}</td><td>{parent.sourceUrl ? <a className="table-link" href={parent.sourceUrl} target="_blank" rel="noreferrer">Open source ↗</a> : 'Not recorded'}</td></tr>)}
+        <div className="table-scroll"><table className="account-table admin-parent-table"><thead><tr><th>Parent / owner</th><th>Families</th><th>Source identities</th><th>Public observations</th><th>Contacts</th><th>Pipeline families</th><th>Open deals</th><th>Pipeline ARR</th><th>Ownership evidence</th></tr></thead><tbody>
+          {parentRows.map(parent => <tr key={parent.name}><td><strong>{parent.name}</strong></td><td>{number.format(parent.familyCount)}</td><td>{number.format(parent.identityCount)}</td><td>{number.format(parent.observations)}</td><td>{number.format(parent.contacts)}</td><td>{number.format(parent.pipeline)}</td><td>{number.format(parent.openDeals)}</td><td>{parent.pipelineArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})}</td><td>{parent.sourceUrl ? <a className="table-link" href={parent.sourceUrl} target="_blank" rel="noreferrer">Open source ↗</a> : 'Not recorded'}</td></tr>)}
         </tbody></table></div>
       </section>
 
