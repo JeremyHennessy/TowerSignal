@@ -1,0 +1,118 @@
+name: Apply service FK delete repair
+
+on:
+  push:
+    branches:
+      - ops/apply-service-fk-fix-20260924
+    paths:
+      - '.github/workflows/apply-service-fk-fix-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard empty service baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "
+            select
+              (select count(*) from public.service_clients) +
+              (select count(*) from public.service_portfolios) +
+              (select count(*) from public.service_sites) +
+              (select count(*) from public.service_assets) +
+              (select count(*) from public.service_agreements) +
+              (select count(*) from public.service_visits) +
+              (select count(*) from public.service_measurements) +
+              (select count(*) from public.service_actions) +
+              (select count(*) from public.service_reports) +
+              (select count(*) from public.service_documents) +
+              (select count(*) from public.service_change_log);
+          " | grep -qx '0'
+
+      - name: Apply migration 005a
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/005a_service_fk_delete_fix.sql
+
+      - name: Verify optional-parent delete semantics transactionally
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+
+          INSERT INTO public.service_clients(client_id,name) VALUES ('__c__','Probe client');
+          INSERT INTO public.service_portfolios(portfolio_id,client_id,name) VALUES ('__p__','__c__','Probe portfolio');
+          INSERT INTO public.service_sites(service_site_id,system_id,client_id,portfolio_id,display_name)
+            VALUES ('__s__','__sys__','__c__','__p__','Probe site');
+          INSERT INTO public.service_assets(asset_id,service_site_id,asset_type,asset_label)
+            VALUES ('__a__','__s__','cooling_tower','Tower A');
+          INSERT INTO public.service_agreements(agreement_id,service_site_id,agreement_name)
+            VALUES ('__g__','__s__','Probe agreement');
+          INSERT INTO public.service_visits(visit_id,service_site_id,agreement_id,status,visit_type)
+            VALUES ('__v__','__s__','__g__','scheduled','routine');
+          INSERT INTO public.service_actions(action_id,service_site_id,visit_id,asset_id,title)
+            VALUES ('__x__','__s__','__v__','__a__','Probe action');
+          INSERT INTO public.service_documents(document_id,service_site_id,visit_id,asset_id,file_name)
+            VALUES ('__d__','__s__','__v__','__a__','probe.pdf');
+
+          DELETE FROM public.service_agreements WHERE agreement_id='__g__';
+          DO $$
+          BEGIN
+            IF (SELECT agreement_id FROM public.service_visits WHERE visit_id='__v__') IS NOT NULL THEN
+              RAISE EXCEPTION 'Agreement delete did not clear visit agreement_id';
+            END IF;
+            IF (SELECT service_site_id FROM public.service_visits WHERE visit_id='__v__') <> '__s__' THEN
+              RAISE EXCEPTION 'Agreement delete damaged visit service_site_id';
+            END IF;
+          END $$;
+
+          DELETE FROM public.service_assets WHERE asset_id='__a__';
+          DO $$
+          BEGIN
+            IF (SELECT asset_id FROM public.service_actions WHERE action_id='__x__') IS NOT NULL
+               OR (SELECT asset_id FROM public.service_documents WHERE document_id='__d__') IS NOT NULL THEN
+              RAISE EXCEPTION 'Asset delete did not clear optional child asset references';
+            END IF;
+            IF (SELECT service_site_id FROM public.service_actions WHERE action_id='__x__') <> '__s__'
+               OR (SELECT service_site_id FROM public.service_documents WHERE document_id='__d__') <> '__s__' THEN
+              RAISE EXCEPTION 'Asset delete damaged child service_site_id';
+            END IF;
+          END $$;
+
+          DELETE FROM public.service_visits WHERE visit_id='__v__';
+          DO $$
+          BEGIN
+            IF (SELECT visit_id FROM public.service_actions WHERE action_id='__x__') IS NOT NULL
+               OR (SELECT visit_id FROM public.service_documents WHERE document_id='__d__') IS NOT NULL THEN
+              RAISE EXCEPTION 'Visit delete did not clear optional child visit references';
+            END IF;
+          END $$;
+
+          DELETE FROM public.service_portfolios WHERE portfolio_id='__p__';
+          DO $$
+          BEGIN
+            IF (SELECT portfolio_id FROM public.service_sites WHERE service_site_id='__s__') IS NOT NULL THEN
+              RAISE EXCEPTION 'Portfolio delete did not clear site portfolio_id';
+            END IF;
+            IF (SELECT client_id FROM public.service_sites WHERE service_site_id='__s__') <> '__c__' THEN
+              RAISE EXCEPTION 'Portfolio delete incorrectly cleared site client_id';
+            END IF;
+          END $$;
+
+          ROLLBACK;
+
+          SELECT 'SERVICE_FK_DELETE_REPAIR=PASS' AS result,
+                 (SELECT count(*) FROM public.service_sites) AS sites,
+                 (SELECT count(*) FROM public.service_change_log) AS audit_rows;
+          SQL
