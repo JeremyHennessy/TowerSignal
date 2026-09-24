@@ -13,12 +13,11 @@ permissions:
 jobs:
   verify-neon-auth-key:
     runs-on: ubuntu-latest
-    environment: github-pages
     timeout-minutes: 5
     env:
       PROJECT_ID: delicate-frost-69301563
       BRANCH_ID: br-orange-bar-aujld2d5
-      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY || vars.NEON_API_KEY || secrets.NEON_KEY || vars.NEON_KEY || secrets.NEON_SECRET_KEY || vars.NEON_SECRET_KEY || secrets.NEON_API_TOKEN || vars.NEON_API_TOKEN }}
     steps:
       - name: Require configured Neon API key
         shell: bash
