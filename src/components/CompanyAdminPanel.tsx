@@ -6,6 +6,7 @@ import {
   loadCompanyAdminAccess,
   loadCompanyAdminSnapshot,
   saveCompanyAdminProfile,
+  saveCompanyAdminContact,
   updateCompanyNote,
 } from '../companyAdmin/client'
 import type {
@@ -120,11 +121,15 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
   const [contactTitle, setContactTitle] = useState('')
   const [contactEmail, setContactEmail] = useState('')
   const [contactPhone, setContactPhone] = useState('')
+  const [contactLinkedin, setContactLinkedin] = useState('')
   const [contactSourceName, setContactSourceName] = useState('')
+  const [editingContact, setEditingContact] = useState<CompanyAdminContact | null>(null)
   const [contactSourceUrl, setContactSourceUrl] = useState('')
   const [contactVerifiedAt, setContactVerifiedAt] = useState('')
   const [activityType, setActivityType] = useState('email')
   const [activityDate, setActivityDate] = useState(() => localDateTime(new Date().toISOString()))
+  const [activityContactId, setActivityContactId] = useState('')
+  const [activitySubject, setActivitySubject] = useState('')
   const [activityOutcome, setActivityOutcome] = useState('')
   const [activityDetails, setActivityDetails] = useState('')
   const [activityNextAction, setActivityNextAction] = useState('')
@@ -165,6 +170,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     return () => { cancelled = true }
   }, [companyId])
 
+  const contactById = useMemo(() => new Map(contacts.map(contact => [contact.contact_id, contact])), [contacts])
+
   const locationSummary = useMemo(() => [
     profile.headquarters_city,
     profile.headquarters_region,
@@ -197,7 +204,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
         title: text(contactTitle),
         email: text(contactEmail),
         phone: text(contactPhone),
-        linkedin_url: null,
+        linkedin_url: text(contactLinkedin),
         notes: null,
         source_name: text(contactSourceName),
         source_url: text(contactSourceUrl),
@@ -208,12 +215,39 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
       setContactTitle('')
       setContactEmail('')
       setContactPhone('')
+      setContactLinkedin('')
       setContactSourceName('')
       setContactSourceUrl('')
       setContactVerifiedAt('')
       await reload()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to add contact')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const saveContact = async () => {
+    if (!editingContact || !editingContact.name.trim()) return
+    setBusy(true)
+    setError(null)
+    try {
+      await saveCompanyAdminContact(editingContact.contact_id, companyId, {
+        name: editingContact.name.trim(),
+        title: text(editingContact.title ?? ''),
+        email: text(editingContact.email ?? ''),
+        phone: text(editingContact.phone ?? ''),
+        linkedin_url: text(editingContact.linkedin_url ?? ''),
+        notes: text(editingContact.notes ?? ''),
+        source_name: text(editingContact.source_name ?? ''),
+        source_url: text(editingContact.source_url ?? ''),
+        verified_at: editingContact.verified_at,
+        active: editingContact.active,
+      })
+      setEditingContact(null)
+      await reload()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update contact')
     } finally {
       setBusy(false)
     }
@@ -229,8 +263,8 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
       await addCompanyActivity(companyId, {
         activity_type: activityType,
         occurred_at: occurredAt,
-        contact_id: null,
-        subject: null,
+        contact_id: text(activityContactId),
+        subject: text(activitySubject),
         details: text(activityDetails),
         outcome: text(activityOutcome),
         next_action_date: text(activityNextAction),
@@ -243,6 +277,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
       }
       await saveCompanyAdminProfile(companyId, canonicalName, nextProfile)
       setProfile(nextProfile)
+      setActivitySubject('')
       setActivityOutcome('')
       setActivityDetails('')
       setActivityNextAction('')
@@ -380,6 +415,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
           <input aria-label="Contact title" value={contactTitle} onChange={event => setContactTitle(event.target.value)} placeholder="Title" />
           <input aria-label="Contact email" type="email" value={contactEmail} onChange={event => setContactEmail(event.target.value)} placeholder="Email" />
           <input aria-label="Contact phone" value={contactPhone} onChange={event => setContactPhone(event.target.value)} placeholder="Phone" />
+          <input aria-label="Contact LinkedIn" type="url" value={contactLinkedin} onChange={event => setContactLinkedin(event.target.value)} placeholder="LinkedIn URL" />
           <button onClick={addContact} disabled={busy || !contactName.trim()}>Add contact</button>
         </div>
         <div className="company-admin-inline-form">
@@ -387,7 +423,25 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
           <input aria-label="Contact source URL" type="url" value={contactSourceUrl} onChange={event => setContactSourceUrl(event.target.value)} placeholder="Source URL" />
           <input aria-label="Contact verified at" type="datetime-local" value={contactVerifiedAt} onChange={event => setContactVerifiedAt(event.target.value)} />
         </div>
-        <div className="company-admin-list">{contacts.length ? contacts.map(contact => <div key={contact.contact_id}><strong>{contact.name}</strong><span>{[contact.title, contact.email, contact.phone].filter(Boolean).join(' · ') || 'No contact detail'}</span>{contact.source_name && <small>{contact.source_name}{contact.verified_at ? ' · verified ' + new Date(contact.verified_at).toLocaleDateString() : ''}</small>}</div>) : <span className="company-admin-empty">No private contacts recorded.</span>}</div>
+        <div className="company-admin-list">{contacts.length ? contacts.map(contact => <div key={contact.contact_id}><strong>{contact.name}</strong><span>{[contact.title, contact.email, contact.phone].filter(Boolean).join(' · ') || 'No contact detail'}</span>{contact.linkedin_url && <a href={contact.linkedin_url} target="_blank" rel="noreferrer">LinkedIn ↗</a>}{contact.source_name && <small>{contact.source_name}{contact.verified_at ? ' · verified ' + new Date(contact.verified_at).toLocaleDateString() : ''}</small>}<button type="button" onClick={() => setEditingContact({ ...contact })}>Edit contact</button></div>) : <span className="company-admin-empty">No private contacts recorded.</span>}</div>
+        {editingContact && <div className="company-admin-contact-editor">
+          <div className="company-admin-card-heading"><strong>Edit contact</strong><span>{editingContact.name}</span></div>
+          <div className="company-admin-inline-form">
+            <input aria-label="Edit contact name" value={editingContact.name} onChange={event => setEditingContact(value => value ? ({ ...value, name:event.target.value }) : value)} placeholder="Name" />
+            <input aria-label="Edit contact title" value={editingContact.title ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, title:text(event.target.value) }) : value)} placeholder="Title" />
+            <input aria-label="Edit contact email" type="email" value={editingContact.email ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, email:text(event.target.value) }) : value)} placeholder="Email" />
+            <input aria-label="Edit contact phone" value={editingContact.phone ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, phone:text(event.target.value) }) : value)} placeholder="Phone" />
+            <input aria-label="Edit contact LinkedIn" type="url" value={editingContact.linkedin_url ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, linkedin_url:text(event.target.value) }) : value)} placeholder="LinkedIn URL" />
+          </div>
+          <div className="company-admin-inline-form">
+            <input aria-label="Edit contact source name" value={editingContact.source_name ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, source_name:text(event.target.value) }) : value)} placeholder="Source name" />
+            <input aria-label="Edit contact source URL" type="url" value={editingContact.source_url ?? ''} onChange={event => setEditingContact(value => value ? ({ ...value, source_url:text(event.target.value) }) : value)} placeholder="Source URL" />
+            <input aria-label="Edit contact verified at" type="datetime-local" value={localDateTime(editingContact.verified_at)} onChange={event => setEditingContact(value => value ? ({ ...value, verified_at:event.target.value ? new Date(event.target.value).toISOString() : null }) : value)} />
+            <label><input aria-label="Contact active" type="checkbox" checked={editingContact.active} onChange={event => setEditingContact(value => value ? ({ ...value, active:event.target.checked }) : value)} /> Active</label>
+            <button type="button" onClick={() => void saveContact()} disabled={busy || !editingContact.name.trim()}>Save contact</button>
+            <button type="button" onClick={() => setEditingContact(null)} disabled={busy}>Cancel</button>
+          </div>
+        </div>}
       </section>
 
       <section className="company-admin-card">
@@ -395,12 +449,14 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
         <div className="company-admin-inline-form activity-form">
           <select aria-label="Activity type" value={activityType} onChange={event => setActivityType(event.target.value)}><option value="email">Email</option><option value="call">Call</option><option value="meeting">Meeting</option><option value="linkedin">LinkedIn</option><option value="other">Other</option></select>
           <input aria-label="Activity date" type="datetime-local" value={activityDate} onChange={event => setActivityDate(event.target.value)} />
+          <select aria-label="Activity contact" value={activityContactId} onChange={event => setActivityContactId(event.target.value)}><option value="">No specific contact</option>{contacts.filter(contact => contact.active).map(contact => <option key={contact.contact_id} value={contact.contact_id}>{contact.name}</option>)}</select>
+          <input aria-label="Activity subject" value={activitySubject} onChange={event => setActivitySubject(event.target.value)} placeholder="Subject / purpose" />
           <input aria-label="Activity outcome" value={activityOutcome} onChange={event => setActivityOutcome(event.target.value)} placeholder="Outcome" />
           <input aria-label="Activity next action" type="date" value={activityNextAction} onChange={event => setActivityNextAction(event.target.value)} />
           <textarea aria-label="Activity details" rows={2} value={activityDetails} onChange={event => setActivityDetails(event.target.value)} placeholder="What happened?" />
           <button onClick={addActivity} disabled={busy || !activityDate}>Log interaction</button>
         </div>
-        <div className="company-admin-timeline">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className="company-admin-empty">No outreach or interaction history recorded.</span>}</div>
+        <div className="company-admin-timeline">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.contact_id && <span>Contact: {contactById.get(activity.contact_id)?.name ?? activity.contact_id}</span>}{activity.subject && <span>{activity.subject}</span>}{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.next_action_date && <small>Next action {activity.next_action_date}</small>}</article>) : <span className="company-admin-empty">No outreach or interaction history recorded.</span>}</div>
       </section>
 
       <section className="company-admin-card company-admin-notes-card">
