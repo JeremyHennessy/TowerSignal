@@ -1,0 +1,167 @@
+name: Apply customer lifecycle schema
+
+on:
+  push:
+    branches:
+      - ops/apply-customer-lifecycle-20260924
+    paths:
+      - '.github/workflows/apply-customer-lifecycle-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard production pre-state
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_active integer;
+          BEGIN
+            IF to_regclass('public.company_sales_subscriptions') IS NOT NULL
+               OR to_regclass('public.company_sales_renewals') IS NOT NULL
+               OR to_regclass('public.company_sales_customer_lifecycle_state') IS NOT NULL THEN
+              RAISE EXCEPTION 'Customer lifecycle objects already exist; refusing first-apply workflow';
+            END IF;
+            IF to_regclass('public.company_sales_accounts') IS NULL
+               OR to_regclass('public.company_sales_proposals') IS NULL
+               OR to_regclass('public.company_private_opportunities') IS NULL
+               OR to_regclass('public.company_private_contacts') IS NULL THEN
+              RAISE EXCEPTION 'Customer lifecycle dependencies are missing';
+            END IF;
+            SELECT count(*) INTO v_active FROM public.company_sales_accounts WHERE record_status='active';
+            IF v_active <> 90 THEN
+              RAISE EXCEPTION 'Unexpected active master-account count: %',v_active;
+            END IF;
+          END $$;
+          SELECT 'CUSTOMER_LIFECYCLE_PRECHECK=PASS' AS result;
+          SQL
+
+      - name: Rollback-validate migration on production schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          sed -e '/^BEGIN;$/d' -e '/^COMMIT;$/d' database/migrations/011_customer_lifecycle.sql > /tmp/011_customer_lifecycle_body.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          BEGIN;
+          \i /tmp/011_customer_lifecycle_body.sql
+          DO $$
+          DECLARE v_policies integer; v_rls integer;
+          BEGIN
+            IF to_regclass('public.company_sales_subscriptions') IS NULL
+               OR to_regclass('public.company_sales_renewals') IS NULL
+               OR to_regclass('public.company_sales_customer_lifecycle_state') IS NULL THEN
+              RAISE EXCEPTION 'Rollback validation did not create required lifecycle objects';
+            END IF;
+            SELECT count(*) INTO v_policies
+            FROM pg_policies
+            WHERE schemaname='public'
+              AND policyname IN ('company_sales_subscriptions_admin_only','company_sales_renewals_admin_only');
+            SELECT count(*) INTO v_rls
+            FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public'
+              AND c.relname IN ('company_sales_subscriptions','company_sales_renewals')
+              AND c.relrowsecurity;
+            IF v_policies<>2 OR v_rls<>2 THEN
+              RAISE EXCEPTION 'Lifecycle security validation failed policies=% rls=%',v_policies,v_rls;
+            END IF;
+          END $$;
+          ROLLBACK;
+
+          DO $$
+          BEGIN
+            IF to_regclass('public.company_sales_subscriptions') IS NOT NULL
+               OR to_regclass('public.company_sales_renewals') IS NOT NULL
+               OR to_regclass('public.company_sales_customer_lifecycle_state') IS NOT NULL THEN
+              RAISE EXCEPTION 'Rollback validation left persistent lifecycle objects';
+            END IF;
+          END $$;
+          SELECT 'CUSTOMER_LIFECYCLE_ROLLBACK_PROOF=PASS' AS result;
+          SQL
+
+      - name: Apply migration 011
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f database/migrations/011_customer_lifecycle.sql
+
+      - name: Verify schema and reversible CRUD smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_policies integer; v_rls integer;
+          BEGIN
+            IF to_regclass('public.company_sales_subscriptions') IS NULL
+               OR to_regclass('public.company_sales_renewals') IS NULL
+               OR to_regclass('public.company_sales_customer_lifecycle_state') IS NULL THEN
+              RAISE EXCEPTION 'Applied lifecycle objects are missing';
+            END IF;
+            SELECT count(*) INTO v_policies
+            FROM pg_policies
+            WHERE schemaname='public'
+              AND policyname IN ('company_sales_subscriptions_admin_only','company_sales_renewals_admin_only');
+            SELECT count(*) INTO v_rls
+            FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+            WHERE n.nspname='public'
+              AND c.relname IN ('company_sales_subscriptions','company_sales_renewals')
+              AND c.relrowsecurity;
+            IF v_policies<>2 OR v_rls<>2 THEN
+              RAISE EXCEPTION 'Applied lifecycle security failed policies=% rls=%',v_policies,v_rls;
+            END IF;
+            IF (SELECT count(*) FROM public.company_sales_subscriptions)<>0
+               OR (SELECT count(*) FROM public.company_sales_renewals)<>0 THEN
+              RAISE EXCEPTION 'Lifecycle tables were not empty after first migration';
+            END IF;
+          END $$;
+
+          SELECT sales_account_id AS test_account_id
+          FROM public.company_sales_accounts
+          WHERE record_status='active'
+          ORDER BY sales_account_id
+          LIMIT 1
+          \gset
+
+          BEGIN;
+          INSERT INTO public.company_sales_subscriptions(
+            subscription_id,sales_account_id,status,plan_name,arr,start_date,renewal_date,term_months,billing_cadence,auto_renew
+          ) VALUES (
+            'customer-lifecycle-smoke-sub',:'test_account_id','active','Smoke test',12000,current_date,current_date+365,12,'annual',false
+          );
+          INSERT INTO public.company_sales_renewals(
+            renewal_id,subscription_id,sales_account_id,status,renewal_date,current_arr,next_step
+          ) VALUES (
+            'customer-lifecycle-smoke-renewal','customer-lifecycle-smoke-sub',:'test_account_id','upcoming',current_date+365,12000,'Smoke test only'
+          );
+          DO $$
+          BEGIN
+            IF (SELECT count(*) FROM public.company_sales_subscriptions WHERE subscription_id='customer-lifecycle-smoke-sub')<>1
+               OR (SELECT count(*) FROM public.company_sales_renewals WHERE renewal_id='customer-lifecycle-smoke-renewal')<>1 THEN
+              RAISE EXCEPTION 'Lifecycle CRUD smoke test failed';
+            END IF;
+          END $$;
+          ROLLBACK;
+
+          DO $$
+          BEGIN
+            IF EXISTS (SELECT 1 FROM public.company_sales_subscriptions WHERE subscription_id='customer-lifecycle-smoke-sub')
+               OR EXISTS (SELECT 1 FROM public.company_sales_renewals WHERE renewal_id='customer-lifecycle-smoke-renewal') THEN
+              RAISE EXCEPTION 'Lifecycle smoke test rollback failed';
+            END IF;
+          END $$;
+
+          SELECT 'CUSTOMER_LIFECYCLE_SCHEMA=PASS' AS result,
+                 (SELECT count(*) FROM public.company_sales_subscriptions) AS subscriptions,
+                 (SELECT count(*) FROM public.company_sales_renewals) AS renewals,
+                 (SELECT count(*) FROM public.company_sales_customer_lifecycle_state) AS account_states;
+          SQL
