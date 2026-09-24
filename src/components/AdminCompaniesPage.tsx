@@ -118,6 +118,7 @@ export function AdminCompaniesPage() {
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [relationship, setRelationship] = useState('ALL')
+  const [salesStageFilter, setSalesStageFilter] = useState('ALL')
   const [gap, setGap] = useState('ALL')
 
   const reloadPrivate = async () => {
@@ -242,6 +243,7 @@ export function AdminCompaniesPage() {
     const needle = search.trim().toLowerCase()
     return families.filter(family => {
       if (relationship !== 'ALL' && family.relationshipStatus !== relationship) return false
+      if (salesStageFilter !== 'ALL' && family.salesStage !== salesStageFilter) return false
       if (gap !== 'ALL' && !family.missing.some(value => value.toLowerCase() === gap.toLowerCase())) return false
       if (!needle) return true
       const haystack = [
@@ -258,7 +260,7 @@ export function AdminCompaniesPage() {
       ].filter(Boolean).join(' ').toLowerCase()
       return haystack.includes(needle)
     })
-  }, [families, relationship, gap, search, profileById])
+  }, [families, relationship, salesStageFilter, gap, search, profileById])
 
   const today = new Date().toISOString().slice(0,10)
   const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().slice(0,10)
@@ -446,7 +448,8 @@ export function AdminCompaniesPage() {
         <div><strong>Company family directory</strong><span>{number.format(filteredFamilies.length)} of {number.format(families.length)} reviewed master families</span></div>
         <div className="admin-family-filters">
           <input aria-label="Admin company search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search family, parent, website, owner or notes…" />
-          <select aria-label="Admin relationship filter" value={relationship} onChange={event => setRelationship(event.target.value)}><option value="ALL">All CRM statuses</option>{statuses.map(status => <option key={status} value={status}>{human(status)}</option>)}</select>
+          <select aria-label="Admin relationship filter" value={relationship} onChange={event => setRelationship(event.target.value)}><option value="ALL">All account statuses</option>{statuses.map(status => <option key={status} value={status}>{human(status)}</option>)}</select>
+          <select aria-label="Admin deal stage filter" value={salesStageFilter} onChange={event => setSalesStageFilter(event.target.value)}><option value="ALL">All deal stages</option>{opportunityStages.map(stage => <option key={stage} value={stage}>{human(stage)}</option>)}</select>
           <select aria-label="Admin enrichment gap filter" value={gap} onChange={event => setGap(event.target.value)}><option value="ALL">All enrichment states</option><option value="website">Missing website</option><option value="HQ">Missing HQ</option><option value="company type">Missing company type</option><option value="ownership">Missing ownership</option><option value="revenue">Missing revenue</option><option value="identity source">Missing identity source</option><option value="contact">Missing contact</option></select>
         </div>
       </div>
