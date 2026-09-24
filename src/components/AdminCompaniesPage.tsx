@@ -376,7 +376,7 @@ export function AdminCompaniesPage() {
           <div className="admin-sales-stage-list">
             {(opportunityByStage.get(stage) ?? []).map(opportunity => {
               const family = familyByMemberId.get(opportunity.company_id)
-              return <a key={opportunity.opportunity_id} href={`#/admin-company/${encodeURIComponent(family?.masterId ?? opportunity.company_id)}`}>
+              return <a key={opportunity.opportunity_id} href={`#/admin-company/${encodeURIComponent(family?.salesAccountId ?? opportunity.sales_account_id ?? opportunity.company_id)}`}>
                 <strong>{family?.name ?? opportunity.name}</strong>
                 <span>{opportunity.estimated_arr == null ? 'ARR not set' : opportunity.estimated_arr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})+' ARR'}{opportunity.probability_percent == null ? '' : ` · ${opportunity.probability_percent}%`}</span>
                 <small>{opportunity.next_step || (opportunity.demo_scheduled_at ? 'Demo '+new Date(opportunity.demo_scheduled_at).toLocaleString() : 'No next step')}</small>
