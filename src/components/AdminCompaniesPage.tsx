@@ -237,7 +237,7 @@ export function AdminCompaniesPage() {
       sourceUrl: string | null
     }>()
     families.forEach(family => {
-      const key = family.parentName || 'Independent / parent not recorded'
+      const key = family.parentName || 'No parent company recorded'
       const row = map.get(key) ?? { name:key, familyCount:0, identityCount:0, observations:0, contacts:0, pipeline:0, sourceUrl:null }
       row.familyCount += 1
       row.identityCount += family.memberCount
