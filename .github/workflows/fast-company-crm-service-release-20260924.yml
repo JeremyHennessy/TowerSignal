@@ -11,6 +11,7 @@ on:
       - 'database/migrations/006_internal_sales_crm.sql'
       - 'src/App.tsx'
       - 'src/companyAdmin/client.ts'
+      - 'src/companyAdmin/import.ts'
       - 'src/components/CompaniesPage.tsx'
       - 'src/components/AdminCompaniesPage.tsx'
       - 'src/components/AdminCompanyProfilePage.tsx'
@@ -81,6 +82,7 @@ jobs:
             'database/migrations/006_internal_sales_crm.sql',
             'src/App.tsx',
             'src/companyAdmin/client.ts',
+            'src/companyAdmin/import.ts',
             'src/components/AdminCompaniesPage.tsx',
             'src/components/AdminCompanyProfilePage.tsx',
             'src/components/CompaniesPage.tsx',
