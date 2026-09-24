@@ -14,6 +14,8 @@ import type {
   CompanySalesAccountMember,
   CompanyRollupSuggestion,
   CompanyRollupSuggestionStatus,
+  CompanySalesDemo,
+  CompanySalesProposal,
   CompanyResearchStatus,
 } from '../types/companyAdmin'
 
@@ -713,4 +715,86 @@ export async function reviewCompanyRollupSuggestion(
   const row=((result.data ?? []) as Array<Record<string,unknown>>)[0]
   if(!row) throw new Error('Unable to review roll-up suggestion: pending row was not returned')
   return rollupSuggestionFrom(row)
+}
+
+
+function salesDemoFrom(row:Record<string,unknown>):CompanySalesDemo{
+  return {
+    demo_id:String(row.demo_id),sales_account_id:String(row.sales_account_id),
+    opportunity_id:nullableString(row.opportunity_id),primary_contact_id:nullableString(row.primary_contact_id),
+    status:String(row.status??'scheduled') as CompanySalesDemo['status'],
+    scheduled_at:nullableString(row.scheduled_at),completed_at:nullableString(row.completed_at),
+    meeting_url:nullableString(row.meeting_url),attendees:Array.isArray(row.attendees)?row.attendees.map(String):[],
+    demo_scope:nullableString(row.demo_scope),demo_accounts:nullableString(row.demo_accounts),
+    objections:nullableString(row.objections),outcome:nullableString(row.outcome),
+    next_step:nullableString(row.next_step),notes:nullableString(row.notes),
+    created_at:nullableString(row.created_at)??undefined,updated_at:nullableString(row.updated_at)??undefined,
+  }
+}
+function salesProposalFrom(row:Record<string,unknown>):CompanySalesProposal{
+  return {
+    proposal_id:String(row.proposal_id),sales_account_id:String(row.sales_account_id),
+    opportunity_id:nullableString(row.opportunity_id),decision_maker_contact_id:nullableString(row.decision_maker_contact_id),
+    status:String(row.status??'draft') as CompanySalesProposal['status'],package_name:nullableString(row.package_name),
+    proposed_arr:nullableNumber(row.proposed_arr),one_time_value:nullableNumber(row.one_time_value),
+    seats:nullableNumber(row.seats),term_months:nullableNumber(row.term_months),sent_at:nullableString(row.sent_at),
+    valid_until:nullableString(row.valid_until),expected_decision_date:nullableString(row.expected_decision_date),
+    proposal_url:nullableString(row.proposal_url),procurement_blockers:nullableString(row.procurement_blockers),
+    objections:nullableString(row.objections),next_step:nullableString(row.next_step),notes:nullableString(row.notes),
+    accepted_at:nullableString(row.accepted_at),rejected_at:nullableString(row.rejected_at),
+    rejection_reason:nullableString(row.rejection_reason),created_at:nullableString(row.created_at)??undefined,
+    updated_at:nullableString(row.updated_at)??undefined,
+  }
+}
+
+export async function loadAllCompanySalesDemos():Promise<CompanySalesDemo[]>{
+  const result=await client.from('company_sales_demos').select('*').order('scheduled_at',{ascending:true})
+  throwIfError('Unable to load sales demos',result.error)
+  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesDemoFrom)
+}
+export async function loadCompanySalesDemos(salesAccountId:string):Promise<CompanySalesDemo[]>{
+  const result=await client.from('company_sales_demos').select('*').eq('sales_account_id',salesAccountId).order('scheduled_at',{ascending:false})
+  throwIfError('Unable to load company sales demos',result.error)
+  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesDemoFrom)
+}
+export async function saveCompanySalesDemo(demoId:string,salesAccountId:string,values:Omit<CompanySalesDemo,'demo_id'|'sales_account_id'|'created_at'|'updated_at'>):Promise<CompanySalesDemo>{
+  const change={...values,updated_at:new Date().toISOString(),last_change_source:'manual',last_change_batch_id:null}
+  const update=await client.from('company_sales_demos').update(change).eq('demo_id',demoId).eq('sales_account_id',salesAccountId).select('*')
+  throwIfError('Unable to update sales demo',update.error)
+  const updated=((update.data??[]) as Array<Record<string,unknown>>)[0]
+  if(updated)return salesDemoFrom(updated)
+  const insert=await client.from('company_sales_demos').insert({demo_id:demoId,sales_account_id:salesAccountId,...change}).select('*')
+  throwIfError('Unable to create sales demo',insert.error)
+  const created=((insert.data??[]) as Array<Record<string,unknown>>)[0]
+  if(!created)throw new Error('Unable to create sales demo: row was not returned')
+  return salesDemoFrom(created)
+}
+export async function addCompanySalesDemo(salesAccountId:string,values:Omit<CompanySalesDemo,'demo_id'|'sales_account_id'|'created_at'|'updated_at'>):Promise<CompanySalesDemo>{
+  return saveCompanySalesDemo(crypto.randomUUID(),salesAccountId,values)
+}
+
+export async function loadAllCompanySalesProposals():Promise<CompanySalesProposal[]>{
+  const result=await client.from('company_sales_proposals').select('*').order('updated_at',{ascending:false})
+  throwIfError('Unable to load sales proposals',result.error)
+  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesProposalFrom)
+}
+export async function loadCompanySalesProposals(salesAccountId:string):Promise<CompanySalesProposal[]>{
+  const result=await client.from('company_sales_proposals').select('*').eq('sales_account_id',salesAccountId).order('updated_at',{ascending:false})
+  throwIfError('Unable to load company sales proposals',result.error)
+  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesProposalFrom)
+}
+export async function saveCompanySalesProposal(proposalId:string,salesAccountId:string,values:Omit<CompanySalesProposal,'proposal_id'|'sales_account_id'|'created_at'|'updated_at'>):Promise<CompanySalesProposal>{
+  const change={...values,updated_at:new Date().toISOString(),last_change_source:'manual',last_change_batch_id:null}
+  const update=await client.from('company_sales_proposals').update(change).eq('proposal_id',proposalId).eq('sales_account_id',salesAccountId).select('*')
+  throwIfError('Unable to update sales proposal',update.error)
+  const updated=((update.data??[]) as Array<Record<string,unknown>>)[0]
+  if(updated)return salesProposalFrom(updated)
+  const insert=await client.from('company_sales_proposals').insert({proposal_id:proposalId,sales_account_id:salesAccountId,...change}).select('*')
+  throwIfError('Unable to create sales proposal',insert.error)
+  const created=((insert.data??[]) as Array<Record<string,unknown>>)[0]
+  if(!created)throw new Error('Unable to create sales proposal: row was not returned')
+  return salesProposalFrom(created)
+}
+export async function addCompanySalesProposal(salesAccountId:string,values:Omit<CompanySalesProposal,'proposal_id'|'sales_account_id'|'created_at'|'updated_at'>):Promise<CompanySalesProposal>{
+  return saveCompanySalesProposal(crypto.randomUUID(),salesAccountId,values)
 }
