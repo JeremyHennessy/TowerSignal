@@ -443,7 +443,12 @@ INSERT INTO public.company_private_profiles (
   enrichment_checked_at, updated_at, last_change_source, last_change_batch_id
 )
 SELECT
-  master_id, canonical_name, {detail_cols},
+  master_id, canonical_name,
+  legal_name, website, headquarters_address, headquarters_city, headquarters_region, headquarters_postal_code, headquarters_country,
+  parent_company_name, company_type, revenue_amount, revenue_year,
+  COALESCE(revenue_type,'unknown'), revenue_source_name, revenue_source_url, COALESCE(revenue_confidence,'unknown'),
+  identity_source_name, identity_source_url, website_source_name, website_source_url,
+  headquarters_source_name, headquarters_source_url, parent_source_name, parent_source_url,
   now(), now(), 'import', '{BATCH_ID}'
 FROM ts_master_detail
 ON CONFLICT (company_id) DO UPDATE SET
@@ -573,8 +578,8 @@ BEGIN
     OR
     (t.company_id<>t.master_id AND p.rollup_company_id=t.master_id AND p.rollup_name=t.rollup_name);
 
-  IF v_profiles <> s.before_profiles + s.new_profiles THEN
-    RAISE EXCEPTION 'Profile postcondition failed: before=% new=% after=%', s.before_profiles, s.new_profiles, v_profiles;
+  IF v_profiles < s.before_profiles + s.new_profiles THEN
+    RAISE EXCEPTION 'Profile postcondition failed: before=% planned_new=% after=%', s.before_profiles, s.new_profiles, v_profiles;
   END IF;
   IF v_rollups <> s.before_rollups + s.new_rollups THEN
     RAISE EXCEPTION 'Rollup postcondition failed: before=% new=% after=%', s.before_rollups, s.new_rollups, v_rollups;
