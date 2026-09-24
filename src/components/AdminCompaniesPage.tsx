@@ -7,6 +7,8 @@ import {
   loadCompanyResearchQueue,
   loadAllCompanySalesOpportunities,
   loadAllCompanySalesTasks,
+  loadCompanySalesAccounts,
+  loadCompanySalesAccountMembers,
 } from '../companyAdmin/client'
 import { loadKnownFirms } from '../data/api'
 import type {
@@ -18,6 +20,8 @@ import type {
   CompanySalesOpportunity,
   CompanySalesTask,
   CompanyOpportunityStage,
+  CompanySalesAccount,
+  CompanySalesAccountMember,
 } from '../types/companyAdmin'
 import type { KnownFirmPayload, KnownFirmSummaryRecord } from '../types/firm'
 import { CompanyAdminImportPanel } from './CompanyAdminImportPanel'
@@ -81,6 +85,7 @@ function missingFields(profile: CompanyAdminProfile, contactCount: number): stri
 }
 
 type FamilyRow = {
+  salesAccountId: string
   masterId: string
   name: string
   parentName: string | null
@@ -115,6 +120,8 @@ export function AdminCompaniesPage() {
   const [queue, setQueue] = useState<CompanyResearchQueueItem[]>([])
   const [opportunities, setOpportunities] = useState<CompanySalesOpportunity[]>([])
   const [salesTasks, setSalesTasks] = useState<CompanySalesTask[]>([])
+  const [salesAccounts, setSalesAccounts] = useState<CompanySalesAccount[]>([])
+  const [salesAccountMembers, setSalesAccountMembers] = useState<CompanySalesAccountMember[]>([])
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [relationship, setRelationship] = useState('ALL')
@@ -122,13 +129,15 @@ export function AdminCompaniesPage() {
   const [gap, setGap] = useState('ALL')
 
   const reloadPrivate = async () => {
-    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks] = await Promise.all([
+    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
       loadCompanyAdminDirectory(),
       loadAllCompanyContacts(),
       loadAllCompanyActivities(),
       loadCompanyResearchQueue(),
       loadAllCompanySalesOpportunities(),
       loadAllCompanySalesTasks(),
+      loadCompanySalesAccounts(),
+      loadCompanySalesAccountMembers(),
     ])
     setProfiles(nextProfiles)
     setContacts(nextContacts)
@@ -136,6 +145,8 @@ export function AdminCompaniesPage() {
     setQueue(nextQueue)
     setOpportunities(nextOpportunities)
     setSalesTasks(nextSalesTasks)
+    setSalesAccounts(nextSalesAccounts)
+    setSalesAccountMembers(nextSalesAccountMembers)
   }
 
   useEffect(() => {
@@ -144,7 +155,7 @@ export function AdminCompaniesPage() {
       if (cancelled) return
       setAllowed(isAdmin)
       if (!isAdmin) return
-      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks] = await Promise.all([
+      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
         loadKnownFirms(),
         loadCompanyAdminDirectory(),
         loadAllCompanyContacts(),
@@ -152,6 +163,8 @@ export function AdminCompaniesPage() {
         loadCompanyResearchQueue(),
         loadAllCompanySalesOpportunities(),
         loadAllCompanySalesTasks(),
+        loadCompanySalesAccounts(),
+        loadCompanySalesAccountMembers(),
       ])
       if (cancelled) return
       setPayload(known)
@@ -161,6 +174,8 @@ export function AdminCompaniesPage() {
       setQueue(nextQueue)
       setOpportunities(nextOpportunities)
       setSalesTasks(nextSalesTasks)
+      setSalesAccounts(nextSalesAccounts)
+      setSalesAccountMembers(nextSalesAccountMembers)
     }).catch(err => {
       if (!cancelled) {
         setAllowed(false)
