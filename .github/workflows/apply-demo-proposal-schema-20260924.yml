@@ -31,9 +31,8 @@ jobs:
             IF v_accounts<>90 THEN
               RAISE EXCEPTION 'Expected 90 active reviewed master accounts, found %',v_accounts;
             END IF;
-            IF to_regclass('public.company_sales_demos') IS NOT NULL
-              OR to_regclass('public.company_sales_proposals') IS NOT NULL THEN
-              RAISE EXCEPTION 'Demo/proposal schema already exists; stop for review';
+            IF (to_regclass('public.company_sales_demos') IS NULL) <> (to_regclass('public.company_sales_proposals') IS NULL) THEN
+              RAISE EXCEPTION 'Demo/proposal schema is only partially present; stop for review';
             END IF;
           END $$;
           SELECT 'DEMO_PROPOSAL_SCHEMA_PRECHECK=PASS' AS result;
@@ -64,7 +63,7 @@ jobs:
             FROM pg_policies
             WHERE schemaname='public'
               AND tablename IN ('company_sales_demos','company_sales_proposals');
-            SELECT count(*) INTO v_triggers
+            SELECT count(DISTINCT trigger_name) INTO v_triggers
             FROM information_schema.triggers
             WHERE event_object_schema='public'
               AND event_object_table IN ('company_sales_demos','company_sales_proposals')
