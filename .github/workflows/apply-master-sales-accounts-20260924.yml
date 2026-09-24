@@ -1,0 +1,107 @@
+name: Apply master sales-account migration
+
+on:
+  push:
+    branches:
+      - ops/apply-master-sales-accounts-20260924
+    paths:
+      - '.github/workflows/apply-master-sales-accounts-20260924.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Capture and guard current reviewed baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE v_users integer; v_admins integer;
+          BEGIN
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin';
+            IF v_users <> 2 OR v_admins <> 2 THEN
+              RAISE EXCEPTION 'Auth guard failed before master sales accounts: users=% admins=%',v_users,v_admins;
+            END IF;
+          END $$;
+          SELECT 'MASTER_ACCOUNT_PRECHECK' AS check,
+            (SELECT count(*) FROM public.company_private_profiles) AS profiles,
+            (SELECT count(*) FROM public.company_private_profiles WHERE rollup_company_id IS NOT NULL) AS rollups,
+            (SELECT count(DISTINCT COALESCE(rollup_company_id,company_id)) FROM public.company_private_profiles) AS expected_accounts,
+            (SELECT count(*) FROM public.company_private_contacts) AS contacts,
+            (SELECT count(*) FROM public.company_private_activities) AS activities,
+            (SELECT count(*) FROM public.company_private_opportunities) AS opportunities,
+            (SELECT count(*) FROM public.company_private_tasks) AS tasks;
+          SQL
+
+      - name: Validate complete migration with rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s database/migrations/007_master_sales_accounts.sql
+          python - <<'PY'
+          from pathlib import Path
+          source=Path('database/migrations/007_master_sales_accounts.sql').read_text()
+          pos=source.rfind('COMMIT;')
+          assert pos >= 0
+          Path('/tmp/007_validation.sql').write_text(source[:pos]+'ROLLBACK;\n')
+          PY
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f /tmp/007_validation.sql
+          echo "MASTER_ACCOUNT_VALIDATION=PASS"
+
+      - name: Apply master sales-account migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f database/migrations/007_master_sales_accounts.sql
+
+      - name: Verify lossless production migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_profiles integer;
+            v_rollups integer;
+            v_expected integer;
+            v_accounts integer;
+            v_members integer;
+            v_primary integer;
+            v_unmapped integer;
+          BEGIN
+            SELECT count(*) INTO v_profiles FROM public.company_private_profiles;
+            SELECT count(*) INTO v_rollups FROM public.company_private_profiles WHERE rollup_company_id IS NOT NULL;
+            SELECT count(DISTINCT COALESCE(rollup_company_id,company_id)) INTO v_expected FROM public.company_private_profiles;
+            SELECT count(*) INTO v_accounts FROM public.company_sales_accounts WHERE record_status='active';
+            SELECT count(*) INTO v_members FROM public.company_sales_account_members;
+            SELECT count(*) INTO v_primary FROM public.company_sales_account_members WHERE is_primary;
+            SELECT count(*) INTO v_unmapped
+              FROM public.company_private_profiles p
+              LEFT JOIN public.company_sales_account_members m ON m.company_id=p.company_id
+              WHERE m.company_id IS NULL;
+
+            IF v_accounts <> v_expected OR v_members <> v_profiles OR v_primary <> v_expected OR v_unmapped <> 0
+               OR v_profiles-v_expected <> v_rollups THEN
+              RAISE EXCEPTION 'Master account acceptance failed profiles=% rollups=% expected=% accounts=% members=% primary=% unmapped=%',
+                v_profiles,v_rollups,v_expected,v_accounts,v_members,v_primary,v_unmapped;
+            END IF;
+          END $$;
+          SELECT 'MASTER_ACCOUNT_ACCEPTANCE=PASS' AS result,
+            (SELECT count(*) FROM public.company_sales_accounts WHERE record_status='active') AS master_accounts,
+            (SELECT count(*) FROM public.company_sales_account_members) AS retained_source_identities,
+            (SELECT count(*) FROM public.company_sales_account_members WHERE NOT is_primary) AS retained_reviewed_rollups,
+            (SELECT count(*) FROM public.company_private_contacts WHERE sales_account_id IS NOT NULL) AS mapped_contacts,
+            (SELECT count(*) FROM public.company_private_opportunities WHERE sales_account_id IS NOT NULL) AS mapped_opportunities,
+            (SELECT count(*) FROM public.company_private_tasks WHERE sales_account_id IS NOT NULL) AS mapped_tasks;
+          SQL
