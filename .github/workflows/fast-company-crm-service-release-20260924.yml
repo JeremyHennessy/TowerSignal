@@ -9,6 +9,7 @@ on:
       - 'database/migrations/005_service_reporting_foundation.sql'
       - 'database/migrations/005a_service_fk_delete_fix.sql'
       - 'database/migrations/006_internal_sales_crm.sql'
+      - 'database/migrations/007_master_sales_accounts.sql'
       - 'src/App.tsx'
       - 'src/companyAdmin/client.ts'
       - 'src/companyAdmin/import.ts'
@@ -18,6 +19,7 @@ on:
       - 'src/components/UserAccountPage.tsx'
       - 'src/components/CompanyAdminPanel.tsx'
       - 'src/components/CompanySalesCrmPanel.tsx'
+      - 'src/components/CompanySalesAccountPanel.tsx'
       - 'src/components/CompanyAdminWorkspace.tsx'
       - 'src/components/CompanyFamilyPanel.tsx'
       - 'src/components/CompanyProfilePage.tsx'
@@ -36,6 +38,7 @@ on:
       - 'src/types/companyAdmin.ts'
       - 'tests/frontend/CompanyAdmin.test.tsx'
       - 'tests/frontend/InternalSalesCrm.test.ts'
+      - 'tests/frontend/MasterSalesAccounts.test.ts'
       - 'tests/frontend/CompanyAdminDirectoryFilters.test.ts'
       - 'tests/frontend/UserAccountAdminAccess.test.tsx'
       - 'tests/frontend/CompanyResearchQueueSync.test.ts'
@@ -80,6 +83,7 @@ jobs:
             'database/migrations/005_service_reporting_foundation.sql',
             'database/migrations/005a_service_fk_delete_fix.sql',
             'database/migrations/006_internal_sales_crm.sql',
+            'database/migrations/007_master_sales_accounts.sql',
             'src/App.tsx',
             'src/companyAdmin/client.ts',
             'src/companyAdmin/import.ts',
@@ -90,6 +94,7 @@ jobs:
             'src/components/CompanyAdminWorkspace.tsx',
             'src/components/CompanyFamilyPanel.tsx',
             'src/components/CompanyProfilePage.tsx',
+            'src/components/CompanySalesAccountPanel.tsx',
             'src/components/CompanySalesCrmPanel.tsx',
             'src/components/DetailPanel.tsx',
             'src/components/ServiceOperationsPage.tsx',
@@ -108,6 +113,7 @@ jobs:
             'tests/frontend/CompanyAdminDirectoryFilters.test.ts',
             'tests/frontend/CompanyResearchQueueSync.test.ts',
             'tests/frontend/InternalSalesCrm.test.ts',
+            'tests/frontend/MasterSalesAccounts.test.ts',
             'tests/frontend/SeparateCompanyAdmin.test.ts',
             'tests/frontend/ServiceOperationsPage.test.tsx',
             'tests/frontend/ServiceReportingMigration.test.ts',
@@ -188,6 +194,7 @@ jobs:
           grep -R -Fq "Parent company summary" dist/assets
           grep -R -Fq "TowerSignal sales pipeline" dist/assets
           grep -R -Fq "Sales pipeline & follow-up" dist/assets
+          grep -R -Fq "Master sales account" dist/assets
           grep -R -Fq "Company master & relationship record" dist/assets
           python - <<'PY'
           import hashlib, json, pathlib
@@ -284,6 +291,7 @@ jobs:
           grep -Fq "Parent company summary" /tmp/towersignal-index.js
           grep -Fq "TowerSignal sales pipeline" /tmp/towersignal-index.js
           grep -Fq "Sales pipeline & follow-up" /tmp/towersignal-index.js
+          grep -Fq "Master sales account" /tmp/towersignal-index.js
           grep -Fq "Company master & relationship record" /tmp/towersignal-index.js
 
   rollback:
