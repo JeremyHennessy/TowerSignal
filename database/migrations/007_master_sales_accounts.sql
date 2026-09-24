@@ -201,6 +201,11 @@ FROM public.company_sales_account_members m
 WHERE m.company_id=c.company_id
   AND c.sales_account_id IS NULL;
 
+DROP INDEX IF EXISTS public.company_private_contacts_one_primary_idx;
+CREATE UNIQUE INDEX IF NOT EXISTS company_private_contacts_one_primary_sales_account_idx
+  ON public.company_private_contacts(sales_account_id)
+  WHERE primary_contact AND active AND sales_account_id IS NOT NULL;
+
 UPDATE public.company_private_activities a
 SET sales_account_id=m.sales_account_id
 FROM public.company_sales_account_members m
