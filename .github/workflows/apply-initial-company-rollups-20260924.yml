@@ -1,0 +1,146 @@
+name: Apply initial sourced company rollups
+
+on:
+  push:
+    branches:
+      - ops/initial-company-rollups-20260924
+    paths:
+      - 'scripts/build_initial_company_rollups.py'
+      - '.github/workflows/apply-initial-company-rollups-20260924.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+      ACCEPTED_PAGES_RUN: '36005415262'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard production database connection
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL_SECRET=MISSING"; exit 2; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          SELECT 'COMPANY_PRECHECK' AS check,
+                 (SELECT count(*) FROM public.company_private_profiles) AS profiles,
+                 (SELECT count(*) FROM public.company_private_profiles WHERE rollup_company_id IS NOT NULL) AS rollups,
+                 (SELECT count(*) FROM public.company_private_research_queue) AS research_queue,
+                 (SELECT count(*) FROM public.company_private_contacts) AS contacts,
+                 (SELECT count(*) FROM neon_auth."user") AS users,
+                 (SELECT count(*) FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin') AS admins;
+          SQL
+
+      - name: Download accepted Known Firms dataset
+        uses: actions/download-artifact@v4
+        with:
+          repository: JeremyHennessy/TowerSignal
+          run-id: ${{ env.ACCEPTED_PAGES_RUN }}
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .accepted-site
+
+      - name: Extract accepted Known Firms
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$(find .accepted-site -type f | head -1)"
+          test -n "$archive"
+          mkdir -p /tmp/accepted
+          tar -xf "$archive" -C /tmp/accepted ./data/known-firms.json
+          test -s /tmp/accepted/data/known-firms.json
+
+      - name: Build reviewed rollup plan and SQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/build_initial_company_rollups.py
+          python scripts/build_initial_company_rollups.py             --known-firms /tmp/accepted/data/known-firms.json             --sql-out /tmp/company-rollups.sql             --plan-out /tmp/company-rollups-plan.json
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/company-rollups-plan.json',encoding='utf-8'))
+          assert p['alias_count'] == 250
+          assert p['detail_master_count'] == 11
+          assert len(p['family_counts']) == 20
+          print('COMPANY_PLAN_COUNTS', json.dumps(p['family_counts'], sort_keys=True))
+          PY
+
+      - name: Validate complete production transaction with rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          source=Path('/tmp/company-rollups.sql').read_text(encoding='utf-8')
+          marker='COMMIT;'
+          pos=source.rfind(marker)
+          assert pos >= 0
+          validation=source[:pos] + 'ROLLBACK;\n'
+          Path('/tmp/company-rollups-validation.sql').write_text(validation,encoding='utf-8')
+          PY
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f /tmp/company-rollups-validation.sql
+          echo "INITIAL_COMPANY_ENRICHMENT_VALIDATION=PASS"
+
+      - name: Apply sourced company rollups atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -f /tmp/company-rollups.sql
+
+      - name: Verify production company rollups and details
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$
+          DECLARE
+            v_users integer;
+            v_admins integer;
+            v_queue integer;
+            v_alias_queue integer;
+            v_tower_family integer;
+            v_tower_parent text;
+          BEGIN
+            SELECT count(*) INTO v_users FROM neon_auth."user";
+            SELECT count(*) INTO v_admins FROM neon_auth."user" WHERE lower(coalesce(role,''))='admin';
+            SELECT count(*) INTO v_queue FROM public.company_private_research_queue;
+            SELECT count(*) INTO v_alias_queue
+              FROM public.company_private_research_queue q
+              JOIN public.company_private_profiles p ON p.company_id=q.company_id
+              WHERE p.rollup_company_id IS NOT NULL;
+            SELECT count(*) INTO v_tower_family
+              FROM public.company_private_profiles
+              WHERE company_id='known-firm-a76ae2375cff31677267'
+                 OR rollup_company_id='known-firm-a76ae2375cff31677267';
+            SELECT parent_company_name INTO v_tower_parent
+              FROM public.company_private_profiles
+              WHERE company_id='known-firm-a76ae2375cff31677267';
+
+            IF v_users <> 2 OR v_admins <> 2 OR v_queue <> 100 OR v_alias_queue <> 0
+               OR v_tower_family <> 5 OR v_tower_parent <> 'Sylmar Group' THEN
+              RAISE EXCEPTION 'Company acceptance failed: users=% admins=% queue=% alias_queue=% tower_family=% tower_parent=%',
+                v_users, v_admins, v_queue, v_alias_queue, v_tower_family, v_tower_parent;
+            END IF;
+          END $$;
+
+          SELECT 'COMPANY_ACCEPTANCE=PASS' AS result,
+                 (SELECT count(*) FROM public.company_private_profiles) AS profiles,
+                 (SELECT count(*) FROM public.company_private_profiles WHERE rollup_company_id IS NOT NULL) AS rollups,
+                 (SELECT count(*) FROM public.company_private_research_queue) AS research_queue,
+                 (SELECT count(*) FROM public.company_private_contacts) AS contacts,
+                 (SELECT count(*) FROM public.company_private_change_log) AS audit_rows,
+                 (SELECT count(*) FROM public.company_private_profiles
+                   WHERE company_id='known-firm-a76ae2375cff31677267'
+                      OR rollup_company_id='known-firm-a76ae2375cff31677267') AS tower_water_family;
+          SQL
+
+      - name: Remove temporary private apply files
+        if: always()
+        shell: bash
+        run: rm -f /tmp/company-rollups.sql /tmp/company-rollups-validation.sql /tmp/company-rollups-plan.json
