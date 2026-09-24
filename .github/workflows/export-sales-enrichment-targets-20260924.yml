@@ -175,8 +175,8 @@ jobs:
           }
           json.dump(output,open('/tmp/sales-enrichment-targets.json','w'),indent=2)
           print('SALES_ENRICHMENT_TARGETS=PASS eligible=',len(eligible),'top=',len(output['targets']))
-          for r in output['targets'][:20]:
-              print(r['fit_score'],r['readiness_score'],r['enrichment_priority'],r['display_name'],','.join(r['missing_fields']))
+          for r in output['targets'][:100]:
+              print(r['sales_account_id'],r['fit_score'],r['readiness_score'],r['enrichment_priority'],r['display_name'],','.join(r['missing_fields']))
           PY
 
       - name: Upload ranked enrichment targets
