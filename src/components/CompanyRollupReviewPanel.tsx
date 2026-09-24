@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   loadCompanyRollupSuggestions,
   reviewCompanyRollupSuggestion,
@@ -33,16 +33,30 @@ export function CompanyRollupReviewPanel({
   const [status,setStatus]=useState<CompanyRollupSuggestionStatus>('pending')
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState<string|null>(null)
+  const autoSyncStarted=useRef(false)
 
   const reload=async()=>setRows(await loadCompanyRollupSuggestions())
 
   useEffect(()=>{
     let cancelled=false
-    loadCompanyRollupSuggestions()
-      .then(value=>{if(!cancelled)setRows(value)})
-      .catch(err=>{if(!cancelled)setError(err instanceof Error?err.message:'Unable to load roll-up suggestions')})
+    const hydrate=async()=>{
+      try{
+        const existing=await loadCompanyRollupSuggestions()
+        if(!cancelled)setRows(existing)
+        const inputsReady=accounts.length>0&&members.length>0&&profiles.length>0&&firms.length>0
+        if(!inputsReady||autoSyncStarted.current)return
+        autoSyncStarted.current=true
+        const candidates=generateCompanyRollupSuggestions({accounts,members,profiles,contacts,firms})
+        await syncCompanyRollupSuggestions(candidates)
+        const updated=await loadCompanyRollupSuggestions()
+        if(!cancelled)setRows(updated)
+      }catch(err){
+        if(!cancelled)setError(err instanceof Error?err.message:'Unable to synchronize roll-up suggestions')
+      }
+    }
+    void hydrate()
     return()=>{cancelled=true}
-  },[])
+  },[accounts,members,profiles,contacts,firms])
 
   const accountById=useMemo(()=>new Map(accounts.map(account=>[account.sales_account_id,account])),[accounts])
   const visible=rows.filter(row=>row.status===status)

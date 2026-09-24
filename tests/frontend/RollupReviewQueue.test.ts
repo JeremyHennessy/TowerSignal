@@ -25,3 +25,12 @@ test('admin dashboard exposes human-reviewed roll-up queue',()=>{
   expect(panel).toContain('Reject for now')
   expect(panel).toContain('window.confirm')
 })
+
+
+test('roll-up queue auto-syncs evidence suggestions without auto-accepting merges',()=>{
+  expect(panel).toContain('const autoSyncStarted=useRef(false)')
+  expect(panel).toContain('const inputsReady=accounts.length>0&&members.length>0&&profiles.length>0&&firms.length>0')
+  expect(panel).toContain('generateCompanyRollupSuggestions({accounts,members,profiles,contacts,firms})')
+  expect(panel).toContain('await syncCompanyRollupSuggestions(candidates)')
+  expect(panel).toContain("if(next==='accepted' && !window.confirm")
+})
