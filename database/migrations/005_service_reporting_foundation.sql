@@ -237,10 +237,10 @@ BEGIN
     'service_reports','service_documents'
   ]
   LOOP
-    EXECUTE format('DROP POLICY IF EXISTS %I_admin_only ON public.%I', table_name, table_name);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', table_name || '_admin_only', table_name);
     EXECUTE format(
-      'CREATE POLICY %I_admin_only ON public.%I TO authenticated USING (public.towersignal_is_admin()) WITH CHECK (public.towersignal_is_admin())',
-      table_name, table_name
+      'CREATE POLICY %I ON public.%I TO authenticated USING (public.towersignal_is_admin()) WITH CHECK (public.towersignal_is_admin())',
+      table_name || '_admin_only', table_name
     );
     EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON public.%I TO authenticated', table_name);
   END LOOP;
