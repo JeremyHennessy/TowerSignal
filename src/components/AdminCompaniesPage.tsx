@@ -452,7 +452,7 @@ export function AdminCompaniesPage() {
       <section className="admin-company-card">
         <div className="admin-company-card-heading"><div><strong>Follow-up attention</strong><span>Overdue and next-seven-day company actions</span></div><small>{number.format(overdue.length + upcoming.length)} due</small></div>
         <div className="admin-company-activity-list">
-          {attentionFamilies.length ? attentionFamilies.map(family => <a key={family.masterId} href={`#/admin-company/${encodeURIComponent(family.masterId)}`}>
+          {attentionFamilies.length ? attentionFamilies.map(family => <a key={family.salesAccountId} href={`#/admin-company/${encodeURIComponent(family.salesAccountId)}`}>
             <strong>{family.name}</strong>
             <span>{family.nextActionDate || 'No date'} · {human(family.relationshipStatus)}</span>
             <small>{family.contacts} active contact{family.contacts===1?'':'s'} · {family.activities} interaction{family.activities===1?'':'s'}</small>
@@ -483,7 +483,7 @@ export function AdminCompaniesPage() {
         </div>
       </div>
       <div className="table-scroll"><table className="account-table admin-family-table"><thead><tr><th>Master family</th><th>Parent / ownership</th><th>Source identities</th><th>Public evidence</th><th>Contacts / activity</th><th>TowerSignal sales</th><th>Research</th><th>Enrichment gaps</th><th>Next action</th><th></th></tr></thead><tbody>
-        {filteredFamilies.map(family => <tr key={family.masterId} onClick={() => { window.location.hash = `#/admin-company/${encodeURIComponent(family.masterId)}` }} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') window.location.hash = `#/admin-company/${encodeURIComponent(family.masterId)}` }}>
+        {filteredFamilies.map(family => <tr key={family.salesAccountId} onClick={() => { window.location.hash = `#/admin-company/${encodeURIComponent(family.salesAccountId)}` }} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') window.location.hash = `#/admin-company/${encodeURIComponent(family.salesAccountId)}` }}>
           <td><strong>{family.name}</strong><small>{family.master.legal_name || family.master.canonical_name}</small>{family.master.website && <small>{family.master.website.replace(/^https?:\/\//,'').replace(/\/$/,'')}</small>}</td>
           <td><strong>{family.parentName || 'Not recorded'}</strong><small>{ownershipKnown(family.master) ? 'Ownership reviewed' : 'Needs ownership research'}</small></td>
           <td><strong>{number.format(family.memberCount)}</strong><small>{number.format(family.publicIdentityCount)} in public Known Firms</small></td>
