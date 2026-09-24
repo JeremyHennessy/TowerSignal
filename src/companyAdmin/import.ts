@@ -74,6 +74,8 @@ const contactKeys = new Set<keyof ContactWrite>([
   'phone',
   'linkedin_url',
   'notes',
+  'contact_role',
+  'primary_contact',
   'source_name',
   'source_url',
   'verified_at',
@@ -100,6 +102,9 @@ const revenueConfidences = new Set(['confirmed', 'strong', 'verify', 'unknown'])
 const relationshipStatuses = new Set([
   'uncontacted', 'researching', 'outreach-planned', 'contacted',
   'engaged', 'opportunity', 'customer', 'not-pursuing',
+])
+const contactRoles = new Set([
+  'decision-maker','champion','technical','procurement','finance','executive','other',
 ])
 
 function optionalText(value: unknown, context: string): string | null {
@@ -242,6 +247,11 @@ export function parseCompanyAdminImport(text: string, knownFirms: KnownFirmSumma
       requiredText(contact.source_name, `${contactContext}.source_name`)
       requireHttps(contact.source_url, `${contactContext}.source_url`)
       validateDate(contact.verified_at, `${contactContext}.verified_at`)
+      const contactRole = optionalText(contact.contact_role, `${contactContext}.contact_role`)
+      if (contactRole && !contactRoles.has(contactRole)) throw new Error(`${contactContext}.contact_role is invalid`)
+      if (contact.primary_contact != null && typeof contact.primary_contact !== 'boolean') {
+        throw new Error(`${contactContext}.primary_contact must be boolean`)
+      }
       if (contactIds.has(contactId)) throw new Error(`Duplicate contact_id in company ${companyId}: ${contactId}`)
       contactIds.add(contactId)
       return {
@@ -252,6 +262,8 @@ export function parseCompanyAdminImport(text: string, knownFirms: KnownFirmSumma
         phone: typeof contact.phone === 'string' ? contact.phone : null,
         linkedin_url: typeof contact.linkedin_url === 'string' ? contact.linkedin_url : null,
         notes: typeof contact.notes === 'string' ? contact.notes : null,
+        contact_role: contactRole as ContactWrite['contact_role'],
+        primary_contact: contact.primary_contact === true,
         source_name: typeof contact.source_name === 'string' ? contact.source_name : null,
         source_url: typeof contact.source_url === 'string' ? contact.source_url : null,
         verified_at: typeof contact.verified_at === 'string' ? contact.verified_at : null,

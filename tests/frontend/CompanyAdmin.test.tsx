@@ -69,7 +69,7 @@ beforeEach(() => {
     contacts:[{
       contact_id:'c1', company_id:'observed-company-alpha', name:'Alex Buyer', title:'Facilities Manager',
       email:'alex@example.test', phone:'212-555-0100', linkedin_url:'https://linkedin.example/alex',
-      notes:null, source_name:'Official staff page', source_url:'https://alpha.example/team',
+      notes:null, contact_role:'decision-maker', primary_contact:true, source_name:'Official staff page', source_url:'https://alpha.example/team',
       verified_at:'2026-09-23T18:00:00Z', active:true,
       created_at:'2026-09-20T00:00:00Z', updated_at:'2026-09-20T00:00:00Z',
     }],

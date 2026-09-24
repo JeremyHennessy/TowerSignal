@@ -71,6 +71,8 @@ export interface CompanyAdminContact {
   phone: string | null
   linkedin_url: string | null
   notes: string | null
+  contact_role: 'decision-maker' | 'champion' | 'technical' | 'procurement' | 'finance' | 'executive' | 'other' | null
+  primary_contact: boolean
   source_name: string | null
   source_url: string | null
   verified_at: string | null
@@ -142,4 +144,60 @@ export interface CompanyAuditEntry {
   import_batch_id: string | null
   changed_at: string
   changed_by: string | null
+}
+
+
+export type CompanyOpportunityStage =
+  | 'lead'
+  | 'qualified'
+  | 'demo-scheduled'
+  | 'demo-complete'
+  | 'proposal'
+  | 'negotiation'
+  | 'closed-won'
+  | 'closed-lost'
+  | 'nurture'
+
+export interface CompanySalesOpportunity {
+  opportunity_id: string
+  company_id: string
+  name: string
+  stage: CompanyOpportunityStage
+  product_scope: string[]
+  estimated_arr: number | null
+  one_time_value: number | null
+  probability_percent: number | null
+  primary_contact_id: string | null
+  lead_source: string | null
+  target_close_date: string | null
+  next_step: string | null
+  next_action_date: string | null
+  demo_scheduled_at: string | null
+  proposal_sent_at: string | null
+  won_at: string | null
+  lost_at: string | null
+  lost_reason: string | null
+  notes: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type CompanyTaskType = 'call' | 'email' | 'demo' | 'proposal' | 'research' | 'follow-up' | 'meeting' | 'other'
+export type CompanyTaskPriority = 'low' | 'medium' | 'high'
+export type CompanyTaskStatus = 'open' | 'completed' | 'cancelled'
+
+export interface CompanySalesTask {
+  task_id: string
+  company_id: string
+  opportunity_id: string | null
+  contact_id: string | null
+  title: string
+  task_type: CompanyTaskType
+  priority: CompanyTaskPriority
+  status: CompanyTaskStatus
+  due_at: string | null
+  completed_at: string | null
+  notes: string | null
+  created_at?: string
+  updated_at?: string
 }

@@ -8,6 +8,8 @@ import type {
   CompanyAdminSnapshot,
   CompanyAuditEntry,
   CompanyResearchQueueItem,
+  CompanySalesOpportunity,
+  CompanySalesTask,
   CompanyResearchStatus,
 } from '../types/companyAdmin'
 
@@ -100,6 +102,8 @@ function contactFrom(row: Record<string, unknown>): CompanyAdminContact {
     phone: nullableString(row.phone),
     linkedin_url: nullableString(row.linkedin_url),
     notes: nullableString(row.notes),
+    contact_role: nullableString(row.contact_role) as CompanyAdminContact['contact_role'],
+    primary_contact: row.primary_contact === true,
     source_name: nullableString(row.source_name),
     source_url: nullableString(row.source_url),
     verified_at: nullableString(row.verified_at),
@@ -212,6 +216,13 @@ export async function saveCompanyAdminContact(
     updated_at: new Date().toISOString(),
     last_change_source: context.source ?? 'manual',
     last_change_batch_id: context.batchId ?? null,
+  }
+  if (values.primary_contact) {
+    const clearPrimary = await client.from('company_private_contacts')
+      .update({ primary_contact:false, updated_at:new Date().toISOString(), last_change_source:context.source ?? 'manual', last_change_batch_id:context.batchId ?? null })
+      .eq('company_id', companyId)
+      .eq('primary_contact', true)
+    throwIfError('Unable to clear prior primary company contact', clearPrimary.error)
   }
   const update = await client.from('company_private_contacts')
     .update(change)
@@ -408,4 +419,123 @@ export async function loadCompanyAuditLog(companyId: string, limit = 80): Promis
     .eq('company_id', companyId).order('changed_at', { ascending: false }).limit(limit)
   throwIfError('Unable to load company change history', result.error)
   return ((result.data ?? []) as Array<Record<string, unknown>>).map(auditFrom)
+}
+
+
+function opportunityFrom(row: Record<string, unknown>): CompanySalesOpportunity {
+  return {
+    opportunity_id:String(row.opportunity_id),
+    company_id:String(row.company_id),
+    name:String(row.name ?? ''),
+    stage:String(row.stage ?? 'lead') as CompanySalesOpportunity['stage'],
+    product_scope:Array.isArray(row.product_scope) ? row.product_scope.map(String) : [],
+    estimated_arr:nullableNumber(row.estimated_arr),
+    one_time_value:nullableNumber(row.one_time_value),
+    probability_percent:nullableNumber(row.probability_percent),
+    primary_contact_id:nullableString(row.primary_contact_id),
+    lead_source:nullableString(row.lead_source),
+    target_close_date:nullableString(row.target_close_date),
+    next_step:nullableString(row.next_step),
+    next_action_date:nullableString(row.next_action_date),
+    demo_scheduled_at:nullableString(row.demo_scheduled_at),
+    proposal_sent_at:nullableString(row.proposal_sent_at),
+    won_at:nullableString(row.won_at),
+    lost_at:nullableString(row.lost_at),
+    lost_reason:nullableString(row.lost_reason),
+    notes:nullableString(row.notes),
+    created_at:nullableString(row.created_at) ?? undefined,
+    updated_at:nullableString(row.updated_at) ?? undefined,
+  }
+}
+
+function taskFrom(row: Record<string, unknown>): CompanySalesTask {
+  return {
+    task_id:String(row.task_id),
+    company_id:String(row.company_id),
+    opportunity_id:nullableString(row.opportunity_id),
+    contact_id:nullableString(row.contact_id),
+    title:String(row.title ?? ''),
+    task_type:String(row.task_type ?? 'follow-up') as CompanySalesTask['task_type'],
+    priority:String(row.priority ?? 'medium') as CompanySalesTask['priority'],
+    status:String(row.status ?? 'open') as CompanySalesTask['status'],
+    due_at:nullableString(row.due_at),
+    completed_at:nullableString(row.completed_at),
+    notes:nullableString(row.notes),
+    created_at:nullableString(row.created_at) ?? undefined,
+    updated_at:nullableString(row.updated_at) ?? undefined,
+  }
+}
+
+export async function loadAllCompanySalesOpportunities(): Promise<CompanySalesOpportunity[]> {
+  const result = await client.from('company_private_opportunities').select('*').order('updated_at',{ascending:false})
+  throwIfError('Unable to load TowerSignal sales opportunities', result.error)
+  return ((result.data ?? []) as Array<Record<string,unknown>>).map(opportunityFrom)
+}
+
+export async function loadCompanySalesOpportunities(companyId: string): Promise<CompanySalesOpportunity[]> {
+  const result = await client.from('company_private_opportunities').select('*').eq('company_id',companyId).order('updated_at',{ascending:false})
+  throwIfError('Unable to load company sales opportunities', result.error)
+  return ((result.data ?? []) as Array<Record<string,unknown>>).map(opportunityFrom)
+}
+
+export async function saveCompanySalesOpportunity(
+  opportunityId: string,
+  companyId: string,
+  values: Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'created_at'|'updated_at'>,
+): Promise<CompanySalesOpportunity> {
+  const now=new Date().toISOString()
+  const change={...values,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
+  const update=await client.from('company_private_opportunities').update(change).eq('opportunity_id',opportunityId).eq('company_id',companyId).select('*')
+  throwIfError('Unable to update TowerSignal sales opportunity', update.error)
+  const updated=((update.data ?? []) as Array<Record<string,unknown>>)[0]
+  if(updated) return opportunityFrom(updated)
+  const insert=await client.from('company_private_opportunities').insert({opportunity_id:opportunityId,company_id:companyId,...change}).select('*')
+  throwIfError('Unable to create TowerSignal sales opportunity', insert.error)
+  const created=((insert.data ?? []) as Array<Record<string,unknown>>)[0]
+  if(!created) throw new Error('Unable to create TowerSignal sales opportunity: row was not returned')
+  return opportunityFrom(created)
+}
+
+export async function addCompanySalesOpportunity(
+  companyId:string,
+  values:Omit<CompanySalesOpportunity,'opportunity_id'|'company_id'|'created_at'|'updated_at'>,
+):Promise<CompanySalesOpportunity>{
+  return saveCompanySalesOpportunity(crypto.randomUUID(),companyId,values)
+}
+
+export async function loadAllCompanySalesTasks(): Promise<CompanySalesTask[]> {
+  const result=await client.from('company_private_tasks').select('*').order('due_at',{ascending:true})
+  throwIfError('Unable to load TowerSignal sales tasks',result.error)
+  return ((result.data ?? []) as Array<Record<string,unknown>>).map(taskFrom)
+}
+
+export async function loadCompanySalesTasks(companyId:string): Promise<CompanySalesTask[]> {
+  const result=await client.from('company_private_tasks').select('*').eq('company_id',companyId).order('due_at',{ascending:true})
+  throwIfError('Unable to load company sales tasks',result.error)
+  return ((result.data ?? []) as Array<Record<string,unknown>>).map(taskFrom)
+}
+
+export async function saveCompanySalesTask(
+  taskId:string,
+  companyId:string,
+  values:Omit<CompanySalesTask,'task_id'|'company_id'|'created_at'|'updated_at'>,
+):Promise<CompanySalesTask>{
+  const now=new Date().toISOString()
+  const change={...values,updated_at:now,last_change_source:'manual',last_change_batch_id:null}
+  const update=await client.from('company_private_tasks').update(change).eq('task_id',taskId).eq('company_id',companyId).select('*')
+  throwIfError('Unable to update TowerSignal sales task',update.error)
+  const updated=((update.data ?? []) as Array<Record<string,unknown>>)[0]
+  if(updated) return taskFrom(updated)
+  const insert=await client.from('company_private_tasks').insert({task_id:taskId,company_id:companyId,...change}).select('*')
+  throwIfError('Unable to create TowerSignal sales task',insert.error)
+  const created=((insert.data ?? []) as Array<Record<string,unknown>>)[0]
+  if(!created) throw new Error('Unable to create TowerSignal sales task: row was not returned')
+  return taskFrom(created)
+}
+
+export async function addCompanySalesTask(
+  companyId:string,
+  values:Omit<CompanySalesTask,'task_id'|'company_id'|'created_at'|'updated_at'>,
+):Promise<CompanySalesTask>{
+  return saveCompanySalesTask(crypto.randomUUID(),companyId,values)
 }
