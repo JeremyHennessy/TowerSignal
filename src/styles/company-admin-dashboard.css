@@ -24,6 +24,26 @@
 .admin-pipeline-grid small{color:var(--muted)}
 .admin-pipeline-grid strong{font-size:1.15rem}
 .admin-family-directory{margin-top:.1rem}
+.admin-account-views{display:flex;gap:.35rem;padding:.65rem .9rem;border-bottom:1px solid var(--border);background:#f8fafb}
+.admin-account-views button{border:1px solid transparent;border-radius:7px;padding:.5rem .8rem;background:transparent;color:var(--muted);font:inherit;font-size:.82rem;cursor:pointer}
+.admin-account-views button[aria-pressed=true]{background:#fff;border-color:var(--border);color:var(--ink-strong,#173758);font-weight:700}
+.company-mapping-review{min-width:0}
+.company-mapping-review .admin-company-card-heading{align-items:center}
+.company-mapping-review .company-rollup-review-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.company-mapping-table{min-width:880px;width:100%;table-layout:fixed}
+.company-mapping-table th:nth-child(1),.company-mapping-table th:nth-child(2){width:19%}
+.company-mapping-table th:nth-child(3){width:28%}
+.company-mapping-table th:nth-child(4){width:11%}
+.company-mapping-table th:nth-child(5){width:23%}
+.company-mapping-table th{font-size:.72rem}
+.company-mapping-table td{vertical-align:top;overflow-wrap:anywhere;font-size:.82rem}
+.company-mapping-table td a{font-weight:650;color:var(--ink-strong,#173758);text-decoration:none}
+.company-mapping-table td a:hover{text-decoration:underline}
+.company-mapping-table small{display:block;margin-top:.3rem;color:var(--muted);line-height:1.45;font-size:.76rem}
+.company-mapping-decision{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.company-mapping-review select,.company-mapping-review button{font:inherit;font-size:.78rem;min-height:36px;border:1px solid var(--border);border-radius:7px;background:#fff;color:inherit;padding:.4rem .55rem}
+.company-mapping-review button{cursor:pointer}
+.company-mapping-review button:disabled,.company-mapping-review select:disabled{opacity:.5;cursor:default}
 .admin-family-directory .admin-company-card-heading{align-items:end}
 .admin-family-filters{display:grid;grid-template-columns:minmax(18rem,2fr) repeat(3,minmax(11rem,1fr));gap:.55rem;min-width:min(100%,940px)}
 .admin-family-filters input,.admin-family-filters select{height:38px;border:1px solid #d5dfe2;border-radius:8px;background:#fff;padding:0 10px;color:inherit;font:inherit;font-size:.8rem;min-width:0}
@@ -64,6 +84,8 @@
   .admin-family-filters input{grid-column:1/-1}
 }
 @media(max-width:700px){
+  .company-mapping-review .admin-company-card-heading{align-items:stretch}
+  .company-mapping-review .company-rollup-review-actions{justify-content:flex-start}
   .admin-company-heading,.admin-company-card-heading,.admin-company-operations-panel>summary{align-items:stretch;flex-direction:column}
   .admin-company-heading .page-actions{justify-content:flex-start;width:100%}
   .admin-company-metrics,.admin-company-profile-metrics{grid-template-columns:1fr 1fr}

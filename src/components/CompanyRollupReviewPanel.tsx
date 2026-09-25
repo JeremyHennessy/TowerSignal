@@ -33,6 +33,7 @@ export function CompanyRollupReviewPanel({
   const [status,setStatus]=useState<CompanyRollupSuggestionStatus>('pending')
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState<string|null>(null)
+  const [decisions,setDecisions]=useState<Record<string,''|'accepted'|'rejected'|'not-same'>>({})
   const autoSyncStarted=useRef(false)
 
   const reload=async()=>setRows(await loadCompanyRollupSuggestions())
@@ -101,36 +102,33 @@ export function CompanyRollupReviewPanel({
     finally{setBusy(false)}
   }
 
-  return <section className="admin-company-card company-rollup-review">
+  return <section className="company-mapping-review" aria-label="Company mapping review">
     <div className="admin-company-card-heading">
-      <div><strong>Roll-up review queue</strong><span>Evidence-based suggestions only; no fuzzy merge is applied without review</span></div>
+      <div><strong>Company mapping review</strong><span>Compare identities before combining accounts. Name similarity alone is not proof.</span></div>
       <div className="company-rollup-review-actions">
         <select aria-label="Roll-up suggestion status" value={status} onChange={e=>setStatus(e.target.value as CompanyRollupSuggestionStatus)}>{statusOptions.map(value=><option key={value} value={value}>{human(value)}</option>)}</select>
         <button onClick={()=>void refresh()} disabled={busy}>{busy?'Working…':'Refresh suggestions'}</button>
       </div>
     </div>
     {error&&<div className="company-admin-error"><strong>Roll-up review error.</strong><span>{error}</span></div>}
-    <div className="company-rollup-review-list">
+    <div className="table-scroll"><table className="account-table company-mapping-table" aria-label="Company mapping suggestions">
+      <thead><tr><th>Company</th><th>Suggested account</th><th>Match evidence</th><th>Confidence</th><th>Decision</th></tr></thead><tbody>
       {visible.length ? visible.map(row=>{
         const candidateName=accountName(row.candidate_sales_account_id)
         const targetName=accountName(row.suggested_sales_account_id)
-        return <article key={row.suggestion_id}>
-          <div className="company-rollup-review-main">
-            <div><small>Candidate</small><strong>{candidateName}</strong></div>
-            <span aria-hidden="true">→</span>
-            <div><small>Suggested master</small><strong>{targetName}</strong></div>
-            <div className="company-rollup-score"><strong>{row.score}</strong><small>{human(row.confidence)}</small></div>
-          </div>
-          <div className="company-rollup-evidence">{row.evidence.map(item=><span key={item}>{item}</span>)}</div>
-          {row.review_note&&<p>{row.review_note}</p>}
-          {row.status==='pending'&&<div className="company-rollup-buttons">
-            <button className="primary" onClick={()=>void review(row,'accepted')} disabled={busy}>Accept merge</button>
-            <button onClick={()=>void review(row,'not-same')} disabled={busy}>Not same company</button>
-            <button onClick={()=>void review(row,'rejected')} disabled={busy}>Reject for now</button>
-          </div>}
-          {row.status!=='pending'&&<small className="company-rollup-reviewed">{human(row.status)}{row.reviewed_at?` · ${new Date(row.reviewed_at).toLocaleString()}`:''}</small>}
-        </article>
-      }) : <span className="company-admin-empty">No {human(status).toLowerCase()} roll-up suggestions.</span>}
-    </div>
+        const decision=decisions[row.suggestion_id]??''
+        const resolvable=accounts.some(a=>a.sales_account_id===row.candidate_sales_account_id)&&accounts.some(a=>a.sales_account_id===row.suggested_sales_account_id)
+        return <tr key={row.suggestion_id}>
+          <td><a href={`#/admin-company/${encodeURIComponent(row.candidate_sales_account_id)}`}>{candidateName}</a></td>
+          <td><a href={`#/admin-company/${encodeURIComponent(row.suggested_sales_account_id)}`}>{targetName}</a></td>
+          <td>{row.evidence.map(item=><small key={item}>{item}</small>)}{row.review_note&&<small>{row.review_note}</small>}</td>
+          <td><strong>{human(row.confidence)}</strong><small>{row.score} / 100</small></td>
+          <td>{row.status==='pending'?<div className="company-mapping-decision">
+            <select aria-label={`Decision for ${candidateName}`} value={decision} disabled={busy||!resolvable} onChange={e=>setDecisions(current=>({...current,[row.suggestion_id]:e.target.value as typeof decision}))}><option value="">Choose decision</option><option value="accepted">Accept merge</option><option value="not-same">Not same company</option><option value="rejected">Reject for now</option></select>
+            <button disabled={busy||!decision||!resolvable} onClick={()=>{if(decision)void review(row,decision)}}>Apply</button>
+          </div>:<><strong>{human(row.status)}</strong><small>{row.reviewed_at?new Date(row.reviewed_at).toLocaleString():''}</small></>}</td>
+        </tr>
+      }) : <tr><td colSpan={5}>No {human(status).toLowerCase()} mapping suggestions.</td></tr>}
+    </tbody></table></div>
   </section>
 }

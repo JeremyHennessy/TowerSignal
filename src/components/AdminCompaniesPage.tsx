@@ -119,6 +119,7 @@ export function AdminCompaniesPage() {
   const [scoreFilter, setScoreFilter] = useState('ALL')
   const [gap, setGap] = useState('ALL')
   const [workspaceView,setWorkspaceView]=useState<AdminWorkspaceView>('today')
+  const [accountView,setAccountView]=useState<'directory'|'mapping'>('directory')
 
   const applyOverview = (data:Awaited<ReturnType<typeof loadCompanyAdminOverview>>) => {
     setProfiles(data.profiles);setContacts(data.contacts);setActivities(data.activities);setQueue(data.queue)
@@ -351,7 +352,7 @@ export function AdminCompaniesPage() {
         <strong>Accounts</strong><span>{number.format(families.length)} master families</span>
       </button>
       <button type="button" className={workspaceView==='data'?'active':''} onClick={()=>setWorkspaceView('data')}>
-        <strong>Data &amp; ops</strong><span>Roll-ups &amp; research</span>
+        <strong>Data &amp; ops</strong><span>Ownership &amp; research</span>
       </button>
     </nav>
 
@@ -408,6 +409,14 @@ export function AdminCompaniesPage() {
 
     {workspaceView==='accounts'&&<div className="admin-workspace-view">
       <section className="admin-company-card admin-family-directory">
+        <div className="admin-account-views" role="group" aria-label="Account table view">
+          <button type="button" aria-pressed={accountView==='directory'} onClick={()=>setAccountView('directory')}>Companies</button>
+          <button type="button" aria-pressed={accountView==='mapping'} onClick={()=>setAccountView('mapping')}>Mapping review</button>
+        </div>
+        {accountView==='mapping'?<CompanyRollupReviewPanel
+          accounts={salesAccounts} members={salesAccountMembers} profiles={profiles}
+          contacts={contacts} firms={payload.firms} onChanged={reloadPrivate}
+        />:<>
         <div className="admin-company-card-heading admin-directory-heading">
           <div><strong>Master account directory</strong><span>{number.format(filteredFamilies.length)} of {number.format(families.length)} reviewed companies</span></div>
           <div className="admin-family-filters">
@@ -429,6 +438,7 @@ export function AdminCompaniesPage() {
             <td><strong>{family.nextActionDate||'—'}</strong><small>{family.salesNextStep||'Open account'}</small></td>
           </tr>)}
         </tbody></table></div>
+        </>}
       </section>
     </div>}
 
@@ -439,15 +449,6 @@ export function AdminCompaniesPage() {
         <article><small>Active contacts</small><strong>{number.format(contacts.filter(contact=>contact.active).length)}</strong><span>{number.format(families.filter(family=>family.contacts>0).length)} accounts covered</span></article>
         <article><small>Fully enriched</small><strong>{number.format(fullyEnriched)}</strong><span>all tracked fields populated</span></article>
       </div>
-
-      <CompanyRollupReviewPanel
-        accounts={salesAccounts}
-        members={salesAccountMembers}
-        profiles={profiles}
-        contacts={contacts}
-        firms={payload.firms}
-        onChanged={reloadPrivate}
-      />
 
       <div className="admin-company-dashboard-grid admin-data-summary-grid">
         <section className="admin-company-card">

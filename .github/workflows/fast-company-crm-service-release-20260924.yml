@@ -297,7 +297,7 @@ jobs:
           grep -R -Fq "Demos & proposals" dist/assets
           grep -R -Fq "Customer lifecycle" dist/assets
           grep -R -Fq "Master sales account" dist/assets
-          grep -R -Fq "Roll-up review queue" dist/assets
+          grep -R -Fq "Company mapping review" dist/assets
           grep -R -Fq "Account classification" dist/assets
           grep -R -Fq "What needs attention" dist/assets
           grep -R -Fq "Priority target accounts" dist/assets
@@ -409,7 +409,7 @@ jobs:
           grep -Fq "Demos & proposals" /tmp/towersignal-index.js
           grep -Fq "Customer lifecycle" /tmp/towersignal-index.js
           grep -Fq "Master sales account" /tmp/towersignal-index.js
-          grep -Fq "Roll-up review queue" /tmp/towersignal-index.js
+          grep -Fq "Company mapping review" /tmp/towersignal-index.js
           grep -Fq "Account classification" /tmp/towersignal-index.js
           grep -Fq "What needs attention" /tmp/towersignal-index.js
           grep -Fq "Priority target accounts" /tmp/towersignal-index.js
