@@ -16,15 +16,16 @@ test('private company command center searches CRM fields and exposes operational
 
   expect(source).toContain('Admin account classification filter')
   expect(source).toContain('Admin enrichment gap filter')
-  expect(source).toContain('Parent company summary')
-  expect(source).toContain('Company family directory')
+  expect(source).toContain('Parent company hierarchy')
+  expect(source).toContain('Master account directory')
   expect(source).toContain('href="#/companies"')
   expect(source).toContain('href="#/service"')
 })
 
 test('admin dashboard has independent responsive table and filter layout', () => {
-  expect(css).toContain('.admin-family-table{min-width:1620px}')
+  expect(css).toContain('.admin-family-table-compact{min-width:1180px}')
   expect(css).toContain('.admin-family-filters')
+  expect(css).toContain('.admin-workspace-nav')
   expect(css).toContain('.admin-company-dashboard-grid')
   expect(css).toContain('.admin-parent-table')
 })
