@@ -52,7 +52,7 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   expect(diagnosticRowCount).toBeGreaterThan(0)
   await expect(diagnostics.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(diagnosticRowCount)
   await expect(property.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(4)
-  await expect(legionella.locator('tbody tr td:last-child a[target="_blank"]')).toHaveCount(12)
+  await expect(legionella.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(12)
   const procurementRowCount = await procurementSources.locator('tbody tr').count()
   expect(procurementRowCount).toBeGreaterThan(0)
   await expect(procurementSources.locator('tbody tr td:first-child a[target="_blank"]')).toHaveCount(procurementRowCount)
@@ -60,7 +60,7 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   const allExternalSourceHrefs = await page.locator([
     '.reference-table.source-health-table:first-of-type tbody tr td:first-child a',
     '[data-testid="property-enforcement-source-health"] tbody tr td:first-child a',
-    '[data-testid="legionella-source-health"] tbody tr td:last-child a',
+    '[data-testid="legionella-source-health"] tbody tr td:first-child a',
     '.procurement-health-table tbody tr td:first-child a',
   ].join(',')).evaluateAll(elements => elements.map(element => element.getAttribute('href') ?? ''))
   expect(allExternalSourceHrefs.length).toBeGreaterThanOrEqual(diagnosticRowCount + 4 + 12 + procurementRowCount)
@@ -96,6 +96,12 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
     await expect(row.locator('td').nth(5)).toContainText(number.format(value.properties))
     await expect(row.locator('td').nth(6)).toHaveText(`${number.format(value.attached)} / ${number.format(value.total)}`)
   }
+  // Verify the evidence caveats through the same disclosure a reader opens.
+  const evidenceSummary = property.locator('summary').filter({ hasText: 'Evidence limits and what a missing match means' })
+  // Keep the real pointer click clear of the fixed application header.
+  await evidenceSummary.evaluate(element => element.scrollIntoView({ block: 'center' }))
+  await evidenceSummary.click()
+  await expect(evidenceSummary.locator('..')).toHaveAttribute('open', '')
   await expect(property).toContainText('not a generic Labor Law filing feed')
   await expect(property).toContainText('Not a complete or current active-SWO ledger')
   await expect(property).toContainText('dated 2022–2024 observation')
@@ -122,6 +128,7 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   expect(swoSource.currentStatusAvailable).toBe(false)
   expect(swoSource.sourceHealthStatus).toBe('WARNING')
   expect(swoSource.observationStart).toBeTruthy()
+  expect(swoSource.sourceHealthStatus).toBe('WARNING')
   expect(swoSource.observationEnd).toBeTruthy()
 
   const laborHealth = page.locator('.source-health-table tbody tr').filter({ hasText: LABOR_LAW_DATASET_ID })
@@ -165,10 +172,12 @@ test('Source Health reports actual enforcement counts, refresh coverage, 12 chan
   expect(errors).toEqual([])
   await screenshotDirectory()
   const stage = process.env.CANDIDATE_ROOT ? 'candidate' : 'hosted'
-  await page.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-page.png`, fullPage: true })
-  await property.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-enforcement.png` })
-  await refresh.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-refresh.png` })
-  await legionella.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-legionella.png` })
+  await page.evaluate(() => window.scrollTo(0, 0))
+  // WebKit caps raster dimensions; mobile proof is also captured section by section.
+  await page.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-page.png`, fullPage: testInfo.project.name !== 'iphone', scale: 'css' })
+  await property.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-enforcement.png`, scale: 'css' })
+  await refresh.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-refresh.png`, scale: 'css' })
+  await legionella.screenshot({ path: `source-health-proof/${stage}-${testInfo.project.name}-legionella.png`, scale: 'css' })
 })
 
 test('Source Health keeps a failed Legionnaires request visible without zero or healthy fallback', async ({ page }) => {
