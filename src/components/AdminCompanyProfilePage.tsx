@@ -1,13 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  loadAllCompanyActivities,
-  loadAllCompanyContacts,
-  loadCompanyAdminAccess,
-  loadCompanyAdminDirectory,
-  loadCompanyResearchQueue,
-  loadCompanySalesAccounts,
-  loadCompanySalesAccountMembers,
-} from '../companyAdmin/client'
+import { loadCompanyAdminAccess, loadCompanyAdminOverview } from '../companyAdmin/client'
 import { loadKnownFirms } from '../data/api'
 import type {
   CompanyAdminActivity,
@@ -59,23 +51,10 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
       if(cancelled) return
       setAllowed(isAdmin)
       if(!isAdmin) return
-      const [nextProfiles,nextContacts,nextActivities,nextQueue,nextKnown,nextSalesAccounts,nextSalesAccountMembers]=await Promise.all([
-        loadCompanyAdminDirectory(),
-        loadAllCompanyContacts(),
-        loadAllCompanyActivities(),
-        loadCompanyResearchQueue(),
-        loadKnownFirms(),
-        loadCompanySalesAccounts(),
-        loadCompanySalesAccountMembers(),
-      ])
-      if(cancelled) return
-      setProfiles(nextProfiles)
-      setContacts(nextContacts)
-      setActivities(nextActivities)
-      setQueue(nextQueue)
-      setKnown(nextKnown)
-      setSalesAccounts(nextSalesAccounts)
-      setSalesAccountMembers(nextSalesAccountMembers)
+      const [nextKnown,data]=await Promise.all([loadKnownFirms(),loadCompanyAdminOverview()])
+      if(cancelled)return
+      setProfiles(data.profiles);setContacts(data.contacts);setActivities(data.activities);setQueue(data.queue)
+      setKnown(nextKnown);setSalesAccounts(data.accounts);setSalesAccountMembers(data.members)
     }).catch(err=>{
       if(!cancelled){setAllowed(false);setError(err instanceof Error?err.message:'Unable to load private company profile')}
     })

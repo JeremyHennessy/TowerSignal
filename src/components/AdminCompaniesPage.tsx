@@ -1,20 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CompanyEvidencePanel } from './CompanyEvidencePanel'
-import {
-  loadAllCompanyActivities,
-  loadAllCompanyContacts,
-  loadCompanyAdminAccess,
-  loadCompanyAdminDirectory,
-  loadCompanyResearchQueue,
-  loadAllCompanySalesOpportunities,
-  loadAllCompanySalesTasks,
-  loadAllCompanySalesDemos,
-  loadAllCompanySalesProposals,
-  loadAllCompanySalesSubscriptions,
-  loadAllCompanySalesRenewals,
-  loadCompanySalesAccounts,
-  loadCompanySalesAccountMembers,
-} from '../companyAdmin/client'
+import { loadCompanyAdminAccess, loadCompanyAdminOverview } from '../companyAdmin/client'
+import { belongsToSalesAccount } from '../companyAdmin/accountMapping'
 import { loadKnownFirms } from '../data/api'
 import type {
   CompanyAdminActivity,
@@ -132,89 +119,35 @@ export function AdminCompaniesPage() {
   const [scoreFilter, setScoreFilter] = useState('ALL')
   const [gap, setGap] = useState('ALL')
   const [workspaceView,setWorkspaceView]=useState<AdminWorkspaceView>('today')
+  const [accountView,setAccountView]=useState<'directory'|'mapping'>('directory')
 
-  const reloadPrivate = async () => {
-    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesDemos, nextSalesProposals, nextSalesSubscriptions, nextSalesRenewals, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
-      loadCompanyAdminDirectory(),
-      loadAllCompanyContacts(),
-      loadAllCompanyActivities(),
-      loadCompanyResearchQueue(),
-      loadAllCompanySalesOpportunities(),
-      loadAllCompanySalesTasks(),
-      loadAllCompanySalesDemos(),
-      loadAllCompanySalesProposals(),
-      loadAllCompanySalesSubscriptions(),
-      loadAllCompanySalesRenewals(),
-      loadCompanySalesAccounts(),
-      loadCompanySalesAccountMembers(),
-    ])
-    setProfiles(nextProfiles)
-    setContacts(nextContacts)
-    setActivities(nextActivities)
-    setQueue(nextQueue)
-    setOpportunities(nextOpportunities)
-    setSalesTasks(nextSalesTasks)
-    setSalesDemos(nextSalesDemos)
-    setSalesProposals(nextSalesProposals)
-    setSalesSubscriptions(nextSalesSubscriptions)
-    setSalesRenewals(nextSalesRenewals)
-    setSalesAccounts(nextSalesAccounts)
-    setSalesAccountMembers(nextSalesAccountMembers)
+  const applyOverview = (data:Awaited<ReturnType<typeof loadCompanyAdminOverview>>) => {
+    setProfiles(data.profiles);setContacts(data.contacts);setActivities(data.activities);setQueue(data.queue)
+    setOpportunities(data.opportunities);setSalesTasks(data.tasks);setSalesDemos(data.demos);setSalesProposals(data.proposals)
+    setSalesSubscriptions(data.subscriptions);setSalesRenewals(data.renewals);setSalesAccounts(data.accounts);setSalesAccountMembers(data.members)
   }
-
+  const reloadPrivate = async () => applyOverview(await loadCompanyAdminOverview())
   useEffect(() => {
-    let cancelled = false
-    loadCompanyAdminAccess().then(async isAdmin => {
-      if (cancelled) return
-      setAllowed(isAdmin)
-      if (!isAdmin) return
-      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesDemos, nextSalesProposals, nextSalesSubscriptions, nextSalesRenewals, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
-        loadKnownFirms(),
-        loadCompanyAdminDirectory(),
-        loadAllCompanyContacts(),
-        loadAllCompanyActivities(),
-        loadCompanyResearchQueue(),
-        loadAllCompanySalesOpportunities(),
-        loadAllCompanySalesTasks(),
-        loadAllCompanySalesDemos(),
-        loadAllCompanySalesProposals(),
-        loadAllCompanySalesSubscriptions(),
-        loadAllCompanySalesRenewals(),
-        loadCompanySalesAccounts(),
-        loadCompanySalesAccountMembers(),
-      ])
-      if (cancelled) return
-      setPayload(known)
-      setProfiles(nextProfiles)
-      setContacts(nextContacts)
-      setActivities(nextActivities)
-      setQueue(nextQueue)
-      setOpportunities(nextOpportunities)
-      setSalesTasks(nextSalesTasks)
-      setSalesDemos(nextSalesDemos)
-      setSalesProposals(nextSalesProposals)
-      setSalesSubscriptions(nextSalesSubscriptions)
-      setSalesRenewals(nextSalesRenewals)
-      setSalesAccounts(nextSalesAccounts)
-      setSalesAccountMembers(nextSalesAccountMembers)
-    }).catch(err => {
-      if (!cancelled) {
-        setAllowed(false)
-        setError(err instanceof Error ? err.message : 'Unable to load private company administration')
+    let cancelled=false
+    void (async()=>{
+      try {
+        const isAdmin=await loadCompanyAdminAccess()
+        if(cancelled)return
+        setAllowed(isAdmin)
+        if(!isAdmin)return
+        const [known,data]=await Promise.all([loadKnownFirms(),loadCompanyAdminOverview()])
+        if(cancelled)return
+        applyOverview(data);setPayload(known)
+      } catch(err) {
+        if(!cancelled)setError(err instanceof Error?err.message:'Unable to load company administration')
       }
-    })
-    return () => { cancelled = true }
+    })()
+    return()=>{cancelled=true}
   }, [])
 
   const profileById = useMemo(() => new Map(profiles.map(profile => [profile.company_id, profile])), [profiles])
   const firmById = useMemo(() => new Map((payload?.firms ?? []).map(firm => [firm.firm_id, firm])), [payload?.firms])
   const queueById = useMemo(() => new Map(queue.map(item => [item.company_id, item])), [queue])
-
-  const activitiesByCompany = useMemo(() => {
-    const map = new Map<string, number>()
-    activities.forEach(activity => map.set(activity.company_id, (map.get(activity.company_id) ?? 0) + 1))
-    return map
-  }, [activities])
 
   const membersBySalesAccount = useMemo(() => {
     const map = new Map<string, CompanySalesAccountMember[]>()
@@ -234,9 +167,9 @@ export function AdminCompaniesPage() {
     const publicRows=members.map(member=>firmById.get(member.company_id)).filter((firm): firm is KnownFirmSummaryRecord => Boolean(firm))
     const memberIds=memberLinks.map(member=>member.company_id)
     const memberIdSet=new Set(memberIds)
-    const familyContactRows=contacts.filter(contact=>memberIdSet.has(contact.company_id)&&contact.active)
+    const familyContactRows=contacts.filter(contact=>belongsToSalesAccount(contact,account.sales_account_id,memberIdSet)&&contact.active)
     const familyContacts=familyContactRows.length
-    const familyActivities=memberIds.reduce((sum,id)=>sum+(activitiesByCompany.get(id)??0),0)
+    const familyActivities=activities.filter(activity=>belongsToSalesAccount(activity,account.sales_account_id,memberIdSet)).length
     const familyOpportunities=opportunities.filter(opportunity =>
       opportunity.sales_account_id===account.sales_account_id ||
       (!opportunity.sales_account_id && memberIdSet.has(opportunity.company_id))
@@ -286,7 +219,7 @@ export function AdminCompaniesPage() {
     }
     return [family]
   }).sort((a,b)=>b.publicObservations-a.publicObservations || a.name.localeCompare(b.name)),
-  [salesAccounts,membersBySalesAccount,profileById,firmById,contacts,activitiesByCompany,opportunities,salesTasks,queue,queueById])
+  [salesAccounts,membersBySalesAccount,profileById,firmById,contacts,activities,opportunities,salesTasks,queue,queueById])
 
   const filteredFamilies = useMemo(() => {
     const needle = search.trim().toLowerCase()
@@ -388,6 +321,7 @@ export function AdminCompaniesPage() {
     return [...map.values()].sort((a,b) => b.familyCount - a.familyCount || b.observations - a.observations || a.name.localeCompare(b.name))
   }, [families])
 
+  if (error) return <section className="product-page admin-company-page"><div className="reference-empty-state" role="alert"><strong>Company administration is unavailable.</strong><span>{error}</span><button onClick={()=>window.location.reload()}>Retry loading</button></div></section>
   if (allowed === null) return <section className="product-page admin-company-page"><div className="reference-empty-state"><strong>Loading private company administration…</strong></div></section>
   if (!allowed) return <section className="product-page admin-company-page"><div className="reference-empty-state"><strong>Administrator access required.</strong><span>{error || 'This workspace contains private company, contact and relationship records.'}</span></div></section>
   if (!payload) return <section className="product-page admin-company-page"><div className="reference-empty-state"><strong>Loading private company command center…</strong></div></section>
@@ -418,7 +352,7 @@ export function AdminCompaniesPage() {
         <strong>Accounts</strong><span>{number.format(families.length)} master families</span>
       </button>
       <button type="button" className={workspaceView==='data'?'active':''} onClick={()=>setWorkspaceView('data')}>
-        <strong>Data &amp; ops</strong><span>Roll-ups &amp; research</span>
+        <strong>Data &amp; ops</strong><span>Ownership &amp; research</span>
       </button>
     </nav>
 
@@ -475,6 +409,14 @@ export function AdminCompaniesPage() {
 
     {workspaceView==='accounts'&&<div className="admin-workspace-view">
       <section className="admin-company-card admin-family-directory">
+        <div className="admin-account-views" role="group" aria-label="Account table view">
+          <button type="button" aria-pressed={accountView==='directory'} onClick={()=>setAccountView('directory')}>Companies</button>
+          <button type="button" aria-pressed={accountView==='mapping'} onClick={()=>setAccountView('mapping')}>Mapping review</button>
+        </div>
+        {accountView==='mapping'?<CompanyRollupReviewPanel
+          accounts={salesAccounts} members={salesAccountMembers} profiles={profiles}
+          contacts={contacts} firms={payload.firms} onChanged={reloadPrivate}
+        />:<>
         <div className="admin-company-card-heading admin-directory-heading">
           <div><strong>Master account directory</strong><span>{number.format(filteredFamilies.length)} of {number.format(families.length)} reviewed companies</span></div>
           <div className="admin-family-filters">
@@ -496,6 +438,7 @@ export function AdminCompaniesPage() {
             <td><strong>{family.nextActionDate||'—'}</strong><small>{family.salesNextStep||'Open account'}</small></td>
           </tr>)}
         </tbody></table></div>
+        </>}
       </section>
     </div>}
 
@@ -506,15 +449,6 @@ export function AdminCompaniesPage() {
         <article><small>Active contacts</small><strong>{number.format(contacts.filter(contact=>contact.active).length)}</strong><span>{number.format(families.filter(family=>family.contacts>0).length)} accounts covered</span></article>
         <article><small>Fully enriched</small><strong>{number.format(fullyEnriched)}</strong><span>all tracked fields populated</span></article>
       </div>
-
-      <CompanyRollupReviewPanel
-        accounts={salesAccounts}
-        members={salesAccountMembers}
-        profiles={profiles}
-        contacts={contacts}
-        firms={payload.firms}
-        onChanged={reloadPrivate}
-      />
 
       <div className="admin-company-dashboard-grid admin-data-summary-grid">
         <section className="admin-company-card">

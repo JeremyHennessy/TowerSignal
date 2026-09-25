@@ -34,3 +34,10 @@ test('standard authenticated account does not show admin shortcuts', async () =>
   expect(screen.queryByRole('link', { name:'Company database' })).not.toBeInTheDocument()
   expect(screen.queryByRole('link', { name:'Service operations' })).not.toBeInTheDocument()
 })
+
+test('a failed access check is not shown as a standard user role',async()=>{
+  vi.mocked(adminClient.loadCompanyAdminAccess).mockRejectedValue(new Error('Unavailable'))
+  render(<UserAccountPage user={user} onSignOut={vi.fn(async()=>{})}/>)
+  expect(await screen.findByText('Access check unavailable; reload to retry.')).toBeInTheDocument()
+  expect(screen.queryByText('Authenticated user')).not.toBeInTheDocument()
+})
