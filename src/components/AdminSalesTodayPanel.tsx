@@ -72,7 +72,7 @@ export function AdminSalesTodayPanel({
         <span className={overdue.length?'urgent':''}><b>{number.format(overdue.length)}</b> overdue</span>
         <span><b>{number.format(dueToday.length)}</b> due today</span>
         <span><b>{number.format(upcomingDemos.length)}</b> demos</span>
-        <span className={overdueRenewals.length?'urgent':''}><b>{number.format(renewalAttention.length+untrackedRenewalSubscriptions.length)}</b> renewals</span>
+        <span className={overdueRenewals.length?'urgent':''}><b>{number.format(renewalAttention.length+untrackedRenewalSubscriptions.length)}</b> Renewal attention</span>
       </div>
     </div>
 
