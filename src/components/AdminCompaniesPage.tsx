@@ -500,7 +500,6 @@ export function AdminCompaniesPage() {
     </div>}
 
     {workspaceView==='data'&&<div className="admin-workspace-view admin-data-workspace">
-      <CompanyEvidencePanel accounts={salesAccounts}/>
       <div className="admin-company-metrics admin-company-metrics-compact">
         <article><small>Master families</small><strong>{number.format(families.length)}</strong><span>{number.format(explicitAliases)} rolled-up identities</span></article>
         <article><small>Parents recorded</small><strong>{number.format(parentsRecorded)}</strong><span>{families.length ? Math.round(parentsRecorded/families.length*100) : 0}% coverage</span></article>
@@ -527,6 +526,11 @@ export function AdminCompaniesPage() {
           <div className="admin-pipeline-grid">{accountClassificationCounts.map(([value,count]) => <article key={value}><small>{human(value)}</small><strong>{number.format(count)}</strong></article>)}</div>
         </section>
       </div>
+
+      <details className="admin-company-secondary-panel">
+        <summary><div><strong>Parent mapping &amp; enrichment checks</strong><small>Reviewed relationships, approved sources and run status</small></div><span>Open evidence</span></summary>
+        <div className="admin-company-secondary-body"><CompanyEvidencePanel accounts={salesAccounts}/></div>
+      </details>
 
       <details className="admin-company-secondary-panel">
         <summary><div><strong>Parent company hierarchy</strong><small>{number.format(parentRows.length)} ownership states</small></div><span>Open hierarchy</span></summary>

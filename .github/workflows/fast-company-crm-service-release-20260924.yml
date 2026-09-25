@@ -84,6 +84,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Confirm company evidence schema is available
+        env:
+          DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+          PGOPTIONS: -c default_transaction_read_only=on -c statement_timeout=30000
+        run: |
+          set -euo pipefail
+          count="$(psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('company_parent_entities','company_parent_relationships','company_enrichment_sources','company_enrichment_runs','company_enrichment_candidates')")"
+          test "$count" = 5
+
       - name: Prove application-only delta from last successful full Pages release
         shell: bash
         run: |
@@ -94,6 +103,21 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           allowed = {
+            '.gitignore',
+            '.github/workflows/company-data-audit.yml',
+            '.github/workflows/company-evidence-ci.yml',
+            '.github/workflows/company-enrichment.yml',
+            'database/audits/company_parent_enrichment.sql',
+            'database/migrations/013_company_parent_enrichment.sql',
+            'docs/company-enrichment-20260925.md',
+            'scripts/company_enrichment.py',
+            'src/companyAdmin/evidence.ts',
+            'src/components/CompanyEvidencePanel.tsx',
+            'tests/database/company_evidence_bootstrap.sql',
+            'tests/database/company_evidence.sql',
+            'tests/database/company_enrichment_worker.py',
+            'tests/frontend/CompanyEvidence.test.tsx',
+            'tests/python/test_company_enrichment.py',
             '.github/workflows/fast-company-crm-service-release-20260924.yml',
             '.github/workflows/fast-company-admin-import-release-20260923.yml',
             'database/migrations/004a_company_audit_refinement.sql',
@@ -156,7 +180,7 @@ jobs:
           }
           actual = {line.strip() for line in Path('/tmp/release-diff.txt').read_text().splitlines() if line.strip()}
           assert actual == allowed, (actual, allowed)
-          forbidden = [p for p in actual if p.startswith(('public/data/','scripts/','.history-store/','data/'))]
+          forbidden = [p for p in actual if p.startswith(('public/data/','scripts/','.history-store/','data/')) and p != 'scripts/company_enrichment.py']
           assert not forbidden, forbidden
           print(f'APPLICATION_ONLY_DELTA=PASS files={len(actual)}')
           PY
@@ -274,6 +298,7 @@ jobs:
           grep -R -Fq "What needs attention" dist/assets
           grep -R -Fq "Priority target accounts" dist/assets
           grep -R -Fq "Company master & relationship record" dist/assets
+          grep -R -Fq "Parent mapping & enrichment" dist/assets
           python - <<'PY'
           import hashlib, json, pathlib
           expected=json.loads(pathlib.Path('accepted-data-sha256.json').read_text())
@@ -385,6 +410,7 @@ jobs:
           grep -Fq "What needs attention" /tmp/towersignal-index.js
           grep -Fq "Priority target accounts" /tmp/towersignal-index.js
           grep -Fq "Company master & relationship record" /tmp/towersignal-index.js
+          grep -Fq "Parent mapping & enrichment" /tmp/towersignal-index.js
 
   rollback:
     if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
