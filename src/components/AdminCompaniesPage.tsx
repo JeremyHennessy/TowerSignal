@@ -394,9 +394,9 @@ export function AdminCompaniesPage() {
   return <section className="product-page admin-company-page">
     <div className="product-page-heading compact-heading admin-company-heading">
       <div>
-        <span className="page-kicker">Admin only · private company intelligence &amp; CRM</span>
-        <h1>Company command center</h1>
-        <p>Your private TowerSignal sales CRM: reviewed company families, contacts, deals, demos, proposals, follow-ups and research. Public Known Firms remains a separate source-backed workspace.</p>
+        <span className="page-kicker">Admin · private TowerSignal CRM</span>
+        <h1>Sales &amp; account command center</h1>
+        <p>Work today’s follow-ups, manage deals and customer renewals, then move into account research only when you need it.</p>
       </div>
       <div className="page-actions">
         <a className="secondary-link-button" href="#/companies">Known Firms</a>
