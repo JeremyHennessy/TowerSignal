@@ -44,3 +44,44 @@ jobs:
               print('=== DETAIL',fid,'===')
               print(json.dumps(detail,indent=2,sort_keys=True)[:50000])
           PY
+
+      - name: Compare remaining candidate evidence overlap
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location https://jeremyhennessy.github.io/TowerSignal/data/known-firms.json -o /tmp/known-firms.json
+          python - <<'PY'
+          import json, subprocess
+          payload=json.load(open('/tmp/known-firms.json'))
+          firms={row['firm_id']:row for row in payload['firms']}
+          pairs=[
+            ('Atlas typo','known-firm-6290b9fc0212984f48d5','known-firm-d83ead023885a2b589ff'),
+            ('Environmental Building typo','known-firm-fa1ec94540a5331fd4bc','known-firm-2f90d731d7bc7894212a'),
+            ('Environmental Solution plural','known-firm-134e1bead2ccd9abcb1a','known-firm-2817ad6afcccf9f627f5'),
+          ]
+          def detail(fid):
+              row=firms[fid]
+              url='https://jeremyhennessy.github.io/TowerSignal/data/'+row['detail_path']
+              return json.loads(subprocess.check_output(['curl','--fail','--silent','--show-error','--location',url],text=True))
+          def evidence(d):
+              sites=set(); records=set(); aliases=set()
+              for rel in d.get('site_relationships',[]):
+                  key=str(rel.get('site_key') or rel.get('building_key') or rel.get('system_id') or rel.get('bbl') or rel.get('bin') or '')
+                  if key: sites.add(key)
+                  for rid in rel.get('source_record_ids',[]) or []:
+                      if rid: records.add(str(rid))
+              for a in d.get('aliases',[]) or []:
+                  if isinstance(a,dict): aliases.add(str(a.get('name') or ''))
+                  else: aliases.add(str(a))
+              return sites,records,{x for x in aliases if x}
+          for label,left_id,right_id in pairs:
+              left=detail(left_id); right=detail(right_id)
+              ls,lr,la=evidence(left); rs,rr,ra=evidence(right)
+              print('PAIR',label)
+              print(' LEFT',left_id,firms[left_id]['canonical_name'],'sites',len(ls),'records',len(lr),'aliases',sorted(la)[:20])
+              print(' RIGHT',right_id,firms[right_id]['canonical_name'],'sites',len(rs),'records',len(rr),'aliases',sorted(ra)[:20])
+              print(' SITE_OVERLAP',len(ls&rs),'LEFT_ONLY',len(ls-rs),'RIGHT_ONLY',len(rs-ls))
+              print(' RECORD_OVERLAP',len(lr&rr),'LEFT_ONLY',len(lr-rr),'RIGHT_ONLY',len(rr-lr))
+              print(' COMMON_SITES',sorted(ls&rs)[:20])
+              print(' COMMON_RECORDS',sorted(lr&rr)[:20])
+          PY
