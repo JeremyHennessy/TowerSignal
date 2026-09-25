@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS public.company_enrichment_candidates (
   candidate_id text PRIMARY KEY,
   sales_account_id text NOT NULL REFERENCES public.company_sales_accounts(sales_account_id),
   source_id text NOT NULL REFERENCES public.company_enrichment_sources(source_id),
-  field_name text NOT NULL CHECK (field_name IN ('legal_name','headquarters','parent_company_name')),
+  field_name text NOT NULL CHECK (field_name IN ('legal_name','headquarters','parent_company_name','contact_route')),
   proposed_value jsonb NOT NULL,
   source_url text NOT NULL CHECK (source_url ~ '^https://[^[:space:]]+$'),
   evidence_excerpt text NOT NULL,

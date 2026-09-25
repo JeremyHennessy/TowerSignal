@@ -17,6 +17,8 @@ Migration 013 is additive and reserves 012 for the separate external-activity br
 
 Company enrichment observations are proposals, not verified company facts. Only approved HTTPS source pages are checked. Structured Organization data must match the approved exact company name. Missing/ambiguous data and failed retrievals stay distinct. Revenue, ownership absence and contact identities are never guessed. Marking a candidate reviewed does not publish it; the existing Research editor is the explicit publication path. Parent changes use the separate relationship review.
 
+The initial collector supports published legal names, organization addresses, parentOrganization statements and explicit mailto/tel contact routes. Contact routes are not identified people or decision makers. Organization addresses require review before treating them as headquarters. This is bounded approved-source enrichment, not unrestricted web research; accounts without an approved source remain in the research backlog.
+
 ## Release order
 
 1. Complete read-only audit and candidate CI/migration tests.
@@ -29,3 +31,21 @@ Company enrichment observations are proposals, not verified company facts. Only 
 No private enrichment payload is committed to Git or uploaded as an Actions artifact. Logs contain aggregate counts and error categories only. A successful source check is not full account verification and does not update `enrichment_checked_at`.
 
 An account with active parent links, approved enabled sources or pending observations cannot be merged until those records are explicitly reviewed, paused or archived. This prevents a roll-up from silently stranding or reassigning ownership evidence. Historical evidence remains attached to its original account.
+
+## Read-only website smoke checks
+
+On September 25 the collector retrieved three previously recorded official websites without writing to the database:
+
+- Tower Water: exact organization matched; two explicitly published contact-route candidates.
+- Atlas Environmental Lab: no supported structured organization data; left unresolved with no candidates.
+- Certified Laboratories: organization matched; no supported proposed fields found on the checked page.
+
+These results demonstrate the collector's boundaries, not complete research or current ownership verification. Broader coverage requires additional approved pages or separately reviewed research adapters.
+
+## Candidate verification
+
+- Existing frontend suite plus four evidence-control tests; eight collector tests.
+- Disposable PostgreSQL 17: all existing migrations plus 013, repeat application of 013, RLS admin/non-admin checks, existing-parent/membership preservation, conflicting-parent rejection, merge guard, repeat-run deduplication, rejection preservation and retrieval-failure handling.
+- Local browser preview with synthetic data: desktop and 390-pixel mobile, expanded evidence sections, pending-review action and no page errors. This does not replace authenticated hosted acceptance after release.
+- Exact release allowlist: 74 changed paths from the accepted product baseline, with no unexpected/missing paths. Public data hash verification remains mandatory during release.
+- Production remains at the previously accepted main until separately authorized. The scheduled worker is disabled by default.

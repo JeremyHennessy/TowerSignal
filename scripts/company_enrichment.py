@@ -6,12 +6,13 @@ import http.client
 import ipaddress
 import json
 import os
+import re
 import socket
 import ssl
 import uuid
 from datetime import datetime, timezone
 from html.parser import HTMLParser
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import unquote, urljoin, urlsplit
 
 MAX_BYTES = 1_000_000
 MAX_SOURCES = 100
@@ -83,8 +84,19 @@ class StructuredDataParser(HTMLParser):
         self.capture = False
         self.parts = []
         self.documents = []
+        self.contact_routes = set()
 
     def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            href = dict(attrs).get('href', '')
+            if href.lower().startswith('mailto:'):
+                email = unquote(href[7:].split('?')[0]).strip()
+                if re.fullmatch(r'[A-Za-z0-9.!#$%&\x27*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', email) and len(email)<=254:
+                    self.contact_routes.add(('email',email.lower()))
+            elif href.lower().startswith('tel:'):
+                phone = unquote(href[4:]).strip()
+                if re.fullmatch(r'[+0-9(). -]{7,40}',phone):
+                    self.contact_routes.add(('phone',phone))
         if tag == 'script':
             self.capture = dict(attrs).get('type', '').lower() == 'application/ld+json'
             self.parts = []
@@ -128,6 +140,8 @@ def observations(html, expected_name):
         return 'identity-unresolved', []
     org = next(iter(unique.values()))
     rows = []
+    for kind,value in sorted(parser.contact_routes):
+        rows.append(('contact_route',{'kind':kind,'value':value}))
     legal = org.get('legalName')
     if isinstance(legal, str) and 0 < len(legal.strip()) <= 240:
         rows.append(('legal_name', legal.strip()))

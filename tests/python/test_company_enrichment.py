@@ -27,6 +27,12 @@ class CompanyEnrichmentTests(unittest.TestCase):
             'parentOrganization':{'@type':'Organization','name':'Alpha','legalName':'Wrong LLC'}}),'Alpha')
         self.assertEqual((outcome,rows),('identity-unresolved',[]))
 
+    def test_published_contact_routes_require_matched_company(self):
+        page=html({'@type':'Organization','name':'Alpha'})+'<a href="mailto:hello@example.com?subject=Hi">Email</a><a href="tel:+1-212-555-0100">Call</a>'
+        self.assertEqual(dict(observations(page,'Alpha')[1][0][1]),{'kind':'email','value':'hello@example.com'})
+        self.assertEqual(len(observations(page,'Alpha')[1]),2)
+        self.assertEqual(observations(page,'Different Company'),('identity-unresolved',[]))
+
     def test_conflicting_organizations_stay_unresolved(self):
         outcome, rows=observations(html([{'@type':'Organization','name':'Alpha','legalName':'A'},
             {'@type':'Organization','name':'Alpha','legalName':'B'}]),'Alpha')
