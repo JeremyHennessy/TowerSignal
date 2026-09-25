@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { CompanyEvidencePanel } from './CompanyEvidencePanel'
 import {
   loadAllCompanyActivities,
   loadAllCompanyContacts,
@@ -525,6 +526,11 @@ export function AdminCompaniesPage() {
           <div className="admin-pipeline-grid">{accountClassificationCounts.map(([value,count]) => <article key={value}><small>{human(value)}</small><strong>{number.format(count)}</strong></article>)}</div>
         </section>
       </div>
+
+      <details className="admin-company-secondary-panel">
+        <summary><div><strong>Parent mapping &amp; enrichment checks</strong><small>Reviewed relationships, approved sources and run status</small></div><span>Open evidence</span></summary>
+        <div className="admin-company-secondary-body"><CompanyEvidencePanel accounts={salesAccounts}/></div>
+      </details>
 
       <details className="admin-company-secondary-panel">
         <summary><div><strong>Parent company hierarchy</strong><small>{number.format(parentRows.length)} ownership states</small></div><span>Open hierarchy</span></summary>

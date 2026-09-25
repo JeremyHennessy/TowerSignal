@@ -1,0 +1,43 @@
+name: Company evidence database and worker checks
+on:
+  push:
+    branches: [feature/company-parent-enrichment-20260925]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: fixture-only
+          POSTGRES_DB: evidence_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:fixture-only@localhost:5432/evidence_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'psycopg[binary]==3.2.10'
+      - name: Build isolated schema and verify migration can be repeated
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f tests/database/company_evidence_bootstrap.sql
+          for migration in database/migrations/*.sql; do
+            psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$migration"
+          done
+          psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f database/migrations/013_company_parent_enrichment.sql
+          psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f tests/database/company_evidence.sql
+      - name: Verify evidence parsing, permissions and worker behavior
+        run: |
+          python -m unittest discover -s tests/python -p test_company_enrichment.py -v
+          python tests/database/company_enrichment_worker.py
