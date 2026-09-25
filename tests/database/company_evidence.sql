@@ -17,6 +17,12 @@ DO $$ BEGIN
   IF (SELECT approved_by FROM public.company_enrichment_sources WHERE source_id='fixture-source')<>'admin-test' THEN RAISE EXCEPTION 'Approval not recorded'; END IF;
   IF (SELECT reviewed_by FROM public.company_parent_relationships WHERE relationship_id='fixture-link')<>'admin-test' THEN RAISE EXCEPTION 'Review not recorded'; END IF;
   BEGIN
+    UPDATE public.company_sales_accounts SET record_status='merged' WHERE sales_account_id='fixture-account';
+    RAISE EXCEPTION 'Active evidence was silently stranded by a merge';
+  EXCEPTION WHEN raise_exception THEN
+    IF SQLERRM NOT LIKE 'Review pending enrichment%' THEN RAISE; END IF;
+  END;
+  BEGIN
     INSERT INTO public.company_parent_relationships(sales_account_id,parent_entity_id,relationship_type,evidence_url,evidence_note,observed_on,status)
     VALUES('fixture-account','fixture-parent','parent','https://example.com','Duplicate',current_date,'confirmed');
     RAISE EXCEPTION 'Duplicate confirmed parent allowed';

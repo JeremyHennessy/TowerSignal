@@ -27,3 +27,5 @@ Company enrichment observations are proposals, not verified company facts. Only 
 6. Verify the first source-check run and its pending observations in Admin. Review evidence before publishing changes through the Research editor.
 
 No private enrichment payload is committed to Git or uploaded as an Actions artifact. Logs contain aggregate counts and error categories only. A successful source check is not full account verification and does not update `enrichment_checked_at`.
+
+An account with active parent links, approved enabled sources or pending observations cannot be merged until those records are explicitly reviewed, paused or archived. This prevents a roll-up from silently stranding or reassigning ownership evidence. Historical evidence remains attached to its original account.

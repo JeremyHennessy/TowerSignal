@@ -25,3 +25,8 @@ export function httpsUrl(value:string):boolean {
   try { const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&!url.hash&&(!url.port||url.port==='443') }
   catch {return false}
 }
+export function observationText(value:unknown):string {
+  if(typeof value==='string')return value
+  if(value&&typeof value==='object')return Object.values(value).filter(v=>typeof v==='string'&&v.trim()).join(', ')
+  return 'No readable value recorded'
+}

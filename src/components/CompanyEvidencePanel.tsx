@@ -4,6 +4,7 @@ import {
   reviewCompanyEnrichmentCandidate, reviewCompanyParent, setCompanyEnrichmentSourceEnabled,
 } from '../companyAdmin/client'
 import type { CompanyEvidence } from '../companyAdmin/evidence'
+import { observationText } from '../companyAdmin/evidence'
 import type { CompanySalesAccount } from '../types/companyAdmin'
 
 export function CompanyEvidencePanel({accounts}:{accounts:CompanySalesAccount[]}) {
@@ -70,7 +71,7 @@ export function CompanyEvidencePanel({accounts}:{accounts:CompanySalesAccount[]}
       </details>
       <details><summary>Review enrichment observations</summary>
         <p>Review the source and update the company’s Research record where appropriate. “Reviewed” closes this observation only; it does not publish a profile change. An organization address may be a branch rather than headquarters.</p>
-        {data.candidates.map(c=><article key={c.candidate_id} className="company-enrichment-observation"><strong>{accountName(c.sales_account_id)} · {c.field_name.replaceAll('_',' ')}</strong><p>{typeof c.proposed_value==='string'?c.proposed_value:JSON.stringify(c.proposed_value)}</p><small>Observed {new Date(c.last_observed_at).toLocaleString()}</small><div><a href={c.source_url} target="_blank" rel="noreferrer">Review source ↗</a>{accounts.find(a=>a.sales_account_id===c.sales_account_id)&&<a href={`#/admin-company/${encodeURIComponent(accounts.find(a=>a.sales_account_id===c.sales_account_id)!.primary_company_id)}`}>Open company record</a>}<button disabled={busy} onClick={()=>void act(()=>reviewCompanyEnrichmentCandidate(c.candidate_id,'reviewed'))}>Reviewed</button><button disabled={busy} onClick={()=>void act(()=>reviewCompanyEnrichmentCandidate(c.candidate_id,'rejected'))}>Reject</button></div></article>)}
+        {data.candidates.map(c=><article key={c.candidate_id} className="company-enrichment-observation"><strong>{accountName(c.sales_account_id)} · {c.field_name==='headquarters'?'Reported organization address':c.field_name.replaceAll('_',' ')}</strong><p>{observationText(c.proposed_value)}</p><small>Observed {new Date(c.last_observed_at).toLocaleString()}</small><div><a href={c.source_url} target="_blank" rel="noreferrer">Review source ↗</a>{accounts.find(a=>a.sales_account_id===c.sales_account_id)&&<a href={`#/admin-company/${encodeURIComponent(accounts.find(a=>a.sales_account_id===c.sales_account_id)!.primary_company_id)}`}>Open company record</a>}<button disabled={busy} onClick={()=>void act(()=>reviewCompanyEnrichmentCandidate(c.candidate_id,'reviewed'))}>Reviewed</button><button disabled={busy} onClick={()=>void act(()=>reviewCompanyEnrichmentCandidate(c.candidate_id,'rejected'))}>Reject</button></div></article>)}
         {!data.candidates.length&&<p>No pending observations. This does not mean all companies are enriched.</p>}
       </details>
     </>}

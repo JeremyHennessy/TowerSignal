@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS public.company_enrichment_sources (
   last_outcome text CHECK (last_outcome IN ('observed','no-structured-data','identity-unresolved','failed')),
   last_error text,
   created_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE(sales_account_id,source_url)
+  UNIQUE(sales_account_id,source_url),
+  UNIQUE(source_id,sales_account_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.company_enrichment_runs (
@@ -72,7 +73,8 @@ CREATE TABLE IF NOT EXISTS public.company_enrichment_candidates (
   status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','reviewed','rejected')),
   review_note text,
   reviewed_at timestamptz,
-  reviewed_by text
+  reviewed_by text,
+  FOREIGN KEY(source_id,sales_account_id) REFERENCES public.company_enrichment_sources(source_id,sales_account_id)
 );
 CREATE INDEX IF NOT EXISTS company_enrichment_candidate_review ON public.company_enrichment_candidates(status,last_observed_at DESC);
 
@@ -118,6 +120,22 @@ GRANT INSERT,UPDATE ON public.company_parent_relationships TO authenticated;
 GRANT INSERT ON public.company_enrichment_sources TO authenticated;
 GRANT UPDATE(enabled,source_url,expected_name) ON public.company_enrichment_sources TO authenticated;
 GRANT UPDATE(status,review_note) ON public.company_enrichment_candidates TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.towersignal_guard_evidence_account_merge()
+RETURNS trigger LANGUAGE plpgsql SET search_path=pg_catalog,public AS $$
+BEGIN
+  IF NEW.record_status='merged' AND OLD.record_status='active' AND (
+    EXISTS(SELECT 1 FROM public.company_parent_relationships WHERE sales_account_id=OLD.sales_account_id AND status IN ('proposed','confirmed')) OR
+    EXISTS(SELECT 1 FROM public.company_enrichment_sources WHERE sales_account_id=OLD.sales_account_id AND enabled) OR
+    EXISTS(SELECT 1 FROM public.company_enrichment_candidates WHERE sales_account_id=OLD.sales_account_id AND status='pending')
+  ) THEN
+    RAISE EXCEPTION 'Review pending enrichment, pause sources and archive active parent links before merging this account';
+  END IF;
+  RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS company_evidence_merge_guard ON public.company_sales_accounts;
+CREATE TRIGGER company_evidence_merge_guard BEFORE UPDATE OF record_status ON public.company_sales_accounts
+FOR EACH ROW EXECUTE FUNCTION public.towersignal_guard_evidence_account_merge();
 
 -- Reviewed means evidence was reviewed, never automatic publication of a profile or identity change.
 -- The existing source profile editor remains the explicit publication path.

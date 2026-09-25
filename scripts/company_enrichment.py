@@ -174,6 +174,7 @@ def run(connection, fetch=fetch_page):
                 html, final_url = fetch(url)
                 outcome, rows = observations(html, name)
                 content_hash = hashlib.sha256(html.encode()).hexdigest()
+                new_candidates = 0
                 with connection.transaction():
                     for field, value in rows:
                         inserted = connection.execute("""INSERT INTO public.company_enrichment_candidates
@@ -183,9 +184,10 @@ def run(connection, fetch=fetch_page):
                             RETURNING (xmax=0)""", (candidate_id(source_id,field,value),account_id,source_id,field,Jsonb(value),final_url,
                             json.dumps({'name':name,'field':field,'value':value},ensure_ascii=False)[:2500],content_hash)).fetchone()[0]
                         if inserted:
-                            counts['candidate'] += 1
+                            new_candidates += 1
                     connection.execute("""UPDATE public.company_enrichment_sources SET last_attempt_at=now(),last_success_at=now(),last_outcome=%s,last_error=NULL WHERE source_id=%s""",(outcome,source_id))
                 counts['observed' if outcome=='observed' else 'unresolved'] += 1
+                counts['candidate'] += new_candidates
             except Exception as error:
                 counts['failed'] += 1
                 # Never persist raw exception text: it may contain a URL, query or private values.
