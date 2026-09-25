@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { CompanyEvidencePanel } from './CompanyEvidencePanel'
 import {
   loadAllCompanyActivities,
   loadAllCompanyContacts,
@@ -499,6 +500,7 @@ export function AdminCompaniesPage() {
     </div>}
 
     {workspaceView==='data'&&<div className="admin-workspace-view admin-data-workspace">
+      <CompanyEvidencePanel accounts={salesAccounts}/>
       <div className="admin-company-metrics admin-company-metrics-compact">
         <article><small>Master families</small><strong>{number.format(families.length)}</strong><span>{number.format(explicitAliases)} rolled-up identities</span></article>
         <article><small>Parents recorded</small><strong>{number.format(parentsRecorded)}</strong><span>{families.length ? Math.round(parentsRecorded/families.length*100) : 0}% coverage</span></article>

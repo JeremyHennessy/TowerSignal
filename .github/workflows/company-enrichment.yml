@@ -1,0 +1,29 @@
+name: Check approved company enrichment sources
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 9 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: company-enrichment
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    if: github.ref == 'refs/heads/main' && vars.COMPANY_ENRICHMENT_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'psycopg[binary]==3.2.10'
+      - name: Record observations for review
+        env:
+          DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+        run: python scripts/company_enrichment.py

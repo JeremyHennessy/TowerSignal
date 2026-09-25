@@ -1,4 +1,6 @@
 import { createClient } from '@neondatabase/neon-js'
+import type { CompanyEvidence, ParentRelationship } from './evidence'
+import { httpsUrl } from './evidence'
 import type {
   CompanyAdminActivity,
   CompanyAdminContact,
@@ -30,6 +32,51 @@ const client = createClient({
 })
 
 export const companyAdminRuntimeEnabled = import.meta.env.MODE !== 'test'
+
+export async function loadCompanyEvidence():Promise<CompanyEvidence> {
+  const tables=['company_parent_entities','company_parent_relationships','company_enrichment_sources','company_enrichment_runs','company_enrichment_candidates']
+  const results=await Promise.all(tables.map(table=>{
+    const query=client.from(table).select('*')
+    if(table==='company_enrichment_runs')return query.order('started_at',{ascending:false}).limit(20)
+    if(table==='company_enrichment_candidates')return query.eq('status','pending').order('last_observed_at',{ascending:false}).limit(100)
+    return query
+  }))
+  results.forEach((result,index)=>throwIfError(`Unable to load ${tables[index]}`,result.error))
+  return Object.fromEntries(['parents','relationships','sources','runs','candidates'].map((key,index)=>[key,results[index].data??[]])) as unknown as CompanyEvidence
+}
+
+export async function addCompanyParent(displayName:string,website:string):Promise<void> {
+  if(!displayName.trim()||(website&&!httpsUrl(website)))throw new Error('Enter a parent name and a valid HTTPS website, if known')
+  const result=await client.from('company_parent_entities').insert({display_name:displayName.trim(),website:website.trim()||null})
+  throwIfError('Unable to add parent entity',result.error)
+}
+
+export async function proposeCompanyParent(value:Omit<ParentRelationship,'relationship_id'|'status'>):Promise<void> {
+  if(!httpsUrl(value.evidence_url)||!value.evidence_note.trim()||!value.observed_on)throw new Error('A source, evidence note and observation date are required')
+  const result=await client.from('company_parent_relationships').insert({...value,status:'proposed'})
+  throwIfError('Unable to propose ownership relationship',result.error)
+}
+
+export async function reviewCompanyParent(id:string,status:ParentRelationship['status']):Promise<void> {
+  const result=await client.from('company_parent_relationships').update({status}).eq('relationship_id',id)
+  throwIfError('Unable to review ownership relationship',result.error)
+}
+
+export async function addCompanyEnrichmentSource(salesAccountId:string,sourceUrl:string,expectedName:string):Promise<void> {
+  if(!httpsUrl(sourceUrl)||!expectedName.trim())throw new Error('An HTTPS source and its exact company name are required')
+  const result=await client.from('company_enrichment_sources').insert({sales_account_id:salesAccountId,source_url:sourceUrl,expected_name:expectedName.trim(),enabled:true})
+  throwIfError('Unable to approve enrichment source',result.error)
+}
+
+export async function setCompanyEnrichmentSourceEnabled(id:string,enabled:boolean):Promise<void> {
+  const result=await client.from('company_enrichment_sources').update({enabled}).eq('source_id',id)
+  throwIfError('Unable to change source schedule',result.error)
+}
+
+export async function reviewCompanyEnrichmentCandidate(id:string,status:'reviewed'|'rejected'):Promise<void> {
+  const result=await client.from('company_enrichment_candidates').update({status}).eq('candidate_id',id)
+  throwIfError('Unable to review enrichment evidence',result.error)
+}
 
 function message(error: unknown): string {
   if (error && typeof error === 'object' && 'message' in error) return String((error as { message?: unknown }).message ?? 'Unknown company database error')
