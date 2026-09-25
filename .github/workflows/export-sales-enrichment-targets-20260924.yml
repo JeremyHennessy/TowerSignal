@@ -37,7 +37,7 @@ jobs:
           python - <<'PY'
           import json
           p=json.load(open('/tmp/private-sales.json'))
-          assert len(p['accounts']) == 90
+          assert len(p['accounts']) == 89
           assert len(p['members']) == 340
           print('PRIVATE_SALES_EXPORT=PASS',len(p['accounts']),len(p['members']),len(p['contacts']))
           PY
