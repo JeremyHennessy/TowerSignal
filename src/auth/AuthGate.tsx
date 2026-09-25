@@ -3,16 +3,18 @@ import App from '../App'
 import { AuthLandingPage } from '../components/AuthLandingPage'
 import { HomePage } from '../components/HomePage'
 import { MarketingLandingPage } from '../components/MarketingLandingPage'
+import { PasswordSetupPage } from '../components/PasswordSetupPage'
 import { UserAccountPage } from '../components/UserAccountPage'
 import type { WorkflowUser } from '../types/workflow'
 import { getWorkflowSession, signInWorkflow, signOutWorkflow } from '../workflow/client'
 
-type GateRoute = 'marketing' | 'login' | 'home' | 'account' | 'app'
+type GateRoute = 'marketing' | 'login' | 'password-setup' | 'home' | 'account' | 'app'
 
 function currentRoute(): GateRoute {
   const raw = window.location.hash.replace(/^#\/?/, '').split('?')[0]
   if (!raw || raw === 'marketing') return 'marketing'
   if (raw === 'login') return 'login'
+  if (raw === 'password-setup') return 'password-setup'
   if (raw === 'home') return 'home'
   if (raw === 'my-account') return 'account'
   return 'app'
@@ -23,7 +25,7 @@ function currentHashOrHome(): string {
 }
 
 function isPublicRoute(route: GateRoute) {
-  return route === 'marketing' || route === 'login'
+  return route === 'marketing' || route === 'login' || route === 'password-setup'
 }
 
 export function AuthGate() {
@@ -94,6 +96,7 @@ export function AuthGate() {
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
   }
 
+  if (route === 'password-setup') return <PasswordSetupPage />
   if (route === 'marketing') return <MarketingLandingPage />
   if (checking) return <main className="auth-check-page"><div className="auth-check-card"><span className="auth-brand-mark">TS</span><h1>TowerSignal</h1><p>Verifying authenticated workspace…</p></div></main>
   if (!user) return <AuthLandingPage initialError={sessionError} onSignIn={signIn} />
