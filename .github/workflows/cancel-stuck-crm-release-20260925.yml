@@ -1,0 +1,33 @@
+name: Cancel stuck CRM release run
+
+on:
+  push:
+    branches:
+      - ops/cancel-stuck-crm-release-20260925
+    paths:
+      - '.github/workflows/cancel-stuck-crm-release-20260925.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel only stale resolver run
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId=36082117098;
+            const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:runId})).data;
+            if(['completed'].includes(run.status)){
+              core.info(`Run ${runId} already completed as ${run.conclusion}`);
+              return;
+            }
+            if(run.path!=='.github/workflows/fast-company-crm-service-release-20260924.yml'){
+              core.setFailed(`Refusing to cancel unexpected workflow path: ${run.path}`);
+              return;
+            }
+            await github.rest.actions.cancelWorkflowRun({...context.repo,run_id:runId});
+            core.info(`Cancellation requested for stale CRM release run ${runId}`);
