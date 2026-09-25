@@ -22,6 +22,7 @@ from towersignal.nyc_water_signals import (  # noqa: E402
     LL84_DATASET_ID,
     NYC_311_DATASET_ID,
     _dob_business_profiles,
+    _fetch_stable_hpd_population,
     build_payload,
     classify_311,
     classify_dob_work,
@@ -203,8 +204,8 @@ class NycWaterSignalsTests(unittest.TestCase):
         self.assertEqual(len(request_wheres), payload["summary"]["water_311_source_partition_count"])
         self.assertEqual(len(set(request_wheres)), payload["summary"]["water_311_source_partition_count"])
         hpd_calls = [call for call in calls if call[0] == HPD_VIOLATIONS_DATASET_ID]
-        self.assertEqual(len(hpd_calls), expected_hpd_partitions)
-        self.assertEqual(len(hpd_wheres), expected_hpd_partitions)
+        self.assertEqual(len(hpd_calls), expected_hpd_partitions * 2)
+        self.assertEqual(len(hpd_wheres), expected_hpd_partitions * 2)
         self.assertEqual(
             {where.split("boro='", 1)[1].split("'", 1)[0] for where in hpd_wheres},
             set(HPD_BOROUGHS),
@@ -216,6 +217,96 @@ class NycWaterSignalsTests(unittest.TestCase):
                 self.assertIn(f"novdescription like '%{term.upper()}%'", where)
         self.assertTrue(all(page_size == HPD_MAX_PAGE_SIZE for _, page_size, _ in hpd_calls))
         self.assertLessEqual(HPD_MAX_PAGE_SIZE, 5000)
+        self.assertEqual(payload["summary"]["hpd_identity_verification_status"], "PASS")
+        self.assertEqual(payload["summary"]["hpd_identity_first_pass_record_count"], 1)
+        self.assertEqual(payload["summary"]["hpd_identity_second_pass_record_count"], 1)
+        self.assertEqual(
+            payload["summary"]["hpd_identity_first_pass_sha256"],
+            payload["summary"]["hpd_identity_second_pass_sha256"],
+        )
+        self.assertEqual(payload["summary"]["hpd_identity_second_pass_partition_count"], expected_hpd_partitions)
+
+    def test_hpd_population_retries_after_transient_identity_drift(self) -> None:
+        snapshot = SourceSnapshot(
+            dataset_id=HPD_VIOLATIONS_DATASET_ID,
+            name=HPD_VIOLATIONS_DATASET_ID,
+            api_root="https://data.cityofnewyork.us",
+            rows=[{"violationid": "123"}],
+            retrieved_at="2026-09-23T17:00:00Z",
+            source_record_count=1,
+            source_last_updated_at="2026-09-23T14:56:59Z",
+            source_query_scope="demo",
+            fields=("violationid",),
+        )
+        stable_proof = {
+            "status": "PASS",
+            "first_pass_record_count": 1,
+            "second_pass_record_count": 1,
+            "first_pass_sha256": "a" * 64,
+            "second_pass_sha256": "a" * 64,
+            "second_pass_duplicate_count": 0,
+            "second_pass_partition_count": len(HPD_BOROUGHS),
+            "source_last_updated_values": ["2026-09-23T14:56:59Z"],
+        }
+        with (
+            patch("towersignal.nyc_water_signals._fetch_hpd_snapshots", return_value=[snapshot]) as fetch_hpd,
+            patch(
+                "towersignal.nyc_water_signals._verify_hpd_snapshot_identity_stability",
+                side_effect=[DomesticWaterSourceError("identity drift"), stable_proof],
+            ) as verify_hpd,
+        ):
+            snapshots, rows, duplicates, proof = _fetch_stable_hpd_population(page_size=50000, max_attempts=3)
+
+        self.assertEqual(fetch_hpd.call_count, 2)
+        self.assertEqual(verify_hpd.call_count, 2)
+        self.assertEqual(snapshots, [snapshot])
+        self.assertEqual(rows, [{"violationid": "123"}])
+        self.assertEqual(duplicates, 0)
+        self.assertEqual(proof["attempt"], 2)
+        self.assertEqual(proof["max_attempts"], 3)
+
+    def test_build_payload_rejects_hpd_identity_drift_between_passes(self) -> None:
+        first = {
+            "violationid": "123",
+            "buildingid": "456",
+            "registrationid": "789",
+            "boro": "MANHATTAN",
+            "housenumber": "10",
+            "streetname": "WATER ST",
+            "zip": "10001",
+            "class": "C",
+            "inspectiondate": "2026-09-21T00:00:00.000",
+            "novdescription": "PROVIDE HOT WATER",
+            "currentstatus": "VIOLATION OPEN",
+            "currentstatusdate": "2026-09-21T00:00:00.000",
+            "violationstatus": "Open",
+            "rentimpairing": "Y",
+            "bin": "1000001",
+            "bbl": "1000010001",
+        }
+        second = {"violationid": "124"}
+
+        def fake_fetch_snapshot(dataset_id: str, **kwargs):
+            where = str(kwargs.get("where") or "")
+            if dataset_id == HPD_VIOLATIONS_DATASET_ID and "MANHATTAN" in where:
+                rows = [second] if kwargs.get("select") == "violationid" else [first]
+            else:
+                rows = []
+            return SourceSnapshot(
+                dataset_id=dataset_id,
+                name=dataset_id,
+                api_root=str(kwargs["api_root"]),
+                rows=rows,
+                retrieved_at="2026-09-23T17:00:00Z",
+                source_record_count=len(rows),
+                source_last_updated_at="2026-09-23T14:56:59Z",
+                source_query_scope=where or "ALL_ROWS",
+                fields=tuple(kwargs["required_fields"]),
+            )
+
+        with patch("towersignal.nyc_water_signals.fetch_snapshot", side_effect=fake_fetch_snapshot):
+            with self.assertRaisesRegex(DomesticWaterSourceError, "identity set changed during collection"):
+                build_payload(page_size=50000)
 
     def test_snapshot_reduces_page_size_after_repeated_source_timeout(self) -> None:
         rows = [{"id": str(index)} for index in range(5)]
@@ -505,6 +596,10 @@ class NycWaterSignalsTests(unittest.TestCase):
         cache = Path(handle.name)
         try:
             validated = validate(cache, max_age_days=1, require_production_volume=False)
+            payload["summary"]["hpd_identity_second_pass_sha256"] = "0" * 64
+            cache.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "identity stability digests"):
+                validate(cache, max_age_days=1, require_production_volume=False)
         finally:
             cache.unlink()
 

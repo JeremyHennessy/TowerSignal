@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import re
 import sys
 from collections import Counter
@@ -7,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from towersignal.domestic_water_market import (
+    DomesticWaterSourceError,
     NYC_API_ROOT,
     SourceSnapshot,
     fetch_snapshot,
@@ -312,6 +314,104 @@ def _dedupe_hpd_rows(snapshots: Sequence[SourceSnapshot]) -> tuple[list[dict[str
     return sorted(rows_by_id.values(), key=lambda row: normalize_space(row.get("violationid"))), duplicate_count
 
 
+def _hpd_identity_digest(rows: Sequence[Mapping[str, Any]]) -> tuple[int, str]:
+    ids = sorted({
+        violation_id
+        for row in rows
+        if (violation_id := normalize_space(row.get("violationid")))
+    }, key=lambda value: (0, int(value)) if value.isdigit() else (1, value))
+    digest = hashlib.sha256(("\n".join(ids) + ("\n" if ids else "")).encode("utf-8")).hexdigest()
+    return len(ids), digest
+
+
+def _verify_hpd_snapshot_identity_stability(
+    first_snapshots: Sequence[SourceSnapshot],
+    *,
+    page_size: int,
+) -> dict[str, Any]:
+    first_rows, _ = _dedupe_hpd_rows(first_snapshots)
+    first_count, first_digest = _hpd_identity_digest(first_rows)
+
+    second_snapshots: list[SourceSnapshot] = []
+    for borough in HPD_BOROUGHS:
+        second_snapshots.append(
+            fetch_snapshot(
+                HPD_VIOLATIONS_DATASET_ID,
+                api_root=NYC_API_ROOT,
+                order_by="violationid",
+                required_fields=("violationid",),
+                where=_hpd_borough_where(borough),
+                select="violationid",
+                page_size=min(page_size, HPD_MAX_PAGE_SIZE),
+                allow_count_fallback=True,
+                progress_label=f"NYC water HPD identity verification {borough}",
+                skip_count=True,
+                seek_field="violationid",
+            )
+        )
+
+    second_rows, second_duplicate_count = _dedupe_hpd_rows(second_snapshots)
+    second_count, second_digest = _hpd_identity_digest(second_rows)
+    first_ids = {normalize_space(row.get("violationid")) for row in first_rows if normalize_space(row.get("violationid"))}
+    second_ids = {normalize_space(row.get("violationid")) for row in second_rows if normalize_space(row.get("violationid"))}
+    if first_ids != second_ids:
+        added = sorted(second_ids - first_ids, key=lambda value: (0, int(value)) if value.isdigit() else (1, value))
+        removed = sorted(first_ids - second_ids, key=lambda value: (0, int(value)) if value.isdigit() else (1, value))
+        raise DomesticWaterSourceError(
+            "HPD water-violation identity set changed during collection; refusing a mixed-time snapshot "
+            f"(first={first_count}, second={second_count}, added={len(added)}, removed={len(removed)}, "
+            f"added_sample={added[:10]}, removed_sample={removed[:10]})"
+        )
+    return {
+        "status": "PASS",
+        "first_pass_record_count": first_count,
+        "second_pass_record_count": second_count,
+        "first_pass_sha256": first_digest,
+        "second_pass_sha256": second_digest,
+        "second_pass_duplicate_count": second_duplicate_count,
+        "second_pass_partition_count": len(second_snapshots),
+        "source_last_updated_values": sorted({
+            str(snapshot.source_last_updated_at)
+            for snapshot in [*first_snapshots, *second_snapshots]
+            if snapshot.source_last_updated_at
+        }),
+    }
+
+
+def _fetch_stable_hpd_population(
+    *,
+    page_size: int,
+    max_attempts: int = 3,
+) -> tuple[list[SourceSnapshot], list[dict[str, Any]], int, dict[str, Any]]:
+    if max_attempts <= 0:
+        raise ValueError("max_attempts must be positive")
+    last_error: DomesticWaterSourceError | None = None
+    for attempt in range(1, max_attempts + 1):
+        print(
+            f"NYC water HPD stability attempt {attempt}/{max_attempts}: fetching primary population",
+            file=sys.stderr,
+            flush=True,
+        )
+        snapshots = _fetch_hpd_snapshots(page_size=page_size)
+        rows, duplicate_count = _dedupe_hpd_rows(snapshots)
+        try:
+            proof = _verify_hpd_snapshot_identity_stability(snapshots, page_size=page_size)
+        except DomesticWaterSourceError as exc:
+            last_error = exc
+            print(
+                f"NYC water HPD stability attempt {attempt}/{max_attempts} drifted; retrying complete HPD population",
+                file=sys.stderr,
+                flush=True,
+            )
+            continue
+        proof["attempt"] = attempt
+        proof["max_attempts"] = max_attempts
+        return snapshots, rows, duplicate_count, proof
+    raise DomesticWaterSourceError(
+        f"HPD water-violation identity set did not stabilize after {max_attempts} complete attempts: {last_error}"
+    )
+
+
 def classify_dob_work(row: Mapping[str, Any]) -> str:
     text = _lower_text(row.get("job_description"), row.get("work_type"))
     if any(term in text for term in ("sprinkler", "standpipe", "fire suppression")) and not any(term in text for term in ("domestic water", "potable", "backflow", "rpz")):
@@ -500,9 +600,10 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
     print("NYC water signals: fetching 311 DEP water/lead request partitions", file=sys.stderr, flush=True)
     requests_snapshots = _fetch_311_snapshots(page_size=page_size)
     request_rows, request_duplicate_partition_count = _dedupe_311_rows(requests_snapshots)
-    print("NYC water signals: fetching HPD water violation partitions", file=sys.stderr, flush=True)
-    hpd_snapshots = _fetch_hpd_snapshots(page_size=page_size)
-    hpd_rows, hpd_duplicate_partition_count = _dedupe_hpd_rows(hpd_snapshots)
+    print("NYC water signals: fetching stable HPD water violation population", file=sys.stderr, flush=True)
+    hpd_snapshots, hpd_rows, hpd_duplicate_partition_count, hpd_identity_verification = _fetch_stable_hpd_population(
+        page_size=page_size
+    )
     job_snapshot = fetch_snapshot(
         DOB_JOB_FILINGS_DATASET_ID, api_root=NYC_API_ROOT, order_by="job_filing_number",
         required_fields=("job_filing_number", "filing_status", "house_no", "street_name", "borough", "bin", "bbl", "applicant_professional_title", "applicant_license", "applicant_first_name", "applicants_middle_initial", "applicant_last_name", "applicant_business_name", "owner_s_business_name", "plumbing_work_type", "boiler_equipment_work_type_", "mechanical_systems_work_type_", "filing_date", "approved_date", "signoff_date", "job_description"),
@@ -536,7 +637,7 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
         "domain": "NYC_BUILDING_WATER_SIGNALS",
-        "query_boundaries": {"311_start": NYC_311_START, "311_scope": "DEP service requests fetched through monthly water/lead source-filter partitions and de-duplicated by unique_key.", "311_fields": list(NYC_311_TEXT_FIELDS), "311_terms": list(NYC_311_WATER_TERMS), "311_month_partition_count": len(_nyc_311_month_windows()), "hpd_scope": "Current open HPD violations fetched through source borough partitions with uppercase source-description OR terms and de-duplicated by violationid.", "hpd_terms": list(HPD_WATER_TERMS), "hpd_boroughs": list(HPD_BOROUGHS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
+        "query_boundaries": {"311_start": NYC_311_START, "311_scope": "DEP service requests fetched through monthly water/lead source-filter partitions and de-duplicated by unique_key.", "311_fields": list(NYC_311_TEXT_FIELDS), "311_terms": list(NYC_311_WATER_TERMS), "311_month_partition_count": len(_nyc_311_month_windows()), "hpd_scope": "Current open HPD violations fetched through source borough partitions with uppercase source-description OR terms, de-duplicated by violationid, then independently re-read as violation IDs under the identical filters; publication fails if the two complete identity sets differ.", "hpd_terms": list(HPD_WATER_TERMS), "hpd_boroughs": list(HPD_BOROUGHS), "dob_start": DOB_START, "ll84_scope": "All rows in current consolidated 2022-present LL84 source, slim water fields only."},
         "evidence_semantics": {
             "311": "Service-request observations. Building signal only when classification is building-water; street/hydrant/sewer remain context.",
             "hpd": "Current HPD violation evidence directly tied to source BIN/BBL when present.",
@@ -555,6 +656,15 @@ def build_payload(*, page_size: int = 50000) -> dict[str, Any]:
             "hpd_source_partition_count": len(hpd_snapshots),
             "hpd_source_partition_record_count": sum(snapshot.source_record_count for snapshot in hpd_snapshots),
             "hpd_duplicate_partition_violation_count": hpd_duplicate_partition_count,
+            "hpd_identity_verification_status": hpd_identity_verification["status"],
+            "hpd_identity_first_pass_record_count": hpd_identity_verification["first_pass_record_count"],
+            "hpd_identity_second_pass_record_count": hpd_identity_verification["second_pass_record_count"],
+            "hpd_identity_first_pass_sha256": hpd_identity_verification["first_pass_sha256"],
+            "hpd_identity_second_pass_sha256": hpd_identity_verification["second_pass_sha256"],
+            "hpd_identity_second_pass_duplicate_count": hpd_identity_verification["second_pass_duplicate_count"],
+            "hpd_identity_second_pass_partition_count": hpd_identity_verification["second_pass_partition_count"],
+            "hpd_identity_stability_attempt": hpd_identity_verification["attempt"],
+            "hpd_identity_stability_max_attempts": hpd_identity_verification["max_attempts"],
             "dob_water_job_filing_count": len(jobs),
             "dob_water_permit_count": len(permits),
             "dob_observed_business_count": len(dob_businesses),
