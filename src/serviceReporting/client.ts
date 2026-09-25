@@ -39,10 +39,10 @@ function rows<T>(data: unknown): T[] {
 }
 
 export async function loadServiceReportingAccess(): Promise<boolean> {
-  const result = await client.from('company_admin_access').select('is_admin').limit(1)
+  const result = await client.rpc('towersignal_is_admin')
   throwIfError('Unable to verify service-reporting access', result.error)
-  const row = rows<{ is_admin?: boolean }>(result.data)[0]
-  return row?.is_admin === true
+  if(typeof result.data!=='boolean')throw new Error('Administrator verification returned no result. Retry loading.')
+  return result.data
 }
 
 export async function loadServiceWorkspace(systemId: string): Promise<ServiceWorkspace> {

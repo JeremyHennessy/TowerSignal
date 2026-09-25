@@ -8,6 +8,7 @@ import type { CompanySalesAccount } from '../../src/types/companyAdmin'
 const reviewMocks=vi.hoisted(()=>({load:vi.fn(),review:vi.fn(),sync:vi.fn()}))
 vi.mock('../../src/companyAdmin/client',()=>({
   loadCompanyRollupSuggestions:reviewMocks.load,
+  loadCompanySalesAccounts:vi.fn().mockResolvedValue([{sales_account_id:'old',display_name:'Historical Source Company'}]),
   reviewCompanyRollupSuggestion:reviewMocks.review,
   syncCompanyRollupSuggestions:reviewMocks.sync,
 }))

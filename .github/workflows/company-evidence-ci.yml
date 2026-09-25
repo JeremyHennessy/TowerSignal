@@ -37,6 +37,7 @@ jobs:
           done
           psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f database/migrations/013_company_parent_enrichment.sql
           psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f database/migrations/014_admin_account_snapshot.sql
+          psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f database/migrations/015_company_evidence_snapshot.sql
           psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f tests/database/company_evidence.sql
       - name: Verify evidence parsing, permissions and worker behavior
         run: |

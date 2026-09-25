@@ -29,7 +29,10 @@ const DEFAULT_DATA_API_URL = 'https://ep-silent-moon-au2icaki.apirest.c-10.us-ea
 
 const client = createClient({
   auth: { url: import.meta.env.VITE_NEON_AUTH_URL || DEFAULT_AUTH_URL },
-  dataApi: { url: import.meta.env.VITE_NEON_DATA_API_URL || DEFAULT_DATA_API_URL },
+  dataApi: {
+    url: import.meta.env.VITE_NEON_DATA_API_URL || DEFAULT_DATA_API_URL,
+    options: { global: { fetch: (input,init)=>fetch(input,{...init,cache:'no-store'}) } },
+  },
 })
 
 export const companyAdminRuntimeEnabled = import.meta.env.MODE !== 'test'
@@ -50,15 +53,13 @@ export async function loadCompanyAdminOverview() {
 }
 
 export async function loadCompanyEvidence():Promise<CompanyEvidence> {
-  const tables=['company_parent_entities','company_parent_relationships','company_enrichment_sources','company_enrichment_runs','company_enrichment_candidates']
-  const results=await Promise.all(tables.map(table=>{
-    const query=client.from(table).select('*')
-    if(table==='company_enrichment_runs')return query.order('started_at',{ascending:false}).limit(20)
-    if(table==='company_enrichment_candidates')return query.eq('status','pending').order('last_observed_at',{ascending:false}).limit(100)
-    return query
-  }))
-  results.forEach((result,index)=>throwIfError(`Unable to load ${tables[index]}`,result.error))
-  return Object.fromEntries(['parents','relationships','sources','runs','candidates'].map((key,index)=>[key,results[index].data??[]])) as unknown as CompanyEvidence
+  const result=await client.rpc('towersignal_company_evidence_snapshot')
+  throwIfError('Unable to load company evidence',result.error)
+  const value=result.data as Record<string,unknown>|null
+  if(!value||!['parents','relationships','sources','runs','candidates'].every(key=>Array.isArray(value[key]))) {
+    throw new Error('Company evidence returned an incomplete snapshot. Refresh to retry.')
+  }
+  return value as unknown as CompanyEvidence
 }
 
 export async function addCompanyParent(displayName:string,website:string):Promise<void> {
@@ -252,14 +253,16 @@ function noteFrom(row: Record<string, unknown>): CompanyAdminNote {
 
 export async function loadCompanyAdminAccess(): Promise<boolean> {
   if (!companyAdminRuntimeEnabled) return false
-  const result = await client.from('company_admin_access').select('is_admin').limit(1)
+  const result = await client.rpc('towersignal_is_admin')
   throwIfError('Unable to verify company-database access', result.error)
-  const row = ((result.data ?? []) as Array<Record<string, unknown>>)[0]
-  return row?.is_admin === true
+  if(typeof result.data!=='boolean')throw new Error('Administrator verification returned no result. Retry loading.')
+  return result.data
 }
 
-export async function loadCompanySalesAccounts(): Promise<CompanySalesAccount[]> {
-  const result=await client.from('company_sales_accounts').select('*').eq('record_status','active').order('display_name',{ascending:true})
+export async function loadCompanySalesAccounts(includeMerged=false): Promise<CompanySalesAccount[]> {
+  let query=client.from('company_sales_accounts').select('*')
+  if(!includeMerged)query=query.eq('record_status','active')
+  const result=await query.order('display_name',{ascending:true})
   throwIfError('Unable to load master sales accounts',result.error)
   return ((result.data ?? []) as Array<Record<string,unknown>>).map(salesAccountFrom)
 }
