@@ -1,0 +1,46 @@
+name: Diagnose pending company roll-ups
+
+on:
+  push:
+    branches:
+      - diagnostic/pending-rollups-20260925
+    paths:
+      - '.github/workflows/diagnose-pending-rollups-20260925.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect public source evidence for remaining roll-up candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location https://jeremyhennessy.github.io/TowerSignal/data/known-firms.json -o /tmp/known-firms.json
+          python - <<'PY'
+          import json, subprocess
+          payload=json.load(open('/tmp/known-firms.json'))
+          wanted=[
+            'known-firm-6290b9fc0212984f48d5',
+            'known-firm-d83ead023885a2b589ff',
+            'known-firm-fa1ec94540a5331fd4bc',
+            'known-firm-2f90d731d7bc7894212a',
+            'known-firm-134e1bead2ccd9abcb1a',
+            'known-firm-2817ad6afcccf9f627f5',
+          ]
+          firms={row['firm_id']:row for row in payload['firms']}
+          for fid in wanted:
+              row=firms.get(fid)
+              print('=== SUMMARY',fid,'===')
+              print(json.dumps(row,indent=2,sort_keys=True))
+              if not row or not row.get('detail_path'):
+                  continue
+              url='https://jeremyhennessy.github.io/TowerSignal/data/'+row['detail_path']
+              raw=subprocess.check_output(['curl','--fail','--silent','--show-error','--location',url],text=True)
+              detail=json.loads(raw)
+              print('=== DETAIL',fid,'===')
+              print(json.dumps(detail,indent=2,sort_keys=True)[:50000])
+          PY
