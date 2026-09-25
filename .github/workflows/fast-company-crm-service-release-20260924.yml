@@ -192,19 +192,19 @@ jobs:
         with:
           script: |
             const workflowPath='.github/workflows/fast-company-crm-service-release-20260924.yml';
-            const runs=await github.paginate(github.rest.actions.listWorkflowRunsForRepo,{
+            const runs=(await github.rest.actions.listWorkflowRunsForRepo({
               ...context.repo,
               per_page:100,
-            });
+            })).data.workflow_runs;
             const candidates=runs
               .filter(run=>run.id!==context.runId && run.path===workflowPath && run.conclusion==='success')
               .sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at));
             for(const run of candidates){
-              const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{
+              const artifacts=(await github.rest.actions.listWorkflowRunArtifacts({
                 ...context.repo,
                 run_id:run.id,
                 per_page:100,
-              });
+              })).data.artifacts;
               const artifact=
                 artifacts.find(item=>item.name==='company-crm-service-production-baseline'&&!item.expired) ||
                 artifacts.find(item=>item.name==='github-pages'&&!item.expired);
