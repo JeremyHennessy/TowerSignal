@@ -67,16 +67,12 @@ export function AdminSalesTodayPanel({
 
   return <section className="admin-sales-today">
     <div className="admin-sales-today-heading">
-      <div><span className="page-kicker">Internal sales · today</span><h2>Sales Today</h2><p>Tasks, demos, deals and customer renewals that need attention before research work.</p></div>
-      <div className="admin-sales-today-metrics">
-        <article><small>Overdue</small><strong>{number.format(overdue.length)}</strong><span>open sales tasks</span></article>
-        <article><small>Due today</small><strong>{number.format(dueToday.length)}</strong><span>sales tasks</span></article>
-        <article><small>Next 7 days</small><strong>{number.format(nextSeven.length)}</strong><span>scheduled tasks</span></article>
-        <article><small>Demos</small><strong>{number.format(upcomingDemos.length)}</strong><span>through next 7 days</span></article>
-        <article><small>Open proposals</small><strong>{number.format(openProposals.length)}</strong><span>sent or revising</span></article>
-        <article><small>No next step</small><strong>{number.format(noNextStep.length)}</strong><span>active opportunities</span></article>
-        <article><small>Renewal attention</small><strong>{number.format(renewalAttention.length+untrackedRenewalSubscriptions.length)}</strong><span>due within 90 days</span></article>
-        <article><small>Renewal overdue</small><strong>{number.format(overdueRenewals.length)}</strong><span>open renewal records</span></article>
+      <div><span className="page-kicker">Internal sales · today</span><h2>What needs attention</h2><p>Work the exceptions first. Research and maintenance live in Data &amp; ops.</p></div>
+      <div className="admin-today-summary">
+        <span className={overdue.length?'urgent':''}><b>{number.format(overdue.length)}</b> overdue</span>
+        <span><b>{number.format(dueToday.length)}</b> due today</span>
+        <span><b>{number.format(upcomingDemos.length)}</b> demos</span>
+        <span className={overdueRenewals.length?'urgent':''}><b>{number.format(renewalAttention.length+untrackedRenewalSubscriptions.length)}</b> Renewal attention</span>
       </div>
     </div>
 
@@ -139,8 +135,8 @@ export function AdminSalesTodayPanel({
         </div>
       </section>
 
-      <section className="admin-company-card admin-sales-recent-card">
-        <div className="admin-company-card-heading"><div><strong>Recent sales activity</strong><span>Latest calls, email, meetings and outreach</span></div><small>{number.format(activities.length)} total</small></div>
+      <details className="admin-company-card admin-sales-recent-card admin-sales-recent-details">
+        <summary><div><strong>Recent sales activity</strong><span>Latest calls, email, meetings and outreach</span></div><small>{number.format(activities.length)} total</small></summary>
         <div className="admin-sales-recent-list">
           {recentActivities.map(activity=>{
             const account=rowAccount(activity.sales_account_id,activity.company_id)
@@ -150,7 +146,7 @@ export function AdminSalesTodayPanel({
           })}
           {!recentActivities.length&&<span className="company-admin-empty">No sales activity logged yet.</span>}
         </div>
-      </section>
+      </details>
     </div>
   </section>
 }

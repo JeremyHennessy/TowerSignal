@@ -23,11 +23,11 @@ test('internal sales CRM has opportunity, task and buying-contact persistence', 
 })
 
 test('admin dashboard is a personal TowerSignal sales CRM without changing Known Firms', () => {
-  expect(dashboard).toContain('TowerSignal sales pipeline')
+  expect(dashboard).toContain('Active sales pipeline')
   expect(dashboard).toContain('Open pipeline ARR')
-  expect(dashboard).toContain('Demos scheduled')
-  expect(dashboard).toContain('Proposals / negotiation')
-  expect(dashboard).toContain('Overdue sales tasks')
+  expect(dashboard).toContain('Upcoming demos')
+  expect(dashboard).toContain('Open proposals')
+  expect(dashboard).toContain('Needs action')
   expect(detail).toContain('CompanySalesCrmPanel')
   expect(crm).toContain('Sales pipeline &amp; follow-up')
   expect(crm).toContain('Add opportunity')
