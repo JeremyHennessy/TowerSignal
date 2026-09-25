@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
     paths:
+      - 'src/auth/client.ts'
+      - 'src/auth/adminAccess.ts'
+      - 'tests/frontend/AdminAccessRecovery.test.ts'
+      - 'tests/frontend/AuthGateSessionRace.test.tsx'
       - 'src/auth/AuthGate.tsx'
       - 'src/components/AuthLandingPage.tsx'
       - 'src/components/PasswordSetupPage.tsx'
@@ -23,6 +27,9 @@ on:
       - 'database/migrations/011_customer_lifecycle.sql'
       - 'src/App.tsx'
       - 'src/companyAdmin/client.ts'
+      - 'src/companyAdmin/pagedRows.ts'
+      - 'tests/frontend/CompanyAdminPagination.test.ts'
+      - 'tests/frontend/AdminCompanyLoadingError.test.tsx'
       - 'src/companyAdmin/import.ts'
       - 'src/companyAdmin/rollupSuggestions.ts'
       - 'src/companyAdmin/scoring.ts'
@@ -112,6 +119,10 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           allowed = {
+            'src/auth/client.ts',
+            'src/auth/adminAccess.ts',
+            'tests/frontend/AdminAccessRecovery.test.ts',
+            'tests/frontend/AuthGateSessionRace.test.tsx',
             'src/auth/AuthGate.tsx',
             'src/components/AuthLandingPage.tsx',
             'src/components/PasswordSetupPage.tsx',
@@ -157,6 +168,9 @@ jobs:
             'database/migrations/011_customer_lifecycle.sql',
             'src/App.tsx',
             'src/companyAdmin/client.ts',
+            'src/companyAdmin/pagedRows.ts',
+            'tests/frontend/CompanyAdminPagination.test.ts',
+            'tests/frontend/AdminCompanyLoadingError.test.tsx',
             'src/companyAdmin/import.ts',
             'src/companyAdmin/rollupSuggestions.ts',
             'src/companyAdmin/scoring.ts',
@@ -326,6 +340,8 @@ jobs:
           grep -R -Fq "Company master & relationship record" dist/assets
           grep -R -Fq "Parent mapping & enrichment" dist/assets
           grep -R -Fq "Choose your password" dist/assets
+          grep -R -Fq "Retry access check" dist/assets
+          grep -R -Fq "Company records returned an incomplete page. Please retry." dist/assets
           python - <<'PY'
           import hashlib, json, pathlib
           expected=json.loads(pathlib.Path('accepted-data-sha256.json').read_text())
@@ -439,6 +455,8 @@ jobs:
           grep -Fq "Company master & relationship record" /tmp/towersignal-index.js
           grep -Fq "Parent mapping & enrichment" /tmp/towersignal-index.js
           grep -Fq "Choose your password" /tmp/towersignal-index.js
+          grep -Fq "Retry access check" /tmp/towersignal-index.js
+          grep -Fq "Company records returned an incomplete page. Please retry." /tmp/towersignal-index.js
 
   rollback:
     if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}

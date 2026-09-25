@@ -34,16 +34,20 @@ export function AuthGate() {
   const [sessionError, setSessionError] = useState<string | null>(null)
   const [route, setRoute] = useState<GateRoute>(currentRoute)
   const intendedHash = useRef(isPublicRoute(route) ? '#/home' : currentHashOrHome())
+  const sessionRequest = useRef(0)
 
   const refreshSession = useCallback(async (preserveExisting = false) => {
+    const request = ++sessionRequest.current
     try {
       const sessionUser = await getWorkflowSession()
+      if (request !== sessionRequest.current) return
       setUser(current => sessionUser ?? (preserveExisting ? current : null))
       setSessionError(null)
     } catch (err) {
+      if (request !== sessionRequest.current) return
       setSessionError(err instanceof Error ? err.message : 'Unable to verify TowerSignal session.')
     } finally {
-      setChecking(false)
+      if (request === sessionRequest.current) setChecking(false)
     }
   }, [])
 
@@ -56,7 +60,7 @@ export function AuthGate() {
     // loads still fail closed, and explicit sign-out still clears the user.
     const onFocus = () => { void refreshSession(true) }
     window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
+    return () => { sessionRequest.current += 1; window.removeEventListener('focus', onFocus) }
   }, [refreshSession])
 
   useEffect(() => {
@@ -75,6 +79,7 @@ export function AuthGate() {
   }, [route, user])
 
   const completeAuthentication = (sessionUser: WorkflowUser) => {
+    sessionRequest.current += 1
     setUser(sessionUser)
     setSessionError(null)
     const target = intendedHash.current || '#/home'
@@ -83,13 +88,16 @@ export function AuthGate() {
   }
 
   const signIn = async (email: string, password: string) => {
+    sessionRequest.current += 1
     const sessionUser = await signInWorkflow(email, password)
     completeAuthentication(sessionUser)
     return sessionUser
   }
 
   const signOut = async () => {
+    sessionRequest.current += 1
     await signOutWorkflow()
+    sessionRequest.current += 1
     intendedHash.current = '#/home'
     setUser(null)
     setRoute('marketing')
@@ -101,6 +109,6 @@ export function AuthGate() {
   if (checking) return <main className="auth-check-page"><div className="auth-check-card"><span className="auth-brand-mark">TS</span><h1>TowerSignal</h1><p>Verifying authenticated workspace…</p></div></main>
   if (!user) return <AuthLandingPage initialError={sessionError} onSignIn={signIn} />
   if (route === 'login' || route === 'home') return <HomePage user={user} />
-  if (route === 'account') return <UserAccountPage user={user} onSignOut={signOut} />
+  if (route === 'account') return <UserAccountPage key={user.id} user={user} onSignOut={signOut} />
   return <App />
 }

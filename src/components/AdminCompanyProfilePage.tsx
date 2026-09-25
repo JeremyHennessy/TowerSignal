@@ -45,10 +45,12 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
   const selectedSourceCompanyId=navigation.params.get('source')
   const [known,setKnown]=useState<KnownFirmPayload|null>(null)
   const [error,setError]=useState<string|null>(null)
+  const [loadAttempt,setLoadAttempt]=useState(0)
   const section=navigation.choice('section',['overview','sales','commercial','customer','research','audit'] as const,'overview')
 
   useEffect(()=>{
     let cancelled=false
+    setError(null);setKnown(null);setAllowed(null)
     loadCompanyAdminAccess().then(async isAdmin=>{
       if(cancelled) return
       setAllowed(isAdmin)
@@ -58,10 +60,10 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
       setProfiles(data.profiles);setContacts(data.contacts);setActivities(data.activities);setQueue(data.queue)
       setKnown(nextKnown);setSalesAccounts(data.accounts);setSalesAccountMembers(data.members)
     }).catch(err=>{
-      if(!cancelled){setAllowed(false);setError(err instanceof Error?err.message:'Unable to load private company profile')}
+      if(!cancelled)setError(err instanceof Error?err.message:'Unable to load private company profile')
     })
     return()=>{cancelled=true}
-  },[companyId])
+  },[companyId,loadAttempt])
 
   const model=useMemo(()=>{
     if(!known) return null
@@ -93,6 +95,7 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
     }
   },[known,profiles,contacts,activities,queue,salesAccounts,salesAccountMembers,companyId,selectedSourceCompanyId])
 
+  if(error) return <section className="product-page admin-company-page"><div className="reference-empty-state"><strong>Unable to load company administration.</strong><span>{error}</span><button type="button" className="secondary-link-button" onClick={()=>setLoadAttempt(attempt=>attempt+1)}>Retry loading</button></div></section>
   if(allowed===null) return <section className="product-page admin-company-page"><div className="reference-empty-state"><strong>Loading private company profile…</strong></div></section>
   if(!allowed) return <section className="product-page admin-company-page"><div className="reference-empty-state"><strong>Administrator access required.</strong><span>{error||'This route contains private company and CRM data.'}</span></div></section>
   if(!known) return <section className="product-page admin-company-page"><div className="reference-empty-state"><strong>Loading company administration…</strong></div></section>

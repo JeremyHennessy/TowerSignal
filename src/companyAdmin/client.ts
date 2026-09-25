@@ -1,4 +1,6 @@
-import { createClient } from '@neondatabase/neon-js'
+import { neonClient as client } from '../auth/client'
+import { loadAdminAccess } from '../auth/adminAccess'
+import { readAllPages } from './pagedRows'
 import { belongsToSalesAccount, validateAccountMappings } from './accountMapping'
 import type { CompanyEvidence, ParentRelationship } from './evidence'
 import { httpsUrl } from './evidence'
@@ -24,32 +26,28 @@ import type {
   CompanyResearchStatus,
 } from '../types/companyAdmin'
 
-const DEFAULT_AUTH_URL = 'https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth'
-const DEFAULT_DATA_API_URL = 'https://ep-silent-moon-au2icaki.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1'
-
-const client = createClient({
-  auth: { url: import.meta.env.VITE_NEON_AUTH_URL || DEFAULT_AUTH_URL },
-  dataApi: {
-    url: import.meta.env.VITE_NEON_DATA_API_URL || DEFAULT_DATA_API_URL,
-    options: { global: { fetch: (input,init)=>fetch(input,{...init,cache:'no-store'}) } },
-  },
-})
-
 export const companyAdminRuntimeEnabled = import.meta.env.MODE !== 'test'
 
 export async function loadCompanyAdminOverview() {
-  const result=await client.rpc('towersignal_company_admin_snapshot')
-  throwIfError('Unable to load company administration',result.error)
-  const value=result.data as Record<string,unknown>|null
-  const rows=(key:string):Record<string,unknown>[]=>{
-    if(!value||!Array.isArray(value[key]))throw new Error('Company administration returned an incomplete snapshot. Refresh to retry.')
-    return value[key] as Record<string,unknown>[]
-  }
-  const profiles=rows('profiles').map(profileFrom)
-  const accounts=rows('accounts').map(salesAccountFrom)
-  const members=rows('members').map(salesAccountMemberFrom)
+  if (!await loadAdminAccess()) throw new Error('Administrator access is required to load company records')
+  // The combined JSON RPC can exceed the Data API's 10 MB response limit.
+  // Each table is counted and paged; incomplete relationships fail closed below.
+  const [profiles, accounts, members, contacts, activities, queue, opportunities, tasks, demos, proposals, subscriptions, renewals] = await Promise.all([
+    loadCompanyAdminDirectory(), loadCompanySalesAccounts(), loadCompanySalesAccountMembers(),
+    loadAllCompanyContacts(), loadAllCompanyActivities(), loadCompanyResearchQueue(),
+    loadAllCompanySalesOpportunities(), loadAllCompanySalesTasks(), loadAllCompanySalesDemos(),
+    loadAllCompanySalesProposals(), loadAllCompanySalesSubscriptions(), loadAllCompanySalesRenewals(),
+  ])
   validateAccountMappings(profiles,accounts,members)
-  return {profiles,accounts,members,contacts:rows('contacts').map(contactFrom),activities:rows('activities').map(activityFrom),queue:rows('queue').map(researchFrom),opportunities:rows('opportunities').map(opportunityFrom),tasks:rows('tasks').map(taskFrom),demos:rows('demos').map(salesDemoFrom),proposals:rows('proposals').map(salesProposalFrom),subscriptions:rows('subscriptions').map(salesSubscriptionFrom),renewals:rows('renewals').map(salesRenewalFrom)}
+  return {profiles,accounts,members,contacts,activities,queue,opportunities,tasks,demos,proposals,subscriptions,renewals}
+}
+
+async function loadCompanyRows(table: string, key: string, order: string, ascending: boolean, activeOnly = false) {
+  return readAllPages((from, to) => {
+    let query = client.from(table).select('*', { count: 'exact' })
+    if (activeOnly) query = query.eq('record_status', 'active')
+    return query.order(order, { ascending }).order(key, { ascending: true }).range(from, to)
+  }, key)
 }
 
 export async function loadCompanyEvidence():Promise<CompanyEvidence> {
@@ -253,24 +251,15 @@ function noteFrom(row: Record<string, unknown>): CompanyAdminNote {
 
 export async function loadCompanyAdminAccess(): Promise<boolean> {
   if (!companyAdminRuntimeEnabled) return false
-  const result = await client.rpc('towersignal_is_admin')
-  throwIfError('Unable to verify company-database access', result.error)
-  if(typeof result.data!=='boolean')throw new Error('Administrator verification returned no result. Retry loading.')
-  return result.data
+  return loadAdminAccess()
 }
 
 export async function loadCompanySalesAccounts(includeMerged=false): Promise<CompanySalesAccount[]> {
-  let query=client.from('company_sales_accounts').select('*')
-  if(!includeMerged)query=query.eq('record_status','active')
-  const result=await query.order('display_name',{ascending:true})
-  throwIfError('Unable to load master sales accounts',result.error)
-  return ((result.data ?? []) as Array<Record<string,unknown>>).map(salesAccountFrom)
+  return (await loadCompanyRows('company_sales_accounts', 'sales_account_id', 'display_name', true, !includeMerged)).map(salesAccountFrom)
 }
 
 export async function loadCompanySalesAccountMembers(): Promise<CompanySalesAccountMember[]> {
-  const result=await client.from('company_sales_account_members').select('*').order('is_primary',{ascending:false})
-  throwIfError('Unable to load master sales-account membership',result.error)
-  return ((result.data ?? []) as Array<Record<string,unknown>>).map(salesAccountMemberFrom)
+  return (await loadCompanyRows('company_sales_account_members', 'company_id', 'is_primary', false)).map(salesAccountMemberFrom)
 }
 
 export async function loadCompanySalesAccount(salesAccountId:string): Promise<CompanySalesAccount|null> {
@@ -297,9 +286,7 @@ export async function saveCompanySalesAccount(
 }
 
 export async function loadCompanyAdminDirectory(): Promise<CompanyAdminProfile[]> {
-  const result = await client.from('company_private_profiles').select('*').order('updated_at', { ascending: false })
-  throwIfError('Unable to load private company directory', result.error)
-  return ((result.data ?? []) as Array<Record<string, unknown>>).map(profileFrom)
+  return (await loadCompanyRows('company_private_profiles', 'company_id', 'updated_at', false)).map(profileFrom)
 }
 
 export async function loadCompanyAdminSnapshot(companyId: string): Promise<CompanyAdminSnapshot> {
@@ -476,21 +463,15 @@ function auditFrom(row: Record<string, unknown>): CompanyAuditEntry {
 }
 
 export async function loadAllCompanyContacts(): Promise<CompanyAdminContact[]> {
-  const result = await client.from('company_private_contacts').select('*').order('updated_at', { ascending: false })
-  throwIfError('Unable to load private company contacts', result.error)
-  return ((result.data ?? []) as Array<Record<string, unknown>>).map(contactFrom)
+  return (await loadCompanyRows('company_private_contacts', 'contact_id', 'updated_at', false)).map(contactFrom)
 }
 
 export async function loadAllCompanyActivities(): Promise<CompanyAdminActivity[]> {
-  const result = await client.from('company_private_activities').select('*').order('occurred_at', { ascending: false })
-  throwIfError('Unable to load private company activities', result.error)
-  return ((result.data ?? []) as Array<Record<string, unknown>>).map(activityFrom)
+  return (await loadCompanyRows('company_private_activities', 'activity_id', 'occurred_at', false)).map(activityFrom)
 }
 
 export async function loadCompanyResearchQueue(): Promise<CompanyResearchQueueItem[]> {
-  const result = await client.from('company_private_research_queue').select('*').order('priority_score', { ascending: false })
-  throwIfError('Unable to load company research queue', result.error)
-  return ((result.data ?? []) as Array<Record<string, unknown>>).map(researchFrom)
+  return (await loadCompanyRows('company_private_research_queue', 'company_id', 'priority_score', false)).map(researchFrom)
 }
 
 export async function saveCompanyResearchQueueItem(
@@ -620,9 +601,7 @@ function taskFrom(row: Record<string, unknown>): CompanySalesTask {
 }
 
 export async function loadAllCompanySalesOpportunities(): Promise<CompanySalesOpportunity[]> {
-  const result = await client.from('company_private_opportunities').select('*').order('updated_at',{ascending:false})
-  throwIfError('Unable to load TowerSignal sales opportunities', result.error)
-  return ((result.data ?? []) as Array<Record<string,unknown>>).map(opportunityFrom)
+  return (await loadCompanyRows('company_private_opportunities', 'opportunity_id', 'updated_at', false)).map(opportunityFrom)
 }
 
 export async function loadCompanySalesOpportunities(companyId: string, salesAccountId?: string | null): Promise<CompanySalesOpportunity[]> {
@@ -662,9 +641,7 @@ export async function addCompanySalesOpportunity(
 }
 
 export async function loadAllCompanySalesTasks(): Promise<CompanySalesTask[]> {
-  const result=await client.from('company_private_tasks').select('*').order('due_at',{ascending:true})
-  throwIfError('Unable to load TowerSignal sales tasks',result.error)
-  return ((result.data ?? []) as Array<Record<string,unknown>>).map(taskFrom)
+  return (await loadCompanyRows('company_private_tasks', 'task_id', 'due_at', true)).map(taskFrom)
 }
 
 export async function loadCompanySalesTasks(companyId:string,salesAccountId?:string|null): Promise<CompanySalesTask[]> {
@@ -811,9 +788,7 @@ function salesProposalFrom(row:Record<string,unknown>):CompanySalesProposal{
 }
 
 export async function loadAllCompanySalesDemos():Promise<CompanySalesDemo[]>{
-  const result=await client.from('company_sales_demos').select('*').order('scheduled_at',{ascending:true})
-  throwIfError('Unable to load sales demos',result.error)
-  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesDemoFrom)
+  return (await loadCompanyRows('company_sales_demos', 'demo_id', 'scheduled_at', true)).map(salesDemoFrom)
 }
 export async function loadCompanySalesDemos(salesAccountId:string):Promise<CompanySalesDemo[]>{
   const result=await client.from('company_sales_demos').select('*').eq('sales_account_id',salesAccountId).order('scheduled_at',{ascending:false})
@@ -837,9 +812,7 @@ export async function addCompanySalesDemo(salesAccountId:string,values:Omit<Comp
 }
 
 export async function loadAllCompanySalesProposals():Promise<CompanySalesProposal[]>{
-  const result=await client.from('company_sales_proposals').select('*').order('updated_at',{ascending:false})
-  throwIfError('Unable to load sales proposals',result.error)
-  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesProposalFrom)
+  return (await loadCompanyRows('company_sales_proposals', 'proposal_id', 'updated_at', false)).map(salesProposalFrom)
 }
 export async function loadCompanySalesProposals(salesAccountId:string):Promise<CompanySalesProposal[]>{
   const result=await client.from('company_sales_proposals').select('*').eq('sales_account_id',salesAccountId).order('updated_at',{ascending:false})
@@ -892,9 +865,7 @@ function salesRenewalFrom(row:Record<string,unknown>):CompanySalesRenewal{
 }
 
 export async function loadAllCompanySalesSubscriptions():Promise<CompanySalesSubscription[]>{
-  const result=await client.from('company_sales_subscriptions').select('*').order('renewal_date',{ascending:true})
-  throwIfError('Unable to load customer subscriptions',result.error)
-  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesSubscriptionFrom)
+  return (await loadCompanyRows('company_sales_subscriptions', 'subscription_id', 'renewal_date', true)).map(salesSubscriptionFrom)
 }
 export async function loadCompanySalesSubscriptions(salesAccountId:string):Promise<CompanySalesSubscription[]>{
   const result=await client.from('company_sales_subscriptions').select('*').eq('sales_account_id',salesAccountId).order('renewal_date',{ascending:true})
@@ -925,9 +896,7 @@ export async function addCompanySalesSubscription(
 }
 
 export async function loadAllCompanySalesRenewals():Promise<CompanySalesRenewal[]>{
-  const result=await client.from('company_sales_renewals').select('*').order('renewal_date',{ascending:true})
-  throwIfError('Unable to load customer renewals',result.error)
-  return ((result.data??[]) as Array<Record<string,unknown>>).map(salesRenewalFrom)
+  return (await loadCompanyRows('company_sales_renewals', 'renewal_id', 'renewal_date', true)).map(salesRenewalFrom)
 }
 export async function loadCompanySalesRenewals(salesAccountId:string):Promise<CompanySalesRenewal[]>{
   const result=await client.from('company_sales_renewals').select('*').eq('sales_account_id',salesAccountId).order('renewal_date',{ascending:true})

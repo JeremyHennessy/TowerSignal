@@ -1,4 +1,5 @@
-import { createClient } from '@neondatabase/neon-js'
+import { neonClient as client } from '../auth/client'
+import { resetAdminAccess } from '../auth/adminAccess'
 import type {
   WorkflowAccountPatch,
   WorkflowAccountState,
@@ -8,18 +9,7 @@ import type {
   WorkflowWatchlist,
 } from '../types/workflow'
 
-const DEFAULT_AUTH_URL = 'https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth'
-const DEFAULT_DATA_API_URL = 'https://ep-silent-moon-au2icaki.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1'
-
-const authUrl = import.meta.env.VITE_NEON_AUTH_URL || DEFAULT_AUTH_URL
-const dataApiUrl = import.meta.env.VITE_NEON_DATA_API_URL || DEFAULT_DATA_API_URL
-
 export const workflowRuntimeEnabled = import.meta.env.MODE !== 'test'
-
-const client = createClient({
-  auth: { url: authUrl },
-  dataApi: { url: dataApiUrl },
-})
 
 function message(error: unknown): string {
   if (error && typeof error === 'object' && 'message' in error) return String((error as { message?: unknown }).message ?? 'Unknown workflow error')
@@ -50,16 +40,20 @@ export async function getWorkflowSession(): Promise<WorkflowUser | null> {
 }
 
 export async function signInWorkflow(email: string, password: string): Promise<WorkflowUser> {
+  resetAdminAccess()
   const result = await client.auth.signIn.email({ email, password, rememberMe: true })
   throwIfError('Unable to sign in', result.error)
   const user = userFrom(result.data?.user)
   if (!user) throw new Error('Unable to sign in: session user was not returned')
+  resetAdminAccess()
   return user
 }
 
 export async function signOutWorkflow(): Promise<void> {
+  resetAdminAccess()
   const result = await client.auth.signOut()
   throwIfError('Unable to sign out', result.error)
+  resetAdminAccess()
 }
 
 export async function requestWorkflowPasswordSetup(email: string): Promise<void> {

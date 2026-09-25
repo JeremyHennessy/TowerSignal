@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { UserAccountPage } from '../../src/components/UserAccountPage'
 import * as adminClient from '../../src/companyAdmin/client'
@@ -38,6 +38,17 @@ test('standard authenticated account does not show admin shortcuts', async () =>
 test('a failed access check is not shown as a standard user role',async()=>{
   vi.mocked(adminClient.loadCompanyAdminAccess).mockRejectedValue(new Error('Unavailable'))
   render(<UserAccountPage user={user} onSignOut={vi.fn(async()=>{})}/>)
-  expect(await screen.findByText('Access check unavailable; reload to retry.')).toBeInTheDocument()
+  expect(await screen.findByText('Access check unavailable.')).toBeInTheDocument()
   expect(screen.queryByText('Authenticated user')).not.toBeInTheDocument()
+  vi.mocked(adminClient.loadCompanyAdminAccess).mockResolvedValue(true)
+  fireEvent.click(screen.getByRole('button', { name: 'Retry access check' }))
+  expect((await screen.findAllByText('Administrator')).length).toBeGreaterThanOrEqual(2)
+})
+
+test('returning to the tab rechecks a newly assigned administrator role', async () => {
+  vi.mocked(adminClient.loadCompanyAdminAccess).mockResolvedValueOnce(false).mockResolvedValue(true)
+  render(<UserAccountPage user={user} onSignOut={vi.fn(async () => {})} />)
+  expect(await screen.findByText('Authenticated user')).toBeInTheDocument()
+  fireEvent.focus(window)
+  expect((await screen.findAllByText('Administrator')).length).toBeGreaterThanOrEqual(2)
 })
