@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   loadCompanyRollupSuggestions,
+  loadCompanySalesAccounts,
   reviewCompanyRollupSuggestion,
   syncCompanyRollupSuggestions,
 } from '../companyAdmin/client'
@@ -30,6 +31,7 @@ export function CompanyRollupReviewPanel({
   onChanged:()=>Promise<void>
 }) {
   const [rows,setRows]=useState<CompanyRollupSuggestion[]>([])
+  const [historicalAccounts,setHistoricalAccounts]=useState<CompanySalesAccount[]>([])
   const [status,setStatus]=useState<CompanyRollupSuggestionStatus>('pending')
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState<string|null>(null)
@@ -42,8 +44,8 @@ export function CompanyRollupReviewPanel({
     let cancelled=false
     const hydrate=async()=>{
       try{
-        const existing=await loadCompanyRollupSuggestions()
-        if(!cancelled)setRows(existing)
+        const [existing,allAccounts]=await Promise.all([loadCompanyRollupSuggestions(),loadCompanySalesAccounts(true)])
+        if(!cancelled){setRows(existing);setHistoricalAccounts(allAccounts)}
         const inputsReady=accounts.length>0&&members.length>0&&profiles.length>0&&firms.length>0
         if(!inputsReady||autoSyncStarted.current)return
         autoSyncStarted.current=true
@@ -61,7 +63,7 @@ export function CompanyRollupReviewPanel({
 
   const profileById=useMemo(()=>new Map(profiles.map(profile=>[profile.company_id,profile])),[profiles])
   const accountNameById=useMemo(()=>{
-    const labels=new Map(accounts.map(account=>[account.sales_account_id,account.display_name]))
+    const labels=new Map([...historicalAccounts,...accounts].map(account=>[account.sales_account_id,account.display_name]))
     const grouped=new Map<string,CompanySalesAccountMember[]>()
     members.forEach(member=>{
       const current=grouped.get(member.sales_account_id) ?? []
@@ -76,7 +78,7 @@ export function CompanyRollupReviewPanel({
       if(label) labels.set(salesAccountId,label)
     })
     return labels
-  },[accounts,members,profileById])
+  },[accounts,historicalAccounts,members,profileById])
   const accountName=(salesAccountId:string)=>accountNameById.get(salesAccountId) ?? 'Account name unavailable'
   const visible=rows.filter(row=>row.status===status)
 

@@ -22,3 +22,16 @@ test('private requests bypass browser cache while preserving method and headers'
     expect(fetchMock).toHaveBeenCalledWith('https://example.com/private',{method:'GET',headers:{'X-Test':'preserved'},cache:'no-store'})
   }finally{fetchMock.mockRestore()}
 })
+
+test('administrator access requires an explicit server boolean; missing results never become a false role',async()=>{
+  vi.stubEnv('MODE','production')
+  vi.resetModules()
+  try{
+    const {loadCompanyAdminAccess}=await import('../../src/companyAdmin/client')
+    mocks.rpc.mockResolvedValueOnce({data:true,error:null}).mockResolvedValueOnce({data:false,error:null}).mockResolvedValueOnce({data:null,error:null})
+    await expect(loadCompanyAdminAccess()).resolves.toBe(true)
+    await expect(loadCompanyAdminAccess()).resolves.toBe(false)
+    await expect(loadCompanyAdminAccess()).rejects.toThrow('verification returned no result')
+    expect(mocks.rpc).toHaveBeenCalledWith('towersignal_is_admin')
+  }finally{vi.unstubAllEnvs()}
+})

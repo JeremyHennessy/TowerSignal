@@ -6,7 +6,7 @@ const today=readFileSync('src/components/AdminSalesTodayPanel.tsx','utf8')
 const detail=readFileSync('src/components/AdminCompanyProfilePage.tsx','utf8')
 
 test('admin command center uses focused workspaces instead of one long dashboard',()=>{
-  expect(dashboard).toContain("useState<AdminWorkspaceView>('today')")
+  expect(dashboard).toContain("useState<AdminWorkspaceView>('accounts')")
   expect(dashboard).toContain("workspaceView==='today'")
   expect(dashboard).toContain("workspaceView==='pipeline'")
   expect(dashboard).toContain("workspaceView==='accounts'")

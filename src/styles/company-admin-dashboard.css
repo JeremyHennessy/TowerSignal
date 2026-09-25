@@ -470,3 +470,23 @@
   .admin-command-strip article,.admin-profile-command-strip article{border-left:0;border-top:1px solid var(--border)}
   .admin-command-strip article:first-child,.admin-profile-command-strip article:first-child{border-top:0}
 }
+
+/* The complete firm directory is the admin landing view. */
+.admin-directory-note{margin:0;padding:0 18px 14px;color:var(--text-muted,#64748b);font-size:13px;line-height:1.5}
+.admin-directory-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px;padding:0 18px 16px}
+.admin-directory-controls label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600}
+.admin-directory-controls label:first-child{flex:1;min-width:220px}
+.admin-directory-controls input,.admin-directory-controls select{font:inherit;padding:10px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;min-width:0;width:100%;box-sizing:border-box}
+.admin-directory-controls .admin-account-views{padding:0;border:0;margin:0}
+.admin-directory-pagination{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid #e2e8f0;font-size:12px}
+.admin-directory-pagination>div{display:flex;align-items:center;gap:10px}
+.admin-directory-pagination button{padding:6px 10px;border:1px solid #cbd5e1;border-radius:5px;background:#fff;cursor:pointer}
+.admin-directory-pagination button:disabled{opacity:.45;cursor:default}
+.admin-all-firms-table{min-width:1000px;table-layout:fixed;width:100%}
+.admin-all-firms-table th:nth-child(1){width:23%}.admin-all-firms-table th:nth-child(2){width:29%}
+.admin-all-firms-table th:nth-child(3){width:18%}.admin-all-firms-table th:nth-child(4){width:15%}
+.admin-all-firms-table td{vertical-align:top;white-space:normal;overflow-wrap:anywhere}
+.admin-all-firms-table td small{display:block;margin-top:5px;color:#64748b;line-height:1.4}
+.admin-all-firms-table details{margin-top:9px}.admin-all-firms-table summary{cursor:pointer;color:#2563eb}
+.admin-identity-list{padding-left:18px;margin:10px 0}.admin-identity-list li{margin:0 0 9px}
+@media(max-width:600px){.admin-directory-controls{padding:0 12px 12px}.admin-directory-controls label{width:100%}.admin-directory-pagination{padding:12px}.admin-account-views{flex-wrap:wrap}}

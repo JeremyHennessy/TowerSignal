@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { AdminFirmDirectory } from './AdminFirmDirectory'
 import { CompanyEvidencePanel } from './CompanyEvidencePanel'
 import { loadCompanyAdminAccess, loadCompanyAdminOverview } from '../companyAdmin/client'
 import { belongsToSalesAccount } from '../companyAdmin/accountMapping'
@@ -118,8 +119,8 @@ export function AdminCompaniesPage() {
   const [salesStageFilter, setSalesStageFilter] = useState('ALL')
   const [scoreFilter, setScoreFilter] = useState('ALL')
   const [gap, setGap] = useState('ALL')
-  const [workspaceView,setWorkspaceView]=useState<AdminWorkspaceView>('today')
-  const [accountView,setAccountView]=useState<'directory'|'mapping'>('directory')
+  const [workspaceView,setWorkspaceView]=useState<AdminWorkspaceView>('accounts')
+  const [accountView,setAccountView]=useState<'all'|'directory'|'mapping'>('all')
 
   const applyOverview = (data:Awaited<ReturnType<typeof loadCompanyAdminOverview>>) => {
     setProfiles(data.profiles);setContacts(data.contacts);setActivities(data.activities);setQueue(data.queue)
@@ -349,19 +350,19 @@ export function AdminCompaniesPage() {
         <strong>Pipeline</strong><span>Deals &amp; targets</span>
       </button>
       <button type="button" className={workspaceView==='accounts'?'active':''} onClick={()=>setWorkspaceView('accounts')}>
-        <strong>Accounts</strong><span>{number.format(families.length)} master families</span>
+        <strong>Companies</strong><span>{number.format(payload.firms.length)} firm identities</span>
       </button>
       <button type="button" className={workspaceView==='data'?'active':''} onClick={()=>setWorkspaceView('data')}>
         <strong>Data &amp; ops</strong><span>Ownership &amp; research</span>
       </button>
     </nav>
 
-    <div className="admin-command-strip">
+    {workspaceView!=='accounts'&&<div className="admin-command-strip">
       <article><small>Open deals</small><strong>{number.format(activeSalesOpportunities.length)}</strong><span>{openPipelineArr.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})} pipeline</span></article>
       <article><small>Needs action</small><strong>{number.format(overdueSalesTasks.length)}</strong><span>overdue sales tasks</span></article>
       <article><small>Customers</small><strong>{number.format(liveSubscriptions.length)}</strong><span>{renewalAttention.length} open renewal workflow{renewalAttention.length===1?'':'s'}</span></article>
       <article><small>Ready targets</small><strong>{number.format(highFitReadyCount)}</strong><span>high fit + sales ready</span></article>
-    </div>
+    </div>}
 
     {workspaceView==='today'&&<div className="admin-workspace-view">
       <AdminSalesTodayPanel accounts={salesAccounts} opportunities={opportunities} tasks={salesTasks} activities={activities} demos={salesDemos} proposals={salesProposals} subscriptions={salesSubscriptions} renewals={salesRenewals} />
@@ -410,10 +411,11 @@ export function AdminCompaniesPage() {
     {workspaceView==='accounts'&&<div className="admin-workspace-view">
       <section className="admin-company-card admin-family-directory">
         <div className="admin-account-views" role="group" aria-label="Account table view">
-          <button type="button" aria-pressed={accountView==='directory'} onClick={()=>setAccountView('directory')}>Companies</button>
+          <button type="button" aria-pressed={accountView==='all'} onClick={()=>setAccountView('all')}>All firms &amp; parents</button>
+          <button type="button" aria-pressed={accountView==='directory'} onClick={()=>setAccountView('directory')}>CRM accounts ({families.length})</button>
           <button type="button" aria-pressed={accountView==='mapping'} onClick={()=>setAccountView('mapping')}>Mapping review</button>
         </div>
-        {accountView==='mapping'?<CompanyRollupReviewPanel
+        {accountView==='all'?<AdminFirmDirectory firms={payload.firms} profiles={profiles} accounts={salesAccounts} members={salesAccountMembers}/>:accountView==='mapping'?<CompanyRollupReviewPanel
           accounts={salesAccounts} members={salesAccountMembers} profiles={profiles}
           contacts={contacts} firms={payload.firms} onChanged={reloadPrivate}
         />:<>
