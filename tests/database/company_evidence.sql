@@ -34,6 +34,10 @@ DO $$ BEGIN
     PERFORM public.towersignal_company_admin_snapshot();
     RAISE EXCEPTION 'Non-admin can load private admin snapshot';
   EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+  BEGIN
+    PERFORM public.towersignal_company_evidence_snapshot();
+    RAISE EXCEPTION 'Non-admin can load private evidence snapshot';
+  EXCEPTION WHEN insufficient_privilege THEN NULL; END;
 END $$;
 DO $$ BEGIN
   IF EXISTS(SELECT 1 FROM public.company_parent_entities) OR EXISTS(SELECT 1 FROM public.company_enrichment_sources) THEN RAISE EXCEPTION 'Non-admin can read evidence'; END IF;
@@ -51,6 +55,13 @@ BEGIN
   IF jsonb_array_length(snapshot->'accounts')<>1 OR jsonb_array_length(snapshot->'members')<>1 OR
     snapshot->'profiles'->0->>'parent_company_name'<>'Legacy Parent' THEN
     RAISE EXCEPTION 'Admin snapshot did not preserve the account/member/profile join';
+  END IF;
+  snapshot:=public.towersignal_company_evidence_snapshot();
+  IF jsonb_array_length(snapshot->'parents')<>1 OR snapshot->'parents'->0->>'display_name'<>'Reviewed Parent' OR
+    jsonb_array_length(snapshot->'relationships')<>1 OR snapshot->'relationships'->0->>'status'<>'confirmed' OR
+    jsonb_array_length(snapshot->'sources')<>1 OR jsonb_array_length(snapshot->'runs')<>0 OR
+    jsonb_array_length(snapshot->'candidates')<>0 THEN
+    RAISE EXCEPTION 'Evidence snapshot did not return saved records';
   END IF;
 END $$;
 RESET ROLE;
