@@ -26,6 +26,7 @@ import { CompanyDemoProposalPanel } from './CompanyDemoProposalPanel'
 import { CompanyCustomerLifecyclePanel } from './CompanyCustomerLifecyclePanel'
 
 const number = new Intl.NumberFormat('en-US')
+type AdminCompanySection = 'overview' | 'sales' | 'commercial' | 'customer' | 'research' | 'audit'
 
 function human(value: string): string {
   return value.replaceAll('_',' ').replaceAll('-',' ').replace(/(^|\s)\S/g, match => match.toUpperCase())
@@ -50,6 +51,7 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
   const [selectedSourceCompanyId,setSelectedSourceCompanyId]=useState<string|null>(null)
   const [known,setKnown]=useState<KnownFirmPayload|null>(null)
   const [error,setError]=useState<string|null>(null)
+  const [section,setSection]=useState<AdminCompanySection>('overview')
 
   useEffect(()=>{
     let cancelled=false
@@ -133,55 +135,77 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
 
     {error&&<div className="company-admin-error"><strong>Private company error.</strong><span>{error}</span></div>}
 
-    <div className="admin-company-metrics admin-company-profile-metrics">
-      <article><small>Source identities</small><strong>{number.format(model.members.length)}</strong><span>{number.format(model.publicRows.length)} represented in Known Firms</span></article>
-      <article><small>Public observations</small><strong>{number.format(model.publicObservations)}</strong><span>Across retained source identities</span></article>
-      <article><small>Serviced relationships</small><strong>{number.format(model.servicedRelationships)}</strong><span>Sum across public identities</span></article>
-      <article><small>Tower account links</small><strong>{number.format(model.towerAccountLinks)}</strong><span>Public firm/account relationships</span></article>
-      <article><small>Public contracts</small><strong>{number.format(model.publicContracts)}</strong><span>Observed procurement records</span></article>
-      <article><small>Active contacts</small><strong>{number.format(model.familyContacts.length)}</strong><span>{number.format(model.familyActivities.length)} logged interactions</span></article>
-      <article><small>Account classification</small><strong>{human(model.account.account_classification)}</strong><span>{model.account.account_owner||'Owner unassigned'}</span></article>
-      <article><small>Research</small><strong>{model.research?model.research.priority_score:'—'}</strong><span>{model.research?human(model.research.status):'Not in active queue'}</span></article>
+    <div className="admin-profile-command-strip">
+      <article><small>Account</small><strong>{human(model.account.account_classification)}</strong><span>{model.account.account_owner||'Owner unassigned'}</span></article>
+      <article><small>Contacts</small><strong>{number.format(model.familyContacts.length)}</strong><span>{number.format(model.familyActivities.length)} interactions</span></article>
+      <article><small>Public evidence</small><strong>{number.format(model.publicObservations)}</strong><span>{number.format(model.servicedRelationships)} serviced relationships</span></article>
+      <article><small>Research</small><strong>{model.research?model.research.priority_score:'—'}</strong><span>{model.research?human(model.research.status):'Not queued'}</span></article>
     </div>
 
-    <div className="admin-company-dashboard-grid admin-company-profile-summary">
-      <section className="admin-company-card">
-        <div className="admin-company-card-heading"><div><strong>Master company summary</strong><span>Private reviewed identity</span></div></div>
-        <dl className="admin-company-definition-list">
-          <div><dt>Sales account</dt><dd>{model.account.display_name}</dd></div>
-          <div><dt>Primary source identity</dt><dd>{model.master.legal_name||model.master.canonical_name}</dd></div>
-          <div><dt>Parent / owner</dt><dd>{model.account.parent_name||model.master.parent_company_name||'Not recorded'}{(model.account.parent_source_url||model.master.parent_source_url)&&<a href={model.account.parent_source_url||model.master.parent_source_url||'#'} target="_blank" rel="noreferrer">Source ↗</a>}</dd></div>
-          <div><dt>Website</dt><dd>{model.master.website?<a href={model.master.website} target="_blank" rel="noreferrer">{model.master.website}</a>:'Not recorded'}</dd></div>
-          <div><dt>Headquarters</dt><dd>{[model.master.headquarters_address,model.master.headquarters_city,model.master.headquarters_region,model.master.headquarters_postal_code,model.master.headquarters_country].filter(Boolean).join(', ')||'Not recorded'}</dd></div>
-          <div><dt>Company type</dt><dd>{model.master.company_type||'Not recorded'}</dd></div>
-          <div><dt>Revenue</dt><dd>{revenueLabel(model.master)}{model.master.revenue_year? ` · ${model.master.revenue_year}`:''}</dd></div>
-          <div><dt>Last enrichment check</dt><dd>{model.master.enrichment_checked_at?new Date(model.master.enrichment_checked_at).toLocaleString():'Not recorded'}</dd></div>
-        </dl>
-      </section>
+    <nav className="admin-profile-nav" aria-label="Company admin sections">
+      <button type="button" className={section==='overview'?'active':''} onClick={()=>setSection('overview')}>Overview</button>
+      <button type="button" className={section==='sales'?'active':''} onClick={()=>setSection('sales')}>Sales</button>
+      <button type="button" className={section==='commercial'?'active':''} onClick={()=>setSection('commercial')}>Demos &amp; proposals</button>
+      <button type="button" className={section==='customer'?'active':''} onClick={()=>setSection('customer')}>Customer</button>
+      <button type="button" className={section==='research'?'active':''} onClick={()=>setSection('research')}>Research</button>
+      <button type="button" className={section==='audit'?'active':''} onClick={()=>setSection('audit')}>Audit</button>
+    </nav>
 
-      <section className="admin-company-card admin-family-member-card">
-        <div className="admin-company-card-heading"><div><strong>Family identities</strong><span>Every reviewed source identity remains addressable</span></div></div>
-        <div className="table-scroll"><table className="account-table admin-family-member-table"><thead><tr><th>Identity</th><th>Private role</th><th>Website / HQ</th><th>Public evidence</th><th>CRM</th><th></th></tr></thead><tbody>
-          {model.members.map(member=>{
-            const firm=model.firmById.get(member.company_id)
-            return <tr key={member.company_id} className={member.company_id===model.selected.company_id?'selected-row':''} onClick={()=>setSelectedSourceCompanyId(member.company_id)}>
-              <td><strong>{member.canonical_name}</strong><small>{member.legal_name||member.company_id}</small></td>
-              <td><strong>{member.company_id===model.masterId?'Master':'Rolled-up identity'}</strong><small>{member.rollup_source_name||'Private reviewed family'}</small></td>
-              <td><strong>{member.website?member.website.replace(/^https?:\/\//,'').replace(/\/$/,''):'Website not recorded'}</strong><small>{[member.headquarters_city,member.headquarters_region].filter(Boolean).join(', ')||'HQ not recorded'}</small></td>
-              <td><strong>{firm?number.format(firm.observation_count):'—'} observations</strong><small>{firm?`${number.format(firm.serviced_site_count)} serviced · ${number.format(firm.tower_account_count)} tower links`:'Private-only identity'}</small></td>
-              <td><strong>{human(member.relationship_status)}</strong><small>{member.next_action_date?`Next ${member.next_action_date}`:'No next action'}</small></td>
-              <td className="row-arrow">›</td>
-            </tr>
-          })}
-        </tbody></table></div>
-      </section>
-    </div>
+    {section==='overview'&&<div className="admin-profile-section">
+      <div className="admin-company-dashboard-grid admin-company-profile-summary">
+        <section className="admin-company-card">
+          <div className="admin-company-card-heading"><div><strong>Account summary</strong><span>Reviewed master identity</span></div></div>
+          <dl className="admin-company-definition-list">
+            <div><dt>Sales account</dt><dd>{model.account.display_name}</dd></div>
+            <div><dt>Primary identity</dt><dd>{model.master.legal_name||model.master.canonical_name}</dd></div>
+            <div><dt>Parent / owner</dt><dd>{model.account.parent_name||model.master.parent_company_name||'Not recorded'}{(model.account.parent_source_url||model.master.parent_source_url)&&<a href={model.account.parent_source_url||model.master.parent_source_url||'#'} target="_blank" rel="noreferrer">Source ↗</a>}</dd></div>
+            <div><dt>Website</dt><dd>{model.master.website?<a href={model.master.website} target="_blank" rel="noreferrer">{model.master.website}</a>:'Not recorded'}</dd></div>
+            <div><dt>Headquarters</dt><dd>{[model.master.headquarters_address,model.master.headquarters_city,model.master.headquarters_region,model.master.headquarters_postal_code,model.master.headquarters_country].filter(Boolean).join(', ')||'Not recorded'}</dd></div>
+            <div><dt>Company type</dt><dd>{model.master.company_type||'Not recorded'}</dd></div>
+            <div><dt>Revenue</dt><dd>{revenueLabel(model.master)}{model.master.revenue_year?` · ${model.master.revenue_year}`:''}</dd></div>
+            <div><dt>Last enrichment check</dt><dd>{model.master.enrichment_checked_at?new Date(model.master.enrichment_checked_at).toLocaleString():'Not recorded'}</dd></div>
+          </dl>
+        </section>
 
-    <CompanySalesAccountPanel salesAccountId={model.account.sales_account_id} />
-    <CompanySalesCrmPanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} companyIds={model.memberIds} companyName={model.account.display_name} />
-    <CompanyDemoProposalPanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} contacts={model.familyContacts} />
-    <CompanyCustomerLifecyclePanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} contacts={model.familyContacts} />
-    <CompanyAdminPanel companyId={model.selected.company_id} canonicalName={model.selected.canonical_name} />
-    <CompanyAuditHistory companyId={model.selected.company_id} />
+        <section className="admin-company-card admin-family-member-card">
+          <div className="admin-company-card-heading"><div><strong>Source identities</strong><span>{model.members.length} retained identities · select one for research editing</span></div></div>
+          <div className="table-scroll"><table className="account-table admin-family-member-table"><thead><tr><th>Identity</th><th>Role</th><th>Location</th><th>Evidence</th><th></th></tr></thead><tbody>
+            {model.members.map(member=>{
+              const firm=model.firmById.get(member.company_id)
+              return <tr key={member.company_id} className={member.company_id===model.selected.company_id?'selected-row':''} onClick={()=>setSelectedSourceCompanyId(member.company_id)}>
+                <td><strong>{member.canonical_name}</strong><small>{member.legal_name||member.company_id}</small></td>
+                <td><strong>{member.company_id===model.masterId?'Master':'Rolled-up identity'}</strong><small>{member.rollup_source_name||'Reviewed family member'}</small></td>
+                <td><strong>{[member.headquarters_city,member.headquarters_region].filter(Boolean).join(', ')||'Not recorded'}</strong><small>{member.website?member.website.replace(/^https?:\/\//,'').replace(/\/$/,''):'Website not recorded'}</small></td>
+                <td><strong>{firm?number.format(firm.observation_count):'—'} observations</strong><small>{firm?`${number.format(firm.serviced_site_count)} serviced · ${number.format(firm.tower_account_count)} tower links`:'Private-only identity'}</small></td>
+                <td className="row-arrow">›</td>
+              </tr>
+            })}
+          </tbody></table></div>
+        </section>
+      </div>
+    </div>}
+
+    {section==='sales'&&<div className="admin-profile-section">
+      <CompanySalesAccountPanel salesAccountId={model.account.sales_account_id} />
+      <CompanySalesCrmPanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} companyIds={model.memberIds} companyName={model.account.display_name} />
+    </div>}
+
+    {section==='commercial'&&<div className="admin-profile-section">
+      <CompanyDemoProposalPanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} contacts={model.familyContacts} />
+    </div>}
+
+    {section==='customer'&&<div className="admin-profile-section">
+      <CompanyCustomerLifecyclePanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} contacts={model.familyContacts} />
+    </div>}
+
+    {section==='research'&&<div className="admin-profile-section">
+      <div className="admin-profile-context"><strong>Editing source identity:</strong><span>{model.selected.canonical_name}</span>{publicFirm&&<a href={`#/company/${encodeURIComponent(publicFirm.firm_id)}`}>Open public Known Firm ↗</a>}</div>
+      <CompanyAdminPanel companyId={model.selected.company_id} canonicalName={model.selected.canonical_name} />
+    </div>}
+
+    {section==='audit'&&<div className="admin-profile-section">
+      <div className="admin-profile-context"><strong>Audit source identity:</strong><span>{model.selected.canonical_name}</span></div>
+      <CompanyAuditHistory companyId={model.selected.company_id} />
+    </div>}
   </section>
 }
