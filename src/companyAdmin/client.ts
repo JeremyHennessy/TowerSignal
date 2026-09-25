@@ -1,6 +1,7 @@
 import { createClient } from '@neondatabase/neon-js'
 import type {
   CompanyAdminActivity,
+  CompanyExternalActivityCapture,
   CompanyAdminContact,
   CompanyAdminNote,
   CompanyAdminProfile,
@@ -169,6 +170,15 @@ function activityFrom(row: Record<string, unknown>): CompanyAdminActivity {
     details: nullableString(row.details),
     outcome: nullableString(row.outcome),
     next_action_date: nullableString(row.next_action_date),
+    external_source:nullableString(row.external_source) as CompanyAdminActivity['external_source'],
+    external_event_id:nullableString(row.external_event_id),
+    external_url:nullableString(row.external_url),
+    external_direction:nullableString(row.external_direction) as CompanyAdminActivity['external_direction'],
+    participant_emails:Array.isArray(row.participant_emails)?row.participant_emails.map(String):[],
+    external_metadata:row.external_metadata && typeof row.external_metadata==='object' && !Array.isArray(row.external_metadata)
+      ? row.external_metadata as Record<string,unknown>
+      : {},
+    external_captured_at:nullableString(row.external_captured_at),
     created_at: nullableString(row.created_at) ?? undefined,
     created_by: nullableString(row.created_by),
   }
@@ -345,6 +355,43 @@ export async function addCompanyActivity(companyId: string, values: Omit<Company
   const row = ((result.data ?? []) as Array<Record<string, unknown>>)[0]
   if (!row) throw new Error('Unable to add company activity: inserted row was not returned')
   return activityFrom(row)
+}
+
+
+export async function captureCompanyExternalActivity(
+  companyId:string,
+  values:CompanyExternalActivityCapture,
+):Promise<{activity:CompanyAdminActivity;created:boolean}>{
+  const resolvedSalesAccountId=await salesAccountIdForCompany(companyId)
+  if(!resolvedSalesAccountId) throw new Error('Unable to capture external activity: master sales account was not resolved')
+
+  const existingResult=await client.from('company_private_activities').select('*')
+    .eq('external_source',values.external_source)
+    .eq('external_event_id',values.external_event_id)
+    .limit(1)
+  throwIfError('Unable to check external activity identity',existingResult.error)
+  const existing=((existingResult.data??[]) as Array<Record<string,unknown>>)[0]
+  if(existing){
+    const activity=activityFrom(existing)
+    if(activity.sales_account_id!==resolvedSalesAccountId){
+      throw new Error('External activity is already linked to a different master sales account')
+    }
+    return {activity,created:false}
+  }
+
+  const result=await client.from('company_private_activities').insert({
+    activity_id:crypto.randomUUID(),
+    company_id:companyId,
+    sales_account_id:resolvedSalesAccountId,
+    ...values,
+    external_captured_at:new Date().toISOString(),
+    last_change_source:'import',
+    last_change_batch_id:`external-capture:${values.external_source}`,
+  }).select('*')
+  throwIfError('Unable to capture external activity',result.error)
+  const row=((result.data??[]) as Array<Record<string,unknown>>)[0]
+  if(!row) throw new Error('Unable to capture external activity: inserted row was not returned')
+  return {activity:activityFrom(row),created:true}
 }
 
 export async function addCompanyNote(companyId: string, note: string): Promise<CompanyAdminNote> {
