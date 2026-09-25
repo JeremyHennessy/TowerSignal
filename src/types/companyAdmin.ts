@@ -82,6 +82,15 @@ export interface CompanyAdminContact {
   updated_at?: string
 }
 
+export type CompanyActivityExternalSource =
+  | 'eml'
+  | 'ics'
+  | 'gmail'
+  | 'google-calendar'
+  | 'microsoft-mail'
+  | 'microsoft-calendar'
+export type CompanyActivityExternalDirection = 'inbound' | 'outbound' | 'internal' | 'unknown'
+
 export interface CompanyAdminActivity {
   activity_id: string
   company_id: string
@@ -93,8 +102,31 @@ export interface CompanyAdminActivity {
   details: string | null
   outcome: string | null
   next_action_date: string | null
+  external_source?: CompanyActivityExternalSource | null
+  external_event_id?: string | null
+  external_url?: string | null
+  external_direction?: CompanyActivityExternalDirection | null
+  participant_emails?: string[]
+  external_metadata?: Record<string, unknown>
+  external_captured_at?: string | null
   created_at?: string
   created_by?: string | null
+}
+
+export interface CompanyExternalActivityCapture {
+  activity_type: string
+  occurred_at: string
+  contact_id: string | null
+  subject: string | null
+  details: string | null
+  outcome: string | null
+  next_action_date: string | null
+  external_source: CompanyActivityExternalSource
+  external_event_id: string
+  external_url: string | null
+  external_direction: CompanyActivityExternalDirection
+  participant_emails: string[]
+  external_metadata: Record<string, unknown>
 }
 
 export interface CompanyAdminNote {
