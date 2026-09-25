@@ -12,6 +12,7 @@ function initials(user: WorkflowUser): string {
 export function UserAccountPage({ user, onSignOut }: { user: WorkflowUser; onSignOut: () => Promise<void> }) {
   const [busy, setBusy] = useState(false)
   const [adminAccess, setAdminAccess] = useState<boolean | null>(null)
+  const [accessError,setAccessError]=useState(false)
   const [error, setError] = useState<string | null>(null)
   const avatar = useMemo(() => initials(user), [user])
   const name = user.name?.trim() || user.email.split('@')[0] || 'TowerSignal user'
@@ -20,7 +21,7 @@ export function UserAccountPage({ user, onSignOut }: { user: WorkflowUser; onSig
     let cancelled = false
     loadCompanyAdminAccess()
       .then(value => { if (!cancelled) setAdminAccess(value) })
-      .catch(() => { if (!cancelled) setAdminAccess(false) })
+      .catch(() => { if (!cancelled) setAccessError(true) })
     return () => { cancelled = true }
   }, [])
 
@@ -56,7 +57,7 @@ export function UserAccountPage({ user, onSignOut }: { user: WorkflowUser; onSig
             <div><dt>Session</dt><dd><span className="account-status active">Authenticated</span></dd></div>
             <div><dt>Application pages</dt><dd>Login required</dd></div>
             <div><dt>Private workflow</dt><dd>Synced to this account</dd></div>
-            <div><dt>Role</dt><dd>{adminAccess === null ? 'Checking access…' : adminAccess ? <span className="account-status administrator">Administrator</span> : 'Authenticated user'}</dd></div>
+            <div><dt>Role</dt><dd>{accessError?'Access check unavailable; reload to retry.':adminAccess === null ? 'Checking access…' : adminAccess ? <span className="account-status administrator">Administrator</span> : 'Authenticated user'}</dd></div>
           </dl>
         </section>
       </div>

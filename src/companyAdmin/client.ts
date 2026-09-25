@@ -1,4 +1,5 @@
 import { createClient } from '@neondatabase/neon-js'
+import { belongsToSalesAccount, validateAccountMappings } from './accountMapping'
 import type { CompanyEvidence, ParentRelationship } from './evidence'
 import { httpsUrl } from './evidence'
 import type {
@@ -32,6 +33,21 @@ const client = createClient({
 })
 
 export const companyAdminRuntimeEnabled = import.meta.env.MODE !== 'test'
+
+export async function loadCompanyAdminOverview() {
+  const result=await client.rpc('towersignal_company_admin_snapshot')
+  throwIfError('Unable to load company administration',result.error)
+  const value=result.data as Record<string,unknown>|null
+  const rows=(key:string):Record<string,unknown>[]=>{
+    if(!value||!Array.isArray(value[key]))throw new Error('Company administration returned an incomplete snapshot. Refresh to retry.')
+    return value[key] as Record<string,unknown>[]
+  }
+  const profiles=rows('profiles').map(profileFrom)
+  const accounts=rows('accounts').map(salesAccountFrom)
+  const members=rows('members').map(salesAccountMemberFrom)
+  validateAccountMappings(profiles,accounts,members)
+  return {profiles,accounts,members,contacts:rows('contacts').map(contactFrom),activities:rows('activities').map(activityFrom),queue:rows('queue').map(researchFrom),opportunities:rows('opportunities').map(opportunityFrom),tasks:rows('tasks').map(taskFrom),demos:rows('demos').map(salesDemoFrom),proposals:rows('proposals').map(salesProposalFrom),subscriptions:rows('subscriptions').map(salesSubscriptionFrom),renewals:rows('renewals').map(salesRenewalFrom)}
+}
 
 export async function loadCompanyEvidence():Promise<CompanyEvidence> {
   const tables=['company_parent_entities','company_parent_relationships','company_enrichment_sources','company_enrichment_runs','company_enrichment_candidates']
@@ -284,21 +300,16 @@ export async function loadCompanyAdminDirectory(): Promise<CompanyAdminProfile[]
 }
 
 export async function loadCompanyAdminSnapshot(companyId: string): Promise<CompanyAdminSnapshot> {
-  const [profileResult, contactsResult, activitiesResult, notesResult] = await Promise.all([
-    client.from('company_private_profiles').select('*').eq('company_id', companyId).limit(1),
-    client.from('company_private_contacts').select('*').eq('company_id', companyId).order('name', { ascending: true }),
-    client.from('company_private_activities').select('*').eq('company_id', companyId).order('occurred_at', { ascending: false }),
-    client.from('company_private_notes').select('*').eq('company_id', companyId).order('updated_at', { ascending: false }),
-  ])
-  throwIfError('Unable to load private company profile', profileResult.error)
-  throwIfError('Unable to load company contacts', contactsResult.error)
-  throwIfError('Unable to load company activity', activitiesResult.error)
+  const overview=await loadCompanyAdminOverview()
+  const accountId=overview.members.find(m=>m.company_id===companyId)?.sales_account_id
+  const memberIds=new Set(overview.members.filter(m=>m.sales_account_id===accountId).map(m=>m.company_id))
+  const notesQuery=client.from('company_private_notes').select('*')
+  const notesResult=await (accountId?notesQuery.eq('sales_account_id',accountId):notesQuery.eq('company_id',companyId)).order('updated_at',{ascending:false})
   throwIfError('Unable to load company notes', notesResult.error)
-  const profileRow = ((profileResult.data ?? []) as Array<Record<string, unknown>>)[0]
   return {
-    profile: profileRow ? profileFrom(profileRow) : null,
-    contacts: ((contactsResult.data ?? []) as Array<Record<string, unknown>>).map(contactFrom),
-    activities: ((activitiesResult.data ?? []) as Array<Record<string, unknown>>).map(activityFrom),
+    profile: overview.profiles.find(p=>p.company_id===companyId)??null,
+    contacts: overview.contacts.filter(c=>accountId?belongsToSalesAccount(c,accountId,memberIds):c.company_id===companyId),
+    activities: overview.activities.filter(a=>accountId?belongsToSalesAccount(a,accountId,memberIds):a.company_id===companyId),
     notes: ((notesResult.data ?? []) as Array<Record<string, unknown>>).map(noteFrom),
   }
 }

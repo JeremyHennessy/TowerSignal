@@ -92,6 +92,7 @@ jobs:
           set -euo pipefail
           count="$(psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('company_parent_entities','company_parent_relationships','company_enrichment_sources','company_enrichment_runs','company_enrichment_candidates')")"
           test "$count" = 5
+          test "$(psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -Atc "SELECT to_regprocedure('public.towersignal_company_admin_snapshot()') IS NOT NULL")" = t
 
       - name: Prove application-only delta from last successful full Pages release
         shell: bash
@@ -109,6 +110,9 @@ jobs:
             '.github/workflows/company-enrichment.yml',
             'database/audits/company_parent_enrichment.sql',
             'database/migrations/013_company_parent_enrichment.sql',
+            'database/migrations/014_admin_account_snapshot.sql',
+            'src/companyAdmin/accountMapping.ts',
+            'tests/frontend/AccountMapping.test.ts',
             'docs/company-enrichment-20260925.md',
             'scripts/company_enrichment.py',
             'src/companyAdmin/evidence.ts',

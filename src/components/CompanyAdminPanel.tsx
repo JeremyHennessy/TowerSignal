@@ -275,7 +275,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
     setBusy(true)
     setError(null)
     try {
-      await saveCompanyAdminContact(editingContact.contact_id, companyId, {
+      await saveCompanyAdminContact(editingContact.contact_id, editingContact.company_id, {
         name: editingContact.name.trim(),
         title: text(editingContact.title ?? ''),
         email: text(editingContact.email ?? ''),
