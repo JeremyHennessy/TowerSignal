@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: e8f1ed1a4e517ec19d86f4767c53f80509eedb0a
+          ref: 5b7a299bb98e4c8adf836f769ef6c39f94da5ef1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -69,3 +69,4 @@ jobs:
           DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
           PGOPTIONS: -c default_transaction_read_only=on -c statement_timeout=30000
         run: psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -P pager=off -At -f database/audits/company_parent_enrichment.sql
+
