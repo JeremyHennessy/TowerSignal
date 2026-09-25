@@ -1,4 +1,5 @@
-import { createClient } from '@neondatabase/neon-js'
+import { neonClient as client } from '../auth/client'
+import { loadAdminAccess } from '../auth/adminAccess'
 import { belongsToSalesAccount, validateAccountMappings } from './accountMapping'
 import type { CompanyEvidence, ParentRelationship } from './evidence'
 import { httpsUrl } from './evidence'
@@ -23,17 +24,6 @@ import type {
   CompanySalesRenewal,
   CompanyResearchStatus,
 } from '../types/companyAdmin'
-
-const DEFAULT_AUTH_URL = 'https://ep-silent-moon-au2icaki.neonauth.c-10.us-east-1.aws.neon.tech/neondb/auth'
-const DEFAULT_DATA_API_URL = 'https://ep-silent-moon-au2icaki.apirest.c-10.us-east-1.aws.neon.tech/neondb/rest/v1'
-
-const client = createClient({
-  auth: { url: import.meta.env.VITE_NEON_AUTH_URL || DEFAULT_AUTH_URL },
-  dataApi: {
-    url: import.meta.env.VITE_NEON_DATA_API_URL || DEFAULT_DATA_API_URL,
-    options: { global: { fetch: (input,init)=>fetch(input,{...init,cache:'no-store'}) } },
-  },
-})
 
 export const companyAdminRuntimeEnabled = import.meta.env.MODE !== 'test'
 
@@ -253,10 +243,7 @@ function noteFrom(row: Record<string, unknown>): CompanyAdminNote {
 
 export async function loadCompanyAdminAccess(): Promise<boolean> {
   if (!companyAdminRuntimeEnabled) return false
-  const result = await client.rpc('towersignal_is_admin')
-  throwIfError('Unable to verify company-database access', result.error)
-  if(typeof result.data!=='boolean')throw new Error('Administrator verification returned no result. Retry loading.')
-  return result.data
+  return loadAdminAccess()
 }
 
 export async function loadCompanySalesAccounts(includeMerged=false): Promise<CompanySalesAccount[]> {

@@ -28,9 +28,11 @@ test('administrator access requires an explicit server boolean; missing results 
   vi.resetModules()
   try{
     const {loadCompanyAdminAccess}=await import('../../src/companyAdmin/client')
-    mocks.rpc.mockResolvedValueOnce({data:true,error:null}).mockResolvedValueOnce({data:false,error:null}).mockResolvedValueOnce({data:null,error:null})
+    mocks.rpc.mockResolvedValue({data:true,error:null})
     await expect(loadCompanyAdminAccess()).resolves.toBe(true)
+    mocks.rpc.mockResolvedValue({data:false,error:null})
     await expect(loadCompanyAdminAccess()).resolves.toBe(false)
+    mocks.rpc.mockResolvedValue({data:null,error:null})
     await expect(loadCompanyAdminAccess()).rejects.toThrow('verification returned no result')
     expect(mocks.rpc).toHaveBeenCalledWith('towersignal_is_admin')
   }finally{vi.unstubAllEnvs()}

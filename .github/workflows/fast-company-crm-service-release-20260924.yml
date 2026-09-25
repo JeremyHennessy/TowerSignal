@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
     paths:
+      - 'src/auth/client.ts'
+      - 'src/auth/adminAccess.ts'
+      - 'tests/frontend/AdminAccessRecovery.test.ts'
+      - 'tests/frontend/AuthGateSessionRace.test.tsx'
       - 'src/auth/AuthGate.tsx'
       - 'src/components/AuthLandingPage.tsx'
       - 'src/components/PasswordSetupPage.tsx'
@@ -112,6 +116,10 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           allowed = {
+            'src/auth/client.ts',
+            'src/auth/adminAccess.ts',
+            'tests/frontend/AdminAccessRecovery.test.ts',
+            'tests/frontend/AuthGateSessionRace.test.tsx',
             'src/auth/AuthGate.tsx',
             'src/components/AuthLandingPage.tsx',
             'src/components/PasswordSetupPage.tsx',
@@ -326,6 +334,7 @@ jobs:
           grep -R -Fq "Company master & relationship record" dist/assets
           grep -R -Fq "Parent mapping & enrichment" dist/assets
           grep -R -Fq "Choose your password" dist/assets
+          grep -R -Fq "Retry access check" dist/assets
           python - <<'PY'
           import hashlib, json, pathlib
           expected=json.loads(pathlib.Path('accepted-data-sha256.json').read_text())
@@ -439,6 +448,7 @@ jobs:
           grep -Fq "Company master & relationship record" /tmp/towersignal-index.js
           grep -Fq "Parent mapping & enrichment" /tmp/towersignal-index.js
           grep -Fq "Choose your password" /tmp/towersignal-index.js
+          grep -Fq "Retry access check" /tmp/towersignal-index.js
 
   rollback:
     if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}
