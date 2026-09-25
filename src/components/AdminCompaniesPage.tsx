@@ -9,6 +9,8 @@ import {
   loadAllCompanySalesTasks,
   loadAllCompanySalesDemos,
   loadAllCompanySalesProposals,
+  loadAllCompanySalesSubscriptions,
+  loadAllCompanySalesRenewals,
   loadCompanySalesAccounts,
   loadCompanySalesAccountMembers,
 } from '../companyAdmin/client'
@@ -22,6 +24,8 @@ import type {
   CompanySalesTask,
   CompanySalesDemo,
   CompanySalesProposal,
+  CompanySalesSubscription,
+  CompanySalesRenewal,
   CompanyOpportunityStage,
   CompanySalesAccount,
   CompanySalesAccountMember,
@@ -114,6 +118,8 @@ export function AdminCompaniesPage() {
   const [salesTasks, setSalesTasks] = useState<CompanySalesTask[]>([])
   const [salesDemos, setSalesDemos] = useState<CompanySalesDemo[]>([])
   const [salesProposals, setSalesProposals] = useState<CompanySalesProposal[]>([])
+  const [salesSubscriptions, setSalesSubscriptions] = useState<CompanySalesSubscription[]>([])
+  const [salesRenewals, setSalesRenewals] = useState<CompanySalesRenewal[]>([])
   const [salesAccounts, setSalesAccounts] = useState<CompanySalesAccount[]>([])
   const [salesAccountMembers, setSalesAccountMembers] = useState<CompanySalesAccountMember[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -124,7 +130,7 @@ export function AdminCompaniesPage() {
   const [gap, setGap] = useState('ALL')
 
   const reloadPrivate = async () => {
-    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesDemos, nextSalesProposals, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
+    const [nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesDemos, nextSalesProposals, nextSalesSubscriptions, nextSalesRenewals, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
       loadCompanyAdminDirectory(),
       loadAllCompanyContacts(),
       loadAllCompanyActivities(),
@@ -133,6 +139,8 @@ export function AdminCompaniesPage() {
       loadAllCompanySalesTasks(),
       loadAllCompanySalesDemos(),
       loadAllCompanySalesProposals(),
+      loadAllCompanySalesSubscriptions(),
+      loadAllCompanySalesRenewals(),
       loadCompanySalesAccounts(),
       loadCompanySalesAccountMembers(),
     ])
@@ -144,6 +152,8 @@ export function AdminCompaniesPage() {
     setSalesTasks(nextSalesTasks)
     setSalesDemos(nextSalesDemos)
     setSalesProposals(nextSalesProposals)
+    setSalesSubscriptions(nextSalesSubscriptions)
+    setSalesRenewals(nextSalesRenewals)
     setSalesAccounts(nextSalesAccounts)
     setSalesAccountMembers(nextSalesAccountMembers)
   }
@@ -154,7 +164,7 @@ export function AdminCompaniesPage() {
       if (cancelled) return
       setAllowed(isAdmin)
       if (!isAdmin) return
-      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesDemos, nextSalesProposals, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
+      const [known, nextProfiles, nextContacts, nextActivities, nextQueue, nextOpportunities, nextSalesTasks, nextSalesDemos, nextSalesProposals, nextSalesSubscriptions, nextSalesRenewals, nextSalesAccounts, nextSalesAccountMembers] = await Promise.all([
         loadKnownFirms(),
         loadCompanyAdminDirectory(),
         loadAllCompanyContacts(),
@@ -164,6 +174,8 @@ export function AdminCompaniesPage() {
         loadAllCompanySalesTasks(),
         loadAllCompanySalesDemos(),
         loadAllCompanySalesProposals(),
+        loadAllCompanySalesSubscriptions(),
+        loadAllCompanySalesRenewals(),
         loadCompanySalesAccounts(),
         loadCompanySalesAccountMembers(),
       ])
@@ -177,6 +189,8 @@ export function AdminCompaniesPage() {
       setSalesTasks(nextSalesTasks)
       setSalesDemos(nextSalesDemos)
       setSalesProposals(nextSalesProposals)
+      setSalesSubscriptions(nextSalesSubscriptions)
+      setSalesRenewals(nextSalesRenewals)
       setSalesAccounts(nextSalesAccounts)
       setSalesAccountMembers(nextSalesAccountMembers)
     }).catch(err => {
@@ -389,7 +403,7 @@ export function AdminCompaniesPage() {
 
     {error && <div className="company-admin-error"><strong>Company administration error.</strong><span>{error}</span></div>}
 
-    <AdminSalesTodayPanel accounts={salesAccounts} opportunities={opportunities} tasks={salesTasks} activities={activities} demos={salesDemos} proposals={salesProposals} />
+    <AdminSalesTodayPanel accounts={salesAccounts} opportunities={opportunities} tasks={salesTasks} activities={activities} demos={salesDemos} proposals={salesProposals} subscriptions={salesSubscriptions} renewals={salesRenewals} />
 
     <div className="admin-sales-metrics">
       <article><small>Open TowerSignal deals</small><strong>{number.format(activeSalesOpportunities.length)}</strong><span>{number.format(opportunities.length)} total opportunities</span></article>

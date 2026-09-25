@@ -23,6 +23,7 @@ import { CompanyAuditHistory } from './CompanyAuditHistory'
 import { CompanySalesCrmPanel } from './CompanySalesCrmPanel'
 import { CompanySalesAccountPanel } from './CompanySalesAccountPanel'
 import { CompanyDemoProposalPanel } from './CompanyDemoProposalPanel'
+import { CompanyCustomerLifecyclePanel } from './CompanyCustomerLifecyclePanel'
 
 const number = new Intl.NumberFormat('en-US')
 
@@ -179,6 +180,7 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
     <CompanySalesAccountPanel salesAccountId={model.account.sales_account_id} />
     <CompanySalesCrmPanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} companyIds={model.memberIds} companyName={model.account.display_name} />
     <CompanyDemoProposalPanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} contacts={model.familyContacts} />
+    <CompanyCustomerLifecyclePanel salesAccountId={model.account.sales_account_id} companyId={model.masterId} contacts={model.familyContacts} />
     <CompanyAdminPanel companyId={model.selected.company_id} canonicalName={model.selected.canonical_name} />
     <CompanyAuditHistory companyId={model.selected.company_id} />
   </section>
