@@ -1,23 +1,70 @@
-name: Read-only company mapping and enrichment audit
+name: Apply reviewed admin snapshot migration 014
 
 on:
-  workflow_dispatch:
   push:
-    branches: [feature/company-parent-enrichment-20260925]
-    paths:
-      - database/audits/company_parent_enrichment.sql
-      - .github/workflows/company-data-audit.yml
+    branches: [ops/admin-snapshot-014-20260925]
+    paths: ['.github/workflows/company-data-audit.yml']
 
 permissions:
   contents: read
 
+concurrency:
+  group: company-evidence-production-migration
+  cancel-in-progress: false
+
 jobs:
-  audit:
+  migrate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Read current mapping integrity and enrichment coverage
+        with:
+          ref: e8f1ed1a4e517ec19d86f4767c53f80509eedb0a
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'psycopg[binary]==3.2.10'
+      - name: Apply approved migration atomically and verify preserved company records
+        env:
+          DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import psycopg
+          from psycopg import sql
+          expected = ['company_parent_entities','company_parent_relationships','company_enrichment_sources','company_enrichment_runs','company_enrichment_candidates']
+          migration = Path('database/migrations/014_admin_account_snapshot.sql').read_text().strip()
+          assert migration.startswith('BEGIN;') and migration.endswith('COMMIT;')
+          with psycopg.connect(os.environ['DATABASE_URL']) as conn:
+              with conn.cursor() as cur:
+                  cur.execute("SET LOCAL lock_timeout='10s'; SET LOCAL statement_timeout='60s'")
+                  cur.execute("SELECT pg_advisory_xact_lock(hashtext('towersignal-company-evidence-migration-013'))")
+                  cur.execute("SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename LIKE 'company_%' ORDER BY tablename")
+                  existing = [row[0] for row in cur.fetchall()]
+                  def fingerprint(table):
+                      cur.execute(sql.SQL("SELECT count(*), md5(coalesce(string_agg(h,'' ORDER BY h),'')) FROM (SELECT md5(to_jsonb(t)::text) h FROM public.{} t) s").format(sql.Identifier(table)))
+                      return cur.fetchone()
+                  for table in existing:
+                      cur.execute(sql.SQL('LOCK TABLE public.{} IN SHARE MODE').format(sql.Identifier(table)))
+                  before = {table: fingerprint(table) for table in existing}
+                  cur.execute(migration[len('BEGIN;'):-len('COMMIT;')])
+                  after = {table: fingerprint(table) for table in existing}
+                  assert before == after, 'Existing company records changed; rolling back'
+                  cur.execute("SELECT prosecdef,provolatile,has_function_privilege('authenticated',oid,'EXECUTE') FROM pg_proc WHERE oid='public.towersignal_company_admin_snapshot()'::regprocedure")
+                  assert cur.fetchone() == (False,'s',True), 'Snapshot privilege definition invalid'
+                  cur.execute('SET LOCAL ROLE authenticated')
+                  try:
+                      with conn.transaction():
+                          cur.execute('SELECT public.towersignal_company_admin_snapshot()')
+                      raise AssertionError('Non-admin loaded private snapshot')
+                  except psycopg.errors.InsufficientPrivilege:
+                      pass
+                  cur.execute('RESET ROLE')
+              print(f'MIGRATION_014_VALIDATED read_only_snapshot_function=1 preserved_existing_tables={len(existing)}')
+          print('MIGRATION_014_COMMITTED=PASS; AUTOMATIC_ENRICHMENT=DISABLED')
+          PY
+      - name: Read post-migration mapping integrity and enrichment coverage
         env:
           DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
           PGOPTIONS: -c default_transaction_read_only=on -c statement_timeout=30000
