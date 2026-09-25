@@ -357,8 +357,6 @@ export function AdminCompaniesPage() {
     .sort((a,b) => b.fitScore-a.fitScore || b.readinessScore-a.readinessScore || b.publicObservations-a.publicObservations)
     .slice(0,12), [families])
 
-  const highFitCount=families.filter(family=>family.fitScore>=70&&!['customer','do-not-pursue'].includes(family.accountClassification)).length
-  const readyCount=families.filter(family=>family.readinessScore>=70&&!['customer','do-not-pursue'].includes(family.accountClassification)).length
   const highFitReadyCount=families.filter(family=>family.fitScore>=70&&family.readinessScore>=70&&!['customer','do-not-pursue'].includes(family.accountClassification)).length
 
   const parentRows = useMemo(() => {
