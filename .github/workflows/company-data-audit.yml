@@ -1,0 +1,24 @@
+name: Read-only company mapping and enrichment audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/company-parent-enrichment-20260925]
+    paths:
+      - database/audits/company_parent_enrichment.sql
+      - .github/workflows/company-data-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read current mapping integrity and enrichment coverage
+        env:
+          DATABASE_URL: ${{ secrets.TOWERSIGNAL_DATABASE_URL_UNPOOLED }}
+          PGOPTIONS: -c default_transaction_read_only=on -c statement_timeout=30000
+        run: psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -P pager=off -At -f database/audits/company_parent_enrichment.sql
