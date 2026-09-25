@@ -79,7 +79,6 @@ jobs:
     timeout-minutes: 45
     env:
       ACCEPTED_PRODUCT_SHA: 01222ffd6381405f9544566f5d83f31f967fece4
-      ACCEPTED_PAGES_RUN: '35932617987'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -187,23 +186,60 @@ jobs:
       - name: Install exact frontend dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Download last successful full Pages artifact
+      - name: Resolve latest successful production baseline
+        id: baseline
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflowPath='.github/workflows/fast-company-crm-service-release-20260924.yml';
+            const runs=await github.paginate(github.rest.actions.listWorkflowRunsForRepo,{
+              ...context.repo,
+              per_page:100,
+            });
+            const candidates=runs
+              .filter(run=>run.id!==context.runId && run.path===workflowPath && run.conclusion==='success')
+              .sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at));
+            for(const run of candidates){
+              const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{
+                ...context.repo,
+                run_id:run.id,
+                per_page:100,
+              });
+              const artifact=
+                artifacts.find(item=>item.name==='company-crm-service-production-baseline'&&!item.expired) ||
+                artifacts.find(item=>item.name==='github-pages'&&!item.expired);
+              if(!artifact) continue;
+              core.info(`Using verified baseline ${artifact.name} from successful run ${run.id} @ ${run.head_sha}`);
+              core.setOutput('run_id',String(run.id));
+              core.setOutput('artifact_name',artifact.name);
+              core.setOutput('head_sha',run.head_sha);
+              return;
+            }
+            core.setFailed('No successful unexpired CRM production baseline artifact is available');
+
+      - name: Download latest successful production baseline
         uses: actions/download-artifact@v4
         with:
           repository: JeremyHennessy/TowerSignal
-          run-id: ${{ env.ACCEPTED_PAGES_RUN }}
-          name: github-pages
+          run-id: ${{ steps.baseline.outputs.run_id }}
+          name: ${{ steps.baseline.outputs.artifact_name }}
           github-token: ${{ github.token }}
           path: .accepted-site
 
       - name: Freeze accepted production data byte-for-byte
         shell: bash
+        env:
+          BASELINE_ARTIFACT_NAME: ${{ steps.baseline.outputs.artifact_name }}
         run: |
           set -euo pipefail
           mkdir -p .rollback .source-data public/data
-          archive="$(find .accepted-site -type f | head -1)"
-          test -n "$archive"
-          tar -xf "$archive" -C .rollback
+          if [ "$BASELINE_ARTIFACT_NAME" = "github-pages" ]; then
+            archive="$(find .accepted-site -type f | head -1)"
+            test -n "$archive"
+            tar -xf "$archive" -C .rollback
+          else
+            cp -R .accepted-site/. .rollback/
+          fi
           test -d .rollback/data
           rm -rf public/data
           cp -R .rollback/data public/data
@@ -282,7 +318,15 @@ jobs:
         with:
           path: dist
 
-      - name: Stage accepted full Pages site for rollback
+      - name: Retain verified production candidate as durable baseline
+        uses: actions/upload-artifact@v4
+        with:
+          name: company-crm-service-production-baseline
+          path: dist
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Stage accepted production site for rollback
         uses: actions/upload-pages-artifact@v3
         with:
           name: company-crm-service-rollback
