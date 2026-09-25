@@ -172,7 +172,13 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
           <div className="table-scroll"><table className="account-table admin-family-member-table"><thead><tr><th>Identity</th><th>Role</th><th>Location</th><th>Evidence</th><th></th></tr></thead><tbody>
             {model.members.map(member=>{
               const firm=model.firmById.get(member.company_id)
-              return <tr key={member.company_id} className={member.company_id===model.selected.company_id?'selected-row':''} onClick={()=>setSelectedSourceCompanyId(member.company_id)}>
+              return <tr
+                key={member.company_id}
+                className={member.company_id===model.selected.company_id?'selected-row':''}
+                onClick={()=>{setSelectedSourceCompanyId(member.company_id);setSection('research')}}
+                tabIndex={0}
+                onKeyDown={event=>{if(event.key==='Enter'){setSelectedSourceCompanyId(member.company_id);setSection('research')}}}
+              >
                 <td><strong>{member.canonical_name}</strong><small>{member.legal_name||member.company_id}</small></td>
                 <td><strong>{member.company_id===model.masterId?'Master':'Rolled-up identity'}</strong><small>{member.rollup_source_name||'Reviewed family member'}</small></td>
                 <td><strong>{[member.headquarters_city,member.headquarters_region].filter(Boolean).join(', ')||'Not recorded'}</strong><small>{member.website?member.website.replace(/^https?:\/\//,'').replace(/\/$/,''):'Website not recorded'}</small></td>
