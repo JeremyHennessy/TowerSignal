@@ -25,6 +25,11 @@ export function httpsUrl(value:string):boolean {
   try { const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password&&!url.hash&&(!url.port||url.port==='443') }
   catch {return false}
 }
+export function validObservationDate(value:string):boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith('0000')) return false
+  const date=new Date(`${value}T00:00:00Z`)
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0,10)===value
+}
 export function observationText(value:unknown):string {
   if(typeof value==='string')return value
   if(value&&typeof value==='object')return Object.values(value).filter(v=>typeof v==='string'&&v.trim()).join(', ')

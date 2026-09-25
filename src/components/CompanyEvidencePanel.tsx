@@ -4,7 +4,7 @@ import {
   reviewCompanyEnrichmentCandidate, reviewCompanyParent, setCompanyEnrichmentSourceEnabled,
 } from '../companyAdmin/client'
 import type { CompanyEvidence } from '../companyAdmin/evidence'
-import { observationText } from '../companyAdmin/evidence'
+import { observationText, validObservationDate } from '../companyAdmin/evidence'
 import type { CompanySalesAccount } from '../types/companyAdmin'
 
 export function CompanyEvidencePanel({accounts}:{accounts:CompanySalesAccount[]}) {
@@ -54,9 +54,10 @@ export function CompanyEvidencePanel({accounts}:{accounts:CompanySalesAccount[]}
           <button disabled={busy||!parentName.trim()} onClick={()=>void act(async()=>{await addCompanyParent(parentName,parentWebsite);setParentName('');setParentWebsite('')})}>Create parent entity</button>
           <label><span>Parent entity</span><select value={parentId} onChange={e=>setParentId(e.target.value)}><option value="">Choose a parent</option>{data.parents.map(p=><option key={p.parent_entity_id} value={p.parent_entity_id}>{p.display_name}</option>)}</select></label>
           <label><span>Ownership evidence URL</span><input type="url" value={evidenceUrl} onChange={e=>setEvidenceUrl(e.target.value)}/></label>
-          <label><span>Observed on</span><input type="date" value={observedOn} onChange={e=>setObservedOn(e.target.value)}/></label>
+          <label><span>Observed on</span><input type="text" aria-label="Observed on" placeholder="YYYY-MM-DD" aria-describedby="parent-date-help" aria-invalid={Boolean(observedOn)&&!validObservationDate(observedOn)} value={observedOn} onChange={e=>setObservedOn(e.target.value)}/><small id="parent-date-help">Date you checked the source, in YYYY-MM-DD format.</small></label>
+          <button type="button" onClick={()=>{const now=new Date();setObservedOn(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`)}}>Use today</button>
           <label className="wide"><span>What the source establishes</span><textarea value={evidenceNote} onChange={e=>setEvidenceNote(e.target.value)}/></label>
-          <button disabled={busy||!accountId||!parentId||!observedOn||!evidenceUrl||!evidenceNote.trim()} onClick={()=>void act(()=>proposeCompanyParent({sales_account_id:accountId,parent_entity_id:parentId,relationship_type:'parent',evidence_url:evidenceUrl,evidence_note:evidenceNote,observed_on:observedOn,valid_from:null,valid_to:null}))}>Propose parent link</button>
+          <button disabled={busy||!accountId||!parentId||!validObservationDate(observedOn)||!evidenceUrl||!evidenceNote.trim()} onClick={()=>void act(()=>proposeCompanyParent({sales_account_id:accountId,parent_entity_id:parentId,relationship_type:'parent',evidence_url:evidenceUrl,evidence_note:evidenceNote,observed_on:observedOn,valid_from:null,valid_to:null}))}>Propose parent link</button>
         </div>
         <div className="table-scroll"><table className="account-table"><thead><tr><th>Account</th><th>Parent</th><th>Evidence</th><th>Status</th><th>Review</th></tr></thead><tbody>{data.relationships.map(r=><tr key={r.relationship_id}><td>{accountName(r.sales_account_id)}</td><td>{data.parents.find(p=>p.parent_entity_id===r.parent_entity_id)?.display_name}</td><td><a href={r.evidence_url} target="_blank" rel="noreferrer">Source ↗</a><small>{r.observed_on} · {r.evidence_note}</small></td><td>{r.status}</td><td>{r.status==='proposed'&&<button disabled={busy} onClick={()=>{if(window.confirm('Confirm this evidence-backed parent relationship? Existing legacy mappings will remain unchanged.'))void act(()=>reviewCompanyParent(r.relationship_id,'confirmed'))}}>Confirm</button>}{r.status!=='historical'&&<button disabled={busy} onClick={()=>void act(()=>reviewCompanyParent(r.relationship_id,'historical'))}>Archive link</button>}</td></tr>)}</tbody></table></div>
       </details>

@@ -4,7 +4,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { CompanyEvidencePanel } from '../../src/components/CompanyEvidencePanel'
 import * as api from '../../src/companyAdmin/client'
 import type { CompanyEvidence } from '../../src/companyAdmin/evidence'
-import { httpsUrl } from '../../src/companyAdmin/evidence'
+import { httpsUrl, validObservationDate } from '../../src/companyAdmin/evidence'
 import type { CompanySalesAccount } from '../../src/types/companyAdmin'
 
 vi.mock('../../src/companyAdmin/client',()=>({
@@ -50,4 +50,26 @@ test('source approval requires chosen account and explicit official source input
 test('source URLs reject credentials and insecure schemes',()=>{
   expect(httpsUrl('https://example.com/about')).toBe(true)
   for(const value of ['http://example.com','javascript:alert(1)','https://user:pass@example.com','https://example.com:8443'])expect(httpsUrl(value)).toBe(false)
+})
+
+test('typed evidence dates reject impossible dates without depending on a native calendar',()=>{
+  expect(validObservationDate('2024-02-29')).toBe(true)
+  expect(validObservationDate('2026-09-25')).toBe(true)
+  for(const value of ['2026-02-29','2026-04-31','09/25/2026','2026-13-01','', '0000-01-01'])expect(validObservationDate(value)).toBe(false)
+})
+
+test('parent evidence accepts a typed date and sends the exact reviewed date',async()=>{
+  vi.mocked(api.loadCompanyEvidence).mockResolvedValue({...empty,parents:[{parent_entity_id:'parent',display_name:'Example Group',website:null}]})
+  render(<CompanyEvidencePanel accounts={accounts}/>)
+  await userEvent.click(await screen.findByText('Parent entities and ownership evidence'))
+  await userEvent.selectOptions(screen.getByLabelText('Evidence company account'),'account')
+  await userEvent.selectOptions(screen.getByLabelText('Parent entity'),'parent')
+  await userEvent.type(screen.getByLabelText('Ownership evidence URL'),'https://example.com/brands')
+  await userEvent.type(screen.getByLabelText('What the source establishes'),'Official portfolio lists the operating company.')
+  await userEvent.type(screen.getByLabelText('Observed on'),'2026-02-30')
+  expect(screen.getByRole('button',{name:'Propose parent link'})).toBeDisabled()
+  await userEvent.clear(screen.getByLabelText('Observed on'))
+  await userEvent.type(screen.getByLabelText('Observed on'),'2026-09-25')
+  await userEvent.click(screen.getByRole('button',{name:'Propose parent link'}))
+  await waitFor(()=>expect(api.proposeCompanyParent).toHaveBeenCalledWith(expect.objectContaining({observed_on:'2026-09-25',sales_account_id:'account',parent_entity_id:'parent'})))
 })

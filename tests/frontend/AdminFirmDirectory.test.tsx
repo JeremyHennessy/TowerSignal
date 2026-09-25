@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { afterEach, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { buildCompanyDirectory } from '../../src/companyAdmin/directory'
 import { AdminFirmDirectory } from '../../src/components/AdminFirmDirectory'
 import type { CompanyAdminProfile, CompanySalesAccount, CompanySalesAccountMember } from '../../src/types/companyAdmin'
@@ -8,6 +8,7 @@ import type { CompanyEvidence } from '../../src/companyAdmin/evidence'
 const mocks=vi.hoisted(()=>({evidence:vi.fn()}))
 vi.mock('../../src/companyAdmin/client',()=>({loadCompanyEvidence:mocks.evidence}))
 afterEach(()=>{cleanup();vi.resetAllMocks()})
+beforeEach(()=>window.history.replaceState(null,'','#/admin-companies'))
 const firm=(id:string,name:string,normalized=name)=>({firm_id:id,canonical_name:name,normalized_name:normalized,roles:['DWT_INSPECTION_PROVIDER'],observation_count:10} as KnownFirmSummaryRecord)
 const accounts=[{sales_account_id:'master',display_name:'Reviewed Water',primary_company_id:'one',record_status:'active',account_classification:'target',parent_name:'Recorded Group',parent_source_url:'https://example.com/recorded'}] as CompanySalesAccount[]
 const profiles=[{company_id:'one',canonical_name:'Water LLC'},{company_id:'two',canonical_name:'Water Ltd'},{company_id:'private',canonical_name:'Private legacy name'}] as CompanyAdminProfile[]
@@ -40,9 +41,9 @@ test('company table loads without tab hunting, searches retained aliases, and sh
   fireEvent.change(screen.getByLabelText('Search all firms'),{target:{value:'Private legacy'}})
   expect(screen.getByRole('link',{name:'Reviewed Water'})).toBeTruthy()
   expect(screen.queryByRole('link',{name:'Water Inc'})).toBeNull()
-  fireEvent.click(screen.getByRole('button',{name:'Parent groups'}))
+  fireEvent.click(screen.getByRole('link',{name:'Parent groups'}))
   expect(await screen.findByText('Recorded Group')).toBeTruthy()
-  expect(screen.getByRole('link',{name:'Reviewed Water evidence ↗'}).getAttribute('href')).toBe('https://example.com/recorded')
+  expect((await screen.findByRole('link',{name:'Reviewed Water evidence ↗'})).getAttribute('href')).toBe('https://example.com/recorded')
 })
 
 test('pagination and coverage filters include firms beyond the first page; evidence failure never empties the directory',async()=>{

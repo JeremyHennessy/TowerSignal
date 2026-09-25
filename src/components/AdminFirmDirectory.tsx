@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { CompanyAdminProfile, CompanySalesAccount, CompanySalesAccountMember } from '../types/companyAdmin'
 import type { KnownFirmSummaryRecord } from '../types/firm'
+import { useAdminNavigation } from '../companyAdmin/navigation'
 import { buildCompanyDirectory } from '../companyAdmin/directory'
 import { loadCompanyEvidence } from '../companyAdmin/client'
 import type { CompanyEvidence } from '../companyAdmin/evidence'
@@ -12,10 +13,13 @@ export function AdminFirmDirectory({firms,profiles,accounts,members}: {
 }) {
   const [evidence,setEvidence]=useState<CompanyEvidence|null>(null)
   const [error,setError]=useState<string|null>(null)
-  const [query,setQuery]=useState('')
-  const [scope,setScope]=useState('all')
-  const [view,setView]=useState<'companies'|'parents'>('companies')
-  const [page,setPage]=useState(0)
+  const navigation=useAdminNavigation()
+  const query=navigation.params.get('q')??''
+  const scope=navigation.choice('coverage',['all','mapped','unmapped','parent'] as const,'all')
+  const view=navigation.choice('hierarchy',['companies','parents'] as const,'companies')
+  const requestedPage=Number(navigation.params.get('page')??1)
+  const page=Number.isSafeInteger(requestedPage)&&requestedPage>0?requestedPage-1:0
+  const setPage=(next:number)=>navigation.update({page:String(next+1)})
   useEffect(()=>{let cancelled=false;void loadCompanyEvidence().then(value=>{if(!cancelled)setEvidence(value)}).catch(err=>{if(!cancelled)setError(err instanceof Error?err.message:'Parent evidence could not load')});return()=>{cancelled=true}},[])
   const rows=useMemo(()=>buildCompanyDirectory(firms,profiles,accounts,members,evidence),[firms,profiles,accounts,members,evidence])
   const filtered=useMemo(()=>{
@@ -34,9 +38,9 @@ export function AdminFirmDirectory({firms,profiles,accounts,members}: {
     <p className="admin-directory-note">Reviewed aliases are grouped under their master company. Every remaining firm is listed separately. Normalized names support search; they do not establish a company or parent match.</p>
     {error&&<div role="alert" className="company-admin-error">Additional parent evidence could not load: {error}. Recorded CRM parents are shown; confirmed-link coverage is unavailable.</div>}
     <div className="admin-directory-controls">
-      <label>Find a company<input aria-label="Search all firms" value={query} placeholder="Company, source name, normalized name or parent…" onChange={event=>{setQuery(event.target.value);setPage(0)}}/></label>
-      <label>Coverage<select aria-label="Firm mapping coverage" value={scope} onChange={event=>{setScope(event.target.value);setPage(0)}}><option value="all">All firms</option><option value="mapped">Mapped to CRM</option><option value="unmapped">Not yet mapped</option><option value="parent">Parent recorded</option></select></label>
-      <div className="admin-account-views" role="group" aria-label="Firm hierarchy view"><button type="button" aria-pressed={view==='companies'} onClick={()=>setView('companies')}>Company table</button><button type="button" aria-pressed={view==='parents'} onClick={()=>setView('parents')}>Parent groups</button></div>
+      <label>Find a company<input aria-label="Search all firms" value={query} placeholder="Company, source name, normalized name or parent…" onChange={event=>{navigation.update({q:event.target.value,page:null},true)}}/></label>
+      <label>Coverage<select aria-label="Firm mapping coverage" value={scope} onChange={event=>{navigation.update({coverage:event.target.value,page:null})}}><option value="all">All firms</option><option value="mapped">Mapped to CRM</option><option value="unmapped">Not yet mapped</option><option value="parent">Parent recorded</option></select></label>
+      <div className="admin-account-views" role="group" aria-label="Firm hierarchy view"><a href={navigation.href({hierarchy:'companies'})} aria-current={view==='companies'?'page':undefined}>Company table</a><a href={navigation.href({hierarchy:'parents'})} aria-current={view==='parents'?'page':undefined}>Parent groups</a></div>
     </div>
     {view==='companies'?<>
       <div className="admin-directory-pagination"><span>{number.format(filtered.length)} company rows · {number.format(filtered.reduce((sum,row)=>sum+row.identities.length,0))} retained identities</span><div><button disabled={visiblePage===0} onClick={()=>setPage(visiblePage-1)}>Previous</button><span>Page {visiblePage+1} of {Math.max(1,Math.ceil(filtered.length/pageSize))}</span><button disabled={(visiblePage+1)*pageSize>=filtered.length} onClick={()=>setPage(visiblePage+1)}>Next</button></div></div>

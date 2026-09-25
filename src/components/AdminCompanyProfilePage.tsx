@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useAdminNavigation } from '../companyAdmin/navigation'
+import { ShareButton } from './ShareButton'
 import { loadCompanyAdminAccess, loadCompanyAdminOverview } from '../companyAdmin/client'
 import { loadKnownFirms } from '../data/api'
 import type {
@@ -18,7 +20,6 @@ import { CompanyDemoProposalPanel } from './CompanyDemoProposalPanel'
 import { CompanyCustomerLifecyclePanel } from './CompanyCustomerLifecyclePanel'
 
 const number = new Intl.NumberFormat('en-US')
-type AdminCompanySection = 'overview' | 'sales' | 'commercial' | 'customer' | 'research' | 'audit'
 
 function human(value: string): string {
   return value.replaceAll('_',' ').replaceAll('-',' ').replace(/(^|\s)\S/g, match => match.toUpperCase())
@@ -40,10 +41,11 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
   const [queue,setQueue]=useState<CompanyResearchQueueItem[]>([])
   const [salesAccounts,setSalesAccounts]=useState<CompanySalesAccount[]>([])
   const [salesAccountMembers,setSalesAccountMembers]=useState<CompanySalesAccountMember[]>([])
-  const [selectedSourceCompanyId,setSelectedSourceCompanyId]=useState<string|null>(null)
+  const navigation=useAdminNavigation()
+  const selectedSourceCompanyId=navigation.params.get('source')
   const [known,setKnown]=useState<KnownFirmPayload|null>(null)
   const [error,setError]=useState<string|null>(null)
-  const [section,setSection]=useState<AdminCompanySection>('overview')
+  const section=navigation.choice('section',['overview','sales','commercial','customer','research','audit'] as const,'overview')
 
   useEffect(()=>{
     let cancelled=false
@@ -107,6 +109,7 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
         <p>{human(model.account.account_classification)} · {model.members.length} retained source identities · editing {model.selected.canonical_name}</p>
       </div>
       <div className="page-actions">
+        <ShareButton label="Copy page link" />
         <a className="secondary-link-button" href="#/admin-companies">Company command center</a>
         {publicFirm&&<a className="secondary-link-button" href={`#/company/${encodeURIComponent(publicFirm.firm_id)}`}>Public Known Firm</a>}
       </div>
@@ -122,12 +125,12 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
     </div>
 
     <nav className="admin-profile-nav" aria-label="Company admin sections">
-      <button type="button" className={section==='overview'?'active':''} onClick={()=>setSection('overview')}>Overview</button>
-      <button type="button" className={section==='sales'?'active':''} onClick={()=>setSection('sales')}>Sales</button>
-      <button type="button" className={section==='commercial'?'active':''} onClick={()=>setSection('commercial')}>Demos &amp; proposals</button>
-      <button type="button" className={section==='customer'?'active':''} onClick={()=>setSection('customer')}>Customer</button>
-      <button type="button" className={section==='research'?'active':''} onClick={()=>setSection('research')}>Research</button>
-      <button type="button" className={section==='audit'?'active':''} onClick={()=>setSection('audit')}>Audit</button>
+      <a href={navigation.href({section:'overview'})} aria-current={section==='overview'?'page':undefined}>Overview</a>
+      <a href={navigation.href({section:'sales'})} aria-current={section==='sales'?'page':undefined}>Sales</a>
+      <a href={navigation.href({section:'commercial'})} aria-current={section==='commercial'?'page':undefined}>Demos &amp; proposals</a>
+      <a href={navigation.href({section:'customer'})} aria-current={section==='customer'?'page':undefined}>Customer</a>
+      <a href={navigation.href({section:'research'})} aria-current={section==='research'?'page':undefined}>Research</a>
+      <a href={navigation.href({section:'audit'})} aria-current={section==='audit'?'page':undefined}>Audit</a>
     </nav>
 
     {section==='overview'&&<div className="admin-profile-section">
@@ -154,9 +157,9 @@ export function AdminCompanyProfilePage({ companyId }: { companyId: string }) {
               return <tr
                 key={member.company_id}
                 className={member.company_id===model.selected.company_id?'selected-row':''}
-                onClick={()=>{setSelectedSourceCompanyId(member.company_id);setSection('research')}}
+                onClick={()=>{navigation.update({section:'research',source:member.company_id})}}
                 tabIndex={0}
-                onKeyDown={event=>{if(event.key==='Enter'){setSelectedSourceCompanyId(member.company_id);setSection('research')}}}
+                onKeyDown={event=>{if(event.key==='Enter'){navigation.update({section:'research',source:member.company_id})}}}
               >
                 <td><strong>{member.canonical_name}</strong><small>{member.legal_name||member.company_id}</small></td>
                 <td><strong>{member.company_id===model.masterId?'Master':'Rolled-up identity'}</strong><small>{member.rollup_source_name||'Reviewed family member'}</small></td>
