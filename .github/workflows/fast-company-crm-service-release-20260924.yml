@@ -115,6 +115,8 @@ jobs:
             'database/migrations/015_company_evidence_snapshot.sql',
             'tests/frontend/CompanyEvidenceSnapshot.test.ts',
             'src/companyAdmin/directory.ts',
+            'src/companyAdmin/navigation.ts',
+            'tests/frontend/AdminNavigation.test.tsx',
             'src/components/AdminFirmDirectory.tsx',
             'tests/frontend/AdminFirmDirectory.test.tsx',
             'src/companyAdmin/accountMapping.ts',

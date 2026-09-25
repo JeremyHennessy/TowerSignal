@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useAdminNavigation } from '../companyAdmin/navigation'
+import { ShareButton } from './ShareButton'
 import { AdminFirmDirectory } from './AdminFirmDirectory'
 import { CompanyEvidencePanel } from './CompanyEvidencePanel'
 import { loadCompanyAdminAccess, loadCompanyAdminOverview } from '../companyAdmin/client'
@@ -33,7 +35,6 @@ const accountClassifications: CompanySalesAccountClassification[] = [
 ]
 const opportunityStages: CompanyOpportunityStage[] = ['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation','closed-won','closed-lost','nurture']
 const pipelineBoardStages: CompanyOpportunityStage[] = ['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation']
-type AdminWorkspaceView = 'today' | 'pipeline' | 'accounts' | 'data'
 const activeOpportunityStages = new Set<CompanyOpportunityStage>(['lead','qualified','demo-scheduled','demo-complete','proposal','negotiation'])
 const opportunityRank: Record<CompanyOpportunityStage,number> = {
   'lead':0,'qualified':1,'demo-scheduled':2,'demo-complete':3,'proposal':4,'negotiation':5,
@@ -119,8 +120,9 @@ export function AdminCompaniesPage() {
   const [salesStageFilter, setSalesStageFilter] = useState('ALL')
   const [scoreFilter, setScoreFilter] = useState('ALL')
   const [gap, setGap] = useState('ALL')
-  const [workspaceView,setWorkspaceView]=useState<AdminWorkspaceView>('accounts')
-  const [accountView,setAccountView]=useState<'all'|'directory'|'mapping'>('all')
+  const navigation=useAdminNavigation()
+  const workspaceView=navigation.choice('section',['today','pipeline','accounts','data'] as const,'accounts')
+  const accountView=navigation.choice('table',['all','directory','mapping'] as const,'all')
 
   const applyOverview = (data:Awaited<ReturnType<typeof loadCompanyAdminOverview>>) => {
     setProfiles(data.profiles);setContacts(data.contacts);setActivities(data.activities);setQueue(data.queue)
@@ -332,9 +334,10 @@ export function AdminCompaniesPage() {
       <div>
         <span className="page-kicker">Admin · private TowerSignal CRM</span>
         <h1>Sales &amp; account command center</h1>
-        <p>Work today’s follow-ups, manage deals and customer renewals, then move into account research only when you need it.</p>
+        <p>Browse every firm, review company and parent mappings, and manage your sales and customer work.</p>
       </div>
       <div className="page-actions">
+        <ShareButton label="Copy page link" />
         <a className="secondary-link-button" href="#/companies">Known Firms</a>
         <a className="secondary-link-button" href="#/service">Service operations</a>
       </div>
@@ -343,18 +346,18 @@ export function AdminCompaniesPage() {
     {error && <div className="company-admin-error"><strong>Company administration error.</strong><span>{error}</span></div>}
 
     <nav className="admin-workspace-nav" aria-label="Admin workspace sections">
-      <button type="button" className={workspaceView==='today'?'active':''} onClick={()=>setWorkspaceView('today')}>
+      <a href={navigation.href({section:'today'})} aria-current={workspaceView==='today'?'page':undefined}>
         <strong>Today</strong><span>Actions &amp; exceptions</span>
-      </button>
-      <button type="button" className={workspaceView==='pipeline'?'active':''} onClick={()=>setWorkspaceView('pipeline')}>
+      </a>
+      <a href={navigation.href({section:'pipeline'})} aria-current={workspaceView==='pipeline'?'page':undefined}>
         <strong>Pipeline</strong><span>Deals &amp; targets</span>
-      </button>
-      <button type="button" className={workspaceView==='accounts'?'active':''} onClick={()=>setWorkspaceView('accounts')}>
+      </a>
+      <a href={navigation.href({section:'accounts'})} aria-current={workspaceView==='accounts'?'page':undefined}>
         <strong>Companies</strong><span>{number.format(payload.firms.length)} firm identities</span>
-      </button>
-      <button type="button" className={workspaceView==='data'?'active':''} onClick={()=>setWorkspaceView('data')}>
+      </a>
+      <a href={navigation.href({section:'data'})} aria-current={workspaceView==='data'?'page':undefined}>
         <strong>Data &amp; ops</strong><span>Ownership &amp; research</span>
-      </button>
+      </a>
     </nav>
 
     {workspaceView!=='accounts'&&<div className="admin-command-strip">
@@ -411,9 +414,9 @@ export function AdminCompaniesPage() {
     {workspaceView==='accounts'&&<div className="admin-workspace-view">
       <section className="admin-company-card admin-family-directory">
         <div className="admin-account-views" role="group" aria-label="Account table view">
-          <button type="button" aria-pressed={accountView==='all'} onClick={()=>setAccountView('all')}>All firms &amp; parents</button>
-          <button type="button" aria-pressed={accountView==='directory'} onClick={()=>setAccountView('directory')}>CRM accounts ({families.length})</button>
-          <button type="button" aria-pressed={accountView==='mapping'} onClick={()=>setAccountView('mapping')}>Mapping review</button>
+          <a href={navigation.href({section:'accounts',table:'all'})} aria-current={accountView==='all'?'page':undefined}>All firms &amp; parents</a>
+          <a href={navigation.href({section:'accounts',table:'directory'})} aria-current={accountView==='directory'?'page':undefined}>CRM accounts ({families.length})</a>
+          <a href={navigation.href({section:'accounts',table:'mapping'})} aria-current={accountView==='mapping'?'page':undefined}>Mapping review</a>
         </div>
         {accountView==='all'?<AdminFirmDirectory firms={payload.firms} profiles={profiles} accounts={salesAccounts} members={salesAccountMembers}/>:accountView==='mapping'?<CompanyRollupReviewPanel
           accounts={salesAccounts} members={salesAccountMembers} profiles={profiles}

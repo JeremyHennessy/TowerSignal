@@ -2,6 +2,12 @@ name: Check approved company enrichment sources
 
 on:
   workflow_dispatch:
+    inputs:
+      run_once:
+        description: Check approved sources once without enabling the weekly schedule
+        required: true
+        type: boolean
+        default: false
   schedule:
     - cron: '23 9 * * 1'
 
@@ -14,7 +20,7 @@ concurrency:
 
 jobs:
   observe:
-    if: github.ref == 'refs/heads/main' && vars.COMPANY_ENRICHMENT_ENABLED == 'true'
+    if: github.ref == 'refs/heads/main' && (vars.COMPANY_ENRICHMENT_ENABLED == 'true' || (github.event_name == 'workflow_dispatch' && inputs.run_once))
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:

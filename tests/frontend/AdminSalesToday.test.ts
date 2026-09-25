@@ -6,7 +6,7 @@ const today=readFileSync('src/components/AdminSalesTodayPanel.tsx','utf8')
 const detail=readFileSync('src/components/AdminCompanyProfilePage.tsx','utf8')
 
 test('admin command center uses focused workspaces instead of one long dashboard',()=>{
-  expect(dashboard).toContain("useState<AdminWorkspaceView>('accounts')")
+  expect(dashboard).toContain("navigation.choice('section',['today','pipeline','accounts','data'] as const,'accounts')")
   expect(dashboard).toContain("workspaceView==='today'")
   expect(dashboard).toContain("workspaceView==='pipeline'")
   expect(dashboard).toContain("workspaceView==='accounts'")
@@ -30,7 +30,7 @@ test('Sales Today stays focused on actionable commercial exceptions',()=>{
 })
 
 test('company admin detail is split into focused sections',()=>{
-  expect(detail).toContain("useState<AdminCompanySection>('overview')")
+  expect(detail).toContain("navigation.choice('section',['overview','sales','commercial','customer','research','audit'] as const,'overview')")
   expect(detail).toContain("section==='overview'")
   expect(detail).toContain("section==='sales'")
   expect(detail).toContain("section==='commercial'")

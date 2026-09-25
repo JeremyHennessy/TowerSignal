@@ -49,3 +49,21 @@ These results demonstrate the collector's boundaries, not complete research or c
 - Local browser preview with synthetic data: desktop and 390-pixel mobile, expanded evidence sections, pending-review action and no page errors. This does not replace authenticated hosted acceptance after release.
 - Exact release allowlist: 74 changed paths from the accepted product baseline, with no unexpected/missing paths. Public data hash verification remains mandatory during release.
 - Production remains at the previously accepted main until separately authorized. The scheduled worker is disabled by default.
+
+
+## September 25 continuation: parent review and usable navigation
+
+The production directory now retains 13,779 source identities in 13,528 rows, including 89 CRM masters covering 340 reviewed memberships. Four additional current group relationships were recorded with observed date September 25, taking the confirmed relationship total from three to seven:
+
+- Nalco Water → Ecolab: https://www.ecolab.com/en-us/about/our-businesses/nalco-water-and-process-services
+- Barclay Water Management → Ecolab: https://investor.ecolab.com/news/news-details/2024/Ecolab-Acquires-Barclay-Water-Management/default.aspx ; current barclaywater.com redirect corroborates the group connection.
+- Environmental Building Solutions → Pinchin Ltd.: https://www.pinchin.com/about
+- Rochester Midland Corp. → Peak Rock Capital: https://www.rochestermidland.com/team/jim-white/
+
+The records describe sourced group/portfolio relationships, not ownership percentages or intermediate legal holding entities. The guarded transaction preserved all 89 active masters and 340 membership mappings. Cascade, Culligan and York legacy parent labels were not promoted merely from old or incomplete evidence.
+
+Tower Water and Certified Laboratories official home pages were approved with exact matching published structured organization names. A read-only collector smoke check matched both organizations; Tower Water exposed two contact-route observations, while Certified Laboratories exposed no supported proposed fields. These are collection results, not complete company enrichment.
+
+The enrichment workflow now offers an explicit `run_once` manual input on main. It permits checking the approved sources once while the weekly `COMPANY_ENRICHMENT_ENABLED` gate remains off. Existing candidate review and publication boundaries remain unchanged. Verify the first production run and pending observations before considering recurring activation.
+
+Admin workspace, table and company-detail navigation now uses visible bordered links, dark selected states and keyboard focus indicators. Hash URLs preserve sections, directory filters, pagination and the selected research source identity. Copy page link copies the current view; recipients still require existing administrator access. The parent evidence date field accepts validated YYYY-MM-DD text and a Use today shortcut, avoiding the embedded browser native calendar crash.
