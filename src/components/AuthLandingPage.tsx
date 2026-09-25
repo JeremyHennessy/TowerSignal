@@ -64,6 +64,7 @@ export function AuthLandingPage({
           {error && <div className="auth-form-error" role="alert">{error}</div>}
           <button className="auth-submit" type="submit" disabled={busy || !email.trim() || password.length < 8}>{busy ? 'Working…' : 'Sign in'} <span aria-hidden="true">→</span></button>
         </form>
+        <p><a href="#/password-setup">Set up or reset your password</a></p>
         <div className="auth-security-note"><strong>Private access only</strong><span>New accounts cannot be created from TowerSignal. Access is provisioned by an administrator.</span></div>
       </div>
     </section>

@@ -4,6 +4,13 @@ on:
   push:
     branches: [main]
     paths:
+      - 'src/auth/AuthGate.tsx'
+      - 'src/components/AuthLandingPage.tsx'
+      - 'src/components/PasswordSetupPage.tsx'
+      - 'src/workflow/remoteClient.ts'
+      - 'tests/frontend/PasswordSetupPage.test.tsx'
+      - 'tests/frontend/AuthGatePasswordSetup.test.tsx'
+      - 'tests/e2e/auth-public.spec.ts'
       - '.github/workflows/fast-company-crm-service-release-20260924.yml'
       - 'database/migrations/004a_company_audit_refinement.sql'
       - 'database/migrations/005_service_reporting_foundation.sql'
@@ -105,6 +112,13 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           allowed = {
+            'src/auth/AuthGate.tsx',
+            'src/components/AuthLandingPage.tsx',
+            'src/components/PasswordSetupPage.tsx',
+            'src/workflow/remoteClient.ts',
+            'tests/frontend/PasswordSetupPage.test.tsx',
+            'tests/frontend/AuthGatePasswordSetup.test.tsx',
+            'tests/e2e/auth-public.spec.ts',
             '.gitignore',
             '.github/workflows/company-data-audit.yml',
             '.github/workflows/company-evidence-ci.yml',
@@ -311,6 +325,7 @@ jobs:
           grep -R -Fq "Priority target accounts" dist/assets
           grep -R -Fq "Company master & relationship record" dist/assets
           grep -R -Fq "Parent mapping & enrichment" dist/assets
+          grep -R -Fq "Choose your password" dist/assets
           python - <<'PY'
           import hashlib, json, pathlib
           expected=json.loads(pathlib.Path('accepted-data-sha256.json').read_text())
@@ -423,6 +438,7 @@ jobs:
           grep -Fq "Priority target accounts" /tmp/towersignal-index.js
           grep -Fq "Company master & relationship record" /tmp/towersignal-index.js
           grep -Fq "Parent mapping & enrichment" /tmp/towersignal-index.js
+          grep -Fq "Choose your password" /tmp/towersignal-index.js
 
   rollback:
     if: ${{ always() && needs.deploy.result == 'success' && needs.verify.result == 'failure' }}

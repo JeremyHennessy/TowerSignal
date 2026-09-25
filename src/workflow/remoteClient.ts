@@ -62,6 +62,18 @@ export async function signOutWorkflow(): Promise<void> {
   throwIfError('Unable to sign out', result.error)
 }
 
+export async function requestWorkflowPasswordSetup(email: string): Promise<void> {
+  const redirectTo = new URL(import.meta.env.BASE_URL, window.location.origin)
+  redirectTo.hash = '/password-setup'
+  const result = await client.auth.requestPasswordReset({ email, redirectTo: redirectTo.href })
+  if (result.error) throw new Error('Unable to send the setup email. Please try again or contact your administrator.')
+}
+
+export async function completeWorkflowPasswordSetup(token: string, newPassword: string): Promise<void> {
+  const result = await client.auth.resetPassword({ token, newPassword })
+  if (result.error) throw new Error('The password could not be saved. The link may have expired; request a new setup email.')
+}
+
 export async function loadWorkflowSnapshot(): Promise<WorkflowSnapshot> {
   const [savedViewsResult, watchlistsResult, accountsResult, membershipsResult] = await Promise.all([
     client.from('workflow_saved_views').select('view_id,name,filters,created_at,updated_at').order('updated_at', { ascending: false }),
