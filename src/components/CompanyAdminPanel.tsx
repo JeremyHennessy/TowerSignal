@@ -16,6 +16,7 @@ import type {
   CompanyAdminProfile,
   CompanyAdminProfilePatch,
 } from '../types/companyAdmin'
+import { CompanyExternalActivityCapturePanel } from './CompanyExternalActivityCapturePanel'
 
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 
@@ -481,6 +482,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
 
       <section className="company-admin-card">
         <div className="company-admin-card-heading"><strong>Contact / activity history</strong><span>{activities.length} logged interactions</span></div>
+        <CompanyExternalActivityCapturePanel companyId={companyId} contacts={contacts} onCaptured={reload} />
         <div className="company-admin-inline-form activity-form">
           <select aria-label="Activity type" value={activityType} onChange={event => setActivityType(event.target.value)}><option value="email">Email</option><option value="call">Call</option><option value="meeting">Meeting</option><option value="linkedin">LinkedIn</option><option value="other">Other</option></select>
           <input aria-label="Activity date" type="datetime-local" value={activityDate} onChange={event => setActivityDate(event.target.value)} />
@@ -490,7 +492,7 @@ export function CompanyAdminPanel({ companyId, canonicalName }: { companyId: str
           <textarea aria-label="Activity details" rows={2} value={activityDetails} onChange={event => setActivityDetails(event.target.value)} placeholder="What happened?" />
           <button onClick={addActivity} disabled={busy || !activityDate}>Log interaction</button>
         </div>
-        <div className="company-admin-timeline">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.contact_id && <span>Contact: {contactById.get(activity.contact_id)?.name ?? activity.contact_id}</span>}{activity.subject && <span>{activity.subject}</span>}{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}</article>) : <span className="company-admin-empty">No outreach or interaction history recorded.</span>}</div>
+        <div className="company-admin-timeline">{activities.length ? activities.map(activity => <article key={activity.activity_id}><time>{new Date(activity.occurred_at).toLocaleString()}</time><strong>{relationshipLabel(activity.activity_type)}</strong>{activity.external_source&&<span>Captured from {relationshipLabel(activity.external_source)}</span>}{activity.contact_id && <span>Contact: {contactById.get(activity.contact_id)?.name ?? activity.contact_id}</span>}{activity.subject && <span>{activity.subject}</span>}{activity.outcome && <span>{activity.outcome}</span>}{activity.details && <p>{activity.details}</p>}{activity.external_url&&<a href={activity.external_url} target="_blank" rel="noreferrer">Open source ↗</a>}</article>) : <span className="company-admin-empty">No outreach or interaction history recorded.</span>}</div>
       </section>
 
       <section className="company-admin-card company-admin-notes-card">
